@@ -109,6 +109,7 @@ void pkgadd::run(int argc, char** argv)
 		cout << "Installation progress: ";
 		pkg_install(o_package, keep_list, non_install_files);
 		cout << ".";
+		pkg_move_metafiles(package.first,package.second);
 		db_add_pkg(package.first, package.second);
 
 		ldconfig();

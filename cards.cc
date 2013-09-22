@@ -177,13 +177,30 @@ void cards::db_convert()
   cerr << packages.size() << " packages written to database" << endl;
 #endif
 }
-
+void cards::pkg_move_metafiles(const string& name, pkginfo_t& info)
+{
+	for (set<string>::iterator i = info.files.begin(); i!=info.files.end();++i) {
+		if ( strncmp(i->c_str(),"install",7) == 0 )
+		{
+			metafiles_list.insert(metafiles_list.end(), *i);
+			info.files.erase(i);
+		}
+	}
+	const string packagedir = root + PKG_DIR ;
+	const string packagenamedir = root + PKG_DIR + "/" + name + " " + info.version;
+	mkdir(packagenamedir.c_str(),0755);
+	if ( metafiles_list.size()>0 )
+	{
+		const string installdir = root + "install";
+		const string metadir = packagenamedir + PKG_INFO;
+		rename( installdir.c_str(), metadir.c_str() );
+	}
+}	 
 void cards::db_add_pkg(const string& name, const pkginfo_t& info)
 {
 	packages[name] = info;
 	const string packagedir = root + PKG_DIR ;
 	const string packagenamedir = root + PKG_DIR + "/" + name + " " + info.version;
-	mkdir(packagenamedir.c_str(),0755);
 	const string fileslist = packagenamedir + PKG_FILES;
 	const string fileslist_new = fileslist + ".imcomplete_transaction";
 	int fd_new = creat(fileslist_new.c_str(),0644);
@@ -232,9 +249,21 @@ void cards::db_rm_pkg_2(const string& name)
 		cout << "rmdir " << packagenamedir << endl;
 #endif
 		unlink(packagenamefile.c_str());
+		const string  packagenamerecept = packagenamedir + PKG_RECEPT;
+		unlink(packagenamerecept.c_str());
+		const string  packagenamereadme = packagenamedir + PKG_README;
+		unlink(packagenamereadme.c_str());
+		const string  packagenamepre = packagenamedir + PKG_PRE_INSTALL;
+		unlink(packagenamepre.c_str());
+		const string  packagenamepost = packagenamedir + PKG_POST_INSTALL;
+		unlink(packagenamepost.c_str());
+		const string  packagenamedirmeta = packagenamedir + PKG_INFO;
+		
+		rmdir(packagenamedirmeta.c_str());
 		rmdir(packagenamedir.c_str());
 
-//		packages.erase(name);
+		
+
 }
 void cards::db_rm_pkg(const string& name)
 {
@@ -694,7 +723,7 @@ void cards::pkg_footprint(string& filename) const
 
 void cards::print_version() const
 {
-	cout << utilname << " (cardss) " << VERSION << endl;
+	cout << utilname << " (cards) " << VERSION << endl;
 }
 
 db_lock::db_lock(const string& root, bool exclusive)

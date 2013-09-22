@@ -39,7 +39,11 @@
 #define PKG_DIR         "var/lib/pkg/DB"
 #define PKG_DB          "var/lib/pkg/db"
 #define PKG_FILES       "/files"
-#define PKG_INFO        "/info"
+#define PKG_INFO        "/meta"
+#define PKG_RECEPT      "/meta/Pkgfile"
+#define PKG_README      "/meta/README"
+#define PKG_PRE_INSTALL "/meta/pre-install"
+#define PKG_POST_INSTALL "/meta/post-install"    
 
 #define PKG_REJECTED    "var/lib/pkg/rejected"
 #define VERSION_DELIM   '#'
@@ -93,6 +97,7 @@ protected:
 	pair<string, pkginfo_t> pkg_open(const string& filename);
 	pair<string, pkginfo_t> pkg_open_2(const string& filename) const;
 	void pkg_install(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
+	void pkg_move_metafiles(const string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
 	void pkg_install_2(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
 	void pkg_footprint(string& filename) const;
 	void ldconfig() const;
@@ -101,6 +106,7 @@ protected:
 	string root;
 	packages_t packages;
 	set<string> set_of_db;
+	set<string> metafiles_list;
 
 	int number_of_files;
 	int number_of_expected_packages;

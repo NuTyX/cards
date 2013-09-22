@@ -31,11 +31,18 @@ or
 $ make DESTDIR=/some/other/path install
 
 
+Converting the database
+-----------------------
+
+To make shure cards find the information about the packages, it's necessary to convert the DB
+
+$ pkginfo -c
+
 Copyright
 ---------
 pkgutils is Copyright (c) 2000-2005 Per Liden and
 Copyright (c) 2006-2013 CRUX team (http://crux.nu)
 Copyright (c) 2013 NuTyX team (http://nutyx.org).
 
-pkgutils is licensed through the GNU General Public License.
+cards is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

@@ -163,6 +163,7 @@ void pkginfo::print_help() const
 	cout << "usage: " << utilname << " [options]" << endl
 	     << "options:" << endl
        << "  -d, --debug                 test the database" << endl
+       << "  -c, --convert               convert the datase from pkgutils format to cards format" << endl 
 	     << "  -i, --installed             list installed packages" << endl
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
