@@ -1,0 +1,41 @@
+
+              cards - Package Management Utilities for NuTyX
+              based on the development of the tool pkgutils
+
+               http://www.fukt.bth.se/~per/pkgutils/
+
+
+Description
+-----------
+cards is a set of utilities (xxx-add, xxx-rm, xxx-info, xxx-mk and xxx-rejmerge),
+which are used for managing software packages in Linux. It was originally developed for
+and used by the CRUX distribution (http://crux.nu). This is a fork of this work for the 
+NuTyX distribution including the handling of the binaries
+
+
+Building and installing
+-----------------------
+ 1. To build the libs
+
+$ make all
+$ make libs
+
+ 2. To build the binaries
+
+$ make
+
+ 3. To install the binaries / the libs
+
+$ make install
+or
+$ make DESTDIR=/some/other/path install
+
+
+Copyright
+---------
+pkgutils is Copyright (c) 2000-2005 Per Liden and
+Copyright (c) 2006-2013 CRUX team (http://crux.nu)
+Copyright (c) 2013 NuTyX team (http://nutyx.org).
+
+pkgutils is licensed through the GNU General Public License.
+Read the COPYING file for the complete license.

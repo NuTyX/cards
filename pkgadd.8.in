@@ -1,0 +1,64 @@
+.TH pkgadd 8 "" "cards #VERSION#" ""
+.SH NAME
+pkgadd \- install software package
+.SH SYNOPSIS
+\fBpkgadd [options] <file>\fP
+.SH DESCRIPTION
+\fBpkgadd\fP is a \fIpackage management\fP utility, which installs
+a software package. A \fIpackage\fP is an archive of files (.pkg.tar.gz).
+.SH OPTIONS
+.TP
+.B "\-u, \-\-upgrade"
+Upgrade/replace package with the same name as <file>.
+.TP
+.B "\-f, \-\-force"
+Force installation, overwrite conflicting files. If the package
+that is about to be installed contains files that are already
+installed this option will cause all those files to be overwritten.
+This option should be used with care, preferably not at all.
+.TP
+.B "\-r, \-\-root <path>"
+Specify alternative installation root (default is "/"). This
+should \fInot\fP be used as a way to install software into
+e.g. /usr/local instead of /usr. Instead this should be used
+if you want to install a package on a temporary mounted partition,
+which is "owned" by another system. By using this option you not only
+specify where the software should be installed, but you also
+specify which package database to use.
+.TP
+.B "\-v, \-\-version"
+Print version and exit.
+.TP
+.B "\-h, \-\-help"
+Print help and exit.
+.SH CONFIGURATION
+\fBpkgadd\fP is configured by the file \fI/etc/pkgadd.conf\fP. This file can contain rules, that are built out of three fragments: \fIevent\fP, \fIpattern\fP and \fIaction\fP. The event describes in what kind of situation this rule applies. Currently there are two types of events: \fBUPGRADE\fP and \fBINSTALL\fP. \fBUPGRADE\fP rules are applied when a package is installed over an existing version, and \fBINSTALL\fP rules are applied in any case. The pattern is a regular expression. The action applicable to both the \fBUPGRADE\fP and \fBINSTALL\fP event is \fBYES\fP and \fBNO\fP. More than one rule of the same
+event type is allowed, in which case the first rule will have the lowest priority and the last rule
+will have the highest priority. Example:
+
+.nf
+UPGRADE         ^etc/.*$                NO
+UPGRADE         ^var/log/.*$            NO
+UPGRADE         ^etc/X11/.*$            YES
+UPGRADE         ^etc/X11/XF86Config$    NO
+.fi
+
+The above example will cause pkgadd to never upgrade anything in /etc/ or /var/log/ (subdirectories included),
+except files in /etc/X11/ (subdirectories included), unless it is the file /etc/X11/XF86Config.
+The default rule is to upgrade/install everything, rules in this file are exceptions to that rule.
+(NOTE! A \fIpattern\fP should never contain an initial "/" since you are referring to the files in the
+package, not the files on the disk.)
+
+If pkgadd finds that a specific file should not be upgraded it will install it under \fI/var/lib/pkg/rejected/\fP.
+The user is then free to examine/use/remove that file manually.
+.SH FILES
+.TP
+.B "/etc/pkgadd.conf"
+Configuration file.
+.SH SEE ALSO
+pkgrm(8), pkginfo(8), pkgmk(8), rejmerge(8)
+.SH COPYRIGHT
+pkgadd (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
+pkgadd (cards) is Copyright (c) 2013 Thierry Nuttens (c) 2013 NuTyX team (http://www.nutyx.org).
+pkgadd (cards) is licensed through the GNU General Public License.
+Read the COPYING file for the complete license.

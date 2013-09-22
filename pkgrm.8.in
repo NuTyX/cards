@@ -1,0 +1,29 @@
+.TH pkgrm 8 "" "cards #VERSION#" ""
+.SH NAME
+pkgrm \- remove software package
+.SH SYNOPSIS
+\fBpkgrm [options] <package>\fP
+.SH DESCRIPTION
+\fBpkgrm\fP is a \fIpackage management\fP utility, which
+removes/uninstalls a previously installed software packages.
+.SH OPTIONS
+.TP
+.B "\-r, \-\-root <path>"
+Specify alternative installation root (default is "/"). This
+should be used if you want to remove a package from a temporary 
+mounted partition, which is "owned" by another system. By using
+this option you not only specify where the software is installed,
+but you also specify which package database to use.
+.TP
+.B "\-v, \-\-version"
+Print version and exit.
+.TP
+.B "\-h, \-\-help"
+Print help and exit.
+.SH SEE ALSO
+pkgadd(8), pkginfo(8), pkgmk(8), rejmerge(8)
+.SH COPYRIGHT
+pkgrm (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
+pkgrm (cards) is Copyright (c) 2013 Thierry Nuttens (c) 2013 NuTyX team (http://www.nutyx.org).
+pkgrm (cards) is licensed through the GNU General Public License.
+Read the COPYING file for the complete license.

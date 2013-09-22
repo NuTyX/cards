@@ -1,0 +1,121 @@
+.TH pkgmk 8 "" "cards #VERSION#" ""
+.SH NOM
+pkgmk \- Construire un paquet
+.SH SYNOPSIS
+\fBpkgmk [options]\fP
+.SH DESCRIPTION
+\fBpkgmk\fP est un utilitaire de \fIgestionnaire de paquets\fP, qui produit un paquet binaire. Un \fIpaquet\fP est une  archive de fichiers (.pkg.tar.gz, .pkg.tar.bz2 or .pkg.tar.xz) pouvant être installée en utilisant pkgadd(8).
+
+Pour pouvoir utiliser pkgmk, vous devez écrire un fichier appelé \fIPkgfile\fP
+qui décrit comment le paquet doit être construit. Une fois le fichier \fIPkgfile\fP créé, chaque fois que vous changez certains fichiers sources, vous exécutez simplement la commande pkgmk pour mettre le paquet à jour. Le programme pkgmk utilise  le fichier \fIPkgfile\fP et la date de la dernière modification des fichiers sources pour décider si le paquet doit être mis à jour. Cette fonctionnalitée est configurable.
+
+La configuration globale de pkgmk est stockée dans le fichier \fI/etc/pkgmk.conf\fP. Ce ficher est lu par pkgmk à son lancement.
+.SH OPTIONS
+.TP
+.B "\-i, \-\-install"
+Installe le paquet en utilisant pkgadd(8) après une construction réussie.
+.TP
+.B "\-u, \-\-upgrade"
+Installe le paquet en le mettant à jour en utilisant  pkgadd(8) après une construction réussie.
+.TP
+.B "\-r, \-\-recursive"
+Cherche et construits les paquets trouvé dans le dossier courant.
+.TP
+.B "\-d, \-\-download"
+Télécharge les fichiers sources manquants.
+.TP
+.B "\-do, \-\-download\-only"
+Ne construit pas, télécharge uniquement les fichiers sources manquants.
+.TP
+.B "\-utd, \-\-up\-to\-date"
+Ne construit pas, vérifie uniquement si le paquet est à jour.
+.TP
+.B "\-uf, \-\-update\-footprint"
+Met à jour la signature footprint et considère la dernière construction comme valable.
+.TP
+.B "\-if, \-\-ignore\-footprint"
+Construit le paquet sans vérifier la signature footprint.
+.TP
+.B "\-in, \-\-ignore\-new"
+Construit le paquet, ignore les nouveaux fichiers trouvés dans une erreur de signature footprint.
+.TP
+.B "\-um, \-\-update\-md5sum"
+Met à jour la somme md5 en utilisant les fichiers sources actuels.
+.TP
+.B "\-im, \-\-ignore\-md5sum"
+Construit le paquet sans vérifier la somme md5 au préalable.
+.TP
+.B "\-ns, \-\-no\-strip"
+Ne supprimes pas les symboles de tests dans les binaires our librairies à la fin de la construction du paquetDo not strip executable binaries or libshtraries.
+.TP
+.B "\-f, \-\-force"
+Construit le paquet même si celui-ci semble être à jour.
+.TP
+.B "\-c, \-\-clean"
+Supprime le paquet binaire (précédement construit) et les fichiers sources téléchargées.
+.TP
+.B "\-kw, \-\-keep-work"
+Conserve le contenu du dossier de travail temporaire.
+.TP
+.B "\-cf, \-\-config\-file <file>"
+Utilise un fichier de configuration alternatif (le défaut étant /etc/pkgmk.conf).
+.TP
+.B "\-v, \-\-version"
+Affiche la version de pkgmk uniquement.
+.TP
+.B "\-h, \-\-help"
+Affiche l'aide.
+.SH FICHIERS
+.TP
+.B "Pkgfile"
+Description de la recette d'un paquet.
+.TP
+.B ".footprint"
+La signature footprint du paquet (used for regression testing).
+.TP
+.B ".md5sum"
+Somme MD5 des fichiers sources.
+.TP
+.B "/etc/pkgmk.conf"
+Fichier global de configuration des paquets.
+.TP
+.B "wget"
+Est utilisé par pkgmk pour télécharger les codes sources.
+.SH CODES DE SORTIE
+.TP
+.B 0
+Aucune erreur de construction.
+.TP
+.B 1
+Une erreur générale s'est produite.
+.TP
+.B 2
+Le fichier Pkgfile est incorrecte.
+.TP
+.B 3
+Les codes sources ou le dossier de construction sont manquants ou il y a un problème d'accès en lecture/écriture.
+.TP
+.B 4
+Une erreur s'est produite durant le téléchargement des fichiers sources.
+.TP
+.B 5
+Une erreur s'est produite pendant l'extraction des fichiers sources.
+.TP
+.B 6
+Une erreur de somme MD5 s'est produite.
+.TP
+.B 7
+Une erreur de signature footprint s'est produite.
+.TP
+.B 8
+Une erreur s'est produite pendant la construction du paquet.
+.TP
+.B 9
+Une erreur s'est produite durant l'installation du paquet  via pkgadd.
+.SH VOIR AUSSI
+pkgmk.conf(5), pkgadd(8), pkgrm(8), pkginfo(8), rejmerge(8), wget(1)
+.SH COPYRIGHT
+pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2010 CRUX team (http://crux.nu).
+pkgmk (cards) is Copyright (c) 2013 NuTyX and Copyright (c) 2013 NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is licensed through the GNU General Public License.
+Read the COPYING file for the complete license.

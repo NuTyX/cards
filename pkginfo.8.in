@@ -1,0 +1,43 @@
+.TH pkginfo 8 "" "cards #VERSION#" ""
+.SH NAME
+pkginfo \- display software package information
+.SH SYNOPSIS
+\fBpkginfo [options]\fP
+.SH DESCRIPTION
+\fBpkginfo\fP is a \fIpackage management\fP utility, which displays
+information about software packages that are installed on the system
+or that reside in a particular directory.
+.SH OPTIONS
+.TP
+.B "\-i, \-\-installed"
+List installed packages and their version.
+.TP
+.B "\-l, \-\-list <package|file>"
+List files owned by the specified <package> or contained in <file>.
+.TP
+.B "\-o, \-\-owner <pattern>"
+List owner(s) of file(s) matching <pattern>.
+.TP
+.B "\-f, \-\-footprint <file>"
+Print footprint for <file>. This feature is mainly used by pkgmk(8)
+for creating and comparing footprints.
+.TP
+.B "\-r, \-\-root <path>"
+Specify alternative installation root (default is "/"). This
+should be used if you want to display information about a package
+that is installed on a temporary mounted partition, which is "owned"
+by another system. By using this option you specify which package
+database to use.
+.TP
+.B "\-v, \-\-version"
+Print version and exit.
+.TP
+.B "\-h, \-\-help"
+Print help and exit.
+.SH SEE ALSO
+pkgadd(8), pkgrm(8), pkgmk(8), rejmerge(8)
+.SH COPYRIGHT
+pkginfo (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
+pkginfo (cards) is Copyright (c) 2013 Thierry Nuttens (c) 2013 NuTyX team (http://www.nutyx.org).
+pkginfo (cards) is licensed through the GNU General Public License.
+Read the COPYING file for the complete license.

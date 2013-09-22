@@ -1,0 +1,42 @@
+.TH pkg-repgen 8 "" "cards #VERSION#" ""
+.SH NAME
+\fBpkg-repgen \fP- Génère un dépot de paquets binaires pour le gestionnaire de paquets pkg-get
+\fB
+.SH SYNOPSIS
+.nf
+.fam C
+\fBpkg-repgen\fP [options][paquet11\.\.\.paquetN] 
+.fam T
+.fi
+.SH DESCRIPTION
+\fBpkg-repgen\fP génère les fichiers utilisé par un dépot de paquets \fBpkg-get\fP(8) 
+repository. Elle génère également un index format html des paquets trouvés.
+.SH USAGE
+Lancez \fBpkg-repgen\fP depuis le dossier contenant les paquets binaires pour générer le dépot complet.
+Spcifiez une liste de noms de paquets pour mettre à jour uniquement ces paquets (très utile dans le cas de gros dépots)..
+Notez que l'index html n'est pas mis à jour lorsque les paquets sont spécifiés.
+.SH OPTIONS
+.TP
+.B
+\fB--header\fP=FILE
+Insert le FILE au début de l'index html.
+.TP
+\fB--footer\fP=FILE
+Insert le FILE à la fin de l'index html.
+.TP
+.B
+\fB--title\fP=title
+Utilise le titre spécifé pour l'index de la page.
+.SH EXEMPLES
+\fBpkg-repgen\fP
+.PP
+\fBpkg-repgen\fP kdebase kdelibs
+.SH AUTHEURS
+Simone Rota <sip@varlock.com>
+Thierry Nuttens <thierryn1@hispeed.ch>
+Le code de la génération d'index adapté du portage de Jukka Heino
+.SH VOIR AUSSI
+\fBpkg-get help\fP, \fBprt-get\fP(8)
+.SH
+pkg-repgen (cards) is Copyright (c) 2010-2013 Thierry Nuttens (c) 2010-2013 NuTyX team (http://www.nutyx.org).
+Read the COPYING file for the complete license.

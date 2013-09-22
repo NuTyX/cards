@@ -1,0 +1,107 @@
+.TH pkgmk.conf 5 "" "cards #VERSION#" ""
+.SH NAME
+\fBpkgmk.conf\fP \- Fichier de configuration pour pkgmk.
+.SH DESCRIPTION
+\fBpkgmk.conf\fP Configure l'utilitaire pkgmk(8) pour la construction des paquets binaires.
+.SH FORMAT DU FICHIER
+Le fichier consiste en un nombre de variables dont la forme d'assignation est la suivante \fBoption\fP=\fBvalue\fP. Des commentaires peuvent être ajoutés en spécifiant un dièse (#) comme premier caractère sur la ligne.
+.SH DIRECTIVES
+.LP
+Si certaines options ne sont pas utilisées (commentée ou pas incluses dans le fichier de configuration) pkgmk utilisera l'action par défaut.
+.TP
+\fBexport CFLAGS='STRING'\fP
+Configure les options du compilateur C.
+.br
+Défaut: rien
+.TP
+\fBexport CXXFLAGS='STRING'\fP
+Configure les options du compilateur C++.
+.br
+Défaut: rien
+.TP
+\fBPKGMK_SOURCE_MIRRORS=('STRING')\fP
+Défini les mirroirs url à vérifier et à utiliser pour télécharger les archives sources.
+.br
+Défaut: rien
+.TP
+\fBPKGMK_SOURCE_DIR='STRING'\fP
+Défini le dossier pour le stockage des archives sources.
+.br
+Défaut: dossier de Pkgfile.
+.TP
+\fBPKGMK_PACKAGE_DIR='STRING'\fR
+Défini le dossier de destination du paquet.
+.br
+Défaut: dossier /srv/NuTyX/release.
+.TP
+\fBPKGMK_WORK_DIR='STRING'\fP
+Défini le dossier pour la construction des paquets.
+.br
+Défaut: '\fBfoo\fP/work', où \fBfoo\fP est le dossier du Pkgfile.
+.TP
+\fBPKGMK_WGET_OPTS='STRING'\fP
+Options additionnelles pour wget(1), qui est utilisée par pkgmk pkgmk pour télécharger tous les fichiers.
+.br
+.TP
+\fBPKGMK_DOWNLOAD='STRING'\fP
+Si défini comme 'yes', pkgmk va télécharger les sources si necessaire.
+.br
+Défaul: 'no'
+.TP
+\fBPKGMK_IGNORE_FOOTPRINT='STRING'\fP
+Si défini comme 'yes', pkgmk ne vérifiera pas la signature footprint du paquet construit.
+.br
+Défaut: 'no'
+.TP
+\fBPKGMK_IGNORE_NEW='STRING'\fP
+Si défini comme 'yes', pkgmk ignore les nouveaux fichiers trouvés dans la signature footprint.
+.br
+Défaut: 'no'
+.TP
+\fBPKGMK_NO_STRIP='STRING'\fP
+Si défini comme 'no', pkgmk va supprimé les symboles de test dans les paquets binaires.
+.br
+Défaut: 'no'
+.TP
+\fBPKGMK_COMPRESSION_MODE='STRING'\fP
+Option pour sélectionner le mode de compression des paquets binaires. Valeurs de chaîne possibles sont: gz, bz2 et xz.
+.br
+Défaut: 'xz'
+.TP
+\fBPKGMK_LOG_DIR='STRING'\fP
+Défini le dossier pour les logs de contruction des paquets.
+.br
+Défaut:
+.TP
+\fBPKGMK_KEEP_SOURCES='STRING'\fP
+Si défini comme 'yes', pkgmk garde les sources du paquet dans tous les cas, si 'no' ceux-ci sont supprimés après une construction réussie.
+.br
+Défaut: 'no'
+
+.TP
+\fBPKGMK_CHECK_FILES='STRING'\fP
+Si défini comme 'yes', pkgmk vérifie la présence des sources et la date de modification du Pkgfile, si celle-ci est plus récente, le paquet sera recompilé
+.br
+Défaut: 'no'
+.TP
+\fBPKGMK_CLEAN_OLD='STRING'\fP
+Si défini comme 'yes', pkgmk supprime les anciens paquets avant de produire le(s) nouveau(x) et ce après une construction réussie.
+.br
+Défaut: 'yes'
+.TP
+\fBPKGMK_DOWNLOAD_BIN='STRING'\fP
+Si défini comme 'yes', pkgmk utilise le paquet déjà disponible sur le mirroir défini dans le fichier \fI/etc/pkg-get.conf\fP. Si le binaire est disponible, il sera donc téléchargé et le paquet binaire ne devra pas être compilé.
+.br
+Défaut: 'no'
+.TP
+\fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
+Si défini, pkgmk fera une tentative de séparation du paquet produit en sous groupes. Chaque groupe étant défini dans cette variable. Une fonction par défaut est exécutée si cette même fonction n'est pas trouvée dans le Pkgfile. (EXPERIMENTAL)
+.br
+Défaut: '(lib devel man doc)'
+.SH VOIR AUSSI
+pkgmk(8)
+.SH COPYRIGHT
+pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2010 CRUX team (http://crux.nu).
+pkgmk (cards) 2013 Thierry Nuttens NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is licensed through the GNU General Public License.
+Read the COPYING file for the complete license.

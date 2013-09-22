@@ -1,0 +1,92 @@
+#!/bin/bash
+#
+#  cards
+#
+#  Copyright (c) 2007-2013 by NuTyX team (http://nutyx.org)
+
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+#  USA.
+#
+
+source /etc/pkgmk.conf
+if [ $# -lt 1 ]; then
+        echo 1>&2
+        echo 1>&2 'Usage: ADD <Package> (ADD kde par exemple)'
+        echo 1>&2
+        exit 1
+fi
+erreur_deps(){
+echo "Erreur de dépendances"
+exit 1
+}
+erreur() {
+echo "Erreur de compilation"
+exit 1
+}
+DRY=false
+UPDATE_FOOTPRINT=false
+UPDATE_MD5SUM=false
+if [ "$2" == "--dry" ];then
+        DRY=true
+fi
+if [ "$2" == "-uf" ]; then
+	UPDATE_FOOTPRINT=true
+fi
+if [ "$2" == "-um" ]; then
+   UPDATE_MD5SUM=true
+fi
+if [ $UPDATE_FOOTPRINT == true ]; then
+        cd `prt-get info $1|grep Path|cut -d ":" -f2`/$1
+        pkgmk -uf
+        exit 0
+fi
+if [ $UPDATE_MD5SUM == true ];then
+			cd `prt-get info $1|grep Path|cut -d ":" -f2`/$1
+			pkgmk -um
+			exit 0
+fi
+TMP=`mktemp -d`
+prt-get depends --all $1|cut -d "]" -f 2|sed "/installed/d" > $TMP/list
+if grep "missing packages" $TMP/list ; then
+        erreur_deps
+fi
+# On supprime la dernière ligne cad le paquet passé en argument que l'on veut contruire
+LINE=`wc -l $TMP/list|cut -d " " -f1`
+sed -i "${LINE}d" $TMP/list
+
+for i in `cat $TMP/list`
+do
+        cd `prt-get info $i|grep Path|cut -d ":" -f2`/$i
+        if [ -a pre-install ]; then sh pre-install ; fi
+        pkgmk -d -i
+        if [ -a post-install ]; then sh post-install ; fi
+done
+if [ $DRY == true ]; then 
+	exit 0
+fi
+# Construction effective du paquet
+if [ $DRY == false ]; then
+        cd `prt-get info $1|grep Path|cut -d ":" -f2`/$1
+        # rm ${PKGMK_PACKAGE_DIR}/$1#*
+        # Si le paquet fait partie de la base, ce sera une maj sinon une install
+        if [ ! "`pkginfo -i|grep ^$1\ `" == "" ];then
+		prt-get update $1 >> /dev/null || erreur
+        else
+		prt-get install $1  > /dev/null || erreur
+        fi
+fi
+rm -r $TMP
+
+# End of file

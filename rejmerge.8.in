@@ -1,0 +1,79 @@
+.TH rejmerge 8 "" "cards #VERSION#" ""
+.SH NAME
+rejmerge \- merge files that were rejected during package upgrades
+.SH SYNOPSIS
+\fBrejmerge [options]\fP
+.SH DESCRIPTION
+\fBrejmerge\fP is a \fIpackage management\fP utility that helps you merge files that were rejected
+during package upgrades. For each rejected file found in \fI/var/lib/pkg/rejected/\fP, \fBrejmerge\fP
+will display the difference between the installed version and the rejected version. The user can then
+choose to keep the installed version, upgrade to the rejected version or perform a merge of the two.
+
+.SH OPTIONS
+.TP
+.B "\-r, \-\-root <path>"
+Specify alternative root (default is "/"). This should be used
+if you want to merge rejected files on a temporary mounted partition,
+which is "owned" by another system.
+.TP
+.B "\-v, \-\-version"
+Print version and exit.
+.TP
+.B "\-h, \-\-help"
+Print help and exit.
+.SH CONFIGURATION
+When \fBrejmerge\fP is started it will source \fI/etc/rejmerge.conf\fP.
+This file can be used to alter the way \fBrejmerge\fP displays file differences and performs file
+merges. Changing the default behaviour is done by re-defining the shell functions \fBrejmerge_diff()\fP
+and/or \fBrejmerge_merge()\fP.
+.TP
+.B rejmerge_diff()
+This function is executed once for each rejected file. Arguments \fB$1\fP and \fB$2\fP contain the paths
+to the installed and rejected files. Argument \fB$3\fP contains the path to a temporary file where this
+function should write its result. The contents of the temporary file will later be presented to the user
+as the difference between the two files.
+.TP
+.B rejmerge_merge()
+This function is executed when the user chooses to merge two files. Arguments \fB$1\fP and \fB$2\fP
+contain the paths to the installed and rejected files. Argument \fB$3\fP contains the path to a temporary
+file where this function should write its result. The contents of the temporary file will later be
+presented to the user as the merge result.
+This function also has the option to set the variable \fB$REJMERGE_MERGE_INFO\fP. The contents of this
+variable will be displayed as informational text after a merge has been performed. Its purpose is to provide
+information about the merge, e.g. "5 merge conflicts found".
+
+.PP
+Example:
+
+.nf
+#
+# /etc/rejmerge.conf: rejmerge(8) configuration
+#
+
+rejmerge_diff() {
+	# Use diff(1) to produce side-by-side output
+	diff -y $1 $2 > $3
+}
+
+rejmerge_merge() {
+	# Use sdiff(1) to merge
+	sdiff -o $3 $1 $2
+}
+
+# End of file
+.fi
+
+.SH FILES
+.TP
+.B "/etc/rejmerge.conf"
+Configuration file.
+.TP
+.B "/var/lib/pkg/rejected/"
+Directory where rejected files are stored.
+.SH SEE ALSO
+pkgadd(8), pkgrm(8), pkginfo(8), pkgmk(8)
+.SH COPYRIGHT
+rejmerge (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
+rejmerge (cards) 2013 Thierry Nuttens NuTyX team (http://www.nutyx.org).
+rejmerge (cards) is licensed through the GNU General Public License.
+Read the COPYING file for the complete license.

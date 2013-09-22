@@ -1,0 +1,111 @@
+.TH pkgmk.conf 5 "" "cards #VERSION#" ""
+.SH NAME
+\fBpkgmk.conf\fP \- Configuration file for pkgmk.
+.SH DESCRIPTION
+\fBpkgmk.conf\fP configures pkgutils package make, pkgmk(8).
+.SH FILE FORMAT
+The file consists of a number of variable assignments of the form \fBoption\fP=\fBvalue\fP. Comments can be specified by putting a hash (#) symbol as the first character on the line.
+.SH DIRECTIVES
+.LP
+If some option is not used (commented out or not included in the configuration file at all) pkgmk will take a default action.
+.TP
+\fBexport CFLAGS='STRING'\fP
+Set C compiler options.
+.br
+Default: none
+.TP
+\fBexport CXXFLAGS='STRING'\fP
+Set C++ compiler options.
+.br
+Default: none
+.TP
+\fBexport MAKEFLAGS='STRING'\fP
+Set make options.
+.br
+Default: none
+.TP
+\fBPKGMK_SOURCE_MIRRORS=('STRING')\fP
+Set mirrors to check and download source archives from.
+.br
+Default: none
+.TP
+\fBPKGMK_SOURCE_DIR='STRING'\fP
+Set directory for downloaded source archives.
+.br
+Default: directory of Pkgfile.
+.TP
+\fBPKGMK_PACKAGE_DIR='STRING'\fR
+Set directory for built packages.
+.br
+Default: directory of Pkgfile.
+.TP
+\fBPKGMK_WORK_DIR='STRING'\fP
+Set directory for building packages.
+.br
+Default: '\fBfoo\fP/work', where \fBfoo\fP is the directory of the Pkgfile.
+.TP
+\fBPKGMK_WGET_OPTS='STRING'\fP
+Additional options for wget(1), which is used by pkgmk to download all files.
+.br
+.TP
+\fBPKGMK_DOWNLOAD='STRING'\fP
+If set to 'yes', pkgmk will download the source archives if necessary.
+.br
+Default: 'no'
+.TP
+\fBPKGMK_IGNORE_FOOTPRINT='STRING'\fP
+If set to 'yes', pkgmk will not perform a footprint check of the built package.
+.br
+Default: 'no'
+.TP
+\fBPKGMK_IGNORE_NEW='STRING'\fP
+If set to 'yes', pkgmk will ignore new files in a footprint mismatch.
+.br
+Default: 'no'
+.TP
+\fBPKGMK_NO_STRIP='STRING'\fP
+If set to 'no', pkgmk will strip built binaries.
+.br
+Default: 'no'
+.TP
+\fBPKGMK_COMPRESSION_MODE='STRING'\fP
+Option to select the mode used to compress the packages. Valid strings are gz, bz2 and xz.
+.br
+Default: 'xz'
+.TP
+\fBPKGMK_LOG_DIR='STRING'\fP
+Define the log folder of the build.
+.br
+Default: '/var/log/pkgbuild'
+.TP
+\fBPKGMK_KEEP_SOURCES='STRING'\fP
+If set to 'yes', pkgmk will keep the sources codes of the build. If 'no', they will be delete after a successfull build.
+.br
+Default: 'no'
+.TP
+\fBPKGMK_CHECK_FILES='STRING'\fP
+If set to 'yes', pkgmk verify availability of the sources and the modification date of the file Pkgfile, if it's more recent, the build will be redone.
+.br
+Default: 'no'
+.TP
+\fBPKGMK_CLEAN_OLD='STRING'\fP
+If set to 'yes', pkgmk will delete any version of the package before producing the new(s) one(s) after a successfull build.
+.br
+Default: 'yes'
+.TP
+\fBPKGMK_DOWNLOAD_BIN='STRING'\fP
+If set to 'yes', pkgmk will try to download and install the available package from the mirror define in \fI/etc/pkg-get.conf\fP. If the binary is available, it will then be download and the package(s) will not be compiled.
+.br
+Default: 'no'
+.TP
+\fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
+If set, pkgmk will try to split the produced package into groups. Each group is define in this variable. A default function is executed if this same function is not found in the Pkgfile. (EXPERIMENTAL)
+.br
+Default: '(lib devel man doc)'
+.SH SEE ALSO
+pkgmk(8)
+.SH COPYRIGHT
+pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
+pkgmk (cards) is Copyright (c) 2013 Thierry Nuttens (c) 2013 NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is licensed through the GNU General Public License.
+Read the COPYING file for the complete license.

@@ -1,0 +1,128 @@
+.TH pkgmk 8 "" "cards #VERSION#" ""
+.SH NAME
+pkgmk \- make software package
+.SH SYNOPSIS
+\fBpkgmk [options]\fP
+.SH DESCRIPTION
+\fBpkgmk\fP is a \fIpackage management\fP utility, which makes
+a software package. A \fIpackage\fP is an archive of files (.pkg.tar.gz, .pkg.tar.bz2 or .pkg.tar.xz)
+that can be installed using pkgadd(8).
+
+To prepare to use pkgmk, you must write a file named \fIPkgfile\fP
+that describes how the package should be build. Once a suitable
+\fIPkgfile\fP file exists, each time you change some source files,
+you simply execute pkgmk to bring the package up to date. The pkgmk
+program uses the \fIPkgfile\fP file and the last-modification
+times of the source files to decide if the package needs to be updated.
+
+Global build configuration is stored in \fI/etc/pkgmk.conf\fP. This
+file is read by pkgmk at startup.
+.SH OPTIONS
+.TP
+.B "\-i, \-\-install"
+Install package using pkgadd(8) after successful build.
+.TP
+.B "\-u, \-\-upgrade"
+Install package as an upgrade using pkgadd(8) after successful build.
+.TP
+.B "\-r, \-\-recursive"
+Search for and build packages recursively.
+.TP
+.B "\-d, \-\-download"
+Download missing source file(s).
+.TP
+.B "\-do, \-\-download\-only"
+Do not build, only download missing source file(s).
+.TP
+.B "\-utd, \-\-up\-to\-date"
+Do not build, only check if the package is up to date.
+.TP
+.B "\-uf, \-\-update\-footprint"
+Update footprint and treat last build as successful.
+.TP
+.B "\-if, \-\-ignore\-footprint"
+Build package without checking footprint.
+.TP
+.B "\-in, \-\-ignore\-new"
+Build package, ignore new files in a footprint mismatch.
+.TP
+.B "\-um, \-\-update\-md5sum"
+Update md5sum using the current source files.
+.TP
+.B "\-im, \-\-ignore\-md5sum"
+Build package without checking md5sum first.
+.TP
+.B "\-ns, \-\-no\-strip"
+Do not strip executable binaries or libraries.
+.TP
+.B "\-f, \-\-force"
+Build package even if it appears to be up to date.
+.TP
+.B "\-c, \-\-clean"
+Remove the (previously built) package and the downloaded source files.
+.TP
+.B "\-kw, \-\-keep-work"
+Keep temporary working directory.
+.TP
+.B "\-cf, \-\-config\-file <file>"
+Use alternative configuration file (default is /etc/pkgmk.conf).
+.TP
+.B "\-v, \-\-version"
+Print version and exit.
+.TP
+.B "\-h, \-\-help"
+Print help and exit.
+.SH FILES
+.TP
+.B "Pkgfile"
+Package build description.
+.TP
+.B ".footprint"
+Package footprint (used for regression testing).
+.TP
+.B ".md5sum"
+MD5 checksum of source files.
+.TP
+.B "/etc/pkgmk.conf"
+Global package make configuration.
+.TP
+.B "wget"
+Used by pkgmk to download source code.
+.SH EXIT CODES
+.TP
+.B 0
+No error occured.
+.TP
+.B 1
+A general error has occured.
+.TP
+.B 2
+The Pkgfile is invalid.
+.TP
+.B 3
+The source or build directory is missing or is lacking read/write permissions.
+.TP
+.B 4
+An error occured during the download of source files.
+.TP
+.B 5
+An error occured during unpacking of source files.
+.TP
+.B 6
+An md5sum mismatch occured.
+.TP
+.B 7
+A footprint mismatch occured.
+.TP
+.B 8
+An error occured while running the build function.
+.TP
+.B 9
+An error occured while installing the package via pkgadd.
+.SH SEE ALSO
+pkgmk.conf(5), pkgadd(8), pkgrm(8), pkginfo(8), rejmerge(8), wget(1)
+.SH COPYRIGHT
+pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
+pkgmk (cards) is Copyright (c) 2013 NuTyX and Copyright (c) 2013 NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is licensed through the GNU General Public License.
+Read the COPYING file for the complete license.
