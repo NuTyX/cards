@@ -650,7 +650,7 @@ clean() {
 	done
 }
 clean_old() {
-	find $PKGMK_PACKAGE_DIR/$name#*.pkg.tar.* -exec rm -v {} \; 2> /dev/null
+	find $PKGMK_PACKAGE_DIR/$name*#*.pkg.tar.* -exec rm -v {} \; 2> /dev/null
 }
 update_footprint() {
 	if [ -z $TARGETS ]; then

@@ -34,24 +34,24 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-#define PKG_EXT         ".pkg.tar."
-#define PKG_DIR_OLD     "var/lib/pkg"
-#define PKG_DIR         "var/lib/pkg/DB"
-#define PKG_DB          "var/lib/pkg/db"
-#define PKG_FILES       "/files"
-#define PKG_INFO        "/meta"
-#define PKG_RECEPT      "/meta/Pkgfile"
-#define PKG_README      "/meta/README"
-#define PKG_PRE_INSTALL "/meta/pre-install"
-#define PKG_POST_INSTALL "/meta/post-install"    
+#define PKG_EXT          ".pkg.tar."
+#define PKG_DIR_OLD      "var/lib/pkg"
+#define PKG_DIR          "var/lib/pkg/DB"
+#define PKG_DB           "var/lib/pkg/db"
+#define PKG_FILES        "/files"
+#define PKG_INSTALL_DIR  "install"
+#define PKG_RECEPT       "/Pkgfile"
+#define PKG_README       "/README"
+#define PKG_PRE_INSTALL  "/pre-install"
+#define PKG_POST_INSTALL "/post-install"    
 
-#define PKG_REJECTED    "var/lib/pkg/rejected"
-#define VERSION_DELIM   '#'
-#define GROUP_DELIM     '#'
-#define NAME_DELIM			' '
+#define PKG_REJECTED     "var/lib/pkg/rejected"
+#define VERSION_DELIM    '#'
+#define GROUP_DELIM      '#'
+#define NAME_DELIM			 ' '
 
-#define LDCONFIG        "/sbin/ldconfig"
-#define LDCONFIG_CONF   "/etc/ld.so.conf"
+#define LDCONFIG         "/sbin/ldconfig"
+#define LDCONFIG_CONF    "/etc/ld.so.conf"
 
 using namespace std;
 
@@ -59,7 +59,6 @@ class cards {
 public:
 	struct pkginfo_t {
 		string version;
-		string description;
 		set<string> files;
 	};
 
@@ -82,9 +81,13 @@ protected:
 	void db_add_pkg_2(const string& name, const pkginfo_t& info);
 	bool db_find_pkg(const string& name);
 	bool db_find_pkg_2(const string& name);	
-	void db_rm_pkg(const string& name);
+	/* Remove the physical files after followings some rules */
+	void rm_pkg_files(const string& name);
+	
 	void db_rm_pkg(const string& name, const set<string>& keep_list);
-	void db_rm_pkg_2(const string& name);
+
+	/* Remove meta data about the removed package */
+	void db_rm_pkg(const string& name);
 	void db_rm_pkg_2(const string& name, const set<string>& keep_list);
 	void db_rm_files(set<string> files, const set<string>& keep_list);
 	set<string> db_find_conflicts(const string& name, const pkginfo_t& info);
@@ -109,7 +112,6 @@ protected:
 	set<string> metafiles_list;
 
 	int number_of_files;
-	int number_of_expected_packages;
 };
 
 class db_lock {
@@ -139,6 +141,7 @@ bool file_empty(const string& filename);
 bool file_equal(const string& file1, const string& file2);
 bool permissions_equal(const string& file1, const string& file2);
 void file_remove(const string& basedir, const string& filename);
+set<string>  file_find(const string& basedir);
 void advance_cursor();
 #endif /* CARDS_H */
 // vim:set ts=2 :

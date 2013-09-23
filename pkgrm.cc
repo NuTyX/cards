@@ -65,10 +65,10 @@ void pkgrm::run(int argc, char** argv)
 
 		if (!db_find_pkg(o_package))
 			throw runtime_error("package " + o_package + " not installed");
-		// Remove folder about info of the package
-		db_rm_pkg_2(o_package);
-		// Remove files on hd
+		// Remove metadata about the package removed 
 		db_rm_pkg(o_package);
+		// Remove the files on hd
+		rm_pkg_files(o_package);
 		ldconfig();
 		cout << endl;
 	}

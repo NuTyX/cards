@@ -71,33 +71,19 @@ int cards::list_pkg (const string& path) // return the number of db files founds
 {
 	root = trim_filename(path + "/");
 	const string pathdb =  root + PKG_DIR;
-  int i = 0;
-  DIR *d;
-  struct dirent *dir;
-  d = opendir(pathdb.c_str());
-  if (d)
-  {
-    while ((dir = readdir(d)) != NULL)
-    {
-      if ( strcmp (dir->d_name, ".") && strcmp (dir->d_name, "..") ) // ignore the directories dots
-        set_of_db.insert(dir->d_name);
-        ++i;
-    }
-    closedir(d);
-  }
-	number_of_expected_packages = i ;
+	set_of_db = file_find(pathdb);
 #ifndef NDEBUG
-  cerr << "Number of Packages: " << i << endl;
+  cerr << "Number of Packages: " << set_of_db.size() << endl;
 #endif
-  return i;
+  return set_of_db.size();
 }
 
 void cards::db_open_2()
 {
 	int j = 0;
 	for (set<string>::iterator i = set_of_db.begin();i != set_of_db.end();++i) {
-		if ( number_of_expected_packages > 100 )
-			printf("%3d%%\b\b\b\b", j / ( number_of_expected_packages / 100 ));		
+		if ( set_of_db.size() > 100 )
+			printf("%3d%%\b\b\b\b", j / ( set_of_db.size() / 100 ));		
 		pkginfo_t info;
 		string name(*i,0, i->find(NAME_DELIM));
 		string version = *i;
@@ -180,7 +166,7 @@ void cards::db_convert()
 void cards::pkg_move_metafiles(const string& name, pkginfo_t& info)
 {
 	for (set<string>::iterator i = info.files.begin(); i!=info.files.end();++i) {
-		if ( strncmp(i->c_str(),"install",7) == 0 )
+		if ( strncmp(i->c_str(),PKG_INSTALL_DIR,7) == 0 )
 		{
 			metafiles_list.insert(metafiles_list.end(), *i);
 			info.files.erase(i);
@@ -188,12 +174,13 @@ void cards::pkg_move_metafiles(const string& name, pkginfo_t& info)
 	}
 	const string packagedir = root + PKG_DIR ;
 	const string packagenamedir = root + PKG_DIR + "/" + name + " " + info.version;
+	
 	mkdir(packagenamedir.c_str(),0755);
 	if ( metafiles_list.size()>0 )
 	{
-		const string installdir = root + "install";
-		const string metadir = packagenamedir + PKG_INFO;
-		rename( installdir.c_str(), metadir.c_str() );
+		const string installdir = root + PKG_INSTALL_DIR;
+//		const string metadir = packagenamedir + PKG_INFO;
+		rename( installdir.c_str(), packagenamedir.c_str() );
 	}
 }	 
 void cards::db_add_pkg(const string& name, const pkginfo_t& info)
@@ -237,35 +224,29 @@ bool cards::db_find_pkg(const string& name)
 	return (packages.find(name) != packages.end());
 }
 
-void cards::db_rm_pkg_2(const string& name)
+/* Remove meta data about the removed package */
+void cards::db_rm_pkg(const string& name)
 {
  	  const string packagedir = root + PKG_DIR ;
 		const string version = packages[name].version;
   	const string packagenamedir = root + PKG_DIR + "/" + name + " " + version;
-		const string  packagenamefile = packagenamedir + PKG_FILES;
+		metafiles_list = file_find( packagenamedir);
+		if (metafiles_list.size() > 0)
+			for (set<string>::iterator i = metafiles_list.begin(); i != metafiles_list.end();++i) {
+				const string filename = packagenamedir +"/" + *i;
+				if (file_exists(filename) && remove(filename.c_str()) == -1) {
+					const char* msg = strerror(errno);
+					cerr << utilname << ": could not remove " << filename << ": " << msg << endl;
+				}
 #ifndef NDEBUG
-		
-		cout << "version: " << version << endl;
-		cout << "rmdir " << packagenamedir << endl;
+				cout << endl << file ;
 #endif
-		unlink(packagenamefile.c_str());
-		const string  packagenamerecept = packagenamedir + PKG_RECEPT;
-		unlink(packagenamerecept.c_str());
-		const string  packagenamereadme = packagenamedir + PKG_README;
-		unlink(packagenamereadme.c_str());
-		const string  packagenamepre = packagenamedir + PKG_PRE_INSTALL;
-		unlink(packagenamepre.c_str());
-		const string  packagenamepost = packagenamedir + PKG_POST_INSTALL;
-		unlink(packagenamepost.c_str());
-		const string  packagenamedirmeta = packagenamedir + PKG_INFO;
-		
-		rmdir(packagenamedirmeta.c_str());
-		rmdir(packagenamedir.c_str());
-
-		
-
+			}
+		remove(packagenamedir.c_str());
 }
-void cards::db_rm_pkg(const string& name)
+
+/* Remove the physical files after followings some rules */
+void cards::rm_pkg_files(const string& name)
 {
 	set<string> files = packages[name].files;
 	packages.erase(name);
@@ -287,7 +268,7 @@ void cards::db_rm_pkg(const string& name)
 	cerr << endl;
 #endif
 
-	// Delete the files
+	// Delete the files from bottom to up to make shure we delete the contents of any folder before
 	for (set<string>::const_reverse_iterator i = files.rbegin(); i != files.rend(); ++i) {
 		const string filename = root + *i;
 		if (file_exists(filename) && remove(filename.c_str()) == -1) {
@@ -1018,6 +999,23 @@ void file_remove(const string& basedir, const string& filename)
 		file_remove(basedir, dirname(path));
 		free(path);
 	}
+}
+set<string> file_find(const string& path)
+{
+	set<string> files_list;
+	DIR *d;
+	struct dirent *dir;
+	d = opendir(path.c_str());
+	if (d)
+	{
+		while ((dir = readdir(d)) != NULL)
+		{
+		if ( strcmp (dir->d_name, ".") && strcmp (dir->d_name, "..") ) // ignore the directories dots
+        files_list.insert(dir->d_name);
+    }
+    closedir(d);
+  }
+  return files_list;
 }
 
 void advance_cursor() {
