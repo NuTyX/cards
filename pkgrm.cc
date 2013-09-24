@@ -23,6 +23,7 @@
 
 #include "pkgrm.h"
 #include <unistd.h>
+#include <stdio.h>
 
 void pkgrm::run(int argc, char** argv)
 {
@@ -47,33 +48,74 @@ void pkgrm::run(int argc, char** argv)
 
 	if (o_package.empty())
 		throw runtime_error("option missing");
-
-	//
+	
 	// Check UID
-	//
 	if (getuid())
 		throw runtime_error("only root can remove packages");
 
-	//
 	// Remove package
-	//
 	{
 		db_lock lock(o_root, true);
+
+		// Get the list of installed packages
 		list_pkg(o_root);
-		cout << "Retrieve files from each packages: " ;
+
+		// Retrieve info about all the packages
 		db_open_2();
 
 		if (!db_find_pkg(o_package))
 			throw runtime_error("package " + o_package + " not installed");
+
 		// Remove metadata about the package removed 
 		db_rm_pkg(o_package);
+
 		// Remove the files on hd
 		rm_pkg_files(o_package);
 		ldconfig();
-		cout << endl;
 	}
 }
+void pkgrm::progress() const
+{
+	static int j = 0;
+	int i;
+	switch ( actual_action )
+	{
+		case DB_OPEN_START:
+			cout << "Retrieve info about the " << set_of_db.size() << " packages: ";
+			break;
 
+		case DB_OPEN_RUN:
+			if ( set_of_db.size()>100)
+			{
+				i = j / ( set_of_db.size() / 100);
+				printf("%3d%%\b\b\b\b",i);
+			}
+			j++;
+			break;
+    
+		case DB_OPEN_END:
+			printf("100 %%\n");
+      break;
+
+		case RM_PKG_FILES_START:
+			j=0;
+			cout << "Removing " << files.size() << " files: ";
+			break;
+
+		case RM_PKG_FILES_RUN:
+			if ( files.size()>100)
+			{
+				i = j / ( files.size() / 100);
+				printf("%3d%%\b\b\b\b",i);
+			}
+			j++;
+			break;
+
+		case RM_PKG_FILES_END:
+			printf("100 %%\n");
+			break;
+	}
+}
 void pkgrm::print_help() const
 {
 	cout << "usage: " << utilname << " [options] <package>" << endl

@@ -70,13 +70,12 @@ void pkgadd::run(int argc, char** argv)
 	{
 		db_lock lock(o_root, true);
 		list_pkg(o_root);
-		cout << "Retrieve files from each packages: ";
+		//Retrieving info about all the packages
 		db_open_2();
-		cout << ". ";
-
-		cout << "Reading from the archiving: ";
+		// Reading the archiving to find a list of files
 		pair<string, pkginfo_t> package = pkg_open(o_package);
-		cout << " files founds. ";
+
+		// checking the rules
 		vector<rule_t> config_rules = read_config();
 
 		bool installed = db_find_pkg(package.first);
@@ -106,17 +105,66 @@ void pkgadd::run(int argc, char** argv)
 			keep_list = make_keep_list(package.second.files, config_rules);
 			db_rm_pkg(package.first, keep_list);
 		}
-		cout << "Installation progress: ";
+
+		// Installation progress of the files on the HD
 		pkg_install(o_package, keep_list, non_install_files);
-		cout << ".";
+
+		// Add the metadata about the package to the DB
 		pkg_move_metafiles(package.first,package.second);
+
+		// Add the info about the files to the DB
 		db_add_pkg(package.first, package.second);
 
 		ldconfig();
-		cout << endl;
 	}
 }
-
+void pkgadd::progress() const
+{
+	static int j = 0;
+	int i;
+	switch ( actual_action )
+	{
+		case DB_OPEN_START:
+			cout << "Retrieve info about the " << set_of_db.size() << " packages: ";
+			break;
+		case DB_OPEN_RUN:
+			if ( set_of_db.size()>100)
+			{
+				i = j / ( set_of_db.size() / 100);
+				printf("%3d%%\b\b\b\b",i);
+			}
+			j++;
+			break;
+		case DB_OPEN_END:
+			printf("100 %%\n");
+			break;
+		case PKG_OPEN_START:
+			cout << "Extract the archive: " ;
+			break;
+		case PKG_OPEN_RUN:
+			advance_cursor();
+			break;	 
+		case PKG_OPEN_END:
+			printf("100 %%\n");
+			break;
+		case PKG_INSTALL_START:
+			j = 0;
+			cout << "Installing "<< number_of_files << " files: ";
+			break;
+		case PKG_INSTALL_RUN:
+			if ( number_of_files > 100)
+			{
+				i = number_installed_files / ( number_of_files  / 100 );
+				printf("%3u%%\b\b\b\b",i);
+			}
+			j++;
+			break;
+		case PKG_INSTALL_END:
+			printf("100 %%\n");
+			break;
+				
+	}
+}
 void pkgadd::print_help() const
 {
 	cout << "usage: " << utilname << " [options] <file>" << endl

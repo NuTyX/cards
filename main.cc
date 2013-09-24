@@ -39,16 +39,10 @@ using namespace std;
 
 static cards* select_utility(const string& name)
 {
-	if (name == "cards-add")
+	if (name == "pkgadd")
 		return new pkgadd;
-	else if (name == "pkgadd")
-		return new pkgadd;
-	else if (name == "cards-rm")
-		return new pkgrm;
 	else if (name == "pkgrm")
-    return new pkgrm;
-	else if (name == "cards-info")
-		return new pkginfo;
+		return new pkgrm;
 	else if (name == "pkginfo")
 		return new pkginfo;
 	else

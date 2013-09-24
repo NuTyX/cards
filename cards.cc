@@ -44,12 +44,19 @@
 #include <archive.h>
 #include <archive_entry.h>
 
+#if ARCHIVE_VERSION_NUMBER >= 3000000
 #define INIT_ARCHIVE(ar) \
 	archive_read_support_filter_gzip((ar)); \
 	archive_read_support_filter_bzip2((ar)); \
 	archive_read_support_filter_xz((ar)); \
 	archive_read_support_format_tar((ar))
-
+#else
+#define INIT_ARCHIVE(ar) \
+	archive_read_support_compression_gzip((ar)); \
+	archive_read_support_compression_bzip2((ar)); \
+	archive_read_support_compression_xz((ar)); \
+	archive_read_support_format_tar((ar))
+#endif
 #define DEFAULT_BYTES_PER_BLOCK (20 * 512)
 
 using __gnu_cxx::stdio_filebuf;
@@ -80,10 +87,12 @@ int cards::list_pkg (const string& path) // return the number of db files founds
 
 void cards::db_open_2()
 {
-	int j = 0;
+	actual_action = DB_OPEN_START;
+	progress();
 	for (set<string>::iterator i = set_of_db.begin();i != set_of_db.end();++i) {
+		actual_action = DB_OPEN_RUN;
 		if ( set_of_db.size() > 100 )
-			printf("%3d%%\b\b\b\b", j / ( set_of_db.size() / 100 ));		
+			progress();		
 		pkginfo_t info;
 		string name(*i,0, i->find(NAME_DELIM));
 		string version = *i;
@@ -113,13 +122,13 @@ void cards::db_open_2()
 			if (!info.files.empty())
 				packages[name] = info;
 		}
-		++j;
 	}
 #ifndef NDEBUG
   cerr << endl;
   cerr << packages.size() << " packages found in database " << endl;
 #endif
-	printf("100%%");
+	actual_action = DB_OPEN_END;
+	progress();
 }
 
 
@@ -165,6 +174,8 @@ void cards::db_convert()
 }
 void cards::pkg_move_metafiles(const string& name, pkginfo_t& info)
 {
+	actual_action = PKG_MOVE_META_START;
+	progress();
 	for (set<string>::iterator i = info.files.begin(); i!=info.files.end();++i) {
 		if ( strncmp(i->c_str(),PKG_INSTALL_DIR,7) == 0 )
 		{
@@ -179,9 +190,10 @@ void cards::pkg_move_metafiles(const string& name, pkginfo_t& info)
 	if ( metafiles_list.size()>0 )
 	{
 		const string installdir = root + PKG_INSTALL_DIR;
-//		const string metadir = packagenamedir + PKG_INFO;
 		rename( installdir.c_str(), packagenamedir.c_str() );
 	}
+	actual_action = PKG_MOVE_META_END;
+	progress();
 }	 
 void cards::db_add_pkg(const string& name, const pkginfo_t& info)
 {
@@ -248,7 +260,7 @@ void cards::db_rm_pkg(const string& name)
 /* Remove the physical files after followings some rules */
 void cards::rm_pkg_files(const string& name)
 {
-	set<string> files = packages[name].files;
+	files = packages[name].files;
 	packages.erase(name);
 
 #ifndef NDEBUG
@@ -268,19 +280,25 @@ void cards::rm_pkg_files(const string& name)
 	cerr << endl;
 #endif
 
+	actual_action = RM_PKG_FILES_START;
+	progress();
 	// Delete the files from bottom to up to make shure we delete the contents of any folder before
 	for (set<string>::const_reverse_iterator i = files.rbegin(); i != files.rend(); ++i) {
+		actual_action = RM_PKG_FILES_RUN;
+		progress();
 		const string filename = root + *i;
 		if (file_exists(filename) && remove(filename.c_str()) == -1) {
 			const char* msg = strerror(errno);
 			cerr << utilname << ": could not remove " << filename << ": " << msg << endl;
 		}
 	}
+	actual_action = RM_PKG_FILES_END;
+	progress();
 }
 
 void cards::db_rm_pkg(const string& name, const set<string>& keep_list)
 {
-	set<string> files = packages[name].files;
+	files = packages[name].files;
 	packages.erase(name);
 
 #ifndef NDEBUG
@@ -311,7 +329,11 @@ void cards::db_rm_pkg(const string& name, const set<string>& keep_list)
 #endif
 
 	// Delete the files
+	actual_action = RM_PKG_FILES_START;
+	progress();
 	for (set<string>::const_reverse_iterator i = files.rbegin(); i != files.rend(); ++i) {
+		actual_action = RM_PKG_FILES_RUN;
+		progress();
 		const string filename = root + *i;
 		if (file_exists(filename) && remove(filename.c_str()) == -1) {
 			if (errno == ENOTEMPTY)
@@ -320,6 +342,8 @@ void cards::db_rm_pkg(const string& name, const set<string>& keep_list)
 			cerr << utilname << ": could not remove " << filename << ": " << msg << endl;
 		}
 	}
+	actual_action = RM_PKG_FILES_END;
+	progress();
 }
 
 void cards::db_rm_files(set<string> files, const set<string>& keep_list)
@@ -414,7 +438,6 @@ set<string> cards::db_find_conflicts(const string& name, const pkginfo_t& info)
 pair<string, cards::pkginfo_t> cards::pkg_open(const string& filename)
 {
 	pair<string, pkginfo_t> result;
-	unsigned int i;
 	struct archive* archive;
 	struct archive_entry* entry;
 
@@ -439,11 +462,12 @@ pair<string, cards::pkginfo_t> cards::pkg_open(const string& filename)
 	    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
 		throw runtime_error_with_errno("could not open " + filename, archive_errno(archive));
 
-
-	for (i = 0; archive_read_next_header(archive, &entry) ==
-	     ARCHIVE_OK; ++i) {
-
-			advance_cursor();
+	actual_action = PKG_OPEN_START;
+	progress();
+	for (number_of_files = 0; archive_read_next_header(archive, &entry) ==
+	     ARCHIVE_OK; ++number_of_files) {
+			actual_action = PKG_OPEN_RUN;
+			progress();
 
 				result.second.files.insert(result.second.files.end(),
 					archive_entry_pathname(entry));
@@ -454,26 +478,29 @@ pair<string, cards::pkginfo_t> cards::pkg_open(const string& filename)
 		    archive_read_data_skip(archive) != ARCHIVE_OK)
 			throw runtime_error_with_errno("could not read " + filename, archive_errno(archive));
 	}
-  
-	number_of_files = i; 
 
-	if (i == 0) {
+	if (number_of_files == 0) {
 		if (archive_errno(archive) == 0)
 			throw runtime_error("empty package");
 		else
 			throw runtime_error("could not read " + filename);
 	}
-
+#if ARCHIVE_VERSION_NUMBER >= 3000000
 	archive_read_free(archive);
-	printf("%u",i);
+#else
+	archive_read_finish(archive);
+#endif
+	// Retrieve number of files from the archive is complete
+	actual_action = PKG_OPEN_END;
+	progress();
+	// printf("%u",i);
 	return result;
 }
 
-void cards::pkg_install(const string& filename, const set<string>& keep_list, const set<string>& non_install_list) const
+void cards::pkg_install(const string& filename, const set<string>& keep_list, const set<string>& non_install_list)
 {
 	struct archive* archive;
 	struct archive_entry* entry;
-	unsigned int i;
 	char buf[PATH_MAX];
 	string absroot;
 
@@ -487,10 +514,13 @@ void cards::pkg_install(const string& filename, const set<string>& keep_list, co
 
 	chdir(root.c_str());
 	absroot = getcwd(buf, sizeof(buf));
-	for (i = 0; archive_read_next_header(archive, &entry) ==
-	     ARCHIVE_OK; ++i) {
-		if (number_of_files > 100)
-			printf("%3d%%\b\b\b\b",i/(number_of_files / 100 ));
+	actual_action = PKG_INSTALL_START;
+	progress();
+	for (number_installed_files = 0; archive_read_next_header(archive, &entry) ==
+	     ARCHIVE_OK; ++number_installed_files) {
+		
+		actual_action = PKG_INSTALL_RUN;
+		progress();
 		string archive_filename = archive_entry_pathname(entry);
 		string reject_dir = trim_filename(absroot + string("/") + string(PKG_REJECTED));
 		string original_filename = trim_filename(absroot + string("/") + archive_filename);
@@ -548,15 +578,19 @@ void cards::pkg_install(const string& filename, const set<string>& keep_list, co
 				cout << utilname << ": rejecting " << archive_filename << ", keeping existing version" << endl;
 		}
 	}
-	printf("100%%");
-	if (i == 0) {
+	actual_action = PKG_INSTALL_END;
+	progress();
+	if (number_installed_files == 0) {
 		if (archive_errno(archive) == 0)
 			throw runtime_error("empty package");
 		else
 			throw runtime_error("could not read " + filename);
 	}
-
+#if ARCHIVE_VERSION_NUMBER >= 3000000
 	archive_read_free(archive);
+#else
+	archive_read_finish(archive);
+#endif
 }
 
 void cards::ldconfig() const
@@ -616,8 +650,11 @@ void cards::pkg_footprint(string& filename) const
 		if (S_ISREG(mode) && archive_read_data_skip(archive))
 			throw runtime_error_with_errno("could not read " + filename, archive_errno(archive));
 	}
-
+#if ARCHIVE_VERSION_NUMBER >= 3000000
 	archive_read_free(archive);
+#else
+  archive_read_finish(archive);
+#endif
 
 	// Too bad, there doesn't seem to be a way to reuse our archive
 	// instance
@@ -698,8 +735,12 @@ void cards::pkg_footprint(string& filename) const
 		else
 			throw runtime_error("could not read " + filename);
 	}
-
+#if ARCHIVE_VERSION_NUMBER >= 3000000
 	archive_read_free(archive);
+#else
+	archive_read_finish(archive);
+#endif
+
 }
 
 void cards::print_version() const

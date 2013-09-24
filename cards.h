@@ -55,6 +55,29 @@
 
 using namespace std;
 
+enum action 
+{ 
+BEGIN,
+DB_OPEN_START,
+DB_OPEN_RUN,
+DB_OPEN_END,
+PKG_OPEN_START,
+PKG_OPEN_RUN,
+PKG_OPEN_END,
+PKG_INSTALL_START,
+PKG_INSTALL_END,
+PKG_INSTALL_RUN,
+PKG_MOVE_META_START,
+PKG_MOVE_META_END,
+DB_ADD_PKG_START,
+DB_ADD_PKG_END,
+LDCONFIG_START,
+LDCONFIG_END,
+RM_PKG_FILES_START,
+RM_PKG_FILES_RUN,
+RM_PKG_FILES_END
+};
+
 class cards {
 public:
 	struct pkginfo_t {
@@ -67,7 +90,8 @@ public:
 	explicit cards(const string& name);
 	virtual ~cards() {}
 	virtual void run(int argc, char** argv) = 0; // Need to be redefine in derivated class
-	virtual void print_help() const = 0; // Need to be redefine in derivated class
+	virtual void print_help() const = 0; // help info is depending of the derivated class
+	virtual void progress() const = 0; // progress info is depending of the derivated class
 	void print_version() const;
 
 protected:
@@ -99,7 +123,7 @@ protected:
 	// Tar.gz
 	pair<string, pkginfo_t> pkg_open(const string& filename);
 	pair<string, pkginfo_t> pkg_open_2(const string& filename) const;
-	void pkg_install(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
+	void pkg_install(const string& filename, const set<string>& keep_list, const set<string>& non_install_files);
 	void pkg_move_metafiles(const string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
 	void pkg_install_2(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
 	void pkg_footprint(string& filename) const;
@@ -110,8 +134,11 @@ protected:
 	packages_t packages;
 	set<string> set_of_db;
 	set<string> metafiles_list;
+	set<string>	files;
 
-	int number_of_files;
+	action actual_action;		
+	unsigned int number_of_files;
+	unsigned int number_installed_files;
 };
 
 class db_lock {

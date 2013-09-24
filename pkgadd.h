@@ -47,6 +47,7 @@ public:
 	pkgadd() : cards("pkgadd") {}
 	virtual void run(int argc, char** argv);
 	virtual void print_help() const;
+	virtual void progress() const;
 
 private:
 	vector<rule_t> read_config() const;
