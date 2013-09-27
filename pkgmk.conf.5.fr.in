@@ -97,7 +97,7 @@ Défaut: 'no'
 \fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
 Si défini, pkgmk fera une tentative de séparation du paquet produit en sous groupes. Chaque groupe étant défini dans cette variable. Une fonction par défaut est exécutée si cette même fonction n'est pas trouvée dans le Pkgfile. (EXPERIMENTAL)
 .br
-Défaut: '(lib devel man doc)'
+Défaut: '(lib devel man doc service)'
 .SH VOIR AUSSI
 pkgmk(8)
 .SH COPYRIGHT

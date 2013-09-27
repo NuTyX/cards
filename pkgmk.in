@@ -102,9 +102,6 @@ check_bin() {
 	fi
 	echo "$RESULT"
 }
-check_package_md5sum() {
-	md5sum $TARGET
-}
 download_file() {
 	info "Downloading '$1'."
 
@@ -430,7 +427,7 @@ make_work_dir() {
 	
 	cd $PKGMK_ROOT
 	remove_work_dir
-	mkdir -p $SRC $PKG
+	mkdir -p $SRC $PKG $PKGMK_MD5SUM_DIR $PKGMK_FOOTPRINT_DIR
 
 	if [ "$PKGMK_IGNORE_MD5SUM" = "no" ]; then
 		check_md5sum
@@ -453,6 +450,81 @@ add_metafiles () {
 			cp $FILE $PKG/install/$FILE
 		fi
 	done 
+}
+pack_lib() {
+	local DIR
+	for DIR in usr/lib usr/lib64; do
+		if [ -d $DIR/pkgconfig ]; then
+			mv $DIR/pkgconfig $PKG
+		fi
+		if [ -d $DIR ]; then
+			bsdtar -r -f \
+			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+			$DIR
+			rm -r $DIR
+			j=1
+		fi
+		if [ -d $PKG/pkgconfig ]; then
+			mkdir $DIR
+			mv $PKG/pkgconfig $DIR/pkgconfig
+		fi
+	done
+}
+pack_devel() {
+	local DIR
+	for DIR in usr/include usr/lib/pkgconfig; do
+		if [ -d $DIR ]; then
+			bsdtar -r -f \
+			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+			$DIR
+			rm -r $DIR
+			j=1
+		fi
+	done
+}
+pack_doc() {
+	local DIR
+	for DIR in usr/share/doc usr/share/gtk-doc; do
+		if [ -d $DIR ]; then
+			bsdtar -r -f \
+			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+			$DIR
+			rm -r $DIR
+			j=1
+		fi
+	done
+}
+pack_man() {
+	local DIR
+	for DIR in usr/share/info usr/share/man; do
+		if [ -d $DIR ]; then
+			bsdtar -r -f \
+			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+			$DIR
+			rm -r $DIR
+			j=1
+		fi
+	done
+}
+pack_service() {
+	local DIR="etc/rc.d"
+	if [ -d $DIR ]; then
+		bsdtar -r -f \
+		$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+		$DIR
+		rm -r $DIR
+		j=1
+	fi
+}
+compress_group_package() {
+	if [ -f $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar ]; then
+	info "compress $group" 
+		case $PKGMK_COMPRESSION_MODE in
+			gz)  gzip -9 $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar;;
+			bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar;;
+			xz)  xz -z -9 $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar ;;
+		esac
+	fi
 }
 build_package() {
 	# TODO find a better solution for the hardcoded folders
@@ -494,48 +566,27 @@ build_package() {
 				(set -e -x ;$group)
 				j=1
 			else
-				case $group in
-					devel|lib)
-						if [ "$group" == "devel" ]; then
-							dir="include"
-						else
-							dir=$group
-						fi
-						if [ -d usr/$dir ]; then
-							bsdtar -c $COMPRESSION -f \
-							$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE \
-							usr/$dir* || error "Building '$name.$group' failed."
-							rm -r usr/$dir*
-							j=1
-						fi;;
-					doc)
-						if [ -d usr/share/doc ] || [ -d usr/share/gtk-doc ]; then
-							bsdtar -c $COMPRESSION -f \
-							$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE \
-							usr/share/*doc* || error "Building '$name.$group' failed."
-							rm -r usr/share/*doc*
-							j=1
-						fi;;
-					man)
-						if [ -d usr/share/man ] || [ -d usr/share/info ]; then
-							bsdtar -c $COMPRESSION -f \
-							$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE \
-							usr/share/man usr/share/info || error "Building '$name.$group' failed."
-							rm -rf usr/share/man
-							rm -rf usr/share/info
-							j=1
-						fi;;
-				esac
-				
+				if [ -f $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar ]; then
+					rm $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar
+				fi
+				pack_$group
+				if [ $j == 1 ]; then
+					compress_group_package
+				fi
 			fi
 			if [ $j == 1 ];then
 				TARGETS[i]="$name.$group#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
 				info "Build result for ${TARGETS[i]}:"
-				i=$((i+1))
-				j=0
 				bsdtar -t -v -f \
 				$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE
+				info "Updating md5sum for ${TARGETS[i]}:"
+				cd $PKGMK_PACKAGE_DIR
+					md5sum ${TARGETS[i]} > $PKGMK_MD5SUM_DIR/$name.$group
+				cd -
+				i=$((i+1))
+				j=0
 			fi
+			j=0
 		done
 		if [ -d usr/share/locale ]; then
 			for loc in `cd usr/share/locale/ && ls`; do
@@ -551,10 +602,7 @@ build_package() {
 			done
 			rm -rv usr/share/locale
 		fi
-
-		
 		TARGETS[i]="$name#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
-
 		info "Build result for ${TARGETS[i]}:"
 
 		bsdtar -c $COMPRESSION -f $TARGET *  &&  bsdtar -t -v -f $TARGET
@@ -567,6 +615,8 @@ build_package() {
 			else
 				check_footprint
 			fi
+			info "Updating md5sum for ${TARGETS[i]}:"
+			md5sum ${TARGETS[i]} > $PKGMK_MD5SUM_DIR/$name
 		fi
 	fi
 	
@@ -740,62 +790,6 @@ print_help() {
 	echo "  -cf,  --config-file <file>  use alternative configuration file"
 	echo "  -v,   --version             print version and exit "
 	echo "  -h,   --help                print help and exit"
-}
-generate_meta() {
-	if [ ! -f $TARGET ]; then
-		error "Unable to update metadata. File '$TARGET' not found."
-		exit 1
-	fi
-	cd $PKGMK_ROOT
-	local PRESENT TESTSTR TESTPKG FOUND NAME PRE POST READ DU MD5SUM DIR DESCR MAINTAINER PACKAGER
-	PRESENT="no"
-	FOUND="no"
-	PRE="no"
-	POST="no"
-	READ="no"
-	DIR=`dirname $TARGET`
-	if [ -f pre-install ]; then PRE="yes"; fi
-	if [ -f post-install ]; then POST="yes"; fi
-	if [ -f README ]; then READ="yes"; fi
-	NAME=`basename $TARGET`
-	DU=`du -b $TARGET|cut -f1`
-	MD5SUM=`md5sum $TARGET|cut -d " " -f1`
-	DESCR=`grep Description Pkgfile|cut -d ":" -f1 --complement|sed "s/^ //"|sed "s/:/ /g"`
-	MAINTAINER=`grep Maintainer Pkgfile|cut -d ":" -f1 --complement|sed "s/^ //"|sed "s/:/ /g"`
-	PACKAGER=`grep Packager Pkgfile|cut -d ":" -f1 --complement|sed "s/^ //"|sed "s/:/ /g"`
-	if [ "$DESCR" == "" ]; then
-		DESCR="N.A."
-	fi
-	if [ ! -f $DIR/$PKGREPO ]; then
-		echo "$NAME:$DU:$MD5SUM:$DESCR:$PRE:$POST:$READ:$MAINTAINER:$PACKAGER" > $DIR/$PKGREPO
-	else
-		mv $DIR/$PKGREPO{,.tmp}
-		old_IFS=$IFS
-		IFS=$'\n'
-		for i in `cat $DIR/$PKGREPO.tmp`
-		do
-			TESTSTR=`echo $i|cut -d "#" -f1`
-			TESTPKG=`echo $i|cut -d ":" -f1`
-			if [ -f $DIR/$TESTPKG ]; then
-				if [ "$TESTSTR" != "$name" ]; then
-					echo "$i" >> $DIR/$PKGREPO
-				else
-					FOUND="yes"
-					echo "$NAME:$DU:$MD5SUM:$DESCR:$PRE:$POST:$READ:$MAINTAINER:$PACKAGER" >> $DIR/$PKGREPO
-				fi
-			fi
-		done
-		if [ $FOUND != "yes" ] && [ -f $DIR/$TESTPKG ]; then
-			echo "$NAME:$DU:$MD5SUM:$DESCR:$PRE:$POST:$READ:$MAINTAINER:$PACKAGER" >> $DIR/$PKGREPO
-		fi
-		mv $DIR/$PKGREPO{,.tmp}
-		for i in `cat $DIR/$PKGREPO.tmp|cut -d "#" -f1|sort`
-		do
-			grep ^${i}# $DIR/$PKGREPO.tmp >> $DIR/PKGREPO
-		done
-		rm $DIR/$PKGREPO.tmp
-		IFS=$old_IFS
-	fi
 }
 parse_options() {
 	while [ "$1" ]; do
@@ -995,10 +989,14 @@ readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
 readonly PKGMK_ROOT="$PWD"
 
+PKGMK_PACKAGE_DIR="$PWD"
+
+
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
-PKGMK_FOOTPRINT_DIR="$PWD/.footprint"
+PKGMK_FOOTPRINT_DIR="$PKGMK_PACKAGE_DIR/.footprint"
 PKGMK_FOOTPRINT=".footprint"
+PKGMK_MD5SUM_DIR="$PKGMK_PACKAGE_DIR/.md5sum"
 PKGMK_MD5SUM=".md5sum"
 PKGMK_NOSTRIP=".nostrip"
 
@@ -1009,12 +1007,12 @@ PKGMK_DOWNLOAD_BIN="no"
 
 PKGMK_SOURCE_MIRRORS=()
 PKGMK_SOURCE_DIR="$PWD"
-PKGMK_PACKAGE_DIR="$PWD"
+
 PKGMK_WORK_DIR="$PWD/work"
 
 PKGMK_COMPRESSION_MODE="xz"
 
-PKGMK_GROUPS=(lib devel man doc)
+PKGMK_GROUPS=(lib devel man doc service)
 
 PKGMK_LOG_DIR=/var/log/pkgbuild
 
@@ -1037,8 +1035,7 @@ PKGMK_CHECK_MD5SUM="no"
 PKGMK_NO_STRIP="no"
 PKGMK_CLEAN="no"
 
-PKGMK_GENERATE_META="no"
-PKGREPO="PKGREPO"
+PKGMKG_REPO="PKGREPO"
 
 main "$@"
 
