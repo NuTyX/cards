@@ -1,5 +1,4 @@
-//
-//  cards
+//  cards.cc
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
@@ -73,7 +72,85 @@ cards::cards(const string& name)
 	sigaction(SIGQUIT, &sa, 0);
 	sigaction(SIGTERM, &sa, 0);
 }
-
+void cards::progress() const
+{
+  static int j = 0;
+  int i;
+  switch ( actual_action )
+  {
+		case PKG_DOWNLOAD_START:
+			break;
+		case PKG_DOWNLOAD_RUN:
+			break;
+		case PKG_DOWNLOAD_END:
+			break;
+		case PKG_MOVE_META_START:
+			break;
+		case PKG_MOVE_META_END:
+			break;
+    case DB_OPEN_START:
+      cout << "Retrieve info about the " << set_of_db.size() << " packages: ";
+      break;
+    case DB_OPEN_RUN:
+      if ( set_of_db.size()>100)
+      {
+        i = j / ( set_of_db.size() / 100);
+        printf("%3d%%\b\b\b\b",i);
+      }
+      j++;
+      break;
+    case DB_OPEN_END:
+      printf("100 %%\n");
+      break;
+    case PKG_OPEN_START:
+      cout << "Extract the archive: " ;
+      break;
+    case PKG_OPEN_RUN:
+      advance_cursor();
+      break;
+    case PKG_OPEN_END:
+      printf("100 %%\n");
+      break;
+    case PKG_INSTALL_START:
+      j = 0;
+      cout << "Installing "<< number_of_files << " files: ";
+      break;
+    case PKG_INSTALL_RUN:
+      if ( number_of_files > 100)
+      {
+        i = number_installed_files / ( number_of_files  / 100 );
+        printf("%3u%%\b\b\b\b",i);
+      }
+      j++;
+      break;
+    case PKG_INSTALL_END:
+      printf("100 %%\n");
+      break;
+		case DB_ADD_PKG_START:
+			break;
+		case DB_ADD_PKG_END:
+			break;
+		case RM_PKG_FILES_START:
+			j=0;
+			cout << "Removing " << files_list.size() << " files";
+			break;
+		case RM_PKG_FILES_RUN:
+			if ( files_list.size()>100)
+			{
+				i = j / ( files_list.size() / 100);
+				printf("%3d%%\b\b\b\b",i);
+			}
+			j++;
+			break;
+		case RM_PKG_FILES_END:
+			printf("100 %%\n");
+			break;
+		case LDCONFIG_START:
+			break;
+		case LDCONFIG_END:
+			break;
+  }
+}
 int cards::list_pkg (const string& path) // return the number of db files founds
 {
 	root = trim_filename(path + "/");
@@ -260,7 +337,7 @@ void cards::db_rm_pkg(const string& name)
 /* Remove the physical files after followings some rules */
 void cards::rm_pkg_files(const string& name)
 {
-	files = packages[name].files;
+	files_list = packages[name].files;
 	packages.erase(name);
 
 #ifndef NDEBUG
@@ -272,7 +349,7 @@ void cards::rm_pkg_files(const string& name)
 	// Don't delete files that still have references
 	for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i)
 		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j)
-			files.erase(*j);
+			files_list.erase(*j);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 2 (files that still have references excluded):" << endl;
@@ -283,7 +360,7 @@ void cards::rm_pkg_files(const string& name)
 	actual_action = RM_PKG_FILES_START;
 	progress();
 	// Delete the files from bottom to up to make shure we delete the contents of any folder before
-	for (set<string>::const_reverse_iterator i = files.rbegin(); i != files.rend(); ++i) {
+	for (set<string>::const_reverse_iterator i = files_list.rbegin(); i != files_list.rend(); ++i) {
 		actual_action = RM_PKG_FILES_RUN;
 		progress();
 		const string filename = root + *i;
@@ -298,7 +375,7 @@ void cards::rm_pkg_files(const string& name)
 
 void cards::db_rm_pkg(const string& name, const set<string>& keep_list)
 {
-	files = packages[name].files;
+	files_list = packages[name].files;
 	packages.erase(name);
 
 #ifndef NDEBUG
@@ -309,7 +386,7 @@ void cards::db_rm_pkg(const string& name, const set<string>& keep_list)
 
 	// Don't delete files found in the keep list
 	for (set<string>::const_iterator i = keep_list.begin(); i != keep_list.end(); ++i)
-		files.erase(*i);
+		files_list.erase(*i);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 2 (files that is in the keep list excluded):" << endl;
@@ -320,7 +397,7 @@ void cards::db_rm_pkg(const string& name, const set<string>& keep_list)
 	// Don't delete files that still have references
 	for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i)
 		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j)
-			files.erase(*j);
+			files_list.erase(*j);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 3 (files that still have references excluded):" << endl;
@@ -331,7 +408,7 @@ void cards::db_rm_pkg(const string& name, const set<string>& keep_list)
 	// Delete the files
 	actual_action = RM_PKG_FILES_START;
 	progress();
-	for (set<string>::const_reverse_iterator i = files.rbegin(); i != files.rend(); ++i) {
+	for (set<string>::const_reverse_iterator i = files_list.rbegin(); i != files_list.rend(); ++i) {
 		actual_action = RM_PKG_FILES_RUN;
 		progress();
 		const string filename = root + *i;
@@ -869,6 +946,49 @@ void cards::db_open(const string& path)
 
 /*******************   Various fonctions ********************/
 
+parameter_value split_parameter_value(string s, string delimiter)
+{
+  parameter_value pv;
+  pv.parameter = s;
+  pv.value = s;
+  pv.parameter.erase(s.find(delimiter),s.size());
+  pv.value.erase(0,s.find(delimiter)+delimiter.size());
+  return pv;
+}
+set<string> get_parameter_list(string file, string delimiter)
+{
+  set<string> parameter_list;
+  ifstream in(file.c_str());
+  string line, property;
+  if (in) {
+    while (!in.eof()) {
+      getline(in, line);
+      if ((line[0] != '#' ) && ( line.find(delimiter) > 0) && ( line.size() > 0)) {
+        property = line;
+        property.erase(property.find(delimiter),property.size());
+        parameter_list.insert(property);
+      }
+    }
+  }
+  return parameter_list;
+}
+string get_configuration_value(string file, string delimiter,string parameter)
+{
+  map<string,string> property_list;
+  ifstream in(file.c_str());
+  string line;
+	parameter_value pv;
+  if (in) {
+    while (!in.eof()) {
+      getline(in, line);
+      if ((line[0] != '#' ) && ( line.find(delimiter) > 0) && ( line.size() > 0)) {
+				pv = split_parameter_value(line,delimiter);
+				property_list[pv.parameter]=pv.value;
+      }
+    }
+  }
+  return property_list[parameter];
+}
 void assert_argument(char** argv, int argc, int index)
 {
 	if (argc - 1 < index + 1)

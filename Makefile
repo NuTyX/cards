@@ -37,9 +37,9 @@ CXXFLAGS += -O2 -Wall -pedantic -D_GNU_SOURCE -DVERSION=\"$(VERSION)\" \
 LIBARCHIVELIBS := $(shell pkg-config --libs --static libarchive)
 LIBCURLLIBS := $(shell pkg-config --libs --static libcurl)
 
-LDFLAGS += -static $(LIBARCHIVELIBS)
+LDFLAGS += $(LIBARCHIVELIBS) $(LIBCURLLIBS)
 
-OBJECTS = main.o cards.o pkgadd.o pkgrm.o pkginfo.o
+OBJECTS = main.o cards.o pkgadd.o pkgrm.o pkginfo.o pkgdwl.o
 
 LIBOBJECTS =  cards.o pkgadd.o pkgrm.o pkginfo.o
 
@@ -52,6 +52,8 @@ libs:
 all: pkgadd pkgmk pkg-repgen rejmerge man
 
 pkgadd: .depend $(OBJECTS)
+	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
+pkgdwl: .depend $(OBJECTS)
 	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 
 pkgmk: pkgmk.in
@@ -93,6 +95,7 @@ install: all
 	install -D -m0755 pkgmk $(DESTDIR)$(BINDIR)/pkgmk
 	install -D -m0755 rejmerge $(DESTDIR)$(BINDIR)/rejmerge
 	install -D -m0644 pkgmk.conf $(DESTDIR)$(ETCDIR)/pkgmk.conf
+	install -D -m0644 pkgdwl.conf $(DESTDIR)$(ETCDIR)/pkgdwl.conf
 	install -D -m0644 rejmerge.conf $(DESTDIR)$(ETCDIR)/rejmerge.conf
 	install -D -m0644 pkgadd.8 $(DESTDIR)$(MANDIR)/man8/pkgadd.8
 	install -D -m0644 pkgrm.8 $(DESTDIR)$(MANDIR)/man8/pkgrm.8
@@ -105,6 +108,7 @@ install: all
 	install -D -m0644 pkgmk.8.fr $(DESTDIR)$(MANDIR)/fr/man8/pkgmk.8
 	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkgrm
 	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkginfo
+	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkgdwl
 
 clean:
 	rm -f .depend

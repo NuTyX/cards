@@ -1,5 +1,4 @@
-//
-//  cards
+//  cards.h
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
@@ -55,9 +54,16 @@
 
 using namespace std;
 
+struct parameter_value {
+		string parameter;
+		string value;
+	};
+
 enum action 
 { 
-BEGIN,
+PKG_DOWNLOAD_START,
+PKG_DOWNLOAD_RUN,
+PKG_DOWNLOAD_END,
 DB_OPEN_START,
 DB_OPEN_RUN,
 DB_OPEN_END,
@@ -84,14 +90,13 @@ public:
 		string version;
 		set<string> files;
 	};
-
 	typedef map<string, pkginfo_t> packages_t;
 
 	explicit cards(const string& name);
 	virtual ~cards() {}
 	virtual void run(int argc, char** argv) = 0; // Need to be redefine in derivated class
 	virtual void print_help() const = 0; // help info is depending of the derivated class
-	virtual void progress() const = 0; // progress info is depending of the derivated class
+	virtual void progress() const; // progress info
 	void print_version() const;
 
 protected:
@@ -134,7 +139,7 @@ protected:
 	packages_t packages;
 	set<string> set_of_db;
 	set<string> metafiles_list;
-	set<string>	files;
+	set<string>	files_list;
 
 	action actual_action;		
 	unsigned int number_of_files;
@@ -158,7 +163,9 @@ public:
 };
 
 // Utility functions
-
+parameter_value split_parameter_value(string s, string delimiter);
+set<string> get_parameter_list(string file, string delimiter);
+string get_configuration_value(string file, string delimiter,string parameter);
 void assert_argument(char** argv, int argc, int index);
 string itos(unsigned int value);
 string mtos(mode_t mode);

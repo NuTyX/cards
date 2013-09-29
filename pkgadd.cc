@@ -1,5 +1,4 @@
-//
-//  cards
+//  pkgadd.cc
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
@@ -116,53 +115,6 @@ void pkgadd::run(int argc, char** argv)
 		db_add_pkg(package.first, package.second);
 
 		ldconfig();
-	}
-}
-void pkgadd::progress() const
-{
-	static int j = 0;
-	int i;
-	switch ( actual_action )
-	{
-		case DB_OPEN_START:
-			cout << "Retrieve info about the " << set_of_db.size() << " packages: ";
-			break;
-		case DB_OPEN_RUN:
-			if ( set_of_db.size()>100)
-			{
-				i = j / ( set_of_db.size() / 100);
-				printf("%3d%%\b\b\b\b",i);
-			}
-			j++;
-			break;
-		case DB_OPEN_END:
-			printf("100 %%\n");
-			break;
-		case PKG_OPEN_START:
-			cout << "Extract the archive: " ;
-			break;
-		case PKG_OPEN_RUN:
-			advance_cursor();
-			break;	 
-		case PKG_OPEN_END:
-			printf("100 %%\n");
-			break;
-		case PKG_INSTALL_START:
-			j = 0;
-			cout << "Installing "<< number_of_files << " files: ";
-			break;
-		case PKG_INSTALL_RUN:
-			if ( number_of_files > 100)
-			{
-				i = number_installed_files / ( number_of_files  / 100 );
-				printf("%3u%%\b\b\b\b",i);
-			}
-			j++;
-			break;
-		case PKG_INSTALL_END:
-			printf("100 %%\n");
-			break;
-				
 	}
 }
 void pkgadd::print_help() const

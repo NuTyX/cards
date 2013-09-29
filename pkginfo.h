@@ -31,7 +31,6 @@ public:
 	pkginfo() : cards("pkginfo") {}
 	virtual void run(int argc, char** argv);
 	virtual void print_help() const;
-	void progress() const;
 };
 
 #endif /* PKGINFO_H */

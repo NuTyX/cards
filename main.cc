@@ -34,6 +34,7 @@
 #include "pkgadd.h"
 #include "pkgrm.h"
 #include "pkginfo.h"
+#include "pkgdwl.h"
 
 using namespace std;
 
@@ -45,7 +46,9 @@ static cards* select_utility(const string& name)
 		return new pkgrm;
 	else if (name == "pkginfo")
 		return new pkginfo;
-	else
+	else if (name == "pkgdwl")
+		return new pkgdwl;
+	else	
 		throw runtime_error("command not supported by cards");
 }
 

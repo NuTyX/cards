@@ -1,5 +1,4 @@
-//
-//  cards
+//  pkgadd.h
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
@@ -47,7 +46,6 @@ public:
 	pkgadd() : cards("pkgadd") {}
 	virtual void run(int argc, char** argv);
 	virtual void print_help() const;
-	virtual void progress() const;
 
 private:
 	vector<rule_t> read_config() const;

@@ -158,30 +158,6 @@ void pkginfo::run(int argc, char** argv)
 		}
 	}
 }
-void pkginfo::progress() const
-{
-	static int j = 0;
-	int i;
-	switch ( actual_action )
-	{
-		case DB_OPEN_START:
-				cout << "Retrieve info about the " << set_of_db.size() << " packages: ";
-				break;
-
-		case DB_OPEN_RUN:
-				if ( set_of_db.size() > 100 )
-				{
-					i = j / ( set_of_db.size() / 100);
-					printf("%3d%%\b\b\b\b",i);
-				}
-				j++;
-				break;
-
-		case DB_OPEN_END:
-				printf("100 %%\n");
-				break;
-	}
-}
 void pkginfo::print_help() const
 {
 	cout << "usage: " << utilname << " [options]" << endl

@@ -31,7 +31,6 @@ public:
 	pkgrm() : cards("pkgrm") {}
 	virtual void run(int argc, char** argv);
 	virtual void print_help() const;
-	virtual void progress() const;
 };
 
 #endif /* PKGRM_H */
