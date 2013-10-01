@@ -1,5 +1,4 @@
-//
-//  cards
+//  pkginfo.cc
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
@@ -28,6 +27,7 @@
 #include <sys/types.h>
 #include <regex.h>
 #include <stdio.h>
+#include <unistd.h>
 
 void pkginfo::run(int argc, char** argv)
 {
@@ -87,9 +87,17 @@ void pkginfo::run(int argc, char** argv)
 		//
 		pkg_footprint(o_arg);
 	} else if (o_convert_mode ) {
-		db_lock lock(o_root, false);
-		db_open(o_root);
-		db_convert();
+			if (getuid())
+				throw runtime_error("only root can convert the db packages");
+
+			const string new_db = PKG_DIR;	
+    	if (file_exists("/" + new_db))
+			{
+				db_convert_space_to_no_space(o_root);
+			} else {
+				db_lock lock(o_root, false);
+				db_open(o_root);
+				db_convert(); }
 	} else {
 		//
 		// Modes that require the database to be opened

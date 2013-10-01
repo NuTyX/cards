@@ -50,6 +50,8 @@ public:
 			}
 		curl_global_init(CURL_GLOBAL_ALL);
 		curl = curl_easy_init();
+		if (! curl)
+			throw runtime_error ("Curl error");
 	}
 	~pkgdwl()
 	{
@@ -68,7 +70,7 @@ protected:
 	int update_progress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
 	size_t write_to_stream(void *buffer, size_t size, size_t nmemb, void *stream);
 
-	void init_file_to_download(const char *_file);
+	void init_file_to_download(const char * _file);
 
 	struct DownloadProgress
 	{
@@ -81,7 +83,7 @@ protected:
 		long int filetime;
 		FILE *stream;
 	};
-	CURLcode download_file(const string _filename);
+	void download_file(const string& _filename);
 	void update_progress();
 
 	CURL* curl;

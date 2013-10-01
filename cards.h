@@ -52,6 +52,9 @@
 #define LDCONFIG         "/sbin/ldconfig"
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
 
+#define MAX_PATH 255
+#define S_CARD_MODE S_ISVTX|S_IRWXU|S_IXGRP|S_IXOTH|S_IRGRP|S_IROTH
+
 using namespace std;
 
 struct parameter_value {
@@ -133,6 +136,7 @@ protected:
 	void pkg_install_2(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
 	void pkg_footprint(string& filename) const;
 	void ldconfig() const;
+	void db_convert_space_to_no_space(const string& path);
 
 	string utilname;
 	string root;
@@ -174,6 +178,7 @@ bool file_exists(const string& filename);
 bool file_empty(const string& filename);
 bool file_equal(const string& file1, const string& file2);
 bool permissions_equal(const string& file1, const string& file2);
+bool create_recursive_dirs(const string& pathname);
 void file_remove(const string& basedir, const string& filename);
 set<string>  file_find(const string& basedir);
 void advance_cursor();

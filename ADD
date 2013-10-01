@@ -36,26 +36,8 @@ echo "Erreur de compilation"
 exit 1
 }
 DRY=false
-UPDATE_FOOTPRINT=false
-UPDATE_MD5SUM=false
 if [ "$2" == "--dry" ];then
         DRY=true
-fi
-if [ "$2" == "-uf" ]; then
-	UPDATE_FOOTPRINT=true
-fi
-if [ "$2" == "-um" ]; then
-   UPDATE_MD5SUM=true
-fi
-if [ $UPDATE_FOOTPRINT == true ]; then
-        cd `prt-get info $1|grep Path|cut -d ":" -f2`/$1
-        pkgmk -uf
-        exit 0
-fi
-if [ $UPDATE_MD5SUM == true ];then
-			cd `prt-get info $1|grep Path|cut -d ":" -f2`/$1
-			pkgmk -um
-			exit 0
 fi
 TMP=`mktemp -d`
 prt-get depends --all $1|cut -d "]" -f 2|sed "/installed/d" > $TMP/list

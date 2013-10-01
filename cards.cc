@@ -153,9 +153,17 @@ void cards::progress() const
 }
 int cards::list_pkg (const string& path) // return the number of db files founds
 {
+	set<string> list_of_packages_file;
+	parameter_value string_splited;
 	root = trim_filename(path + "/");
 	const string pathdb =  root + PKG_DIR;
-	set_of_db = file_find(pathdb);
+	list_of_packages_file = file_find(pathdb);
+	for (set<string>::iterator i = list_of_packages_file.begin();i != list_of_packages_file.end();++i) {
+		string_splited=split_parameter_value(*i,"#");
+		if (string_splited.value.size()>0)
+			set_of_db.insert(string_splited.parameter + " " + string_splited.value);
+}
+	
 #ifndef NDEBUG
   cerr << "Number of Packages: " << set_of_db.size() << endl;
 #endif
@@ -177,7 +185,8 @@ void cards::db_open_2()
 		info.version = version;
 	
 		// list of files
-		const string filelist = root + PKG_DIR + "/" + *i + PKG_FILES;
+		string package_foldername = name + "#" + version;
+		const string filelist = root + PKG_DIR + "/" + package_foldername + PKG_FILES;
 		int fd = open(filelist.c_str(), O_RDONLY);
 		if (fd == -1)
 			throw runtime_error_with_errno("could not open " + filelist);
@@ -207,8 +216,26 @@ void cards::db_open_2()
 	actual_action = DB_OPEN_END;
 	progress();
 }
+void cards::db_convert_space_to_no_space(const string& path)
+{
+	root = trim_filename(path + "/");
+	/* Convert from directories with spaces to directories without spaces */
+	const string packagedir = root + PKG_DIR ;
+	set_of_db = file_find(packagedir);
+	for (set<string>::iterator i = set_of_db.begin();i != set_of_db.end();++i) {
 
-
+		if ( ! (i->find(NAME_DELIM) == string::npos))
+		{
+			string name(*i,0, i->find(NAME_DELIM));
+			string version = *i;
+			version.erase(0, version.find(NAME_DELIM) == string::npos ? string::npos : version.find(NAME_DELIM) + 1);
+			const string packagenamedir_with_space = root + PKG_DIR + "/" + name + " " + version;
+			const string packagenamedir_without_space = root + PKG_DIR + "/" + name + "#" + version;
+			rename( packagenamedir_with_space.c_str(), packagenamedir_without_space.c_str() );
+			cout << packagenamedir_with_space << " renamed in " << packagenamedir_without_space << endl;
+		}
+	}	
+}
 void cards::db_convert()
 {
 	/* Convert from single db file to multi directories */
@@ -218,7 +245,8 @@ void cards::db_convert()
 	cout << packagedir << endl;
 	for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i) {
 
-		const string packagenamedir = root + PKG_DIR + "/" + i->first + " " + i-> second.version;
+		const string packagenamedir = root + PKG_DIR + "/" + i->first + "#" + i-> second.version;
+		cout << packagenamedir << " created" << endl;
 		mkdir(packagenamedir.c_str(),0755);	
 		const string fileslist = packagenamedir + PKG_FILES;
 		const string fileslist_new = fileslist + ".imcomplete_transaction";
@@ -261,7 +289,7 @@ void cards::pkg_move_metafiles(const string& name, pkginfo_t& info)
 		}
 	}
 	const string packagedir = root + PKG_DIR ;
-	const string packagenamedir = root + PKG_DIR + "/" + name + " " + info.version;
+	const string packagenamedir = root + PKG_DIR + "/" + name + "#" + info.version;
 	
 	mkdir(packagenamedir.c_str(),0755);
 	if ( metafiles_list.size()>0 )
@@ -276,7 +304,7 @@ void cards::db_add_pkg(const string& name, const pkginfo_t& info)
 {
 	packages[name] = info;
 	const string packagedir = root + PKG_DIR ;
-	const string packagenamedir = root + PKG_DIR + "/" + name + " " + info.version;
+	const string packagenamedir = root + PKG_DIR + "/" + name + "#" + info.version;
 	const string fileslist = packagenamedir + PKG_FILES;
 	const string fileslist_new = fileslist + ".imcomplete_transaction";
 	int fd_new = creat(fileslist_new.c_str(),0644);
@@ -318,7 +346,7 @@ void cards::db_rm_pkg(const string& name)
 {
  	  const string packagedir = root + PKG_DIR ;
 		const string version = packages[name].version;
-  	const string packagenamedir = root + PKG_DIR + "/" + name + " " + version;
+  	const string packagenamedir = root + PKG_DIR + "/" + name + "#" + version;
 		metafiles_list = file_find( packagenamedir);
 		if (metafiles_list.size() > 0)
 			for (set<string>::iterator i = metafiles_list.begin(); i != metafiles_list.end();++i) {
@@ -951,9 +979,17 @@ parameter_value split_parameter_value(string s, string delimiter)
   parameter_value pv;
   pv.parameter = s;
   pv.value = s;
-  pv.parameter.erase(s.find(delimiter),s.size());
-  pv.value.erase(0,s.find(delimiter)+delimiter.size());
-  return pv;
+	size_t found =  s.find(delimiter);
+	if (found != string::npos)
+  {
+		pv.parameter.erase(s.find(delimiter),s.size());
+  	pv.value.erase(0,s.find(delimiter)+delimiter.size());
+  }
+	else
+	{
+		pv.value = "";
+	}
+	return pv;
 }
 set<string> get_parameter_list(string file, string delimiter)
 {
@@ -1061,7 +1097,33 @@ string trim_filename(const string& filename)
 
 	return result;
 }
-
+bool create_recursive_dirs(const string& path)
+{
+	char opath[MAX_PATH];
+	char *p;
+	size_t len;
+	strcpy(opath, path.c_str());
+	len = strlen(opath);
+	if ( len > 1)
+	{
+		if(opath[len - 1] == '/')
+			opath[len - 1] = '\0';
+		for(p = opath; *p; p++)
+		{
+			if(*p == '/')
+			{
+				*p='\0';
+				if(access(opath, 0))
+					mkdir(opath,S_CARD_MODE);
+				*p = '/';
+			}
+		}
+		if(access(opath, 0))
+			mkdir(opath,S_CARD_MODE);
+		return true;
+	}
+	return false;
+}	
 bool file_exists(const string& filename)
 {
 	struct stat buf;
@@ -1171,9 +1233,11 @@ set<string> file_find(const string& path)
 	{
 		while ((dir = readdir(d)) != NULL)
 		{
-		if ( strcmp (dir->d_name, ".") && strcmp (dir->d_name, "..") ) // ignore the directories dots
-        files_list.insert(dir->d_name);
-    }
+			if ( strcmp (dir->d_name, ".") && strcmp (dir->d_name, "..") ) // ignore the directories dots
+			{
+				files_list.insert(dir->d_name);
+    	}
+		}
     closedir(d);
   }
   return files_list;
