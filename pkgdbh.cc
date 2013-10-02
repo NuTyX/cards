@@ -1,4 +1,4 @@
-//  cards.cc
+//  pkgdbh.cc
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
@@ -19,8 +19,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
+#include "string_utils.h"
+#include "file_utils.h"
+#include "pkgdbh.h"
 
-#include "cards.h"
 #include <iostream>
 #include <fstream>
 #include <iterator>
@@ -156,7 +158,7 @@ int cards::list_pkg (const string& path) // return the number of db files founds
 	set<string> list_of_packages_file;
 	parameter_value string_splited;
 	root = trim_filename(path + "/");
-	const string pathdb =  root + PKG_DIR;
+	const string pathdb =  root + PKG_DB_DIR;
 	list_of_packages_file = file_find(pathdb);
 	for (set<string>::iterator i = list_of_packages_file.begin();i != list_of_packages_file.end();++i) {
 		string_splited=split_parameter_value(*i,"#");
@@ -186,7 +188,7 @@ void cards::db_open_2()
 	
 		// list of files
 		string package_foldername = name + "#" + version;
-		const string filelist = root + PKG_DIR + "/" + package_foldername + PKG_FILES;
+		const string filelist = root + PKG_DB_DIR + "/" + package_foldername + PKG_FILES;
 		int fd = open(filelist.c_str(), O_RDONLY);
 		if (fd == -1)
 			throw runtime_error_with_errno("could not open " + filelist);
@@ -220,7 +222,7 @@ void cards::db_convert_space_to_no_space(const string& path)
 {
 	root = trim_filename(path + "/");
 	/* Convert from directories with spaces to directories without spaces */
-	const string packagedir = root + PKG_DIR ;
+	const string packagedir = root + PKG_DB_DIR ;
 	set_of_db = file_find(packagedir);
 	for (set<string>::iterator i = set_of_db.begin();i != set_of_db.end();++i) {
 
@@ -229,8 +231,8 @@ void cards::db_convert_space_to_no_space(const string& path)
 			string name(*i,0, i->find(NAME_DELIM));
 			string version = *i;
 			version.erase(0, version.find(NAME_DELIM) == string::npos ? string::npos : version.find(NAME_DELIM) + 1);
-			const string packagenamedir_with_space = root + PKG_DIR + "/" + name + " " + version;
-			const string packagenamedir_without_space = root + PKG_DIR + "/" + name + "#" + version;
+			const string packagenamedir_with_space = root + PKG_DB_DIR + "/" + name + " " + version;
+			const string packagenamedir_without_space = root + PKG_DB_DIR + "/" + name + "#" + version;
 			rename( packagenamedir_with_space.c_str(), packagenamedir_without_space.c_str() );
 			cout << packagenamedir_with_space << " renamed in " << packagenamedir_without_space << endl;
 		}
@@ -240,12 +242,12 @@ void cards::db_convert()
 {
 	/* Convert from single db file to multi directories */
 
-	const string packagedir = root + PKG_DIR ;
+	const string packagedir = root + PKG_DB_DIR ;
 	mkdir(packagedir.c_str(),0755);
 	cout << packagedir << endl;
 	for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i) {
 
-		const string packagenamedir = root + PKG_DIR + "/" + i->first + "#" + i-> second.version;
+		const string packagenamedir = root + PKG_DB_DIR + "/" + i->first + "#" + i-> second.version;
 		cout << packagenamedir << " created" << endl;
 		mkdir(packagenamedir.c_str(),0755);	
 		const string fileslist = packagenamedir + PKG_FILES;
@@ -288,8 +290,8 @@ void cards::pkg_move_metafiles(const string& name, pkginfo_t& info)
 			info.files.erase(i);
 		}
 	}
-	const string packagedir = root + PKG_DIR ;
-	const string packagenamedir = root + PKG_DIR + "/" + name + "#" + info.version;
+	const string packagedir = root + PKG_DB_DIR ;
+	const string packagenamedir = root + PKG_DB_DIR + "/" + name + "#" + info.version;
 	
 	mkdir(packagenamedir.c_str(),0755);
 	if ( metafiles_list.size()>0 )
@@ -303,8 +305,8 @@ void cards::pkg_move_metafiles(const string& name, pkginfo_t& info)
 void cards::db_add_pkg(const string& name, const pkginfo_t& info)
 {
 	packages[name] = info;
-	const string packagedir = root + PKG_DIR ;
-	const string packagenamedir = root + PKG_DIR + "/" + name + "#" + info.version;
+	const string packagedir = root + PKG_DB_DIR ;
+	const string packagenamedir = root + PKG_DB_DIR + "/" + name + "#" + info.version;
 	const string fileslist = packagenamedir + PKG_FILES;
 	const string fileslist_new = fileslist + ".imcomplete_transaction";
 	int fd_new = creat(fileslist_new.c_str(),0644);
@@ -344,9 +346,9 @@ bool cards::db_find_pkg(const string& name)
 /* Remove meta data about the removed package */
 void cards::db_rm_pkg(const string& name)
 {
- 	  const string packagedir = root + PKG_DIR ;
+ 	  const string packagedir = root + PKG_DB_DIR ;
 		const string version = packages[name].version;
-  	const string packagenamedir = root + PKG_DIR + "/" + name + "#" + version;
+  	const string packagenamedir = root + PKG_DB_DIR + "/" + name + "#" + version;
 		metafiles_list = file_find( packagenamedir);
 		if (metafiles_list.size() > 0)
 			for (set<string>::iterator i = metafiles_list.begin(); i != metafiles_list.end();++i) {
@@ -856,7 +858,7 @@ void cards::print_version() const
 db_lock::db_lock(const string& root, bool exclusive)
 	: dir(0)
 {
-	const string dirname = trim_filename(root + string("/") + PKG_DIR_OLD);
+	const string dirname = trim_filename(root + string("/") + PKG_DB_DIR_OLD);
 
 	if (!(dir = opendir(dirname.c_str())))
 		throw runtime_error_with_errno("could not read directory " + dirname);
@@ -879,7 +881,7 @@ db_lock::~db_lock()
 
 void cards::db_commit()
 {
-  const string dbfilename = root + PKG_DB;
+  const string dbfilename = root + PKG_DB_OLD;
   const string dbfilename_new = dbfilename + ".incomplete_transaction";
   const string dbfilename_bak = dbfilename + ".backup";
 
@@ -935,7 +937,7 @@ void cards::db_open(const string& path)
   // Only need to convert from pkgutils to cards
 
   root = trim_filename(path + "/");
-  const string filename = root + PKG_DB;
+  const string filename = root + PKG_DB_OLD;
 
   int fd = open(filename.c_str(), O_RDONLY);
   if (fd == -1)
@@ -974,275 +976,11 @@ void cards::db_open(const string& path)
 
 /*******************   Various fonctions ********************/
 
-parameter_value split_parameter_value(string s, string delimiter)
-{
-  parameter_value pv;
-  pv.parameter = s;
-  pv.value = s;
-	size_t found =  s.find(delimiter);
-	if (found != string::npos)
-  {
-		pv.parameter.erase(s.find(delimiter),s.size());
-  	pv.value.erase(0,s.find(delimiter)+delimiter.size());
-  }
-	else
-	{
-		pv.value = "";
-	}
-	return pv;
-}
-set<string> get_parameter_list(string file, string delimiter)
-{
-  set<string> parameter_list;
-  ifstream in(file.c_str());
-  string line, property;
-  if (in) {
-    while (!in.eof()) {
-      getline(in, line);
-      if ((line[0] != '#' ) && ( line.find(delimiter) > 0) && ( line.size() > 0)) {
-        property = line;
-        property.erase(property.find(delimiter),property.size());
-        parameter_list.insert(property);
-      }
-    }
-  }
-  return parameter_list;
-}
-string get_configuration_value(string file, string delimiter,string parameter)
-{
-  map<string,string> property_list;
-  ifstream in(file.c_str());
-  string line;
-	parameter_value pv;
-  if (in) {
-    while (!in.eof()) {
-      getline(in, line);
-      if ((line[0] != '#' ) && ( line.find(delimiter) > 0) && ( line.size() > 0)) {
-				pv = split_parameter_value(line,delimiter);
-				property_list[pv.parameter]=pv.value;
-      }
-    }
-  }
-  return property_list[parameter];
-}
 void assert_argument(char** argv, int argc, int index)
 {
 	if (argc - 1 < index + 1)
 		throw runtime_error("option " + string(argv[index]) + " requires an argument");
 }
-
-string itos(unsigned int value)
-{
-	static char buf[20];
-	sprintf(buf, "%u", value);
-	return buf;
-}
-
-string mtos(mode_t mode)
-{
-	string s;
-
-	// File type
-	switch (mode & S_IFMT) {
-        case S_IFREG:  s += '-'; break; // Regular
-        case S_IFDIR:  s += 'd'; break; // Directory
-        case S_IFLNK:  s += 'l'; break; // Symbolic link
-        case S_IFCHR:  s += 'c'; break; // Character special
-        case S_IFBLK:  s += 'b'; break; // Block special
-        case S_IFSOCK: s += 's'; break; // Socket
-        case S_IFIFO:  s += 'p'; break; // Fifo
-        default:       s += '?'; break; // Unknown
-        }
-
-	// User permissions
-        s += (mode & S_IRUSR) ? 'r' : '-';
-        s += (mode & S_IWUSR) ? 'w' : '-';
-        switch (mode & (S_IXUSR | S_ISUID)) {
-        case S_IXUSR:           s += 'x'; break;
-        case S_ISUID:           s += 'S'; break;
-        case S_IXUSR | S_ISUID: s += 's'; break;
-        default:                s += '-'; break;
-        }
-
-        // Group permissions
-	s += (mode & S_IRGRP) ? 'r' : '-';
-        s += (mode & S_IWGRP) ? 'w' : '-';
-        switch (mode & (S_IXGRP | S_ISGID)) {
-        case S_IXGRP:           s += 'x'; break;
-        case S_ISGID:           s += 'S'; break;
-	case S_IXGRP | S_ISGID: s += 's'; break;
-        default:                s += '-'; break;
-        }
-
-        // Other permissions
-        s += (mode & S_IROTH) ? 'r' : '-';
-        s += (mode & S_IWOTH) ? 'w' : '-';
-        switch (mode & (S_IXOTH | S_ISVTX)) {
-        case S_IXOTH:           s += 'x'; break;
-        case S_ISVTX:           s += 'T'; break;
-        case S_IXOTH | S_ISVTX: s += 't'; break;
-        default:                s += '-'; break;
-        }
-
-	return s;
-}
-
-string trim_filename(const string& filename)
-{
-	string search("//");
-	string result = filename;
-
-	for (string::size_type pos = result.find(search); pos != string::npos; pos = result.find(search))
-		result.replace(pos, search.size(), "/");
-
-	return result;
-}
-bool create_recursive_dirs(const string& path)
-{
-	char opath[MAX_PATH];
-	char *p;
-	size_t len;
-	strcpy(opath, path.c_str());
-	len = strlen(opath);
-	if ( len > 1)
-	{
-		if(opath[len - 1] == '/')
-			opath[len - 1] = '\0';
-		for(p = opath; *p; p++)
-		{
-			if(*p == '/')
-			{
-				*p='\0';
-				if(access(opath, 0))
-					mkdir(opath,S_CARD_MODE);
-				*p = '/';
-			}
-		}
-		if(access(opath, 0))
-			mkdir(opath,S_CARD_MODE);
-		return true;
-	}
-	return false;
-}	
-bool file_exists(const string& filename)
-{
-	struct stat buf;
-	return !lstat(filename.c_str(), &buf);
-}
-
-bool file_empty(const string& filename)
-{
-	struct stat buf;
-
-	if (lstat(filename.c_str(), &buf) == -1)
-		return false;
-	
-	return (S_ISREG(buf.st_mode) && buf.st_size == 0);
-}
-
-bool file_equal(const string& file1, const string& file2)
-{
-	struct stat buf1, buf2;
-
-	if (lstat(file1.c_str(), &buf1) == -1)
-		return false;
-
-	if (lstat(file2.c_str(), &buf2) == -1)
-		return false;
-
-	// Regular files
-	if (S_ISREG(buf1.st_mode) && S_ISREG(buf2.st_mode)) {
-		ifstream f1(file1.c_str());
-		ifstream f2(file2.c_str());
-	
-		if (!f1 || !f2)
-			return false;
-
-		while (!f1.eof()) {
-			char buffer1[4096];
-			char buffer2[4096];
-			f1.read(buffer1, 4096);
-			f2.read(buffer2, 4096);
-			if (f1.gcount() != f2.gcount() ||
-			    memcmp(buffer1, buffer2, f1.gcount()) ||
-			    f1.eof() != f2.eof())
-				return false;
-		}
-
-		return true;
-	}
-	// Symlinks
-	else if (S_ISLNK(buf1.st_mode) && S_ISLNK(buf2.st_mode)) {
-		char symlink1[MAXPATHLEN];
-		char symlink2[MAXPATHLEN];
-
-		memset(symlink1, 0, MAXPATHLEN);
-		memset(symlink2, 0, MAXPATHLEN);
-
-		if (readlink(file1.c_str(), symlink1, MAXPATHLEN - 1) == -1)
-			return false;
-
-		if (readlink(file2.c_str(), symlink2, MAXPATHLEN - 1) == -1)
-			return false;
-
-		return !strncmp(symlink1, symlink2, MAXPATHLEN);
-	}
-	// Character devices
-	else if (S_ISCHR(buf1.st_mode) && S_ISCHR(buf2.st_mode)) {
-		return buf1.st_dev == buf2.st_dev;
-	}
-	// Block devices
-	else if (S_ISBLK(buf1.st_mode) && S_ISBLK(buf2.st_mode)) {
-		return buf1.st_dev == buf2.st_dev;
-	}
-
-	return false;
-}
-
-bool permissions_equal(const string& file1, const string& file2)
-{
-	struct stat buf1;
-	struct stat buf2;
-
-	if (lstat(file1.c_str(), &buf1) == -1)
-		return false;
-
-	if (lstat(file2.c_str(), &buf2) == -1)
-		return false;
-	
-	return(buf1.st_mode == buf2.st_mode) &&
-		(buf1.st_uid == buf2.st_uid) &&
-		(buf1.st_gid == buf2.st_gid);
-}
-
-void file_remove(const string& basedir, const string& filename)
-{
-	if (filename != basedir && !remove(filename.c_str())) {
-		char* path = strdup(filename.c_str());
-		file_remove(basedir, dirname(path));
-		free(path);
-	}
-}
-set<string> file_find(const string& path)
-{
-	set<string> files_list;
-	DIR *d;
-	struct dirent *dir;
-	d = opendir(path.c_str());
-	if (d)
-	{
-		while ((dir = readdir(d)) != NULL)
-		{
-			if ( strcmp (dir->d_name, ".") && strcmp (dir->d_name, "..") ) // ignore the directories dots
-			{
-				files_list.insert(dir->d_name);
-    	}
-		}
-    closedir(d);
-  }
-  return files_list;
-}
-
 void advance_cursor() {
   static int pos=0;
   char cursor[4]={'/','-','\\','|'};

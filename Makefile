@@ -39,9 +39,9 @@ LIBCURLLIBS := $(shell pkg-config --libs --static libcurl)
 
 LDFLAGS += $(LIBARCHIVELIBS) $(LIBCURLLIBS)
 
-OBJECTS = main.o cards.o pkgadd.o pkgrm.o pkginfo.o pkgdwl.o
+OBJECTS = main.o string_utils.o file_utils.o pkgdbh.o pkgadd.o pkgrm.o pkginfo.o pkgdwl.o
 
-LIBOBJECTS =  cards.o pkgadd.o pkgrm.o pkginfo.o
+LIBOBJECTS =  pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
 
 MANPAGES = pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr rejmerge.8 pkgmk.conf.5 pkgmk.conf.5.fr pkg-repgen.8.fr
 

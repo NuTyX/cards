@@ -23,7 +23,8 @@
 #ifndef PKGADD_H
 #define PKGADD_H
 
-#include "cards.h"
+#include "string_utils.h"
+#include "pkgdbh.h"
 #include <vector>
 #include <set>
 

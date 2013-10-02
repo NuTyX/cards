@@ -1,4 +1,4 @@
-//  cards.h
+//  pkgdbh.h
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
@@ -34,9 +34,9 @@
 #include <dirent.h>
 
 #define PKG_EXT          ".pkg.tar."
-#define PKG_DIR_OLD      "var/lib/pkg"
-#define PKG_DIR          "var/lib/pkg/DB"
-#define PKG_DB           "var/lib/pkg/db"
+#define PKG_DB_DIR_OLD      "var/lib/pkg"
+#define PKG_DB_DIR          "var/lib/pkg/DB"
+#define PKG_DB_OLD           "var/lib/pkg/db"
 #define PKG_FILES        "/files"
 #define PKG_INSTALL_DIR  "install"
 #define PKG_RECEPT       "/Pkgfile"
@@ -52,15 +52,7 @@
 #define LDCONFIG         "/sbin/ldconfig"
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
 
-#define MAX_PATH 255
-#define S_CARD_MODE S_ISVTX|S_IRWXU|S_IXGRP|S_IXOTH|S_IRGRP|S_IROTH
-
 using namespace std;
-
-struct parameter_value {
-		string parameter;
-		string value;
-	};
 
 enum action 
 { 
@@ -167,20 +159,7 @@ public:
 };
 
 // Utility functions
-parameter_value split_parameter_value(string s, string delimiter);
-set<string> get_parameter_list(string file, string delimiter);
-string get_configuration_value(string file, string delimiter,string parameter);
 void assert_argument(char** argv, int argc, int index);
-string itos(unsigned int value);
-string mtos(mode_t mode);
-string trim_filename(const string& filename);
-bool file_exists(const string& filename);
-bool file_empty(const string& filename);
-bool file_equal(const string& file1, const string& file2);
-bool permissions_equal(const string& file1, const string& file2);
-bool create_recursive_dirs(const string& pathname);
-void file_remove(const string& basedir, const string& filename);
-set<string>  file_find(const string& basedir);
 void advance_cursor();
 #endif /* CARDS_H */
 // vim:set ts=2 :

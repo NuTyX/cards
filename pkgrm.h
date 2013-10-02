@@ -24,7 +24,7 @@
 #ifndef PKGRM_H
 #define PKGRM_H
 
-#include "cards.h"
+#include "pkgdbh.h"
 
 class pkgrm : public cards {
 public:

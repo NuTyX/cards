@@ -23,8 +23,8 @@
 
 #ifndef PKGINFO_H
 #define PKGINFO_H
-
-#include "cards.h"
+#include "file_utils.h"
+#include "pkgdbh.h"
 
 class pkginfo : public cards {
 public:

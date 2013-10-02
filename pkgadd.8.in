@@ -5,7 +5,7 @@ pkgadd \- install software package
 \fBpkgadd [options] <file>\fP
 .SH DESCRIPTION
 \fBpkgadd\fP is a \fIpackage management\fP utility, which installs
-a software package. A \fIpackage\fP is an archive of files (.pkg.tar.gz).
+a software package. A \fIpackage\fP is an archive of files (.pkg.tar.xz).
 .SH OPTIONS
 .TP
 .B "\-u, \-\-upgrade"

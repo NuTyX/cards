@@ -90,7 +90,7 @@ void pkginfo::run(int argc, char** argv)
 			if (getuid())
 				throw runtime_error("only root can convert the db packages");
 
-			const string new_db = PKG_DIR;	
+			const string new_db = PKG_DB_DIR;	
     	if (file_exists("/" + new_db))
 			{
 				db_convert_space_to_no_space(o_root);

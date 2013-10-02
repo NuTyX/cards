@@ -21,7 +21,9 @@
 #ifndef PKGDWL_H
 #define PKGDWL_H
 
-#include "cards.h"
+#include "string_utils.h"
+#include "file_utils.h"
+#include "pkgdbh.h"
 #include <curl/curl.h>
 
 #include <unistd.h>
