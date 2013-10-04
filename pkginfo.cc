@@ -71,16 +71,21 @@ void pkginfo::run(int argc, char** argv)
 			o_arg = argv[i + 1];
 			i++;
 		} else {
-			throw runtime_error("invalid option " + option);
+			actual_error = INVALID_OPTION;
+			error_treatment(option);
 		}
 	}
 
 	if (o_footprint_mode + o_installed_mode + o_list_mode + o_owner_mode + o_debug_mode + o_convert_mode == 0)
-		throw runtime_error("option missing");
-
+	{
+		actual_error = OPTION_MISSING;
+		error_treatment(o_arg);
+	}
 	if (o_footprint_mode + o_installed_mode + o_list_mode + o_owner_mode > 1)
-		throw runtime_error("too many options");
-
+	{
+		actual_error = TOO_MANY_OPTIONS;
+		error_treatment(o_arg);
+	}
 	if (o_footprint_mode) {
 		//
 		// Make footprint
@@ -88,7 +93,10 @@ void pkginfo::run(int argc, char** argv)
 		pkg_footprint(o_arg);
 	} else if (o_convert_mode ) {
 			if (getuid())
-				throw runtime_error("only root can convert the db packages");
+			{
+				actual_error = ONLY_ROOT_CAN_CONVERT_DB;
+				error_treatment("");
+			}
 
 			const string new_db = PKG_DB_DIR;	
     	if (file_exists("/" + new_db))
@@ -124,7 +132,8 @@ void pkginfo::run(int argc, char** argv)
 				pair<string, pkginfo_t> package = pkg_open(o_arg);
 				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
 			} else {
-				throw runtime_error(o_arg + " is neither an installed package nor a package file");
+				actual_error = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
+				error_treatment(o_arg);
 			}
 		} else if (o_owner_mode) {
 			//
@@ -133,8 +142,10 @@ void pkginfo::run(int argc, char** argv)
 			db_open_2();
 			regex_t preg;
 			if (regcomp(&preg, o_arg.c_str(), REG_EXTENDED | REG_NOSUB))
-				throw runtime_error("error compiling regular expression '" + o_arg + "', aborting");
-
+			{
+				actual_error = CANNOT_COMPILE_REGULAR_EXPRESSION;
+				error_treatment(o_arg);
+			}
 			vector<pair<string, string> > result;
 			result.push_back(pair<string, string>("Package", "File"));
 			unsigned int width = result.begin()->first.length(); // Width of "Package"

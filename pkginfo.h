@@ -26,9 +26,9 @@
 #include "file_utils.h"
 #include "pkgdbh.h"
 
-class pkginfo : public cards {
+class pkginfo : public pkgdbh {
 public:
-	pkginfo() : cards("pkginfo") {}
+	pkginfo() : pkgdbh("pkginfo") {}
 	virtual void run(int argc, char** argv);
 	virtual void print_help() const;
 };

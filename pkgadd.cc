@@ -55,14 +55,18 @@ void pkgadd::run(int argc, char** argv)
 	}
 
 	if (o_package.empty())
-		throw runtime_error("option missing");
-
+	{
+		actual_error = OPTION_MISSING;
+		error_treatment("");
+	}
 	//
 	// Check UID
 	//
 	if (getuid())
-		throw runtime_error("only root can install/upgrade packages");
-
+	{
+		actual_error = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		error_treatment("");
+	}
 	//
 	// Install/upgrade package
 	//
@@ -79,10 +83,15 @@ void pkgadd::run(int argc, char** argv)
 
 		bool installed = db_find_pkg(package.first);
 		if (installed && !o_upgrade)
-			throw runtime_error("package " + package.first + " already installed (use -u to upgrade)");
+		{
+			actual_error = PACKAGE_ALLREADY_INSTALL;
+			error_treatment (package.first);
+		}
 		else if (!installed && o_upgrade)
-			throw runtime_error("package " + package.first + " not previously installed (skip -u to install)");
-
+		{
+			actual_error = PACKAGE_NOT_PREVIOUSLY_INSTALL;
+			error_treatment(package.first);
+		}
 		set<string> non_install_files = apply_install_rules(package.first, package.second, config_rules);
 		set<string> conflicting_files = db_find_conflicts(package.first, package.second);
       
@@ -94,7 +103,8 @@ void pkgadd::run(int argc, char** argv)
 				db_rm_files(conflicting_files, keep_list); // Remove unwanted conflicts
 			} else {
 				copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
-				throw runtime_error("listed file(s) already installed (use -f to ignore and overwrite)");
+				actual_error = LISTED_FILES_ALLREADY_INSTALLED;
+				error_treatment("listed file(s) already installed (use -f to ignore and overwrite)");
 			}
 		}
    
@@ -128,7 +138,7 @@ void pkgadd::print_help() const
 	     << "  -h, --help          print help and exit" << endl;
 }
 
-vector<rule_t> pkgadd::read_config() const
+vector<rule_t> pkgadd::read_config()
 {
 	vector<rule_t> rules;
 	unsigned int linecount = 0;
@@ -142,15 +152,19 @@ vector<rule_t> pkgadd::read_config() const
 			linecount++;
 			if (!line.empty() && line[0] != '#') {
 				if (line.length() >= PKGADD_CONF_MAXLINE)
-					throw runtime_error(filename + ":" + itos(linecount) + ": line too long, aborting");
-
+				{
+					actual_error = PKGADD_CONFIG_LINE_TOO_LONG;
+					error_treatment(filename + ":" + itos(linecount));
+				}
 				char event[PKGADD_CONF_MAXLINE];
 				char pattern[PKGADD_CONF_MAXLINE];
 				char action[PKGADD_CONF_MAXLINE];
 				char dummy[PKGADD_CONF_MAXLINE];
 				if (sscanf(line.c_str(), "%s %s %s %s", event, pattern, action, dummy) != 3)
-					throw runtime_error(filename + ":" + itos(linecount) + ": wrong number of arguments, aborting");
-
+				{
+					actual_error = PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS;
+					error_treatment(filename + ":" + itos(linecount));
+				}
 				if (!strcmp(event, "UPGRADE") || !strcmp(event, "INSTALL")) {
 					rule_t rule;
 					rule.event = strcmp(event, "UPGRADE") ? INSTALL : UPGRADE;
@@ -160,13 +174,19 @@ vector<rule_t> pkgadd::read_config() const
 					} else if (!strcmp(action, "NO")) {
 						rule.action = false;
 					} else
-						throw runtime_error(filename + ":" + itos(linecount) + ": '" +
-								    string(action) + "' unknown action, should be YES or NO, aborting");
+					{
+						actual_error = PKGADD_CONFIG_UNKNOWN_ACTION;
+						error_treatment(filename + ":" + itos(linecount) + ": '" +
+								    string(action));
+					}
 
 					rules.push_back(rule);
 				} else
-					throw runtime_error(filename + ":" + itos(linecount) + ": '" +
-							    string(event) + "' unknown event, aborting");
+				{
+					actual_error = PKGADD_CONFIG_UNKNOWN_EVENT;
+					error_treatment(filename + ":" + itos(linecount) + ": '" +
+							    string(event));
+				}
 			}
 		}
 		in.close();
@@ -183,7 +203,7 @@ vector<rule_t> pkgadd::read_config() const
 	return rules;
 }
 
-set<string> pkgadd::make_keep_list(const set<string>& files, const vector<rule_t>& rules) const
+set<string> pkgadd::make_keep_list(const set<string>& files, const vector<rule_t>& rules)
 {
 	set<string> keep_list;
 	vector<rule_t> found;
@@ -264,14 +284,16 @@ void pkgadd::find_rules(const vector<rule_t>& rules, rule_event_t event, vector<
 			found.push_back(*i);
 }
 
-bool pkgadd::rule_applies_to_file(const rule_t& rule, const string& file) const
+bool pkgadd::rule_applies_to_file(const rule_t& rule, const string& file)
 {
 	regex_t preg;
 	bool ret;
 
 	if (regcomp(&preg, rule.pattern.c_str(), REG_EXTENDED | REG_NOSUB))
-		throw runtime_error("error compiling regular expression '" + rule.pattern + "', aborting");
-
+	{
+		actual_error = CANNOT_COMPILE_REGULAR_EXPRESSION;
+		error_treatment(rule.pattern);
+	}
 	ret = !regexec(&preg, file.c_str(), 0, 0, 0);
 	regfree(&preg);
 

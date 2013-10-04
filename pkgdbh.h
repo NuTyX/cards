@@ -20,8 +20,8 @@
 //  USA.
 //
 
-#ifndef CARDS_H
-#define CARDS_H
+#ifndef PKGDBH_H
+#define PKGDBH_H
 
 #include <string>
 #include <set>
@@ -53,6 +53,43 @@
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
 
 using namespace std;
+enum error
+{
+CANNOT_DOWNLOAD_FILE,
+CANNOT_CREATE_FILE,
+CANNOT_OPEN_FILE,
+CANNOT_FIND_FILE,
+CANNOT_READ_FILE,
+CANNOT_READ_DIRECTORY,
+CANNOT_WRITE_FILE,
+CANNOT_SYNCHRONIZE,
+CANNOT_RENAME_FILE,
+CANNOT_DETERMINE_NAME_VERSION,
+EMPTY_PACKAGE,
+CANNOT_FORK,
+WAIT_PID_FAILED,
+DATABASE_LOCKED,
+CANNOT_LOCK_DIRECTORY,
+CANNOT_REMOVE_FILE,
+CANNOT_RENAME_DIRECTORY,
+OPTION_ONE_ARGUMENT,
+INVALID_OPTION,
+OPTION_MISSING,
+TOO_MANY_OPTIONS,
+ONLY_ROOT_CAN_CONVERT_DB,
+ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE,
+PACKAGE_ALLREADY_INSTALL,
+PACKAGE_NOT_INSTALL,
+PACKAGE_NOT_PREVIOUSLY_INSTALL,
+LISTED_FILES_ALLREADY_INSTALLED,
+PKGADD_CONFIG_LINE_TOO_LONG,
+PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS,
+PKGADD_CONFIG_UNKNOWN_ACTION,
+PKGADD_CONFIG_UNKNOWN_EVENT,
+CANNOT_COMPILE_REGULAR_EXPRESSION,
+NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE
+};
+
 
 enum action 
 { 
@@ -79,7 +116,7 @@ RM_PKG_FILES_RUN,
 RM_PKG_FILES_END
 };
 
-class cards {
+class pkgdbh {
 public:
 	struct pkginfo_t {
 		string version;
@@ -87,11 +124,12 @@ public:
 	};
 	typedef map<string, pkginfo_t> packages_t;
 
-	explicit cards(const string& name);
-	virtual ~cards() {}
+	explicit pkgdbh(const string& name);
+	virtual ~pkgdbh() {}
 	virtual void run(int argc, char** argv) = 0; // Need to be redefine in derivated class
 	virtual void print_help() const = 0; // help info is depending of the derivated class
 	virtual void progress() const; // progress info
+	virtual void error_treatment(const string& s) const; 
 	void print_version() const;
 
 protected:
@@ -118,7 +156,7 @@ protected:
 
 	// old member from pkgutils
 	void db_open(const string& path);
-	void db_commit();
+//	void db_commit();
 
 	// Tar.gz
 	pair<string, pkginfo_t> pkg_open(const string& filename);
@@ -126,8 +164,8 @@ protected:
 	void pkg_install(const string& filename, const set<string>& keep_list, const set<string>& non_install_files);
 	void pkg_move_metafiles(const string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
 	void pkg_install_2(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
-	void pkg_footprint(string& filename) const;
-	void ldconfig() const;
+	void pkg_footprint(string& filename);
+	void ldconfig();
 	void db_convert_space_to_no_space(const string& path);
 
 	string utilname;
@@ -137,7 +175,8 @@ protected:
 	set<string> metafiles_list;
 	set<string>	files_list;
 
-	action actual_action;		
+	action actual_action;
+	error actual_error;
 	unsigned int number_of_files;
 	unsigned int number_installed_files;
 };

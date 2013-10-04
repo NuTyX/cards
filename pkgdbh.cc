@@ -62,7 +62,7 @@
 
 using __gnu_cxx::stdio_filebuf;
 
-cards::cards(const string& name)
+pkgdbh::pkgdbh(const string& name)
 	: utilname(name)
 {
 	// Ignore signals
@@ -74,7 +74,112 @@ cards::cards(const string& name)
 	sigaction(SIGQUIT, &sa, 0);
 	sigaction(SIGTERM, &sa, 0);
 }
-void cards::progress() const
+void pkgdbh::error_treatment(const string& s) const
+{
+	switch ( actual_error )
+	{
+		case CANNOT_DOWNLOAD_FILE:
+			throw runtime_error("could not download " + s);
+			break;
+		case CANNOT_CREATE_FILE:
+			throw runtime_error_with_errno("could not created  " + s);
+			break;
+		case CANNOT_OPEN_FILE:
+			throw runtime_error_with_errno("could not open " + s);
+			break;
+		case CANNOT_FIND_FILE:
+			throw runtime_error_with_errno("could not find " + s);
+			break;
+		case CANNOT_READ_FILE:
+			throw runtime_error("could not read " + s);
+			break;
+		case CANNOT_READ_DIRECTORY:
+			throw runtime_error_with_errno("could not read directory " + s);
+			break;
+		case CANNOT_WRITE_FILE:
+			throw runtime_error_with_errno("could not write file " + s);
+			break;
+		case CANNOT_SYNCHRONIZE:
+			throw runtime_error_with_errno("could not synchronize " + s);
+			break;
+		case CANNOT_RENAME_FILE:
+			throw runtime_error_with_errno("could not rename " + s);
+			break;
+		case CANNOT_DETERMINE_NAME_VERSION:
+			throw runtime_error_with_errno("could not determine name / version " + s);
+			break;
+		case EMPTY_PACKAGE:
+			throw runtime_error_with_errno("could not synchronize " + s);
+			break;
+		case CANNOT_FORK:
+			throw runtime_error_with_errno("fork() failed " + s);
+			break;
+		case WAIT_PID_FAILED:
+			throw runtime_error_with_errno("waitpid() failed " + s);
+			break;
+		case DATABASE_LOCKED:
+			throw runtime_error_with_errno("Database  " + s + " locked by another user");
+			break;
+		case CANNOT_LOCK_DIRECTORY:
+			throw runtime_error_with_errno("could lock directory " + s);
+			break;
+		case CANNOT_REMOVE_FILE:
+			throw runtime_error_with_errno("could not remove file " + s);
+			break;
+		case CANNOT_RENAME_DIRECTORY:
+			throw runtime_error_with_errno("could not rename directory  " + s);
+			break;
+		case OPTION_ONE_ARGUMENT:
+			throw runtime_error_with_errno(s + " require one argument");
+			break;
+		case INVALID_OPTION:
+			throw runtime_error(s + " invalid option" );
+			break;
+		case OPTION_MISSING:
+			throw runtime_error(s + " option missing");
+			break;
+		case TOO_MANY_OPTIONS:
+			throw runtime_error(s+ ": to many options");
+			break;
+		case ONLY_ROOT_CAN_CONVERT_DB:
+			throw runtime_error(s + "only root can convert the database");
+			break;
+		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
+			throw runtime_error(s + " only root can install / upgrade / remove packages");
+			break;
+		case PACKAGE_ALLREADY_INSTALL:
+			throw runtime_error("package " + s + " allready installed (use -u to upgrade)");
+			break;
+		case PACKAGE_NOT_INSTALL:
+			throw runtime_error("package " + s + " not yet installed");
+			break;
+		case PACKAGE_NOT_PREVIOUSLY_INSTALL:
+			throw runtime_error("package " + s + " not previously installed (skip -u to install)");
+			break;
+		case LISTED_FILES_ALLREADY_INSTALLED:
+			throw runtime_error(s + "listed file(s) allready installed (use -f to ignore and overwrite)");
+			break;
+		case PKGADD_CONFIG_LINE_TOO_LONG:
+			throw runtime_error_with_errno(s + ": line too long, aborting");
+			break;
+		case PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS:
+			throw runtime_error_with_errno(s + ": wrong number of arguments, aborting");
+			break;
+		case PKGADD_CONFIG_UNKNOWN_ACTION:
+			throw runtime_error_with_errno(s + "': config unknown action, should be YES or NO, aborting");
+			break;
+		case PKGADD_CONFIG_UNKNOWN_EVENT:
+			throw runtime_error_with_errno(s + "' unknown event, aborting");
+			break;
+		case CANNOT_COMPILE_REGULAR_EXPRESSION:
+			throw runtime_error("error compiling regular expression '" + s + "', aborting");
+			break;
+		case NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE:
+			throw runtime_error(s + " is neither an installed package nor a package file");
+			break;
+	}
+}
+void pkgdbh::progress() const
 {
   static int j = 0;
   int i;
@@ -153,7 +258,7 @@ void cards::progress() const
 			break;
   }
 }
-int cards::list_pkg (const string& path) // return the number of db files founds
+int pkgdbh::list_pkg (const string& path) // return the number of db files founds
 {
 	set<string> list_of_packages_file;
 	parameter_value string_splited;
@@ -172,7 +277,7 @@ int cards::list_pkg (const string& path) // return the number of db files founds
   return set_of_db.size();
 }
 
-void cards::db_open_2()
+void pkgdbh::db_open_2()
 {
 	actual_action = DB_OPEN_START;
 	progress();
@@ -191,8 +296,10 @@ void cards::db_open_2()
 		const string filelist = root + PKG_DB_DIR + "/" + package_foldername + PKG_FILES;
 		int fd = open(filelist.c_str(), O_RDONLY);
 		if (fd == -1)
-			throw runtime_error_with_errno("could not open " + filelist);
-
+		{
+			actual_error = CANNOT_OPEN_FILE;
+			error_treatment(filelist);
+		}
 		stdio_filebuf<char> listbuf(fd, ios::in, getpagesize());
 		istream in(&listbuf);
 		if (!in)
@@ -218,7 +325,7 @@ void cards::db_open_2()
 	actual_action = DB_OPEN_END;
 	progress();
 }
-void cards::db_convert_space_to_no_space(const string& path)
+void pkgdbh::db_convert_space_to_no_space(const string& path)
 {
 	root = trim_filename(path + "/");
 	/* Convert from directories with spaces to directories without spaces */
@@ -233,12 +340,16 @@ void cards::db_convert_space_to_no_space(const string& path)
 			version.erase(0, version.find(NAME_DELIM) == string::npos ? string::npos : version.find(NAME_DELIM) + 1);
 			const string packagenamedir_with_space = root + PKG_DB_DIR + "/" + name + " " + version;
 			const string packagenamedir_without_space = root + PKG_DB_DIR + "/" + name + "#" + version;
-			rename( packagenamedir_with_space.c_str(), packagenamedir_without_space.c_str() );
+			if (rename( packagenamedir_with_space.c_str(), packagenamedir_without_space.c_str() ) == -1 )
+			{
+				actual_error = CANNOT_RENAME_FILE;
+				error_treatment(packagenamedir_with_space + " to " + packagenamedir_without_space);
+			}
 			cout << packagenamedir_with_space << " renamed in " << packagenamedir_without_space << endl;
 		}
 	}	
 }
-void cards::db_convert()
+void pkgdbh::db_convert()
 {
 	/* Convert from single db file to multi directories */
 
@@ -256,7 +367,10 @@ void cards::db_convert()
 		int fd_new = creat(fileslist_new.c_str(),0444);
 
 		if (fd_new == -1)
-			throw runtime_error_with_errno("could not create " + fileslist_new);
+		{
+			actual_error = CANNOT_CREATE_FILE;
+			error_treatment(fileslist_new);
+		}
 
 		stdio_filebuf<char> filebuf_new(fd_new, ios::out, getpagesize());
 
@@ -265,21 +379,29 @@ void cards::db_convert()
 	
 		db_new.flush();
 		if (!db_new)
-    	throw runtime_error("could not write " + fileslist_new);
-
+		{
+			actual_error = CANNOT_WRITE_FILE;
+			error_treatment(fileslist_new);
+		}
 		// Synchronize file to disk
 		if (fsync(fd_new) == -1)
-			throw runtime_error_with_errno("could not synchronize " + fileslist_new);
+		{
+			actual_error = CANNOT_SYNCHRONIZE;
+			error_treatment(fileslist_new);
+		}
 
 		// Move new database into place
 		if (rename(fileslist_new.c_str(), fileslist.c_str()) == -1)
-			throw runtime_error_with_errno("could not rename " + fileslist_new + " to " + fileslist);
+		{
+			actual_error = CANNOT_RENAME_FILE;
+			error_treatment(fileslist_new + " to " + fileslist);
+		}
 	}
 #ifndef NDEBUG
   cerr << packages.size() << " packages written to database" << endl;
 #endif
 }
-void cards::pkg_move_metafiles(const string& name, pkginfo_t& info)
+void pkgdbh::pkg_move_metafiles(const string& name, pkginfo_t& info)
 {
 	actual_action = PKG_MOVE_META_START;
 	progress();
@@ -297,12 +419,16 @@ void cards::pkg_move_metafiles(const string& name, pkginfo_t& info)
 	if ( metafiles_list.size()>0 )
 	{
 		const string installdir = root + PKG_INSTALL_DIR;
-		rename( installdir.c_str(), packagenamedir.c_str() );
+		if (rename(installdir.c_str(), packagenamedir.c_str()) == -1)
+		{
+			actual_error = CANNOT_RENAME_FILE;
+			error_treatment(installdir + " to " + packagenamedir);
+		}
 	}
 	actual_action = PKG_MOVE_META_END;
 	progress();
 }	 
-void cards::db_add_pkg(const string& name, const pkginfo_t& info)
+void pkgdbh::db_add_pkg(const string& name, const pkginfo_t& info)
 {
 	packages[name] = info;
 	const string packagedir = root + PKG_DB_DIR ;
@@ -311,7 +437,10 @@ void cards::db_add_pkg(const string& name, const pkginfo_t& info)
 	const string fileslist_new = fileslist + ".imcomplete_transaction";
 	int fd_new = creat(fileslist_new.c_str(),0644);
 	if (fd_new == -1)
-		throw runtime_error_with_errno("could not create " + fileslist_new);
+	{
+		actual_error = CANNOT_CREATE_FILE;
+		error_treatment(fileslist_new);
+	}
 
 	stdio_filebuf<char> filebuf_new(fd_new, ios::out, getpagesize());
 
@@ -319,32 +448,35 @@ void cards::db_add_pkg(const string& name, const pkginfo_t& info)
 	copy(info.files.begin(), info.files.end(), ostream_iterator<string>(db_new, "\n"));
 
 	db_new.flush();
-		if (!db_new)
-			{ 
-				rmdir(packagenamedir.c_str());
-				throw runtime_error("could not write " + fileslist_new);
-			}
+	if (!db_new)
+	{ 
+		rmdir(packagenamedir.c_str());
+		actual_error = CANNOT_WRITE_FILE;
+		error_treatment(fileslist_new);
+	}
 	// Synchronize file to disk
 	if (fsync(fd_new) == -1)
 	{
 		rmdir(packagenamedir.c_str());
-		throw runtime_error_with_errno("could not synchronize " + fileslist_new);
+		actual_error = CANNOT_SYNCHRONIZE;
+		error_treatment(fileslist_new);
 	}
 	// Move new database into place
 	if (rename(fileslist_new.c_str(), fileslist.c_str()) == -1)
 	{
 		rmdir(packagenamedir.c_str());
-		throw runtime_error_with_errno("could not rename " + fileslist_new + " to " + fileslist);
+		actual_error = CANNOT_RENAME_FILE;
+		error_treatment(fileslist_new + " to " + fileslist);
 	}
 }
 
-bool cards::db_find_pkg(const string& name)
+bool pkgdbh::db_find_pkg(const string& name)
 {
 	return (packages.find(name) != packages.end());
 }
 
 /* Remove meta data about the removed package */
-void cards::db_rm_pkg(const string& name)
+void pkgdbh::db_rm_pkg(const string& name)
 {
  	  const string packagedir = root + PKG_DB_DIR ;
 		const string version = packages[name].version;
@@ -365,7 +497,7 @@ void cards::db_rm_pkg(const string& name)
 }
 
 /* Remove the physical files after followings some rules */
-void cards::rm_pkg_files(const string& name)
+void pkgdbh::rm_pkg_files(const string& name)
 {
 	files_list = packages[name].files;
 	packages.erase(name);
@@ -403,7 +535,7 @@ void cards::rm_pkg_files(const string& name)
 	progress();
 }
 
-void cards::db_rm_pkg(const string& name, const set<string>& keep_list)
+void pkgdbh::db_rm_pkg(const string& name, const set<string>& keep_list)
 {
 	files_list = packages[name].files;
 	packages.erase(name);
@@ -453,7 +585,7 @@ void cards::db_rm_pkg(const string& name, const set<string>& keep_list)
 	progress();
 }
 
-void cards::db_rm_files(set<string> files, const set<string>& keep_list)
+void pkgdbh::db_rm_files(set<string> files, const set<string>& keep_list)
 {
 	// Remove all references
 	for (packages_t::iterator i = packages.begin(); i != packages.end(); ++i)
@@ -482,7 +614,7 @@ void cards::db_rm_files(set<string> files, const set<string>& keep_list)
 	}
 }
 
-set<string> cards::db_find_conflicts(const string& name, const pkginfo_t& info)
+set<string> pkgdbh::db_find_conflicts(const string& name, const pkginfo_t& info)
 {
 	set<string> files;
    
@@ -542,7 +674,7 @@ set<string> cards::db_find_conflicts(const string& name, const pkginfo_t& info)
 	return files;
 }
 
-pair<string, cards::pkginfo_t> cards::pkg_open(const string& filename)
+pair<string, pkgdbh::pkginfo_t> pkgdbh::pkg_open(const string& filename)
 {
 	pair<string, pkginfo_t> result;
 	struct archive* archive;
@@ -555,7 +687,10 @@ pair<string, cards::pkginfo_t> cards::pkg_open(const string& filename)
 	version.erase(0, version.find(VERSION_DELIM) == string::npos ? string::npos : version.find(VERSION_DELIM) + 1);
    
 	if (name.empty() || version.empty())
-		throw runtime_error("could not determine name and/or version of " + basename + ": Invalid package name");
+	{
+		actual_error = CANNOT_DETERMINE_NAME_VERSION;
+		error_treatment(basename);
+	}
 
 	result.first = name;
 	result.second.version = version;
@@ -567,8 +702,11 @@ pair<string, cards::pkginfo_t> cards::pkg_open(const string& filename)
 	if (archive_read_open_filename(archive,
 	    filename.c_str(),
 	    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
-		throw runtime_error_with_errno("could not open " + filename, archive_errno(archive));
-
+		{
+			actual_error = CANNOT_OPEN_FILE;
+			error_treatment(filename);
+			//throw runtime_error_with_errno("could not open " + filename, archive_errno(archive));
+		}
 	actual_action = PKG_OPEN_START;
 	progress();
 	for (number_of_files = 0; archive_read_next_header(archive, &entry) ==
@@ -583,14 +721,24 @@ pair<string, cards::pkginfo_t> cards::pkg_open(const string& filename)
 
 		if (S_ISREG(mode) &&
 		    archive_read_data_skip(archive) != ARCHIVE_OK)
-			throw runtime_error_with_errno("could not read " + filename, archive_errno(archive));
+			{
+				actual_error = CANNOT_READ_FILE;
+				error_treatment(filename);
+			// throw runtime_error_with_errno("could not read " + filename, archive_errno(archive));
+			}
 	}
 
 	if (number_of_files == 0) {
 		if (archive_errno(archive) == 0)
-			throw runtime_error("empty package");
+		{
+			actual_error = EMPTY_PACKAGE;
+			error_treatment(filename);
+		}
 		else
-			throw runtime_error("could not read " + filename);
+		{
+			actual_error = CANNOT_READ_FILE;
+			error_treatment(filename);
+		}
 	}
 #if ARCHIVE_VERSION_NUMBER >= 3000000
 	archive_read_free(archive);
@@ -604,7 +752,7 @@ pair<string, cards::pkginfo_t> cards::pkg_open(const string& filename)
 	return result;
 }
 
-void cards::pkg_install(const string& filename, const set<string>& keep_list, const set<string>& non_install_list)
+void pkgdbh::pkg_install(const string& filename, const set<string>& keep_list, const set<string>& non_install_list)
 {
 	struct archive* archive;
 	struct archive_entry* entry;
@@ -617,8 +765,11 @@ void cards::pkg_install(const string& filename, const set<string>& keep_list, co
 	if (archive_read_open_filename(archive,
 	    filename.c_str(),
 	    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
-		throw runtime_error_with_errno("could not open " + filename, archive_errno(archive));
-
+		{
+			actual_error = CANNOT_OPEN_FILE;
+			error_treatment(filename);
+//		throw runtime_error_with_errno("could not open " + filename, archive_errno(archive));
+		}
 	chdir(root.c_str());
 	absroot = getcwd(buf, sizeof(buf));
 	actual_action = PKG_INSTALL_START;
@@ -689,9 +840,15 @@ void cards::pkg_install(const string& filename, const set<string>& keep_list, co
 	progress();
 	if (number_installed_files == 0) {
 		if (archive_errno(archive) == 0)
-			throw runtime_error("empty package");
+		{
+			actual_error = EMPTY_PACKAGE;
+			error_treatment(filename);
+		}
 		else
-			throw runtime_error("could not read " + filename);
+		{
+			actual_error = CANNOT_READ_FILE;
+			error_treatment(filename);
+		}
 	}
 #if ARCHIVE_VERSION_NUMBER >= 3000000
 	archive_read_free(archive);
@@ -700,14 +857,17 @@ void cards::pkg_install(const string& filename, const set<string>& keep_list, co
 #endif
 }
 
-void cards::ldconfig() const
+void pkgdbh::ldconfig()
 {
 	// Only execute ldconfig if /etc/ld.so.conf exists
 	if (file_exists(root + LDCONFIG_CONF)) {
 		pid_t pid = fork();
 
 		if (pid == -1)
-			throw runtime_error_with_errno("fork() failed");
+		{
+			actual_error = CANNOT_FORK;
+			error_treatment("");
+		}
 
 		if (pid == 0) {
 			execl(LDCONFIG, LDCONFIG, "-r", root.c_str(), (char *) 0);
@@ -716,12 +876,15 @@ void cards::ldconfig() const
 			exit(EXIT_FAILURE);
 		} else {
 			if (waitpid(pid, 0, 0) == -1)
-				throw runtime_error_with_errno("waitpid() failed");
+			{
+				actual_error = WAIT_PID_FAILED;
+				error_treatment("");
+			}
 		}
 	}
 }
 
-void cards::pkg_footprint(string& filename) const
+void pkgdbh::pkg_footprint(string& filename)
 {
 	unsigned int i;
 	struct archive* archive;
@@ -741,7 +904,11 @@ void cards::pkg_footprint(string& filename) const
 	if (archive_read_open_filename(archive,
 	    filename.c_str(),
 	    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
-                throw runtime_error_with_errno("could not open " + filename, archive_errno(archive));
+			{
+				actual_error = CANNOT_OPEN_FILE;
+				error_treatment(filename);
+			}
+      //         throw runtime_error_with_errno("could not open " + filename, archive_errno(archive));
 
 	for (i = 0; archive_read_next_header(archive, &entry) ==
 	     ARCHIVE_OK; ++i) {
@@ -755,7 +922,11 @@ void cards::pkg_footprint(string& filename) const
 		}
 
 		if (S_ISREG(mode) && archive_read_data_skip(archive))
-			throw runtime_error_with_errno("could not read " + filename, archive_errno(archive));
+		{
+			actual_error = CANNOT_READ_FILE;
+			error_treatment(filename);
+		//	throw runtime_error_with_errno("could not read " + filename, archive_errno(archive));
+		}
 	}
 #if ARCHIVE_VERSION_NUMBER >= 3000000
 	archive_read_free(archive);
@@ -771,8 +942,11 @@ void cards::pkg_footprint(string& filename) const
 	if (archive_read_open_filename(archive,
 	    filename.c_str(),
 	    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
-                throw runtime_error_with_errno("could not open " + filename, archive_errno(archive));
-
+			{
+				actual_error = CANNOT_OPEN_FILE;
+				error_treatment(filename);
+        // throw runtime_error_with_errno("could not open " + filename, archive_errno(archive));
+			}
 	for (i = 0; archive_read_next_header(archive, &entry) ==
 	     ARCHIVE_OK; ++i) {
 		mode_t mode = archive_entry_mode(entry);
@@ -833,14 +1007,24 @@ void cards::pkg_footprint(string& filename) const
 		cout << '\n';
 		
 		if (S_ISREG(mode) && archive_read_data_skip(archive))
-			throw runtime_error_with_errno("could not read " + filename, archive_errno(archive));
+		{
+			actual_error = CANNOT_READ_FILE;
+			error_treatment(filename);
+		//	throw runtime_error_with_errno("could not read " + filename, archive_errno(archive));
+		}
 	}
    
 	if (i == 0) {
 		if (archive_errno(archive) == 0)
-			throw runtime_error("empty package");
+		{
+			actual_error = EMPTY_PACKAGE;
+			error_treatment(filename);
+		}
 		else
-			throw runtime_error("could not read " + filename);
+		{
+			actual_error = CANNOT_READ_FILE;
+			error_treatment(filename);
+		}
 	}
 #if ARCHIVE_VERSION_NUMBER >= 3000000
 	archive_read_free(archive);
@@ -850,7 +1034,7 @@ void cards::pkg_footprint(string& filename) const
 
 }
 
-void cards::print_version() const
+void pkgdbh::print_version() const
 {
 	cout << utilname << " (cards) " << VERSION << endl;
 }
@@ -879,7 +1063,7 @@ db_lock::~db_lock()
 	}
 }
 
-void cards::db_commit()
+/*void pkgdbh::db_commit()
 {
   const string dbfilename = root + PKG_DB_OLD;
   const string dbfilename_new = dbfilename + ".incomplete_transaction";
@@ -887,13 +1071,17 @@ void cards::db_commit()
 
   // Remove failed transaction (if it exists)
   if (unlink(dbfilename_new.c_str()) == -1 && errno != ENOENT)
-    throw runtime_error_with_errno("could not remove " + dbfilename_new);
-
+	{
+		actual_error = CANNOT_REMOVE_FILE;
+    error_treatment(dbfilename_new);
+	}
   // Write new database
   int fd_new = creat(dbfilename_new.c_str(), 0444);
   if (fd_new == -1)
-    throw runtime_error_with_errno("could not create " + dbfilename_new);
-
+	{
+		actual_error = CANNOT_CREATE_FILE;
+		error_treatment(dbfilename_new);
+	}
   stdio_filebuf<char> filebuf_new(fd_new, ios::out, getpagesize());
 
   ostream db_new(&filebuf_new);
@@ -910,28 +1098,41 @@ void cards::db_commit()
 
   // Make sure the new database was successfully written
   if (!db_new)
-    throw runtime_error("could not write " + dbfilename_new);
-
-  // Synchronize file to disk
+	{
+		actual_error = CANNOT_WRITE_FILE;
+		error_treatment(dbfilename_new);
+  }
+	// Synchronize file to disk
   if (fsync(fd_new) == -1)
-    throw runtime_error_with_errno("could not synchronize " + dbfilename_new);
-
+	{
+		actual_error = CANNOT_SYNCHRONIZE;
+		error_treatment(dbfilename_new);
+	}
   // Relink database backup
   if (unlink(dbfilename_bak.c_str()) == -1 && errno != ENOENT)
-    throw runtime_error_with_errno("could not remove " + dbfilename_bak);
+	{
+		actual_error = CANNOT_REMOVE_FILE;
+		error_treatment(dbfilename_bak);
+	} 
   if (link(dbfilename.c_str(), dbfilename_bak.c_str()) == -1)
-    throw runtime_error_with_errno("could not create " + dbfilename_bak);
+	{
+		actual_error = CANNOT_CREATE_FILE;
+		error_treatment(dbfilename_bak);
+	}
 
   // Move new database into place
   if (rename(dbfilename_new.c_str(), dbfilename.c_str()) == -1)
-    throw runtime_error_with_errno("could not rename " + dbfilename_new + " to " + dbfilename);
+	{
+		actual_error = CANNOT_RENAME_FILE;
+		error_treatment(dbfilename_new + " to " + dbfilename);
+	}
 
 #ifndef NDEBUG
   cerr << packages.size() << " packages written to database" << endl;
 #endif
 }
-
-void cards::db_open(const string& path)
+*/
+void pkgdbh::db_open(const string& path)
 {
   // Read database from single file
   // Only need to convert from pkgutils to cards
@@ -941,13 +1142,17 @@ void cards::db_open(const string& path)
 
   int fd = open(filename.c_str(), O_RDONLY);
   if (fd == -1)
-    throw runtime_error_with_errno("could not open " + filename);
-
+	{
+		actual_error = CANNOT_OPEN_FILE;
+    error_treatment(filename);
+	}
   stdio_filebuf<char> filebuf(fd, ios::in, getpagesize());
   istream in(&filebuf);
   if (!in)
-    throw runtime_error_with_errno("could not read " + filename);
-
+	{
+		actual_error = CANNOT_READ_FILE;
+		error_treatment(filename);
+	}
   while (!in.eof()) {
     // Read record
     string name;

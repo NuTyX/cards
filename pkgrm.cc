@@ -40,18 +40,25 @@ void pkgrm::run(int argc, char** argv)
 			o_root = argv[i + 1];
 			i++;
 		} else if (option[0] == '-' || !o_package.empty()) {
-			throw runtime_error("invalid option " + option);
+			actual_error = INVALID_OPTION;
+			error_treatment(option);
 		} else {
 			o_package = option;
 		}
 	}
 
 	if (o_package.empty())
-		throw runtime_error("option missing");
+	{
+		actual_error = OPTION_MISSING;
+		error_treatment("o_package");
+	}
 	
 	// Check UID
 	if (getuid())
-		throw runtime_error("only root can remove packages");
+	{
+		actual_error = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		error_treatment("");
+	}
 
 	// Remove package
 	{
@@ -64,7 +71,10 @@ void pkgrm::run(int argc, char** argv)
 		db_open_2();
 
 		if (!db_find_pkg(o_package))
-			throw runtime_error("package " + o_package + " not installed");
+		{
+			actual_error = PACKAGE_NOT_INSTALL;
+			error_treatment(o_package);
+		}
 
 		// Remove metadata about the package removed 
 		db_rm_pkg(o_package);

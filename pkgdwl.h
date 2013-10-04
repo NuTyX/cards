@@ -33,9 +33,9 @@
 #define PARAM_DELIM     "="
 #define PKG_MD5SUM    ".md5sum"
 
-class pkgdwl : public cards {
+class pkgdwl : public pkgdbh {
 public:
-	pkgdwl() : cards("pkgdwl") 
+	pkgdwl() : pkgdbh("pkgdwl") 
 	{
 		// Check the configuration file
 		if ( ! file_exists(PKGDWL_CONF))
@@ -85,7 +85,7 @@ protected:
 		long int filetime;
 		FILE *stream;
 	};
-	void download_file(const string& _filename);
+	void download_file(const string& url_to_download , const string& filename);
 	void update_progress();
 
 	CURL* curl;

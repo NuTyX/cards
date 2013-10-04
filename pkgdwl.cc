@@ -38,24 +38,28 @@ void pkgdwl::run(int argc, char** argv)
 		} else if (option == "-i" || option == "--info") {
 			o_info = true;
 		} else if (option[0] == '-' || !o_package.empty()) {
-			throw runtime_error("invalid option " + option);
+			actual_error = INVALID_OPTION;
+			error_treatment(option);
 		} else {
 			o_package = option;
 		}
 	}
 	if (o_package.empty())
-		throw runtime_error("option missing");
+	{
+		actual_error = OPTION_MISSING;
+		error_treatment("");
+	}
 	if (o_info) // Get the package via it's name's md5sum
 	{
 
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
 		init_file_to_download(PKG_MD5SUM);
-		download_file(url + "/" + PKG_MD5SUM + "/" + o_package);
+		download_file(url + "/" + PKG_MD5SUM + "/" + o_package,PKG_MD5SUM);
 
 	} else {
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
 		init_file_to_download(PKG_MD5SUM);
-		download_file(url + "/" + PKG_MD5SUM + "/" + o_package);
+		download_file(url + "/" + PKG_MD5SUM + "/" + o_package,PKG_MD5SUM);
 
 		// Build up the tar to download we need to replace the symbol "#" with "%23" 
 
@@ -72,7 +76,7 @@ void pkgdwl::run(int argc, char** argv)
 		init_file_to_download(tar_file.c_str());
 		// Get the archive with progress pleeeeease
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-		download_file(url + "/" + tar_file_to_download);
+		download_file(url + "/" + tar_file_to_download,tar_file);
 		cout << endl;	
 	}
 }
@@ -84,7 +88,7 @@ void pkgdwl::init_file_to_download(const char * _file)
 	download_progress.lastruntime = 0;
 	download_progress.curl = curl;
 }
-void pkgdwl::download_file(const string& url_to_download)
+void pkgdwl::download_file(const string& url_to_download, const string& file)
 {
 	download_progress.lastruntime = 0;
 	download_progress.curl = curl;
@@ -102,13 +106,16 @@ void pkgdwl::download_file(const string& url_to_download)
 	result = curl_easy_perform(curl);
 	if (result != CURLE_OK)
 	{
-		cout << result << endl;
-		throw runtime_error("TODO: Something is wrong...");
+		actual_error = CANNOT_DOWNLOAD_FILE;
+		error_treatment(url_to_download);
 	}
 	if (destination_file.stream)
 		fclose(destination_file.stream);
 	else
-		throw runtime_error("TODO: No file created");
+	{
+		actual_error = CANNOT_CREATE_FILE;
+		error_treatment(file);
+	}
 }
 size_t pkgdwl::write_to_stream(void *buffer, size_t size, size_t nmemb, void *stream)
 {

@@ -38,7 +38,7 @@
 
 using namespace std;
 
-static cards* select_utility(const string& name)
+static pkgdbh* select_utility(const string& name)
 {
 	if (name == "pkgadd")
 		return new pkgadd;
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 	string name = basename(argv[0]);
 
 	try {
-		auto_ptr<cards> util(select_utility(name));
+		auto_ptr<pkgdbh> util(select_utility(name));
 
 		// Handle common options
 		for (int i = 1; i < argc; i++) {

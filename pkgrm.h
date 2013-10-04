@@ -26,9 +26,9 @@
 
 #include "pkgdbh.h"
 
-class pkgrm : public cards {
+class pkgrm : public pkgdbh {
 public:
-	pkgrm() : cards("pkgrm") {}
+	pkgrm() : pkgdbh("pkgrm") {}
 	virtual void run(int argc, char** argv);
 	virtual void print_help() const;
 };
