@@ -376,14 +376,13 @@ compress_manpages() {
 check_footprint() {
 	local TARGET FILE="$PKGMK_WORK_DIR/.tmp"
 	
-	cd $PKGMK_ROOT
+	cd $PKGMK_PACKAGE_DIR
 	if [ -z $TARGETS ]; then
 		get_package_list
 		if [ -z $TARGETS ]; then
 			error "Unable to update footprint"
 		fi
 	fi
-	
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $TARGET ]; then
 			PKGMK_FOOTPRINT="$PKGMK_FOOTPRINT_DIR/`echo $TARGET|cut -d "#" -f1`"
@@ -427,7 +426,7 @@ make_work_dir() {
 	
 	cd $PKGMK_ROOT
 	remove_work_dir
-	mkdir -p $SRC $PKG $PKGMK_MD5SUM_DIR $PKGMK_FOOTPRINT_DIR
+	mkdir -p $SRC $PKG
 
 	if [ "$PKGMK_IGNORE_MD5SUM" = "no" ]; then
 		check_md5sum
@@ -579,10 +578,6 @@ build_package() {
 				info "Build result for ${TARGETS[i]}:"
 				bsdtar -t -v -f \
 				$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE
-				info "Updating md5sum for ${TARGETS[i]}:"
-				cd $PKGMK_PACKAGE_DIR
-					md5sum ${TARGETS[i]} > $PKGMK_MD5SUM_DIR/$name.$group
-				cd -
 				i=$((i+1))
 				j=0
 			fi
@@ -615,8 +610,6 @@ build_package() {
 			else
 				check_footprint
 			fi
-			info "Updating md5sum for ${TARGETS[i]}:"
-			md5sum ${TARGETS[i]} > $PKGMK_MD5SUM_DIR/$name
 		fi
 	fi
 	
@@ -703,6 +696,7 @@ clean_old() {
 	find $PKGMK_PACKAGE_DIR/$name*#*.pkg.tar.* -exec rm -v {} \; 2> /dev/null
 }
 update_footprint() {
+	cd $PKGMK_PACKAGE_DIR
 	if [ -z $TARGETS ]; then
 		get_package_list
 		if [ -z $TARGETS ]; then		
@@ -729,11 +723,10 @@ update_footprint() {
 
 build_needed() {
 	local FILE RESULT
-	echo "$TARGET"
 	RESULT="yes"
-	
-	if [ -f $TARGET ]; then
+	if [ -f $TARGET ]; then 
 		RESULT="no"
+	else
 		if [ "$PKGMK_CHECK_FILES" != "no" ]; then
 			for FILE in $PKGMK_PKGFILE ${source[@]}; do
 				FILE=`get_filename $FILE`
@@ -742,13 +735,14 @@ build_needed() {
 					break
 				fi
 			done
-		fi
-	else
-		if [ "$PKGMK_DOWNLOAD_BIN" != "no" ]; then
-			if [ "`check_bin`" != "yes" ]; then
-				RESULT="yes"
-			else
-				RESULT="no"
+			
+		else
+			if [ "$PKGMK_DOWNLOAD_BIN" != "no" ]; then
+				if [ "`check_bin`" != "yes" ]; then
+					RESULT="yes"
+				else
+					RESULT="no"
+				fi
 			fi
 		fi
 	fi
@@ -874,6 +868,12 @@ main() {
 		. $FILE
 	done
 
+	if [ -z $PKGMK_PACKAGE_DIR ]; then
+		pushd ../.. > /dev/null
+		PKGMK_PACKAGE_DIR="$PWD/`uname -m`"
+		info "PKGMK_PACKAGE_DIR set to: $PKGMK_PACKAGE_DIR"
+		popd > /dev/null
+	fi
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "`dirname $PKGMK_WORK_DIR`"
@@ -929,7 +929,6 @@ main() {
 	fi
 
 	if [ "$PKGMK_UP_TO_DATE" = "yes" ]; then
-		echo "$PKGMK_UP_TO_DATE = \"yes\" "
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
 				if [ "`build_needed`" = "yes" ]; then
@@ -950,9 +949,8 @@ main() {
 	fi
 	# From here on it's need to check the base package not any group which means
 	# TARGET=$PKGMK_PACKAGE_DIR/$name#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE
-	TARGET=$PKGMK_PACKAGE_DIR/$name#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE	
+	TARGET=$PKGMK_PACKAGE_DIR/$name#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE
 	if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
-		echo "Checking ..."
 		info "Package '$TARGET' is up to date."
 		if [ ! -f $TARGET ]; then
 			if [ "$PKGMK_DOWNLOAD_BIN" = "yes" ]; then
@@ -989,14 +987,10 @@ readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
 readonly PKGMK_ROOT="$PWD"
 
-PKGMK_PACKAGE_DIR="$PWD"
-
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
 PKGMK_FOOTPRINT_DIR="$PKGMK_PACKAGE_DIR/.footprint"
-PKGMK_FOOTPRINT=".footprint"
-PKGMK_MD5SUM_DIR="$PKGMK_PACKAGE_DIR/.md5sum"
 PKGMK_MD5SUM=".md5sum"
 PKGMK_NOSTRIP=".nostrip"
 
