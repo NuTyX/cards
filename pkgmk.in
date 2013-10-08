@@ -59,13 +59,13 @@ get_basename() {
 	echo $FILE
 }
 check_pkgfile() {
-	if [ ! "$name" ]; then
+	if [ "$name" == "" ]; then
 		error "Variable 'name' not specified in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
-	elif [ ! "$version" ]; then
+	elif [ "$version" == "" ]; then
 		error "Variable 'version' not specified in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
-	elif [ ! "$release" ]; then
+	elif [ "$release" == "" ]; then
 		error "Variable 'release' not specified in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	elif [ "`type -t build`" != "function" ]; then
@@ -135,6 +135,7 @@ download_file() {
 
 	if [ $error != 0 ]; then
 		while true; do
+			echo "wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $1"
 			wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $1
 			error=$?
 			if [ $error != 0 ] && [ "$RESUME_CMD" ]; then
@@ -385,7 +386,7 @@ check_footprint() {
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $TARGET ]; then
-			PKGMK_FOOTPRINT="$PKGMK_FOOTPRINT_DIR/`echo $TARGET|cut -d "#" -f1`"
+			PKGMK_FOOTPRINT="$PKGMK_FOOTPRINT_DIR/`echo $TARGET|cut -d "#" -f1`.`uname -m`"
 			make_footprint > $FILE.footprint
 			if [ -f $PKGMK_FOOTPRINT ]; then
 				sort -k 3 $PKGMK_FOOTPRINT > $FILE.footprint.orig
@@ -438,15 +439,10 @@ remove_work_dir() {
 }
 add_metafiles () {
 	local FILE
-	if [ -d $PKG/install ];then
-		error "There is allready a folder named install"
-		error "It is reserved for the meta datas"
-		exit 1
-	fi
-	mkdir $PKG/install
-	for FILE in Pkgfile README pre-install post-install; do
+	mkdir -p $PKG/tmp/$name#$version-$release
+	for FILE in Pkgfile README pre-install post-install meta; do
 		if [ -f $FILE ]; then 
-			cp $FILE $PKG/install/$FILE
+			cp $FILE $PKG/tmp/$name#$version-$release/$FILE
 		fi
 	done 
 }
@@ -709,7 +705,7 @@ update_footprint() {
 			error "Unable to update footprint. File '$TARGET' not found."
 			exit 1
 		fi
-		PKGMK_FOOTPRINT="$PKGMK_FOOTPRINT_DIR/`echo $TARGET|cut -d "#" -f1`"	
+		PKGMK_FOOTPRINT="$PKGMK_FOOTPRINT_DIR/`echo $TARGET|cut -d "#" -f1`.`uname -m`"	
 		check_file "$PKGMK_FOOTPRINT"
 		if [ ! -d $PKGMK_FOOTPRINT_DIR ]; then
 			mkdir -p $PKGMK_FOOTPRINT_DIR
@@ -845,6 +841,20 @@ parse_options() {
 }
 
 main() {
+	if [ -f /etc/profile ]; then
+		source /etc/profile
+	fi
+	pushd ../.. > /dev/null
+	if [ -f etc/pkgmk.conf ]; then
+		PKGMK_CONFFILE="$PWD/etc/pkgmk.conf"
+		info "PKGMK_CONFFILE set to: $PKGMK_CONFFILE"
+	fi
+	
+	if [ -z $PKGMK_PACKAGE_DIR ]; then
+		PKGMK_PACKAGE_DIR="$PWD/`uname -m`"
+		info "PKGMK_PACKAGE_DIR set to: $PKGMK_PACKAGE_DIR"
+	fi
+	popd > /dev/null
 	# multilib
 	PKGMK_ARCH=64
 	if [ -f ".32bit" ]; then
@@ -855,10 +865,20 @@ main() {
 
 	parse_options "$@"
 
+	name="`basename $PKGMK_ROOT | cut  -d "#" -f1`"
+	version="`basename $PKGMK_ROOT | cut -d "#" -f2 | cut -d "-" -f1`"
+	release="`basename $PKGMK_ROOT | cut -d "#" -f2 | cut -d "-" -f2`"
+
+	info "name: $name"
+	info "version: $version"
+	info "release: $release"
+
+
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
 		recursive "$@"
 		exit 0
 	fi
+
 
 	for FILE in $PKGMK_CONFFILE $PKGMK_PKGFILE; do
 		if [ ! -f $FILE ]; then
@@ -976,6 +996,9 @@ main() {
 	if [ "$PKGMK_KEEP_SOURCES" == "no" ]; then
 		remove_source
 	fi
+
+	cd $PKGMK_PACKAGE_DIR
+	find . -name "*.pkg.tar.*"|sed "s/.pkg.tar.$PKGMK_COMPRESSION_MODE//"|sed "s/.\///" > $PKGMK_REPO
 	exit 0
 }
 
@@ -990,8 +1013,8 @@ readonly PKGMK_ROOT="$PWD"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
-PKGMK_FOOTPRINT_DIR="$PKGMK_PACKAGE_DIR/.footprint"
-PKGMK_MD5SUM=".md5sum"
+PKGMK_FOOTPRINT_DIR="$PKGMK_ROOT/.footprint"
+PKGMK_MD5SUM=".md5sum.`uname -m`"
 PKGMK_NOSTRIP=".nostrip"
 
 PKGMK_CHECK_FILES="no"
@@ -1024,12 +1047,12 @@ PKGMK_KEEP_WORK="no"
 PKGMK_KEEP_SOURCES="yes"
 
 PKGMK_UPDATE_MD5SUM="no"
-PKGMK_IGNORE_MD5SUM="yes"
+PKGMK_IGNORE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"
 PKGMK_NO_STRIP="no"
 PKGMK_CLEAN="no"
 
-PKGMKG_REPO="PKGREPO"
+PKGMK_REPO="PKGDB"
 
 main "$@"
 

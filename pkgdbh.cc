@@ -239,7 +239,7 @@ void pkgdbh::progress() const
 			break;
 		case RM_PKG_FILES_START:
 			j=0;
-			cout << "Removing " << files_list.size() << " files";
+			cout << "Removing " << files_list.size() << " files: ";
 			break;
 		case RM_PKG_FILES_RUN:
 			if ( files_list.size()>100)
@@ -293,7 +293,7 @@ void pkgdbh::db_open_2()
 	
 		// list of files
 		string package_foldername = name + "#" + version;
-		const string filelist = root + PKG_DB_DIR + "/" + package_foldername + PKG_FILES;
+		const string filelist = root + PKG_DB_DIR + package_foldername + PKG_FILES;
 		int fd = open(filelist.c_str(), O_RDONLY);
 		if (fd == -1)
 		{
@@ -338,8 +338,8 @@ void pkgdbh::db_convert_space_to_no_space(const string& path)
 			string name(*i,0, i->find(NAME_DELIM));
 			string version = *i;
 			version.erase(0, version.find(NAME_DELIM) == string::npos ? string::npos : version.find(NAME_DELIM) + 1);
-			const string packagenamedir_with_space = root + PKG_DB_DIR + "/" + name + " " + version;
-			const string packagenamedir_without_space = root + PKG_DB_DIR + "/" + name + "#" + version;
+			const string packagenamedir_with_space = root + PKG_DB_DIR + name + " " + version;
+			const string packagenamedir_without_space = root + PKG_DB_DIR + name + "#" + version;
 			if (rename( packagenamedir_with_space.c_str(), packagenamedir_without_space.c_str() ) == -1 )
 			{
 				actual_error = CANNOT_RENAME_FILE;
@@ -358,7 +358,7 @@ void pkgdbh::db_convert()
 	cout << packagedir << endl;
 	for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i) {
 
-		const string packagenamedir = root + PKG_DB_DIR + "/" + i->first + "#" + i-> second.version;
+		const string packagenamedir = root + PKG_DB_DIR + i->first + "#" + i-> second.version;
 		cout << packagenamedir << " created" << endl;
 		mkdir(packagenamedir.c_str(),0755);	
 		const string fileslist = packagenamedir + PKG_FILES;
@@ -405,26 +405,28 @@ void pkgdbh::pkg_move_metafiles(const string& name, pkginfo_t& info)
 {
 	actual_action = PKG_MOVE_META_START;
 	progress();
+	string package_meta_dir = PKG_INSTALL_DIR + name + "#" + info.version;
 	for (set<string>::iterator i = info.files.begin(); i!=info.files.end();++i) {
-		if ( strncmp(i->c_str(),PKG_INSTALL_DIR,7) == 0 )
+		if ( strncmp(i->c_str(),package_meta_dir.c_str(),package_meta_dir.size()) == 0 )
 		{
 			metafiles_list.insert(metafiles_list.end(), *i);
 			info.files.erase(i);
 		}
 	}
 	const string packagedir = root + PKG_DB_DIR ;
-	const string packagenamedir = root + PKG_DB_DIR + "/" + name + "#" + info.version;
+	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version;
 	
-	mkdir(packagenamedir.c_str(),0755);
+//	mkdir(packagenamedir.c_str(),0755);
 	if ( metafiles_list.size()>0 )
 	{
 		const string installdir = root + PKG_INSTALL_DIR;
-		if (rename(installdir.c_str(), packagenamedir.c_str()) == -1)
+		if (rename(package_meta_dir.c_str(), packagenamedir.c_str()) == -1)
 		{
 			actual_error = CANNOT_RENAME_FILE;
 			error_treatment(installdir + " to " + packagenamedir);
 		}
-	}
+	} else
+		mkdir(packagenamedir.c_str(),0755);
 	actual_action = PKG_MOVE_META_END;
 	progress();
 }	 
@@ -432,7 +434,7 @@ void pkgdbh::db_add_pkg(const string& name, const pkginfo_t& info)
 {
 	packages[name] = info;
 	const string packagedir = root + PKG_DB_DIR ;
-	const string packagenamedir = root + PKG_DB_DIR + "/" + name + "#" + info.version;
+	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version;
 	const string fileslist = packagenamedir + PKG_FILES;
 	const string fileslist_new = fileslist + ".imcomplete_transaction";
 	int fd_new = creat(fileslist_new.c_str(),0644);
@@ -480,11 +482,11 @@ void pkgdbh::db_rm_pkg(const string& name)
 {
  	  const string packagedir = root + PKG_DB_DIR ;
 		const string version = packages[name].version;
-  	const string packagenamedir = root + PKG_DB_DIR + "/" + name + "#" + version;
+  	const string packagenamedir = root + PKG_DB_DIR + name + "#" + version;
 		metafiles_list = file_find( packagenamedir);
 		if (metafiles_list.size() > 0)
 			for (set<string>::iterator i = metafiles_list.begin(); i != metafiles_list.end();++i) {
-				const string filename = packagenamedir +"/" + *i;
+				const string filename = packagenamedir + "/" + *i;
 				if (file_exists(filename) && remove(filename.c_str()) == -1) {
 					const char* msg = strerror(errno);
 					cerr << utilname << ": could not remove " << filename << ": " << msg << endl;

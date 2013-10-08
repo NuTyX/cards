@@ -34,15 +34,15 @@
 #include <dirent.h>
 
 #define PKG_EXT          ".pkg.tar."
-#define PKG_DB_DIR_OLD      "var/lib/pkg"
-#define PKG_DB_DIR          "var/lib/pkg/DB"
+#define PKG_DB_DIR_OLD      "var/lib/pkg/"
+#define PKG_DB_DIR          "var/lib/pkg/DB/"
 #define PKG_DB_OLD           "var/lib/pkg/db"
 #define PKG_FILES        "/files"
-#define PKG_INSTALL_DIR  "install"
-#define PKG_RECEPT       "/Pkgfile"
-#define PKG_README       "/README"
-#define PKG_PRE_INSTALL  "/pre-install"
-#define PKG_POST_INSTALL "/post-install"    
+#define PKG_INSTALL_DIR  "tmp/"
+#define PKG_RECEPT       "Pkgfile"
+#define PKG_README       "README"
+#define PKG_PRE_INSTALL  "pre-install"
+#define PKG_POST_INSTALL "post-install"    
 
 #define PKG_REJECTED     "var/lib/pkg/rejected"
 #define VERSION_DELIM    '#'
