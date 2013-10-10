@@ -60,13 +60,13 @@ get_basename() {
 }
 check_pkgfile() {
 	if [ "$name" == "" ]; then
-		error "Variable 'name' not specified in $PKGMK_PKGFILE."
+		error "Variable 'name' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	elif [ "$version" == "" ]; then
-		error "Variable 'version' not specified in $PKGMK_PKGFILE."
+		error "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	elif [ "$release" == "" ]; then
-		error "Variable 'release' not specified in $PKGMK_PKGFILE."
+		error "Variable 'release' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	elif [ "`type -t build`" != "function" ]; then
 		error "Function 'build' not specified in $PKGMK_PKGFILE."
@@ -861,13 +861,25 @@ main() {
 		PKGMK_ARCH=32
 	fi
 
-	local FILE TARGET
+	local FILE TARGET PACKAGENAME
 
 	parse_options "$@"
 
-	name="`basename $PKGMK_ROOT | cut  -d "#" -f1`"
+	PACKAGENAME=`basename $PKGMK_ROOT`
+	if [ "$PACKAGENAME" == "`echo $PACKAGENAME | cut  -d '#' -f1`" ];then
+		error "name not found when parsing the foldername"
+		exit $E_PKGFILE
+	fi
+	if [ "$PACKAGENAME" == "`echo $PACKAGENAME | cut  -d '-' -f2`" ];then
+		error "release not found when parsing the foldername"
+		exit $E_PKGFILE
+	fi
+	name="`echo $PACKAGENAME | cut  -d "#" -f1`"
+	
 	version="`basename $PKGMK_ROOT | cut -d "#" -f2 | cut -d "-" -f1`"
+
 	release="`basename $PKGMK_ROOT | cut -d "#" -f2 | cut -d "-" -f2`"
+
 
 	info "name: $name"
 	info "version: $version"

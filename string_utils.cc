@@ -29,14 +29,17 @@
 
 parameter_value split_parameter_value(string s, string delimiter)
 {
-  parameter_value pv;
-  pv.parameter = s;
-  pv.value = s;
+	parameter_value pv;
+	string entry;
   size_t found =  s.find(delimiter);
   if (found != string::npos)
   {
-    pv.parameter.erase(s.find(delimiter),s.size());
-    pv.value.erase(0,s.find(delimiter)+delimiter.size());
+		entry = s;
+		entry.erase(s.find(delimiter),s.size());
+    pv.parameter=strip_white_space(entry);
+		entry = s;
+    entry.erase(0,s.find(delimiter)+delimiter.size());
+		pv.value=strip_white_space(entry);
   }
   else
   {
@@ -72,13 +75,14 @@ string get_configuration_value(string file, string delimiter,string parameter)
   if (in) {
     while (!in.eof()) {
       getline(in, line);
+			
       if ((line[0] != '#' ) && ( line.find(delimiter) > 0) && ( line.size() > 0)) {
-        pv = split_parameter_value(line,delimiter);
+        pv = split_parameter_value(strip_white_space(line),delimiter);
         property_list[pv.parameter]=pv.value;
       }
     }
   }
-  return property_list[parameter];
+  return strip_white_space(property_list[parameter]);
 }
 
 string itos(unsigned int value)
