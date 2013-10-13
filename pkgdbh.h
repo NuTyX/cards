@@ -38,6 +38,7 @@
 #define PKG_DB_DIR          "var/lib/pkg/DB/"
 #define PKG_DB_OLD           "var/lib/pkg/db"
 #define PKG_FILES        "/files"
+#define PKG_META         "/Pkgmeta"
 #define PKG_INSTALL_DIR  "tmp/"
 #define PKG_RECEPT       "Pkgfile"
 #define PKG_README       "README"
@@ -48,6 +49,7 @@
 #define VERSION_DELIM    '#'
 #define GROUP_DELIM      '#'
 #define NAME_DELIM			 ' '
+#define PARAM_DELIM      "="
 
 #define LDCONFIG         "/sbin/ldconfig"
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
@@ -120,6 +122,13 @@ class pkgdbh {
 public:
 	struct pkginfo_t {
 		string version;
+		string description;
+		string url;
+		string packager;
+		string maintainer;
+		string depends;
+		string run;
+		string size;
 		set<string> files;
 	};
 	typedef map<string, pkginfo_t> packages_t;

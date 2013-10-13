@@ -30,7 +30,6 @@
 #include <sys/stat.h>
 
 #define PKGDWL_CONF   "/etc/pkgdwl.conf"
-#define PARAM_DELIM     "="
 #define PKG_MD5SUM    ".md5sum"
 
 class pkgdwl : public pkgdbh {

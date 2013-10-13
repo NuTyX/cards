@@ -128,9 +128,18 @@ void pkginfo::run(int argc, char** argv)
 			db_open_2();
 			if (db_find_pkg(o_arg)) {
 				copy(packages[o_arg].files.begin(), packages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
+				cout << endl << "Name: " << o_arg << endl
+				<< "Version: " << packages[o_arg].version << endl 
+				<< "Description: " << packages[o_arg].description << endl
+				<< "URL: " << packages[o_arg].url << endl
+				<< "Packager : " << packages[o_arg].packager << endl
+				<< "Size : " << packages[o_arg].size << endl
+				<< "Maintainer : " << packages[o_arg].maintainer << endl
+				<< "Depends on: " << packages[o_arg].depends << endl;
 			} else if (file_exists(o_arg)) {
 				pair<string, pkginfo_t> package = pkg_open(o_arg);
 				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
+			
 			} else {
 				actual_error = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
 				error_treatment(o_arg);

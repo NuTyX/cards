@@ -269,7 +269,7 @@ int pkgdbh::list_pkg (const string& path) // return the number of db files found
 		string_splited=split_parameter_value(*i,"#");
 		if (string_splited.value.size()>0)
 			set_of_db.insert(string_splited.parameter + " " + string_splited.value);
-}
+	}
 	
 #ifndef NDEBUG
   cerr << "Number of Packages: " << set_of_db.size() << endl;
@@ -290,9 +290,14 @@ void pkgdbh::db_open_2()
 		string version = *i;
 		version.erase(0, version.find(NAME_DELIM) == string::npos ? string::npos : version.find(NAME_DELIM) + 1);
 		info.version = version;
-	
-		// list of files
 		string package_foldername = name + "#" + version;
+		info.description = 	get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"Description");
+		info.url = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"URL");
+		info.maintainer = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"Maintainer");
+		info.packager = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"Packager");
+		info.depends = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"Depends on");
+		info.size = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size");
+		// list of files
 		const string filelist = root + PKG_DB_DIR + package_foldername + PKG_FILES;
 		int fd = open(filelist.c_str(), O_RDONLY);
 		if (fd == -1)
@@ -492,7 +497,7 @@ void pkgdbh::db_rm_pkg(const string& name)
 					cerr << utilname << ": could not remove " << filename << ": " << msg << endl;
 				}
 #ifndef NDEBUG
-				cout << endl << file ;
+				cout << endl << filename ;
 #endif
 			}
 		remove(packagenamedir.c_str());
@@ -506,7 +511,7 @@ void pkgdbh::rm_pkg_files(const string& name)
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
-	copy(files.begin(), files.end(), ostream_iterator<string>(cerr, "\n"));
+	copy(files_list.begin(), files_list.end(), ostream_iterator<string>(cerr, "\n"));
 	cerr << endl;
 #endif
 
@@ -517,7 +522,7 @@ void pkgdbh::rm_pkg_files(const string& name)
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 2 (files that still have references excluded):" << endl;
-	copy(files.begin(), files.end(), ostream_iterator<string>(cerr, "\n"));
+	copy(files_list.begin(), files_list.end(), ostream_iterator<string>(cerr, "\n"));
 	cerr << endl;
 #endif
 
@@ -544,7 +549,7 @@ void pkgdbh::db_rm_pkg(const string& name, const set<string>& keep_list)
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
-	copy(files.begin(), files.end(), ostream_iterator<string>(cerr, "\n"));
+	copy(files_list.begin(), files_list.end(), ostream_iterator<string>(cerr, "\n"));
 	cerr << endl;
 #endif
 
@@ -554,7 +559,7 @@ void pkgdbh::db_rm_pkg(const string& name, const set<string>& keep_list)
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 2 (files that is in the keep list excluded):" << endl;
-	copy(files.begin(), files.end(), ostream_iterator<string>(cerr, "\n"));
+	copy(files_list.begin(), files_list.end(), ostream_iterator<string>(cerr, "\n"));
 	cerr << endl;
 #endif
 
@@ -565,7 +570,7 @@ void pkgdbh::db_rm_pkg(const string& name, const set<string>& keep_list)
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 3 (files that still have references excluded):" << endl;
-	copy(files.begin(), files.end(), ostream_iterator<string>(cerr, "\n"));
+	copy(files_list.begin(), files_list.end(), ostream_iterator<string>(cerr, "\n"));
 	cerr << endl;
 #endif
 

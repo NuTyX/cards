@@ -581,17 +581,19 @@ build_package() {
 		done
 		if [ -d usr/share/locale ]; then
 			for loc in `cd usr/share/locale/ && ls`; do
-				bsdtar -c $COMPRESSION -f \
-				$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE \
-				usr/share/locale/$loc || error "Building '$name.$loc' failed."
-				rm -rf usr/share/locale/$loc
-				TARGETS[i]="$name.$loc#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
-				info "Build result for ${TARGETS[i]}:"
-				i=$((i+1))
-				bsdtar -t -v -f \
-				$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE
+				# Need to double check because glibc for exemple create a file in this directory
+				if [ -d usr/share/locale/$loc ];then
+					bsdtar -c $COMPRESSION -f \
+					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE \
+					usr/share/locale/$loc || error "Building '$name.$loc' failed."
+					rm -rf usr/share/locale/$loc
+					TARGETS[i]="$name.$loc#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
+					info "Build result for ${TARGETS[i]}:"
+					i=$((i+1))
+					bsdtar -t -v -f \
+					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE
+				fi
 			done
-			rm -rv usr/share/locale
 		fi
 		TARGETS[i]="$name#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
 		info "Build result for ${TARGETS[i]}:"
