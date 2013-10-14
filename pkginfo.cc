@@ -135,7 +135,7 @@ void pkginfo::run(int argc, char** argv)
 				<< "Packager : " << packages[o_arg].packager << endl
 				<< "Size : " << packages[o_arg].size << endl
 				<< "Maintainer : " << packages[o_arg].maintainer << endl
-				<< "Depends on: " << packages[o_arg].depends << endl;
+				<< "Depends on (run): " << packages[o_arg].depends << endl;
 			} else if (file_exists(o_arg)) {
 				pair<string, pkginfo_t> package = pkg_open(o_arg);
 				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));

@@ -291,12 +291,12 @@ void pkgdbh::db_open_2()
 		version.erase(0, version.find(NAME_DELIM) == string::npos ? string::npos : version.find(NAME_DELIM) + 1);
 		info.version = version;
 		string package_foldername = name + "#" + version;
-		info.description = 	get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"Description");
-		info.url = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"URL");
-		info.maintainer = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"Maintainer");
-		info.packager = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"Packager");
-		info.depends = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"Depends on");
-		info.size = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size");
+		info.description = 	get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"des");
+		info.url = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"url");
+		info.maintainer = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"mai");
+		info.packager = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"pac");
+		info.depends = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
+		info.size = get_configuration_value(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
 		// list of files
 		const string filelist = root + PKG_DB_DIR + package_foldername + PKG_FILES;
 		int fd = open(filelist.c_str(), O_RDONLY);

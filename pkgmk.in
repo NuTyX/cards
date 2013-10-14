@@ -437,14 +437,32 @@ make_work_dir() {
 remove_work_dir() {
 	rm -rf $PKGMK_WORK_DIR
 }
+generate_meta () {
+	local IN_1 IN_2 IN_3
+	rm -f $SRC/Pkgmeta
+	for i in des url mai pac run
+	do
+		IN_1=`grep ^# $PKGMK_ROOT/Pkgfile|grep -i $i|sed "s/#//"|sed "s/ //"|grep -i ^$i`
+		IN_2=`echo $IN_1 |cut -d ":" --complement -f1|sed "s/^\ //"`
+		if [ ! "$IN_2"  == "" ]; then
+			if [ "$i" == "dep" ] || [ "$i" == "run" ]; then
+				IN_3="`echo $IN_2|sed "s/ //g"`"
+				IN_2=$IN_3
+			fi
+			echo "$i = $IN_2" >> $SRC/Pkgmeta
+		fi
+	done
+
+}
 add_metafiles () {
 	local FILE
 	mkdir -p $PKG/tmp/$name#$version-$release
-	for FILE in Pkgfile README pre-install post-install meta; do
+	for FILE in README pre-install post-install ; do
 		if [ -f $FILE ]; then 
 			cp $FILE $PKG/tmp/$name#$version-$release/$FILE
 		fi
-	done 
+	done
+	cp $SRC/Pkgmeta $PKG/tmp/$name#$version-$release/Pkgmeta
 }
 pack_lib() {
 	local DIR
@@ -527,9 +545,8 @@ build_package() {
 	
 	check_file "$TARGET"
 	make_work_dir
-
-	add_metafiles
-
+	generate_meta
+	
 	if [ "$UID" != "0" ]; then
 		warning "Packages should be built as root."
 	fi
@@ -565,11 +582,20 @@ build_package() {
 					rm $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar
 				fi
 				pack_$group
-				if [ $j == 1 ]; then
-					compress_group_package
-				fi
 			fi
-			if [ $j == 1 ];then
+			# Add the meta in each package
+			if [ $j == 1 ]; then
+				mkdir -p $PKG/tmp/$name.$group#$version-$release
+				cp $SRC/Pkgmeta $PKG/tmp/$name.$group#$version-$release/Pkgmeta
+				sed -i "/^run/d" $PKG/tmp/$name.$group#$version-$release/Pkgmeta
+				echo "run = $name" >> $PKG/tmp/$name.$group#$version-$release/Pkgmeta
+				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar|sed "s/\t/ /"|cut -d " " -f1`"
+				echo "size_i = $SIZE_I" >> $PKG/tmp/$name.$group#$version-$release/Pkgmeta
+				bsdtar -r -f \
+				$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+				tmp
+				rm -r $PKG/tmp
+				compress_group_package
 				TARGETS[i]="$name.$group#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
 				info "Build result for ${TARGETS[i]}:"
 				bsdtar -t -v -f \
@@ -596,6 +622,9 @@ build_package() {
 			done
 		fi
 		TARGETS[i]="$name#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
+		add_metafiles
+		SIZE_I="`du -b --summarize $PKG|sed "s/\t/ /"|cut -d " " -f1`"
+		echo "size_i = $SIZE_I" >> $PKG/tmp/$name#$version-$release/Pkgmeta
 		info "Build result for ${TARGETS[i]}:"
 
 		bsdtar -c $COMPRESSION -f $TARGET *  &&  bsdtar -t -v -f $TARGET
