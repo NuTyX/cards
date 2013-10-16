@@ -36,12 +36,12 @@ void pkgrm::run(int argc, char** argv)
 	for (int i = 1; i < argc; i++) {
 		string option(argv[i]);
 		if (option == "-r" || option == "--root") {
-			assert_argument(argv, argc, i);
+			assertArgument(argv, argc, i);
 			o_root = argv[i + 1];
 			i++;
 		} else if (option[0] == '-' || !o_package.empty()) {
-			actual_error = INVALID_OPTION;
-			error_treatment(option);
+			actualError = INVALID_OPTION;
+			treatErrors(option);
 		} else {
 			o_package = option;
 		}
@@ -49,15 +49,15 @@ void pkgrm::run(int argc, char** argv)
 
 	if (o_package.empty())
 	{
-		actual_error = OPTION_MISSING;
-		error_treatment("o_package");
+		actualError = OPTION_MISSING;
+		treatErrors("o_package");
 	}
 	
 	// Check UID
 	if (getuid())
 	{
-		actual_error = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		error_treatment("");
+		actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		treatErrors("");
 	}
 
 	// Remove package
@@ -65,28 +65,28 @@ void pkgrm::run(int argc, char** argv)
 		db_lock lock(o_root, true);
 
 		// Get the list of installed packages
-		list_pkg(o_root);
+		getListOfPackages(o_root);
 
 		// Retrieve info about all the packages
-		db_open_2();
+		getInstalledPackages();
 
-		if (!db_find_pkg(o_package))
+		if (!getPackageName(o_package))
 		{
-			actual_error = PACKAGE_NOT_INSTALL;
-			error_treatment(o_package);
+			actualError = PACKAGE_NOT_INSTALL;
+			treatErrors(o_package);
 		}
 
 		// Remove metadata about the package removed 
-		db_rm_pkg(o_package);
+		removePackageFilesRefsFromDB(o_package);
 
 		// Remove the files on hd
-		rm_pkg_files(o_package);
-		ldconfig();
+		removePackageFiles(o_package);
+		runLdConfig();
 	}
 }
-void pkgrm::print_help() const
+void pkgrm::printHelp() const
 {
-	cout << "usage: " << utilname << " [options] <package>" << endl
+	cout << "usage: " << utilName << " [options] <package>" << endl
 	     << "options:" << endl
 	     << "  -r, --root <path>   specify alternative installation root" << endl
 	     << "  -v, --version       print version and exit" << endl

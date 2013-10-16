@@ -46,7 +46,7 @@ void pkginfo::run(int argc, char** argv)
 	for (int i = 1; i < argc; ++i) {
 		string option(argv[i]);
 		if (option == "-r" || option == "--root") {
-			assert_argument(argv, argc, i);
+			assertArgument(argv, argc, i);
 			o_root = argv[i + 1];
 			i++;
 		} else if (option == "-i" || option == "--installed") {
@@ -56,77 +56,77 @@ void pkginfo::run(int argc, char** argv)
 		} else if (option == "-d" || option == "--debug") {
 			o_debug_mode += 1;
 		} else if (option == "-l" || option == "--list") {
-			assert_argument(argv, argc, i);
+			assertArgument(argv, argc, i);
 			o_list_mode += 1;
 			o_arg = argv[i + 1];
 			i++;
 		} else if (option == "-o" || option == "--owner") {
-			assert_argument(argv, argc, i);
+			assertArgument(argv, argc, i);
 			o_owner_mode += 1;
 			o_arg = argv[i + 1];
 			i++;
 		} else if (option == "-f" || option == "--footprint") {
-			assert_argument(argv, argc, i);
+			assertArgument(argv, argc, i);
 			o_footprint_mode += 1;
 			o_arg = argv[i + 1];
 			i++;
 		} else {
-			actual_error = INVALID_OPTION;
-			error_treatment(option);
+			actualError = INVALID_OPTION;
+			treatErrors(option);
 		}
 	}
 
 	if (o_footprint_mode + o_installed_mode + o_list_mode + o_owner_mode + o_debug_mode + o_convert_mode == 0)
 	{
-		actual_error = OPTION_MISSING;
-		error_treatment(o_arg);
+		actualError = OPTION_MISSING;
+		treatErrors(o_arg);
 	}
 	if (o_footprint_mode + o_installed_mode + o_list_mode + o_owner_mode > 1)
 	{
-		actual_error = TOO_MANY_OPTIONS;
-		error_treatment(o_arg);
+		actualError = TOO_MANY_OPTIONS;
+		treatErrors(o_arg);
 	}
 	if (o_footprint_mode) {
 		//
 		// Make footprint
 		//
-		pkg_footprint(o_arg);
+		getFootprintPackage(o_arg);
 	} else if (o_convert_mode ) {
 			if (getuid())
 			{
-				actual_error = ONLY_ROOT_CAN_CONVERT_DB;
-				error_treatment("");
+				actualError = ONLY_ROOT_CAN_CONVERT_DB;
+				treatErrors("");
 			}
 
 			const string new_db = PKG_DB_DIR;	
-    	if (file_exists("/" + new_db))
+    	if (checkFileExist("/" + new_db))
 			{
-				db_convert_space_to_no_space(o_root);
+				convertSpaceToNoSpaceDBFormat(o_root);
 			} else {
 				db_lock lock(o_root, false);
 				db_open(o_root);
-				db_convert(); }
+				convertDBFormat(); }
 	} else {
 		//
 		// Modes that require the database to be opened
 		//
 		{
 			db_lock lock(o_root, false);
-			list_pkg(o_root);
+			getListOfPackages(o_root);
 		}
 
 		if (o_installed_mode) {
 			//
 			// List installed packages
 			//
-			for (set<string>::const_iterator i = set_of_db.begin(); i != set_of_db.end(); ++i)
+			for (set<string>::const_iterator i = pkgList.begin(); i != pkgList.end(); ++i)
 				cout << *i << endl;
 		} else if (o_list_mode) {
 			//
 			// List package or file contents
 			//
-			db_open_2();
-			if (db_find_pkg(o_arg)) {
+			getInstalledPackages();
+			if (getPackageName(o_arg)) {
 				copy(packages[o_arg].files.begin(), packages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
 				cout << endl << "Name: " << o_arg << endl
 				<< "Version: " << packages[o_arg].version << endl 
@@ -136,24 +136,24 @@ void pkginfo::run(int argc, char** argv)
 				<< "Size : " << packages[o_arg].size << endl
 				<< "Maintainer : " << packages[o_arg].maintainer << endl
 				<< "Depends on (run): " << packages[o_arg].depends << endl;
-			} else if (file_exists(o_arg)) {
-				pair<string, pkginfo_t> package = pkg_open(o_arg);
+			} else if (checkFileExist(o_arg)) {
+				pair<string, pkginfo_t> package = openArchivePackage(o_arg);
 				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
 			
 			} else {
-				actual_error = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
-				error_treatment(o_arg);
+				actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
+				treatErrors(o_arg);
 			}
 		} else if (o_owner_mode) {
 			//
 			// List owner(s) of file or directory
 			//
-			db_open_2();
+			getInstalledPackages();
 			regex_t preg;
 			if (regcomp(&preg, o_arg.c_str(), REG_EXTENDED | REG_NOSUB))
 			{
-				actual_error = CANNOT_COMPILE_REGULAR_EXPRESSION;
-				error_treatment(o_arg);
+				actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
+				treatErrors(o_arg);
 			}
 			vector<pair<string, string> > result;
 			result.push_back(pair<string, string>("Package", "File"));
@@ -179,16 +179,16 @@ void pkginfo::run(int argc, char** argv)
 					cout << left << setw(width + 2) << i->first << i->second << endl;
 				}
 			} else {
-				cout << utilname << ": no owner(s) found" << endl;
+				cout << utilName << ": no owner(s) found" << endl;
 			}
 		} else {
-				cout << utilname << ":debug" << endl;
+				cout << utilName << ":debug" << endl;
 		}
 	}
 }
-void pkginfo::print_help() const
+void pkginfo::printHelp() const
 {
-	cout << "usage: " << utilname << " [options]" << endl
+	cout << "usage: " << utilName << " [options]" << endl
 	     << "options:" << endl
        << "  -d, --debug                 test the database" << endl
        << "  -c, --convert               convert the datase from pkgutils format to cards format" << endl 

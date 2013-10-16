@@ -51,7 +51,7 @@
 #define NAME_DELIM			 ' '
 #define PARAM_DELIM      "="
 
-#define LDCONFIG         "/sbin/ldconfig"
+#define LDCONFIG         "/sbin/runLdConfig"
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
 
 using namespace std;
@@ -136,58 +136,58 @@ public:
 	explicit pkgdbh(const string& name);
 	virtual ~pkgdbh() {}
 	virtual void run(int argc, char** argv) = 0; // Need to be redefine in derivated class
-	virtual void print_help() const = 0; // help info is depending of the derivated class
-	virtual void progress() const; // progress info
-	virtual void error_treatment(const string& s) const; 
+	virtual void printHelp() const = 0; // help info is depending of the derivated class
+	virtual void progressInfo() const; // progressInfo info
+	virtual void treatErrors(const string& s) const; 
 	void print_version() const;
 
 protected:
 	// Database
 
-	void db_convert();
-	int list_pkg(const string& path );
-	void db_open_2();
-	void db_open_2(const string& path);
-	void db_add_pkg(const string& name, const pkginfo_t& info);
-	void db_add_pkg_2(const string& name, const pkginfo_t& info);
-	bool db_find_pkg(const string& name);
-	bool db_find_pkg_2(const string& name);	
+	void convertDBFormat();
+	int getListOfPackages(const string& path );
+	void getInstalledPackages();
+	void getInstalledPackages(const string& path);
+	void addPackageFilesRefsToDB(const string& name, const pkginfo_t& info);
+	void addPackageFilesRefsToDB_2(const string& name, const pkginfo_t& info);
+	bool getPackageName(const string& name);
+	bool getPackageName_2(const string& name);	
 	/* Remove the physical files after followings some rules */
-	void rm_pkg_files(const string& name);
+	void removePackageFiles(const string& name);
 	
-	void db_rm_pkg(const string& name, const set<string>& keep_list);
+	void removePackageFilesRefsFromDB(const string& name, const set<string>& keep_list);
 
 	/* Remove meta data about the removed package */
-	void db_rm_pkg(const string& name);
-	void db_rm_pkg_2(const string& name, const set<string>& keep_list);
-	void db_rm_files(set<string> files, const set<string>& keep_list);
-	set<string> db_find_conflicts(const string& name, const pkginfo_t& info);
+	void removePackageFilesRefsFromDB(const string& name);
+	void removePackageFilesRefsFromDB_2(const string& name, const set<string>& keep_list);
+	void removePackageFilesRefsFromDB(set<string> files, const set<string>& keep_list);
+	set<string> getConflictsFilesList(const string& name, const pkginfo_t& info);
 
 	// old member from pkgutils
 	void db_open(const string& path);
 //	void db_commit();
 
 	// Tar.gz
-	pair<string, pkginfo_t> pkg_open(const string& filename);
-	pair<string, pkginfo_t> pkg_open_2(const string& filename) const;
-	void pkg_install(const string& filename, const set<string>& keep_list, const set<string>& non_install_files);
-	void pkg_move_metafiles(const string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
-	void pkg_install_2(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
-	void pkg_footprint(string& filename);
-	void ldconfig();
-	void db_convert_space_to_no_space(const string& path);
+	pair<string, pkginfo_t> openArchivePackage(const string& filename);
+	pair<string, pkginfo_t> openArchivePackage_2(const string& filename) const;
+	void installArchivePackage(const string& filename, const set<string>& keep_list, const set<string>& non_install_files);
+	void moveMetaFilesPackage(const string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
+	void installArchivePackage_2(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
+	void getFootprintPackage(string& filename);
+	void runLdConfig();
+	void convertSpaceToNoSpaceDBFormat(const string& path);
 
-	string utilname;
+	string utilName;
 	string root;
 	packages_t packages;
-	set<string> set_of_db;
-	set<string> metafiles_list;
-	set<string>	files_list;
+	set<string> pkgList;
+	set<string> metaFilesList;
+	set<string>	FilesList;
 
-	action actual_action;
-	error actual_error;
-	unsigned int number_of_files;
-	unsigned int number_installed_files;
+	action actualAction;
+	error actualError;
+	unsigned int filesNumber;
+	unsigned int installedFilesNumber;
 };
 
 class db_lock {
@@ -198,16 +198,16 @@ private:
 	DIR* dir;
 };
 
-class runtime_error_with_errno : public runtime_error {
+class runTimeErrorWithErrno : public runtime_error {
 public:
-	explicit runtime_error_with_errno(const string& msg) throw()
+	explicit runTimeErrorWithErrno(const string& msg) throw()
 		: runtime_error(msg + string(": ") + strerror(errno)) {}
-	explicit runtime_error_with_errno(const string& msg, int e) throw()
+	explicit runTimeErrorWithErrno(const string& msg, int e) throw()
 		: runtime_error(msg + string(": ") + strerror(e)) {}
 };
 
 // Utility functions
-void assert_argument(char** argv, int argc, int index);
-void advance_cursor();
+void assertArgument(char** argv, int argc, int index);
+void rotatingCursor();
 #endif /* CARDS_H */
 // vim:set ts=2 :

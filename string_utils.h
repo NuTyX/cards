@@ -29,15 +29,15 @@
 
 using namespace std;
 
-struct parameter_value {
+struct keyValue {
     string parameter;
     string value;
   };
 
 
-parameter_value split_parameter_value(string s, string delimiter);
-set<string> get_parameter_list(string file, string delimiter);
-string get_configuration_value(string file, string delimiter,string parameter);
+keyValue split_keyValue(string s, string delimiter);
+set<string> getKeysList(string file, string delimiter);
+string getValueOfKey(string file, string delimiter,string parameter);
 
 string itos(unsigned int value);
 string mtos(mode_t mode);
@@ -45,14 +45,14 @@ string trim_filename(const string& filename);
 
 /*param s the string to be searched, param delimiter the delimiter char 
 return the value after the first occurance of a delimiter */
-string get_value(const string& s, char delimiter);
+string getFirstValueOfKeyAfterDelim(const string& s, char delimiter);
 
 /*param s the string to be searched param delimiter  the delimiter char
 return the value before the first occurance of a delimiter */
-string get_value_before(const string& s, char delimiter);
+string getFirstValueOfKeyBeforeDelim(const string& s, char delimiter);
 
 /* strip whitespace in the beginning and end of string, return a stripped string */
-string strip_white_space(const string& s);
+string stripWhiteSpace(const string& s);
 
 /* make sure s1 starts with s2 */
 bool startsWith(const string& s, const string& with);
@@ -60,8 +60,8 @@ bool startsWith(const string& s, const string& with);
 /* make sure s1 starts with s2 */
 bool starts_with_no_case(const string& s1, const string& s2);
 
-string to_lower_case(const string& s);
-string to_upper_case(const string& s);
+string convertToLowerCase(const string& s);
+string convertToUpperCase(const string& s);
 
 #endif /* STRING_UTILS_H */
 // vim:set ts=2 :

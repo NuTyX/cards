@@ -31,13 +31,13 @@ string trim_filename(const string& filename)
 
   return result;
 }
-bool file_exists(const string& filename)
+bool checkFileExist(const string& filename)
 {
   struct stat buf;
   return !lstat(filename.c_str(), &buf);
 }
 
-bool file_empty(const string& filename)
+bool checkFileEmpty(const string& filename)
 {
   struct stat buf;
 
@@ -46,7 +46,7 @@ bool file_empty(const string& filename)
 
   return (S_ISREG(buf.st_mode) && buf.st_size == 0);
 }
-bool file_equal(const string& file1, const string& file2)
+bool checkFilesEqual(const string& file1, const string& file2)
 {
   struct stat buf1, buf2;
 
@@ -104,7 +104,7 @@ bool file_equal(const string& file1, const string& file2)
 
   return false;
 }
-bool permissions_equal(const string& file1, const string& file2)
+bool checkPermissionsEqual(const string& file1, const string& file2)
 {
   struct stat buf1;
   struct stat buf2;
@@ -120,15 +120,15 @@ bool permissions_equal(const string& file1, const string& file2)
     (buf1.st_gid == buf2.st_gid);
 }
 
-void file_remove(const string& basedir, const string& filename)
+void removeFile(const string& basedir, const string& filename)
 {
   if (filename != basedir && !remove(filename.c_str())) {
     char* path = strdup(filename.c_str());
-    file_remove(basedir, dirname(path));
+    removeFile(basedir, dirname(path));
     free(path);
   }
 }
-set<string> file_find(const string& path)
+set<string> findFile(const string& path)
 {
   set<string> files_list;
   DIR *d;
@@ -147,7 +147,7 @@ set<string> file_find(const string& path)
   }
   return files_list;
 }
-bool create_recursive_dirs(const string& path)
+bool createRecursiveDirs(const string& path)
 {
   char opath[MAXPATHLEN];
   char *p;

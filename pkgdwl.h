@@ -37,13 +37,13 @@ public:
 	pkgdwl() : pkgdbh("pkgdwl") 
 	{
 		// Check the configuration file
-		if ( ! file_exists(PKGDWL_CONF))
+		if ( ! checkFileExist(PKGDWL_CONF))
 		{
 			cout << PKGDWL_CONF  << " missing: ";
 			throw runtime_error ("Cannot find the configuration file");
 		}
 		string config_file = root + PKGDWL_CONF;
-		url = get_configuration_value(config_file,PARAM_DELIM,"url");
+		url = getValueOfKey(config_file,PARAM_DELIM,"url");
 		if ( url.size() < 4 )
 			{
 				cout << PKGDWL_CONF << ": ";
@@ -61,19 +61,19 @@ public:
 	}
 	
 	virtual void run(int argc, char** argv);
-	virtual void print_help() const;
+	virtual void printHelp() const;
 
 protected:
 
-	static int handle_update_progress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
-	static size_t handle_write_to_stream(void *buffer, size_t size, size_t nmemb, void *stream);
+	static int updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
+	static size_t writeToStreamHandle(void *buffer, size_t size, size_t nmemb, void *stream);
 
-	int update_progress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
-	size_t write_to_stream(void *buffer, size_t size, size_t nmemb, void *stream);
+	int updateProgress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
+	size_t writeToStream(void *buffer, size_t size, size_t nmemb, void *stream);
 
-	void init_file_to_download(const char * _file);
+	void initFileToDownload(const char * _file);
 
-	struct DownloadProgress
+	struct dwlProgress
 	{
 		double lastruntime;
 		CURL *curl;
@@ -84,19 +84,19 @@ protected:
 		long int filetime;
 		FILE *stream;
 	};
-	void download_file(const string& url_to_download , const string& filename);
-	void update_progress();
+	void downloadFile(const string& url_to_download , const string& filename);
+	void updateProgress();
 
 	CURL* curl;
 	CURLcode result;
 
-	DownloadProgress download_progress;
+	dwlProgress downloadProgress;
 	DestinationFile  destination_file;
 
 	
-	string content_file;
+	string contentFile;
 	string url;
-	string download_filename;
+	string downloadFileName;
 };
 
 #endif /* PKGDWL_H */

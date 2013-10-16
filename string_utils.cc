@@ -27,19 +27,19 @@
 #include <sys/stat.h>
 
 
-parameter_value split_parameter_value(string s, string delimiter)
+keyValue split_keyValue(string s, string delimiter)
 {
-	parameter_value pv;
+	keyValue pv;
 	string entry;
   size_t found =  s.find(delimiter);
   if (found != string::npos)
   {
 		entry = s;
 		entry.erase(s.find(delimiter),s.size());
-    pv.parameter=strip_white_space(entry);
+    pv.parameter=stripWhiteSpace(entry);
 		entry = s;
     entry.erase(0,s.find(delimiter)+delimiter.size());
-		pv.value=strip_white_space(entry);
+		pv.value=stripWhiteSpace(entry);
   }
   else
   {
@@ -48,7 +48,7 @@ parameter_value split_parameter_value(string s, string delimiter)
   return pv;
 }
 
-set<string> get_parameter_list(string file, string delimiter)
+set<string> getKeysList(string file, string delimiter)
 {
   set<string> parameter_list;
   ifstream in(file.c_str());
@@ -66,23 +66,23 @@ set<string> get_parameter_list(string file, string delimiter)
   return parameter_list;
 }
 
-string get_configuration_value(string file, string delimiter,string parameter)
+string getValueOfKey(string file, string delimiter,string parameter)
 {
   map<string,string> property_list;
   ifstream in(file.c_str());
   string line;
-  parameter_value pv;
+  keyValue pv;
   if (in) {
     while (!in.eof()) {
       getline(in, line);
 			
       if ((line[0] != '#' ) && ( line.find(delimiter) > 0) && ( line.size() > 0)) {
-        pv = split_parameter_value(strip_white_space(line),delimiter);
+        pv = split_keyValue(stripWhiteSpace(line),delimiter);
         property_list[pv.parameter]=pv.value;
       }
     }
   }
-  return strip_white_space(property_list[parameter]);
+  return stripWhiteSpace(property_list[parameter]);
 }
 
 string itos(unsigned int value)
@@ -140,21 +140,21 @@ string mtos(mode_t mode)
 
   return s;
 }
-string get_value(const string& s, char delimiter)
+string getFirstValueOfKeyAfterDelim(const string& s, char delimiter)
 {
 	string::size_type pos = s.find( delimiter );
 	if ( pos != string::npos && pos+1 < s.length() )
 		return s.substr( pos + 1 );
 	return "";
 }
-string get_value_before(const string& s, char delimiter)
+string getFirstValueOfKeyBeforeDelim(const string& s, char delimiter)
 {
 	string::size_type pos = s.find( delimiter );
 	if ( pos != string::npos )
 		return s.substr( 0, pos );
 	return s;
 }
-string strip_white_space(const string& s)
+string stripWhiteSpace(const string& s)
 {
 	if ( s.empty() )
 		return s;
@@ -191,7 +191,7 @@ bool starts_with_no_case(const string& s1, const string& s2)
 	}
 	return true;
 }
-string to_lower_case(const string& s)
+string convertToLowerCase(const string& s)
 {
 	string result = "";
 	for ( string::size_type i = 0; i < s.length(); ++i ) {
@@ -199,7 +199,7 @@ string to_lower_case(const string& s)
 	}
 	return result;
 }
-string to_upper_case(const string& s)
+string convertToUpperCase(const string& s)
 {
 	string result = "";
 	for ( string::size_type i = 0; i < s.length(); ++i ) {

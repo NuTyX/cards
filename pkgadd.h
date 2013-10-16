@@ -46,14 +46,14 @@ class pkgadd : public pkgdbh {
 public:
 	pkgadd() : pkgdbh("pkgadd") {}
 	virtual void run(int argc, char** argv);
-	virtual void print_help() const;
+	virtual void printHelp() const;
 
 private:
-	vector<rule_t> read_config();
-	set<string> make_keep_list(const set<string>& files, const vector<rule_t>& rules);
-	set<string> apply_install_rules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
-	void find_rules(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const;
-	bool rule_applies_to_file(const rule_t& rule, const string& file);
+	vector<rule_t> readRulesFile();
+	set<string> getKeepFileList(const set<string>& files, const vector<rule_t>& rules);
+	set<string> applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
+	void getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const;
+	bool checkRuleAppliesToFile(const rule_t& rule, const string& file);
 };
 
 #endif /* PKGADD_H */

@@ -40,7 +40,7 @@ void pkgadd::run(int argc, char** argv)
 	for (int i = 1; i < argc; i++) {
 		string option(argv[i]);
 		if (option == "-r" || option == "--root") {
-			assert_argument(argv, argc, i);
+			assertArgument(argv, argc, i);
 			o_root = argv[i + 1];
 			i++;
 		} else if (option == "-u" || option == "--upgrade") {
@@ -56,80 +56,80 @@ void pkgadd::run(int argc, char** argv)
 
 	if (o_package.empty())
 	{
-		actual_error = OPTION_MISSING;
-		error_treatment("");
+		actualError = OPTION_MISSING;
+		treatErrors("");
 	}
 	//
 	// Check UID
 	//
 	if (getuid())
 	{
-		actual_error = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		error_treatment("");
+		actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		treatErrors("");
 	}
 	//
 	// Install/upgrade package
 	//
 	{
 		db_lock lock(o_root, true);
-		list_pkg(o_root);
+		getListOfPackages(o_root);
 		//Retrieving info about all the packages
-		db_open_2();
+		getInstalledPackages();
 		// Reading the archiving to find a list of files
-		pair<string, pkginfo_t> package = pkg_open(o_package);
+		pair<string, pkginfo_t> package = openArchivePackage(o_package);
 
 		// checking the rules
-		vector<rule_t> config_rules = read_config();
+		vector<rule_t> config_rules = readRulesFile();
 
-		bool installed = db_find_pkg(package.first);
+		bool installed = getPackageName(package.first);
 		if (installed && !o_upgrade)
 		{
-			actual_error = PACKAGE_ALLREADY_INSTALL;
-			error_treatment (package.first);
+			actualError = PACKAGE_ALLREADY_INSTALL;
+			treatErrors (package.first);
 		}
 		else if (!installed && o_upgrade)
 		{
-			actual_error = PACKAGE_NOT_PREVIOUSLY_INSTALL;
-			error_treatment(package.first);
+			actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
+			treatErrors(package.first);
 		}
-		set<string> non_install_files = apply_install_rules(package.first, package.second, config_rules);
-		set<string> conflicting_files = db_find_conflicts(package.first, package.second);
+		set<string> non_install_files = applyInstallRules(package.first, package.second, config_rules);
+		set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
       
 		if (!conflicting_files.empty()) {
 			if (o_force) {
 				set<string> keep_list;
 				if (o_upgrade) // Don't remove files matching the rules in configuration
-					keep_list = make_keep_list(conflicting_files, config_rules);
-				db_rm_files(conflicting_files, keep_list); // Remove unwanted conflicts
+					keep_list = getKeepFileList(conflicting_files, config_rules);
+				removePackageFilesRefsFromDB(conflicting_files, keep_list); // Remove unwanted conflicts
 			} else {
 				copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
-				actual_error = LISTED_FILES_ALLREADY_INSTALLED;
-				error_treatment("listed file(s) already installed (use -f to ignore and overwrite)");
+				actualError = LISTED_FILES_ALLREADY_INSTALLED;
+				treatErrors("listed file(s) already installed (use -f to ignore and overwrite)");
 			}
 		}
    
 		set<string> keep_list;
 
 		if (o_upgrade) {
-			keep_list = make_keep_list(package.second.files, config_rules);
-			db_rm_pkg(package.first, keep_list);
+			keep_list = getKeepFileList(package.second.files, config_rules);
+			removePackageFilesRefsFromDB(package.first, keep_list);
 		}
 
-		// Installation progress of the files on the HD
-		pkg_install(o_package, keep_list, non_install_files);
+		// Installation progressInfo of the files on the HD
+		installArchivePackage(o_package, keep_list, non_install_files);
 
 		// Add the metadata about the package to the DB
-		pkg_move_metafiles(package.first,package.second);
+		moveMetaFilesPackage(package.first,package.second);
 
 		// Add the info about the files to the DB
-		db_add_pkg(package.first, package.second);
+		addPackageFilesRefsToDB(package.first, package.second);
 
-		ldconfig();
+		runLdConfig();
 	}
 }
-void pkgadd::print_help() const
+void pkgadd::printHelp() const
 {
-	cout << "usage: " << utilname << " [options] <file>" << endl
+	cout << "usage: " << utilName << " [options] <file>" << endl
 	     << "options:" << endl
 	     << "  -u, --upgrade       upgrade package with the same name" << endl
 	     << "  -f, --force         force install, overwrite conflicting files" << endl
@@ -138,7 +138,7 @@ void pkgadd::print_help() const
 	     << "  -h, --help          print help and exit" << endl;
 }
 
-vector<rule_t> pkgadd::read_config()
+vector<rule_t> pkgadd::readRulesFile()
 {
 	vector<rule_t> rules;
 	unsigned int linecount = 0;
@@ -153,8 +153,8 @@ vector<rule_t> pkgadd::read_config()
 			if (!line.empty() && line[0] != '#') {
 				if (line.length() >= PKGADD_CONF_MAXLINE)
 				{
-					actual_error = PKGADD_CONFIG_LINE_TOO_LONG;
-					error_treatment(filename + ":" + itos(linecount));
+					actualError = PKGADD_CONFIG_LINE_TOO_LONG;
+					treatErrors(filename + ":" + itos(linecount));
 				}
 				char event[PKGADD_CONF_MAXLINE];
 				char pattern[PKGADD_CONF_MAXLINE];
@@ -162,8 +162,8 @@ vector<rule_t> pkgadd::read_config()
 				char dummy[PKGADD_CONF_MAXLINE];
 				if (sscanf(line.c_str(), "%s %s %s %s", event, pattern, action, dummy) != 3)
 				{
-					actual_error = PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS;
-					error_treatment(filename + ":" + itos(linecount));
+					actualError = PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS;
+					treatErrors(filename + ":" + itos(linecount));
 				}
 				if (!strcmp(event, "UPGRADE") || !strcmp(event, "INSTALL")) {
 					rule_t rule;
@@ -175,16 +175,16 @@ vector<rule_t> pkgadd::read_config()
 						rule.action = false;
 					} else
 					{
-						actual_error = PKGADD_CONFIG_UNKNOWN_ACTION;
-						error_treatment(filename + ":" + itos(linecount) + ": '" +
+						actualError = PKGADD_CONFIG_UNKNOWN_ACTION;
+						treatErrors(filename + ":" + itos(linecount) + ": '" +
 								    string(action));
 					}
 
 					rules.push_back(rule);
 				} else
 				{
-					actual_error = PKGADD_CONFIG_UNKNOWN_EVENT;
-					error_treatment(filename + ":" + itos(linecount) + ": '" +
+					actualError = PKGADD_CONFIG_UNKNOWN_EVENT;
+					treatErrors(filename + ":" + itos(linecount) + ": '" +
 							    string(event));
 				}
 			}
@@ -203,16 +203,16 @@ vector<rule_t> pkgadd::read_config()
 	return rules;
 }
 
-set<string> pkgadd::make_keep_list(const set<string>& files, const vector<rule_t>& rules)
+set<string> pkgadd::getKeepFileList(const set<string>& files, const vector<rule_t>& rules)
 {
 	set<string> keep_list;
 	vector<rule_t> found;
 
-	find_rules(rules, UPGRADE, found);
+	getInstallRulesList(rules, UPGRADE, found);
 
 	for (set<string>::const_iterator i = files.begin(); i != files.end(); i++) {
 		for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
-			if (rule_applies_to_file(*j, *i)) {
+			if (checkRuleAppliesToFile(*j, *i)) {
 				if (!(*j).action)
 					keep_list.insert(keep_list.end(), *i);
 
@@ -232,20 +232,20 @@ set<string> pkgadd::make_keep_list(const set<string>& files, const vector<rule_t
 	return keep_list;
 }
 
-set<string> pkgadd::apply_install_rules(const string& name, pkginfo_t& info, const vector<rule_t>& rules)
+set<string> pkgadd::applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules)
 {
 	// TODO: better algo(?)
 	set<string> install_set;
 	set<string> non_install_set;
 	vector<rule_t> found;
 
-	find_rules(rules, INSTALL, found);
+	getInstallRulesList(rules, INSTALL, found);
 
 	for (set<string>::const_iterator i = info.files.begin(); i != info.files.end(); i++) {
 		bool install_file = true;
 
 		for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
-			if (rule_applies_to_file(*j, *i)) {
+			if (checkRuleAppliesToFile(*j, *i)) {
 				install_file = (*j).action;
 				break;
 			}
@@ -277,22 +277,22 @@ set<string> pkgadd::apply_install_rules(const string& name, pkginfo_t& info, con
 	return non_install_set;
 }
 
-void pkgadd::find_rules(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const
+void pkgadd::getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const
 {
 	for (vector<rule_t>::const_iterator i = rules.begin(); i != rules.end(); i++)
 		if (i->event == event)
 			found.push_back(*i);
 }
 
-bool pkgadd::rule_applies_to_file(const rule_t& rule, const string& file)
+bool pkgadd::checkRuleAppliesToFile(const rule_t& rule, const string& file)
 {
 	regex_t preg;
 	bool ret;
 
 	if (regcomp(&preg, rule.pattern.c_str(), REG_EXTENDED | REG_NOSUB))
 	{
-		actual_error = CANNOT_COMPILE_REGULAR_EXPRESSION;
-		error_treatment(rule.pattern);
+		actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
+		treatErrors(rule.pattern);
 	}
 	ret = !regexec(&preg, file.c_str(), 0, 0, 0);
 	regfree(&preg);

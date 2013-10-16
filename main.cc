@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 				util->print_version();
 				return EXIT_SUCCESS;
 			} else if (option == "-h" || option == "--help") {
-				util->print_help();
+				util->printHelp();
 				return EXIT_SUCCESS;
 			}
 		}

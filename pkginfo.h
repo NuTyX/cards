@@ -30,7 +30,7 @@ class pkginfo : public pkgdbh {
 public:
 	pkginfo() : pkgdbh("pkginfo") {}
 	virtual void run(int argc, char** argv);
-	virtual void print_help() const;
+	virtual void printHelp() const;
 };
 
 #endif /* PKGINFO_H */

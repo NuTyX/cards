@@ -48,13 +48,13 @@
 
 using namespace std;
 
-bool file_exists(const string& filename);
-bool file_empty(const string& filename);
-bool file_equal(const string& file1, const string& file2);
-bool permissions_equal(const string& file1, const string& file2);
-bool create_recursive_dirs(const string& pathname);
-void file_remove(const string& basedir, const string& filename);
-set<string>  file_find(const string& basedir);
+bool checkFileExist(const string& filename);
+bool checkFileEmpty(const string& filename);
+bool checkFilesEqual(const string& file1, const string& file2);
+bool checkPermissionsEqual(const string& file1, const string& file2);
+bool createRecursiveDirs(const string& pathname);
+void removeFile(const string& basedir, const string& filename);
+set<string>  findFile(const string& basedir);
 
 
 #endif /* FILE_UTILS_H */

@@ -32,73 +32,73 @@ void pkgdwl::run(int argc, char** argv)
 	for (int i = 1; i < argc; i++) {
 		string option(argv[i]);
 		if (option == "-r" || option == "--root") {
-			assert_argument(argv, argc, i);
+			assertArgument(argv, argc, i);
 			o_root = argv[i + 1];
 			i++;
 		} else if (option == "-i" || option == "--info") {
 			o_info = true;
 		} else if (option[0] == '-' || !o_package.empty()) {
-			actual_error = INVALID_OPTION;
-			error_treatment(option);
+			actualError = INVALID_OPTION;
+			treatErrors(option);
 		} else {
 			o_package = option;
 		}
 	}
 	if (o_package.empty())
 	{
-		actual_error = OPTION_MISSING;
-		error_treatment("");
+		actualError = OPTION_MISSING;
+		treatErrors("");
 	}
 	if (o_info) // Get the package via it's name's md5sum
 	{
 
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-		init_file_to_download(PKG_MD5SUM);
-		download_file(url + "/" + PKG_MD5SUM + "/" + o_package,PKG_MD5SUM);
+		initFileToDownload(PKG_MD5SUM);
+		downloadFile(url + "/" + PKG_MD5SUM + "/" + o_package,PKG_MD5SUM);
 
 	} else {
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-		init_file_to_download(PKG_MD5SUM);
-		download_file(url + "/" + PKG_MD5SUM + "/" + o_package,PKG_MD5SUM);
+		initFileToDownload(PKG_MD5SUM);
+		downloadFile(url + "/" + PKG_MD5SUM + "/" + o_package,PKG_MD5SUM);
 
 		// Build up the tar to download we need to replace the symbol "#" with "%23" 
 
 		string tar_file;                                           // Name of the archive file
 		set<string> md5sum_value;                                  // Even if its a set they will be only one line
-		parameter_value decomp_tar_file;                           // Little trick ... parameter = name, value = 4.7.1-1.pkg.tar.xz  or whatever
-		md5sum_value=get_parameter_list(PKG_MD5SUM, "  ");        // get the content of the md5sum is ...
+		keyValue decomp_tar_file;                           // Little trick ... parameter = name, value = 4.7.1-1.pkg.tar.xz  or whatever
+		md5sum_value=getKeysList(PKG_MD5SUM, "  ");        // get the content of the md5sum is ...
 		set<string>::iterator it = md5sum_value.begin();           // ... just one line
-		tar_file=get_configuration_value(PKG_MD5SUM, "  ",*it);   // Get the archive name
-		decomp_tar_file=split_parameter_value(tar_file,"#");			 // Split it.
+		tar_file=getValueOfKey(PKG_MD5SUM, "  ",*it);   // Get the archive name
+		decomp_tar_file=split_keyValue(tar_file,"#");			 // Split it.
 
 		// It time to get the real archive
 		string tar_file_to_download = decomp_tar_file.parameter + "%23" + decomp_tar_file.value; // Rebuild de download file
-		init_file_to_download(tar_file.c_str());
-		// Get the archive with progress pleeeeease
+		initFileToDownload(tar_file.c_str());
+		// Get the archive with progressInfo pleeeeease
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-		download_file(url + "/" + tar_file_to_download,tar_file);
+		downloadFile(url + "/" + tar_file_to_download,tar_file);
 		cout << endl;	
 	}
 }
-void pkgdwl::init_file_to_download(const char * _file)
+void pkgdwl::initFileToDownload(const char * _file)
 {
 	destination_file.filename = _file;
 	destination_file.filetime = 0;
 	destination_file.stream = NULL;
-	download_progress.lastruntime = 0;
-	download_progress.curl = curl;
+	downloadProgress.lastruntime = 0;
+	downloadProgress.curl = curl;
 }
-void pkgdwl::download_file(const string& url_to_download, const string& file)
+void pkgdwl::downloadFile(const string& url_to_download, const string& file)
 {
-	download_progress.lastruntime = 0;
-	download_progress.curl = curl;
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &pkgdwl::handle_write_to_stream);
+	downloadProgress.lastruntime = 0;
+	downloadProgress.curl = curl;
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &pkgdwl::writeToStreamHandle);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &destination_file);
-	curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, &pkgdwl::handle_update_progress);
+	curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, &pkgdwl::updateProgressHandle);
 	curl_easy_setopt(curl, CURLOPT_URL,url_to_download.c_str());
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION,1L);
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR,1L);
-	curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, &download_progress);
+	curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, &downloadProgress);
 	curl_easy_setopt(curl, CURLOPT_FILETIME,1L);
 #ifndef NDEBUG
 	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
@@ -106,18 +106,18 @@ void pkgdwl::download_file(const string& url_to_download, const string& file)
 	result = curl_easy_perform(curl);
 	if (result != CURLE_OK)
 	{
-		actual_error = CANNOT_DOWNLOAD_FILE;
-		error_treatment(url_to_download);
+		actualError = CANNOT_DOWNLOAD_FILE;
+		treatErrors(url_to_download);
 	}
 	if (destination_file.stream)
 		fclose(destination_file.stream);
 	else
 	{
-		actual_error = CANNOT_CREATE_FILE;
-		error_treatment(file);
+		actualError = CANNOT_CREATE_FILE;
+		treatErrors(file);
 	}
 }
-size_t pkgdwl::write_to_stream(void *buffer, size_t size, size_t nmemb, void *stream)
+size_t pkgdwl::writeToStream(void *buffer, size_t size, size_t nmemb, void *stream)
 {
 	DestinationFile *outputf = (DestinationFile *)stream;
 	if ( outputf && ! outputf->stream)
@@ -128,9 +128,9 @@ size_t pkgdwl::write_to_stream(void *buffer, size_t size, size_t nmemb, void *st
 	}
 	return fwrite(buffer,size,nmemb,outputf->stream);
 }
-int pkgdwl::update_progress(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
+int pkgdwl::updateProgress(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
 {
-	struct DownloadProgress *CurrentProgress = (struct DownloadProgress *)p;
+	struct dwlProgress *CurrentProgress = (struct dwlProgress *)p;
 	CURL *curl = CurrentProgress->curl;
 	double TotalTime = 0;
 	double SpeedDownload = 0;
@@ -143,17 +143,17 @@ int pkgdwl::update_progress(void *p, double dltotal, double dlnow, double ultota
 	
 	return 0;
 }
-int pkgdwl::handle_update_progress(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
+int pkgdwl::updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
 {
-	return static_cast<pkgdwl*>(p)->update_progress(p,dltotal,dlnow,ultotal,ulnow);
+	return static_cast<pkgdwl*>(p)->updateProgress(p,dltotal,dlnow,ultotal,ulnow);
 }
-size_t pkgdwl::handle_write_to_stream(void *buffer, size_t size, size_t nmemb, void *stream)
+size_t pkgdwl::writeToStreamHandle(void *buffer, size_t size, size_t nmemb, void *stream)
 {
-	return static_cast<pkgdwl*>(stream)->write_to_stream(buffer,size,nmemb,stream);
+	return static_cast<pkgdwl*>(stream)->writeToStream(buffer,size,nmemb,stream);
 }
-void pkgdwl::print_help() const
+void pkgdwl::printHelp() const
 {
-	cout << "usage: " << utilname << " [options] <package>" << endl
+	cout << "usage: " << utilName << " [options] <package>" << endl
 	     << "options:" << endl
 			 << "  -i, --info          download md5sum info file only" << endl
 	     << "  -v, --version       print version and exit" << endl

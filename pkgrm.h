@@ -30,7 +30,7 @@ class pkgrm : public pkgdbh {
 public:
 	pkgrm() : pkgdbh("pkgrm") {}
 	virtual void run(int argc, char** argv);
-	virtual void print_help() const;
+	virtual void printHelp() const;
 };
 
 #endif /* PKGRM_H */
