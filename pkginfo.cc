@@ -126,7 +126,7 @@ void pkginfo::run(int argc, char** argv)
 			// List package or file contents
 			//
 			getInstalledPackages();
-			if (getPackageName(o_arg)) {
+			if (checkPackageNameExist(o_arg)) {
 				copy(packages[o_arg].files.begin(), packages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
 				cout << endl << "Name: " << o_arg << endl
 				<< "Version: " << packages[o_arg].version << endl 

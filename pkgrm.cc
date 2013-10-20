@@ -70,7 +70,7 @@ void pkgrm::run(int argc, char** argv)
 		// Retrieve info about all the packages
 		getInstalledPackages();
 
-		if (!getPackageName(o_package))
+		if (!checkPackageNameExist(o_package))
 		{
 			actualError = PACKAGE_NOT_INSTALL;
 			treatErrors(o_package);

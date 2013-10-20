@@ -258,7 +258,8 @@ void pkgdbh::progressInfo() const
 			break;
   }
 }
-int pkgdbh::getListOfPackages (const string& path) // return the number of db files founds
+/* Append to the "DB" the number of packages founds (directory containg a file named files */
+int pkgdbh::getListOfPackages (const string& path)
 {
 	set<string> list_of_packages_file;
 	keyValue string_splited;
@@ -276,7 +277,7 @@ int pkgdbh::getListOfPackages (const string& path) // return the number of db fi
 #endif
   return pkgList.size();
 }
-
+/* Populate the database with all details infos */
 void pkgdbh::getInstalledPackages()
 {
 	actualAction = DB_OPEN_START;
@@ -477,7 +478,7 @@ void pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 	}
 }
 
-bool pkgdbh::getPackageName(const string& name)
+bool pkgdbh::checkPackageNameExist(const string& name)
 {
 	return (packages.find(name) != packages.end());
 }

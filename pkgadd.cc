@@ -81,7 +81,7 @@ void pkgadd::run(int argc, char** argv)
 		// checking the rules
 		vector<rule_t> config_rules = readRulesFile();
 
-		bool installed = getPackageName(package.first);
+		bool installed = checkPackageNameExist(package.first);
 		if (installed && !o_upgrade)
 		{
 			actualError = PACKAGE_ALLREADY_INSTALL;

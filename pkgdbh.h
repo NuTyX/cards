@@ -150,8 +150,8 @@ protected:
 	void getInstalledPackages(const string& path);
 	void addPackageFilesRefsToDB(const string& name, const pkginfo_t& info);
 	void addPackageFilesRefsToDB_2(const string& name, const pkginfo_t& info);
-	bool getPackageName(const string& name);
-	bool getPackageName_2(const string& name);	
+	bool checkPackageNameExist(const string& name);
+	bool checkPackageNameExist_2(const string& name);	
 	/* Remove the physical files after followings some rules */
 	void removePackageFiles(const string& name);
 	
