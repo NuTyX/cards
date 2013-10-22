@@ -11,14 +11,14 @@ typedef struct elf_internal_ehdr_begin {
 	unsigned int       e_version;
 } Elf_Ehdr_Begin;
 typedef struct elf_internal_ehdr_32b {
-	unsigned long     e_entry;
-  unsigned long     e_phoff;
-	unsigned long     e_shoff;
+	unsigned int     e_entry;
+  unsigned int     e_phoff;
+	unsigned int     e_shoff;
 } Elf_Ehdr_32Bit;
 typedef struct elf_internal_ehdr_64b {
-   unsigned long    e_entry;
-   unsigned long    e_phoff;
-   unsigned long    e_shoff;
+   unsigned long long    e_entry;
+   unsigned long long    e_phoff;
+   unsigned long long    e_shoff;
 } Elf_Ehdr_64Bit;
 
 typedef struct elf_internal_ehdr_end {

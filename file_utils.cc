@@ -21,6 +21,39 @@
 //
 
 #include "file_utils.h"
+
+void * get_data ( void * var, FILE * file, long offset, size_t size, size_t nmemb)
+{
+  void * mvar;
+  if (size == 0 || nmemb == 0)
+    return NULL;
+  if (fseek (file, offset, SEEK_SET))
+  {
+    printf("Cannot seek\n");
+    return NULL;
+  }
+  mvar = var;
+  if (mvar == NULL)
+  {
+  /* Check for overflow.  */
+    if (nmemb < (~(size_t) 0 - 1) / size)
+      /* + 1 so that we can '\0' terminate invalid string table sections.  */
+      mvar = malloc (size * nmemb + 1);
+    if (mvar == NULL)
+    {
+      printf("Out of memory\n");
+      return NULL;
+    }
+    ((char *) mvar)[size * nmemb] = '\0';
+  }
+  if (fread (mvar, size, nmemb, file) != nmemb)
+  {
+    printf("Unable to read in 0x%lx bytes", (unsigned long)(size * nmemb));
+    return NULL;
+  }
+  return mvar;
+}
+
 string trim_filename(const string& filename)
 {
   string search("//");

@@ -4,7 +4,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include "elf_common.h"
-#include "elf_internal.h"
+#include "pkglibs.h"
+#include "file_utils.h"
 
 int error ( const char* message);
 void end (void);
@@ -36,40 +37,11 @@ static Elf_Phdr_64 * program_headers_64bits = NULL;
 static Elf_Dyn_32 *  dynamics_section_32bits = NULL;
 static Elf_Dyn_64 *  dynamics_section_64bits = NULL;
 
-static FILE * file = NULL;
-static size_t result;
+FILE * file = NULL;
+size_t result;
 
-static void * get_data ( void * var, FILE * file, long offset, size_t size, size_t nmemb)
-{
-	void * mvar;
-	if (size == 0 || nmemb == 0)
-		return NULL;
-	if (fseek (file, offset, SEEK_SET))
-	{
-		printf("Cannot seek\n");
-		return NULL;
-	}
-	mvar = var;
-	if (mvar == NULL)
-	{
-	/* Check for overflow.  */
-		if (nmemb < (~(size_t) 0 - 1) / size)
-			/* + 1 so that we can '\0' terminate invalid string table sections.  */
-			mvar = malloc (size * nmemb + 1);
-		if (mvar == NULL)
-		{
-			printf("Out of memory\n");
-			return NULL;
-		}
-		((char *) mvar)[size * nmemb] = '\0';
-	}
-	if (fread (mvar, size, nmemb, file) != nmemb)
-	{
-		printf("Unable to read in 0x%lx bytes", (unsigned long)(size * nmemb));
-		return NULL;
-	}
-	return mvar;
-}
+const char *file_name;
+
 int get_32bit_elf_header_part(FILE *file)
 {
 	buffer_32bits_part = (Elf_Ehdr_32Bit*)malloc(sizeof(elf_header_32bits));
@@ -91,33 +63,54 @@ int get_64bit_elf_header_part(FILE *file)
 
 int main(int argc, char *argv[])
 {
+#ifndef NDEBUG
+	printf("sizeof unsigned char: %d\n",sizeof(unsigned char));
+	printf("sizeof unsigned short int: %d\n",sizeof(unsigned short int));
+	printf("sizeof short int: %d\n",sizeof(short int));
+	printf("sizeof int: %d\n",sizeof(int));
+	printf("sizeof unsigned int: %d\n",sizeof(unsigned int));
+	printf("sizeof int long: %d\n",sizeof(int long));
+	printf("sizeof int long long: %d\n",sizeof(int long long));
+	printf("sizeof unsigned int long long: %d\n",sizeof(unsigned int long long));
 
-	const char *file_name;
+#endif
 	struct stat statbuf;
-
 	file_name = argv[1];
 
-	if (stat (file_name, &statbuf) < 0)
+	if ( ! checkFileExist(file_name) || checkFileEmpty(file_name) )
 		return error ("Cannot find file");
 
 	file = fopen (file_name, "rb" );
 	if (file == NULL)
 		return error("Cannot open the file");
+#ifndef NDEBUG
+ printf("File open: %s\n",file_name);
+#endif
 
-	/* Check Magic number */
+
+	/* Magic number */
 	buffer = (Elf_Ehdr_Begin *)malloc( sizeof(elf_header_begin));
-
+#ifndef NDEBUG
+	printf("sizeof elf_header_begin :%d\n",sizeof(elf_header_begin));
+#endif
 	// copy the file into the buffer:
 	result = fread (buffer,1,sizeof(elf_header_begin),file);
 	if (result != sizeof(elf_header_begin))
 		return error ("Reading error"); 
 	elf_header_begin = *buffer;
 
-	if (   elf_header_begin.e_ident[EI_MAG0] != ELFMAG0
-		||  elf_header_begin.e_ident[EI_MAG1] != ELFMAG1
-		||  elf_header_begin.e_ident[EI_MAG2] != ELFMAG2
-		||  elf_header_begin.e_ident[EI_MAG3] != ELFMAG3)
-		return error(" Not an ELF file \n");
+  if (  elf_header_begin.e_ident[EI_MAG0] != ELFMAG0
+    ||  elf_header_begin.e_ident[EI_MAG1] != ELFMAG1
+    ||  elf_header_begin.e_ident[EI_MAG2] != ELFMAG2
+    ||  elf_header_begin.e_ident[EI_MAG3] != ELFMAG3)
+    return error("Not an ELF file");
+#ifndef NDEBUG
+  printf("Magic Number: %d %c %c %c\n",
+  elf_header_begin.e_ident[EI_MAG0],
+  elf_header_begin.e_ident[EI_MAG1],
+  elf_header_begin.e_ident[EI_MAG2],
+  elf_header_begin.e_ident[EI_MAG3]);
+#endif
 
  if ( elf_header_begin.e_ident[EI_CLASS] == ELFCLASS32 )
 /* 32bit elf file */
@@ -136,6 +129,17 @@ int main(int argc, char *argv[])
 
 	if (elf_header_end.e_shnum == 0)
 		return error ("There are no Sections in this file");
+#ifndef NDEBUG
+  printf("\nNumber of Section header: %d 0x%x\n",
+	elf_header_end.e_shnum,elf_header_end.e_shnum);
+	printf("Size of Section header entity : %d 0x%x\n",
+	elf_header_end.e_shentsize,elf_header_end.e_shentsize);
+	printf("Number of Program header: %d 0x%x\n",
+	elf_header_end.e_phnum,elf_header_end.e_phnum);
+	printf("Size of Program header entity: %d 0x%x\n\n",
+	elf_header_end.e_phentsize,elf_header_end.e_phentsize);
+#endif
+
 
 /* Main check if it's a 32 bits or 64 bits elf files */
 	if ( elf_header_begin.e_ident[EI_CLASS] == ELFCLASS32 )
@@ -158,14 +162,23 @@ int main(int argc, char *argv[])
 /* Only the dynamic section we are concern */
 			if ( section_headers_32bits[i].sh_type == SHT_STRTAB )
 			{
-				if (offset == 0)
-				{
 					offset = section_headers_32bits[i].sh_offset;
 #ifndef NDEBUG
-          printf("section_headers_32bits[%d].sh_offset: %x\n",
-            i,section_headers_32bits[i].sh_offset);
+		printf("section_headers_32bits[%d].sh_offset: %u 0x%x\n",
+	i,section_headers_32bits[i].sh_offset,section_headers_32bits[i].sh_offset);
 #endif
-				}
+				
+					if ( i ==  elf_header_end.e_shnum - 1 )
+					{
+						end();
+#ifndef NDEBUG
+	printf("No dynamics found\n");
+		printf("offset : %u 0x%x\n",
+	offset,offset);
+#endif
+						return 0;
+					}
+					break;
 			}
 		}
 /* Program header */
@@ -175,7 +188,7 @@ int main(int argc, char *argv[])
 			elf_header_end.e_phnum);
 
 		if (!program_headers_32bits)
-			return error("Out of mem\n");
+			return error("Out of mem");
 
 		for (unsigned int i = 0;i < elf_header_end.e_phnum;i++)
 		{
@@ -186,10 +199,10 @@ int main(int argc, char *argv[])
 				dynamic_addr = program_headers_32bits[i].p_offset;
 				dynamic_size_32bits = program_headers_32bits[i].p_filesz;
 #ifndef NDEBUG
-        printf("program_headers_32bits[%d].p_offset: %x\n",
-        i,program_headers_32bits[i].p_offset);
-        printf("program_headers_32bits[%d].p_filesz: %x\n",
-        i,program_headers_32bits[i].p_filesz);
+		printf("program_headers_32bits[%d].p_offset: %u 0x%x\n",
+	i,program_headers_32bits[i].p_offset,program_headers_32bits[i].p_offset);
+		printf("program_headers_32bits[%d].p_filesz: %u 0x%x\n",
+	i,program_headers_32bits[i].p_filesz,program_headers_32bits[i].p_filesz);
 #endif
 			}
 		}
@@ -203,31 +216,38 @@ int main(int argc, char *argv[])
 
 		if (fseek (file, 0, SEEK_END))
 			return error ("Error to seek to end of the file");
+
+#ifndef NDEBUG
+		printf("File length: %u 0x%x\n",
+	ftell (file),ftell (file));
+#endif
 		str_tab_len = ftell (file) - offset;
 #ifndef NDEBUG
-		printf("offset : %x\n",
-			offset);
-		printf("str_tab_len: %x\n",
-			str_tab_len);
+		printf("offset : %u 0x%x\n",
+	offset,offset);
+		printf("str_tab_len: %u 0x%x\n",
+	str_tab_len,str_tab_len);
 #endif
-
 		if (str_tab_len < 1)
 			return error("Impossible to determine the size of the dynamic table");
 
 		dynamic_strings = (char *) get_data (NULL, file, offset, 1,
 				str_tab_len);
 		dynamic_strings_length = dynamic_strings == NULL ? 0 : str_tab_len;
-
 		for (edyn = dynamics_section_32bits;
 				edyn < dynamics_section_32bits + dynamic_size_32bits;
 				edyn ++)
 		{
+			if (edyn->d_tag != DT_NEEDED)
+				break;
+			
 			if (edyn->d_tag == DT_NEEDED) /* if it's a lib */
 			{
 				if ( ( dynamic_strings != NULL ) && ( offset <  dynamic_strings_length) )
 				{
 					name = dynamic_strings + edyn->d_un.d_val;
-					printf("%s ",name);
+					if ( name != NULL )
+						printf("%s ",name);
 				}
 			}
 		}
@@ -254,16 +274,34 @@ int main(int argc, char *argv[])
 /* Only the dynamic section we are concern */
 			if ( section_headers_64bits[i].sh_type == SHT_STRTAB )
 			{
-				if (offset == 0)
-				{
-					offset = section_headers_64bits[i].sh_offset;
+				offset = section_headers_64bits[i].sh_offset;
 #ifndef NDEBUG
-					printf("section_headers_64bits[%d].sh_offset: %x\n",
-						i,section_headers_64bits[i].sh_offset);
+		printf("section_headers_64bits[%d].sh_offset: %u 0x%x\n",
+	i,section_headers_64bits[i].sh_offset,section_headers_64bits[i].sh_offset);
 #endif
+				if ( i ==  elf_header_end.e_shnum - 1 )
+				{
+					end();
+#ifndef NDEBUG
+	printf("No dynamics found\n");
+		printf("offset : %u 0x%x\n",
+	offset,offset);
+#endif
+					return 0;
 				}
+				break;
 			}
 		}
+    if ( offset == elf_header_end.e_shnum - 1)
+    {
+      end();
+#ifndef NDEBUG
+  printf("No dynamics found\n");
+    printf("offset : %u 0x%x\n",
+  offset,offset);
+#endif
+      return 0;
+    }
 /* Program header */
 		program_headers_64bits = (Elf_Phdr_64 *) get_data(NULL, file,
 			elf_header_64bits.e_phoff,
@@ -271,7 +309,7 @@ int main(int argc, char *argv[])
 			elf_header_end.e_phnum);
 
 		if (!program_headers_64bits)
-			return error("Out of mem\n");
+			return error("Out of mem");
 
 		for (unsigned int i = 0;i < elf_header_end.e_phnum;i++)
 		{
@@ -282,30 +320,33 @@ int main(int argc, char *argv[])
 				dynamic_addr = program_headers_64bits[i].p_offset;
 				dynamic_size_64bits = program_headers_64bits[i].p_filesz;
 #ifndef NDEBUG
-				printf("program_headers_64bits[%d].p_offset: %x\n",
-				i,program_headers_64bits[i].p_offset);
-				printf("program_headers_64bits[%d].p_filesz: %x\n",
-				i,program_headers_64bits[i].p_filesz);
+		printf("program_headers_64bits[%d].p_offset: %u 0x%x\n",
+	i,program_headers_64bits[i].p_offset,program_headers_64bits[i].p_offset);
+		printf("program_headers_64bits[%d].p_filesz: %u 0x%x\n",
+	i,program_headers_64bits[i].p_filesz,program_headers_64bits[i].p_filesz);
 #endif
 			}
-		}	
+		}
 /* Only the dynamic section we are concern for Dynamic libraries */
 		Elf_Dyn_64  * edyn;
 		dynamics_section_64bits = (Elf_Dyn_64 *) get_data ( NULL,file,dynamic_addr,
 			 1,dynamic_size_64bits);
 
 		if (!dynamics_section_64bits)
-			return error("Out of mem\n");
+			return error("Out of mem");
 
 		if (fseek (file, 0, SEEK_END))
 			return error ("Error to seek to end of the file");
-
+#ifndef NDEBUG
+    printf("File length: %u 0x%x\n",
+  ftell (file),ftell (file));
+#endif
 		str_tab_len = ftell (file) - offset;
 #ifndef NDEBUG
-    printf("offset : %x\n",
-      offset);
-    printf("str_tab_len: %x\n",
-      str_tab_len);
+		printf("offset : %u 0x%x\n",
+	offset,offset);
+		printf("str_tab_len: %u 0x%x\n",
+	str_tab_len,str_tab_len);
 #endif
 		if (str_tab_len < 1)
 			return error ("Impossible to determine the size of the dynamic table");
@@ -318,6 +359,9 @@ int main(int argc, char *argv[])
 			edyn < dynamics_section_64bits + dynamic_size_64bits;
 			edyn ++)
 		{
+			if (edyn->d_tag != DT_NEEDED)
+				break;
+
 			if (edyn->d_tag == DT_NEEDED) /* if it's a lib */
 			{
 				if ( ( dynamic_strings != NULL ) && ( offset <	dynamic_strings_length) )
@@ -335,9 +379,9 @@ return 0;
 
 void end()
 {
-  if (file !=NULL)
-    fclose(file);
-  if (buffer_32bits_part!=NULL)
+	if (file != NULL)
+		fclose(file);
+  if (buffer_32bits_part != NULL)
     free(buffer_32bits_part);
   if (buffer_64bits_part)
     free(buffer_64bits_part);
@@ -361,7 +405,7 @@ void end()
 
 int error ( const char* message)
 {
-  printf("%s\n");
+  fprintf(stderr,"%s: %s\n",file_name,message);
   end();
   return 1;
 }

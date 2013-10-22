@@ -47,7 +47,7 @@
 #define S_CARD_MODE S_ISVTX|S_IRWXU|S_IXGRP|S_IXOTH|S_IRGRP|S_IROTH
 
 using namespace std;
-
+void * get_data ( void * var, FILE * file, long offset, size_t size, size_t nmemb);
 bool checkFileExist(const string& filename);
 bool checkFileEmpty(const string& filename);
 bool checkFilesEqual(const string& file1, const string& file2);
