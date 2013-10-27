@@ -68,7 +68,7 @@ void pkgrm::run(int argc, char** argv)
 		getListOfPackages(o_root);
 
 		// Retrieve info about all the packages
-		getInstalledPackages();
+		getInstalledPackages(false);
 
 		if (!checkPackageNameExist(o_package))
 		{

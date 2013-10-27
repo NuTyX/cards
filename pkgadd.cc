@@ -74,7 +74,7 @@ void pkgadd::run(int argc, char** argv)
 		db_lock lock(o_root, true);
 		getListOfPackages(o_root);
 		//Retrieving info about all the packages
-		getInstalledPackages();
+		getInstalledPackages(false);
 		// Reading the archiving to find a list of files
 		pair<string, pkginfo_t> package = openArchivePackage(o_package);
 

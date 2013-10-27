@@ -294,14 +294,20 @@ pair<string, pkginfo_t> pkgdbh::getInfosPackage(const string& packageName)
 	return result;
 } 
 /* Populate the database with all details infos */
-void pkgdbh::getInstalledPackages()
+void pkgdbh::getInstalledPackages(bool silent)
 {
-	actualAction = DB_OPEN_START;
-	progressInfo();
+	if (!silent)
+	{
+		actualAction = DB_OPEN_START;
+		progressInfo();
+	}
 	for (set<string>::iterator i = pkgList.begin();i != pkgList.end();++i) {
-		actualAction = DB_OPEN_RUN;
-		if ( pkgList.size() > 100 )
-			progressInfo();		
+		if (!silent)
+		{
+			actualAction = DB_OPEN_RUN;
+			if ( pkgList.size() > 100 )
+				progressInfo();
+		}
 		pkginfo_t info;
 		string name(*i,0, i->find(NAME_DELIM));
 		string version = *i;
@@ -344,8 +350,11 @@ void pkgdbh::getInstalledPackages()
   cerr << endl;
   cerr << listOfInstPackages.size() << " packages found in database " << endl;
 #endif
-	actualAction = DB_OPEN_END;
-	progressInfo();
+	if (!silent)
+	{
+		actualAction = DB_OPEN_END;
+		progressInfo();
+	}
 }
 /* Populate the list depListOfPackages with the found dependencies from the list of packages name */
 void pkgdbh::getDependenciesList(const set<string>& listOfPackagesName)

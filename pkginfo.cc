@@ -42,6 +42,7 @@ void pkginfo::run(int argc, char** argv)
 	int o_details_mode = 0;
 	int o_dependencies_mode = 0;
 	int o_librairies_mode = 0;
+	int o_runtime_mode = 0;
 
 	string o_root;
 	string o_arg;
@@ -71,6 +72,11 @@ void pkginfo::run(int argc, char** argv)
 			o_list_mode += 1;
 			o_arg = argv[i + 1];
 			i++;
+		} else if (option == "-R" || option == "--runtime") {
+			assertArgument(argv, argc, i);
+			o_runtime_mode += 1;
+			o_arg = argv[i + 1];
+			i++;
 		} else if (option == "-o" || option == "--owner") {
 			assertArgument(argv, argc, i);
 			o_owner_mode += 1;
@@ -94,7 +100,7 @@ void pkginfo::run(int argc, char** argv)
 
 	if (o_footprint_mode + o_details_mode + o_dependencies_mode + 
 	o_installed_mode + o_list_mode + o_owner_mode + o_convert_mode + 
-	o_footprint_mode + o_librairies_mode == 0)
+	o_footprint_mode + o_librairies_mode + o_runtime_mode == 0)
 	{
 		actualError = OPTION_MISSING;
 		treatErrors(o_arg);
@@ -143,7 +149,7 @@ void pkginfo::run(int argc, char** argv)
 			//
 			// List package or file contents
 			//
-			getInstalledPackages();
+			getInstalledPackages(false);
 			if (checkPackageNameExist(o_arg)) {
 				copy(listOfInstPackages[o_arg].files.begin(), listOfInstPackages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
 			} else if (checkFileExist(o_arg)) {
@@ -154,8 +160,8 @@ void pkginfo::run(int argc, char** argv)
 				actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
 				treatErrors(o_arg);
 			}
-		} else if (o_librairies_mode) {
-			getInstalledPackages();
+		} else if (o_librairies_mode + o_runtime_mode > 0) {
+			getInstalledPackages(true);
 			set<string> librairiesList;
 			int Result;
 			if (checkPackageNameExist(o_arg))
@@ -167,14 +173,49 @@ void pkginfo::run(int argc, char** argv)
 				}
 				if (librairiesList.size() > 0)
 				{
-					for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
+					if (o_runtime_mode)
 					{
-						cout << *i << endl;
+						set<string> runtimeList;
+						for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
+						{
+							for (packages_t::const_iterator j = listOfInstPackages.begin(); j != listOfInstPackages.end();++j)
+							{
+								bool found = false;
+								for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k)
+								{
+									if ( k->find('/' + *i) != string::npos)
+									{
+										runtimeList.insert(j->first);
+										break;
+										found = true;
+									}
+								}
+								if (found == true)
+								{
+									found = false;
+									break;
+								}
+							}
+						}
+						if (runtimeList.size()>0)
+						{
+							int s = 1;
+							for (set<string>::const_iterator i = runtimeList.begin();i!=runtimeList.end();++i)
+							{
+								cout << *i;
+								s++;
+								if (s <= runtimeList.size())
+									cout << ",";
+							}
+						}
+					} else {
+							for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
+								cout << *i << endl;
 					}
 				}
-			}
+			}	
 		} else if (o_dependencies_mode) {
-			getInstalledPackages();
+			getInstalledPackages(false);
 			set<string> listOfPackageName;
 			listOfPackageName.insert(o_arg);
 			getDependenciesList(listOfPackageName);
@@ -187,7 +228,7 @@ void pkginfo::run(int argc, char** argv)
 				}
 			}
 		} else if (o_details_mode) {
-			getInstalledPackages();
+			getInstalledPackages(false);
 			if (checkPackageNameExist(o_arg)) {
 				cout << "Name: " << o_arg << endl
 				<< "Version: " << listOfInstPackages[o_arg].version << endl
@@ -202,7 +243,7 @@ void pkginfo::run(int argc, char** argv)
 			//
 			// List owner(s) of file or directory
 			//
-			getInstalledPackages();
+			getInstalledPackages(false);
 			regex_t preg;
 			if (regcomp(&preg, o_arg.c_str(), REG_EXTENDED | REG_NOSUB))
 			{
@@ -250,6 +291,7 @@ void pkginfo::printHelp() const
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl
+       << "  -R, --runtime <package>		 return on a single line all the runtime dependencies" << endl
 	     << "  -r, --root <path>           specify alternative installation root" << endl
 	     << "  -v, --version               print version and exit" << endl
 	     << "  -h, --help                  print help and exit" << endl;

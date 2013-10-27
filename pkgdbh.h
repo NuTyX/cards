@@ -148,7 +148,7 @@ protected:
 	void convertDBFormat();
 	int getListOfPackages(const string& path );
 	pair<string, pkginfo_t> getInfosPackage(const string& packageName);
-	void getInstalledPackages();
+	void getInstalledPackages(bool silent);
 	void getInstalledPackages(const string& path);
 
 	/* Add the found dependencies from the list of packages name */
