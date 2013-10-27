@@ -1,5 +1,30 @@
-#ifndef  _ELF_INTERNAL_H
-#define _ELF_INTERNAL_H
+//  elf.h
+//
+//  Copyright (c) 2013 by NuTyX team (http://nutyx.org)
+// 
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  USA.
+//
+
+#ifndef ELF_H
+#define ELF_H
+#if __x86_64__ || __ppc64__
+  #define ENV64BIT
+#else
+ #define ENV32BIT
+#endif
 
 /* ELF Header */
 #define EI_NIDENT 16    /* Size of e_ident[] */
@@ -10,6 +35,7 @@ typedef struct elf_internal_ehdr_begin {
 	unsigned short     e_machine;
 	unsigned int       e_version;
 } Elf_Ehdr_Begin;
+
 typedef struct elf_internal_ehdr_32b {
 	unsigned int     e_entry;
   unsigned int     e_phoff;
@@ -101,7 +127,7 @@ typedef struct elf_internal_phdr_64 {
 	unsigned long p_memsz;
 	unsigned long p_align;
 } Elf_Phdr_64;
-	
-#endif /* _ELF_INTERNAL_H */
+
+#endif /* ELF_H */
 
 // vim:set ts=2 :

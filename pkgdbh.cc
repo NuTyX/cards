@@ -66,13 +66,13 @@ pkgdbh::pkgdbh(const string& name)
 	: utilName(name)
 {
 	// Ignore signals
-	struct sigaction sa;
+/*	struct sigaction sa;
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = SIG_IGN;
 	sigaction(SIGHUP, &sa, 0);
 	sigaction(SIGINT, &sa, 0);
 	sigaction(SIGQUIT, &sa, 0);
-	sigaction(SIGTERM, &sa, 0);
+	sigaction(SIGTERM, &sa, 0); */
 }
 void pkgdbh::treatErrors(const string& s) const
 {
@@ -261,12 +261,11 @@ void pkgdbh::progressInfo() const
 /* Append to the "DB" the number of packages founds (directory containg a file named files */
 int pkgdbh::getListOfPackages (const string& path)
 {
-	set<string> list_of_packages_file;
 	keyValue string_splited;
 	root = trim_filename(path + "/");
 	const string pathdb =  root + PKG_DB_DIR;
-	list_of_packages_file = findFile(pathdb);
-	for (set<string>::iterator i = list_of_packages_file.begin();i != list_of_packages_file.end();++i) {
+	pkgFoldersList = findFile(pathdb);
+	for (set<string>::iterator i = pkgFoldersList.begin();i != pkgFoldersList.end();++i) {
 		string_splited=split_keyValue(*i,"#");
 		if (string_splited.value.size()>0)
 			pkgList.insert(string_splited.parameter + " " + string_splited.value);
@@ -277,6 +276,23 @@ int pkgdbh::getListOfPackages (const string& path)
 #endif
   return pkgList.size();
 }
+/* get details infos of a package */
+pair<string, pkginfo_t> pkgdbh::getInfosPackage(const string& packageName)
+{
+	pair<string, pkginfo_t> result;
+	string name(packageName,0,packageName.find('#'));
+	string version = packageName;
+	result.second.version=version.erase(0, version.find('#') == string::npos ? string::npos : version.find('#') + 1);
+	result.first = name;
+	string package_foldername = name + "#" + version;
+	result.second.description =  getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"des");
+	result.second.url = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"url");
+	result.second.maintainer = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"mai");
+	result.second.packager = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"pac");
+	result.second.run = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
+	result.second.size = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
+	return result;
+} 
 /* Populate the database with all details infos */
 void pkgdbh::getInstalledPackages()
 {
@@ -296,7 +312,7 @@ void pkgdbh::getInstalledPackages()
 		info.url = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"url");
 		info.maintainer = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"mai");
 		info.packager = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"pac");
-		info.depends = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
+		info.run = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
 		info.size = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
 		// list of files
 		const string filelist = root + PKG_DB_DIR + package_foldername + PKG_FILES;
@@ -321,15 +337,84 @@ void pkgdbh::getInstalledPackages()
 				info.files.insert(info.files.end(), file);
 			}
 			if (!info.files.empty())
-				packages[name] = info;
+				listOfInstPackages[name] = info;
 		}
 	}
 #ifndef NDEBUG
   cerr << endl;
-  cerr << packages.size() << " packages found in database " << endl;
+  cerr << listOfInstPackages.size() << " packages found in database " << endl;
 #endif
 	actualAction = DB_OPEN_END;
 	progressInfo();
+}
+/* Populate the list depListOfPackages with the found dependencies from the list of packages name */
+void pkgdbh::getDependenciesList(const set<string>& listOfPackagesName)
+{
+//	int depReturnVal=-1;
+	pair<string, pkginfo_t> pkg;
+
+	for (set<string>::iterator i = listOfPackagesName.begin();i != listOfPackagesName.end();++i)
+	{
+		if (checkPackageNameExist(*i)) 
+		{
+			/* we need to find the name#version folder */
+			for (set<string>::const_iterator k = pkgFoldersList.begin(); k != pkgFoldersList.end(); ++k)
+			{
+				string name = *i + "#";
+				string matchS = k->substr(0,name.size());
+				size_t found = matchS.find(name);
+				if ( found != string::npos)
+				{
+					pkg = getInfosPackage(*k);
+					if (getDependencies(listOfInstPackages,depListOfPackages,pkg) == 0) 
+					{
+						depListOfPackages.insert(pkg);
+					}
+					break;
+				}
+			}
+		}
+	}
+}
+int pkgdbh::getDependencies(const packages_t& list_of_availables_packages, packages_t& dep, const pair<string, pkginfo_t>& pkg)
+{
+	set<string> dDepsList;
+	/* if the package pkg doen't have dependencies (anymore) we can return normaly */
+	if ( strcmp(pkg.second.run.c_str(),"") == 0 || strcmp(pkg.second.run.c_str()," ") == 0 )
+	{
+		return 0;
+	}
+	/* if the list of dependencies Packages depsPkgList not yet exist as this function can be call recursivly, create it */
+	dDepsList=parseDelimitedList(pkg.second.run,',');
+	if (dDepsList.size() > 0)
+	{
+		for (set<string>::const_iterator i = dDepsList.begin();
+				i != dDepsList.end(); ++i)
+		{
+			/* if exist and not yet in  the dependencies list */
+			if (checkPackageNameExist(*i) && !(depListOfPackages.find(*i) != depListOfPackages.end()))
+			{
+				/* we need to find the name#version folder */
+				for (set<string>::const_iterator k = pkgFoldersList.begin(); k != pkgFoldersList.end(); ++k)
+				{
+					string name = *i + "#";
+					string matchS = k->substr(0,name.size());
+					size_t found = matchS.find(name);
+					if ( found != string::npos)
+					{
+						pair<string, pkginfo_t> tmpPkg = getInfosPackage(*k);
+						dep.insert(tmpPkg);
+						int depReturnVal = getDependencies(list_of_availables_packages, dep, tmpPkg);
+						if  (depReturnVal != -1)
+							break;
+						break;
+					}
+				}
+			}
+		
+		}
+	} else cout << "List empty" << endl;
+	return 0;
 }
 void pkgdbh::convertSpaceToNoSpaceDBFormat(const string& path)
 {
@@ -362,7 +447,7 @@ void pkgdbh::convertDBFormat()
 	const string packagedir = root + PKG_DB_DIR ;
 	mkdir(packagedir.c_str(),0755);
 	cout << packagedir << endl;
-	for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i) {
+	for (packages_t::const_iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i) {
 
 		const string packagenamedir = root + PKG_DB_DIR + i->first + "#" + i-> second.version;
 		cout << packagenamedir << " created" << endl;
@@ -404,7 +489,7 @@ void pkgdbh::convertDBFormat()
 		}
 	}
 #ifndef NDEBUG
-  cerr << packages.size() << " packages written to database" << endl;
+  cerr << listOfInstPackages.size() << " packages written to database" << endl;
 #endif
 }
 void pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
@@ -438,7 +523,7 @@ void pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 }	 
 void pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 {
-	packages[name] = info;
+	listOfInstPackages[name] = info;
 	const string packagedir = root + PKG_DB_DIR ;
 	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version;
 	const string fileslist = packagenamedir + PKG_FILES;
@@ -480,14 +565,14 @@ void pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 
 bool pkgdbh::checkPackageNameExist(const string& name)
 {
-	return (packages.find(name) != packages.end());
+	return (listOfInstPackages.find(name) != listOfInstPackages.end());
 }
 
 /* Remove meta data about the removed package */
 void pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
  	  const string packagedir = root + PKG_DB_DIR ;
-		const string version = packages[name].version;
+		const string version = listOfInstPackages[name].version;
   	const string packagenamedir = root + PKG_DB_DIR + name + "#" + version;
 		metaFilesList = findFile( packagenamedir);
 		if (metaFilesList.size() > 0)
@@ -507,8 +592,8 @@ void pkgdbh::removePackageFilesRefsFromDB(const string& name)
 /* Remove the physical files after followings some rules */
 void pkgdbh::removePackageFiles(const string& name)
 {
-	FilesList = packages[name].files;
-	packages.erase(name);
+	FilesList = listOfInstPackages[name].files;
+	listOfInstPackages.erase(name);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
@@ -517,7 +602,7 @@ void pkgdbh::removePackageFiles(const string& name)
 #endif
 
 	// Don't delete files that still have references
-	for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i)
+	for (packages_t::const_iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i)
 		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j)
 			FilesList.erase(*j);
 
@@ -545,8 +630,8 @@ void pkgdbh::removePackageFiles(const string& name)
 
 void pkgdbh::removePackageFilesRefsFromDB(const string& name, const set<string>& keep_list)
 {
-	FilesList = packages[name].files;
-	packages.erase(name);
+	FilesList = listOfInstPackages[name].files;
+	listOfInstPackages.erase(name);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
@@ -565,7 +650,7 @@ void pkgdbh::removePackageFilesRefsFromDB(const string& name, const set<string>&
 #endif
 
 	// Don't delete files that still have references
-	for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i)
+	for (packages_t::const_iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i)
 		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j)
 			FilesList.erase(*j);
 
@@ -596,7 +681,7 @@ void pkgdbh::removePackageFilesRefsFromDB(const string& name, const set<string>&
 void pkgdbh::removePackageFilesRefsFromDB(set<string> files, const set<string>& keep_list)
 {
 	// Remove all references
-	for (packages_t::iterator i = packages.begin(); i != packages.end(); ++i)
+	for (packages_t::iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i)
 		for (set<string>::const_iterator j = files.begin(); j != files.end(); ++j)
 			i->second.files.erase(*j);
    
@@ -627,7 +712,7 @@ set<string> pkgdbh::getConflictsFilesList(const string& name, const pkginfo_t& i
 	set<string> files;
    
 	// Find conflicting files in database
-	for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i) {
+	for (packages_t::const_iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i) {
 		if (i->first != name) {
 			set_intersection(info.files.begin(), info.files.end(),
 					 i->second.files.begin(), i->second.files.end(),
@@ -668,8 +753,8 @@ set<string> pkgdbh::getConflictsFilesList(const string& name, const pkginfo_t& i
 #endif
 
 	// If this is an upgrade, remove files already owned by this package
-	if (packages.find(name) != packages.end()) {
-		for (set<string>::const_iterator i = packages[name].files.begin(); i != packages[name].files.end(); ++i)
+	if (listOfInstPackages.find(name) != listOfInstPackages.end()) {
+		for (set<string>::const_iterator i = listOfInstPackages[name].files.begin(); i != listOfInstPackages[name].files.end(); ++i)
 			files.erase(*i);
 
 #ifndef NDEBUG
@@ -682,7 +767,7 @@ set<string> pkgdbh::getConflictsFilesList(const string& name, const pkginfo_t& i
 	return files;
 }
 
-pair<string, pkgdbh::pkginfo_t> pkgdbh::openArchivePackage(const string& filename)
+pair<string, pkginfo_t> pkgdbh::openArchivePackage(const string& filename)
 {
 	pair<string, pkginfo_t> result;
 	struct archive* archive;
@@ -1093,7 +1178,7 @@ db_lock::~db_lock()
   stdio_filebuf<char> filebuf_new(fd_new, ios::out, getpagesize());
 
   ostream db_new(&filebuf_new);
-  for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i) {
+  for (packages_t::const_iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i) {
     if (!i->second.files.empty()) {
       db_new << i->first << "\n";
       db_new << i->second.version << "\n";
@@ -1136,7 +1221,7 @@ db_lock::~db_lock()
 	}
 
 #ifndef NDEBUG
-  cerr << packages.size() << " packages written to database" << endl;
+  cerr << listOfInstPackages.size() << " packages written to database" << endl;
 #endif
 }
 */
@@ -1177,12 +1262,12 @@ void pkgdbh::db_open(const string& path)
       info.files.insert(info.files.end(), file);
     }
    if (!info.files.empty())
-        packages[name] = info;
+        listOfInstPackages[name] = info;
   }
 
 #ifndef NDEBUG
   cerr << endl;
-  cerr << packages.size() << " packages found in database " << endl;
+  cerr << listOfInstPackages.size() << " packages found in database " << endl;
 #endif
 }
 /*******************     End of Members *********************/

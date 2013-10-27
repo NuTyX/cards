@@ -21,7 +21,7 @@
 
 
 #include "string_utils.h"
-
+#include <iostream>
 #include <cctype>
 #include <fstream>
 #include <sys/stat.h>
@@ -154,6 +154,22 @@ string getFirstValueOfKeyBeforeDelim(const string& s, char delimiter)
 		return s.substr( 0, pos );
 	return s;
 }
+set<string> parseDelimitedList(const string& s, char delimiter)
+{
+	set<string> depList;
+	if ( s.empty() )
+		return depList;
+	int start = 0, end = 0;
+
+	while ( (end = s.find(delimiter,start)) != string::npos )
+	{
+		depList.insert(s.substr( start, end - start ));
+		start = end +1;
+	}
+	depList.insert(s.substr(start));
+	return depList;
+}
+		
 string stripWhiteSpace(const string& s)
 {
 	if ( s.empty() )

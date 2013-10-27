@@ -39,7 +39,10 @@ void pkginfo::run(int argc, char** argv)
 	int o_list_mode = 0;
 	int o_owner_mode = 0;
 	int o_convert_mode = 0;
-	int o_debug_mode = 0;
+	int o_details_mode = 0;
+	int o_dependencies_mode = 0;
+	int o_librairies_mode = 0;
+
 	string o_root;
 	string o_arg;
 
@@ -53,8 +56,16 @@ void pkginfo::run(int argc, char** argv)
 			o_installed_mode += 1;
 		} else if (option == "-c" || option == "--convert") {
 			o_convert_mode += 1;
-		} else if (option == "-d" || option == "--debug") {
-			o_debug_mode += 1;
+		} else if (option == "-D" || option == "--depends") {
+			assertArgument(argv, argc, i);
+			o_dependencies_mode += 1;
+			o_arg = argv[i + 1];
+			i++;
+		} else if (option == "-d" || option == "--details") {
+			assertArgument(argv, argc, i);
+			o_details_mode +=1;
+			o_arg = argv[i + 1];
+			i++;
 		} else if (option == "-l" || option == "--list") {
 			assertArgument(argv, argc, i);
 			o_list_mode += 1;
@@ -70,13 +81,20 @@ void pkginfo::run(int argc, char** argv)
 			o_footprint_mode += 1;
 			o_arg = argv[i + 1];
 			i++;
+		} else if (option == "-L" || option == "--librairies") {
+			assertArgument(argv, argc, i);
+			o_librairies_mode +=1;
+			o_arg =  argv[i + 1];
+			i++;
 		} else {
 			actualError = INVALID_OPTION;
 			treatErrors(option);
 		}
 	}
 
-	if (o_footprint_mode + o_installed_mode + o_list_mode + o_owner_mode + o_debug_mode + o_convert_mode == 0)
+	if (o_footprint_mode + o_details_mode + o_dependencies_mode + 
+	o_installed_mode + o_list_mode + o_owner_mode + o_convert_mode + 
+	o_footprint_mode + o_librairies_mode == 0)
 	{
 		actualError = OPTION_MISSING;
 		treatErrors(o_arg);
@@ -127,15 +145,7 @@ void pkginfo::run(int argc, char** argv)
 			//
 			getInstalledPackages();
 			if (checkPackageNameExist(o_arg)) {
-				copy(packages[o_arg].files.begin(), packages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
-				cout << endl << "Name: " << o_arg << endl
-				<< "Version: " << packages[o_arg].version << endl 
-				<< "Description: " << packages[o_arg].description << endl
-				<< "URL: " << packages[o_arg].url << endl
-				<< "Packager : " << packages[o_arg].packager << endl
-				<< "Size : " << packages[o_arg].size << endl
-				<< "Maintainer : " << packages[o_arg].maintainer << endl
-				<< "Depends on (run): " << packages[o_arg].depends << endl;
+				copy(listOfInstPackages[o_arg].files.begin(), listOfInstPackages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
 			} else if (checkFileExist(o_arg)) {
 				pair<string, pkginfo_t> package = openArchivePackage(o_arg);
 				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
@@ -144,7 +154,43 @@ void pkginfo::run(int argc, char** argv)
 				actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
 				treatErrors(o_arg);
 			}
-		} else if (o_owner_mode) {
+		} else if (o_librairies_mode) {
+			getInstalledPackages();
+			int result = 0;
+			if (checkPackageNameExist(o_arg))
+			{
+				for (set<string>::const_iterator i = listOfInstPackages[o_arg].files.begin(); i != listOfInstPackages[o_arg].files.end(); ++i)
+				{
+					const string filename = "/" + *i;
+					result = getRuntimeLibrairiesList(filename);
+				}
+			}
+		} else if (o_dependencies_mode) {
+			getInstalledPackages();
+			set<string> listOfPackageName;
+			listOfPackageName.insert(o_arg);
+			getDependenciesList(listOfPackageName);
+			if (depListOfPackages.size() > 0)
+			{
+					cout << "Number of deps: " << depListOfPackages.size() << endl;
+				for (packages_t::const_iterator i = depListOfPackages.begin(); i != depListOfPackages.end();i++)
+				{
+					cout << i->first << " " << i->second.version << endl;
+				}
+			}
+		} else if (o_details_mode) {
+			getInstalledPackages();
+			if (checkPackageNameExist(o_arg)) {
+				cout << "Name: " << o_arg << endl
+				<< "Version: " << listOfInstPackages[o_arg].version << endl
+				<< "Description: " << listOfInstPackages[o_arg].description << endl
+				<< "URL: " << listOfInstPackages[o_arg].url << endl
+				<< "Packager : " << listOfInstPackages[o_arg].packager << endl
+				<< "Size : " << listOfInstPackages[o_arg].size << endl
+				<< "Maintainer : " << listOfInstPackages[o_arg].maintainer << endl
+				<< "Depends on (run): " << listOfInstPackages[o_arg].run <<"."<< endl;
+				}
+			} else if (o_owner_mode) {
 			//
 			// List owner(s) of file or directory
 			//
@@ -161,7 +207,7 @@ void pkginfo::run(int argc, char** argv)
 #ifndef NDEBUG
 			cerr << o_arg << endl;
 #endif
-			for (packages_t::const_iterator i = packages.begin(); i != packages.end(); ++i) {
+			for (packages_t::const_iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i) {
 				for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j) {
 					const string file('/' + *j);
 					if (!regexec(&preg, file.c_str(), 0, 0, 0)) {
@@ -181,8 +227,6 @@ void pkginfo::run(int argc, char** argv)
 			} else {
 				cout << utilName << ": no owner(s) found" << endl;
 			}
-		} else {
-				cout << utilName << ":debug" << endl;
 		}
 	}
 }
@@ -190,9 +234,9 @@ void pkginfo::printHelp() const
 {
 	cout << "usage: " << utilName << " [options]" << endl
 	     << "options:" << endl
-       << "  -d, --debug                 test the database" << endl
        << "  -c, --convert               convert the datase from pkgutils format to cards format" << endl 
 	     << "  -i, --installed             list installed packages" << endl
+       << "  -d, --details               list details about the <package>" << endl
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl

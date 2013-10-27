@@ -1,10 +1,7 @@
+//  dependencies_utils.h
 //
-//  cards
-// 
-//  Copyright (c) 2000-2005 Per Liden
-//  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
 //  Copyright (c) 2013 by NuTyX team (http://nutyx.org)
-// 
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -17,23 +14,32 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
 
-#ifndef PKGINFO_H
-#define PKGINFO_H
-#include "file_utils.h"
-#include "pkgdbh.h"
-#include "dependencies_utils.h"
+#ifndef DEPENDENCIES_UTILS_H
+#define DEPENDENCIES_UTILS_H
 
-class pkginfo : public pkgdbh {
-public:
-	pkginfo() : pkgdbh("pkginfo") {}
-	virtual void run(int argc, char** argv);
-	virtual void printHelp() const;
-};
+#include <string>
+#include <set>
+#include <map>
+#include <vector>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include "elf_common.h"
+#include "elf.h"
 
-#endif /* PKGINFO_H */
+using namespace std;
 
+int getRuntimeLibrairiesList (const string& filename);
+
+
+// int getDependencies(const pkgList *avail_pkgs, pkgList *dep, const pkgInfo *pkg);
+// int getDependencies(const packages_t& list_of_availables_packages, packages_t& dep, const pkginfo_t& pkg);
+
+#endif /* DEPENDENCIES_UTILS_H */
 // vim:set ts=2 :

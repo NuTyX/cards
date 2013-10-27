@@ -51,7 +51,7 @@
 #define NAME_DELIM			 ' '
 #define PARAM_DELIM      "="
 
-#define LDCONFIG         "/sbin/runLdConfig"
+#define LDCONFIG         "/sbin/ldconfig"
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
 
 using namespace std;
@@ -118,21 +118,22 @@ RM_PKG_FILES_RUN,
 RM_PKG_FILES_END
 };
 
+struct pkginfo_t {
+    string version;
+    string description;
+    string url;
+    string packager;
+    string maintainer;
+    string depends;
+    string run;
+    string size;
+    set<string> files;
+  };
+typedef map<string, pkginfo_t> packages_t;
+
 class pkgdbh {
 public:
-	struct pkginfo_t {
-		string version;
-		string description;
-		string url;
-		string packager;
-		string maintainer;
-		string depends;
-		string run;
-		string size;
-		set<string> files;
-	};
-	typedef map<string, pkginfo_t> packages_t;
-
+	
 	explicit pkgdbh(const string& name);
 	virtual ~pkgdbh() {}
 	virtual void run(int argc, char** argv) = 0; // Need to be redefine in derivated class
@@ -146,8 +147,14 @@ protected:
 
 	void convertDBFormat();
 	int getListOfPackages(const string& path );
+	pair<string, pkginfo_t> getInfosPackage(const string& packageName);
 	void getInstalledPackages();
 	void getInstalledPackages(const string& path);
+
+	/* Add the found dependencies from the list of packages name */
+	void getDependenciesList(const set<string>& listOfPackagesName);
+	int getDependencies(const packages_t& list_of_availables_packages, packages_t& dep, const pair<string, pkginfo_t>& pkg);
+
 	void addPackageFilesRefsToDB(const string& name, const pkginfo_t& info);
 	void addPackageFilesRefsToDB_2(const string& name, const pkginfo_t& info);
 	bool checkPackageNameExist(const string& name);
@@ -179,10 +186,13 @@ protected:
 
 	string utilName;
 	string root;
-	packages_t packages;
+	packages_t listOfInstPackages; /* List of Installed packages */
+	set<string> pkgFoldersList;
 	set<string> pkgList;
 	set<string> metaFilesList;
-	set<string>	FilesList;
+	set<string> FilesList;
+	set<string> runtimeLibrairiesList;
+	packages_t depListOfPackages;
 
 	action actualAction;
 	error actualError;

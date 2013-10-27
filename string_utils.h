@@ -54,6 +54,9 @@ string getFirstValueOfKeyBeforeDelim(const string& s, char delimiter);
 /* strip whitespace in the beginning and end of string, return a stripped string */
 string stripWhiteSpace(const string& s);
 
+/* populate a set of string with delimited string */
+set<string> parseDelimitedList(const string& s, char delimiter);
+
 /* make sure s1 starts with s2 */
 bool startsWith(const string& s, const string& with);
 
