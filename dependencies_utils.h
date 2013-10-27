@@ -35,7 +35,7 @@
 
 using namespace std;
 
-int getRuntimeLibrairiesList (const string& filename);
+int getRuntimeLibrairiesList (set<string>& runtimeLibrairiesList, const string& filename);
 
 
 // int getDependencies(const pkgList *avail_pkgs, pkgList *dep, const pkgInfo *pkg);

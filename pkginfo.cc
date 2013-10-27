@@ -156,13 +156,21 @@ void pkginfo::run(int argc, char** argv)
 			}
 		} else if (o_librairies_mode) {
 			getInstalledPackages();
-			int result = 0;
+			set<string> librairiesList;
+			int Result;
 			if (checkPackageNameExist(o_arg))
 			{
 				for (set<string>::const_iterator i = listOfInstPackages[o_arg].files.begin(); i != listOfInstPackages[o_arg].files.end(); ++i)
 				{
-					const string filename = "/" + *i;
-					result = getRuntimeLibrairiesList(filename);
+					string filename('/' + *i);
+					Result = getRuntimeLibrairiesList(librairiesList,filename);
+				}
+				if (librairiesList.size() > 0)
+				{
+					for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
+					{
+						cout << *i << endl;
+					}
 				}
 			}
 		} else if (o_dependencies_mode) {
@@ -237,6 +245,8 @@ void pkginfo::printHelp() const
        << "  -c, --convert               convert the datase from pkgutils format to cards format" << endl 
 	     << "  -i, --installed             list installed packages" << endl
        << "  -d, --details               list details about the <package>" << endl
+       << "  -D, --depends               list of the dependencies founds in the Pkgmeta file recursively" << endl
+       << "  -L, --librairies            list all the runtime librairies for the <package>" << endl
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl
