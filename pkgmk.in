@@ -225,10 +225,21 @@ unpack_source() {
 get_package_list() {
 	local FILE i
 	i=0
-	for FILE in `find $PKGMK_PACKAGE_DIR -name "$name*#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"`; do
-		TARGETS[i]=`basename $FILE`
-		i=$((i+1))
-	done
+	if [ "$PKGMK_ARCH" == "x86_64" ]; then
+		for FILE in `find $PKGMK_PACKAGE_DIR -name "$name*#$version-$release-x86_64.pkg.tar.$PKGMK_COMPRESSION_MODE"`; do
+			TARGETS[i]=`basename $FILE`
+			i=$((i+1))
+		done
+		for FILE in `find $PKGMK_PACKAGE_DIR -name "$name*#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE"`; do
+			TARGETS[i]=`basename $FILE`
+			i=$((i+1))
+		done
+	else
+		for FILE in `find $PKGMK_PACKAGE_DIR -name "$name*#$version-$release-i686.pkg.tar.$PKGMK_COMPRESSION_MODE"`; do
+			TARGETS[i]=`basename $FILE`
+			i=$((i+1))
+		done
+	fi
 	if [ -z $TARGETS ]; then
 		warning "Package(s) not found(s)..."
 	fi
@@ -472,7 +483,7 @@ pack_lib() {
 		fi
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$PKGMK_ARCH.pkg.tar \
 			$DIR
 			rm -r $DIR
 			j=1
@@ -488,7 +499,7 @@ pack_devel() {
 	for DIR in usr/include usr/lib/pkgconfig; do
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
 			$DIR
 			rm -r $DIR
 			j=1
@@ -500,7 +511,7 @@ pack_doc() {
 	for DIR in usr/share/doc usr/share/gtk-doc; do
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
 			$DIR
 			rm -r $DIR
 			j=1
@@ -512,7 +523,7 @@ pack_man() {
 	for DIR in usr/share/info usr/share/man; do
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
 			$DIR
 			rm -r $DIR
 			j=1
@@ -523,21 +534,28 @@ pack_service() {
 	local DIR="etc/rc.d"
 	if [ -d $DIR ]; then
 		bsdtar -r -f \
-		$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+		$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
 		$DIR
 		rm -r $DIR
 		j=1
 	fi
 }
 compress_group_package() {
-	if [ -f $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar ]; then
-	info "compress $group" 
-		case $PKGMK_COMPRESSION_MODE in
-			gz)  gzip -9 $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar;;
-			bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar;;
-			xz)  xz -z -9 $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar ;;
-		esac
-	fi
+	local ARCH
+	for ARCH in x86_64 i686 any; do
+		if [ -f $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar ]; then
+			info "compress $group" 
+			case $PKGMK_COMPRESSION_MODE in
+				gz)  gzip -9 $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar;;
+				bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar;;
+				xz)  xz -z -9 $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar ;;
+			esac
+			TARGETS[i]="$name.$group#$version-$release-$ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
+			info "Build result for ${TARGETS[i]}:"
+			bsdtar -t -v -f \
+			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE
+		fi
+	done
 }
 build_package() {
 	# TODO find a better solution for the hardcoded folders
@@ -578,8 +596,8 @@ build_package() {
 				(set -e -x ;$group)
 				j=1
 			else
-				if [ -f $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar ]; then
-					rm $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar
+				if [ -f $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-* ]; then
+					rm $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*
 				fi
 				pack_$group
 			fi
@@ -589,17 +607,13 @@ build_package() {
 				cp $SRC/Pkgmeta $PKG/tmp/$name.$group#$version-$release/Pkgmeta
 				sed -i "/^run/d" $PKG/tmp/$name.$group#$version-$release/Pkgmeta
 				echo "run = $name" >> $PKG/tmp/$name.$group#$version-$release/Pkgmeta
-				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar|sed "s/\t/ /"|cut -d " " -f1`"
+				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*|sed "s/\t/ /"|cut -d " " -f1`"
 				echo "size_i = $SIZE_I" >> $PKG/tmp/$name.$group#$version-$release/Pkgmeta
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar \
+				$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*.pkg.tar \
 				tmp
 				rm -r $PKG/tmp
 				compress_group_package
-				TARGETS[i]="$name.$group#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
-				info "Build result for ${TARGETS[i]}:"
-				bsdtar -t -v -f \
-				$PKGMK_PACKAGE_DIR/$name.$group#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE
 				i=$((i+1))
 				j=0
 			fi
@@ -610,18 +624,18 @@ build_package() {
 				# Need to double check because glibc for exemple create a file in this directory
 				if [ -d usr/share/locale/$loc ];then
 					bsdtar -c $COMPRESSION -f \
-					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE \
+					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE \
 					usr/share/locale/$loc || error "Building '$name.$loc' failed."
 					rm -rf usr/share/locale/$loc
-					TARGETS[i]="$name.$loc#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
+					TARGETS[i]="$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE"
 					info "Build result for ${TARGETS[i]}:"
 					i=$((i+1))
 					bsdtar -t -v -f \
-					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE
+					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE
 				fi
 			done
 		fi
-		TARGETS[i]="$name#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
+		TARGETS[i]="$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
 		add_metafiles
 		SIZE_I="`du -b --summarize $PKG|sed "s/\t/ /"|cut -d " " -f1`"
 		echo "size_i = $SIZE_I" >> $PKG/tmp/$name#$version-$release/Pkgmeta
@@ -720,7 +734,12 @@ clean() {
 	done
 }
 clean_old() {
-	find $PKGMK_PACKAGE_DIR/$name*#*.pkg.tar.* -exec rm -v {} \; 2> /dev/null
+	if [ "$PKGMK_ARCH" == "x86_64" ]; then
+		find $PKGMK_PACKAGE_DIR/$name*#*-x86_64.pkg.tar.* -exec rm -v {} \; 2> /dev/null
+		find $PKGMK_PACKAGE_DIR/$name*#*-any.pkg.tar.* -exec rm -v {} \; 2> /dev/null
+	else
+		find $PKGMK_PACKAGE_DIR/$name*#*-i686.pkg.tar.* -exec rm -v {} \; 2> /dev/null
+	fi
 }
 update_footprint() {
 	cd $PKGMK_PACKAGE_DIR
@@ -882,15 +901,12 @@ main() {
 	fi
 	
 	if [ -z $PKGMK_PACKAGE_DIR ]; then
-		PKGMK_PACKAGE_DIR="$PWD/`uname -m`"
+		PKGMK_PACKAGE_DIR="$PWD/PACKAGES"
 		info "PKGMK_PACKAGE_DIR set to: $PKGMK_PACKAGE_DIR"
 	fi
 	popd > /dev/null
-	# multilib
-	PKGMK_ARCH=64
-	if [ -f ".32bit" ]; then
-		PKGMK_ARCH=32
-	fi
+
+	PKGMK_ARCH=`uname -m`
 
 	local FILE TARGET PACKAGENAME
 
@@ -933,7 +949,7 @@ main() {
 
 	if [ -z $PKGMK_PACKAGE_DIR ]; then
 		pushd ../.. > /dev/null
-		PKGMK_PACKAGE_DIR="$PWD/`uname -m`"
+		PKGMK_PACKAGE_DIR="$PWD/PACKAGES"
 		info "PKGMK_PACKAGE_DIR set to: $PKGMK_PACKAGE_DIR"
 		popd > /dev/null
 	fi
@@ -947,7 +963,7 @@ main() {
 		gz|bz2|xz)
 			get_package_list
 			if [ -z $TARGETS ]; then
-				TARGET="$PKGMK_PACKAGE_DIR/$name#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE"
+				TARGET="$PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
 			fi;;
 		*)
 			error "Compression mode '$PKGMK_COMPRESSION_MODE' not supported"
@@ -1011,8 +1027,7 @@ main() {
 
 	fi
 	# From here on it's need to check the base package not any group which means
-	# TARGET=$PKGMK_PACKAGE_DIR/$name#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE
-	TARGET=$PKGMK_PACKAGE_DIR/$name#$version-$release.pkg.tar.$PKGMK_COMPRESSION_MODE
+	TARGET=$PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE
 	if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
 		info "Package '$TARGET' is up to date."
 		if [ ! -f $TARGET ]; then
@@ -1040,8 +1055,6 @@ main() {
 		remove_source
 	fi
 
-	cd $PKGMK_PACKAGE_DIR
-	find . -name "*.pkg.tar.*"|sed "s/.pkg.tar.$PKGMK_COMPRESSION_MODE//"|sed "s/.\///" > $PKGMK_REPO
 	exit 0
 }
 
