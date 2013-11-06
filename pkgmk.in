@@ -684,9 +684,9 @@ install_package() {
 		info "Installing '$TARGET'."
 	
 		if [ "$PKGMK_INSTALL" = "install" ]; then
-			COMMAND="pkgadd $TARGET"
+			COMMAND="pkgadd $PKGMK_PACKAGE_DIR/$TARGET"
 		else
-			COMMAND="pkgadd -u $TARGET"
+			COMMAND="pkgadd -u $PKGMK_PACKAGE_DIR/$TARGET"
 		fi
 	
 		cd $PKGMK_ROOT
