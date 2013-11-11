@@ -163,7 +163,7 @@ void pkginfo::run(int argc, char** argv)
 		} else if (o_librairies_mode + o_runtime_mode > 0) {
 			getInstalledPackages(true);
 			set<string> librairiesList;
-			int Result;
+			int Result = -1;
 			if (checkPackageNameExist(o_arg))
 			{
 				for (set<string>::const_iterator i = listOfInstPackages[o_arg].files.begin(); i != listOfInstPackages[o_arg].files.end(); ++i)
@@ -171,7 +171,7 @@ void pkginfo::run(int argc, char** argv)
 					string filename('/' + *i);
 					Result = getRuntimeLibrairiesList(librairiesList,filename);
 				}
-				if (librairiesList.size() > 0)
+				if ( (librairiesList.size() > 0 ) && (Result > -1) )
 				{
 					if (o_runtime_mode)
 					{
@@ -231,6 +231,7 @@ void pkginfo::run(int argc, char** argv)
 			getInstalledPackages(false);
 			if (checkPackageNameExist(o_arg)) {
 				cout << "Name: " << o_arg << endl
+				<< "Arch: " << listOfInstPackages[o_arg].arch << endl
 				<< "Version: " << listOfInstPackages[o_arg].version << endl
 				<< "Description: " << listOfInstPackages[o_arg].description << endl
 				<< "URL: " << listOfInstPackages[o_arg].url << endl

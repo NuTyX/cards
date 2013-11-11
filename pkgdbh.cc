@@ -312,8 +312,12 @@ void pkgdbh::getInstalledPackages(bool silent)
 		string name(*i,0, i->find(NAME_DELIM));
 		string version = *i;
 		version.erase(0, version.find(NAME_DELIM) == string::npos ? string::npos : version.find(NAME_DELIM) + 1);
+		string arch = version;
+		version.erase(version.find_last_of("-"),version.size());
+		arch.erase(0, arch.find_last_of("-")+1);
 		info.version = version;
-		string package_foldername = name + "#" + version;
+		info.arch = arch;
+		string package_foldername = name + "#" + version + "-" + arch;
 		info.description = 	getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"des");
 		info.url = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"url");
 		info.maintainer = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"mai");
@@ -509,12 +513,12 @@ void pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 	for (set<string>::iterator i = info.files.begin(); i!=info.files.end();++i) {
 		if ( strncmp(i->c_str(),package_meta_dir.c_str(),package_meta_dir.size()) == 0 )
 		{
-			metaFilesList.insert(metaFilesList.end(), *i);
+			metaFilesList.insert(metaFilesList.end(), *i );
 			info.files.erase(i);
 		}
 	}
 	const string packagedir = root + PKG_DB_DIR ;
-	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version;
+	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version + "-" + info.arch;
 	
 //	mkdir(packagenamedir.c_str(),0755);
 	if ( metaFilesList.size()>0 )
@@ -534,7 +538,7 @@ void pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 {
 	listOfInstPackages[name] = info;
 	const string packagedir = root + PKG_DB_DIR ;
-	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version;
+	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version + "-" + info.arch;
 	const string fileslist = packagenamedir + PKG_FILES;
 	const string fileslist_new = fileslist + ".imcomplete_transaction";
 	int fd_new = creat(fileslist_new.c_str(),0644);
@@ -582,7 +586,8 @@ void pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
  	  const string packagedir = root + PKG_DB_DIR ;
 		const string version = listOfInstPackages[name].version;
-  	const string packagenamedir = root + PKG_DB_DIR + name + "#" + version;
+		const string arch = listOfInstPackages[name].arch;
+  	const string packagenamedir = root + PKG_DB_DIR + name + "#" + version + "-" + arch;
 		metaFilesList = findFile( packagenamedir);
 		if (metaFilesList.size() > 0)
 			for (set<string>::iterator i = metaFilesList.begin(); i != metaFilesList.end();++i) {
@@ -782,12 +787,15 @@ pair<string, pkginfo_t> pkgdbh::openArchivePackage(const string& filename)
 	struct archive* archive;
 	struct archive_entry* entry;
 
-	// Extract name and version from filename
+	// Extract name, version and the arch from filename
 	string basename(filename, filename.rfind('/') + 1);
 	string name(basename, 0, basename.find(VERSION_DELIM));
 	string version(basename, 0, basename.rfind(PKG_EXT));
-	version.erase(0, version.find(VERSION_DELIM) == string::npos ? string::npos : version.find(VERSION_DELIM) + 1);
-   
+  version.erase(0, version.find(VERSION_DELIM) == string::npos ? string::npos : version.find(VERSION_DELIM) + 1);
+	string arch = version;
+  version.erase(version.find_last_of("-"),version.size());
+  arch.erase(0, arch.find_last_of("-")+1);
+
 	if (name.empty() || version.empty())
 	{
 		actualError = CANNOT_DETERMINE_NAME_VERSION;
@@ -796,7 +804,7 @@ pair<string, pkginfo_t> pkgdbh::openArchivePackage(const string& filename)
 
 	result.first = name;
 	result.second.version = version;
-
+	result.second.arch = arch;
 
 	archive = archive_read_new();
 	INIT_ARCHIVE(archive);
