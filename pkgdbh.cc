@@ -509,8 +509,9 @@ void pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 {
 	actualAction = PKG_MOVE_META_START;
 	progressInfo();
-	string package_meta_dir = PKG_INSTALL_DIR + name + "#" + info.version;
-	for (set<string>::iterator i = info.files.begin(); i!=info.files.end();++i) {
+	string package_meta_dir = ".";
+	for (set<string>::const_iterator i = info.files.begin(); i != info.files.end(); ++i)
+	{
 		if ( strncmp(i->c_str(),package_meta_dir.c_str(),package_meta_dir.size()) == 0 )
 		{
 			metaFilesList.insert(metaFilesList.end(), *i );
@@ -521,16 +522,16 @@ void pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version + "-" + info.arch;
 	
 //	mkdir(packagenamedir.c_str(),0755);
-	if ( metaFilesList.size()>0 )
+	mkdir(packagenamedir.c_str(),0755);
+	for (set<string>::const_iterator i = metaFilesList.begin(); i!=  metaFilesList.end(); ++i)
 	{
-		const string installdir = root + PKG_INSTALL_DIR;
-		if (rename(package_meta_dir.c_str(), packagenamedir.c_str()) == -1)
+		string file = packagenamedir + "/" + *i;
+		if (rename(i->c_str(), file.c_str()) == -1)
 		{
 			actualError = CANNOT_RENAME_FILE;
-			treatErrors(installdir + " to " + packagenamedir);
+			treatErrors( *i + " to " + file);
 		}
-	} else
-		mkdir(packagenamedir.c_str(),0755);
+	}
 	actualAction = PKG_MOVE_META_END;
 	progressInfo();
 }	 
@@ -861,7 +862,74 @@ pair<string, pkginfo_t> pkgdbh::openArchivePackage(const string& filename)
 	// printf("%u",i);
 	return result;
 }
+void pkgdbh::extractAndRunPREfromPackage(const string& filename)
+{
+	struct archive* archive;
+	struct archive_entry* entry;
+	string absroot;
+	archive = archive_read_new();
+	INIT_ARCHIVE(archive);
+	if (archive_read_open_filename(archive,
+		filename.c_str(),
+		DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
+	{
+		actualError = CANNOT_OPEN_FILE;
+		treatErrors(filename);
+	}
 
+	chdir(root.c_str());
+
+	for (installedFilesNumber = 0; archive_read_next_header(archive, &entry) ==
+		ARCHIVE_OK; ++installedFilesNumber)
+	{
+		string archive_filename = archive_entry_pathname(entry);
+		if ( strcmp(archive_filename.c_str(),PKG_PRE_INSTALL) == 0)
+		{
+			unsigned int flags = ARCHIVE_EXTRACT_OWNER | ARCHIVE_EXTRACT_PERM | ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_UNLINK;
+			if (archive_read_extract(archive, entry, flags) != ARCHIVE_OK) 
+			{
+				const char* msg = archive_error_string(archive);
+				cerr << utilName << ": could not install " + archive_filename << " : " << msg << endl;
+				exit(EXIT_FAILURE);
+			}
+			break;
+				
+		}
+
+	}
+#if ARCHIVE_VERSION_NUMBER >= 3000000
+        archive_read_free(archive);
+#else
+        archive_read_finish(archive);
+#endif
+	chdir("-");
+	if (checkFileExist(root + PKG_PRE_INSTALL))
+	{
+		pid_t pid = fork();
+		if (pid == -1)
+		{
+			actualError = CANNOT_FORK;
+			treatErrors("");
+		}
+		string shell_path = root + "bin/sh";
+		if (pid == 0)
+		{
+			execl(shell_path.c_str(), shell_path.c_str(), PKG_PRE_INSTALL, (char *) 0);
+			const char* msg = strerror(errno);
+			cerr << utilName << ": could not execute " << PKG_PRE_INSTALL << " : " << msg << endl;
+			exit(EXIT_FAILURE);
+		}
+		else
+		{
+			if (waitpid(pid, 0, 0) == -1)
+			{
+				actualError = WAIT_PID_FAILED;
+				treatErrors("");
+			}
+		}
+		removeFile(root,PKG_PRE_INSTALL);
+	}
+}
 void pkgdbh::installArchivePackage(const string& filename, const set<string>& keep_list, const set<string>& non_install_list)
 {
 	struct archive* archive;
@@ -878,7 +946,6 @@ void pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 		{
 			actualError = CANNOT_OPEN_FILE;
 			treatErrors(filename);
-//		throw runTimeErrorWithErrno("could not open " + filename, archive_errno(archive));
 		}
 	chdir(root.c_str());
 	absroot = getcwd(buf, sizeof(buf));

@@ -466,14 +466,18 @@ generate_meta () {
 
 }
 add_metafiles () {
-	local FILE
-	mkdir -p $PKG/tmp/$name#$version-$release
-	for FILE in README pre-install post-install ; do
-		if [ -f $FILE ]; then 
-			cp $FILE $PKG/tmp/$name#$version-$release/$FILE
-		fi
-	done
-	cp $SRC/Pkgmeta $PKG/tmp/$name#$version-$release/Pkgmeta
+	if [ -f $PKGMK_ROOT/README ]; then
+		cp $PKGMK_ROOT/README $PKG/.README
+	fi
+	if [ -f $PKGMK_ROOT/pre-install ]; then
+		cp $PKGMK_ROOT/pre-install $PKG/.PRE
+	fi
+	if [ -f $PKGMK_ROOT/post-install ]; then
+		cp $PKGMK_ROOT/post-install $PKG/.POST
+	fi
+	if [ -f $PKGMK_ROOT/Pkgmeta ]; then
+		cp $PKGMK_ROOT/Pkgmeta $PKG/.META
+	fi
 }
 pack_lib() {
 	local DIR
@@ -484,7 +488,7 @@ pack_lib() {
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
 			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$PKGMK_ARCH.pkg.tar \
-			$DIR
+			$DIR || BUILD_SUCCESSFUL="no"
 			rm -r $DIR
 			j=1
 		fi
@@ -500,7 +504,7 @@ pack_devel() {
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
 			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
-			$DIR
+			$DIR || BUILD_SUCCESSFUL="no"
 			rm -r $DIR
 			j=1
 		fi
@@ -512,7 +516,7 @@ pack_doc() {
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
 			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
-			$DIR
+			$DIR || BUILD_SUCCESSFUL="no"
 			rm -r $DIR
 			j=1
 		fi
@@ -524,7 +528,7 @@ pack_man() {
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
 			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
-			$DIR
+			$DIR || BUILD_SUCCESSFUL="no"
 			rm -r $DIR
 			j=1
 		fi
@@ -535,7 +539,7 @@ pack_service() {
 	if [ -d $DIR ]; then
 		bsdtar -r -f \
 		$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
-		$DIR
+		$DIR || BUILD_SUCCESSFUL="no"
 		rm -r $DIR
 		j=1
 	fi
@@ -553,7 +557,8 @@ compress_group_package() {
 			TARGETS[i]="$name.$group#$version-$release-$ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
 			info "Build result for ${TARGETS[i]}:"
 			bsdtar -t -v -f \
-			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE
+			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE \
+			|| BUILD_SUCCESSFUL = "no"
 		fi
 	done
 }
@@ -592,28 +597,43 @@ build_package() {
 		i=0
 		j=0
 		for group in ${PKGMK_GROUPS[@]}; do
+			BUILD_SUCCESSFUL="yes"
 			if [ "`type -t $group`" == "function" ]; then
 				(set -e -x ;$group)
 				j=1
+				if [ $? = 0 ]; then
+					BUILD_SUCCESSFUL="yes"
+				else
+					error "Building '$TARGET' failed."
+					exit 1
+				fi
 			else
 				if [ -f $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-* ]; then
 					rm $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*
 				fi
-				pack_$group
+				pack_$group 
+				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
+					error "Building '$TARGET' failed."
+                			exit 1
+				fi
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
-				mkdir -p $PKG/tmp/$name.$group#$version-$release
-				cp $SRC/Pkgmeta $PKG/tmp/$name.$group#$version-$release/Pkgmeta
-				sed -i "/^run/d" $PKG/tmp/$name.$group#$version-$release/Pkgmeta
-				echo "run = $name" >> $PKG/tmp/$name.$group#$version-$release/Pkgmeta
+				cp $SRC/Pkgmeta $PKG/.META
 				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*|sed "s/\t/ /"|cut -d " " -f1`"
-				echo "size_i = $SIZE_I" >> $PKG/tmp/$name.$group#$version-$release/Pkgmeta
+				echo "size_i = $SIZE_I" >> $PKG/.META
 				bsdtar -r -f \
 				$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*.pkg.tar \
-				tmp
-				rm -r $PKG/tmp
+				.META  || BUILD_SUCCESSFUL = "no"
+				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
+					error "Building '$TARGET' failed."
+					exit 1
+				fi
 				compress_group_package
+				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
+					error "Building '$TARGET' failed."
+					exit 1
+				fi
 				i=$((i+1))
 				j=0
 			fi
@@ -625,28 +645,43 @@ build_package() {
 				if [ -d usr/share/locale/$loc ];then
 					bsdtar -c $COMPRESSION -f \
 					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE \
-					usr/share/locale/$loc || error "Building '$name.$loc' failed."
+					usr/share/locale/$loc || BUILD_SUCCESSFUL = "no"
 					rm -rf usr/share/locale/$loc
 					TARGETS[i]="$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE"
 					info "Build result for ${TARGETS[i]}:"
 					i=$((i+1))
 					bsdtar -t -v -f \
-					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE
+					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE \
+					|| BUILD_SUCCESSFUL = "no"
 				fi
 			done
 		fi
 		TARGETS[i]="$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
+		cp $SRC/Pkgmeta $PKG/.META
 		add_metafiles
 		SIZE_I="`du -b --summarize $PKG|sed "s/\t/ /"|cut -d " " -f1`"
-		echo "size_i = $SIZE_I" >> $PKG/tmp/$name#$version-$release/Pkgmeta
-		info "Build result for ${TARGETS[i]}:"
+		echo "size_i = $SIZE_I" >> $PKG/.META || BUILD_SUCCESSFUL = "no"
 
-		bsdtar -c $COMPRESSION -f $TARGET *  &&  bsdtar -t -v -f $TARGET
+		for file in .META .PRE .POST .README; do
+			if [ -f $file ]; then
+				bsdtar -r -f $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar \
+				$file
+			fi
+		done
 
+		bsdtar -r -f $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar *
+
+                info "compress $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar"
+		case $PKGMK_COMPRESSION_MODE in
+			gz)  gzip -9 $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar;;
+			bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar;;
+			xz)  xz -z -9 $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar ;;
+		esac
+		info "Build result for $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE:"
+		bsdtar -t -v -f $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE
 		if [ $? = 0 ]; then
 			BUILD_SUCCESSFUL="yes"
-
-			if [ "$PKGMK_IGNORE_FOOTPRINT" = "yes" ]; then
+			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
 				warning "Footprint ignored."
 			else
 				check_footprint
@@ -907,7 +942,10 @@ main() {
 	popd > /dev/null
 
 	PKGMK_ARCH=`uname -m`
-
+	if ! (`which pkginfo > /dev/null`); then
+		warning "Footprint ignored."
+		PKGMK_IGNORE_FOOTPRINT="yes"
+	fi
 	local FILE TARGET PACKAGENAME
 
 	parse_options "$@"

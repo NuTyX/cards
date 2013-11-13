@@ -38,16 +38,15 @@
 #define PKG_DB_DIR          "var/lib/pkg/DB/"
 #define PKG_DB_OLD           "var/lib/pkg/db"
 #define PKG_FILES        "/files"
-#define PKG_META         "/Pkgmeta"
-#define PKG_INSTALL_DIR  "tmp/"
+#define PKG_META         "/.META"
 #define PKG_RECEPT       "Pkgfile"
-#define PKG_README       "README"
-#define PKG_PRE_INSTALL  "pre-install"
-#define PKG_POST_INSTALL "post-install"    
+#define PKG_README       ".README"
+#define PKG_PRE_INSTALL  ".PRE"
+#define PKG_POST_INSTALL ".POST"    
 
 #define PKG_REJECTED     "var/lib/pkg/rejected"
 #define VERSION_DELIM    '#'
-#define GROUP_DELIM      '#'
+#define GROUP_DELIM      '.'
 #define NAME_DELIM			 ' '
 #define PARAM_DELIM      "="
 
@@ -178,6 +177,7 @@ protected:
 	// Tar.gz
 	pair<string, pkginfo_t> openArchivePackage(const string& filename);
 	pair<string, pkginfo_t> openArchivePackage_2(const string& filename) const;
+	void extractAndRunPREfromPackage(const string& filename);
 	void installArchivePackage(const string& filename, const set<string>& keep_list, const set<string>& non_install_files);
 	void moveMetaFilesPackage(const string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
 	void installArchivePackage_2(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
