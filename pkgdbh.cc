@@ -866,7 +866,6 @@ void pkgdbh::extractAndRunPREfromPackage(const string& filename)
 {
 	struct archive* archive;
 	struct archive_entry* entry;
-	string absroot;
 	archive = archive_read_new();
 	INIT_ARCHIVE(archive);
 	if (archive_read_open_filename(archive,

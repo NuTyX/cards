@@ -22,12 +22,12 @@
 #
 
 DESTDIR =
-BINDIR = /usr/bin
+BINDIR = /bin
 MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.0.90.12
+VERSION = 0.0.90.13
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG

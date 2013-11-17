@@ -75,8 +75,7 @@ void pkgadd::run(int argc, char** argv)
 		getListOfPackages(o_root);
 		//Retrieving info about all the packages
 		getInstalledPackages(false);
-		// Run pre-install if exist
-		extractAndRunPREfromPackage(o_package);
+
 		// Reading the archiving to find a list of files
 		pair<string, pkginfo_t> package = openArchivePackage(o_package);
 
@@ -94,6 +93,7 @@ void pkgadd::run(int argc, char** argv)
 			actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
 			treatErrors(package.first);
 		}
+
 		set<string> non_install_files = applyInstallRules(package.first, package.second, config_rules);
 		set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
       
@@ -116,6 +116,8 @@ void pkgadd::run(int argc, char** argv)
 			keep_list = getKeepFileList(package.second.files, config_rules);
 			removePackageFilesRefsFromDB(package.first, keep_list);
 		}
+		// Run pre-install if exist
+		extractAndRunPREfromPackage(o_package);
 
 		// Installation progressInfo of the files on the HD
 		installArchivePackage(o_package, keep_list, non_install_files);
