@@ -619,12 +619,27 @@ build_package() {
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
+				if [ -f $PKGMK_ROOT/pre-install.$group ]; then
+					cp $PKGMK_ROOT/pre-install.$group $PKG/.PRE
+				fi
+				if [ -f $PKGMK_ROOT/post-install.$group ]; then
+					cp $PKGMK_ROOT/post-install.$group $PKG/.POST
+				fi
+				if [ -f $PKGMK_ROOT/README.$group ]; then
+					cp $PKGMK_ROOT/README.$group $PKG/.README
+				fi
 				cp $SRC/Pkgmeta $PKG/.META
 				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*|sed "s/\t/ /"|cut -d " " -f1`"
 				echo "size_i = $SIZE_I" >> $PKG/.META
-				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*.pkg.tar \
-				.META  || BUILD_SUCCESSFUL = "no"
+
+				for file in .META .PRE .POST .README; do
+					if [ -f $file ]; then
+						bsdtar -r -f \
+						$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*.pkg.tar \
+						file  || BUILD_SUCCESSFUL = "no"
+						rm file
+					fi
+				done
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
 					exit 1
