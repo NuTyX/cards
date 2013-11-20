@@ -113,8 +113,12 @@ void pkgadd::run(int argc, char** argv)
 		set<string> keep_list;
 
 		if (o_upgrade) {
+
+			// Remove metadata about the package removed
+			removePackageFilesRefsFromDB(package.first);
+
 			keep_list = getKeepFileList(package.second.files, config_rules);
-			removePackageFilesRefsFromDB(package.first, keep_list);
+			removePackageFiles(package.first, keep_list);
 		}
 		// Run pre-install if exist
 		extractAndRunPREfromPackage(o_package);

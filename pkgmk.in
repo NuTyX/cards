@@ -636,8 +636,8 @@ build_package() {
 					if [ -f $file ]; then
 						bsdtar -r -f \
 						$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*.pkg.tar \
-						file  || BUILD_SUCCESSFUL = "no"
-						rm file
+						$file  || BUILD_SUCCESSFUL = "no"
+						rm $file
 					fi
 				done
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then

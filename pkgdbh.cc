@@ -643,7 +643,7 @@ void pkgdbh::removePackageFiles(const string& name)
 	progressInfo();
 }
 
-void pkgdbh::removePackageFilesRefsFromDB(const string& name, const set<string>& keep_list)
+void pkgdbh::removePackageFiles(const string& name, const set<string>& keep_list)
 {
 	FilesList = listOfInstPackages[name].files;
 	listOfInstPackages.erase(name);

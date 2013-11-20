@@ -162,7 +162,7 @@ protected:
 	/* Remove the physical files after followings some rules */
 	void removePackageFiles(const string& name);
 	
-	void removePackageFilesRefsFromDB(const string& name, const set<string>& keep_list);
+	void removePackageFiles(const string& name, const set<string>& keep_list);
 
 	/* Remove meta data about the removed package */
 	void removePackageFilesRefsFromDB(const string& name);
