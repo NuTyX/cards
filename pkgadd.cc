@@ -1,9 +1,9 @@
 //  pkgadd.cc
-// 
+//
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
 //  Copyright (c) 2013 by NuTyX team (http://nutyx.org)
-// 
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -16,7 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
 
@@ -95,8 +95,16 @@ void pkgadd::run(int argc, char** argv)
 		}
 
 		set<string> non_install_files = applyInstallRules(package.first, package.second, config_rules);
+		if (!o_upgrade) {
+#ifndef NDEBUG
+			cerr << "Run extractAndRunPREfromPackage whithout upgrade" << endl;
+#endif
+			// Run pre-install if exist
+			extractAndRunPREfromPackage(o_package);
+		}
+
 		set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
-      
+
 		if (!conflicting_files.empty()) {
 			if (o_force) {
 				set<string> keep_list;
@@ -109,7 +117,7 @@ void pkgadd::run(int argc, char** argv)
 				treatErrors("listed file(s) already installed (use -f to ignore and overwrite)");
 			}
 		}
-   
+
 		set<string> keep_list;
 
 		if (o_upgrade) {
@@ -119,10 +127,13 @@ void pkgadd::run(int argc, char** argv)
 
 			keep_list = getKeepFileList(package.second.files, config_rules);
 			removePackageFiles(package.first, keep_list);
-		}
-		// Run pre-install if exist
-		extractAndRunPREfromPackage(o_package);
 
+#ifndef NDEBUG
+			cerr << "Run extractAndRunPREfromPackage after upgrade" << endl;
+#endif
+			// Run pre-install if exist
+			extractAndRunPREfromPackage(o_package);
+		}
 		// Installation progressInfo of the files on the HD
 		installArchivePackage(o_package, keep_list, non_install_files);
 

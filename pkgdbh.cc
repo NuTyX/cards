@@ -1,9 +1,9 @@
 //  pkgdbh.cc
-// 
+//
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
 //  Copyright (c) 2013 by NuTyX team (http://nutyx.org)
-// 
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -16,7 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
 #include "string_utils.h"
@@ -270,7 +270,7 @@ int pkgdbh::getListOfPackages (const string& path)
 		if (string_splited.value.size()>0)
 			pkgList.insert(string_splited.parameter + " " + string_splited.value);
 	}
-	
+
 #ifndef NDEBUG
   cerr << "Number of Packages: " << pkgList.size() << endl;
 #endif
@@ -292,7 +292,7 @@ pair<string, pkginfo_t> pkgdbh::getInfosPackage(const string& packageName)
 	result.second.run = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
 	result.second.size = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
 	return result;
-} 
+}
 /* Populate the database with all details infos */
 void pkgdbh::getInstalledPackages(bool silent)
 {
@@ -368,7 +368,7 @@ void pkgdbh::getDependenciesList(const set<string>& listOfPackagesName)
 
 	for (set<string>::iterator i = listOfPackagesName.begin();i != listOfPackagesName.end();++i)
 	{
-		if (checkPackageNameExist(*i)) 
+		if (checkPackageNameExist(*i))
 		{
 			/* we need to find the name#version folder */
 			for (set<string>::const_iterator k = pkgFoldersList.begin(); k != pkgFoldersList.end(); ++k)
@@ -379,7 +379,7 @@ void pkgdbh::getDependenciesList(const set<string>& listOfPackagesName)
 				if ( found != string::npos)
 				{
 					pkg = getInfosPackage(*k);
-					if (getDependencies(listOfInstPackages,depListOfPackages,pkg) == 0) 
+					if (getDependencies(listOfInstPackages,depListOfPackages,pkg) == 0)
 					{
 						depListOfPackages.insert(pkg);
 					}
@@ -424,7 +424,7 @@ int pkgdbh::getDependencies(const packages_t& list_of_availables_packages, packa
 					}
 				}
 			}
-		
+
 		}
 	} else cout << "List empty" << endl;
 	return 0;
@@ -451,7 +451,7 @@ void pkgdbh::convertSpaceToNoSpaceDBFormat(const string& path)
 			}
 			cout << packagenamedir_with_space << " renamed in " << packagenamedir_without_space << endl;
 		}
-	}	
+	}
 }
 void pkgdbh::convertDBFormat()
 {
@@ -464,7 +464,7 @@ void pkgdbh::convertDBFormat()
 
 		const string packagenamedir = root + PKG_DB_DIR + i->first + "#" + i-> second.version;
 		cout << packagenamedir << " created" << endl;
-		mkdir(packagenamedir.c_str(),0755);	
+		mkdir(packagenamedir.c_str(),0755);
 		const string fileslist = packagenamedir + PKG_FILES;
 		const string fileslist_new = fileslist + ".imcomplete_transaction";
 
@@ -480,7 +480,7 @@ void pkgdbh::convertDBFormat()
 
 		ostream db_new(&filebuf_new);
 		copy(i->second.files.begin(), i->second.files.end(), ostream_iterator<string>(db_new, "\n"));
-	
+
 		db_new.flush();
 		if (!db_new)
 		{
@@ -514,14 +514,16 @@ void pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 	{
 		if ( strncmp(i->c_str(),package_meta_dir.c_str(),package_meta_dir.size()) == 0 )
 		{
+#ifndef NDEBUG
+			cout << "*I: " << *i << endl;
+#endif
 			metaFilesList.insert(metaFilesList.end(), *i );
 			info.files.erase(i);
 		}
 	}
 	const string packagedir = root + PKG_DB_DIR ;
 	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version + "-" + info.arch;
-	
-//	mkdir(packagenamedir.c_str(),0755);
+
 	mkdir(packagenamedir.c_str(),0755);
 	for (set<string>::const_iterator i = metaFilesList.begin(); i!=  metaFilesList.end(); ++i)
 	{
@@ -534,12 +536,14 @@ void pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 	}
 	actualAction = PKG_MOVE_META_END;
 	progressInfo();
-}	 
+}
 void pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 {
+
 	listOfInstPackages[name] = info;
 	const string packagedir = root + PKG_DB_DIR ;
 	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version + "-" + info.arch;
+	mkdir(packagenamedir.c_str(),0755);
 	const string fileslist = packagenamedir + PKG_FILES;
 	const string fileslist_new = fileslist + ".imcomplete_transaction";
 	int fd_new = creat(fileslist_new.c_str(),0644);
@@ -556,7 +560,7 @@ void pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 
 	db_new.flush();
 	if (!db_new)
-	{ 
+	{
 		rmdir(packagenamedir.c_str());
 		actualError = CANNOT_WRITE_FILE;
 		treatErrors(fileslist_new);
@@ -585,23 +589,32 @@ bool pkgdbh::checkPackageNameExist(const string& name)
 /* Remove meta data about the removed package */
 void pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
- 	  const string packagedir = root + PKG_DB_DIR ;
-		const string version = listOfInstPackages[name].version;
-		const string arch = listOfInstPackages[name].arch;
+	const string packagedir = root + PKG_DB_DIR ;
+	const string version = listOfInstPackages[name].version;
+	const string arch = listOfInstPackages[name].arch;
   	const string packagenamedir = root + PKG_DB_DIR + name + "#" + version + "-" + arch;
-		metaFilesList = findFile( packagenamedir);
-		if (metaFilesList.size() > 0)
-			for (set<string>::iterator i = metaFilesList.begin(); i != metaFilesList.end();++i) {
-				const string filename = packagenamedir + "/" + *i;
-				if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
-					const char* msg = strerror(errno);
+
+	metaFilesList = findFile( packagenamedir);
+	if (metaFilesList.size() > 0)
+		for (set<string>::iterator i = metaFilesList.begin(); i != metaFilesList.end();++i) {
+			const string filename = packagenamedir + "/" + *i;
+			if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
+				const char* msg = strerror(errno);
 					cerr << utilName << ": could not remove " << filename << ": " << msg << endl;
 				}
 #ifndef NDEBUG
-				cout << endl << filename ;
+				cout  << "File: " << filename << " is removed"<< endl;
 #endif
 			}
-		remove(packagenamedir.c_str());
+		if( remove(packagenamedir.c_str()) == -1)
+		{
+			const char* msg = strerror(errno);
+			cerr << utilName << ": could not remove " << packagenamedir << ": " << msg << endl;
+		}
+#ifndef NDEBUG
+	cout  << "Directory: " << packagenamedir << " is removed"<< endl;
+#endif
+	metaFilesList.clear();
 }
 
 /* Remove the physical files after followings some rules */
@@ -699,7 +712,7 @@ void pkgdbh::removePackageFilesRefsFromDB(set<string> files, const set<string>& 
 	for (packages_t::iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i)
 		for (set<string>::const_iterator j = files.begin(); j != files.end(); ++j)
 			i->second.files.erase(*j);
-   
+
 #ifndef NDEBUG
 	cerr << "Removing files:" << endl;
 	copy(files.begin(), files.end(), ostream_iterator<string>(cerr, "\n"));
@@ -725,7 +738,7 @@ void pkgdbh::removePackageFilesRefsFromDB(set<string> files, const set<string>& 
 set<string> pkgdbh::getConflictsFilesList(const string& name, const pkginfo_t& info)
 {
 	set<string> files;
-   
+
 	// Find conflicting files in database
 	for (packages_t::const_iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i) {
 		if (i->first != name) {
@@ -734,7 +747,7 @@ set<string> pkgdbh::getConflictsFilesList(const string& name, const pkginfo_t& i
 					 inserter(files, files.end()));
 		}
 	}
-	
+
 #ifndef NDEBUG
 	cerr << "Conflicts phase 1 (conflicts in database):" << endl;
 	copy(files.begin(), files.end(), ostream_iterator<string>(cerr, "\n"));
@@ -859,7 +872,6 @@ pair<string, pkginfo_t> pkgdbh::openArchivePackage(const string& filename)
 	// Retrieve number of files from the archive is complete
 	actualAction = PKG_OPEN_END;
 	progressInfo();
-	// printf("%u",i);
 	return result;
 }
 void pkgdbh::extractAndRunPREfromPackage(const string& filename)
@@ -885,14 +897,14 @@ void pkgdbh::extractAndRunPREfromPackage(const string& filename)
 		if ( strcmp(archive_filename.c_str(),PKG_PRE_INSTALL) == 0)
 		{
 			unsigned int flags = ARCHIVE_EXTRACT_OWNER | ARCHIVE_EXTRACT_PERM | ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_UNLINK;
-			if (archive_read_extract(archive, entry, flags) != ARCHIVE_OK) 
+			if (archive_read_extract(archive, entry, flags) != ARCHIVE_OK)
 			{
 				const char* msg = archive_error_string(archive);
 				cerr << utilName << ": could not install " + archive_filename << " : " << msg << endl;
 				exit(EXIT_FAILURE);
 			}
 			break;
-				
+
 		}
 
 	}
@@ -904,6 +916,11 @@ void pkgdbh::extractAndRunPREfromPackage(const string& filename)
 	chdir("-");
 	if (checkFileExist(root + PKG_PRE_INSTALL))
 	{
+#ifndef NDEBUG
+  cerr << root + PKG_PRE_INSTALL + " exist " << endl;
+#endif
+
+
 		pid_t pid = fork();
 		if (pid == -1)
 		{
@@ -913,6 +930,9 @@ void pkgdbh::extractAndRunPREfromPackage(const string& filename)
 		string shell_path = root + "bin/sh";
 		if (pid == 0)
 		{
+#ifndef NDEBUG
+			cerr << shell_path << " " << PKG_PRE_INSTALL <<	endl;
+#endif
 			execl(shell_path.c_str(), shell_path.c_str(), PKG_PRE_INSTALL, (char *) 0);
 			const char* msg = strerror(errno);
 			cerr << utilName << ": could not execute " << PKG_PRE_INSTALL << " : " << msg << endl;
@@ -952,7 +972,7 @@ void pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 	progressInfo();
 	for (installedFilesNumber = 0; archive_read_next_header(archive, &entry) ==
 	     ARCHIVE_OK; ++installedFilesNumber) {
-		
+
 		actualAction = PKG_INSTALL_RUN;
 		progressInfo();
 		string archive_filename = archive_entry_pathname(entry);
@@ -989,7 +1009,7 @@ void pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 			const char* msg = archive_error_string(archive);
 			cerr << utilName << ": could not install " + archive_filename << ": " << msg << endl;
 			continue;
-		
+
 		}
 
 		// Check rejected file
@@ -1181,7 +1201,7 @@ void pkgdbh::getFootprintPackage(string& filename)
 		}
 
 		cout << '\n';
-		
+
 		if (S_ISREG(mode) && archive_read_data_skip(archive))
 		{
 			actualError = CANNOT_READ_FILE;
@@ -1189,7 +1209,7 @@ void pkgdbh::getFootprintPackage(string& filename)
 		//	throw runTimeErrorWithErrno("could not read " + filename, archive_errno(archive));
 		}
 	}
-   
+
 	if (i == 0) {
 		if (archive_errno(archive) == 0)
 		{
@@ -1289,7 +1309,7 @@ db_lock::~db_lock()
 	{
 		actualError = CANNOT_REMOVE_FILE;
 		treatErrors(dbfilename_bak);
-	} 
+	}
   if (link(dbfilename.c_str(), dbfilename_bak.c_str()) == -1)
 	{
 		actualError = CANNOT_CREATE_FILE;
