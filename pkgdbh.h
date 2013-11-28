@@ -190,7 +190,6 @@ protected:
 	packages_t listOfInstPackages; /* List of Installed packages */
 	set<string> pkgFoldersList;
 	set<string> pkgList;
-	set<string> metaFilesList;
 	set<string> FilesList;
 	set<string> runtimeLibrairiesList;
 	packages_t depListOfPackages;

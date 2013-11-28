@@ -507,6 +507,7 @@ void pkgdbh::convertDBFormat()
 }
 void pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 {
+  set<string> metaFilesList;
 	actualAction = PKG_MOVE_META_START;
 	progressInfo();
 	string package_meta_dir = ".";
@@ -589,10 +590,11 @@ bool pkgdbh::checkPackageNameExist(const string& name)
 /* Remove meta data about the removed package */
 void pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
+	set<string> metaFilesList;
 	const string packagedir = root + PKG_DB_DIR ;
 	const string version = listOfInstPackages[name].version;
 	const string arch = listOfInstPackages[name].arch;
-  	const string packagenamedir = root + PKG_DB_DIR + name + "#" + version + "-" + arch;
+	const string packagenamedir = root + PKG_DB_DIR + name + "#" + version + "-" + arch;
 
 	metaFilesList = findFile( packagenamedir);
 	if (metaFilesList.size() > 0)
@@ -614,7 +616,6 @@ void pkgdbh::removePackageFilesRefsFromDB(const string& name)
 #ifndef NDEBUG
 	cout  << "Directory: " << packagenamedir << " is removed"<< endl;
 #endif
-	metaFilesList.clear();
 }
 
 /* Remove the physical files after followings some rules */

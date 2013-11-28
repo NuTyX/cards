@@ -951,7 +951,7 @@ main() {
 	fi
 	
 	if [ -z $PKGMK_PACKAGE_DIR ]; then
-		PKGMK_PACKAGE_DIR="$PWD/PACKAGES"
+		PKGMK_PACKAGE_DIR="$PWD/pkg"
 		info "PKGMK_PACKAGE_DIR set to: $PKGMK_PACKAGE_DIR"
 	fi
 	popd > /dev/null
@@ -1002,7 +1002,7 @@ main() {
 
 	if [ -z $PKGMK_PACKAGE_DIR ]; then
 		pushd ../.. > /dev/null
-		PKGMK_PACKAGE_DIR="$PWD/PACKAGES"
+		PKGMK_PACKAGE_DIR="$PWD/pkg"
 		info "PKGMK_PACKAGE_DIR set to: $PKGMK_PACKAGE_DIR"
 		popd > /dev/null
 	fi
