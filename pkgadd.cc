@@ -19,7 +19,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
-
+#include "file_utils.h"
 #include "pkgadd.h"
 #include "process.h"
 
@@ -141,9 +141,12 @@ void pkgadd::run(int argc, char** argv)
 		// Installation progressInfo of the files on the HD
 		installArchivePackage(o_package, keep_list, non_install_files);
 		// Post install
-		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
-		if (postinstall.executeShell()) {
-			exit(EXIT_FAILURE);
+		if (checkFileExist(PKG_POST_INSTALL))
+		{
+			process postinstall(SHELL,PKG_POST_INSTALL, 0 );
+			if (postinstall.executeShell()) {
+				exit(EXIT_FAILURE);
+			}
 		}
 		// Add the metadata about the package to the DB
 		moveMetaFilesPackage(package.first,package.second);

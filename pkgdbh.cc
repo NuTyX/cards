@@ -917,12 +917,14 @@ void pkgdbh::extractAndRunPREfromPackage(const string& filename)
 #else
         archive_read_finish(archive);
 #endif
-
-	process preinstall(SHELL,PKG_PRE_INSTALL, 0 );
-	if (preinstall.executeShell()) {
+	if (checkFileExist(PKG_PRE_INSTALL))
+	{
+		process preinstall(SHELL,PKG_PRE_INSTALL, 0 );
+		if (preinstall.executeShell()) {
 			exit(EXIT_FAILURE);
+		}
+		removeFile(root,PKG_PRE_INSTALL);
 	}
-	removeFile(root,PKG_PRE_INSTALL);
 	chdir(buf);
 }
 void pkgdbh::installArchivePackage(const string& filename, const set<string>& keep_list, const set<string>& non_install_list)
