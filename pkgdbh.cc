@@ -22,6 +22,7 @@
 #include "string_utils.h"
 #include "file_utils.h"
 #include "pkgdbh.h"
+#include "process.h"
 
 #include <iostream>
 #include <fstream>
@@ -877,6 +878,7 @@ pair<string, pkginfo_t> pkgdbh::openArchivePackage(const string& filename)
 }
 void pkgdbh::extractAndRunPREfromPackage(const string& filename)
 {
+	char buf[PATH_MAX];
 	struct archive* archive;
 	struct archive_entry* entry;
 	archive = archive_read_new();
@@ -889,6 +891,7 @@ void pkgdbh::extractAndRunPREfromPackage(const string& filename)
 		treatErrors(filename);
 	}
 
+	getcwd(buf, sizeof(buf));
 	chdir(root.c_str());
 
 	for (installedFilesNumber = 0; archive_read_next_header(archive, &entry) ==
@@ -914,41 +917,13 @@ void pkgdbh::extractAndRunPREfromPackage(const string& filename)
 #else
         archive_read_finish(archive);
 #endif
-	chdir("-");
-	if (checkFileExist(root + PKG_PRE_INSTALL))
-	{
-#ifndef NDEBUG
-  cerr << root + PKG_PRE_INSTALL + " exist " << endl;
-#endif
 
-
-		pid_t pid = fork();
-		if (pid == -1)
-		{
-			actualError = CANNOT_FORK;
-			treatErrors("");
-		}
-		string shell_path = root + "bin/sh";
-		if (pid == 0)
-		{
-#ifndef NDEBUG
-			cerr << shell_path << " " << PKG_PRE_INSTALL <<	endl;
-#endif
-			execl(shell_path.c_str(), shell_path.c_str(), PKG_PRE_INSTALL, (char *) 0);
-			const char* msg = strerror(errno);
-			cerr << utilName << ": could not execute " << PKG_PRE_INSTALL << " : " << msg << endl;
+	process preinstall(SHELL,PKG_PRE_INSTALL, 0 );
+	if (preinstall.executeShell()) {
 			exit(EXIT_FAILURE);
-		}
-		else
-		{
-			if (waitpid(pid, 0, 0) == -1)
-			{
-				actualError = WAIT_PID_FAILED;
-				treatErrors("");
-			}
-		}
-		removeFile(root,PKG_PRE_INSTALL);
 	}
+	removeFile(root,PKG_PRE_INSTALL);
+	chdir(buf);
 }
 void pkgdbh::installArchivePackage(const string& filename, const set<string>& keep_list, const set<string>& non_install_list)
 {
@@ -969,6 +944,9 @@ void pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 		}
 	chdir(root.c_str());
 	absroot = getcwd(buf, sizeof(buf));
+#ifndef NDEBUG
+	cout << "absroot: " <<  absroot  << " and root: " << root<< endl;
+#endif
 	actualAction = PKG_INSTALL_START;
 	progressInfo();
 	for (installedFilesNumber = 0; archive_read_next_header(archive, &entry) ==
@@ -1053,31 +1031,13 @@ void pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 	archive_read_finish(archive);
 #endif
 }
-
 void pkgdbh::runLdConfig()
 {
 	// Only execute runLdConfig if /etc/ld.so.conf exists
 	if (checkFileExist(root + LDCONFIG_CONF)) {
-		pid_t pid = fork();
-
-		if (pid == -1)
-		{
-			actualError = CANNOT_FORK;
-			treatErrors("");
-		}
-
-		if (pid == 0) {
-			execl(LDCONFIG, LDCONFIG, "-r", root.c_str(), (char *) 0);
-			const char* msg = strerror(errno);
-			cerr << utilName << ": could not execute " << LDCONFIG << ": " << msg << endl;
-			exit(EXIT_FAILURE);
-		} else {
-			if (waitpid(pid, 0, 0) == -1)
-			{
-				actualError = WAIT_PID_FAILED;
-				treatErrors("");
-			}
-		}
+		string args = "-r " + root;
+		process ldconfig(LDCONFIG, args,0);
+		ldconfig.execute();
 	}
 }
 

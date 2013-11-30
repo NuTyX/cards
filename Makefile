@@ -27,7 +27,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.0.90.17
+VERSION = 0.0.91.0
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG
@@ -39,7 +39,7 @@ LIBCURLLIBS := $(shell pkg-config --libs --static libcurl)
 
 LDFLAGS += $(LIBARCHIVELIBS) $(LIBCURLLIBS)
 
-OBJECTS = main.o string_utils.o file_utils.o dependencies_utils.o pkgdbh.o pkgadd.o pkgrm.o pkginfo.o pkgdwl.o
+OBJECTS = main.o string_utils.o file_utils.o process.o dependencies_utils.o pkgdbh.o pkgadd.o pkgrm.o pkginfo.o pkgdwl.o
 
 LIBOBJECTS =  pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
 

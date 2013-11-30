@@ -21,6 +21,10 @@
 //
 
 #include "pkgadd.h"
+#include "process.h"
+
+#include <algorithm>
+
 #include <fstream>
 #include <iterator>
 #include <cstdio>
@@ -136,7 +140,11 @@ void pkgadd::run(int argc, char** argv)
 		}
 		// Installation progressInfo of the files on the HD
 		installArchivePackage(o_package, keep_list, non_install_files);
-
+		// Post install
+		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
+		if (postinstall.executeShell()) {
+			exit(EXIT_FAILURE);
+		}
 		// Add the metadata about the package to the DB
 		moveMetaFilesPackage(package.first,package.second);
 

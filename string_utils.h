@@ -22,6 +22,7 @@
 #ifndef STRING_UTILS_H
 #define STRING_UTILS_H
 
+#include <list>
 #include <string>
 #include <set>
 #include <map>
@@ -34,6 +35,10 @@ struct keyValue {
     string value;
   };
 
+template <class T>
+void split( const string& s, char del,
+            T& target,
+            int startPos=0, bool useEmpty=true  );
 
 keyValue split_keyValue(string s, string delimiter);
 set<string> getKeysList(string file, string delimiter);
@@ -65,6 +70,37 @@ bool starts_with_no_case(const string& s1, const string& s2);
 
 string convertToLowerCase(const string& s);
 string convertToUpperCase(const string& s);
+
+/* split a string into parts
+	param s string to be split
+	param del delimter
+	param startPos position to start at
+	param useEmpty include empty (whitespace only9 results in the result
+
+	return a list of string */
+template <class T>
+void split( const string& s, char del,
+            T& target,
+            int startPos, bool useEmpty )
+{
+    string line = s;
+
+    string::size_type pos;
+    int offset = startPos;
+    while ( ( pos = line.find( del, offset ) ) != string::npos ) {
+        offset = 0;
+
+        string val = line.substr( 0, pos );
+        if ( useEmpty || !stripWhiteSpace( val ).empty() ) {
+            target.push_back( val );
+        }
+        line.erase( 0, pos+1 );
+    }
+
+    if ( line.length() > 0 ) {
+        target.push_back( line );
+    }
+}
 
 #endif /* STRING_UTILS_H */
 // vim:set ts=2 :

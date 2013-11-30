@@ -52,7 +52,7 @@
 
 #define LDCONFIG         "/sbin/ldconfig"
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
-
+#define SHELL            "bin/sh"
 using namespace std;
 enum error
 {
