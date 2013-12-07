@@ -54,7 +54,7 @@ void * get_data ( void * var, FILE * file, long offset, size_t size, size_t nmem
   return mvar;
 }
 
-string trim_filename(const string& filename)
+string trimFileName(const string& filename)
 {
   string search("//");
   string result = filename;
@@ -207,6 +207,66 @@ bool createRecursiveDirs(const string& path)
   }
   return false;
 }
+int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, int spec)
+{
+	struct dirent *dent;
+	DIR *dir;
+	struct stat st;
+	char fn[FILENAME_MAX];
+	int res = WALK_OK;
+	int len = strlen(filename);
+	string sfilename;
+	if (len >= FILENAME_MAX - 1)
+                return WALK_NAMETOOLONG;
 
+	strcpy(fn, filename);
+	fn[len++] = '/';
+
+	if (!(dir = opendir(filename)))
+	{
+		warn("can't open %s", filename);
+		return WALK_BADIO;
+	}
+	errno = 0;
+	while ((dent = readdir(dir)))
+	{
+		if (!(spec & WS_DOTFILES) && dent->d_name[0] == '.')
+			continue;
+		if (!strcmp(dent->d_name, ".") || !strcmp(dent->d_name, ".."))
+			continue;
+		strncpy(fn + len, dent->d_name, FILENAME_MAX - len);
+		if (lstat(fn, &st) == -1)
+		{
+			warn("Can't stat %s", fn);
+			res = WALK_BADIO;
+			continue;
+		}
+
+		/* don't follow symlink unless told so */
+		if (S_ISLNK(st.st_mode) && !(spec & WS_FOLLOWLINK))
+			continue;
+
+		/* will be false for symlinked dirs */
+		if (S_ISDIR(st.st_mode))
+		{
+			/* recursively follow dirs */
+			if ((spec & WS_RECURSIVE))
+				findRecursiveFile(filenameList, fn, reg, spec);
+
+			if (!(spec & WS_MATCHDIRS))
+				continue;
+		}
+
+		/* pattern match */
+		if (!regexec(reg, fn, 0, 0, 0))
+		{
+			sfilename=fn;
+			filenameList.insert(sfilename);
+		}				
+	}
+
+	if (dir) closedir(dir);
+	return res ? res : errno ? WALK_BADIO : WALK_OK;
+}
 
 // vim:set ts=2 :

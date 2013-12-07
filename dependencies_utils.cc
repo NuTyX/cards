@@ -60,7 +60,8 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 	printf("sizeof unsigned int: %d\n",sizeof(unsigned int));
 	printf("sizeof int long: %d\n",sizeof(int long));
 	printf("sizeof double: %d\n",sizeof(double));
-
+	printf("sizeof unsigned long long: %u\n",sizeof( unsigned long long)); 
+	printf("sizeof unsigned long : %u\n",sizeof( unsigned long));
 #endif
 	unsigned long dynamic_addr;
 	unsigned long dynamic_size_32bits;

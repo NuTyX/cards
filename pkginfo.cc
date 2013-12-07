@@ -25,7 +25,7 @@
 #include <vector>
 #include <iomanip>
 #include <sys/types.h>
-#include <regex.h>
+
 #include <stdio.h>
 #include <unistd.h>
 
@@ -34,6 +34,7 @@ void pkginfo::run(int argc, char** argv)
 	//
 	// Check command line options
 	//
+  int o_runtimedependencies_mode = 0;
 	int o_footprint_mode = 0;
 	int o_installed_mode = 0;
 	int o_list_mode = 0;
@@ -72,7 +73,7 @@ void pkginfo::run(int argc, char** argv)
 			o_list_mode += 1;
 			o_arg = argv[i + 1];
 			i++;
-		} else if (option == "-R" || option == "--runtime") {
+		} else if (option == "-R" || option == "--runtimedep") {
 			assertArgument(argv, argc, i);
 			o_runtime_mode += 1;
 			o_arg = argv[i + 1];
@@ -92,20 +93,25 @@ void pkginfo::run(int argc, char** argv)
 			o_librairies_mode +=1;
 			o_arg =  argv[i + 1];
 			i++;
+		} else if (option == "--runtimedepfiles") {
+			assertArgument(argv, argc, i);
+			o_runtimedependencies_mode +=1;
+			o_arg = argv[i + 1];
+			i++;
 		} else {
 			actualError = INVALID_OPTION;
 			treatErrors(option);
 		}
 	}
 
-	if (o_footprint_mode + o_details_mode + o_dependencies_mode + 
+	if (o_runtimedependencies_mode + o_footprint_mode + o_details_mode + o_dependencies_mode + 
 	o_installed_mode + o_list_mode + o_owner_mode + o_convert_mode + 
 	o_footprint_mode + o_librairies_mode + o_runtime_mode == 0)
 	{
 		actualError = OPTION_MISSING;
 		treatErrors(o_arg);
 	}
-	if (o_footprint_mode + o_installed_mode + o_list_mode + o_owner_mode > 1)
+	if (o_runtimedependencies_mode + o_footprint_mode + o_installed_mode + o_list_mode + o_owner_mode > 1)
 	{
 		actualError = TOO_MANY_OPTIONS;
 		treatErrors(o_arg);
@@ -138,7 +144,6 @@ void pkginfo::run(int argc, char** argv)
 			db_lock lock(o_root, false);
 			getListOfPackages(o_root);
 		}
-
 		if (o_installed_mode) {
 			//
 			// List installed packages
@@ -160,8 +165,66 @@ void pkginfo::run(int argc, char** argv)
 				actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
 				treatErrors(o_arg);
 			}
+		} else if (o_runtimedependencies_mode) {
+			//
+			// Get runtimedependencies of the file found in the directory path
+			//
+			getInstalledPackages(true); // get the list of installed package silently
+			regex_t r;
+			int Result;
+			regcomp(&r, ".", REG_EXTENDED | REG_NOSUB);
+			set<string>filenameList;
+			Result = findRecursiveFile (filenameList, const_cast<char*>(o_arg.c_str()), &r, WS_DEFAULT);
+			// get the list of library for all the possible files 
+			set<string> librairiesList;
+			for (set<string>::const_iterator i = filenameList.begin();i != filenameList.end();++i)
+				Result = getRuntimeLibrairiesList(librairiesList,*i);
+			// get the own package  for all the elf files dependencies libraries
+#ifndef NDEBUG
+			for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
+				cerr << *i<<endl;
+#endif
+			if ( (librairiesList.size() > 0 ) && (Result > -1) )
+			{
+				set<string> runtimeList;
+				for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
+				{
+					for (packages_t::const_iterator j = listOfInstPackages.begin(); j != listOfInstPackages.end();++j)
+					{
+						bool found = false;
+						for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k)
+						{
+							if ( k->find('/' + *i) != string::npos)
+							{
+								runtimeList.insert(j->first);
+								break;
+								found = true;
+							}
+						}
+						if ( found == true)
+						{
+							found = false;
+							break;
+						}
+					}
+				}
+				if (runtimeList.size()>0)
+				{
+#ifndef NDEBUG
+					cerr << "Number of librairies founds: " << runtimeList.size() << endl;
+#endif
+					int s = 1;
+					for (set<string>::const_iterator i = runtimeList.begin();i!=runtimeList.end();++i)
+					{
+						cout << *i;
+						s++;
+						if (s <= runtimeList.size())
+							cout << ",";
+					}
+				}
+			}	
 		} else if (o_librairies_mode + o_runtime_mode > 0) {
-			getInstalledPackages(true);
+			getInstalledPackages(true); // get the list of installed package silently
 			set<string> librairiesList;
 			int Result = -1;
 			if (checkPackageNameExist(o_arg))
@@ -292,7 +355,8 @@ void pkginfo::printHelp() const
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl
-       << "  -R, --runtime <package>		 return on a single line all the runtime dependencies" << endl
+       << "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
+       << "  --runtimedepfiles <path>    return on a single line all the runtime dependencies for the files found in the <path>" << endl
 	     << "  -r, --root <path>           specify alternative installation root" << endl
 	     << "  -v, --version               print version and exit" << endl
 	     << "  -h, --help                  print help and exit" << endl;

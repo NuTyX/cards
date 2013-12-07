@@ -44,10 +44,31 @@
 #include <unistd.h>
 #include <dirent.h>
 
+#include <regex.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <err.h>
+
 #define S_CARD_MODE S_ISVTX|S_IRWXU|S_IXGRP|S_IXOTH|S_IRGRP|S_IROTH
+
+#define WS_NONE         0
+#define WS_RECURSIVE    (1 << 0)
+#define WS_DEFAULT      WS_RECURSIVE
+#define WS_FOLLOWLINK   (1 << 1)        /* follow symlinks */
+#define WS_DOTFILES     (1 << 2)        /* per unix convention, .file is hidden */
+#define WS_MATCHDIRS    (1 << 3)        /* if pattern is used on dir names too */
+
+enum {
+        WALK_OK = 0,
+        WALK_BADPATTERN,
+        WALK_NAMETOOLONG,
+        WALK_BADIO
+};
 
 using namespace std;
 void * get_data ( void * var, FILE * file, long offset, size_t size, size_t nmemb);
+string trimFileName(const string& filename);
 bool checkFileExist(const string& filename);
 bool checkFileEmpty(const string& filename);
 bool checkFilesEqual(const string& file1, const string& file2);
@@ -55,7 +76,7 @@ bool checkPermissionsEqual(const string& file1, const string& file2);
 bool createRecursiveDirs(const string& pathname);
 void removeFile(const string& basedir, const string& filename);
 set<string>  findFile(const string& basedir);
-
+int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, int spec);
 
 #endif /* FILE_UTILS_H */
 // vim:set ts=2 :

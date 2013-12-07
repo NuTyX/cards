@@ -42,9 +42,9 @@ typedef struct elf_internal_ehdr_32b {
 	unsigned int     e_shoff;
 } Elf_Ehdr_32Bit;
 typedef struct elf_internal_ehdr_64b {
-   unsigned long long    e_entry;
-   unsigned long long    e_phoff;
-   unsigned long long    e_shoff;
+   long    e_entry;
+   long    e_phoff;
+   long    e_shoff;
 } Elf_Ehdr_64Bit;
 
 typedef struct elf_internal_ehdr_end {

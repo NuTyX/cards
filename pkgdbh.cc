@@ -263,7 +263,7 @@ void pkgdbh::progressInfo() const
 int pkgdbh::getListOfPackages (const string& path)
 {
 	keyValue string_splited;
-	root = trim_filename(path + "/");
+	root = trimFileName(path + "/");
 	const string pathdb =  root + PKG_DB_DIR;
 	pkgFoldersList = findFile(pathdb);
 	for (set<string>::iterator i = pkgFoldersList.begin();i != pkgFoldersList.end();++i) {
@@ -432,7 +432,7 @@ int pkgdbh::getDependencies(const packages_t& list_of_availables_packages, packa
 }
 void pkgdbh::convertSpaceToNoSpaceDBFormat(const string& path)
 {
-	root = trim_filename(path + "/");
+	root = trimFileName(path + "/");
 	/* Convert from directories with spaces to directories without spaces */
 	const string packagedir = root + PKG_DB_DIR ;
 	pkgList = findFile(packagedir);
@@ -957,8 +957,8 @@ void pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 		actualAction = PKG_INSTALL_RUN;
 		progressInfo();
 		string archive_filename = archive_entry_pathname(entry);
-		string reject_dir = trim_filename(absroot + string("/") + string(PKG_REJECTED));
-		string original_filename = trim_filename(absroot + string("/") + archive_filename);
+		string reject_dir = trimFileName(absroot + string("/") + string(PKG_REJECTED));
+		string original_filename = trimFileName(absroot + string("/") + archive_filename);
 		string real_filename = original_filename;
 
 		// Check if file is filtered out via INSTALL
@@ -977,7 +977,7 @@ void pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 
 		// Check if file should be rejected
 		if (checkFileExist(real_filename) && keep_list.find(archive_filename) != keep_list.end())
-			real_filename = trim_filename(reject_dir + string("/") + archive_filename);
+			real_filename = trimFileName(reject_dir + string("/") + archive_filename);
 
 		archive_entry_set_pathname(entry, const_cast<char*>
 		                           (real_filename.c_str()));
@@ -1201,7 +1201,7 @@ void pkgdbh::print_version() const
 db_lock::db_lock(const string& root, bool exclusive)
 	: dir(0)
 {
-	const string dirname = trim_filename(root + string("/") + PKG_DB_DIR_OLD);
+	const string dirname = trimFileName(root + string("/") + PKG_DB_DIR_OLD);
 
 	if (!(dir = opendir(dirname.c_str())))
 		throw runTimeErrorWithErrno("could not read directory " + dirname);
@@ -1296,7 +1296,7 @@ void pkgdbh::db_open(const string& path)
   // Read database from single file
   // Only need to convert from pkgutils to cards
 
-  root = trim_filename(path + "/");
+  root = trimFileName(path + "/");
   const string filename = root + PKG_DB_OLD;
 
   int fd = open(filename.c_str(), O_RDONLY);

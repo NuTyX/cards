@@ -673,6 +673,8 @@ build_package() {
 		fi
 		TARGETS[i]="$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
 		cp $SRC/Pkgmeta $PKG/.META
+		echo -n "run = " >> $PKG/.META
+		pkginfo --runtimedepfiles $PKG >> $PKG/.META 
 		add_metafiles
 		SIZE_I="`du -b --summarize $PKG|sed "s/\t/ /"|cut -d " " -f1`"
 		echo "size_i = $SIZE_I" >> $PKG/.META || BUILD_SUCCESSFUL = "no"
