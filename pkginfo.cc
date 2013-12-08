@@ -221,6 +221,7 @@ void pkginfo::run(int argc, char** argv)
 						if (s <= runtimeList.size())
 							cout << ",";
 					}
+					cout << endl;
 				}
 			}	
 		} else if (o_librairies_mode + o_runtime_mode > 0) {
@@ -270,6 +271,7 @@ void pkginfo::run(int argc, char** argv)
 								if (s <= runtimeList.size())
 									cout << ",";
 							}
+							cout << endl;
 						}
 					} else {
 							for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
