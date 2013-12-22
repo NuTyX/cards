@@ -37,9 +37,5 @@ using namespace std;
 
 int getRuntimeLibrairiesList (set<string>& runtimeLibrairiesList, const string& filename);
 
-
-// int getDependencies(const pkgList *avail_pkgs, pkgList *dep, const pkgInfo *pkg);
-// int getDependencies(const packages_t& list_of_availables_packages, packages_t& dep, const pkginfo_t& pkg);
-
 #endif /* DEPENDENCIES_UTILS_H */
 // vim:set ts=2 :

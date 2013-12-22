@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include "elf_common.h"
 #include "elf.h"
-#include "dependencies_utils.h"
+#include "runtime_dependencies_utils.h"
 #include "file_utils.h"
 
 int error ( const char* message);
