@@ -27,12 +27,14 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.1.80.0
+VERSION = 0.1.80.1
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG
 CXXFLAGS += -O2 -Wall -pedantic -D_GNU_SOURCE -DVERSION=\"$(VERSION)\" \
 	    -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC
+CFLAGS += -DNDEBUG
+CFLAGS += -D_GNU_SOURCE
 
 LIBARCHIVELIBS := $(shell pkg-config --libs --static libarchive)
 LIBCURLLIBS := $(shell pkg-config --libs --static libcurl)
@@ -49,12 +51,15 @@ MANPAGES = pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr rejmerge.8 pkgmk.conf.5
 libs:
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
 
-all: pkgadd pkgmk pkg-repgen rejmerge man
+all: pkgcrea pkgadd pkgmk pkg-repgen rejmerge man
 
 pkgadd: .depend $(OBJECTS)
 	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 pkgdwl: .depend $(OBJECTS)
 	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
+
+pkgcrea: 
+	$(CC) $(CFLAGS) compile_dependencies_utils.c pkgcrea.c -o pkgcrea
 
 pkgmk: pkgmk.in
 
@@ -90,6 +95,7 @@ dist: distclean
 
 install: all
 	install -D -m0755 pkgadd $(DESTDIR)$(BINDIR)/pkgadd
+	install -D -m0755 pkgcrea $(DESTDIR)$(BINDIR)/pkgcrea
 	install -D -m0755 pkg-repgen $(DESTDIR)$(BINDIR)/pkg-repgen
 	install -D -m0644 pkgadd.conf $(DESTDIR)$(ETCDIR)/pkgadd.conf
 	install -D -m0755 pkgmk $(DESTDIR)$(BINDIR)/pkgmk
@@ -119,6 +125,7 @@ clean:
 	rm -f pkgadd
 	rm -f pkg-repgen
 	rm -f pkgmk
+	rm -f pkgcrea
 
 distclean: clean
 	rm -f pkgadd pkginfo pkgrm pkgmk rejmerge

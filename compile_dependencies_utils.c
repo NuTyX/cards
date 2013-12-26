@@ -118,7 +118,7 @@ depList *readDependenciesList(itemList *listFiles, unsigned int nameIndex)
 	depList *list;
 
 	char *fullPathfileName = calloc (255,sizeof(char));
-	sprintf(fullPathfileName,"pakxe/%s",listFiles->items[nameIndex]);
+	sprintf(fullPathfileName,"%s",listFiles->items[nameIndex]);
 	FILE *fileHandler = NULL;
 	size_t bytesReads = 0, lineLenght = 0;
 

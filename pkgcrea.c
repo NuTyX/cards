@@ -206,7 +206,7 @@ int main (int argc, char* argv[])
 	unsigned int nInd,dInd;
 	itemList *filesList;
 
-	filesList = findFile("pakxe/");
+	filesList = findFile(DEPENDENCIES_FILES_DIR);
 
 	int niveau= 0;
 	pkgInfo *package = NULL;
@@ -315,81 +315,7 @@ int main (int argc, char* argv[])
 									printf("  %s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
 									currentNiveau++;
 						}
-/*						int niveau = 0;
-						printf("Niveau: %d\n",niveau);
-						for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-							if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-								printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-						printf("\n");
-						niveau++;
-						printf("Niveau: %d\n",niveau);
-						for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-							if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-								printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-						printf("\n");
-						niveau++;
-						printf("Niveau: %d\n",niveau);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-						printf("\n");
-						niveau++;
-						printf("Niveau: %d\n",niveau);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            niveau++;
-						printf("Niveau: %d\n",niveau);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            niveau++;
-						printf("Niveau: %d\n",niveau);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            niveau++;
-						printf("Niveau: %d\n",niveau);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            niveau++;
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-       			niveau++;
-						printf("Niveau: %d\n",niveau);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);            niveau++;
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-            for ( dInd=0; dInd < dependenciesList ->count; dInd++ )
-              if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == niveau )
-                printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
-			*/		}
+					}
 					break;
 				default:
 					return 0;

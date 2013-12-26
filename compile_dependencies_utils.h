@@ -33,6 +33,8 @@
 
 #include <dirent.h>
 
+#define DEPENDENCIES_FILES_DIR "/mnt/nutyx/dependences/"
+
 /***    Structures   ****/
 /* itemList is a list of *char dynamically allocated */
 typedef struct
