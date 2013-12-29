@@ -33,6 +33,8 @@
 
 #include <dirent.h>
 
+/* TODO This is a tempory trick to test the dependencies tree, implement the function to extract all the dependencies */
+
 #define DEPENDENCIES_FILES_DIR "/mnt/nutyx/dependences/"
 
 /***    Structures   ****/

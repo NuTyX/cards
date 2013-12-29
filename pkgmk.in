@@ -947,17 +947,6 @@ main() {
 	if [ -f /etc/profile ]; then
 		source /etc/profile
 	fi
-	pushd ../.. > /dev/null
-	if [ -f etc/pkgmk.conf ]; then
-		PKGMK_CONFFILE="$PWD/etc/pkgmk.conf"
-		info "PKGMK_CONFFILE set to: $PKGMK_CONFFILE"
-	fi
-	
-	if [ -z $PKGMK_PACKAGE_DIR ]; then
-		PKGMK_PACKAGE_DIR="$PWD/pkg"
-		info "PKGMK_PACKAGE_DIR set to: $PKGMK_PACKAGE_DIR"
-	fi
-	popd > /dev/null
 
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
@@ -1003,12 +992,6 @@ main() {
 		. $FILE
 	done
 
-	if [ -z $PKGMK_PACKAGE_DIR ]; then
-		pushd ../.. > /dev/null
-		PKGMK_PACKAGE_DIR="$PWD/pkg"
-		info "PKGMK_PACKAGE_DIR set to: $PKGMK_PACKAGE_DIR"
-		popd > /dev/null
-	fi
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "`dirname $PKGMK_WORK_DIR`"
@@ -1137,6 +1120,7 @@ PKGMK_DOWNLOAD_BIN="no"
 PKGMK_SOURCE_MIRRORS=()
 PKGMK_SOURCE_DIR="$PWD"
 
+PKGMK_PACKAGE_DIR="$PWD"
 PKGMK_WORK_DIR="$PWD/work"
 
 PKGMK_COMPRESSION_MODE="xz"
