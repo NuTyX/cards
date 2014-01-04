@@ -45,6 +45,10 @@ warning() {
 error() {
 	info "ERROR: $1" >&2
 }
+abort_on_build() {
+        error $1
+        exit $E_BUILD
+}
 
 get_filename() {
 	if [[ $1 =~ ^(http|https|ftp|file)://.*/(.+) ]]; then
@@ -397,7 +401,7 @@ check_footprint() {
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $TARGET ]; then
-			PKGMK_FOOTPRINT="$PKGMK_FOOTPRINT_DIR/`echo $TARGET|cut -d "#" -f1`.`uname -m`"
+			PKGMK_FOOTPRINT="`echo $TARGET|cut -d "#" -f1`.`echo $TARGET|cut -d "-" -f3|cut -d "." -f1`.footprint"
 			make_footprint > $FILE.footprint
 			if [ -f $PKGMK_FOOTPRINT ]; then
 				sort -k 3 $PKGMK_FOOTPRINT > $FILE.footprint.orig
@@ -419,9 +423,6 @@ check_footprint() {
 			fi
 		else
 			warning "Footprint not found, creating new."
-			if [ ! -d $PKGMK_FOOTPRINT_DIR ]; then
-				mkdir -p $PKGMK_FOOTPRINT_DIR
-			fi
 			mv $FILE.footprint $PKGMK_FOOTPRINT
 		fi
 		else
@@ -448,35 +449,18 @@ make_work_dir() {
 remove_work_dir() {
 	rm -rf $PKGMK_WORK_DIR
 }
-generate_meta () {
-	local IN_1 IN_2 IN_3
-	rm -f $SRC/Pkgmeta
-	for i in des url mai pac run
-	do
-		IN_1=`grep ^# $PKGMK_ROOT/Pkgfile|grep -i $i|sed "s/#//"|sed "s/ //"|grep -i ^$i`
-		IN_2=`echo $IN_1 |cut -d ":" --complement -f1|sed "s/^\ //"`
-		if [ ! "$IN_2"  == "" ]; then
-			if [ "$i" == "dep" ] || [ "$i" == "run" ]; then
-				IN_3="`echo $IN_2|sed "s/ //g"`"
-				IN_2=$IN_3
-			fi
-			echo "$i = $IN_2" >> $SRC/Pkgmeta
-		fi
-	done
-
-}
 add_metafiles () {
-	if [ -f $PKGMK_ROOT/README ]; then
-		cp $PKGMK_ROOT/README $PKG/.README
+	if [ -f $PKGMK_ROOT/$name.README ]; then
+		cp $PKGMK_ROOT/$name.README $PKG/.README
 	fi
-	if [ -f $PKGMK_ROOT/pre-install ]; then
-		cp $PKGMK_ROOT/pre-install $PKG/.PRE
+	if [ -f $PKGMK_ROOT/$name.pre-install ]; then
+		cp $PKGMK_ROOT/$name.pre-install $PKG/.PRE
 	fi
-	if [ -f $PKGMK_ROOT/post-install ]; then
-		cp $PKGMK_ROOT/post-install $PKG/.POST
+	if [ -f $PKGMK_ROOT/$name.post-install ]; then
+		cp $PKGMK_ROOT/$name.post-install $PKG/.POST
 	fi
-	if [ -f $PKGMK_ROOT/Pkgmeta ]; then
-		cp $PKGMK_ROOT/Pkgmeta $PKG/.META
+	if [ -f $PKGMK_ROOT/$name.info ]; then
+		cp $PKGMK_ROOT/$name.info $PKG/.INFO
 	fi
 }
 pack_lib() {
@@ -568,7 +552,6 @@ build_package() {
 	
 	check_file "$TARGET"
 	make_work_dir
-	generate_meta
 	
 	if [ "$UID" != "0" ]; then
 		warning "Packages should be built as root."
@@ -619,24 +602,26 @@ build_package() {
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
-				if [ -f $PKGMK_ROOT/pre-install.$group ]; then
-					cp $PKGMK_ROOT/pre-install.$group $PKG/.PRE
+				if [ -f $PKGMK_ROOT/$name.$group.pre-install ]; then
+					cp $PKGMK_ROOT/$name.$group.pre-install $PKG/.PRE
 				fi
-				if [ -f $PKGMK_ROOT/post-install.$group ]; then
-					cp $PKGMK_ROOT/post-install.$group $PKG/.POST
+				if [ -f $PKGMK_ROOT/$name.$group.post-install ]; then
+					cp $PKGMK_ROOT/$name.$group.post-install $PKG/.POST
 				fi
-				if [ -f $PKGMK_ROOT/README.$group ]; then
-					cp $PKGMK_ROOT/README.$group $PKG/.README
+				if [ -f $PKGMK_ROOT/$name.$group.README ]; then
+					cp $PKGMK_ROOT/$name.$group.README $PKG/.README
 				fi
-				cp $SRC/Pkgmeta $PKG/.META
+				if [ -f $PKGMK_ROOT/$name.$group.info ]; then
+					cp $SRC/$name.$group.info $PKG/.INFO
+				fi
 				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*|sed "s/\t/ /"|cut -d " " -f1`"
-				echo "size_i = $SIZE_I" >> $PKG/.META
+				echo "size_i = $SIZE_I" > $PKG/.META
 
-				for file in .META .PRE .POST .README; do
+				for file in .INFO .META .PRE .POST .README; do
 					if [ -f $file ]; then
 						bsdtar -r -f \
 						$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*.pkg.tar \
-						$file  || BUILD_SUCCESSFUL = "no"
+						$file  || abort_on_build "$name.$loc#$version-$release"
 						rm $file
 					fi
 				done
@@ -660,27 +645,26 @@ build_package() {
 				if [ -d usr/share/locale/$loc ];then
 					bsdtar -c $COMPRESSION -f \
 					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE \
-					usr/share/locale/$loc || BUILD_SUCCESSFUL = "no"
+					usr/share/locale/$loc || abort_on_build "$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE"
 					rm -rf usr/share/locale/$loc
 					TARGETS[i]="$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE"
 					info "Build result for ${TARGETS[i]}:"
 					i=$((i+1))
 					bsdtar -t -v -f \
 					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE \
-					|| BUILD_SUCCESSFUL = "no"
+					|| abort_on_build "$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE"
 				fi
 			done
 		fi
 		TARGETS[i]="$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
-		cp $SRC/Pkgmeta $PKG/.META
-		echo -n "run = " >> $PKG/.META
-		# Need to sed otherwize it also takes the devel packages
-		pkginfo --runtimedepfiles $PKG |sed "s/,[a-z]*.devel//g" >> $PKG/.META 
 		add_metafiles
 		SIZE_I="`du -b --summarize $PKG|sed "s/\t/ /"|cut -d " " -f1`"
-		echo "size_i = $SIZE_I" >> $PKG/.META || BUILD_SUCCESSFUL = "no"
+		echo "size_i = $SIZE_I" > $PKG/.META || abort_on_build "$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
 
-		for file in .META .PRE .POST .README; do
+		# Need to sed otherwize it also takes the devel packages
+		echo  "run = `pkginfo --runtimedepfiles $PKG |sed "s/,[a-z]*.devel//g"`" >> $PKG/.META
+		
+		for file in .INFO .META .PRE .POST .README; do
 			if [ -f $file ]; then
 				bsdtar -r -f $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar \
 				$file
@@ -808,11 +792,8 @@ update_footprint() {
 			error "Unable to update footprint. File '$TARGET' not found."
 			exit 1
 		fi
-		PKGMK_FOOTPRINT="$PKGMK_FOOTPRINT_DIR/`echo $TARGET|cut -d "#" -f1`.`uname -m`"	
+		PKGMK_FOOTPRINT="`echo $TARGET|cut -d "#" -f1`.`echo $TARGET|cut -d "-" -f3|cut -d "." -f1`.footprint"
 		check_file "$PKGMK_FOOTPRINT"
-		if [ ! -d $PKGMK_FOOTPRINT_DIR ]; then
-			mkdir -p $PKGMK_FOOTPRINT_DIR
-		fi
 		make_footprint > $PKGMK_FOOTPRINT
 		touch $TARGET
 
@@ -849,6 +830,37 @@ build_needed() {
 	echo $RESULT
 }
 
+update_index_html()
+{
+	cat > $PKGMK_ROOT/index.html << "EOF"
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta charset="utf-8" />
+EOF
+echo "<title>$name $version-$release</title>" >> $PKGMK_ROOT/index.html
+cat >> $PKGMK_ROOT/index.html << "EOF"
+ </head>
+ <body>
+EOF
+echo "<h4>$name $version-$release `date +%Y-%m-%d`</h4>" >> $PKGMK_ROOT/index.html
+echo -n "<pre><kbd>" >> $PKGMK_ROOT/index.html
+cd $PKGMK_ROOT
+cat $name.info >> $PKGMK_ROOT/index.html
+echo "" >> $PKGMK_ROOT/index.html
+for FILE in `find $PKGMK_ROOT -type f -name "$name*"`
+do
+   FILE=`basename $FILE`
+   echo "`md5sum $FILE` `du -b  --summarize $FILE|sed "s/\t/ /" | cut -d " " -f1`" >> $PKGMK_ROOT/index.html
+done
+cd -
+cat >> $PKGMK_ROOT/index.html << "EOF"
+  </kbd></pre>
+ </body>
+</html>
+EOF
+}
 interrupted() {
 	echo ""
 	error "Interrupted."
@@ -1086,7 +1098,9 @@ main() {
 		download_source
 		build_package
 	fi
-	
+	if [ "$PKGMK_UPDATE_INDEX" != "no" ];then
+		update_index_html
+	fi
 	if [ "$PKGMK_INSTALL" != "no" ]; then
 		install_package
 	fi
@@ -1108,8 +1122,7 @@ readonly PKGMK_ROOT="$PWD"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
-PKGMK_FOOTPRINT_DIR="$PKGMK_ROOT/.footprint"
-PKGMK_MD5SUM=".md5sum.`uname -m`"
+PKGMK_MD5SUM="`uname -m`.md5sum"
 PKGMK_NOSTRIP=".nostrip"
 
 PKGMK_CHECK_FILES="no"
