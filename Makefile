@@ -27,7 +27,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.2.82.0
+VERSION = 0.2.82.1
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG
@@ -45,13 +45,13 @@ OBJECTS = main.o string_utils.o file_utils.o process.o runtime_dependencies_util
 
 LIBOBJECTS =  pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
 
-MANPAGES = pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr rejmerge.8 pkgmk.conf.5 pkgmk.conf.5.fr pkg-repgen.8.fr
+MANPAGES = pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr rejmerge.8 pkgmk.conf.5 pkgmk.conf.5.fr
 
 
 libs:
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
 
-all: pkgcrea pkgadd pkgmk pkg-repgen rejmerge man
+all: pkgcrea pkgadd pkgmk rejmerge man
 
 pkgadd: .depend $(OBJECTS)
 	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
@@ -63,7 +63,6 @@ pkgcrea:
 
 pkgmk: pkgmk.in
 
-pkg-repgen: pkg-repgen.in
 
 rejmerge: rejmerge.in
 
@@ -123,7 +122,6 @@ clean:
 	rm -f $(MANPAGES:=.txt)
 	rm -f libcards.so.$(VERSION)
 	rm -f pkgadd
-	rm -f pkg-repgen
 	rm -f pkgmk
 	rm -f pkgcrea
 

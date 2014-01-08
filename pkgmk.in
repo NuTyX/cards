@@ -844,17 +844,48 @@ cat >> $PKGMK_ROOT/index.html << "EOF"
  </head>
  <body>
 EOF
-echo "<h4>$name $version-$release `date +%Y-%m-%d`</h4>" >> $PKGMK_ROOT/index.html
+echo "<h4>$name $version-$release `date +%Y%m%d`</h4>" >> $PKGMK_ROOT/index.html
 echo -n "<pre><kbd>" >> $PKGMK_ROOT/index.html
-cd $PKGMK_ROOT
-cat $name.info >> $PKGMK_ROOT/index.html
+pushd $PKGMK_ROOT > /dev/null
+if [ -f  $name.info ]; then
+  cat $name.info >> $PKGMK_ROOT/index.html
+fi
 echo "" >> $PKGMK_ROOT/index.html
 for FILE in `find $PKGMK_ROOT -type f -name "$name*"`
 do
    FILE=`basename $FILE`
    echo "`md5sum $FILE` `du -b  --summarize $FILE|sed "s/\t/ /" | cut -d " " -f1`" >> $PKGMK_ROOT/index.html
 done
-cd -
+popd > /dev/null
+cat >> $PKGMK_ROOT/index.html << "EOF"
+  </kbd></pre>
+EOF
+for file in `find $PKGMK_ROOT -type f -name "*.jpg"`
+do 
+  pict_ext=`basename $file|cut -d "." -f2`
+  if [ "$pict_ext" == "jpg" ]; then
+    picture="`basename $file`"
+    pictures="$pictures $picture"
+  fi
+done
+if [ "$pictures" != "" ]; then
+	echo "  <h4>Screenshot(s):</h4>
+   <table>" >> $PKGMK_ROOT/index.html
+	for pict in ${pictures}; do
+		echo "    <tr><td><img src="$pict"></td></tr>" >> $PKGMK_ROOT/index.html
+	done
+	echo "   </table>"  >> $PKGMK_ROOT/index.html
+fi
+
+if [ -f $name.deps ]; then
+  echo "  <h4>Dependencies needs for the compilation:</h4>" >> $PKGMK_ROOT/index.html
+  cat $name.deps >> $PKGMK_ROOT/index.html
+fi
+if [ -f $name.README ]; then
+  echo "  <h4>README info</</h4>" >> $PKGMK_ROOT/index.html
+  echo -n "  <pre><kbd>" >> $PKGMK_ROOT/index.html
+  cat $name.README >> $PKGMK_ROOT/index.html
+fi
 cat >> $PKGMK_ROOT/index.html << "EOF"
   </kbd></pre>
  </body>
@@ -882,6 +913,7 @@ print_help() {
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
 	echo "  -utd, --up-to-date          do not build, only check if package is up to date"
+	echo "  -ui,  --update-index        do not build, only update index.html"
 	echo "  -uf,  --update-footprint    update footprint using result from last build"
 	echo "  -if,  --ignore-footprint    build package without checking footprint"
 	echo "  -in,  --ignore-new          build package, ignore new files in a footprint missmatch"
@@ -914,6 +946,8 @@ parse_options() {
 				PKGMK_EXTRACT_ONLY="yes" ;;
 			-utd|--up-to-date)
 				PKGMK_UP_TO_DATE="yes" ;;
+			-ui|--update-index)
+				PKGMK_UPDATE_INDEX="yes" ;;
 			-uf|--update-footprint)
 				PKGMK_UPDATE_FOOTPRINT="yes" ;;
 			-if|--ignore-footprint)
@@ -1031,12 +1065,15 @@ main() {
 		clean
 		exit 0
 	fi
-
+	if [ "$PKGMK_UPDATE_INDEX" == "yes" ]; then
+		update_index_html
+		exit 0
+	fi
 	if [ "$PKGMK_UPDATE_FOOTPRINT" = "yes" ]; then
 		update_footprint
 		exit 0
 	fi
-
+	
 	if [ "$PKGMK_UPDATE_MD5SUM" = "yes" ]; then
 		download_source
 		check_file "$PKGMK_MD5SUM"

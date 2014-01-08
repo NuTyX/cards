@@ -146,9 +146,6 @@ protected:
 	void getInstalledPackages(bool silent);
 	void getInstalledPackages(const string& path);
 
-	/* Add the found dependencies from the list of packages name */
-	void getDependenciesList(const set<string>& listOfPackagesName);
-	int getDependencies(const packages_t& list_of_availables_packages, packages_t& dep, const pair<string, pkginfo_t>& pkg);
 
 	void addPackageFilesRefsToDB(const string& name, const pkginfo_t& info);
 	void addPackageFilesRefsToDB_2(const string& name, const pkginfo_t& info);

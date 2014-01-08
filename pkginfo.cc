@@ -41,7 +41,6 @@ void pkginfo::run(int argc, char** argv)
 	int o_owner_mode = 0;
 	int o_convert_mode = 0;
 	int o_details_mode = 0;
-	int o_dependencies_mode = 0;
 	int o_librairies_mode = 0;
 	int o_runtime_mode = 0;
 
@@ -58,11 +57,6 @@ void pkginfo::run(int argc, char** argv)
 			o_installed_mode += 1;
 		} else if (option == "-c" || option == "--convert") {
 			o_convert_mode += 1;
-		} else if (option == "-D" || option == "--depends") {
-			assertArgument(argv, argc, i);
-			o_dependencies_mode += 1;
-			o_arg = argv[i + 1];
-			i++;
 		} else if (option == "-d" || option == "--details") {
 			assertArgument(argv, argc, i);
 			o_details_mode +=1;
@@ -104,7 +98,7 @@ void pkginfo::run(int argc, char** argv)
 		}
 	}
 
-	if (o_runtimedependencies_mode + o_footprint_mode + o_details_mode + o_dependencies_mode + 
+	if (o_runtimedependencies_mode + o_footprint_mode + o_details_mode + 
 	o_installed_mode + o_list_mode + o_owner_mode + o_convert_mode + 
 	o_footprint_mode + o_librairies_mode + o_runtime_mode == 0)
 	{
@@ -279,19 +273,6 @@ void pkginfo::run(int argc, char** argv)
 					}
 				}
 			}	
-		} else if (o_dependencies_mode) {
-			getInstalledPackages(false);
-			set<string> listOfPackageName;
-			listOfPackageName.insert(o_arg);
-			getDependenciesList(listOfPackageName);
-			if (depListOfPackages.size() > 0)
-			{
-					cout << "Number of deps: " << depListOfPackages.size() << endl;
-				for (packages_t::const_iterator i = depListOfPackages.begin(); i != depListOfPackages.end();i++)
-				{
-					cout << i->first << " " << i->second.version << endl;
-				}
-			}
 		} else if (o_details_mode) {
 			getInstalledPackages(false);
 			if (checkPackageNameExist(o_arg)) {
@@ -348,7 +329,6 @@ void pkginfo::printHelp() const
        << "  -c, --convert               convert the datase from pkgutils format to cards format" << endl 
 	     << "  -i, --installed             list installed packages" << endl
        << "  -d, --details               list details about the <package>" << endl
-       << "  -D, --depends               list of the dependencies founds in the Pkgmeta file recursively" << endl
        << "  -L, --librairies            list all the runtime librairies for the <package>" << endl
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
