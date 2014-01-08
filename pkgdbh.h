@@ -120,11 +120,6 @@ RM_PKG_FILES_END
 struct pkginfo_t {
     string version;
     string arch;
-    string description;
-    string url;
-    string packager;
-    string maintainer;
-    string depends;
     string run;
     string size;
     set<string> files;

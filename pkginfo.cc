@@ -298,11 +298,7 @@ void pkginfo::run(int argc, char** argv)
 				cout << "Name: " << o_arg << endl
 				<< "Arch: " << listOfInstPackages[o_arg].arch << endl
 				<< "Version: " << listOfInstPackages[o_arg].version << endl
-				<< "Description: " << listOfInstPackages[o_arg].description << endl
-				<< "URL: " << listOfInstPackages[o_arg].url << endl
-				<< "Packager : " << listOfInstPackages[o_arg].packager << endl
 				<< "Size : " << listOfInstPackages[o_arg].size << endl
-				<< "Maintainer : " << listOfInstPackages[o_arg].maintainer << endl
 				<< "Depends on (run): " << listOfInstPackages[o_arg].run <<"."<< endl;
 				}
 			} else if (o_owner_mode) {

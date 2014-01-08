@@ -286,10 +286,6 @@ pair<string, pkginfo_t> pkgdbh::getInfosPackage(const string& packageName)
 	result.second.version=version.erase(0, version.find('#') == string::npos ? string::npos : version.find('#') + 1);
 	result.first = name;
 	string package_foldername = name + "#" + version;
-	result.second.description =  getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"des");
-	result.second.url = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"url");
-	result.second.maintainer = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"mai");
-	result.second.packager = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"pac");
 	result.second.run = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
 	result.second.size = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
 	return result;
@@ -319,10 +315,6 @@ void pkgdbh::getInstalledPackages(bool silent)
 		info.version = version;
 		info.arch = arch;
 		string package_foldername = name + "#" + version + "-" + arch;
-		info.description = 	getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"des");
-		info.url = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"url");
-		info.maintainer = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"mai");
-		info.packager = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"pac");
 		info.run = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
 		info.size = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
 		// list of files
