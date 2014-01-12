@@ -4,7 +4,7 @@
 # 
 #  Copyright (c) 2000-2005 Per Liden
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -849,6 +849,8 @@ echo -n "<pre><kbd>" >> $PKGMK_ROOT/index.html
 pushd $PKGMK_ROOT > /dev/null
 if [ -f  $name.info ]; then
   cat $name.info >> $PKGMK_ROOT/index.html
+else
+  warning "$name.info doesn't exist"  
 fi
 echo "" >> $PKGMK_ROOT/index.html
 for FILE in `find $PKGMK_ROOT -type f -name "$name*"`
@@ -856,7 +858,7 @@ do
    FILE=`basename $FILE`
    echo "`md5sum $FILE` `du -b  --summarize $FILE|sed "s/\t/ /" | cut -d " " -f1`" >> $PKGMK_ROOT/index.html
 done
-popd > /dev/null
+# popd > /dev/null
 cat >> $PKGMK_ROOT/index.html << "EOF"
   </kbd></pre>
 EOF
@@ -976,7 +978,7 @@ parse_options() {
 				PKGMK_CONFFILE="$2"
 				shift ;;
 			-v|--version)
-				echo "`basename $PKGMK_COMMAND` (pkgutils) $PKGMK_VERSION"
+				echo "`basename $PKGMK_COMMAND` (cards) $PKGMK_VERSION"
 				exit 0 ;;
 			-h|--help)
 				print_help

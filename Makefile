@@ -3,7 +3,7 @@
 #
 #  Copyright (c) 2000-2005 by Per Liden <per@fukt.bth.se>
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.2.82.1
+VERSION = 0.3.80.0
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG
@@ -51,7 +51,7 @@ MANPAGES = pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr rejmerge.8 pkgmk.conf.5
 libs:
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
 
-all: pkgcrea pkgadd pkgmk rejmerge man
+all: pkgcrea pkgadd pkgmk rejmerge man cards
 
 pkgadd: .depend $(OBJECTS)
 	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
@@ -63,6 +63,7 @@ pkgcrea:
 
 pkgmk: pkgmk.in
 
+cards: cards.in
 
 rejmerge: rejmerge.in
 
@@ -95,7 +96,7 @@ dist: distclean
 install: all
 	install -D -m0755 pkgadd $(DESTDIR)$(BINDIR)/pkgadd
 	install -D -m0755 pkgcrea $(DESTDIR)$(BINDIR)/pkgcrea
-	install -D -m0755 pkg-repgen $(DESTDIR)$(BINDIR)/pkg-repgen
+	install -D -m0755 cards $(DESTDIR)$(BINDIR)/cards
 	install -D -m0644 pkgadd.conf $(DESTDIR)$(ETCDIR)/pkgadd.conf
 	install -D -m0755 pkgmk $(DESTDIR)$(BINDIR)/pkgmk
 	install -D -m0755 rejmerge $(DESTDIR)$(BINDIR)/rejmerge
@@ -106,7 +107,6 @@ install: all
 	install -D -m0644 pkgrm.8 $(DESTDIR)$(MANDIR)/man8/pkgrm.8
 	install -D -m0644 pkginfo.8 $(DESTDIR)$(MANDIR)/man8/pkginfo.8
 	install -D -m0644 pkgmk.8 $(DESTDIR)$(MANDIR)/man8/pkgmk.8
-	install -D -m0644 pkg-repgen.8.fr $(DESTDIR)$(MANDIR)/fr/man8/pkg-repgen.8
 	install -D -m0644 rejmerge.8 $(DESTDIR)$(MANDIR)/man8/rejmerge.8
 	install -D -m0644 pkgmk.conf.5 $(DESTDIR)$(MANDIR)/man5/pkgmk.conf.5
 	install -D -m0644 pkgmk.conf.5.fr $(DESTDIR)$(MANDIR)/fr/man5/pkgmk.conf.5
@@ -124,8 +124,9 @@ clean:
 	rm -f pkgadd
 	rm -f pkgmk
 	rm -f pkgcrea
+	rm -f cards
 
 distclean: clean
-	rm -f pkgadd pkginfo pkgrm pkgmk rejmerge
+	rm -f pkgadd pkginfo pkgrm pkgmk rejmerge cards
 
 # End of file
