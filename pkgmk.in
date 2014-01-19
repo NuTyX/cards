@@ -998,29 +998,37 @@ parse_options() {
 }
 
 main() {
-	if [ -f /etc/profile ]; then
-		source /etc/profile
+	if [ -f /etc/noprofile ]; then
+		source /etc/noprofile
 	fi
 
-	if [ ! -f $CARDS_CONFFILE ]; then
-		error "$CARDS_CONFFILE not found"
-		exit 1
+	parse_options "$@"
+
+        if [ ! -f $PKGMK_CONFFILE ]; then
+                error "File '$PKGMK_CONFFILE' not found."
+                exit 1
+        fi
+        . $PKGMK_CONFFILE
+	if [ "$PKGMK_SYNC_FILES" == "yes" ]; then
+		if [ ! -f $CARDS_CONFFILE ]; then
+			error "$CARDS_CONFFILE not found"
+			exit 1
+		fi
+
+		CARDS_DEPOT_URL=`cat $CARDS_CONFFILE|grep url|cut -d "=" -f2|sed "s/ //g"`
+		if [ "$CARDS_DEPOT_URL" == "" ]; then
+   			error "Variable url missing in $CARDS_CONFFILE"
+   			exit 1
+		fi
+
+		CARDS_DEPOT_DIR=`cat $CARDS_CONFFILE|grep dir|cut -d "=" -f2|sed "s/ //g"`
+		if [ "$CARDS_DEPOT_DIR" == "" ]; then
+			error "Variable dir missing in $CARDS_CONFFILE"
+			exit 1
+		fi
+	
+		CARDS_DEPOT_VERSION=`curl -s -K $CARDS_CONFFILE |grep -o "<a href=\"[[:print:]]\+\/\""|cut -d "\"" -f2|sort -n|tail -1|sed "s/\/$//"`
 	fi
-
-	CARDS_DEPOT_URL=`cat $CARDS_CONFFILE|grep url|cut -d "=" -f2|sed "s/ //g"`
-	if [ "$CARDS_DEPOT_URL" == "" ]; then
-   		error "Variable url missing in $CARDS_CONFFILE"
-   		exit 1
-	fi
-
-	CARDS_DEPOT_DIR=`cat $CARDS_CONFFILE|grep dir|cut -d "=" -f2|sed "s/ //g"`
-	if [ "$CARDS_DEPOT_DIR" == "" ]; then
-		error "Variable dir missing in $CARDS_CONFFILE"
-		exit 1
-	fi
-
-	CARDS_DEPOT_VERSION=`curl -s -K $CARDS_CONFFILE |grep -o "<a href=\"[[:print:]]\+\/\""|cut -d "\"" -f2|sort -n|tail -1|sed "s/\/$//"`
-
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
 		warning "Footprint ignored."
@@ -1028,7 +1036,6 @@ main() {
 	fi
 	local FILE TARGET PACKAGENAME
 
-	parse_options "$@"
 
 	PACKAGENAME=`basename $PKGMK_ROOT`
 	if [ "$PACKAGENAME" == "`echo $PACKAGENAME | cut  -d '_' -f1`" ];then
@@ -1049,28 +1056,24 @@ main() {
 	info "name: ${name}"
 	info "version: $version"
 	info "release: $release"
-	info "NuTyX version: $CARDS_DEPOT_VERSION"
-
+	if [ "$PKGMK_SYNC_FILES" == "yes" ]; then
+		info "NuTyX version: $CARDS_DEPOT_VERSION"
+	fi
 
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
 		recursive "$@"
 		exit 0
 	fi
 
-	if [ ! -f $PKGMK_CONFFILE ]; then
-		error "File '$PKGMK_CONFFILE' not found."
-		exit 1
-	fi
-	. $PKGMK_CONFFILE
-
-	if [ ! -f $PKGMK_PKGFILE ]; then
-		if [ "$PKGMK_SYNC_FILES" == "no" ]; then
+	if [ "$PKGMK_SYNC_FILES" == "yes" ]; then
+		if [ ! -f $PKGMK_PKGFILE ]; then
+			sync_all_files
+		fi
+	else
+		if [ ! -f $PKGMK_PKGFILE ]; then
 			info  "Variable PKGMK_SYNC_FILES set to \"no\""
 			error "File '$PKGMK_PKGFILE' not found"
 			exit 1
-		
-		else
-			sync_all_files
 		fi
 	fi
 	if [ ! -f $PKGMK_PKGFILE  ]; then
