@@ -658,16 +658,17 @@ build_package() {
 			for loc in `cd usr/share/locale/ && ls`; do
 				# Need to double check because glibc for exemple create a file in this directory
 				if [ -d usr/share/locale/$loc ];then
+					LOCALE_GROUP=`echo $loc|sed "s/_/-/g"`
 					bsdtar -c $COMPRESSION -f \
-					$PKGMK_PACKAGE_DIR/${name}.${loc}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE \
-					usr/share/locale/$loc || abort_on_build "${name}.${loc}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE"
+					$PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE \
+					usr/share/locale/$loc || abort_on_build "${name}.${LOCALE_GROUP}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE"
 					rm -rf usr/share/locale/$loc
-					TARGETS[i]="${name}.${loc}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE"
+					TARGETS[i]="${name}.${LOCALE_GROUP}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE"
 					info "Build result for ${TARGETS[i]}:"
 					i=$((i+1))
 					bsdtar -t -v -f \
-					$PKGMK_PACKAGE_DIR/${name}.${loc}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE \
-					|| abort_on_build "${name}.${loc}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE"
+					$PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE \
+					|| abort_on_build "${name}.${LOCALE_GROUP}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE"
 				fi
 			done
 		fi
