@@ -33,10 +33,10 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-#define PKG_EXT          ".pkg.tar."
-#define PKG_DB_DIR_OLD      "var/lib/pkg/"
-#define PKG_DB_DIR          "var/lib/pkg/DB/"
-#define PKG_DB_OLD           "var/lib/pkg/db"
+#define PKG_EXT          ".cards.tar."
+#define PKG_DB_DIR_OLD   "var/lib/pkg/"
+#define PKG_DB_DIR       "var/lib/pkg/DB/"
+#define PKG_DB_OLD       "var/lib/pkg/db"
 #define PKG_FILES        "/files"
 #define PKG_META         "/.META"
 #define PKG_RECEPT       "Pkgfile"
@@ -45,7 +45,7 @@
 #define PKG_POST_INSTALL ".POST"    
 
 #define PKG_REJECTED     "var/lib/pkg/rejected"
-#define VERSION_DELIM    '#'
+#define VERSION_DELIM    '_'
 #define GROUP_DELIM      '.'
 #define NAME_DELIM			 ' '
 #define PARAM_DELIM      "="
@@ -164,7 +164,6 @@ protected:
 
 	// old member from pkgutils
 	void db_open(const string& path);
-//	void db_commit();
 
 	// Tar.gz
 	pair<string, pkginfo_t> openArchivePackage(const string& filename);

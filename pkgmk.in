@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#  cards
+# .cards.tar
 # 
 #  Copyright (c) 2000-2005 Per Liden
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
@@ -63,7 +63,7 @@ get_basename() {
 	echo $FILE
 }
 check_pkgfile() {
-	if [ "$name" == "" ]; then
+	if [ "${name}" == "" ]; then
 		error "Variable 'name' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	elif [ "$version" == "" ]; then
@@ -96,15 +96,6 @@ check_file() {
 		error "File '$1' is not writable."
 		exit 1
 	fi
-}
-check_bin() {
-	local RESULT
-	RESULT="no"
-	CURRENT=`pkg-get-version $name`
-	if [ "$CURRENT" == "$version-$release" ]; then
-		RESULT="yes"
-	fi
-	echo "$RESULT"
 }
 download_file() {
 	info "Downloading '$1'."
@@ -159,16 +150,40 @@ download_file() {
 	
 	mv -f "$LOCAL_FILENAME_PARTIAL" "$LOCAL_FILENAME"
 }
-download_package() {
-	info "Downloading '$1'."
-	if [ ! "`type -p wget`" ]; then
-		error "Command 'wget' not found."
+sync_file() {
+	local DIR GROUP FILE URL
+	FILE=`basename $1`
+	info "Synchronising '$1' ..."
+	if [ ! "`type -p curl`" ]; then
+		error "Command 'curl' not found."
 		exit $E_GENERAL
 	fi
-	DOWNLOAD_OPTS="--passive-ftp --no-directories --tries=3 --waitretry=3 \
-		--directory-prefix=$PKGMK_PACKAGE_DIR \
-		--no-check-certificate"
-	wget $DOWNLOAD_OPTS $1
+	DIR=`dirname $PWD`
+	GROUP=`basename $DIR`
+	URL="$CARDS_DEPOT_URL/$CARDS_DEPOT_VERSION/$GROUP/${name}_$version-$release/$1"
+	echo "$URL"
+	DOWNLOAD_OPTS="-# --retry 3 --retry-delay 3 -O "
+	curl $DOWNLOAD_OPTS $URL
+}
+sync_all_files() {
+	local DIR GROUP FILE URL
+	if [ ! "`type -p curl`" ]; then
+		error "Command 'curl' not found."
+		exit $E_GENERAL
+	fi
+	DIR=`dirname $PWD`
+	GROUP=`basename $DIR`
+	URL="$CARDS_DEPOT_URL/$CARDS_DEPOT_VERSION/$GROUP/${name}_$version-$release/"
+	sync_file index.html
+	DOWNLOAD_OPTS="--silent --retry 3 --retry-delay 3 -O "
+	grep -o "^[[:xdigit:]]\{32\}  [[:alnum:],.,_,-]\+" index.html > .md5
+	for FILE in $(cat .md5|cut -d " " -f 3);do
+		if [ ! -f $FILE ];then
+			curl $DOWNLOAD_OPTS $URL/$FILE
+		fi
+		grep $FILE .md5|md5sum -c -|| exit $E_GENERAL
+	done
+	rm .md5
 }
 download_source() {
 	local FILE LOCAL_FILENAME
@@ -230,16 +245,16 @@ get_package_list() {
 	local FILE i
 	i=0
 	if [ "$PKGMK_ARCH" == "x86_64" ]; then
-		for FILE in `find $PKGMK_PACKAGE_DIR -name "$name*#$version-$release-x86_64.pkg.tar.$PKGMK_COMPRESSION_MODE"`; do
+		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*_$version-$release-x86_64.cards.tar.$PKGMK_COMPRESSION_MODE"`; do
 			TARGETS[i]=`basename $FILE`
 			i=$((i+1))
 		done
-		for FILE in `find $PKGMK_PACKAGE_DIR -name "$name*#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE"`; do
+		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE"`; do
 			TARGETS[i]=`basename $FILE`
 			i=$((i+1))
 		done
 	else
-		for FILE in `find $PKGMK_PACKAGE_DIR -name "$name*#$version-$release-i686.pkg.tar.$PKGMK_COMPRESSION_MODE"`; do
+		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*_$version-$release-i686.cards.tar.$PKGMK_COMPRESSION_MODE"`; do
 			TARGETS[i]=`basename $FILE`
 			i=$((i+1))
 		done
@@ -401,7 +416,7 @@ check_footprint() {
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $TARGET ]; then
-			PKGMK_FOOTPRINT="`echo $TARGET|cut -d "#" -f1`.`echo $TARGET|cut -d "-" -f3|cut -d "." -f1`.footprint"
+			PKGMK_FOOTPRINT="`echo $TARGET|cut -d "_" -f1`.`echo $TARGET|cut -d "-" -f3|cut -d "." -f1`.footprint"
 			make_footprint > $FILE.footprint
 			if [ -f $PKGMK_FOOTPRINT ]; then
 				sort -k 3 $PKGMK_FOOTPRINT > $FILE.footprint.orig
@@ -450,17 +465,17 @@ remove_work_dir() {
 	rm -rf $PKGMK_WORK_DIR
 }
 add_metafiles () {
-	if [ -f $PKGMK_ROOT/$name.README ]; then
-		cp $PKGMK_ROOT/$name.README $PKG/.README
+	if [ -f $PKGMK_ROOT/${name}.README ]; then
+		cp $PKGMK_ROOT/${name}.README $PKG/.README
 	fi
-	if [ -f $PKGMK_ROOT/$name.pre-install ]; then
-		cp $PKGMK_ROOT/$name.pre-install $PKG/.PRE
+	if [ -f $PKGMK_ROOT/${name}.pre-install ]; then
+		cp $PKGMK_ROOT/${name}.pre-install $PKG/.PRE
 	fi
-	if [ -f $PKGMK_ROOT/$name.post-install ]; then
-		cp $PKGMK_ROOT/$name.post-install $PKG/.POST
+	if [ -f $PKGMK_ROOT/${name}.post-install ]; then
+		cp $PKGMK_ROOT/${name}.post-install $PKG/.POST
 	fi
-	if [ -f $PKGMK_ROOT/$name.info ]; then
-		cp $PKGMK_ROOT/$name.info $PKG/.INFO
+	if [ -f $PKGMK_ROOT/${name}.info ]; then
+		cp $PKGMK_ROOT/${name}.info $PKG/.INFO
 	fi
 }
 pack_lib() {
@@ -471,7 +486,7 @@ pack_lib() {
 		fi
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$PKGMK_ARCH.pkg.tar \
+			$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-$PKGMK_ARCH.cards.tar \
 			$DIR || BUILD_SUCCESSFUL="no"
 			rm -r $DIR
 			j=1
@@ -487,7 +502,7 @@ pack_devel() {
 	for DIR in usr/include usr/lib/pkgconfig; do
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
+			$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-any.cards.tar \
 			$DIR || BUILD_SUCCESSFUL="no"
 			rm -r $DIR
 			j=1
@@ -499,7 +514,7 @@ pack_doc() {
 	for DIR in usr/share/doc usr/share/gtk-doc; do
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
+			$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-any.cards.tar \
 			$DIR || BUILD_SUCCESSFUL="no"
 			rm -r $DIR
 			j=1
@@ -511,7 +526,7 @@ pack_man() {
 	for DIR in usr/share/info usr/share/man; do
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
+			$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-any.cards.tar \
 			$DIR || BUILD_SUCCESSFUL="no"
 			rm -r $DIR
 			j=1
@@ -522,7 +537,7 @@ pack_service() {
 	local DIR="etc/rc.d"
 	if [ -d $DIR ]; then
 		bsdtar -r -f \
-		$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-any.pkg.tar \
+		$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-any.cards.tar \
 		$DIR || BUILD_SUCCESSFUL="no"
 		rm -r $DIR
 		j=1
@@ -531,17 +546,17 @@ pack_service() {
 compress_group_package() {
 	local ARCH
 	for ARCH in x86_64 i686 any; do
-		if [ -f $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar ]; then
-			info "compress $group" 
+		if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-$ARCH.cards.tar ]; then
+			info "compress ${group}" 
 			case $PKGMK_COMPRESSION_MODE in
-				gz)  gzip -9 $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar;;
-				bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar;;
-				xz)  xz -z -9 $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar ;;
+				gz)  gzip -9 $PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-$ARCH.cards.tar;;
+				bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-$ARCH.cards.tar;;
+				xz)  xz -z -9 $PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-$ARCH.cards.tar ;;
 			esac
-			TARGETS[i]="$name.$group#$version-$release-$ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
+			TARGETS[i]="${name}.${group}_$version-$release-$ARCH.cards.tar.$PKGMK_COMPRESSION_MODE"
 			info "Build result for ${TARGETS[i]}:"
 			bsdtar -t -v -f \
-			$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-$ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE \
+			$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-$ARCH.cards.tar.$PKGMK_COMPRESSION_MODE \
 			|| BUILD_SUCCESSFUL = "no"
 		fi
 	done
@@ -581,8 +596,8 @@ build_package() {
 		j=0
 		for group in ${PKGMK_GROUPS[@]}; do
 			BUILD_SUCCESSFUL="yes"
-			if [ "`type -t $group`" == "function" ]; then
-				(set -e -x ;$group)
+			if [ "`type -t ${group}`" == "function" ]; then
+				(set -e -x ;${group})
 				j=1
 				if [ $? = 0 ]; then
 					BUILD_SUCCESSFUL="yes"
@@ -591,10 +606,10 @@ build_package() {
 					exit 1
 				fi
 			else
-				if [ -f $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-* ]; then
-					rm $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*
+				if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-* ]; then
+					rm $PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-*
 				fi
-				pack_$group 
+				pack_${group} 
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
                 			exit 1
@@ -602,26 +617,26 @@ build_package() {
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
-				if [ -f $PKGMK_ROOT/$name.$group.pre-install ]; then
-					cp $PKGMK_ROOT/$name.$group.pre-install $PKG/.PRE
+				if [ -f $PKGMK_ROOT/${name}.${group}.pre-install ]; then
+					cp $PKGMK_ROOT/${name}.${group}.pre-install $PKG/.PRE
 				fi
-				if [ -f $PKGMK_ROOT/$name.$group.post-install ]; then
-					cp $PKGMK_ROOT/$name.$group.post-install $PKG/.POST
+				if [ -f $PKGMK_ROOT/${name}.${group}.post-install ]; then
+					cp $PKGMK_ROOT/${name}.${group}.post-install $PKG/.POST
 				fi
-				if [ -f $PKGMK_ROOT/$name.$group.README ]; then
-					cp $PKGMK_ROOT/$name.$group.README $PKG/.README
+				if [ -f $PKGMK_ROOT/${name}.${group}.README ]; then
+					cp $PKGMK_ROOT/${name}.${group}.README $PKG/.README
 				fi
-				if [ -f $PKGMK_ROOT/$name.$group.info ]; then
-					cp $SRC/$name.$group.info $PKG/.INFO
+				if [ -f $PKGMK_ROOT/${name}.${group}.info ]; then
+					cp $SRC/${name}.${group}.info $PKG/.INFO
 				fi
-				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*|sed "s/\t/ /"|cut -d " " -f1`"
+				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-*|sed "s/\t/ /"|cut -d " " -f1`"
 				echo "size_i = $SIZE_I" > $PKG/.META
 
 				for file in .INFO .META .PRE .POST .README; do
 					if [ -f $file ]; then
 						bsdtar -r -f \
-						$PKGMK_PACKAGE_DIR/$name.$group#$version-$release-*.pkg.tar \
-						$file  || abort_on_build "$name.$loc#$version-$release"
+						$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-*.cards.tar \
+						$file  || abort_on_build "${name}.$loc_$version-$release"
 						rm $file
 					fi
 				done
@@ -644,43 +659,43 @@ build_package() {
 				# Need to double check because glibc for exemple create a file in this directory
 				if [ -d usr/share/locale/$loc ];then
 					bsdtar -c $COMPRESSION -f \
-					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE \
-					usr/share/locale/$loc || abort_on_build "$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE"
+					$PKGMK_PACKAGE_DIR/${name}.${loc}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE \
+					usr/share/locale/$loc || abort_on_build "${name}.${loc}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE"
 					rm -rf usr/share/locale/$loc
-					TARGETS[i]="$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE"
+					TARGETS[i]="${name}.${loc}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE"
 					info "Build result for ${TARGETS[i]}:"
 					i=$((i+1))
 					bsdtar -t -v -f \
-					$PKGMK_PACKAGE_DIR/$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE \
-					|| abort_on_build "$name.$loc#$version-$release-any.pkg.tar.$PKGMK_COMPRESSION_MODE"
+					$PKGMK_PACKAGE_DIR/${name}.${loc}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE \
+					|| abort_on_build "${name}.${loc}_$version-$release-any.cards.tar.$PKGMK_COMPRESSION_MODE"
 				fi
 			done
 		fi
-		TARGETS[i]="$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
+		TARGETS[i]="${name}_$version-$release-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE"
 		add_metafiles
 		SIZE_I="`du -b --summarize $PKG|sed "s/\t/ /"|cut -d " " -f1`"
-		echo "size_i = $SIZE_I" > $PKG/.META || abort_on_build "$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
+		echo "size_i = $SIZE_I" > $PKG/.META || abort_on_build "${name}_$version-$release-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE"
 
 		# Need to sed otherwize it also takes the devel packages
 		echo  "run = `pkginfo --runtimedepfiles $PKG |sed "s/,[a-z]*.devel//g"`" >> $PKG/.META
 		
 		for file in .INFO .META .PRE .POST .README; do
 			if [ -f $file ]; then
-				bsdtar -r -f $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar \
+				bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}_$version-$release-$PKGMK_ARCH.cards.tar \
 				$file
 			fi
 		done
 
-		bsdtar -r -f $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar *
+		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}_$version-$release-$PKGMK_ARCH.cards.tar *
 
-                info "compress $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar"
+                info "compress $PKGMK_PACKAGE_DIR/${name}_$version-$release-$PKGMK_ARCH.cards.tar"
 		case $PKGMK_COMPRESSION_MODE in
-			gz)  gzip -9 $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar;;
-			bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar;;
-			xz)  xz -z -9 $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar ;;
+			gz)  gzip -9 $PKGMK_PACKAGE_DIR/${name}_$version-$release-$PKGMK_ARCH.cards.tar;;
+			bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/${name}_$version-$release-$PKGMK_ARCH.cards.tar;;
+			xz)  xz -z -9 $PKGMK_PACKAGE_DIR/${name}_$version-$release-$PKGMK_ARCH.cards.tar ;;
 		esac
-		info "Build result for $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE:"
-		bsdtar -t -v -f $PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE
+		info "Build result for $PKGMK_PACKAGE_DIR/${name}_$version-$release-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE:"
+		bsdtar -t -v -f $PKGMK_PACKAGE_DIR/${name}_$version-$release-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE
 		if [ $? = 0 ]; then
 			BUILD_SUCCESSFUL="yes"
 			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
@@ -772,10 +787,10 @@ clean() {
 }
 clean_old() {
 	if [ "$PKGMK_ARCH" == "x86_64" ]; then
-		find $PKGMK_PACKAGE_DIR/$name*#*-x86_64.pkg.tar.* -exec rm -v {} \; 2> /dev/null
-		find $PKGMK_PACKAGE_DIR/$name*#*-any.pkg.tar.* -exec rm -v {} \; 2> /dev/null
+		find $PKGMK_PACKAGE_DIR/${name}*#*-x86_64.cards.tar.* -exec rm -v {} \; 2> /dev/null
+		find $PKGMK_PACKAGE_DIR/${name}*#*-any.cards.tar.* -exec rm -v {} \; 2> /dev/null
 	else
-		find $PKGMK_PACKAGE_DIR/$name*#*-i686.pkg.tar.* -exec rm -v {} \; 2> /dev/null
+		find $PKGMK_PACKAGE_DIR/${name}*#*-i686.cards.tar.* -exec rm -v {} \; 2> /dev/null
 	fi
 }
 update_footprint() {
@@ -792,7 +807,7 @@ update_footprint() {
 			error "Unable to update footprint. File '$TARGET' not found."
 			exit 1
 		fi
-		PKGMK_FOOTPRINT="`echo $TARGET|cut -d "#" -f1`.`echo $TARGET|cut -d "-" -f3|cut -d "." -f1`.footprint"
+		PKGMK_FOOTPRINT="`echo $TARGET|cut -d "_" -f1`.`echo $TARGET|cut -d "-" -f3|cut -d "." -f1`.footprint"
 		check_file "$PKGMK_FOOTPRINT"
 		make_footprint > $PKGMK_FOOTPRINT
 		touch $TARGET
@@ -815,15 +830,6 @@ build_needed() {
 					break
 				fi
 			done
-			
-		else
-			if [ "$PKGMK_DOWNLOAD_BIN" != "no" ]; then
-				if [ "`check_bin`" != "yes" ]; then
-					RESULT="yes"
-				else
-					RESULT="no"
-				fi
-			fi
 		fi
 	fi
 
@@ -839,21 +845,21 @@ update_index_html()
  <head>
   <meta charset="utf-8" />
 EOF
-echo "<title>$name $version-$release</title>" >> $PKGMK_ROOT/index.html
+echo "<title>${name} $version-$release</title>" >> $PKGMK_ROOT/index.html
 cat >> $PKGMK_ROOT/index.html << "EOF"
  </head>
  <body>
 EOF
-echo "<h4>$name $version-$release `date +%Y%m%d`</h4>" >> $PKGMK_ROOT/index.html
+echo "<h4>${name} $version-$release `date +%Y%m%d`</h4>" >> $PKGMK_ROOT/index.html
 echo -n "<pre><kbd>" >> $PKGMK_ROOT/index.html
 pushd $PKGMK_ROOT > /dev/null
-if [ -f  $name.info ]; then
-  cat $name.info >> $PKGMK_ROOT/index.html
+if [ -f  ${name}.info ]; then
+  cat ${name}.info >> $PKGMK_ROOT/index.html
 else
-  warning "$name.info doesn't exist"  
+  warning "${name}.info doesn't exist"  
 fi
 echo "" >> $PKGMK_ROOT/index.html
-for FILE in `find $PKGMK_ROOT -type f -name "$name*"`
+for FILE in Pkgfile `find $PKGMK_ROOT -type f -name "${name}*"`
 do
    FILE=`basename $FILE`
    echo "`md5sum $FILE` `du -b  --summarize $FILE|sed "s/\t/ /" | cut -d " " -f1`" >> $PKGMK_ROOT/index.html
@@ -879,14 +885,14 @@ if [ "$pictures" != "" ]; then
 	echo "   </table>"  >> $PKGMK_ROOT/index.html
 fi
 
-if [ -f $name.deps ]; then
+if [ -f ${name}.deps ]; then
   echo "  <h4>Dependencies needs for the compilation:</h4>" >> $PKGMK_ROOT/index.html
-  cat $name.deps >> $PKGMK_ROOT/index.html
+  cat ${name}.deps >> $PKGMK_ROOT/index.html
 fi
-if [ -f $name.README ]; then
-  echo "  <h4>README info</</h4>" >> $PKGMK_ROOT/index.html
+if [ -f ${name}.README ]; then
+  echo "  <h4>README info</h4>" >> $PKGMK_ROOT/index.html
   echo -n "  <pre><kbd>" >> $PKGMK_ROOT/index.html
-  cat $name.README >> $PKGMK_ROOT/index.html
+  cat ${name}.README >> $PKGMK_ROOT/index.html
 fi
 cat >> $PKGMK_ROOT/index.html << "EOF"
   </kbd></pre>
@@ -996,6 +1002,25 @@ main() {
 		source /etc/profile
 	fi
 
+	if [ ! -f $CARDS_CONFFILE ]; then
+		error "$CARDS_CONFFILE not found"
+		exit 1
+	fi
+
+	CARDS_DEPOT_URL=`cat $CARDS_CONFFILE|grep url|cut -d "=" -f2|sed "s/ //g"`
+	if [ "$CARDS_DEPOT_URL" == "" ]; then
+   		error "Variable url missing in $CARDS_CONFFILE"
+   		exit 1
+	fi
+
+	CARDS_DEPOT_DIR=`cat $CARDS_CONFFILE|grep dir|cut -d "=" -f2|sed "s/ //g"`
+	if [ "$CARDS_DEPOT_DIR" == "" ]; then
+		error "Variable dir missing in $CARDS_CONFFILE"
+		exit 1
+	fi
+
+	CARDS_DEPOT_VERSION=`curl -s -K $CARDS_CONFFILE |grep -o "<a href=\"[[:print:]]\+\/\""|cut -d "\"" -f2|sort -n|tail -1|sed "s/\/$//"`
+
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
 		warning "Footprint ignored."
@@ -1006,7 +1031,7 @@ main() {
 	parse_options "$@"
 
 	PACKAGENAME=`basename $PKGMK_ROOT`
-	if [ "$PACKAGENAME" == "`echo $PACKAGENAME | cut  -d '#' -f1`" ];then
+	if [ "$PACKAGENAME" == "`echo $PACKAGENAME | cut  -d '_' -f1`" ];then
 		error "name not found when parsing the foldername"
 		exit $E_PKGFILE
 	fi
@@ -1014,16 +1039,17 @@ main() {
 		error "release not found when parsing the foldername"
 		exit $E_PKGFILE
 	fi
-	name="`echo $PACKAGENAME | cut  -d "#" -f1`"
+	name="`echo $PACKAGENAME | cut  -d "_" -f1`"
 	
-	version="`basename $PKGMK_ROOT | cut -d "#" -f2 | cut -d "-" -f1`"
+	version="`basename $PKGMK_ROOT | cut -d "_" -f2 | cut -d "-" -f1`"
 
-	release="`basename $PKGMK_ROOT | cut -d "#" -f2 | cut -d "-" -f2`"
+	release="`basename $PKGMK_ROOT | cut -d "_" -f2 | cut -d "-" -f2`"
 
 
-	info "name: $name"
+	info "name: ${name}"
 	info "version: $version"
 	info "release: $release"
+	info "NuTyX version: $CARDS_DEPOT_VERSION"
 
 
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
@@ -1031,14 +1057,28 @@ main() {
 		exit 0
 	fi
 
+	if [ ! -f $PKGMK_CONFFILE ]; then
+		error "File '$PKGMK_CONFFILE' not found."
+		exit 1
+	fi
+	. $PKGMK_CONFFILE
 
-	for FILE in $PKGMK_CONFFILE $PKGMK_PKGFILE; do
-		if [ ! -f $FILE ]; then
-			error "File '$FILE' not found."
+	if [ ! -f $PKGMK_PKGFILE ]; then
+		if [ "$PKGMK_SYNC_FILES" == "no" ]; then
+			info  "Variable PKGMK_SYNC_FILES set to \"no\""
+			error "File '$PKGMK_PKGFILE' not found"
 			exit 1
+		
+		else
+			sync_all_files
 		fi
-		. $FILE
-	done
+	fi
+	if [ ! -f $PKGMK_PKGFILE  ]; then
+		error "File '$PKGMK_PKGFILE' not found."
+		exit 1
+	fi
+
+	. $PKGMK_PKGFILE
 
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
@@ -1050,7 +1090,7 @@ main() {
 		gz|bz2|xz)
 			get_package_list
 			if [ -z $TARGETS ]; then
-				TARGET="$PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE"
+				TARGET="$PKGMK_PACKAGE_DIR/${name}_$version-$release-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE"
 			fi;;
 		*)
 			error "Compression mode '$PKGMK_COMPRESSION_MODE' not supported"
@@ -1092,7 +1132,7 @@ main() {
 	if [ "$PKGMK_EXTRACT_ONLY" = "yes" ]; then
 		download_source
 		make_work_dir
-		info "Extracting sources of package '$name-$version'."
+		info "Extracting sources of package '${name}-$version'."
 		unpack_source
 		exit 0
 	fi
@@ -1117,22 +1157,9 @@ main() {
 
 	fi
 	# From here on it's need to check the base package not any group which means
-	TARGET=$PKGMK_PACKAGE_DIR/$name#$version-$release-$PKGMK_ARCH.pkg.tar.$PKGMK_COMPRESSION_MODE
+	TARGET=$PKGMK_PACKAGE_DIR/${name}_$version-$release-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE
 	if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
 		info "Package '$TARGET' is up to date."
-		if [ ! -f $TARGET ]; then
-			if [ "$PKGMK_DOWNLOAD_BIN" = "yes" ]; then
-				FILE=`pkg-get-url $name`
-				if [ "$FILE" != "" ]; then
-					download_package $FILE
-					if (! pkg-get-md5sum $name|md5sum -c - >/dev/null); then
-						rm $TARGET
-						error "Md5sum not ok."
-						exit $E_MD5
-					fi
-				fi
-			fi
-		fi
 	else
 		download_source
 		build_package
@@ -1158,6 +1185,7 @@ readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
 readonly PKGMK_ROOT="$PWD"
 
+CARDS_CONFFILE="/etc/pkgdwl.conf"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
@@ -1166,7 +1194,8 @@ PKGMK_NOSTRIP=".nostrip"
 
 PKGMK_CHECK_FILES="no"
 PKGMK_CLEAN_OLD="yes"
-PKGMK_DOWNLOAD_BIN="no"
+
+PKGMK_SYNC_FILES="yes"
 
 
 PKGMK_SOURCE_MIRRORS=()

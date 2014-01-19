@@ -92,7 +92,7 @@ if [ "$1" == "sync" ] || [ "$1" == "-S" ] || [ "$1" == "--synchronise" ]; then
     for i in `curl -s $DEPOT_URL/$DEPOT_VERSION/$LOCAL_DIR/|grep -o "<a href=\"[a-z][[:print:]]\+\/\""|cut -d "\"" -f2`
     do
       PORT_DIR=`echo $i|sed "s/%23/#/"|sed "s|/$||"`
-      PORT_NAME=`echo $dir|cut -d "#" -f1`
+      PORT_NAME=`echo $dir|cut -d "_" -f1`
       mkdir -vp ${DEPOT_DIR}/${DEPOT_VERSION}${LOCAL_DIR}${PORT_DIR}
     done
   done

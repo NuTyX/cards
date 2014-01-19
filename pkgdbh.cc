@@ -267,7 +267,7 @@ int pkgdbh::getListOfPackages (const string& path)
 	const string pathdb =  root + PKG_DB_DIR;
 	pkgFoldersList = findFile(pathdb);
 	for (set<string>::iterator i = pkgFoldersList.begin();i != pkgFoldersList.end();++i) {
-		string_splited=split_keyValue(*i,"#");
+		string_splited=split_keyValue(*i,"_");
 		if (string_splited.value.size()>0)
 			pkgList.insert(string_splited.parameter + " " + string_splited.value);
 	}
@@ -281,11 +281,11 @@ int pkgdbh::getListOfPackages (const string& path)
 pair<string, pkginfo_t> pkgdbh::getInfosPackage(const string& packageName)
 {
 	pair<string, pkginfo_t> result;
-	string name(packageName,0,packageName.find('#'));
+	string name(packageName,0,packageName.find('_'));
 	string version = packageName;
-	result.second.version=version.erase(0, version.find('#') == string::npos ? string::npos : version.find('#') + 1);
+	result.second.version=version.erase(0, version.find('_') == string::npos ? string::npos : version.find('_') + 1);
 	result.first = name;
-	string package_foldername = name + "#" + version;
+	string package_foldername = name + "_" + version;
 	result.second.run = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
 	result.second.size = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
 	return result;
@@ -314,7 +314,7 @@ void pkgdbh::getInstalledPackages(bool silent)
 		arch.erase(0, arch.find_last_of("-")+1);
 		info.version = version;
 		info.arch = arch;
-		string package_foldername = name + "#" + version + "-" + arch;
+		string package_foldername = name + "_" + version + "-" + arch;
 		info.run = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
 		info.size = getValueOfKey(root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
 		// list of files
@@ -367,7 +367,7 @@ void pkgdbh::convertSpaceToNoSpaceDBFormat(const string& path)
 			string version = *i;
 			version.erase(0, version.find(NAME_DELIM) == string::npos ? string::npos : version.find(NAME_DELIM) + 1);
 			const string packagenamedir_with_space = root + PKG_DB_DIR + name + " " + version;
-			const string packagenamedir_without_space = root + PKG_DB_DIR + name + "#" + version;
+			const string packagenamedir_without_space = root + PKG_DB_DIR + name + "_" + version;
 			if (rename( packagenamedir_with_space.c_str(), packagenamedir_without_space.c_str() ) == -1 )
 			{
 				actualError = CANNOT_RENAME_FILE;
@@ -386,7 +386,7 @@ void pkgdbh::convertDBFormat()
 	cout << packagedir << endl;
 	for (packages_t::const_iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i) {
 
-		const string packagenamedir = root + PKG_DB_DIR + i->first + "#" + i-> second.version;
+		const string packagenamedir = root + PKG_DB_DIR + i->first + "_" + i-> second.version;
 		cout << packagenamedir << " created" << endl;
 		mkdir(packagenamedir.c_str(),0755);
 		const string fileslist = packagenamedir + PKG_FILES;
@@ -447,7 +447,7 @@ void pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 		}
 	}
 	const string packagedir = root + PKG_DB_DIR ;
-	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version + "-" + info.arch;
+	const string packagenamedir = root + PKG_DB_DIR + name + "_" + info.version + "-" + info.arch;
 
 	mkdir(packagenamedir.c_str(),0755);
 	for (set<string>::const_iterator i = metaFilesList.begin(); i!=  metaFilesList.end(); ++i)
@@ -467,7 +467,7 @@ void pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 
 	listOfInstPackages[name] = info;
 	const string packagedir = root + PKG_DB_DIR ;
-	const string packagenamedir = root + PKG_DB_DIR + name + "#" + info.version + "-" + info.arch;
+	const string packagenamedir = root + PKG_DB_DIR + name + "_" + info.version + "-" + info.arch;
 	mkdir(packagenamedir.c_str(),0755);
 	const string fileslist = packagenamedir + PKG_FILES;
 	const string fileslist_new = fileslist + ".imcomplete_transaction";
@@ -518,7 +518,7 @@ void pkgdbh::removePackageFilesRefsFromDB(const string& name)
 	const string packagedir = root + PKG_DB_DIR ;
 	const string version = listOfInstPackages[name].version;
 	const string arch = listOfInstPackages[name].arch;
-	const string packagenamedir = root + PKG_DB_DIR + name + "#" + version + "-" + arch;
+	const string packagenamedir = root + PKG_DB_DIR + name + "_" + version + "-" + arch;
 
 	metaFilesList = findFile( packagenamedir);
 	if (metaFilesList.size() > 0)
@@ -1145,75 +1145,6 @@ db_lock::~db_lock()
 	}
 }
 
-/*void pkgdbh::db_commit()
-{
-  const string dbfilename = root + PKG_DB_OLD;
-  const string dbfilename_new = dbfilename + ".incomplete_transaction";
-  const string dbfilename_bak = dbfilename + ".backup";
-
-  // Remove failed transaction (if it exists)
-  if (unlink(dbfilename_new.c_str()) == -1 && errno != ENOENT)
-	{
-		actualError = CANNOT_REMOVE_FILE;
-    treatErrors(dbfilename_new);
-	}
-  // Write new database
-  int fd_new = creat(dbfilename_new.c_str(), 0444);
-  if (fd_new == -1)
-	{
-		actualError = CANNOT_CREATE_FILE;
-		treatErrors(dbfilename_new);
-	}
-  stdio_filebuf<char> filebuf_new(fd_new, ios::out, getpagesize());
-
-  ostream db_new(&filebuf_new);
-  for (packages_t::const_iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i) {
-    if (!i->second.files.empty()) {
-      db_new << i->first << "\n";
-      db_new << i->second.version << "\n";
-      copy(i->second.files.begin(), i->second.files.end(), ostream_iterator<string>(db_new, "\n"));
-      db_new << "\n";
-    }
-  }
-
-  db_new.flush();
-
-  // Make sure the new database was successfully written
-  if (!db_new)
-	{
-		actualError = CANNOT_WRITE_FILE;
-		treatErrors(dbfilename_new);
-  }
-	// Synchronize file to disk
-  if (fsync(fd_new) == -1)
-	{
-		actualError = CANNOT_SYNCHRONIZE;
-		treatErrors(dbfilename_new);
-	}
-  // Relink database backup
-  if (unlink(dbfilename_bak.c_str()) == -1 && errno != ENOENT)
-	{
-		actualError = CANNOT_REMOVE_FILE;
-		treatErrors(dbfilename_bak);
-	}
-  if (link(dbfilename.c_str(), dbfilename_bak.c_str()) == -1)
-	{
-		actualError = CANNOT_CREATE_FILE;
-		treatErrors(dbfilename_bak);
-	}
-
-  // Move new database into place
-  if (rename(dbfilename_new.c_str(), dbfilename.c_str()) == -1)
-	{
-		actualError = CANNOT_RENAME_FILE;
-		treatErrors(dbfilename_new + " to " + dbfilename);
-	}
-
-#ifndef NDEBUG
-  cerr << listOfInstPackages.size() << " packages written to database" << endl;
-#endif
-}
-*/
 void pkgdbh::db_open(const string& path)
 {
   // Read database from single file
