@@ -1,4 +1,4 @@
-//  pkgdwl.h
+//  file_download.h
 // 
 //  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
 // 
@@ -18,59 +18,36 @@
 //  USA.
 //
 
-#ifndef PKGDWL_H
-#define PKGDWL_H
+#ifndef FILE_DOWNLOAD_H
+#define FILE_DOWNLOAD_H
 
-#include "string_utils.h"
-#include "file_utils.h"
-#include "pkgdbh.h"
+
 #include <curl/curl.h>
 
 #include <unistd.h>
 #include <sys/stat.h>
 
-#define PKGDWL_CONF   "/etc/pkgdwl.conf"
-#define PKG_MD5SUM    ".md5sum"
+#include "string_utils.h"
+#include "file_utils.h"
 
-class pkgdwl : public pkgdbh {
-public:
-	pkgdwl() : pkgdbh("pkgdwl") 
-	{
-		// Check the configuration file
-		if ( ! checkFileExist(PKGDWL_CONF))
-		{
-			cout << PKGDWL_CONF  << " missing: ";
-			throw runtime_error ("Cannot find the configuration file");
-		}
-		string config_file = root + PKGDWL_CONF;
-		url = getValueOfKey(config_file,PARAM_DELIM,"url");
-		if ( url.size() < 4 )
-			{
-				cout << PKGDWL_CONF << ": ";
-				throw runtime_error ("url not define. Did you put some spaces ...");
-			}
-		curl_global_init(CURL_GLOBAL_ALL);
-		curl = curl_easy_init();
-		if (! curl)
-			throw runtime_error ("Curl error");
-	}
-	~pkgdwl()
+class FileDownload
+{
+	public:
+
+	FileDownload(std::string url, std::string fileName);
+	FileDownload(std::string url, std::string fileName, std::string MD5Sum );
+	~FileDownload()
 	{
 		curl_global_cleanup();
 		curl_easy_cleanup(curl);
 	}
-	
-	virtual void run(int argc, char** argv);
-	virtual void printHelp() const;
+	bool checkMD5sum();
 
-protected:
-
+	private:
 	static int updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
 	static size_t writeToStreamHandle(void *buffer, size_t size, size_t nmemb, void *stream);
-
 	int updateProgress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
 	size_t writeToStream(void *buffer, size_t size, size_t nmemb, void *stream);
-
 	void initFileToDownload(const char * _file);
 
 	struct dwlProgress
@@ -84,20 +61,19 @@ protected:
 		long int filetime;
 		FILE *stream;
 	};
-	void downloadFile(const string& url_to_download , const string& filename);
+	int downloadFile(const string& url_to_download , const string& filename);
 	void updateProgress();
 
 	CURL* curl;
 	CURLcode result;
 
-	dwlProgress downloadProgress;
-	DestinationFile  destination_file;
+	dwlProgress 		m_downloadProgress;
+	DestinationFile	m_destinationFile;
 
-	
-	string contentFile;
-	string url;
-	string downloadFileName;
+	string m_url;
+	string m_downloadFileName;
+	string m_MD5Sum;
 };
 
-#endif /* PKGDWL_H */
+#endif /* FILE_DOWNLOAD_H */
 // vim:set ts=2 :

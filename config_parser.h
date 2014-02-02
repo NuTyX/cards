@@ -1,9 +1,7 @@
+//  config_parser.h
 //
-//  cards
-// 
-//  Copyright (c) 2000-2005 Per Liden
-//  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
+//  Copyright (c) 2014 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,17 +19,26 @@
 //  USA.
 //
 
-#ifndef PKGRM_H
-#define PKGRM_H
+#ifndef CONFIG_PARSER_H
+#define CONFIG_PARSER_H
 
-#include "pkgdbh.h"
+#include <string>
+#include <vector>
 
-class Pkgrm : public Pkgdbh {
-public:
-	Pkgrm() : Pkgdbh("pkgrm") {}
-	virtual void run(int argc, char** argv);
-	virtual void printHelp() const;
+struct Config
+{
+	Config()
+		: Url("http://nutyx.meticul.eu/saravane/latest") {}
+	std::string Url;
+	std::vector<std::string> prtDir;
 };
 
-#endif /* PKGRM_H */
+class ConfigParser
+{
+	public:
+		static std::string stripWhiteSpace(const std::string& input);
+		static int parseConfig(const std::string& fileName,
+			Config& config);
+};
+#endif /* CONFIG_PARSER_H */
 // vim:set ts=2 :

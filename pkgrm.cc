@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-void pkgrm::run(int argc, char** argv)
+void Pkgrm::run(int argc, char** argv)
 {
 	//
 	// Check command line options
@@ -40,7 +40,7 @@ void pkgrm::run(int argc, char** argv)
 			o_root = argv[i + 1];
 			i++;
 		} else if (option[0] == '-' || !o_package.empty()) {
-			actualError = INVALID_OPTION;
+			m_actualError = INVALID_OPTION;
 			treatErrors(option);
 		} else {
 			o_package = option;
@@ -49,20 +49,20 @@ void pkgrm::run(int argc, char** argv)
 
 	if (o_package.empty())
 	{
-		actualError = OPTION_MISSING;
+		m_actualError = OPTION_MISSING;
 		treatErrors("o_package");
 	}
 	
 	// Check UID
 	if (getuid())
 	{
-		actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
 
 	// Remove package
 	{
-		db_lock lock(o_root, true);
+		Db_lock lock(o_root, true);
 
 		// Get the list of installed packages
 		getListOfPackages(o_root);
@@ -72,7 +72,7 @@ void pkgrm::run(int argc, char** argv)
 
 		if (!checkPackageNameExist(o_package))
 		{
-			actualError = PACKAGE_NOT_INSTALL;
+			m_actualError = PACKAGE_NOT_INSTALL;
 			treatErrors(o_package);
 		}
 
@@ -84,9 +84,9 @@ void pkgrm::run(int argc, char** argv)
 		runLdConfig();
 	}
 }
-void pkgrm::printHelp() const
+void Pkgrm::printHelp() const
 {
-	cout << "usage: " << utilName << " [options] <package>" << endl
+	cout << "usage: " << m_utilName << " [options] <package>" << endl
 	     << "options:" << endl
 	     << "  -r, --root <path>   specify alternative installation root" << endl
 	     << "  -v, --version       print version and exit" << endl

@@ -268,5 +268,23 @@ int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, i
 	if (dir) closedir(dir);
 	return res ? res : errno ? WALK_BADIO : WALK_OK;
 }
+bool findMD5sum(const string& fileName, unsigned char* result)
+{
+	struct md5_context ctx;
+	unsigned char buffer[1000];
 
+	FILE* f = fopen(fileName.c_str(), "rb");
+	if (!f)
+		return false;
+	md5_starts( &ctx );
+	int i = 0;
+	while( ( i = fread( buffer, 1, sizeof( buffer ), f ) ) > 0 )
+	{
+		md5_update( &ctx, buffer, i );
+	}
+	fclose(f);
+
+	md5_finish( &ctx, result );
+	return true;
+}
 // vim:set ts=2 :

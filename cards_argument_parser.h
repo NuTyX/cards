@@ -1,8 +1,5 @@
-//
-//  cards
+// cards_argument_parser.h
 // 
-//  Copyright (c) 2000-2005 Per Liden
-//  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
 //  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
@@ -21,17 +18,27 @@
 //  USA.
 //
 
-#ifndef PKGRM_H
-#define PKGRM_H
+#ifndef CARDS_ARGUMENT_PARSER_H
+#define CARDS_ARGUMENT_PARSER_H
 
-#include "pkgdbh.h"
+#include "argument_parser.h"
 
-class Pkgrm : public Pkgdbh {
-public:
-	Pkgrm() : Pkgdbh("pkgrm") {}
-	virtual void run(int argc, char** argv);
-	virtual void printHelp() const;
+class CardsArgumentParser : public ArgParser
+{
+	public:
+		CardsArgumentParser();
+		virtual ~CardsArgumentParser() {};
+
+		static ArgParser::APCmd CMD_SYNC;
+
+		static ArgParser::APOpt OPT_DEPENDENCIES;
+		static ArgParser::APOpt OPT_REZEPT;
+
+		std::string getAppIdentification() const
+		{
+			return std::string("cards ")  + VERSION + "\n";
+		}
 };
 
-#endif /* PKGRM_H */
+#endif
 // vim:set ts=2 :

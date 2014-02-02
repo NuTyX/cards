@@ -28,9 +28,9 @@
 #include "runtime_dependencies_utils.h"
 #include "file_utils.h"
 
-class pkginfo : public pkgdbh {
+class Pkginfo : public Pkgdbh {
 public:
-	pkginfo() : pkgdbh("pkginfo") {}
+	Pkginfo() : Pkgdbh("pkginfo") {}
 	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;
 };

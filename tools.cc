@@ -34,20 +34,17 @@
 #include "pkgadd.h"
 #include "pkgrm.h"
 #include "pkginfo.h"
-#include "pkgdwl.h"
 
 using namespace std;
 
-static pkgdbh* select_utility(const string& name)
+static Pkgdbh* select_utility(const string& name)
 {
 	if (name == "pkgadd")
-		return new pkgadd;
+		return new Pkgadd;
 	else if (name == "pkgrm")
-		return new pkgrm;
+		return new Pkgrm;
 	else if (name == "pkginfo")
-		return new pkginfo;
-	else if (name == "pkgdwl")
-		return new pkgdwl;
+		return new Pkginfo;
 	else	
 		throw runtime_error("command not supported by cards");
 }
@@ -57,7 +54,7 @@ int main(int argc, char** argv)
 	string name = basename(argv[0]);
 
 	try {
-		auto_ptr<pkgdbh> util(select_utility(name));
+		auto_ptr<Pkgdbh> util(select_utility(name));
 
 		// Handle common options
 		for (int i = 1; i < argc; i++) {

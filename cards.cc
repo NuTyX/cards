@@ -1,9 +1,6 @@
+// cards.cc
 //
-//  cards
-// 
-//  Copyright (c) 2000-2005 Per Liden
-//  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,17 +18,36 @@
 //  USA.
 //
 
-#ifndef PKGRM_H
-#define PKGRM_H
+#include <iostream>
+#include <cstdlib>
+#include "file_download.h"
+#include "cards_sync.h"
 
-#include "pkgdbh.h"
 
-class Pkgrm : public Pkgdbh {
-public:
-	Pkgrm() : Pkgdbh("pkgrm") {}
-	virtual void run(int argc, char** argv);
-	virtual void printHelp() const;
-};
+using namespace std;
 
-#endif /* PKGRM_H */
+
+int main(int argc, char** argv)
+{
+
+	CardsArgumentParser cardsArgPars;
+	cardsArgPars.parse(argc, argv);
+
+	CardsSync::ExecType execType = CardsSync::TYPE_SYNC;
+
+	if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
+		execType = CardsSync::TYPE_SYNC;
+
+	} else {
+		cerr << "Supported commands so far:\n"
+			<< "   sync  \n"
+			<< "\n"
+			<< endl;
+		exit(-1);
+	}
+
+	CardsSync CS(cardsArgPars);
+	return CS.exec(execType);
+}
+
 // vim:set ts=2 :

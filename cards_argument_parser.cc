@@ -1,8 +1,5 @@
-//
-//  cards
+// cards_argument_parser.cc
 // 
-//  Copyright (c) 2000-2005 Per Liden
-//  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
 //  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
@@ -21,17 +18,25 @@
 //  USA.
 //
 
-#ifndef PKGRM_H
-#define PKGRM_H
+#include "cards_argument_parser.h"
 
-#include "pkgdbh.h"
+ArgParser::APCmd CardsArgumentParser::CMD_SYNC;
 
-class Pkgrm : public Pkgdbh {
-public:
-	Pkgrm() : Pkgdbh("pkgrm") {}
-	virtual void run(int argc, char** argv);
-	virtual void printHelp() const;
-};
+ArgParser::APOpt CardsArgumentParser::OPT_DEPENDENCIES;
+ArgParser::APOpt CardsArgumentParser::OPT_REZEPT;
 
-#endif /* PKGRM_H */
+CardsArgumentParser::CardsArgumentParser()
+{
+	addCommand(CMD_SYNC, "sync",
+		"synchronize local info with remote repository",
+		ArgParser::NONE, 0 , "");
+
+	OPT_DEPENDENCIES.init("dependencies",
+		'd',
+		"get dependencies files");
+
+	OPT_REZEPT.init("rezept",
+		'r',
+		"get the rezept and info");
+}
 // vim:set ts=2 :

@@ -27,7 +27,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.4.80.2
+VERSION = 0.5.80.0
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG
@@ -39,9 +39,12 @@ CFLAGS += -D_GNU_SOURCE
 LIBARCHIVELIBS := $(shell pkg-config --libs --static libarchive)
 LIBCURLLIBS := $(shell pkg-config --libs --static libcurl)
 
-LDFLAGS += $(LIBARCHIVELIBS) $(LIBCURLLIBS)
+LDFLAGS += $(LIBARCHIVELIBS)
 
-OBJECTS = main.o string_utils.o file_utils.o process.o runtime_dependencies_utils.o pkgdbh.o pkgadd.o pkgrm.o pkginfo.o pkgdwl.o
+TOOLSOBJECTS = tools.o md5.o string_utils.o file_utils.o process.o runtime_dependencies_utils.o pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
+
+CARDSOBJECTS = md5.o config_parser.o file_download.o argument_parser.o cards_argument_parser.o file_utils.o cards_sync.o cards.o
+
 
 LIBOBJECTS =  pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
 
@@ -51,19 +54,18 @@ MANPAGES = pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr rejmerge.8 pkgmk.conf.5
 libs:
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
 
-all: pkgcrea pkgadd pkgmk rejmerge man cards
+all: pkgadd pkgcrea cards pkgmk rejmerge man
 
-pkgadd: .depend $(OBJECTS)
-	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
-pkgdwl: .depend $(OBJECTS)
-	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
+pkgadd: .tools_depend $(TOOLSOBJECTS)
+	$(CXX) $(TOOLSOBJECTS) -o $@ $(LDFLAGS)
 
 pkgcrea: 
 	$(CC) $(CFLAGS) compile_dependencies_utils.c pkgcrea.c -o pkgcrea
 
 pkgmk: pkgmk.in
 
-cards: cards.in
+cards:  .cards_depend $(CARDSOBJECTS)
+	$(CXX) $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
 
 rejmerge: rejmerge.in
 
@@ -77,11 +79,18 @@ mantxt: man $(MANPAGES:=.txt)
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
 
-.depend:
-	$(CXX) $(CXXFLAGS) -MM $(OBJECTS:.o=.cc) > .depend
+.tools_depend:
+	$(CXX) $(CXXFLAGS) -MM $(TOOLSOBJECTS:.o=.cc) > .tools_depend
 
-ifeq (.depend,$(wildcard .depend))
-include .depend
+.cards_depend:
+	$(CXX) $(CXXFLAGS) -MM $(CARDSOBJECTS:.o=.cc) > .cards_depend
+
+ifeq (.cards_depend,$(wildcard .cards_depend))
+include .cards_depend
+endif
+
+ifeq (.tools_depend,$(wildcard .tools_depend))
+include .tools_depend
 endif
 
 .PHONY:	install clean distclean dist
@@ -113,11 +122,12 @@ install: all
 	install -D -m0644 pkgmk.8.fr $(DESTDIR)$(MANDIR)/fr/man8/pkgmk.8
 	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkgrm
 	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkginfo
-	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkgdwl
 
 clean:
-	rm -f .depend
-	rm -f $(OBJECTS)
+	rm -f .tools_depend
+	rm -f .cards_depend
+	rm -f $(TOOLSOBJECTS)
+	rm -f $(CARDSOBJECTS)
 	rm -f $(MANPAGES)
 	rm -f $(MANPAGES:=.txt)
 	rm -f libcards.so.$(VERSION)

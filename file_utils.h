@@ -23,6 +23,7 @@
 #ifndef FILE_UTILS_H
 #define FILE_UTILS_H
 
+#include "md5.h"
 #include "string_utils.h"
 #include <iostream>
 #include <fstream>
@@ -77,6 +78,7 @@ bool createRecursiveDirs(const string& pathname);
 void removeFile(const string& basedir, const string& filename);
 set<string>  findFile(const string& basedir);
 int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, int spec);
+bool findMD5sum(const string& fileName, unsigned char* result);
 
 #endif /* FILE_UTILS_H */
 // vim:set ts=2 :

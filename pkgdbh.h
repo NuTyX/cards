@@ -126,11 +126,11 @@ struct pkginfo_t {
   };
 typedef map<string, pkginfo_t> packages_t;
 
-class pkgdbh {
+class Pkgdbh {
 public:
 	
-	explicit pkgdbh(const string& name);
-	virtual ~pkgdbh() {}
+	explicit Pkgdbh(const string& name);
+	virtual ~Pkgdbh() {}
 	virtual void run(int argc, char** argv) = 0; // Need to be redefine in derivated class
 	virtual void printHelp() const = 0; // help info is depending of the derivated class
 	virtual void progressInfo() const; // progressInfo info
@@ -176,34 +176,34 @@ protected:
 	void runLdConfig();
 	void convertSpaceToNoSpaceDBFormat(const string& path);
 
-	string utilName;
-	string root;
-	packages_t listOfInstPackages; /* List of Installed packages */
-	set<string> pkgFoldersList;
-	set<string> pkgList;
+	string m_utilName;
+	string m_root;
+	packages_t m_listOfInstPackages; /* List of Installed packages */
+	set<string> m_pkgFoldersList;
+	set<string> m_packagesList;
 	set<string> FilesList;
-	set<string> runtimeLibrairiesList;
-	packages_t depListOfPackages;
+	set<string> m_runtimeLibrairiesList;
+	packages_t m_dependancesList;
 
-	action actualAction;
-	error actualError;
-	unsigned int filesNumber;
-	unsigned int installedFilesNumber;
+	action m_actualAction;
+	error m_actualError;
+	unsigned int m_filesNumber;
+	unsigned int m_installedFilesNumber;
 };
 
-class db_lock {
+class Db_lock {
 public:
-	db_lock(const string& root, bool exclusive);
-	~db_lock();
+	Db_lock(const string& m_root, bool exclusive);
+	~Db_lock();
 private:
-	DIR* dir;
+	DIR* m_dir;
 };
 
-class runTimeErrorWithErrno : public runtime_error {
+class RunTimeErrorWithErrno : public runtime_error {
 public:
-	explicit runTimeErrorWithErrno(const string& msg) throw()
+	explicit RunTimeErrorWithErrno(const string& msg) throw()
 		: runtime_error(msg + string(": ") + strerror(errno)) {}
-	explicit runTimeErrorWithErrno(const string& msg, int e) throw()
+	explicit RunTimeErrorWithErrno(const string& msg, int e) throw()
 		: runtime_error(msg + string(": ") + strerror(e)) {}
 };
 

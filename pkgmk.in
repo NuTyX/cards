@@ -479,58 +479,66 @@ add_metafiles () {
 	fi
 }
 pack_lib() {
-	local DIR
-	for DIR in usr/lib usr/lib64; do
-		if [ -d $DIR/pkgconfig ]; then
-			mv $DIR/pkgconfig $PKG
-		fi
-		if [ -d $DIR ]; then
-			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-$PKGMK_ARCH.cards.tar \
-			$DIR || BUILD_SUCCESSFUL="no"
-			rm -r $DIR
-			j=1
-		fi
-		if [ -d $PKG/pkgconfig ]; then
-			mkdir $DIR
-			mv $PKG/pkgconfig $DIR/pkgconfig
-		fi
+	local DIR SUBDIR
+	for DIR in usr opt/*; do
+		for SUBDIR in lib lib64; do
+			if [ -d $DIR/$SUBDIR/pkgconfig ]; then
+				mv $DIR/$SUBDIR/pkgconfig $PKG
+			fi
+			if [ -d $DIR/$SUBDIR ]; then
+				bsdtar -r -f \
+				$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-$PKGMK_ARCH.cards.tar \
+				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
+				rm -r $DIR/$SUBDIR
+				j=1
+			fi
+			if [ -d $PKG/pkgconfig ]; then
+				mkdir $DIR/$SUBDIR
+				mv $PKG/pkgconfig $DIR/$SUBDIR/pkgconfig
+			fi
+		done
 	done
 }
 pack_devel() {
-	local DIR
-	for DIR in usr/include usr/lib/pkgconfig; do
-		if [ -d $DIR ]; then
-			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-any.cards.tar \
-			$DIR || BUILD_SUCCESSFUL="no"
-			rm -r $DIR
-			j=1
-		fi
+	local DIR SUBDIR
+	for DIR in usr opt/*; do
+		for SUBDIR in include lib/pkgconfig; do
+			if [ -d $DIR/$SUBDIR ]; then
+				bsdtar -r -f \
+				$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-any.cards.tar \
+				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
+				rm -r $DIR/$SUBDIR
+				j=1
+			fi
+		done
 	done
 }
 pack_doc() {
-	local DIR
-	for DIR in usr/share/doc usr/share/gtk-doc; do
-		if [ -d $DIR ]; then
-			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-any.cards.tar \
-			$DIR || BUILD_SUCCESSFUL="no"
-			rm -r $DIR
-			j=1
-		fi
+	local DIR SUBDIR
+	for DIR in usr/share opt/*/share; do
+		for SUBDIR in doc gtk-doc; do
+			if [ -d $DIR/$SUBDIR ]; then
+				bsdtar -r -f \
+				$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-any.cards.tar \
+				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
+				rm -r $DIR/$SUBDIR
+				j=1
+			fi
+		done
 	done
 }
 pack_man() {
-	local DIR
-	for DIR in usr/share/info usr/share/man; do
-		if [ -d $DIR ]; then
-			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-any.cards.tar \
-			$DIR || BUILD_SUCCESSFUL="no"
-			rm -r $DIR
-			j=1
-		fi
+	local DIR SUBDIR
+	for DIR in usr/share opt/*/share; do
+		for SUBDIR in info man; do
+			if [ -d $DIR/$SUBDIR  ]; then
+				bsdtar -r -f \
+				$PKGMK_PACKAGE_DIR/${name}.${group}_$version-$release-any.cards.tar \
+				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
+				rm -r $DIR/$SUBDIR
+				j=1
+			fi
+		done
 	done
 }
 pack_service() {
@@ -836,6 +844,18 @@ build_needed() {
 
 	echo $RESULT
 }
+generate_md5sum()
+{
+	cd $PKGMK_ROOT
+	if [ -f MD5SUM ]; then
+		rm MD5SUM
+	fi
+	for FILE in Pkgfile `find . -type f -name "${name}*"`
+	do
+		FILE=`basename $FILE`
+		echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> MD5SUM
+	done
+}
 
 update_index_html()
 {
@@ -860,6 +880,9 @@ else
   warning "${name}.info doesn't exist"  
 fi
 echo "" >> $PKGMK_ROOT/index.html
+
+generate_md5sum
+
 for FILE in Pkgfile `find $PKGMK_ROOT -type f -name "${name}*"`
 do
    FILE=`basename $FILE`
@@ -1210,7 +1233,7 @@ PKGMK_WORK_DIR="$PWD/work"
 
 PKGMK_COMPRESSION_MODE="xz"
 
-PKGMK_GROUPS=(lib devel man doc service)
+PKGMK_GROUPS=(devel man doc service)
 
 PKGMK_LOG_DIR=/var/log/pkgbuild
 

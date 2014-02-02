@@ -1,8 +1,5 @@
-//
-//  cards
+// cards_sync.h
 // 
-//  Copyright (c) 2000-2005 Per Liden
-//  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
 //  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
@@ -20,18 +17,58 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
+#ifndef CARDS_H
+#define CARDS_H
 
-#ifndef PKGRM_H
-#define PKGRM_H
+#include <string>
+#include <list>
+#include <map>
 
-#include "pkgdbh.h"
+#include <curl/curl.h>
+#include "cards_argument_parser.h"
 
-class Pkgrm : public Pkgdbh {
+class CardsSync
+{
 public:
-	Pkgrm() : Pkgdbh("pkgrm") {}
-	virtual void run(int argc, char** argv);
-	virtual void printHelp() const;
-};
+	enum Action
+	{ 
+		NOP,
+		DIR_CREATE,
+		MOVE_DIR,
+		FILE_GET,
+		NEW_FILE_GET,
+		REMOVE
+	};
 
-#endif /* PKGRM_H */
+	enum ExecType
+	{
+		TYPE_SYNC,
+		TYPE_COPY
+	};
+
+	CardsSync (const CardsArgumentParser& argParser);
+	CardsSync (const CardsArgumentParser& argParser,
+		const std::string& url,
+		const std::string& directory,
+		const std::string& repoFile);
+
+	int exec ( ExecType execType);
+
+	static const std::string DEFAULT_REPOFILE;
+	static const std::string URLINFO;
+
+	static const int DEFAULT_TIMEOUT;
+ 
+	
+private:
+
+
+	const std::string m_baseDirectory;
+	const std::string m_remoteUrl;
+	std::string m_repoFile;
+
+	const CardsArgumentParser& m_argParser;
+	
+};
+#endif
 // vim:set ts=2 :

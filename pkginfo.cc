@@ -29,7 +29,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void pkginfo::run(int argc, char** argv)
+void Pkginfo::run(int argc, char** argv)
 {
 	//
 	// Check command line options
@@ -93,7 +93,7 @@ void pkginfo::run(int argc, char** argv)
 			o_arg = argv[i + 1];
 			i++;
 		} else {
-			actualError = INVALID_OPTION;
+			m_actualError = INVALID_OPTION;
 			treatErrors(option);
 		}
 	}
@@ -102,12 +102,12 @@ void pkginfo::run(int argc, char** argv)
 	o_installed_mode + o_list_mode + o_owner_mode + o_convert_mode + 
 	o_footprint_mode + o_librairies_mode + o_runtime_mode == 0)
 	{
-		actualError = OPTION_MISSING;
+		m_actualError = OPTION_MISSING;
 		treatErrors(o_arg);
 	}
 	if (o_runtimedependencies_mode + o_footprint_mode + o_installed_mode + o_list_mode + o_owner_mode > 1)
 	{
-		actualError = TOO_MANY_OPTIONS;
+		m_actualError = TOO_MANY_OPTIONS;
 		treatErrors(o_arg);
 	}
 	if (o_footprint_mode) {
@@ -118,7 +118,7 @@ void pkginfo::run(int argc, char** argv)
 	} else if (o_convert_mode ) {
 			if (getuid())
 			{
-				actualError = ONLY_ROOT_CAN_CONVERT_DB;
+				m_actualError = ONLY_ROOT_CAN_CONVERT_DB;
 				treatErrors("");
 			}
 
@@ -127,7 +127,7 @@ void pkginfo::run(int argc, char** argv)
 			{
 				convertSpaceToNoSpaceDBFormat(o_root);
 			} else {
-				db_lock lock(o_root, false);
+				Db_lock lock(o_root, false);
 				db_open(o_root);
 				convertDBFormat(); }
 	} else {
@@ -135,14 +135,14 @@ void pkginfo::run(int argc, char** argv)
 		// Modes that require the database to be opened
 		//
 		{
-			db_lock lock(o_root, false);
+			Db_lock lock(o_root, false);
 			getListOfPackages(o_root);
 		}
 		if (o_installed_mode) {
 			//
 			// List installed packages
 			//
-			for (set<string>::const_iterator i = pkgList.begin(); i != pkgList.end(); ++i)
+			for (set<string>::const_iterator i = m_packagesList.begin(); i != m_packagesList.end(); ++i)
 				cout << *i << endl;
 		} else if (o_list_mode) {
 			//
@@ -150,13 +150,13 @@ void pkginfo::run(int argc, char** argv)
 			//
 			getInstalledPackages(false);
 			if (checkPackageNameExist(o_arg)) {
-				copy(listOfInstPackages[o_arg].files.begin(), listOfInstPackages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
+				copy(m_listOfInstPackages[o_arg].files.begin(), m_listOfInstPackages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
 			} else if (checkFileExist(o_arg)) {
 				pair<string, pkginfo_t> package = openArchivePackage(o_arg);
 				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
 			
 			} else {
-				actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
+				m_actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
 				treatErrors(o_arg);
 			}
 		} else if (o_runtimedependencies_mode) {
@@ -183,7 +183,7 @@ void pkginfo::run(int argc, char** argv)
 				set<string> runtimeList;
 				for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
 				{
-					for (packages_t::const_iterator j = listOfInstPackages.begin(); j != listOfInstPackages.end();++j)
+					for (packages_t::const_iterator j = m_listOfInstPackages.begin(); j != m_listOfInstPackages.end();++j)
 					{
 						bool found = false;
 						for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k)
@@ -224,7 +224,7 @@ void pkginfo::run(int argc, char** argv)
 			int Result = -1;
 			if (checkPackageNameExist(o_arg))
 			{
-				for (set<string>::const_iterator i = listOfInstPackages[o_arg].files.begin(); i != listOfInstPackages[o_arg].files.end(); ++i)
+				for (set<string>::const_iterator i = m_listOfInstPackages[o_arg].files.begin(); i != m_listOfInstPackages[o_arg].files.end(); ++i)
 				{
 					string filename('/' + *i);
 					Result = getRuntimeLibrairiesList(librairiesList,filename);
@@ -236,7 +236,7 @@ void pkginfo::run(int argc, char** argv)
 						set<string> runtimeList;
 						for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
 						{
-							for (packages_t::const_iterator j = listOfInstPackages.begin(); j != listOfInstPackages.end();++j)
+							for (packages_t::const_iterator j = m_listOfInstPackages.begin(); j != m_listOfInstPackages.end();++j)
 							{
 								bool found = false;
 								for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k)
@@ -277,10 +277,10 @@ void pkginfo::run(int argc, char** argv)
 			getInstalledPackages(false);
 			if (checkPackageNameExist(o_arg)) {
 				cout << "Name: " << o_arg << endl
-				<< "Arch: " << listOfInstPackages[o_arg].arch << endl
-				<< "Version: " << listOfInstPackages[o_arg].version << endl
-				<< "Size : " << listOfInstPackages[o_arg].size << endl
-				<< "Depends on (run): " << listOfInstPackages[o_arg].run <<"."<< endl;
+				<< "Arch: " << m_listOfInstPackages[o_arg].arch << endl
+				<< "Version: " << m_listOfInstPackages[o_arg].version << endl
+				<< "Size : " << m_listOfInstPackages[o_arg].size << endl
+				<< "Depends on (run): " << m_listOfInstPackages[o_arg].run <<"."<< endl;
 				}
 			} else if (o_owner_mode) {
 			//
@@ -290,7 +290,7 @@ void pkginfo::run(int argc, char** argv)
 			regex_t preg;
 			if (regcomp(&preg, o_arg.c_str(), REG_EXTENDED | REG_NOSUB))
 			{
-				actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
+				m_actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
 				treatErrors(o_arg);
 			}
 			vector<pair<string, string> > result;
@@ -299,7 +299,7 @@ void pkginfo::run(int argc, char** argv)
 #ifndef NDEBUG
 			cerr << o_arg << endl;
 #endif
-			for (packages_t::const_iterator i = listOfInstPackages.begin(); i != listOfInstPackages.end(); ++i) {
+			for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
 				for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j) {
 					const string file('/' + *j);
 					if (!regexec(&preg, file.c_str(), 0, 0, 0)) {
@@ -317,14 +317,14 @@ void pkginfo::run(int argc, char** argv)
 					cout << left << setw(width + 2) << i->first << i->second << endl;
 				}
 			} else {
-				cout << utilName << ": no owner(s) found" << endl;
+				cout << m_utilName << ": no owner(s) found" << endl;
 			}
 		}
 	}
 }
-void pkginfo::printHelp() const
+void Pkginfo::printHelp() const
 {
-	cout << "usage: " << utilName << " [options]" << endl
+	cout << "usage: " << m_utilName << " [options]" << endl
 	     << "options:" << endl
        << "  -c, --convert               convert the datase from pkgutils format to cards format" << endl 
 	     << "  -i, --installed             list installed packages" << endl

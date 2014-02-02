@@ -42,9 +42,9 @@ struct rule_t {
 	bool action;
 };
 
-class pkgadd : public pkgdbh {
+class Pkgadd : public Pkgdbh {
 public:
-	pkgadd() : pkgdbh("pkgadd") {}
+	Pkgadd() : Pkgdbh("pkgadd") {}
 	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;
 

@@ -1,10 +1,7 @@
+// md5.h
 //
-//  cards
-// 
-//  Copyright (c) 2000-2005 Per Liden
-//  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
-// 
+// Copyright (c) by Christophe <Devine devine at cr0 dot net>
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -21,17 +18,21 @@
 //  USA.
 //
 
-#ifndef PKGRM_H
-#define PKGRM_H
+#ifndef MD5_H
+#define MD5_H
 
-#include "pkgdbh.h"
+#define uint8  unsigned char
+#define uint32 unsigned long int
 
-class Pkgrm : public Pkgdbh {
-public:
-	Pkgrm() : Pkgdbh("pkgrm") {}
-	virtual void run(int argc, char** argv);
-	virtual void printHelp() const;
+struct md5_context
+{
+    uint32 total[2];
+    uint32 state[4];
+    uint8 buffer[64];
 };
 
-#endif /* PKGRM_H */
-// vim:set ts=2 :
+void md5_starts( struct md5_context *ctx );
+void md5_update( struct md5_context *ctx, uint8 *input, uint32 length );
+void md5_finish( struct md5_context *ctx, uint8 digest[16] );
+
+#endif /* md5.h */
