@@ -72,13 +72,14 @@ int CardsSync::exec(ExecType type)
 
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
+
 	if (type == TYPE_SYNC) {
 		for (unsigned int i = 0; i< config.prtDir.size();++i) {
 			cout << " Synchronising: " << config.prtDir[i]<< endl;
 			set<string> localPackagesList;
 			// Let see what we have so for locally
 			localPackagesList=findFile(config.prtDir[i]);
-
+			// If no directories found
 			if (localPackagesList.size() == 0 ) {
 				cout << "Still nothing" << endl;
 				string category = basename(const_cast<char*>(config.prtDir[i].c_str()));
@@ -94,13 +95,20 @@ int CardsSync::exec(ExecType type)
 				char input[512];
 				while (fgets(input, 512, fp)) {
 					input[strlen(input)-1] = '\0';
+					string md5sum = input;
 					string dir = input + 32 + 1; // md5sum string + ":"
 					dirToStat = config.prtDir[i] + "/" + dir;
 					createRecursiveDirs(dirToStat);
+					// get the MD5SUM file of the port and put it in the right directory
+					string destinationFile = dirToStat + "/" + m_repoFile;
+					FileDownload MD5SumPort(remoteUrl + "/" + dir + "/" + m_repoFile, destinationFile, md5sum.substr(0,32));
 				}
 				fclose(fp);
 				continue;
-			}
+			} else {
+			// some directories found, let's check the status of them
+
+			}	
 		}
 	}
 	return 0;	

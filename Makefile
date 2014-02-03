@@ -27,7 +27,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.5.80.0
+VERSION = 0.5.80.1
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG
@@ -110,7 +110,7 @@ install: all
 	install -D -m0755 pkgmk $(DESTDIR)$(BINDIR)/pkgmk
 	install -D -m0755 rejmerge $(DESTDIR)$(BINDIR)/rejmerge
 	install -D -m0644 pkgmk.conf $(DESTDIR)$(ETCDIR)/pkgmk.conf
-	install -D -m0644 pkgdwl.conf $(DESTDIR)$(ETCDIR)/pkgdwl.conf
+	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf
 	install -D -m0644 rejmerge.conf $(DESTDIR)$(ETCDIR)/rejmerge.conf
 	install -D -m0644 pkgadd.8 $(DESTDIR)$(MANDIR)/man8/pkgadd.8
 	install -D -m0644 pkgrm.8 $(DESTDIR)$(MANDIR)/man8/pkgrm.8

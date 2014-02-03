@@ -38,6 +38,10 @@ FileDownload::FileDownload(std::string url, std::string fileName)
 	cout << endl;	
 }
 
+	/*
+	* url is the complete url adress including the file	
+	* filename is the complete path 
+	*/
 FileDownload::FileDownload(std::string url, std::string fileName, std::string MD5Sum )
   : m_url(url),m_downloadFileName(fileName),m_MD5Sum(MD5Sum)
 {
@@ -47,7 +51,7 @@ FileDownload::FileDownload(std::string url, std::string fileName, std::string MD
     throw runtime_error ("Curl error");
   initFileToDownload(m_downloadFileName.c_str());
   curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-  downloadFile(m_url + "/" + m_downloadFileName,m_downloadFileName);
+  downloadFile(m_url,m_downloadFileName);
   cout << endl;
 }
 void FileDownload::initFileToDownload(const char * _file)

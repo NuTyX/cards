@@ -35,8 +35,10 @@ CardsArgumentParser::CardsArgumentParser()
 		'd',
 		"get dependencies files");
 
-	OPT_REZEPT.init("rezept",
-		'r',
-		"get the rezept and info");
+	OPT_REZEPT.init("pkgfile",
+		'p',
+		"get the Pkgfile and info files");
+	addOption(CMD_SYNC, OPT_DEPENDENCIES, false);
+	addOption(CMD_SYNC, OPT_REZEPT,false);
 }
 // vim:set ts=2 :
