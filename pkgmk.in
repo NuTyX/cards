@@ -97,73 +97,77 @@ check_file() {
 		exit 1
 	fi
 }
-download_file() {
-	info "Downloading '$1'."
-
-	if [ ! "`type -p wget`" ]; then
-		error "Command 'wget' not found."
-		exit $E_GENERAL
-	fi
-
-	LOCAL_FILENAME=`get_filename $1`
-	LOCAL_FILENAME_PARTIAL="$LOCAL_FILENAME.partial"
-	DOWNLOAD_OPTS="--passive-ftp --no-directories --tries=3 --waitretry=3 \
-		--directory-prefix=$PKGMK_SOURCE_DIR \
-		--output-document=$LOCAL_FILENAME_PARTIAL --no-check-certificate"
-
-	if [ -f "$LOCAL_FILENAME_PARTIAL" ]; then
-		info "Partial download found, trying to resume"
-		RESUME_CMD="-c"
-	fi
-
-	error=1
-
-	BASENAME=`get_basename $1`
-	for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
-		REPO="`echo $REPO | sed 's|/$||'`"
-		wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $REPO/$BASENAME
-		error=$?
-		if [ $error == 0 ]; then
-			break
-		fi
-	done
-
-	if [ $error != 0 ]; then
-		while true; do
-			echo "wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $1"
-			wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $1
-			error=$?
-			if [ $error != 0 ] && [ "$RESUME_CMD" ]; then
-				info "Partial download failed, restarting"
-				rm -f "$LOCAL_FILENAME_PARTIAL"
-				RESUME_CMD=""
-			else
-				break
-			fi
-		done
-	fi
-	
-	if [ $error != 0 ]; then
-		error "Downloading '$1' failed."
-		exit $E_DOWNLOAD
-	fi
-	
-	mv -f "$LOCAL_FILENAME_PARTIAL" "$LOCAL_FILENAME"
-}
-sync_file() {
-	local DIR GROUP FILE URL
-	FILE=`basename $1`
-	info "Synchronising '$1' ..."
+downloads_file_with_curl() {
 	if [ ! "`type -p curl`" ]; then
 		error "Command 'curl' not found."
 		exit $E_GENERAL
 	fi
-	DIR=`dirname $PWD`
-	GROUP=`basename $DIR`
-	URL="$CARDS_DEPOT_URL/$CARDS_DEPOT_VERSION/$GROUP/${name}_$version-$release/$1"
-	echo "$URL"
-	DOWNLOAD_OPTS="-# --retry 3 --retry-delay 3 -O "
-	curl $DOWNLOAD_OPTS $URL
+	DOWNLOAD_OPTS="--ftp-pasv --retry 3 --retry-delay 3 \
+	-o $1 --fail -#"
+
+	error=1
+
+	curl $DOWNLOAD_OPTS $2
+	error=$?
+	if [ $error != 0 ]; then
+		error "Downloading '$2' failed."
+		exit $E_DOWNLOAD
+	fi
+}
+download_file() {
+	info "Downloading '$1'."
+
+	LOCAL_FILENAME=`get_filename $1`
+
+	if [ ! "`type -p wget`" ]; then
+		warning "Command 'wget' not found."
+		info "You should install 'wget' as soon as possible, trying with curl ..."
+		downloads_file_with_curl $LOCAL_FILENAME $1
+	else
+		LOCAL_FILENAME_PARTIAL="$LOCAL_FILENAME.partial"
+		DOWNLOAD_OPTS="--passive-ftp --no-directories --tries=3 --waitretry=3 \
+		--directory-prefix=$PKGMK_SOURCE_DIR \
+		--output-document=$LOCAL_FILENAME_PARTIAL --no-check-certificate"
+
+		if [ -f "$LOCAL_FILENAME_PARTIAL" ]; then
+			info "Partial download found, trying to resume"
+			RESUME_CMD="-c"
+		fi
+
+		error=1
+
+		BASENAME=`get_basename $1`
+		for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
+			REPO="`echo $REPO | sed 's|/$||'`"
+			wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $REPO/$BASENAME
+			error=$?
+			if [ $error == 0 ]; then
+				break
+			fi
+		done
+
+		if [ $error != 0 ]; then
+			while true; do
+				echo "wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $1"
+				wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $1
+				error=$?
+				if [ $error != 0 ] && [ "$RESUME_CMD" ]; then
+					info "Partial download failed, restarting"
+					rm -f "$LOCAL_FILENAME_PARTIAL"
+					RESUME_CMD=""
+				else
+					break
+				fi
+			done
+		fi
+	
+		if [ $error != 0 ]; then
+			error "Downloading '$1' failed."
+			exit $E_DOWNLOAD
+		fi
+	
+		mv -f "$LOCAL_FILENAME_PARTIAL" "$LOCAL_FILENAME"
+	fi
 }
 sync_all_files() {
 	local DIR GROUP FILE URL
@@ -173,13 +177,14 @@ sync_all_files() {
 	fi
 	DIR=`dirname $PWD`
 	GROUP=`basename $DIR`
-	URL="$CARDS_DEPOT_URL/$CARDS_DEPOT_VERSION/$GROUP/${name}_$version-$release/"
-	sync_file index.html
-	DOWNLOAD_OPTS="--silent --retry 3 --retry-delay 3 -O "
-	grep -o "^[[:xdigit:]]\{32\}  [[:alnum:],.,_,-]\+" index.html > .md5
+	URL="$CARDS_DEPOT_URL/$GROUP/${name}_$version-$release"
+	if [ ! -f $PKGMK_SIGNATURE ]; then
+		downloads_file_with_curl  $PKGMK_SIGNATURE $URL/$PKGMK_SIGNATURE
+	fi
+	sed  "s/:/  /" $PKGMK_SIGNATURE > .md5
 	for FILE in $(cat .md5|cut -d " " -f 3);do
 		if [ ! -f $FILE ];then
-			curl $DOWNLOAD_OPTS $URL/$FILE
+			downloads_file_with_curl $FILE $URL/$FILE
 		fi
 		grep $FILE .md5|md5sum -c -|| exit $E_GENERAL
 	done
@@ -847,13 +852,13 @@ build_needed() {
 generate_md5sum()
 {
 	cd $PKGMK_ROOT
-	if [ -f MD5SUM ]; then
-		rm MD5SUM
+	if [ -f $PKGMK_SIGNATURE ]; then
+		rm $PKGMK_SIGNATURE
 	fi
 	for FILE in Pkgfile `find . -type f -name "${name}*"`
 	do
 		FILE=`basename $FILE`
-		echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> MD5SUM
+		echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> $PKGMK_SIGNATURE
 	done
 }
 
@@ -883,10 +888,11 @@ echo "" >> $PKGMK_ROOT/index.html
 
 generate_md5sum
 
-for FILE in Pkgfile `find $PKGMK_ROOT -type f -name "${name}*"`
+for INPUT in `cat $PKGMK_SIGNATURE`
 do
-   FILE=`basename $FILE`
-   echo "`md5sum $FILE` `du -b  --summarize $FILE|sed "s/\t/ /" | cut -d " " -f1`" >> $PKGMK_ROOT/index.html
+   FILE=`echo $INPUT|cut -d ":" -f2`
+   MD5=`echo $INPUT|cut -d ":" -f1`
+   echo "$MD5 $FILE `du -b  --summarize $FILE|sed "s/\t/ /" | cut -d " " -f1`" >> $PKGMK_ROOT/index.html
 done
 # popd > /dev/null
 cat >> $PKGMK_ROOT/index.html << "EOF"
@@ -1039,19 +1045,17 @@ main() {
 			exit 1
 		fi
 
-		CARDS_DEPOT_URL=`cat $CARDS_CONFFILE|grep url|cut -d "=" -f2|sed "s/ //g"`
+		CARDS_DEPOT_URL=`cat $CARDS_CONFFILE|grep url|cut -d " " -f2|sed "s/ //g"`
 		if [ "$CARDS_DEPOT_URL" == "" ]; then
    			error "Variable url missing in $CARDS_CONFFILE"
    			exit 1
 		fi
 
-		CARDS_DEPOT_DIR=`cat $CARDS_CONFFILE|grep dir|cut -d "=" -f2|sed "s/ //g"`
+		CARDS_DEPOT_DIR=`cat $CARDS_CONFFILE|grep dir|cut -d " " -f2|sed "s/ //g"`
 		if [ "$CARDS_DEPOT_DIR" == "" ]; then
 			error "Variable dir missing in $CARDS_CONFFILE"
 			exit 1
 		fi
-	
-		CARDS_DEPOT_VERSION=`curl -s -K $CARDS_CONFFILE |grep -o "<a href=\"[[:print:]]\+\/\""|cut -d "\"" -f2|sort -n|tail -1|sed "s/\/$//"`
 	fi
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
@@ -1080,9 +1084,6 @@ main() {
 	info "name: ${name}"
 	info "version: $version"
 	info "release: $release"
-	if [ "$PKGMK_SYNC_FILES" == "yes" ]; then
-		info "NuTyX version: $CARDS_DEPOT_VERSION"
-	fi
 
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
 		recursive "$@"
@@ -1212,7 +1213,9 @@ readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
 readonly PKGMK_ROOT="$PWD"
 
-CARDS_CONFFILE="/etc/pkgdwl.conf"
+CARDS_CONFFILE="/etc/cards.conf"
+
+PKGMK_SIGNATURE="MD5SUM"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"

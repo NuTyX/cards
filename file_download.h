@@ -34,8 +34,8 @@ class FileDownload
 {
 	public:
 
-	FileDownload(std::string url, std::string fileName);
-	FileDownload(std::string url, std::string fileName, std::string MD5Sum );
+	FileDownload(std::string url, std::string dirName, std::string fileName, bool progress);
+	FileDownload(std::string url, std::string dirName, std::string fileName, std::string MD5Sum , bool progress);
 	~FileDownload()
 	{
 		curl_global_cleanup();

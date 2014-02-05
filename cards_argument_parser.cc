@@ -22,6 +22,7 @@
 
 ArgParser::APCmd CardsArgumentParser::CMD_SYNC;
 
+ArgParser::APOpt CardsArgumentParser::OPT_SIGNATURE;
 ArgParser::APOpt CardsArgumentParser::OPT_DEPENDENCIES;
 ArgParser::APOpt CardsArgumentParser::OPT_REZEPT;
 
@@ -31,6 +32,10 @@ CardsArgumentParser::CardsArgumentParser()
 		"synchronize local info with remote repository",
 		ArgParser::NONE, 0 , "");
 
+	OPT_SIGNATURE.init("signature",
+		's',
+		"get the signature of the port");
+
 	OPT_DEPENDENCIES.init("dependencies",
 		'd',
 		"get dependencies files");
@@ -38,6 +43,7 @@ CardsArgumentParser::CardsArgumentParser()
 	OPT_REZEPT.init("pkgfile",
 		'p',
 		"get the Pkgfile and info files");
+	addOption(CMD_SYNC, OPT_SIGNATURE,false);
 	addOption(CMD_SYNC, OPT_DEPENDENCIES, false);
 	addOption(CMD_SYNC, OPT_REZEPT,false);
 }

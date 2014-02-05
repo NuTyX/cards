@@ -31,6 +31,7 @@ class CardsArgumentParser : public ArgParser
 
 		static ArgParser::APCmd CMD_SYNC;
 
+		static ArgParser::APOpt OPT_SIGNATURE;
 		static ArgParser::APOpt OPT_DEPENDENCIES;
 		static ArgParser::APOpt OPT_REZEPT;
 

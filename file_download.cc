@@ -23,39 +23,48 @@
 #include <fstream>
 #include <iterator>
 
-FileDownload::FileDownload(std::string url, std::string fileName)
-	: m_url(url),m_downloadFileName(fileName)
+FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, bool progress)
+	: m_url(url),m_downloadFileName(dirName+"/"+fileName)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
 	if (! curl)
 		throw runtime_error ("Curl error");
 
-
+	createRecursiveDirs(dirName);
 	initFileToDownload(m_downloadFileName.c_str());
-	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-	downloadFile(m_url + "/" + m_downloadFileName,m_downloadFileName);
-	cout << endl;	
+	if ( progress ) {
+		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+	} else {
+		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+	}
+	downloadFile(m_url, m_downloadFileName);
 }
 
 	/*
 	* url is the complete url adress including the file	
 	* filename is the complete path 
 	*/
-FileDownload::FileDownload(std::string url, std::string fileName, std::string MD5Sum )
-  : m_url(url),m_downloadFileName(fileName),m_MD5Sum(MD5Sum)
+FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, std::string MD5Sum, bool progress )
+  : m_url(url),m_downloadFileName(dirName+"/"+fileName),m_MD5Sum(MD5Sum)
 {
   curl_global_init(CURL_GLOBAL_ALL);
   curl = curl_easy_init();
   if (! curl)
     throw runtime_error ("Curl error");
+	createRecursiveDirs(dirName);
   initFileToDownload(m_downloadFileName.c_str());
-  curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-  downloadFile(m_url,m_downloadFileName);
-  cout << endl;
+	if ( progress ) {
+  	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+	} else {
+		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+	}
+  downloadFile(m_url, m_downloadFileName);
 }
+
 void FileDownload::initFileToDownload(const char * _file)
 {
+	
 	m_destinationFile.filename = _file;
 	m_destinationFile.filetime = 0;
 	m_destinationFile.stream = NULL;
