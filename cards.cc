@@ -22,7 +22,10 @@
 #include <cstdlib>
 #include "file_download.h"
 #include "cards_sync.h"
+#include "cards_depends.h"
+#include "config_parser.h"
 
+#define PKG_DB_DIR       "/var/lib/pkg/DB/"
 
 using namespace std;
 
@@ -33,21 +36,93 @@ int main(int argc, char** argv)
 	CardsArgumentParser cardsArgPars;
 	cardsArgPars.parse(argc, argv);
 
-	CardsSync::ExecType execType = CardsSync::TYPE_SYNC;
 
 	if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
-		execType = CardsSync::TYPE_SYNC;
+		CardsSync CS(cardsArgPars);
+		return CS.exec();
+  } else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
+
+
+	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
+		
+	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPINST) {
+
+	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
+
+		return cards_depends(argv[2]);
+
+	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
+
+		return cards_deptree(argv[2]);
+	
+  } else if (cardsArgPars.command() == CardsArgumentParser::CMD_LISTINST) {
+		set<string> installedPackagesList;
+		if ( findFile(installedPackagesList, PKG_DB_DIR) != 0 ) {
+			cerr << " Cannot read "  << PKG_DB_DIR
+				<< endl;
+			return -1;
+		}
+		if (installedPackagesList.size() > 0) {
+			for (set<string>::const_iterator packageName = installedPackagesList.begin();
+			packageName != installedPackagesList.end();
+			packageName++ ) {
+				unsigned int pos = packageName -> find("_");
+				if ( pos != std::string::npos) {
+					string name = packageName -> substr(0,pos); 
+					string version = packageName -> substr(pos+1);
+					cout << name + " " + version << endl;
+				}
+			}
+			cout << endl << installedPackagesList.size() << " packages installed" << endl;
+		} else {
+			cout << endl <<  "No packages found" << endl;
+		}
+  } else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
+		Config config;
+		ConfigParser::parseConfig("/etc/cards.conf", config);
+		unsigned int  numberOfPorts = 0;
+		set<string> localPackagesList;
+		for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
+			if ( findFile(localPackagesList, config.prtDir[indCat]) != 0 ) {
+				cerr << " Cannot read "  << config.prtDir[indCat]
+					<< endl;
+			}
+		}
+		if (localPackagesList.size() == 0 ) {
+			cout << "You need to cards sync first" << endl;
+			return 0;
+		} else {
+			for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
+				cout << *li << endl;
+			}
+			numberOfPorts = numberOfPorts + localPackagesList.size();
+		}
+		cout << endl << "Number of availables ports : " << numberOfPorts << endl << endl;
+
+  } else if (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) {
+
+  } else if (cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) {
+
+  } else if (cardsArgPars.command() == CardsArgumentParser::CMD_DSEARCH) {
+
+  } else if (cardsArgPars.command() == CardsArgumentParser::CMD_FSEARCH) {
 
 	} else {
 		cerr << "Supported commands so far:\n"
-			<< "   sync  \n"
+		<< "  sync\n"
+		<< "  install\n"
+		<< "  depinst\n"
+		<< "  info\n"
+		<< "  list\n"
+		<< "  listinst\n"
+		<< "  search\n"
+		<< "  dsearch\n"
+		<< "  fsearch\n"
 			<< "\n"
-			<< endl;
+			<< " use cards <command> -h " << endl;
 		exit(-1);
 	}
-
-	CardsSync CS(cardsArgPars);
-	return CS.exec(execType);
+	return 0;
 }
 
 // vim:set ts=2 :

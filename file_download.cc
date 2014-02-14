@@ -32,13 +32,13 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 		throw runtime_error ("Curl error");
 
 	createRecursiveDirs(dirName);
+
 	initFileToDownload(m_downloadFileName.c_str());
 	if ( progress ) {
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 	} else {
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
 	}
-	downloadFile(m_url, m_downloadFileName);
 }
 
 	/*
@@ -52,26 +52,18 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
   curl = curl_easy_init();
   if (! curl)
     throw runtime_error ("Curl error");
+
 	createRecursiveDirs(dirName);
+
   initFileToDownload(m_downloadFileName.c_str());
 	if ( progress ) {
   	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 	} else {
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
 	}
-  downloadFile(m_url, m_downloadFileName);
 }
 
-void FileDownload::initFileToDownload(const char * _file)
-{
-	
-	m_destinationFile.filename = _file;
-	m_destinationFile.filetime = 0;
-	m_destinationFile.stream = NULL;
-	m_downloadProgress.lastruntime = 0;
-	m_downloadProgress.curl = curl;
-}
-int FileDownload::downloadFile(const string& url_to_download, const string& file)
+int FileDownload::downloadFile()
 {
 	int result;
 	m_downloadProgress.lastruntime = 0;
@@ -79,7 +71,7 @@ int FileDownload::downloadFile(const string& url_to_download, const string& file
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &FileDownload::writeToStreamHandle);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &m_destinationFile);
 	curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, &FileDownload::updateProgressHandle);
-	curl_easy_setopt(curl, CURLOPT_URL,url_to_download.c_str());
+	curl_easy_setopt(curl, CURLOPT_URL,m_url.c_str());
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION,1L);
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR,1L);
 	curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, &m_downloadProgress);
@@ -88,23 +80,24 @@ int FileDownload::downloadFile(const string& url_to_download, const string& file
 	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 #endif
 	result=curl_easy_perform(curl);
-	fclose(m_destinationFile.stream);
-	return result;
-
-/*	result = curl_easy_perform(curl);
-	if (result != CURLE_OK)
-	{
-		actualError = CANNOT_DOWNLOAD_FILE;
-		treatErrors(url_to_download);
+	if (m_destinationFile.stream) {
+		fclose(m_destinationFile.stream);
 	}
-	if (destination_file.stream)
-		fclose(destination_file.stream);
-	else
-	{
-		actualError = CANNOT_CREATE_FILE;
-		treatErrors(file);
-	} */
+	return result;
 }
+
+void FileDownload::initFileToDownload(const char * _file)
+{
+
+  m_destinationFile.filename = _file;
+  m_destinationFile.filetime = 0;
+  m_destinationFile.stream = NULL;
+  m_downloadProgress.lastruntime = 0;
+  m_downloadProgress.curl = curl;
+}
+
+
+
 size_t FileDownload::writeToStream(void *buffer, size_t size, size_t nmemb, void *stream)
 {
 	DestinationFile *outputf = (DestinationFile *)stream;

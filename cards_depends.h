@@ -1,4 +1,4 @@
-// cards_sync.h
+// cards_depends.h
 // 
 //  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
 // 
@@ -17,42 +17,31 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
-#ifndef CARDS_SYNC_H
-#define CARDS_SYNC_H
+#ifndef CARDS_DEPENDS_H
+#define CARDS_DEPENDS_H
 
 #include <string>
 #include <list>
 #include <map>
 
-#include <curl/curl.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
+#include <locale.h>
+#include <string.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/file.h>
+
+#include <dirent.h>
+#include "string_utils.h"
 #include "cards_argument_parser.h"
+#include "compile_dependencies_utils.h"
 
-class CardsSync
-{
-public:
-	CardsSync (const CardsArgumentParser& argParser);
-	CardsSync (const CardsArgumentParser& argParser,
-		const std::string& url,
-		const std::string& directory,
-		const std::string& repoFile);
 
-	int exec ();
+int cards_depends(const char* packageName);
+int cards_deptree(const char* packageName);
 
-	static const std::string DEFAULT_REPOFILE;
-	static const std::string URLINFO;
-
-	static const int DEFAULT_TIMEOUT;
- 
-	
-private:
-
-	int parseFile(set<string>& fileContent, const char* fileName);
-	const std::string m_baseDirectory;
-	const std::string m_remoteUrl;
-	std::string m_repoFile;
-
-	const CardsArgumentParser& m_argParser;
-	
-};
 #endif
 // vim:set ts=2 :

@@ -21,6 +21,10 @@
 
 #ifndef STRING_UTILS_H
 #define STRING_UTILS_H
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 #include <list>
 #include <string>
@@ -30,10 +34,25 @@
 
 using namespace std;
 
-struct keyValue {
+void *Malloc(size_t s);
+
+struct keyValue 
+{
     string parameter;
     string value;
-  };
+};
+
+/* itemList is a list of *char dynamically allocated */
+typedef struct
+{
+	char **items;
+	unsigned int count;
+} itemList;
+
+/***  itemList: Create the list, Add Item to the list, free the list  ***/
+itemList *initItemList(void);
+void addItemToItemList(itemList *list, const char *item);
+void freeItemList(itemList *list);
 
 template <class T>
 void split( const string& s, char del,

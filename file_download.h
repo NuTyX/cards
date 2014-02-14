@@ -42,6 +42,7 @@ class FileDownload
 		curl_easy_cleanup(curl);
 	}
 	bool checkMD5sum();
+	int downloadFile();
 
 	private:
 	static int updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
@@ -61,7 +62,7 @@ class FileDownload
 		long int filetime;
 		FILE *stream;
 	};
-	int downloadFile(const string& url_to_download , const string& filename);
+
 	void updateProgress();
 
 	CURL* curl;
@@ -72,6 +73,7 @@ class FileDownload
 
 	string m_url;
 	string m_downloadFileName;
+	bool m_checkMD5;
 	string m_MD5Sum;
 };
 

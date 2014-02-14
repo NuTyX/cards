@@ -27,7 +27,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.5.80.2
+VERSION = 0.6.80.0
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG
@@ -43,7 +43,7 @@ LDFLAGS += $(LIBARCHIVELIBS)
 
 TOOLSOBJECTS = tools.o md5.o string_utils.o file_utils.o process.o runtime_dependencies_utils.o pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
 
-CARDSOBJECTS = md5.o config_parser.o file_download.o argument_parser.o cards_argument_parser.o file_utils.o cards_sync.o cards.o
+CARDSOBJECTS = md5.o string_utils.o config_parser.o file_download.o compile_dependencies_utils.o argument_parser.o cards_argument_parser.o file_utils.o cards_depends.o cards_sync.o cards.o
 
 
 LIBOBJECTS =  pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
@@ -57,10 +57,7 @@ libs:
 all: pkgadd pkgcrea cards pkgmk rejmerge man
 
 pkgadd: .tools_depend $(TOOLSOBJECTS)
-	$(CXX) $(TOOLSOBJECTS) -o $@ $(LDFLAGS)
-
-pkgcrea: 
-	$(CC) $(CFLAGS) compile_dependencies_utils.c pkgcrea.c -o pkgcrea
+	$(CXX) $(TOOLSOBJECTS) -o $@ $(LDFLAGS) -static
 
 pkgmk: pkgmk.in
 

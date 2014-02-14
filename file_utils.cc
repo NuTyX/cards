@@ -22,7 +22,20 @@
 
 #include "file_utils.h"
 
-void * get_data ( void * var, FILE * file, long offset, size_t size, size_t nmemb)
+FILE *openFile(const char *fileName)
+{
+	FILE *fileHandler = NULL;
+	if ( (fileHandler = fopen(fileName,"r")) == NULL ) {
+		fprintf(stderr,"Failed to open %s\n",fileName);
+		if (errno) {
+			perror(fileName);
+		}
+		return NULL;
+	}
+	return fileHandler;
+}
+
+void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmemb)
 {
   void * mvar;
   if (size == 0 || nmemb == 0)
@@ -161,9 +174,29 @@ void removeFile(const string& basedir, const string& filename)
     free(path);
   }
 }
-set<string> findFile(const string& path)
+int findFile(itemList* filesList, const char* path)
 {
-  set<string> files_list;
+	DIR *d;
+	struct dirent *dir;
+	d = opendir(path);
+	char fullPath[255];
+	if (d) {
+		while ((dir = readdir(d)) != NULL) {
+			if ( strcmp (dir->d_name, ".") && strcmp (dir->d_name, "..") ) { // ignore the directories dots
+				sprintf(fullPath,"%s/%s",path,dir->d_name);
+				addItemToItemList(filesList,fullPath);
+			}
+		}
+		closedir(d);
+	} else { 
+		cerr << "Cannot open " << path << endl;
+		return -1;
+	}
+	return 0;
+}
+	
+int findFile(set<string>& filesList, const string& path)
+{
   DIR *d;
   struct dirent *dir;
   d = opendir(path.c_str());
@@ -173,12 +206,15 @@ set<string> findFile(const string& path)
     {
       if ( strcmp (dir->d_name, ".") && strcmp (dir->d_name, "..") ) // ignore the directories dots
       {
-        files_list.insert(dir->d_name);
+        filesList.insert(dir->d_name);
       }
     }
     closedir(d);
-  }
-  return files_list;
+  } else {
+		cerr << "Cannot open " << path << endl;
+		return -1;
+	}
+  return 0;
 }
 bool createRecursiveDirs(const string& path)
 {
@@ -267,6 +303,52 @@ int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, i
 
 	if (dir) closedir(dir);
 	return res ? res : errno ? WALK_BADIO : WALK_OK;
+}
+int readFile(itemList* fileContent, const char* fileName)
+{
+	FILE* fp = NULL;
+	if ((fp = openFile (fileName)) == NULL ) {
+		return -1;
+	}
+	char input[1024];
+	while (fgets(input, 1024, fp)) {
+		input[strlen(input)-1] = '\0';
+		addItemToItemList(fileContent,input);
+	}
+	fclose(fp);
+	return 0;
+}
+int parseFile(set<string>& fileContent, const char* fileName)
+{
+	FILE* fp = NULL;
+	if ((fp = openFile (fileName)) == NULL ) {
+		return -1;
+	}
+
+  char input[1024];
+  while (fgets(input, 1024, fp)) {
+    input[strlen(input)-1] = '\0';
+    string inputString = input;
+    fileContent.insert(inputString);
+  }
+  fclose(fp);
+  return 0;
+}
+
+int parseFile(vector<string>& fileContent, const char* fileName)
+{
+	FILE* fp = NULL;
+	if ((fp = openFile (fileName)) == NULL ) {
+		return -1;
+	}
+	char input[1024];
+	while (fgets(input, 1024, fp)) {
+		input[strlen(input)-1] = '\0';
+		string inputString = input;
+		fileContent.push_back(inputString);
+	}
+	fclose(fp);
+	return 0;
 }
 bool findMD5sum(const string& fileName, unsigned char* result)
 {

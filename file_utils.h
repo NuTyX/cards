@@ -32,6 +32,7 @@
 
 #include <set>
 #include <map>
+#include <vector>
 #include <iostream>
 #include <stdexcept>
 #include <cstdio>
@@ -68,7 +69,9 @@ enum {
 };
 
 using namespace std;
-void * get_data ( void * var, FILE * file, long offset, size_t size, size_t nmemb);
+
+FILE *openFile(const char *fileName);
+void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmemb);
 string trimFileName(const string& filename);
 bool checkFileExist(const string& filename);
 bool checkFileEmpty(const string& filename);
@@ -76,8 +79,12 @@ bool checkFilesEqual(const string& file1, const string& file2);
 bool checkPermissionsEqual(const string& file1, const string& file2);
 bool createRecursiveDirs(const string& pathname);
 void removeFile(const string& basedir, const string& filename);
-set<string>  findFile(const string& basedir);
+int findFile(set<string>& filesList, const string& basedir);
+int findFile(itemList *filenameList, const char *path);
 int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, int spec);
+int readFile(itemList *fileContent, const char *fileName);
+int parseFile(set<string>& fileContent, const char* fileName);
+int parseFile(vector<string>& fileContent, const char* fileName);
 bool findMD5sum(const string& fileName, unsigned char* result);
 
 #endif /* FILE_UTILS_H */

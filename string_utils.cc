@@ -26,6 +26,48 @@
 #include <fstream>
 #include <sys/stat.h>
 
+void *Malloc(size_t s)
+{
+	void *p;
+	if ( ! ( p = malloc(s) ) ) {
+		fprintf(stderr,"Failled to malloc\n");
+		if ( errno ) {
+			perror("malloc");
+			exit(EXIT_FAILURE);
+		}
+	}
+	return p;
+}
+
+
+itemList *initItemList(void)
+{
+	itemList *list = (itemList*)Malloc(sizeof *list);
+	list->items = (char **)Malloc(sizeof (*list->items));
+	list->count = 0;
+	return list;
+}
+
+void addItemToItemList(itemList *list, const char *item)
+{
+	char **realloc_tmp;
+	realloc_tmp = (char **)realloc( list->items, sizeof *list->items * (list->count + 1) );
+	if ( realloc_tmp == NULL ) {
+		return;
+	}
+	list->items = realloc_tmp;
+	list->items[ list->count ] = strdup(item);
+	++list->count;
+}
+
+void freeItemList(itemList *list)
+{
+	for (unsigned int i=0; i < list->count;i++) {
+		free(list->items[i]);
+	}
+	free(list->items);
+	free(list);
+}
 
 keyValue split_keyValue(string s, string delimiter)
 {
@@ -159,7 +201,7 @@ set<string> parseDelimitedList(const string& s, char delimiter)
 	set<string> depList;
 	if ( s.empty() )
 		return depList;
-	int start = 0, end = 0;
+	unsigned int start = 0, end = 0;
 
 	while ( (end = s.find(delimiter,start)) != string::npos )
 	{
@@ -176,7 +218,7 @@ string stripWhiteSpace(const string& s)
 		return s;
 	int pos = 0;
 	string line = s;
-	string::size_type len = line.length();
+	int len = line.length();
 	while ( pos < len && isspace( line[pos] ) ) {
 		++pos;
 	}

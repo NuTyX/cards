@@ -265,7 +265,10 @@ int Pkgdbh::getListOfPackages (const string& path)
 	keyValue string_splited;
 	m_root = trimFileName(path + "/");
 	const string pathdb =  m_root + PKG_DB_DIR;
-	m_pkgFoldersList = findFile(pathdb);
+	if ( findFile(m_pkgFoldersList, pathdb) != 0 ) {
+		m_actualError = CANNOT_READ_FILE;
+    treatErrors(pathdb);
+	}
 	for (set<string>::iterator i = m_pkgFoldersList.begin();i != m_pkgFoldersList.end();++i) {
 		string_splited=split_keyValue(*i,"_");
 		if (string_splited.value.size()>0)
@@ -358,7 +361,11 @@ void Pkgdbh::convertSpaceToNoSpaceDBFormat(const string& path)
 	m_root = trimFileName(path + "/");
 	/* Convert from directories with spaces to directories without spaces */
 	const string packagedir = m_root + PKG_DB_DIR ;
-	m_packagesList = findFile(packagedir);
+	if ( findFile(m_packagesList,packagedir) != 0 ) {
+		m_actualError = CANNOT_READ_FILE;
+		treatErrors(packagedir);
+	}
+
 	for (set<string>::iterator i = m_packagesList.begin();i != m_packagesList.end();++i) {
 
 		if ( ! (i->find(NAME_DELIM) == string::npos))
@@ -520,7 +527,11 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 	const string arch = m_listOfInstPackages[name].arch;
 	const string packagenamedir = m_root + PKG_DB_DIR + name + "_" + version + "-" + arch;
 
-	metaFilesList = findFile( packagenamedir);
+	if ( findFile(metaFilesList, packagenamedir) != 0 ) {
+		m_actualError = CANNOT_READ_FILE;
+		treatErrors(packagenamedir);
+	}
+
 	if (metaFilesList.size() > 0)
 		for (set<string>::iterator i = metaFilesList.begin(); i != metaFilesList.end();++i) {
 			const string filename = packagenamedir + "/" + *i;

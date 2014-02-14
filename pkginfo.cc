@@ -207,7 +207,7 @@ void Pkginfo::run(int argc, char** argv)
 #ifndef NDEBUG
 					cerr << "Number of librairies founds: " << runtimeList.size() << endl;
 #endif
-					int s = 1;
+					unsigned int s = 1;
 					for (set<string>::const_iterator i = runtimeList.begin();i!=runtimeList.end();++i)
 					{
 						cout << *i;
@@ -257,7 +257,7 @@ void Pkginfo::run(int argc, char** argv)
 						}
 						if (runtimeList.size()>0)
 						{
-							int s = 1;
+							unsigned int s = 1;
 							for (set<string>::const_iterator i = runtimeList.begin();i!=runtimeList.end();++i)
 							{
 								cout << *i;

@@ -63,9 +63,9 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 	printf("sizeof unsigned long long: %u\n",sizeof( unsigned long long)); 
 	printf("sizeof unsigned long : %u\n",sizeof( unsigned long));
 #endif
-	unsigned long dynamic_addr;
-	unsigned long dynamic_size_32bits;
-	unsigned long long dynamic_size_64bits;
+	unsigned long dynamic_addr = 0;
+	unsigned long dynamic_size_32bits = 0;
+	unsigned long long dynamic_size_64bits = 0;
 	long dynamic_strings_length;
 	size_t result;
 
@@ -143,7 +143,7 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 		long str_tab_len = 0;
 		char * name = NULL;
 
-		section_headers_32bits = (Elf_Shdr_32 *)get_data (NULL, file,
+		section_headers_32bits = (Elf_Shdr_32 *)getDatas (NULL, file,
 				elf_header_32bits.e_shoff,
 				elf_header_end.e_shentsize,
 				elf_header_end.e_shnum);
@@ -176,7 +176,7 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 			}
 		}
 /* Program header */
-		program_headers_32bits  = (Elf_Phdr_32 *) get_data(NULL, file,
+		program_headers_32bits  = (Elf_Phdr_32 *) getDatas(NULL, file,
 			elf_header_32bits.e_phoff,
 			elf_header_end.e_phentsize,
 			elf_header_end.e_phnum);
@@ -202,7 +202,7 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 		}
 /* Only the dynamic section we are concern for Dynamic libraries */
 		Elf_Dyn_32 * edyn;
-		dynamics_section_32bits = (Elf_Dyn_32 *) get_data ( NULL,file,dynamic_addr,
+		dynamics_section_32bits = (Elf_Dyn_32 *) getDatas ( NULL,file,dynamic_addr,
 			1,dynamic_size_32bits);
 
 		if (!dynamics_section_32bits)
@@ -225,7 +225,7 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 		if (str_tab_len < 1)
 			return error("Impossible to determine the size of the dynamic table");
 
-		dynamic_strings = (char *) get_data (NULL, file, offset, 1,
+		dynamic_strings = (char *) getDatas (NULL, file, offset, 1,
 				str_tab_len);
 		dynamic_strings_length = dynamic_strings == NULL ? 0 : str_tab_len;
 		for (edyn = dynamics_section_32bits;
@@ -265,7 +265,7 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 		long str_tab_len = 0;
 		char * name = NULL;
 
-		section_headers_64bits = (Elf_Shdr_64  *)get_data (NULL, file,
+		section_headers_64bits = (Elf_Shdr_64  *)getDatas (NULL, file,
 				elf_header_64bits.e_shoff,
 				elf_header_end.e_shentsize,
 				elf_header_end.e_shnum);
@@ -307,7 +307,7 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
       return 0;
     }
 /* Program header */
-		program_headers_64bits = (Elf_Phdr_64 *) get_data(NULL, file,
+		program_headers_64bits = (Elf_Phdr_64 *) getDatas(NULL, file,
 			elf_header_64bits.e_phoff,
 			elf_header_end.e_phentsize,
 			elf_header_end.e_phnum);
@@ -333,7 +333,7 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 		}
 /* Only the dynamic section we are concern for Dynamic libraries */
 		Elf_Dyn_64  * edyn;
-		dynamics_section_64bits = (Elf_Dyn_64 *) get_data ( NULL,file,dynamic_addr,
+		dynamics_section_64bits = (Elf_Dyn_64 *) getDatas ( NULL,file,dynamic_addr,
 			 1,dynamic_size_64bits);
 
 		if (!dynamics_section_64bits)
@@ -354,7 +354,7 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 #endif
 		if (str_tab_len < 1)
 			return error ("Impossible to determine the size of the dynamic table");
-		dynamic_strings = (char *) get_data (NULL, file, offset, 1,
+		dynamic_strings = (char *) getDatas (NULL, file, offset, 1,
 				str_tab_len);
 		dynamic_strings_length = dynamic_strings == NULL ? 0 : str_tab_len;
 		for (edyn = dynamics_section_64bits;

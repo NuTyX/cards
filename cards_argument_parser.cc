@@ -21,16 +21,74 @@
 #include "cards_argument_parser.h"
 
 ArgParser::APCmd CardsArgumentParser::CMD_SYNC;
+ArgParser::APCmd CardsArgumentParser::CMD_INSTALL;
+ArgParser::APCmd CardsArgumentParser::CMD_DEPINST;
+
+ArgParser::APCmd CardsArgumentParser::CMD_LIST;
+ArgParser::APCmd CardsArgumentParser::CMD_LISTINST;
+
+ArgParser::APCmd CardsArgumentParser::CMD_INFO;
+
+ArgParser::APCmd CardsArgumentParser::CMD_DIFF;
+ArgParser::APCmd CardsArgumentParser::CMD_DEPENDS;
+ArgParser::APCmd CardsArgumentParser::CMD_DEPTREE;
+
+ArgParser::APCmd CardsArgumentParser::CMD_SEARCH;
+ArgParser::APCmd CardsArgumentParser::CMD_DSEARCH;
+ArgParser::APCmd CardsArgumentParser::CMD_FSEARCH;
 
 ArgParser::APOpt CardsArgumentParser::OPT_SIGNATURE;
 ArgParser::APOpt CardsArgumentParser::OPT_DEPENDENCIES;
-ArgParser::APOpt CardsArgumentParser::OPT_REZEPT;
 
 CardsArgumentParser::CardsArgumentParser()
 {
 	addCommand(CMD_SYNC, "sync",
 		"synchronize local info with remote repository",
 		ArgParser::NONE, 0 , "");
+
+	addCommand(CMD_INFO, "info",
+		"show info about a port",
+		ArgParser::EQ, 1 , "<port>");
+
+	addCommand(CMD_LIST, "list",
+		"show a list of available ports",
+		ArgParser::NONE, 0 , "");
+
+	addCommand(CMD_LISTINST, "listinst",
+		"show a list of installed ports",
+		ArgParser::NONE, 0 , "");
+
+	addCommand(CMD_INSTALL, "install",
+		"install ports",
+		 ArgParser::MIN, 1, "<port1 port2 ...>");
+
+	addCommand(CMD_DEPINST, "depinst",
+		"install ports and their dependencies",
+		ArgParser::MIN, 1, "<port1 port2 ...>"); 
+
+	addCommand(CMD_DIFF, "diff",
+		"list outdated packages (or check args for change)",
+		ArgParser::NONE, 0 , "");
+
+	addCommand(CMD_DEPENDS, "depends",
+		"show dependencies for the port",
+		ArgParser::EQ, 1,"<port>");
+
+	addCommand(CMD_DEPTREE, "deptree",
+		"show dependencies tree for the port",
+		ArgParser::EQ, 1,"<port>");
+
+	addCommand(CMD_SEARCH, "search",
+		"show port names containing 'expr'",
+		ArgParser::EQ, 1, "<expr>");
+
+	addCommand(CMD_DSEARCH, "dsearch",
+		"show ports containing 'expr' in the name or description",
+		ArgParser::EQ, 1, "<expr>");
+
+	addCommand(CMD_FSEARCH, "fsearch",
+		"show file names in footprints matching 'pattern'",
+		ArgParser::EQ, 1, "<pattern>");
 
 	OPT_SIGNATURE.init("signature",
 		's',
@@ -40,11 +98,7 @@ CardsArgumentParser::CardsArgumentParser()
 		'd',
 		"get dependencies files");
 
-	OPT_REZEPT.init("pkgfile",
-		'p',
-		"get the Pkgfile and info files");
 	addOption(CMD_SYNC, OPT_SIGNATURE,false);
 	addOption(CMD_SYNC, OPT_DEPENDENCIES, false);
-	addOption(CMD_SYNC, OPT_REZEPT,false);
 }
 // vim:set ts=2 :

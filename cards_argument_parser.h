@@ -30,10 +30,20 @@ class CardsArgumentParser : public ArgParser
 		virtual ~CardsArgumentParser() {};
 
 		static ArgParser::APCmd CMD_SYNC;
+		static ArgParser::APCmd CMD_INFO;
+		static ArgParser::APCmd CMD_LIST;
+		static ArgParser::APCmd CMD_LISTINST;
+		static ArgParser::APCmd CMD_INSTALL;
+		static ArgParser::APCmd CMD_DEPINST;
+		static ArgParser::APCmd CMD_DIFF;
+		static ArgParser::APCmd CMD_DEPENDS;
+		static ArgParser::APCmd CMD_DEPTREE;
+		static ArgParser::APCmd CMD_SEARCH;
+		static ArgParser::APCmd CMD_DSEARCH;
+		static ArgParser::APCmd CMD_FSEARCH;
 
 		static ArgParser::APOpt OPT_SIGNATURE;
 		static ArgParser::APOpt OPT_DEPENDENCIES;
-		static ArgParser::APOpt OPT_REZEPT;
 
 		std::string getAppIdentification() const
 		{

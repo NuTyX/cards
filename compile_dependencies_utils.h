@@ -1,4 +1,4 @@
-//  compile_dependencies_utils.h
+// cards_depends.h
 // 
 //  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
 // 
@@ -17,9 +17,12 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
+#ifndef CARDS_DEPENDS_H
+#define CARDS_DEPENDS_H
 
-#ifndef COMPILE_DEPENDENCIES_UTILS_H
-#define COMPILE_DEPENDENCIES_UTILS_H
+#include <string>
+#include <list>
+#include <map>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -32,24 +35,14 @@
 #include <sys/file.h>
 
 #include <dirent.h>
-
-/* TODO This is a tempory trick to test the dependencies tree, implement the function to extract all the dependencies */
-
-#define DEPENDENCIES_FILES_DIR "/mnt/nutyx/dependences/"
-
-/***    Structures   ****/
-/* itemList is a list of *char dynamically allocated */
-typedef struct
-{
-	char **items;
-	unsigned int count;
-} itemList;
+#include "string_utils.h"
+#include "cards_argument_parser.h"
 
 /* depList is a dependances List */
 typedef struct
 {
 	unsigned int *depsIndex;
-	unsigned int *niveau;	/* To show a nice incrementation */
+	unsigned int *niveau; /* To show a nice incrementation */
 	unsigned int count;
 	unsigned int decrement; /* number of removed dep when searching them */
 	int decount;
@@ -69,14 +62,6 @@ typedef struct
 	unsigned int count;
 } pkgList;
 
-/***   Basic functions   ***/
-void *Malloc(size_t s);
-FILE *openFile(const char *fileName);
-
-/***  itemList: Create the list, Add Item to the list, free the list  ***/
-itemList *initItemList(void);
-void addItemToItemList(itemList *list, const char *item);
-void freeItemList(itemList *list);
 
 /*** depList: Create the list, Add dependence to the list, free the list  ***/
 depList *initDepsList(void);
@@ -93,9 +78,10 @@ void freePkgInfo(pkgInfo *package);
 pkgList *initPkgList(void);
 void addPkgToPkgList(pkgList *list, pkgInfo *package);
 
+int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList,const char* pkgName, unsigned int niveau);
+depList *readDependenciesList(itemList *listFiles, unsigned int nameIndex);
+int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int niveau);
 
-itemList *findFile (const char *path);
-
-#endif /*COMPILE_DEPENDENCIES_UTILS_H */
-
+char *getLongPackageName(itemList *filesList, const char * packageName);
+#endif
 // vim:set ts=2 :

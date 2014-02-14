@@ -307,7 +307,8 @@ void ArgParser::parse(int argc, char** argv)
 
 void ArgParser::parseError(const string& error, const string& cmd) const
 {
-    cerr << "Parse error: " << error << endl;
+//    cerr << "Parse error: " << error << endl;
+		cerr << error << endl;
     if (cmd != "") {
         cerr << generateHelpForCommand(cmd) << endl;
     } else {
@@ -413,8 +414,8 @@ std::string ArgParser::generateUsage() const
 {
     string usage = getAppIdentification() +
         "USAGE: " + m_appName +
-        " [OPTIONS] command <arguments>\n\n";
-    usage += "  Where command is one of the following:\n";
+        " COMMAND [OPTIONS] <arguments>\n\n";
+    usage += "  Where COMMAND is one of the following:\n";
 
     std::map<std::string, Command*>::const_iterator it;
     it = m_commands.begin();
