@@ -27,7 +27,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.6.80.0
+VERSION = 0.6.80.1
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG
@@ -54,7 +54,7 @@ MANPAGES = pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr rejmerge.8 pkgmk.conf.5
 libs:
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
 
-all: pkgadd pkgcrea cards pkgmk rejmerge man
+all: pkgadd cards pkgmk rejmerge man
 
 pkgadd: .tools_depend $(TOOLSOBJECTS)
 	$(CXX) $(TOOLSOBJECTS) -o $@ $(LDFLAGS) -static
