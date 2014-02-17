@@ -30,7 +30,32 @@
 #include "config_parser.h"
 
 using namespace std;
+int cards_depinst(const char* packageName)
+{
+	pkgList *packagesList = initPkgList();
 
+	itemList *filesList = initItemList();
+
+	Config config;
+	ConfigParser::parseConfig("/etc/cards.conf", config);
+
+	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
+		if ( (findFile(filesList,config.prtDir[indCat].c_str())) != 0) {
+			return -1;
+		}
+	}
+
+	char * longPackageName = NULL;
+	if ( (longPackageName = getLongPackageName(filesList,packageName)) == NULL) {
+		cout << "The package '" << packageName << "' is not found" << endl;
+		return -1;
+	}
+
+	printf("%s\n",longPackageName);
+	freePkgList(packagesList);
+	freeItemList(filesList);
+	return 0;
+}
 int cards_depends(const char* packageName)
 {
 	pkgInfo *package = NULL;
@@ -46,10 +71,9 @@ int cards_depends(const char* packageName)
 	}
 	char * longPackageName = NULL;
 	if ( (longPackageName = getLongPackageName(filesList,packageName)) == NULL) {
-		cout << "The package " << packageName << " is not found" << endl;
+		cout << "The package '" << packageName << "' is not found" << endl;
 		return -1;
 	}
-
 	for (unsigned int nInd=0;nInd <filesList->count;nInd++){
 		package = addInfoToPkgInfo(nInd);
 		addPkgToPkgList(packagesList,package);
@@ -69,35 +93,76 @@ int cards_depends(const char* packageName)
 			}
 		} */
 		depList *dependenciesList = initDepsList();
-		int returnVal = deps_direct (filesList,packagesList,dependenciesList,longPackageName,1);
+		if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,longPackageName,1) != 0 ) {
+			return returnVal;
+		}
 		if (dependenciesList ->count > 0) {
-			unsigned int currentNiveau = 0;
-			char * dependanceName = NULL;
+			int currentNiveau = 0;
 			while ( currentNiveau <= niveau) {
-				printf("Niveau: %d\n",currentNiveau);
 				for ( unsigned int dInd=0; dInd < dependenciesList->count; dInd++ ) {
 					if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == currentNiveau ) {
-						printf("%d:  %s\n",packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau,
-							basename(filesList->items[dependenciesList->depsIndex[dInd]]));
+						printf("%d:%s\n",packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau,
+							filesList->items[dependenciesList->depsIndex[dInd]]);
 					}
 				}
 				currentNiveau++;
 			}
+			
 		}
-	free(filesList);
+	freeItemList(filesList);
+	freePkgInfo(package);
+	freePkgList(packagesList);
 	free(longPackageName);
 	return 0;
 }
 int cards_deptree(const char* packageName)
 {
-	unsigned int nInd = 0 ;
 	itemList *filesList = initItemList();
 
 	pkgInfo *package = NULL;
 	pkgList *packagesList = initPkgList();
 
+	depList *dependenciesList = NULL;
+	dependenciesList = initDepsList();
+
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
+
+	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
+		if ( (findFile(filesList,config.prtDir[indCat].c_str())) != 0) {
+			return -1;
+		}
+	}
+
+	char * longPackageName = NULL;
+	if ( (longPackageName = getLongPackageName(filesList,packageName)) == NULL) {
+		cout << "The package '" << packageName << "' is not found" << endl;
+		return -1;
+	}
+
+	for (unsigned int nInd=0;nInd <filesList->count;nInd++) {
+		package = addInfoToPkgInfo(nInd);
+		addPkgToPkgList(packagesList,package);
+		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
+	}
+
+	if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,longPackageName,1) != 0 ) {
+		return returnVal;
+	}
+
+	if (dependenciesList ->count > 0) {
+		printf("0) %s \n",basename(longPackageName));
+		for (unsigned int dInd=0; dInd < dependenciesList ->count; dInd++) {
+			printf("  ");
+			int j=1;
+			while ( j < dependenciesList->niveau[dInd]) {
+				printf("  ");
+				j++;
+			}
+			printf("%d) %s\n",dependenciesList->niveau[dInd],basename(filesList->items[dependenciesList->depsIndex[dInd]]));
+		}
+	}
+	
 	bool found=false;
 	string name = "";
 	set<string> localPackagesList, depsPackagesList;
@@ -119,7 +184,6 @@ int cards_deptree(const char* packageName)
 					}
 					if (! strcmp (packageName,name.c_str())) {
 						found=true;
-						cout << name << endl;
 						string depFile = config.prtDir[indCat] 
 								+ "/" + dir->d_name + "/" + name + ".deps";
 						if (checkFileExist(depFile)) {
@@ -141,11 +205,6 @@ int cards_deptree(const char* packageName)
 								return -1;
 							}
 						}
-						for ( set<string>::const_iterator dep = depsPackagesList.begin();
-							dep != depsPackagesList.end();
-							dep++) {
-							cout << *dep << endl;
-						}
 					}
 				}
 			}
@@ -159,15 +218,11 @@ int cards_deptree(const char* packageName)
 	if (localPackagesList.size() == 0 ) {
 		cout << "You need to 'cards sync first" << endl;
 		return -1;
-	} else {
-		set<string>::const_iterator packageName = localPackagesList.begin();
-		for (nInd=0;nInd < localPackagesList.size();nInd++) {
-			addItemToItemList(filesList, packageName->c_str());
-			package = addInfoToPkgInfo(nInd);
-			addPkgToPkgList(packagesList,package);
-			packageName++;
-		}
 	}
+/*	freeItemList(filesList);
+	freePkgInfo(package);
+	freePkgList(packagesList);
+	*/
 	return 0;
 }
 // vim:set ts=2 :

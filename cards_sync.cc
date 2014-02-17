@@ -59,23 +59,6 @@ CardsSync::CardsSync ( const CardsArgumentParser& argParser,
 	}
 }
 
-int CardsSync::parseFile(set<string>& fileContent, const char* fileName)
-{
-	FILE* fp = fopen(fileName,"r");
-	if (!fp) {
-		cerr << "Couldn't open " << fileName << endl;
-		return -1;
-	}
-	char input[1024];
-	while (fgets(input, 1024, fp)) {
-		input[strlen(input)-1] = '\0';
-		string inputString = input;
-		fileContent.insert(inputString);
-	}
-	fclose(fp);
-	return 0;
-}
-
 int CardsSync::exec()
 {
 	struct stat info;

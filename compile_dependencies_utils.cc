@@ -32,14 +32,14 @@ depList *initDepsList(void)
 	depList *list;
 	list = (depList*)Malloc(sizeof *list );
 	list->depsIndex = (unsigned int*)Malloc(sizeof (*list->depsIndex ));
-	list->niveau = (unsigned int*)Malloc(sizeof (*list->niveau));
+	list->niveau = (int*)Malloc(sizeof (*list->niveau));
 	list->count = 0;
 	list->decount = 0;
 	list->decrement = 0;
 	return list;
 }
 
-void addDepToDepList(depList *list, unsigned int nameIndex, unsigned int niveau)
+void addDepToDepList(depList *list, unsigned int nameIndex, int niveau)
 {
 	 unsigned int  *realloc_tmp;
 
@@ -51,8 +51,8 @@ void addDepToDepList(depList *list, unsigned int nameIndex, unsigned int niveau)
 	list->depsIndex = realloc_tmp;
 	list->depsIndex[list->count] = nameIndex;
 
-	realloc_tmp = (unsigned int*)realloc(list->niveau, sizeof (*list->niveau ) * (list->count+1));
-	list->niveau = realloc_tmp;
+	int	*realloc_tmp2 = (int*)realloc(list->niveau, sizeof (*list->niveau ) * (list->count+1));
+	list->niveau = realloc_tmp2;
 	list->niveau[list->count] = niveau;
 	++list->count;
 	list->decount = list->count;
@@ -79,6 +79,7 @@ pkgInfo *addInfoToPkgInfo(unsigned int nameIndex)
 
 void freePkgInfo(pkgInfo *package)
 {
+	free(package);
 }
 
 pkgList *initPkgList(void)
@@ -106,6 +107,16 @@ void addPkgToPkgList(pkgList *list, pkgInfo *package)
 
 	++list->count;
 }
+void freePkgList(pkgList *packagesList)
+{
+	for (unsigned int i = 0 ; i < packagesList->count;i++) {
+		free(packagesList->pkgs[i]);
+	}
+	free( packagesList->pkgs);
+	free(packagesList);
+}
+
+/* Get the tree dependencies of the dependencies recursively */
 int deps_tree (pkgList *packagesList, depList *dependenciesList,unsigned int nameIndex, unsigned int niveau)
 {
 	niveau++;
@@ -125,15 +136,19 @@ int deps_tree (pkgList *packagesList, depList *dependenciesList,unsigned int nam
 		}
 		if ( found == 0) {
 			addDepToDepList(dependenciesList,localDependenciesList->depsIndex[dInd],niveau);
-			int retVal = deps_tree(packagesList,dependenciesList,localDependenciesList->depsIndex[dInd],niveau);
+			if ( int retVal = deps_tree(packagesList,dependenciesList,localDependenciesList->depsIndex[dInd],niveau) !=0) {
+				return retVal;
+			}
 		}
 	}
 	return 0;
 }
-int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList,const char* pkgName, unsigned int niveau)
+
+/* Get the direct dependencies of the packageName and for each direct dependencies we check the deps recursively */
+int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList, const char* packageName, unsigned int niveau)
 {
 	for (unsigned int nInd=0; nInd < filesList->count;nInd++) {
-		if ( strcmp(filesList->items[nInd],pkgName) == 0 ) {
+		if ( strcmp(filesList->items[nInd],packageName) == 0 ) {
 			if (packagesList->pkgs[nInd]->dependences->count > 0) {
 				for(unsigned int dInd=0;dInd < packagesList->pkgs[nInd]->dependences->count;dInd++) {
 					addDepToDepList(dependenciesList,packagesList->pkgs[nInd]->dependences->depsIndex[dInd],niveau);
@@ -142,12 +157,12 @@ int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenci
 					}
 				}
 			} else {
-				printf("%s has no deps\n",pkgName);
+				printf("%s has no deps\n",packageName);
 			}
 			return 0;
 		}
 	}
-	printf("%s not found\n", pkgName);
+	printf("%s not found\n", packageName);
 	return 0;
 }
 	
@@ -159,47 +174,74 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 
 	depList *dependancesList = initDepsList();
 
-	char *fullPathfileName = (char*)calloc (255,sizeof(char));
-	char *name = (char*)calloc (255,sizeof(char));
-	
+	char *fullPathfileName = (char*)Malloc (sizeof(char)*255);
+	char *name = (char*)Malloc(sizeof(char)*255);
+	char *depfile = (char*)Malloc(sizeof(char)*255);	
+
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
 	name[ strchr(name,'_') - name ]='\0';
 	
-	sprintf(fullPathfileName,"%s/%s.deps",filesList->items[nameIndex], name);
+	sprintf(fullPathfileName,"%s/MD5SUM",filesList->items[nameIndex]);
 
 	itemList *nameDeps = initItemList();
 
-	if ( (readFile(nameDeps,fullPathfileName)) != 0 ) {	
-		cout << name << " has no deps" << endl;
+	/* We check if any deps file exist */
+	
+	sprintf(depfile,"%s.deps",name);
+	itemList *packageFilesList = initItemList();
+
+	bool found = false;
+	if ( (readFile(packageFilesList,fullPathfileName)) != 0 ) {
+		cout << fullPathfileName << " not exist" << endl;
 	} else {
-		for (unsigned int i = 0; i < nameDeps->count;i++) {
-			unsigned j = 0;
-			char *name = (char*)calloc (255,sizeof(char));
-			for(j = 0; j < filesList->count; j++) {
-				sprintf(name,"%s",basename(filesList->items[j]));
-				name[ strchr(name,'_') - name ]='\0';
-				char * dep = strdup ( nameDeps->items[i]);
-				if ( strchr(dep,'.') != NULL) {
-					dep[strchr(dep,'.') - dep ]= '\0';
-				}
-				if ( strchr(dep,'_') != NULL) {
-					dep[strchr(dep,'_') - dep ]= '-';
-				}
-				if (strcmp(dep,name) == 0 ) {
-					addDepToDepList(dependancesList,j,0);
+		char *name = NULL;
+		for (unsigned int i = 0; i < packageFilesList->count;i++) {
+			if ( strchr(packageFilesList->items[i],':') != NULL) {
+				name = strchr(packageFilesList->items[i],':');
+				name++;
+			if (strcmp(name,depfile) == 0 ) {
+					found = true;
 					break;
 				}
-				free(dep);
 			}
-			if ( j == filesList->count ) {
-				printf("WARNING %s from %s NOT FOUND ...\n",
-					nameDeps->items[i], filesList->items[nameIndex]);
+		}
+	}
+	freeItemList(packageFilesList);
+	if (found) {
+		sprintf(fullPathfileName,"%s/%s.deps",filesList->items[nameIndex],name);
+		if ( (readFile(nameDeps,fullPathfileName)) != 0 ) {	
+			cout << name << " not found... " << endl;
+		} else {
+			for (unsigned int i = 0; i < nameDeps->count;i++) {
+				unsigned j = 0;
+				char *name = (char*)Malloc(sizeof(char)*255);
+				for(j = 0; j < filesList->count; j++) {
+					sprintf(name,"%s",basename(filesList->items[j]));
+					name[ strchr(name,'_') - name ]='\0';
+					char * dep = strdup ( nameDeps->items[i]);
+					if ( strchr(dep,'.') != NULL) {
+						dep[strchr(dep,'.') - dep ]= '\0';
+					}
+					if ( strchr(dep,'_') != NULL) {
+						dep[strchr(dep,'_') - dep ]= '-';
+					}
+					if (strcmp(dep,name) == 0 ) {
+						addDepToDepList(dependancesList,j,0);
+						break;
+					}
+					free(dep);
+				}
+				if ( j == filesList->count ) {
+					printf("WARNING %s from %s NOT FOUND ...\n",
+						nameDeps->items[i], filesList->items[nameIndex]);
+				}
+				free(name);
 			}
-			free(name);
 		}
 	}
 	freeItemList(nameDeps);
 	free(name);
+	free(depfile);
 	free(fullPathfileName);
 	return dependancesList;
 }
@@ -266,11 +308,10 @@ int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int ni
 #ifndef NDEBUG
 	printf("\n");
 #endif
-	if ( found == 0) {
-		return niveau;
-	} else {
+	if ( found != 0) {
 		generate_level (filesList,packagesList,niveau + 1);
-	}
+	} else
+		return niveau;
 }
 char *getLongPackageName(itemList *filesList, const char * packageName)
 {

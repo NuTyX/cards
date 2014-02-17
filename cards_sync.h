@@ -46,7 +46,6 @@ public:
 	
 private:
 
-	int parseFile(set<string>& fileContent, const char* fileName);
 	const std::string m_baseDirectory;
 	const std::string m_remoteUrl;
 	std::string m_repoFile;

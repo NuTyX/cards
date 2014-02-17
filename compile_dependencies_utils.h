@@ -42,7 +42,7 @@
 typedef struct
 {
 	unsigned int *depsIndex;
-	unsigned int *niveau; /* To show a nice incrementation */
+	int *niveau; /* To show a nice incrementation */
 	unsigned int count;
 	unsigned int decrement; /* number of removed dep when searching them */
 	int decount;
@@ -53,7 +53,7 @@ typedef struct
 {
 	unsigned int nameIndex;
 	depList *dependences;
-	unsigned int niveau;
+	int niveau;
 } pkgInfo;
 
 typedef struct
@@ -65,7 +65,7 @@ typedef struct
 
 /*** depList: Create the list, Add dependence to the list, free the list  ***/
 depList *initDepsList(void);
-void addDepToDepList(depList *list, unsigned int nameIndex, unsigned int niveau);
+void addDepToDepList(depList *list, unsigned int nameIndex, int niveau);
 depList *readDependenciesList(itemList *listFiles, unsigned int nameIndex);
 void freeDepList(depList *list);
 
@@ -77,6 +77,7 @@ void freePkgInfo(pkgInfo *package);
 /*** pkgList: create the pkgList, add pkgs, free the pkgList ***/
 pkgList *initPkgList(void);
 void addPkgToPkgList(pkgList *list, pkgInfo *package);
+void freePkgList(pkgList *packagesList);
 
 int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList,const char* pkgName, unsigned int niveau);
 depList *readDependenciesList(itemList *listFiles, unsigned int nameIndex);

@@ -47,6 +47,8 @@ int main(int argc, char** argv)
 		
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPINST) {
 
+		return cards_depinst(argv[2]);
+
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
 
 		return cards_depends(argv[2]);

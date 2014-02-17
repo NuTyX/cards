@@ -39,7 +39,7 @@
 #include "cards_argument_parser.h"
 #include "compile_dependencies_utils.h"
 
-
+int cards_depinst(const char* packageName);
 int cards_depends(const char* packageName);
 int cards_deptree(const char* packageName);
 
