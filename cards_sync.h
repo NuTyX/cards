@@ -39,8 +39,6 @@ public:
 	int exec ();
 
 	static const std::string DEFAULT_REPOFILE;
-	static const std::string URLINFO;
-
 	static const int DEFAULT_TIMEOUT;
  
 	

@@ -166,7 +166,34 @@ int CardsSync::exec()
 					string input = *i;
 					string dir = input.substr(33);
 					string destinationFile = config.prtDir[indCat] + "/" + dir + "/" + m_repoFile;
-					if ( ! checkFileExist( destinationFile )) {
+					/* If the MD5SUM File is present, need to check if it's uptodate
+						 We need to check the MD5 sum of the local MD5SUM file against the list */
+					if ( checkFileExist( destinationFile )) {
+						for (set<string>::const_iterator ri = remotePackagesList.begin(); ri != remotePackagesList.end(); ri++) {
+							string remote_input = *ri;
+							string remote_dir = remote_input.substr(33);
+							string MD5S = remote_input.substr(0,32);
+							if ( remote_dir == dir ) {
+								if (! checkMD5sum(destinationFile.c_str(),MD5S.c_str())) {
+									cout << "f: " << destinationFile ;
+									FileDownload MD5SumPort(remoteUrl + "/" + dir + "/" + m_repoFile,
+										config.prtDir[indCat] + "/" + dir,
+										m_repoFile,
+										input.substr(0,32),false);
+									if ( MD5SumPort.downloadFile() != 0) {
+										cerr << "Failed to download " + config.prtDir[indCat] + "/" + dir
+											<< "/" + m_repoFile << endl ;
+										return -1;
+									}
+									if (MD5SumPort.checkMD5sum()) {
+										cout << " OK" << endl;
+									} else {
+										cout << " FAIL !!!" << endl;
+									}
+								}
+							}
+						}
+					} else { /* If the MD5SUM File is not present download it */
 						cout << "f: " << destinationFile ;
 						FileDownload MD5SumPort(remoteUrl + "/" + dir + "/" + m_repoFile,
 							config.prtDir[indCat] + "/" + dir,
@@ -193,15 +220,42 @@ int CardsSync::exec()
 					unsigned int pos = input.find('_');
 					if (pos != std::string::npos) {
 						string depFile = input.substr(33,pos - 33) + ".deps";
-						// Allready download ?
-						if ( ! checkFileExist(config.prtDir[indCat] + "/" + dir + "/" + depFile) ) {
+						string destinationFile = config.prtDir[indCat] + "/" + dir + "/" + depFile;
+						/* If deps file is allready download, we check if it is Up to date */
+						if ( checkFileExist(destinationFile) ) {
+							set<string> filesList;
+							string MD5FIle = config.prtDir[indCat] + "/" + dir + "/" + m_repoFile;
+							if ( parseFile(filesList,MD5FIle.c_str()) != 0) {
+								cerr << "Failed to parse "
+									<< MD5FIle << endl;
+								return -1;
+							}
+							for (set<string>::const_iterator iF = filesList.begin(); iF != filesList.end(); iF++) {
+								string input = *iF;
+								string file  = input.substr(33);
+								string MD5S = input.substr(0,32);
+								if ( file == depFile ) {
+									if (! checkMD5sum(destinationFile.c_str(),MD5S.c_str())) {
+										cout << "f: " << destinationFile << endl;
+										FileDownload DepsPort(remoteUrl + "/" + dir  + "/" + depFile,
+											config.prtDir[indCat] + "/" + dir,
+											depFile,
+											false);
+										if ( DepsPort.downloadFile() != 0) {
+											cerr << "Failed to download " + destinationFile << endl;
+											return -1;
+										}
+										break;
+									}
+								}
+							}
+						} else { /* If deps file is not present download it */
 							if (parseFile(remoteFilesList, MD5File.c_str()) != 0 ) {
 								cerr << "Failed to parse " +  MD5File << endl;
 								return -1;
 							}
 							for (set<string>::const_iterator indFile = remoteFilesList.begin(); indFile != remoteFilesList.end(); indFile++) {
 								if ( indFile -> substr(33) == depFile ) {
-									string destinationFile = config.prtDir[indCat] + "/" + dir + "/" + depFile;
 									cout << "f: " << destinationFile << endl;
 									FileDownload DepsPort(remoteUrl + "/" + dir  + "/" + depFile,
 										config.prtDir[indCat] + "/" + dir,

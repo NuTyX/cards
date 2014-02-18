@@ -369,4 +369,29 @@ bool findMD5sum(const string& fileName, unsigned char* result)
 	md5_finish( &ctx, result );
 	return true;
 }
+bool checkMD5sum(const char * fileName, const char * MD5Sum)
+{
+  bool same = true;
+  unsigned char md5sum[16];
+
+  if ( findMD5sum(fileName,md5sum) ) {
+    static char hexNumbers[] = {'0','1','2','3','4','5','6','7',
+                                '8','9','a','b','c','d','e','f'};
+
+    unsigned char high, low;
+    for (int i = 0; i < 16; ++i) {
+      high = (md5sum[i] & 0xF0) >> 4;
+      low = md5sum[i] & 0xF;
+      if ( *(MD5Sum+2*i) - hexNumbers[high] ||
+           *(MD5Sum+2*i+1) - hexNumbers[low]) {
+        same = false;
+        break;
+      }
+    }
+  } else {
+    same = false;
+  }
+  return same;
+}
+
 // vim:set ts=2 :

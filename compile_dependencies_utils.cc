@@ -39,6 +39,7 @@ depList *initDepsList(void)
 	return list;
 }
 
+/* Add a reference to PackagesList index and the level of deps to the Dependencies List */
 void addDepToDepList(depList *list, unsigned int nameIndex, int niveau)
 {
 	 unsigned int  *realloc_tmp;
@@ -165,7 +166,8 @@ int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenci
 	printf("%s not found\n", packageName);
 	return 0;
 }
-	
+
+/* Populate the List of dependance for each found package */	
 depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 {
 	if ( nameIndex > filesList->count  ) {
@@ -245,6 +247,10 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 	free(fullPathfileName);
 	return dependancesList;
 }
+
+/* Generate the all list of package sorted by level where level = 0 No deps , 
+	level = 1 somes deps from level 0 etc
+*/
 int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int niveau)
 {
 	int found = 0;
@@ -313,6 +319,10 @@ int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int ni
 	} else
 		return niveau;
 }
+
+/* Return the full path with the name including 
+the name, version and release of the package
+*/
 char *getLongPackageName(itemList *filesList, const char * packageName)
 {
 	char *name = NULL;

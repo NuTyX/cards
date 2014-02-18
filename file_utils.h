@@ -86,6 +86,7 @@ int readFile(itemList *fileContent, const char *fileName);
 int parseFile(set<string>& fileContent, const char* fileName);
 int parseFile(vector<string>& fileContent, const char* fileName);
 bool findMD5sum(const string& fileName, unsigned char* result);
+bool checkMD5sum(const char * fileName, const char * MD5Sum);
 
 #endif /* FILE_UTILS_H */
 // vim:set ts=2 :

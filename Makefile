@@ -27,7 +27,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.6.80.2
+VERSION = 0.6.80.3
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG
@@ -57,7 +57,7 @@ libs:
 all: pkgadd cards pkgmk rejmerge man
 
 pkgadd: .tools_depend $(TOOLSOBJECTS)
-	$(CXX) $(TOOLSOBJECTS) -o $@ $(LDFLAGS) -static
+	$(CXX) $(TOOLSOBJECTS) -o $@ $(LDFLAGS)
 
 pkgmk: pkgmk.in
 
@@ -101,7 +101,6 @@ dist: distclean
 
 install: all
 	install -D -m0755 pkgadd $(DESTDIR)$(BINDIR)/pkgadd
-	install -D -m0755 pkgcrea $(DESTDIR)$(BINDIR)/pkgcrea
 	install -D -m0755 cards $(DESTDIR)$(BINDIR)/cards
 	install -D -m0644 pkgadd.conf $(DESTDIR)$(ETCDIR)/pkgadd.conf
 	install -D -m0755 pkgmk $(DESTDIR)$(BINDIR)/pkgmk
