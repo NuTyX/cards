@@ -29,6 +29,7 @@ ArgParser::APCmd CardsArgumentParser::CMD_LISTINST;
 
 ArgParser::APCmd CardsArgumentParser::CMD_INFO;
 
+ArgParser::APCmd CardsArgumentParser::CMD_LEVEL;
 ArgParser::APCmd CardsArgumentParser::CMD_DIFF;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPENDS;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPTREE;
@@ -61,6 +62,10 @@ CardsArgumentParser::CardsArgumentParser()
 	addCommand(CMD_INSTALL, "install",
 		"install ports",
 		 ArgParser::MIN, 1, "<port1 port2 ...>");
+
+	addCommand(CMD_LEVEL, "level",
+		"generate all the levels",
+		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_DEPINST, "depinst",
 		"install ports and their dependencies",

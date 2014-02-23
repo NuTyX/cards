@@ -79,7 +79,9 @@ pkgList *initPkgList(void);
 void addPkgToPkgList(pkgList *list, pkgInfo *package);
 void freePkgList(pkgList *packagesList);
 
+int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList,unsigned int niveau);
 int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList,const char* pkgName, unsigned int niveau);
+
 depList *readDependenciesList(itemList *listFiles, unsigned int nameIndex);
 int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int niveau);
 

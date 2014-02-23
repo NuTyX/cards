@@ -30,6 +30,52 @@
 #include "config_parser.h"
 
 using namespace std;
+int cards_level()
+{
+	pkgInfo *package = NULL;
+	pkgList *packagesList = initPkgList();
+
+	itemList *filesList = initItemList();
+	Config config;
+	ConfigParser::parseConfig("/etc/cards.conf", config);
+
+	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
+		if ( (findFile(filesList,config.prtDir[indCat].c_str())) != 0) {
+			return -1;
+		}
+	}
+	for (unsigned int nInd=0;nInd <filesList->count;nInd++) {
+		package = addInfoToPkgInfo(nInd);
+		addPkgToPkgList(packagesList,package);
+		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
+	}
+	int niveau = generate_level (filesList,packagesList,0);
+
+	if (niveau == 0 ) {
+		printf("Problem with genrate_level: %d\n",niveau);
+		return -1;
+	} else {
+		printf("Number of level: %d\n",niveau);
+	}
+	depList *dependenciesList = initDepsList();
+	if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,1) != 0 ) {
+		return returnVal;
+	}
+	int currentNiveau = 0;
+	while ( currentNiveau <= niveau) {
+		printf("Level: %d\n",currentNiveau);
+		for ( unsigned int dInd=0; dInd < dependenciesList->count; dInd++ ) {
+			if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == currentNiveau ) {
+				printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
+			}
+		}
+		currentNiveau++;
+	}
+	freeItemList(filesList);
+	freePkgInfo(package);
+	freePkgList(packagesList);
+	return 0;
+}
 int cards_depinst(const char* packageName)
 {
 	pkgList *packagesList = initPkgList();
@@ -79,10 +125,12 @@ int cards_depends(const char* packageName)
 		addPkgToPkgList(packagesList,package);
 		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
 	}
-
-
 	int niveau = generate_level (filesList,packagesList,0);
 
+	if (niveau == 0 ) {
+		printf("Problem with genrate_level: %d\n",niveau);
+		return -1;
+	}
 /*	printf("Number of niveaux: %d\n",niveau);
 
 		for (unsigned int nInd = 0; nInd<packagesList->count;nInd++){
@@ -99,10 +147,10 @@ int cards_depends(const char* packageName)
 		if (dependenciesList ->count > 0) {
 			int currentNiveau = 0;
 			while ( currentNiveau <= niveau) {
+				printf("Level: %d\n",currentNiveau);
 				for ( unsigned int dInd=0; dInd < dependenciesList->count; dInd++ ) {
 					if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == currentNiveau ) {
-						printf("%d:%s\n",packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau,
-							filesList->items[dependenciesList->depsIndex[dInd]]);
+						printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
 					}
 				}
 				currentNiveau++;

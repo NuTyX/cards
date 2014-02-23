@@ -145,6 +145,24 @@ int deps_tree (pkgList *packagesList, depList *dependenciesList,unsigned int nam
 	return 0;
 }
 
+/* Get the direct dependencies of all the package found and for each direct dependencies we check the deps recursively */
+int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList, unsigned int niveau)
+{
+	for (unsigned int nInd=0; nInd < filesList->count;nInd++) {
+		if (packagesList->pkgs[nInd]->dependences->count > 0) {
+			for(unsigned int dInd=0;dInd < packagesList->pkgs[nInd]->dependences->count;dInd++) {
+				addDepToDepList(dependenciesList,packagesList->pkgs[nInd]->dependences->depsIndex[dInd],niveau);
+				if (niveau > 0) {
+					deps_tree (packagesList,dependenciesList,packagesList->pkgs[nInd]->dependences->depsIndex[dInd],niveau);
+				}
+			}
+		} else {
+			return 0;
+		}
+	}
+	return 0;
+
+}
 /* Get the direct dependencies of the packageName and for each direct dependencies we check the deps recursively */
 int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList, const char* packageName, unsigned int niveau)
 {

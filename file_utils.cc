@@ -182,7 +182,8 @@ int findFile(itemList* filesList, const char* path)
 	char fullPath[255];
 	if (d) {
 		while ((dir = readdir(d)) != NULL) {
-			if ( strcmp (dir->d_name, ".") && strcmp (dir->d_name, "..") ) { // ignore the directories dots
+			if ( strcmp (dir->d_name, ".") && strcmp (dir->d_name, "..") 
+				&& strcmp (dir->d_name, ".git") ) { // ignore the directories dots and the .git folder
 				sprintf(fullPath,"%s/%s",path,dir->d_name);
 				addItemToItemList(filesList,fullPath);
 			}

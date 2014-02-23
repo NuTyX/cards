@@ -44,7 +44,11 @@ int main(int argc, char** argv)
 
 
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
-		
+
+	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
+
+		return cards_level();
+	
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPINST) {
 
 		return cards_depinst(argv[2]);

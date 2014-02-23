@@ -36,6 +36,7 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_INSTALL;
 		static ArgParser::APCmd CMD_DEPINST;
 		static ArgParser::APCmd CMD_DIFF;
+		static ArgParser::APCmd CMD_LEVEL;
 		static ArgParser::APCmd CMD_DEPENDS;
 		static ArgParser::APCmd CMD_DEPTREE;
 		static ArgParser::APCmd CMD_SEARCH;
