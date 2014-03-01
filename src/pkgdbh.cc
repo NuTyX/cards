@@ -288,7 +288,7 @@ pair<string, pkginfo_t> Pkgdbh::getInfosPackage(const string& packageName)
 	string version = packageName;
 	result.second.version=version.erase(0, version.find('_') == string::npos ? string::npos : version.find('_') + 1);
 	result.first = name;
-	string package_foldername = name + "_" + version;
+	string package_foldername = name + "_" + version + "/";
 	result.second.run = getValueOfKey(m_root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
 	result.second.size = getValueOfKey(m_root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
 	return result;
@@ -317,7 +317,7 @@ void Pkgdbh::getInstalledPackages(bool silent)
 		arch.erase(0, arch.find_last_of("-")+1);
 		info.version = version;
 		info.arch = arch;
-		string package_foldername = name + "_" + version + "-" + arch;
+		string package_foldername = name + "_" + version + "-" + arch + "/";
 		info.run = getValueOfKey(m_root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
 		info.size = getValueOfKey(m_root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
 		// list of files
@@ -459,7 +459,9 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 	mkdir(packagenamedir.c_str(),0755);
 	for (set<string>::const_iterator i = metaFilesList.begin(); i!=  metaFilesList.end(); ++i)
 	{
-		string file = packagenamedir + "/" + *i;
+		char * destFile = const_cast<char*>(i->c_str());
+		destFile++;
+		string file = packagenamedir + "/" + destFile;
 		if (rename(i->c_str(), file.c_str()) == -1)
 		{
 			m_actualError = CANNOT_RENAME_FILE;

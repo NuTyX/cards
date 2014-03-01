@@ -40,7 +40,6 @@
 #include "compile_dependencies_utils.h"
 
 int cards_level();
-int cards_depinst(const char* packageName);
 int cards_depends(const char* packageName);
 int cards_deptree(const char* packageName);
 

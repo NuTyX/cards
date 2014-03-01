@@ -76,32 +76,6 @@ int cards_level()
 	freePkgList(packagesList);
 	return 0;
 }
-int cards_depinst(const char* packageName)
-{
-	pkgList *packagesList = initPkgList();
-
-	itemList *filesList = initItemList();
-
-	Config config;
-	ConfigParser::parseConfig("/etc/cards.conf", config);
-
-	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
-		if ( (findFile(filesList,config.prtDir[indCat].c_str())) != 0) {
-			return -1;
-		}
-	}
-
-	char * longPackageName = NULL;
-	if ( (longPackageName = getLongPackageName(filesList,packageName)) == NULL) {
-		cout << "The package '" << packageName << "' is not found" << endl;
-		return -1;
-	}
-
-	printf("%s\n",longPackageName);
-	freePkgList(packagesList);
-	freeItemList(filesList);
-	return 0;
-}
 int cards_depends(const char* packageName)
 {
 	pkgInfo *package = NULL;

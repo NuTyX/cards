@@ -106,6 +106,6 @@ Default: '(lib devel man doc service)'
 pkgmk(8)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
-pkgmk (cards) is Copyright (c) 2013 Thierry Nuttens (c) 2013 NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is Copyright (c)  2013-2014 Thierry Nuttens (c)  2013-2014 NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

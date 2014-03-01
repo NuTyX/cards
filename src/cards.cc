@@ -23,9 +23,8 @@
 #include "file_download.h"
 #include "cards_sync.h"
 #include "cards_depends.h"
+#include "cards_install.h"
 #include "config_parser.h"
-
-#define PKG_DB_DIR       "/var/lib/pkg/DB/"
 
 using namespace std;
 
@@ -45,13 +44,14 @@ int main(int argc, char** argv)
 
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 
+		return cards_install(argv[2]);
+
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 
 		return cards_level();
 	
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPINST) {
 
-		return cards_depinst(argv[2]);
 
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
 

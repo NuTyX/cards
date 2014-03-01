@@ -163,7 +163,11 @@ int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenci
 	return 0;
 
 }
-/* Get the direct dependencies of the packageName and for each direct dependencies we check the deps recursively */
+
+/*
+	Get the direct dependencies of the packageName and for each direct dependencies 
+	we check the deps recursively 
+*/
 int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList, const char* packageName, unsigned int niveau)
 {
 	for (unsigned int nInd=0; nInd < filesList->count;nInd++) {
@@ -185,7 +189,11 @@ int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenci
 	return 0;
 }
 
-/* Populate the List of dependance for each found package */	
+/* 
+	Populate the List of dependance for each found package.
+	We need to check if each dependance exist if yes add the index reference to the list
+	if not printout a warning message
+*/	
 depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 {
 	if ( nameIndex > filesList->count  ) {
