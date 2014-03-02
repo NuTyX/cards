@@ -29,6 +29,19 @@
 #include <stdio.h>
 #include <unistd.h>
 
+bool Pkginfo::isInstalled(const char * packageName)
+{
+	int nPkg = getListOfPackages("");
+	getInstalledPackages(true);
+	if	( nPkg == 0 ) {
+		return false;
+	}
+	return checkPackageNameExist(packageName);
+}
+int Pkginfo::numberOfPackages()
+{
+	return getListOfPackages("");
+}
 void Pkginfo::run(int argc, char** argv)
 {
 	//

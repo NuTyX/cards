@@ -25,6 +25,7 @@
 #include "cards_depends.h"
 #include "cards_install.h"
 #include "config_parser.h"
+#include "pkginfo.h"
 
 using namespace std;
 
@@ -62,27 +63,23 @@ int main(int argc, char** argv)
 		return cards_deptree(argv[2]);
 	
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_LISTINST) {
-		set<string> installedPackagesList;
-		if ( findFile(installedPackagesList, PKG_DB_DIR) != 0 ) {
-			cerr << " Cannot read "  << PKG_DB_DIR
-				<< endl;
-			return -1;
-		}
-		if (installedPackagesList.size() > 0) {
-			for (set<string>::const_iterator packageName = installedPackagesList.begin();
-			packageName != installedPackagesList.end();
-			packageName++ ) {
-				unsigned int pos = packageName -> find("_");
-				if ( pos != std::string::npos) {
-					string name = packageName -> substr(0,pos); 
-					string version = packageName -> substr(pos+1);
-					cout << name + " " + version << endl;
-				}
-			}
-			cout << endl << installedPackagesList.size() << " packages installed" << endl;
+
+		Pkginfo * packagesInfo =  new Pkginfo;
+		itemList * commandList = initItemList();
+		addItemToItemList(commandList,"pkginfo");
+		addItemToItemList(commandList, "-i");
+		packagesInfo->run(commandList->count,commandList->items);
+		cout << endl << packagesInfo->numberOfPackages() << " packages installed" << endl;
+		freeItemList(commandList);
+		delete packagesInfo;
+	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_ISINST) {
+		Pkginfo * packagesInfo =  new Pkginfo;
+		if ( packagesInfo->isInstalled(argv[2]) )	{
+			cout << argv[2] << " is installed" << endl;
 		} else {
-			cout << endl <<  "No packages found" << endl;
+			 cout << argv[2] << " is not installed" << endl;
 		}
+		delete packagesInfo;
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
 		Config config;
 		ConfigParser::parseConfig("/etc/cards.conf", config);
@@ -118,6 +115,7 @@ int main(int argc, char** argv)
 		<< "  sync\n"
 		<< "  install\n"
 		<< "  depinst\n"
+		<< "  isinst\n"
 		<< "  info\n"
 		<< "  list\n"
 		<< "  listinst\n"

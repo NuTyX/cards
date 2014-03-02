@@ -26,6 +26,7 @@ ArgParser::APCmd CardsArgumentParser::CMD_DEPINST;
 
 ArgParser::APCmd CardsArgumentParser::CMD_LIST;
 ArgParser::APCmd CardsArgumentParser::CMD_LISTINST;
+ArgParser::APCmd CardsArgumentParser::CMD_ISINST;
 
 ArgParser::APCmd CardsArgumentParser::CMD_INFO;
 
@@ -58,6 +59,9 @@ CardsArgumentParser::CardsArgumentParser()
 	addCommand(CMD_LISTINST, "listinst",
 		"show a list of installed ports",
 		ArgParser::NONE, 0 , "");
+	addCommand(CMD_ISINST, "isinst",
+		"print whether port is installed",
+		ArgParser::EQ, 1, "<port>");
 
 	addCommand(CMD_INSTALL, "install",
 		"install ports",

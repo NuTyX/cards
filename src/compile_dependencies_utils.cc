@@ -279,13 +279,22 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 */
 int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int niveau)
 {
-	int found = 0;
-	unsigned int nameIndex = 0;
 #ifndef NDEBUG
-	printf("Niveau %d: \n",niveau);
+	printf("List des %d paquets\n",packagesList->count);
+	for (unsigned int nameIndex = 0; nameIndex < packagesList->count; nameIndex++) {
+		printf("%s, Level: %d, Number of deps: %d, Decount: %d \n",filesList->items[nameIndex],
+			packagesList->pkgs[nameIndex]->niveau,
+			packagesList->pkgs[nameIndex]->dependences->count,
+			packagesList->pkgs[nameIndex]->dependences->decount);
+	}
 #endif
+	int found = 0;
+#ifndef NDEBUG
+	printf("Loop %d\n",niveau);
+#endif
+	
 	/* Pour tous les paquets existants */
-	for (nameIndex = 0; nameIndex < packagesList->count; nameIndex++) {
+	for (unsigned int nameIndex = 0; nameIndex < packagesList->count; nameIndex++) {
 		/* Si le paquet nameIndex n'a plus de dépendance son décompte est zero */
 		if ( packagesList->pkgs[nameIndex]->dependences->decount == 0 ) {
 			found = 1;
@@ -308,7 +317,7 @@ int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int ni
 						if ( packagesList->pkgs[nameIndexHaveThisDep]->dependences->depsIndex[depIndex] == nameIndex ) {
 							/* On incrémente de UN le nombre de dépendances */
 #ifndef NDEBUG
-							printf("  %d) for %s. Dep: %s  %d > ",
+							printf("  %d) for %s. Dependencie of %s  %d > ",
 								niveau, filesList->items[nameIndex],filesList->items[nameIndexHaveThisDep],
 								packagesList->pkgs[nameIndexHaveThisDep]->dependences->decount);
 #endif
@@ -323,7 +332,7 @@ int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int ni
 		}
 	}
 	/* Pour tous les paquets trouvé */
-	for (nameIndex = 0; nameIndex < packagesList->count; nameIndex++) {
+	for (unsigned int nameIndex = 0; nameIndex < packagesList->count; nameIndex++) {
 		/* Si il faut mettre a jour le nombres de deps du paquet [nameIndex] */
 		if (packagesList->pkgs[nameIndex]->dependences->decrement > 0) {
 			/* Le nouveau nombre de deps = l'actuel - le nombre de deps supprimés */

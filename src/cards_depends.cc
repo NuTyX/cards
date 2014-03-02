@@ -55,7 +55,9 @@ int cards_level()
 		printf("Problem with genrate_level: %d\n",niveau);
 		return -1;
 	} else {
+#ifndef NDEBUG
 		printf("Number of level: %d\n",niveau);
+#endif
 	}
 	depList *dependenciesList = initDepsList();
 	if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,1) != 0 ) {
@@ -63,10 +65,9 @@ int cards_level()
 	}
 	int currentNiveau = 0;
 	while ( currentNiveau <= niveau) {
-		printf("Level: %d\n",currentNiveau);
-		for ( unsigned int dInd=0; dInd < dependenciesList->count; dInd++ ) {
-			if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == currentNiveau ) {
-				printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
+		for ( unsigned int nameIndex = 0; nameIndex < packagesList -> count; nameIndex++ ) {
+			if ( packagesList -> pkgs[nameIndex]->niveau == currentNiveau ) {
+				printf("%d: %s \n",currentNiveau,filesList->items[nameIndex]);
 			}
 		}
 		currentNiveau++;
@@ -105,32 +106,41 @@ int cards_depends(const char* packageName)
 		printf("Problem with genrate_level: %d\n",niveau);
 		return -1;
 	}
-/*	printf("Number of niveaux: %d\n",niveau);
-
-		for (unsigned int nInd = 0; nInd<packagesList->count;nInd++){
-			printf("%s has %d deps:\n",filesList->items[nInd], packagesList->pkgs[nInd]->dependences->count);
-			for(unsigned int dInd=0;dInd < packagesList->pkgs[nInd]->dependences->count;dInd++) {
-				printf("%d) %s\n", dInd + 1,
-					filesList->items[packagesList->pkgs[nInd]->dependences->depsIndex[dInd]]);
-			}
-		} */
-		depList *dependenciesList = initDepsList();
-		if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,longPackageName,1) != 0 ) {
-			return returnVal;
-		}
-		if (dependenciesList ->count > 0) {
-			int currentNiveau = 0;
-			while ( currentNiveau <= niveau) {
-				printf("Level: %d\n",currentNiveau);
-				for ( unsigned int dInd=0; dInd < dependenciesList->count; dInd++ ) {
-					if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == currentNiveau ) {
-						printf("%s\n",filesList->items[dependenciesList->depsIndex[dInd]]);
+	depList *dependenciesList = initDepsList();
+	if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,longPackageName,1) != 0 ) {
+		return returnVal;
+	}
+	if (dependenciesList ->count > 0) {
+		int currentNiveau = 0;
+		itemList *sortPackagesList = initItemList();
+		char * levelPackageName = (char*)Malloc(sizeof(char)*1024);
+		while ( currentNiveau <= niveau) {
+#ifndef NDEBUG
+			printf("Level: %d\n",currentNiveau);
+#endif
+			for ( unsigned int dInd=0; dInd < dependenciesList->count; dInd++ ) {
+				if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == currentNiveau ) {
+					sprintf(levelPackageName,"%d %s",currentNiveau,basename(filesList->items[dependenciesList->depsIndex[dInd]]));
+					bool found = false;
+					for (unsigned int j = 0; j< sortPackagesList->count ;++j) {
+						if (strcmp ( levelPackageName , sortPackagesList->items[j]) == 0) {
+							found = true;
+							break;
+						}
+					}
+					if ( ! found ) {
+						addItemToItemList(sortPackagesList,levelPackageName);
 					}
 				}
-				currentNiveau++;
 			}
-			
+			currentNiveau++;
 		}
+		free(levelPackageName);
+		for (unsigned int i = 0; i < sortPackagesList-> count;++i) {
+			printf("%s\n",sortPackagesList-> items[i]);
+		}
+		freeItemList(sortPackagesList);
+	}
 	freeItemList(filesList);
 	freePkgInfo(package);
 	freePkgList(packagesList);

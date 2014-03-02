@@ -23,9 +23,33 @@
 
 include ../Makefile.inc
 
-TOOLSOBJECTS = tools.o md5.o string_utils.o file_utils.o process.o runtime_dependencies_utils.o pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
+TOOLSOBJECTS =	md5.o \
+		string_utils.o \
+		file_utils.o \
+		process.o \
+		runtime_dependencies_utils.o \
+		pkgdbh.o \
+		pkgadd.o \
+		pkgrm.o \
+		pkginfo.o \
+		tools.o
 
-CARDSOBJECTS = md5.o string_utils.o config_parser.o file_download.o compile_dependencies_utils.o argument_parser.o cards_argument_parser.o file_utils.o process.o runtime_dependencies_utils.o pkgdbh.o pkgadd.o cards_depends.o cards_sync.o cards_install.o cards.o
+CARDSOBJECTS =	md5.o \
+		string_utils.o \
+		config_parser.o \
+		file_download.o \
+		compile_dependencies_utils.o \
+		argument_parser.o \
+		cards_argument_parser.o \
+		file_utils.o process.o \
+		runtime_dependencies_utils.o \
+		pkgdbh.o \
+		pkgadd.o \
+		pkginfo.o \
+		cards_depends.o \
+		cards_sync.o \
+		cards_install.o \
+		cards.o
 
 
 LIBOBJECTS =  pkgdbh.o pkgadd.o pkgrm.o pkginfo.o

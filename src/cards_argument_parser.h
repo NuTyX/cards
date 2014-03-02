@@ -42,6 +42,7 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_SEARCH;
 		static ArgParser::APCmd CMD_DSEARCH;
 		static ArgParser::APCmd CMD_FSEARCH;
+		static ArgParser::APCmd CMD_ISINST;
 
 		static ArgParser::APOpt OPT_SIGNATURE;
 		static ArgParser::APOpt OPT_DEPENDENCIES;
