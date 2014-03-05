@@ -34,7 +34,7 @@ public:
 	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;
 	bool isInstalled(const char* packageName);
-	int numberOfPackages();
+	int getNumberOfPackages();
 };
 
 #endif /* PKGINFO_H */

@@ -41,6 +41,7 @@ ArgParser::APCmd CardsArgumentParser::CMD_FSEARCH;
 
 ArgParser::APOpt CardsArgumentParser::OPT_SIGNATURE;
 ArgParser::APOpt CardsArgumentParser::OPT_DEPENDENCIES;
+ArgParser::APOpt CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES;
 
 CardsArgumentParser::CardsArgumentParser()
 {
@@ -107,7 +108,13 @@ CardsArgumentParser::CardsArgumentParser()
 		'd',
 		"get dependencies files");
 
+	OPT_SHOW_ALL_DEPENDENCIES.init("all",
+    'a',
+		"show all the dependencies, included the one allready installed");
+
 	addOption(CMD_SYNC, OPT_SIGNATURE,false);
 	addOption(CMD_SYNC, OPT_DEPENDENCIES, false);
+
+	addOption(CMD_DEPENDS, OPT_SHOW_ALL_DEPENDENCIES, false);
 }
 // vim:set ts=2 :

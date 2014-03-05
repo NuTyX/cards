@@ -17,8 +17,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
-#ifndef CARDS_SYNC_H
-#define CARDS_SYNC_H
+#ifndef CARDSSYNC_H
+#define CARDSSYNC_H
 
 #include <string>
 #include <list>
@@ -36,7 +36,7 @@ public:
 		const std::string& directory,
 		const std::string& repoFile);
 
-	int exec ();
+	int run ();
 
 	static const std::string DEFAULT_REPOFILE;
 	static const int DEFAULT_TIMEOUT;

@@ -25,12 +25,14 @@
 
 #include "file_download.h"
 #include "file_utils.h"
+#include "pkginfo.h"
 #include "compile_dependencies_utils.h"
 #include "cards_depends.h"
 #include "config_parser.h"
 
-using namespace std;
-int cards_level()
+// using namespace std;
+
+int CardsDepends::level()
 {
 	pkgInfo *package = NULL;
 	pkgList *packagesList = initPkgList();
@@ -77,11 +79,14 @@ int cards_level()
 	freePkgList(packagesList);
 	return 0;
 }
-int cards_depends(const char* packageName)
+int CardsDepends::depends()
 {
 	pkgInfo *package = NULL;
 	pkgList *packagesList = initPkgList();
 
+	Pkginfo * packagesInfo = new Pkginfo;
+	packagesInfo->getNumberOfPackages();
+ 
 	itemList *filesList = initItemList();
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
@@ -91,8 +96,8 @@ int cards_depends(const char* packageName)
 		}
 	}
 	char * longPackageName = NULL;
-	if ( (longPackageName = getLongPackageName(filesList,packageName)) == NULL) {
-		cout << "The package '" << packageName << "' is not found" << endl;
+	if ( (longPackageName = getLongPackageName(filesList,m_packageName)) == NULL) {
+		cout << "The package '" << m_packageName << "' is not found" << endl;
 		return -1;
 	}
 	for (unsigned int nInd=0;nInd <filesList->count;nInd++){
@@ -112,32 +117,38 @@ int cards_depends(const char* packageName)
 	}
 	if (dependenciesList ->count > 0) {
 		int currentNiveau = 0;
-		itemList *sortPackagesList = initItemList();
-		char * levelPackageName = (char*)Malloc(sizeof(char)*1024);
+		itemList *sortPackagesList = initItemList(); // We need to get read of the duplicated found packages
 		while ( currentNiveau <= niveau) {
 #ifndef NDEBUG
 			printf("Level: %d\n",currentNiveau);
 #endif
 			for ( unsigned int dInd=0; dInd < dependenciesList->count; dInd++ ) {
 				if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == currentNiveau ) {
-					sprintf(levelPackageName,"%d %s",currentNiveau,basename(filesList->items[dependenciesList->depsIndex[dInd]]));
 					bool found = false;
 					for (unsigned int j = 0; j< sortPackagesList->count ;++j) {
-						if (strcmp ( levelPackageName , sortPackagesList->items[j]) == 0) {
+						if (strcmp ( filesList->items[dependenciesList->depsIndex[dInd]] , sortPackagesList->items[j]) == 0) {
 							found = true;
 							break;
 						}
 					}
-					if ( ! found ) {
-						addItemToItemList(sortPackagesList,levelPackageName);
+					if ( ! found ) { // if not allready found
+						addItemToItemList(sortPackagesList,filesList->items[dependenciesList->depsIndex[dInd]]);
 					}
 				}
 			}
 			currentNiveau++;
 		}
-		free(levelPackageName);
 		for (unsigned int i = 0; i < sortPackagesList-> count;++i) {
-			printf("%s\n",sortPackagesList-> items[i]);
+			string packageName = basename(sortPackagesList->items[i]);
+			string name(packageName,0,packageName.find('_'));
+			if (m_argParser.isSet(CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES)) {
+				printf("%s\n",sortPackagesList-> items[i]);
+			} else {
+				if ( ! packagesInfo->isInstalled(name.c_str())) { // need to improved the perf
+					printf("%s\n",sortPackagesList-> items[i]);
+			
+				}
+			}
 		}
 		freeItemList(sortPackagesList);
 	}
@@ -145,9 +156,10 @@ int cards_depends(const char* packageName)
 	freePkgInfo(package);
 	freePkgList(packagesList);
 	free(longPackageName);
+	delete packagesInfo;
 	return 0;
 }
-int cards_deptree(const char* packageName)
+int CardsDepends::deptree()
 {
 	itemList *filesList = initItemList();
 
@@ -167,8 +179,8 @@ int cards_deptree(const char* packageName)
 	}
 
 	char * longPackageName = NULL;
-	if ( (longPackageName = getLongPackageName(filesList,packageName)) == NULL) {
-		cout << "The package '" << packageName << "' is not found" << endl;
+	if ( (longPackageName = getLongPackageName(filesList,m_packageName)) == NULL) {
+		cout << "The package '" << m_packageName << "' is not found" << endl;
 		return -1;
 	}
 
@@ -214,7 +226,7 @@ int cards_deptree(const char* packageName)
 					if ( pos != std::string::npos) {
 						name = dirName.substr(0,pos);
 					}
-					if (! strcmp (packageName,name.c_str())) {
+					if (! strcmp (m_packageName,name.c_str())) {
 						found=true;
 						string depFile = config.prtDir[indCat] 
 								+ "/" + dir->d_name + "/" + name + ".deps";
@@ -243,7 +255,7 @@ int cards_deptree(const char* packageName)
 		}
 		closedir(d);
 		if (!found) {
-			cerr << "Cannot find " << packageName << endl;
+			cerr << "Cannot find " << m_packageName << endl;
 			return -1;
 		}
 	}

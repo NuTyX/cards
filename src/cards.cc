@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 
 	if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
 		CardsSync CS(cardsArgPars);
-		return CS.exec();
+		return CS.run();
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
 
 
@@ -49,18 +49,20 @@ int main(int argc, char** argv)
 
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 
-		return cards_level();
+		CardsDepends CD(cardsArgPars);
+		return CD.level();
 	
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPINST) {
 
 
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
 
-		return cards_depends(argv[2]);
+		CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
+		return CD.depends();
 
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
-
-		return cards_deptree(argv[2]);
+		CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
+		return CD.deptree();
 	
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_LISTINST) {
 
@@ -69,11 +71,12 @@ int main(int argc, char** argv)
 		addItemToItemList(commandList,"pkginfo");
 		addItemToItemList(commandList, "-i");
 		packagesInfo->run(commandList->count,commandList->items);
-		cout << endl << packagesInfo->numberOfPackages() << " packages installed" << endl;
+		cout << endl << packagesInfo->getNumberOfPackages() << " packages installed" << endl;
 		freeItemList(commandList);
 		delete packagesInfo;
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_ISINST) {
 		Pkginfo * packagesInfo =  new Pkginfo;
+		packagesInfo->getNumberOfPackages();
 		if ( packagesInfo->isInstalled(argv[2]) )	{
 			cout << argv[2] << " is installed" << endl;
 		} else {

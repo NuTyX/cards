@@ -17,8 +17,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
-#ifndef CARDS_DEPENDS_H
-#define CARDS_DEPENDS_H
+#ifndef CARDSDEPENDS_H
+#define CARDSDEPENDS_H
 
 #include <string>
 #include <list>
@@ -39,9 +39,24 @@
 #include "cards_argument_parser.h"
 #include "compile_dependencies_utils.h"
 
-int cards_level();
-int cards_depends(const char* packageName);
-int cards_deptree(const char* packageName);
 
+class CardsDepends
+{
+public:
+
+	CardsDepends (const CardsArgumentParser& argParser, const char * packageName)
+	: m_argParser(argParser),
+		m_packageName(packageName) {}
+
+	CardsDepends (const CardsArgumentParser& argParser)
+	: m_argParser(argParser) {}
+
+	int level();
+	int depends();
+	int deptree();
+private:
+	const CardsArgumentParser& m_argParser;
+	const char* m_packageName;
+};
 #endif
 // vim:set ts=2 :

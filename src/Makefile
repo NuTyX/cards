@@ -46,9 +46,9 @@ CARDSOBJECTS =	md5.o \
 		pkgdbh.o \
 		pkgadd.o \
 		pkginfo.o \
-		cards_depends.o \
 		cards_sync.o \
 		cards_install.o \
+		cards_depends.o \
 		cards.o
 
 

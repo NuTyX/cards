@@ -59,7 +59,7 @@ CardsSync::CardsSync ( const CardsArgumentParser& argParser,
 	}
 }
 
-int CardsSync::exec()
+int CardsSync::run()
 {
 	struct stat info;
 	if (stat(m_baseDirectory.c_str(), &info)) {
