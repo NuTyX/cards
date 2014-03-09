@@ -37,12 +37,21 @@ int Pkginfo::getNumberOfPackages()
 }
 bool Pkginfo::isInstalled(const char * packageName)
 {
+	string s_packageName = packageName;
 	int nPkg = getListOfPackages("");
-	getInstalledPackages(true);
-	if	( nPkg == 0 ) {
+	if (nPkg > 0) {
+		for (set<string>::iterator i = m_pkgFoldersList.begin();i != m_pkgFoldersList.end();++i) {
+			string installedPackageName = (*i).substr(0,(*i).find('_'));
+			if ( installedPackageName == s_packageName) {
+#ifndef NDEBUG
+        cerr << s_packageName << endl;
+#endif
+				return true;
+			}
+		}
 		return false;
 	}
-	return checkPackageNameExist(packageName);
+	return false;
 }
 void Pkginfo::run(int argc, char** argv)
 {
