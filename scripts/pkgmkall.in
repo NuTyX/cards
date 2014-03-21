@@ -19,11 +19,12 @@
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 #  USA.
 #
+#  Version #VERSION#
 
 source /etc/pkgmk.conf
 if [ $# -lt 1 ]; then
         echo 1>&2
-        echo 1>&2 'Usage: ADD <Package> (ADD kde par exemple)'
+        echo 1>&2 'Usage: pkgmkall <Package> (pkgmkall kde par exemple)'
         echo 1>&2
         exit 1
 fi
@@ -40,7 +41,7 @@ if [ "$2" == "--dry" ];then
         DRY=true
 fi
 TMP=`mktemp -d`
-prt-get depends --all $1|cut -d "]" -f 2|sed "/installed/d" > $TMP/list
+cards depends $1 > $TMP/list
 if grep "missing packages" $TMP/list ; then
         erreur_deps
 fi
@@ -50,23 +51,21 @@ sed -i "${LINE}d" $TMP/list
 
 for i in `cat $TMP/list`
 do
-        cd `prt-get info $i|grep Path|cut -d ":" -f2`/$i
-        if [ -a pre-install ]; then sh pre-install ; fi
+        cd $i
         pkgmk -d -i
-        if [ -a post-install ]; then sh post-install ; fi
 done
 if [ $DRY == true ]; then 
 	exit 0
 fi
 # Construction effective du paquet
 if [ $DRY == false ]; then
-        cd `prt-get info $1|grep Path|cut -d ":" -f2`/$1
+        cd $1
         # rm ${PKGMK_PACKAGE_DIR}/$1#*
         # Si le paquet fait partie de la base, ce sera une maj sinon une install
         if [ ! "`pkginfo -i|grep ^$1\ `" == "" ];then
-		prt-get update $1 >> /dev/null || erreur
+		cards update $1 >> /dev/null || erreur
         else
-		prt-get install $1  > /dev/null || erreur
+		cards install $1  > /dev/null || erreur
         fi
 fi
 rm -r $TMP

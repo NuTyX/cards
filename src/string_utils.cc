@@ -69,7 +69,7 @@ void freeItemList(itemList *list)
 	free(list);
 }
 
-keyValue split_keyValue(string s, string delimiter)
+keyValue split_keyValue(string s, char delimiter)
 {
 	keyValue pv;
 	string entry;
@@ -80,7 +80,7 @@ keyValue split_keyValue(string s, string delimiter)
 		entry.erase(s.find(delimiter),s.size());
     pv.parameter=stripWhiteSpace(entry);
 		entry = s;
-    entry.erase(0,s.find(delimiter)+delimiter.size());
+    entry.erase(0,s.find(delimiter)+sizeof(char));
 		pv.value=stripWhiteSpace(entry);
   }
   else
@@ -108,7 +108,7 @@ set<string> getKeysList(string file, string delimiter)
   return parameter_list;
 }
 
-string getValueOfKey(string file, string delimiter,string parameter)
+string getValueOfKey(string file, char delimiter,string parameter)
 {
   map<string,string> property_list;
   ifstream in(file.c_str());
@@ -134,6 +134,12 @@ string itos(unsigned int value)
   return buf;
 }
 
+string ultos(unsigned long int value)
+{
+	static char buf[20];
+	sprintf(buf, "%lu", value);
+	return buf;
+}
 string mtos(mode_t mode)
 {
   string s;

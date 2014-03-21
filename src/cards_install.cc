@@ -43,8 +43,13 @@ int cards_install(const char* packageName)
   Config config;
   ConfigParser::parseConfig("/etc/cards.conf", config);
 
-  for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
-    if ( (findFile(filesList,config.prtDir[indCat].c_str())) != 0) {
+	string Url = "";
+	for (map<string,string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+
+		string prtDir = i -> first;
+		Url = i -> second;
+//  for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
+    if ( (findFile(filesList,prtDir.c_str())) != 0) {
       return -1;
     }
   }
@@ -67,7 +72,7 @@ int cards_install(const char* packageName)
 	string category = dirname(longPackageName);
 	category = basename(const_cast<char*>(category.c_str()));
 	
-	string url = config.Url + "/" + category + "/" + packageNameVersion + "/" ;
+	string url = Url + "/" + category + "/" + packageNameVersion + "/" ;
 
 #ifndef NDEBUG
 	cout << category << endl;

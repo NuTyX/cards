@@ -4,20 +4,32 @@ DIRSRC = src
 
 DIRMAN = man
 
+DIRSCRIPTS = scripts
+
 .PHONY: cards
 
 all:
 	$(MAKE) -C $(DIRSRC) all
+	$(MAKE) -C $(DIRSCRIPTS) all
 	$(MAKE) -C $(DIRMAN) all
 
 install: all
 
 	$(MAKE) -C $(DIRSRC) install
+	$(MAKE) -C $(DIRSCRIPTS) install
 	$(MAKE) -C $(DIRMAN) install
 
 pkgadd:
 
 	$(MAKE) -C $(DIRSRC) pkgadd
+
+pkgmk:
+
+	$(MAKE) -C $(DIRSCRIPTS) pkgmk
+
+pkgmkall:
+
+	$(MAKE) -C $(DIRSCRIPTS) pkgmkall
 
 cards:
 
@@ -28,6 +40,7 @@ man:
 clean:
 
 	$(MAKE) -C $(DIRSRC) clean
+	$(MAKE) -C $(DIRSCRIPTS) clean
 	$(MAKE) -C $(DIRMAN) clean
 
 dist: distclean

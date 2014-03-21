@@ -58,10 +58,13 @@ int ConfigParser::parseConfig(const string& fileName, Config& config)
 			string key = s.substr(0, pos);
 			string val = stripWhiteSpace(s.substr(pos));
 
-			if (key == "url") {
-				config.Url = val;
-			} else if (key == "prtdir") {
-				config.prtDir.push_back(val);
+			if (key == "dir") {
+				pos = val.find('|');
+				if (pos != string::npos) {
+					string dir = stripWhiteSpace(val.substr(0,pos));
+					string url = stripWhiteSpace(val.substr(pos+1));
+					config.dirUrl[dir] = url;
+				}
 			}
 		}
 	}

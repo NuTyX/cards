@@ -38,12 +38,20 @@ int main(int argc, char** argv)
 
 
 	if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
+		if (getuid()) {
+			cerr << "Only root can sync !!!" << endl;
+			return -1;
+		}
 		CardsSync CS(cardsArgPars);
 		return CS.run();
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
 
 
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
+		if (getuid()) {
+			cerr << "Only root can install !!!" << endl;
+			return -1;
+		}
 
 		return cards_install(argv[2]);
 
@@ -88,9 +96,12 @@ int main(int argc, char** argv)
 		ConfigParser::parseConfig("/etc/cards.conf", config);
 		unsigned int  numberOfPorts = 0;
 		set<string> localPackagesList;
-		for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
-			if ( findFile(localPackagesList, config.prtDir[indCat]) != 0 ) {
-				cerr << " Cannot read "  << config.prtDir[indCat]
+		for (map<string,string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+			string prtDir = i -> first;
+			string Url = i -> second;
+//		for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
+			if ( findFile(localPackagesList, prtDir) != 0 ) {
+				cerr << " Cannot read "  << prtDir
 					<< endl;
 			}
 		}

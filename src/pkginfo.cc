@@ -41,7 +41,7 @@ bool Pkginfo::isInstalled(const char * packageName)
 	int nPkg = getListOfPackages("");
 	if (nPkg > 0) {
 		for (set<string>::iterator i = m_pkgFoldersList.begin();i != m_pkgFoldersList.end();++i) {
-			string installedPackageName = (*i).substr(0,(*i).find('_'));
+			string installedPackageName = (*i).substr(0,(*i).find(BUILD_DELIM));
 			if ( installedPackageName == s_packageName) {
 #ifndef NDEBUG
         cerr << s_packageName << endl;
@@ -63,7 +63,6 @@ void Pkginfo::run(int argc, char** argv)
 	int o_installed_mode = 0;
 	int o_list_mode = 0;
 	int o_owner_mode = 0;
-	int o_convert_mode = 0;
 	int o_details_mode = 0;
 	int o_librairies_mode = 0;
 	int o_runtime_mode = 0;
@@ -79,8 +78,6 @@ void Pkginfo::run(int argc, char** argv)
 			i++;
 		} else if (option == "-i" || option == "--installed") {
 			o_installed_mode += 1;
-		} else if (option == "-c" || option == "--convert") {
-			o_convert_mode += 1;
 		} else if (option == "-d" || option == "--details") {
 			assertArgument(argv, argc, i);
 			o_details_mode +=1;
@@ -123,7 +120,7 @@ void Pkginfo::run(int argc, char** argv)
 	}
 
 	if (o_runtimedependencies_mode + o_footprint_mode + o_details_mode + 
-	o_installed_mode + o_list_mode + o_owner_mode + o_convert_mode + 
+	o_installed_mode + o_list_mode + o_owner_mode + 
 	o_footprint_mode + o_librairies_mode + o_runtime_mode == 0)
 	{
 		m_actualError = OPTION_MISSING;
@@ -139,21 +136,6 @@ void Pkginfo::run(int argc, char** argv)
 		// Make footprint
 		//
 		getFootprintPackage(o_arg);
-	} else if (o_convert_mode ) {
-			if (getuid())
-			{
-				m_actualError = ONLY_ROOT_CAN_CONVERT_DB;
-				treatErrors("");
-			}
-
-			const string new_db = PKG_DB_DIR;	
-    	if (checkFileExist("/" + new_db))
-			{
-				convertSpaceToNoSpaceDBFormat(o_root);
-			} else {
-				Db_lock lock(o_root, false);
-				db_open(o_root);
-				convertDBFormat(); }
 	} else {
 		//
 		// Modes that require the database to be opened
@@ -166,8 +148,12 @@ void Pkginfo::run(int argc, char** argv)
 			//
 			// List installed packages
 			//
-			for (set<string>::const_iterator i = m_packagesList.begin(); i != m_packagesList.end(); ++i)
-				cout << *i << endl;
+			for (set<string>::const_iterator i = m_packagesList.begin(); i != m_packagesList.end(); ++i) {
+				string packageName = *i;
+				string name(packageName,0,packageName.find(' '));
+				cout << name << " ";
+			}
+			cout << endl;
 		} else if (o_list_mode) {
 			//
 			// List package or file contents
@@ -214,7 +200,8 @@ void Pkginfo::run(int argc, char** argv)
 						{
 							if ( k->find('/' + *i) != string::npos)
 							{
-								runtimeList.insert(j->first);
+								string dependencie = j->first + BUILD_DELIM + ultos(j->second.build);
+								runtimeList.insert(dependencie);
 								break;
 								found = true;
 							}
@@ -226,18 +213,14 @@ void Pkginfo::run(int argc, char** argv)
 						}
 					}
 				}
-				if (runtimeList.size()>0)
-				{
+				if (runtimeList.size()>0) {
 #ifndef NDEBUG
 					cerr << "Number of librairies founds: " << runtimeList.size() << endl;
 #endif
 					unsigned int s = 1;
-					for (set<string>::const_iterator i = runtimeList.begin();i!=runtimeList.end();++i)
-					{
-						cout << *i;
+					for (set<string>::const_iterator i = runtimeList.begin();i!=runtimeList.end();++i) {
+						cout << *i << endl;
 						s++;
-						if (s <= runtimeList.size())
-							cout << ",";
 					}
 					cout << endl;
 				}
@@ -303,6 +286,7 @@ void Pkginfo::run(int argc, char** argv)
 				cout << "Name: " << o_arg << endl
 				<< "Arch: " << m_listOfInstPackages[o_arg].arch << endl
 				<< "Version: " << m_listOfInstPackages[o_arg].version << endl
+				<< "Build: " << m_listOfInstPackages[o_arg].build << endl
 				<< "Size : " << m_listOfInstPackages[o_arg].size << endl
 				<< "Depends on (run): " << m_listOfInstPackages[o_arg].run <<"."<< endl;
 				}
@@ -350,7 +334,6 @@ void Pkginfo::printHelp() const
 {
 	cout << "usage: " << m_utilName << " [options]" << endl
 	     << "options:" << endl
-       << "  -c, --convert               convert the datase from pkgutils format to cards format" << endl 
 	     << "  -i, --installed             list installed packages" << endl
        << "  -d, --details               list details about the <package>" << endl
        << "  -L, --librairies            list all the runtime librairies for the <package>" << endl

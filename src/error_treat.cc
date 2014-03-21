@@ -1,6 +1,5 @@
-//  config_parser.h
-//
-//  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
+//  error_treat.cc
+// 
 //  Copyright (c) 2014 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
@@ -19,27 +18,14 @@
 //  USA.
 //
 
-#ifndef CONFIGPARSER_H
-#define CONFIGPARSER_H
+#include "error_treat.h"
 
-#include <string>
-#include <vector>
-#include <map>
-
-typedef std::map<std::string, std::string> dir_url;
-
-struct Config
+RunTimeErrorWithErrno::RunTimeErrorWithErrno(const std::string& msg) throw()
+	: std::runtime_error(msg + std::string(": ") + strerror(errno))
 {
-	Config() {}
-	dir_url dirUrl;
-};
-
-class ConfigParser
+}
+RunTimeErrorWithErrno::RunTimeErrorWithErrno(const std::string& msg, int e) throw()
+	: std::runtime_error(msg + std::string(": ") + strerror(e))
 {
-	public:
-		static std::string stripWhiteSpace(const std::string& input);
-		static int parseConfig(const std::string& fileName,
-			Config& config);
-};
-#endif /* CONFIGPARSER_H */
+}
 // vim:set ts=2 :

@@ -34,6 +34,7 @@
 
 int CardsDepends::level()
 {
+	cout << "Generate Level, please wait ... " << endl;
 	pkgInfo *package = NULL;
 	pkgList *packagesList = initPkgList();
 
@@ -41,8 +42,11 @@ int CardsDepends::level()
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
 
-	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
-		if ( (findFile(filesList,config.prtDir[indCat].c_str())) != 0) {
+	for (map<string,string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+		cout << "Scan " << i->first << endl;
+		string prtDir = i->first;
+		if ( (findFile(filesList,prtDir.c_str())) != 0) {
+			cerr << "Directory " << prtDir << " not found" << endl;
 			return -1;
 		}
 	}
@@ -51,8 +55,9 @@ int CardsDepends::level()
 		addPkgToPkgList(packagesList,package);
 		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
 	}
+	cout << "Generate Level, please wait ... " << endl;
 	int niveau = generate_level (filesList,packagesList,0);
-
+	cout << "Level done " << endl;
 	if (niveau == 0 ) {
 		printf("Problem with genrate_level: %d\n",niveau);
 		return -1;
@@ -90,8 +95,10 @@ int CardsDepends::depends()
 	itemList *filesList = initItemList();
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
-	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
-		if ( (findFile(filesList,config.prtDir[indCat].c_str())) != 0) {
+	for (map<string,string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+		string prtDir = i -> first;
+//	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
+		if ( (findFile(filesList,prtDir.c_str())) != 0) {
 				return -1;
 		}
 	}
@@ -172,8 +179,10 @@ int CardsDepends::deptree()
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
 
-	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
-		if ( (findFile(filesList,config.prtDir[indCat].c_str())) != 0) {
+	for (map<string,string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+		string prtDir = i -> first;
+//	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
+		if ( (findFile(filesList,prtDir.c_str())) != 0) {
 			return -1;
 		}
 	}
@@ -210,16 +219,19 @@ int CardsDepends::deptree()
 	bool found=false;
 	string name = "";
 	set<string> localPackagesList, depsPackagesList;
-	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
-		string category = basename(const_cast<char*>(config.prtDir[indCat].c_str()));
-		string remoteUrl = config.Url + "/" + category;
+	for (map<string,string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+		string prtDir = i -> first;
+		string Url = i -> second;
+//	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
+		string category = basename(const_cast<char*>(prtDir.c_str()));
+		string remoteUrl = Url + "/" + category;
 		DIR *d;
 		struct dirent *dir;
-		d = opendir(config.prtDir[indCat].c_str());
+		d = opendir(prtDir.c_str());
 		if (d) {
 			while ((dir = readdir(d)) != NULL) {
 				if ( strcmp (dir->d_name, ".") && strcmp (dir->d_name, "..") ) {
-					localPackagesList.insert(config.prtDir[indCat] + "/" + dir->d_name);
+					localPackagesList.insert(prtDir + "/" + dir->d_name);
 					string dirName = dir->d_name;
 					name = dirName;
 					unsigned int pos =  dirName.find('_');
@@ -228,7 +240,7 @@ int CardsDepends::deptree()
 					}
 					if (! strcmp (m_packageName,name.c_str())) {
 						found=true;
-						string depFile = config.prtDir[indCat] 
+						string depFile = prtDir
 								+ "/" + dir->d_name + "/" + name + ".deps";
 						if (checkFileExist(depFile)) {
 								if (parseFile(depsPackagesList,depFile.c_str()) != 0 ) {
@@ -237,7 +249,7 @@ int CardsDepends::deptree()
 								}
 						} else {
 							FileDownload DepsPort(remoteUrl + "/" + dirName  + "/" + name + ".deps",
-                    config.prtDir[indCat] + "/" + dirName  ,
+                    prtDir + "/" + dirName  ,
                     name + ".deps",
                     false);	
 							if ( DepsPort.downloadFile() != 0) {

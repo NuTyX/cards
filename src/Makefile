@@ -23,8 +23,10 @@
 
 include ../Makefile.inc
 
-TOOLSOBJECTS =	md5.o \
+TOOLSOBJECTS =	error_treat.o \
+		md5.o \
 		string_utils.o \
+		archive_utils.o \
 		file_utils.o \
 		process.o \
 		runtime_dependencies_utils.o \
@@ -34,7 +36,8 @@ TOOLSOBJECTS =	md5.o \
 		pkginfo.o \
 		tools.o
 
-CARDSOBJECTS =	md5.o \
+CARDSOBJECTS =	error_treat.o \
+		md5.o \
 		string_utils.o \
 		config_parser.o \
 		file_download.o \
@@ -57,21 +60,13 @@ LIBOBJECTS =  pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
 libs:
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
 
-all: pkgadd cards pkgmk rejmerge
+all: pkgadd cards
 
 pkgadd: .tools_depend $(TOOLSOBJECTS)
 	$(CXX) $(TOOLSOBJECTS) -o $@ $(LDFLAGS)
 
-pkgmk: pkgmk.in
-
 cards:  .cards_depend $(CARDSOBJECTS)
 	$(CXX) $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
-
-rejmerge: rejmerge.in
-
-
-%: %.in
-	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
 
 .tools_depend:
 	$(CXX) $(CXXFLAGS) -MM $(TOOLSOBJECTS:.o=.cc) > .tools_depend
@@ -93,11 +88,7 @@ install: all
 	install -D -m0755 pkgadd $(DESTDIR)$(BINDIR)/pkgadd
 	install -D -m0755 cards $(DESTDIR)$(BINDIR)/cards
 	install -D -m0644 pkgadd.conf $(DESTDIR)$(ETCDIR)/pkgadd.conf
-	install -D -m0755 pkgmk $(DESTDIR)$(BINDIR)/pkgmk
-	install -D -m0755 rejmerge $(DESTDIR)$(BINDIR)/rejmerge
-	install -D -m0644 pkgmk.conf $(DESTDIR)$(ETCDIR)/pkgmk.conf
 	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf
-	install -D -m0644 rejmerge.conf $(DESTDIR)$(ETCDIR)/rejmerge.conf
 	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkgrm
 	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkginfo
 
@@ -110,11 +101,10 @@ clean:
 	rm -f $(MANPAGES:=.txt)
 	rm -f libcards.so.$(VERSION)
 	rm -f pkgadd
-	rm -f pkgmk
 	rm -f pkgcrea
 	rm -f cards
 
 distclean: clean
-	rm -f pkgadd pkginfo pkgrm pkgmk rejmerge cards
+	rm -f pkgadd pkginfo pkgrm cards
 
 # End of file

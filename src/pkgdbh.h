@@ -23,6 +23,8 @@
 #ifndef PKGDBH_H
 #define PKGDBH_H
 
+#include "archive_utils.h"
+
 #include <string>
 #include <set>
 #include <map>
@@ -34,9 +36,7 @@
 #include <dirent.h>
 
 #define PKG_EXT          ".cards.tar."
-#define PKG_DB_DIR_OLD   "var/lib/pkg/"
 #define PKG_DB_DIR       "var/lib/pkg/DB/"
-#define PKG_DB_OLD       "var/lib/pkg/db"
 #define PKG_FILES        "/files"
 #define PKG_META         "META"
 #define PKG_RECEPT       "Pkgfile"
@@ -45,7 +45,7 @@
 #define PKG_POST_INSTALL ".POST"    
 
 #define PKG_REJECTED     "var/lib/pkg/rejected"
-#define VERSION_DELIM    '_'
+#define BUILD_DELIM    '@'
 #define GROUP_DELIM      '.'
 #define NAME_DELIM			 ' '
 #define PARAM_DELIM      "="
@@ -65,7 +65,7 @@ CANNOT_READ_DIRECTORY,
 CANNOT_WRITE_FILE,
 CANNOT_SYNCHRONIZE,
 CANNOT_RENAME_FILE,
-CANNOT_DETERMINE_NAME_VERSION,
+CANNOT_DETERMINE_NAME_BUILDNR,
 EMPTY_PACKAGE,
 CANNOT_FORK,
 WAIT_PID_FAILED,
@@ -77,7 +77,6 @@ OPTION_ONE_ARGUMENT,
 INVALID_OPTION,
 OPTION_MISSING,
 TOO_MANY_OPTIONS,
-ONLY_ROOT_CAN_CONVERT_DB,
 ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE,
 PACKAGE_ALLREADY_INSTALL,
 PACKAGE_NOT_INSTALL,
@@ -118,6 +117,7 @@ RM_PKG_FILES_END
 };
 
 struct pkginfo_t {
+    unsigned int long build;
     string version;
     string arch;
     string run;
@@ -140,7 +140,6 @@ public:
 protected:
 	// Database
 
-	void convertDBFormat();
 	int getListOfPackages(const string& path );
 	pair<string, pkginfo_t> getInfosPackage(const string& packageName);
 	void getInstalledPackages(bool silent);
@@ -162,9 +161,6 @@ protected:
 	void removePackageFilesRefsFromDB(set<string> files, const set<string>& keep_list);
 	set<string> getConflictsFilesList(const string& name, const pkginfo_t& info);
 
-	// old member from pkgutils
-	void db_open(const string& path);
-
 	// Tar.gz
 	pair<string, pkginfo_t> openArchivePackage(const string& filename);
 	pair<string, pkginfo_t> openArchivePackage_2(const string& filename) const;
@@ -174,10 +170,10 @@ protected:
 	void installArchivePackage_2(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
 	void getFootprintPackage(string& filename);
 	void runLdConfig();
-	void convertSpaceToNoSpaceDBFormat(const string& path);
 
 	string m_utilName;
 	string m_root;
+	string m_build;
 	packages_t m_listOfInstPackages; /* List of Installed packages */
 	set<string> m_pkgFoldersList;
 	set<string> m_packagesList;
@@ -199,14 +195,14 @@ private:
 	DIR* m_dir;
 };
 
-class RunTimeErrorWithErrno : public runtime_error {
+/* class RunTimeErrorWithErrno : public runtime_error {
 public:
 	explicit RunTimeErrorWithErrno(const string& msg) throw()
 		: runtime_error(msg + string(": ") + strerror(errno)) {}
 	explicit RunTimeErrorWithErrno(const string& msg, int e) throw()
 		: runtime_error(msg + string(": ") + strerror(e)) {}
 };
-
+*/
 // Utility functions
 void assertArgument(char** argv, int argc, int index);
 void rotatingCursor();

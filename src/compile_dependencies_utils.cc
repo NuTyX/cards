@@ -207,7 +207,7 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 	char *depfile = (char*)Malloc(sizeof(char)*255);	
 
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
-	name[ strchr(name,'_') - name ]='\0';
+	name[ strchr(name,'@') - name ]='\0';
 	
 	sprintf(fullPathfileName,"%s/MD5SUM",filesList->items[nameIndex]);
 
@@ -245,13 +245,13 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 				char *name = (char*)Malloc(sizeof(char)*255);
 				for(j = 0; j < filesList->count; j++) {
 					sprintf(name,"%s",basename(filesList->items[j]));
-					name[ strchr(name,'_') - name ]='\0';
+					name[ strchr(name,'@') - name ]='\0';
 					char * dep = strdup ( nameDeps->items[i]);
 					if ( strchr(dep,'.') != NULL) {
 						dep[strchr(dep,'.') - dep ]= '\0';
 					}
-					if ( strchr(dep,'_') != NULL) {
-						dep[strchr(dep,'_') - dep ]= '-';
+					if ( strchr(dep,'@') != NULL) {
+						dep[strchr(dep,'@') - dep ]= '-';
 					}
 					if (strcmp(dep,name) == 0 ) {
 						addDepToDepList(dependancesList,j,0);
@@ -365,9 +365,9 @@ char *getLongPackageName(itemList *filesList, const char * packageName)
 	unsigned int i = 0 ;
 	for (i = 0; i < filesList->count;i++) {
 		name = strdup(filesList->items[i]);
-		name[strchr(name,'_') - name] = '\0';
+		name[strchr(name,'@') - name] = '\0';
 		if ( strcmp ( basename(name), packageName ) == 0 ) {
-			name[strlen(name)]='_';
+			name[strlen(name)]='@';
 			found = true ;
 			break;
 		}

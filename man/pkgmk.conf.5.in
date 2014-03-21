@@ -83,11 +83,6 @@ If set to 'yes', pkgmk will keep the sources codes of the build. If 'no', they w
 .br
 Default: 'no'
 .TP
-\fBPKGMK_CHECK_FILES='STRING'\fP
-If set to 'yes', pkgmk verify availability of the sources and the modification date of the file Pkgfile, if it's more recent, the build will be redone.
-.br
-Default: 'no'
-.TP
 \fBPKGMK_CLEAN_OLD='STRING'\fP
 If set to 'yes', pkgmk will delete any version of the package before producing the new(s) one(s) after a successfull build.
 .br

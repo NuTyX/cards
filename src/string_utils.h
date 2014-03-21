@@ -59,11 +59,13 @@ void split( const string& s, char del,
             T& target,
             int startPos=0, bool useEmpty=true  );
 
-keyValue split_keyValue(string s, string delimiter);
+keyValue split_keyValue(string s, char delimiter);
 set<string> getKeysList(string file, string delimiter);
 string getValueOfKey(string file, string delimiter,string parameter);
 
 string itos(unsigned int value);
+string ultos(unsigned long int value);
+
 string mtos(mode_t mode);
 string trim_filename(const string& filename);
 

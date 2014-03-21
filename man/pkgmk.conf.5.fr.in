@@ -77,12 +77,6 @@ Défaut:
 Si défini comme 'yes', pkgmk garde les sources du paquet dans tous les cas, si 'no' ceux-ci sont supprimés après une construction réussie.
 .br
 Défaut: 'no'
-
-.TP
-\fBPKGMK_CHECK_FILES='STRING'\fP
-Si défini comme 'yes', pkgmk vérifie la présence des sources et la date de modification du Pkgfile, si celle-ci est plus récente, le paquet sera recompilé
-.br
-Défaut: 'no'
 .TP
 \fBPKGMK_CLEAN_OLD='STRING'\fP
 Si défini comme 'yes', pkgmk supprime les anciens paquets avant de produire le(s) nouveau(x) et ce après une construction réussie.

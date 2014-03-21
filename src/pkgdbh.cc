@@ -43,23 +43,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <libgen.h>
-#include <archive.h>
-#include <archive_entry.h>
-
-#if ARCHIVE_VERSION_NUMBER >= 3000000
-#define INIT_ARCHIVE(ar) \
-	archive_read_support_filter_gzip((ar)); \
-	archive_read_support_filter_bzip2((ar)); \
-	archive_read_support_filter_xz((ar)); \
-	archive_read_support_format_tar((ar))
-#else
-#define INIT_ARCHIVE(ar) \
-	archive_read_support_compression_gzip((ar)); \
-	archive_read_support_compression_bzip2((ar)); \
-	archive_read_support_compression_xz((ar)); \
-	archive_read_support_format_tar((ar))
-#endif
-#define DEFAULT_BYTES_PER_BLOCK (20 * 512)
 
 using __gnu_cxx::stdio_filebuf;
 
@@ -106,8 +89,8 @@ void Pkgdbh::treatErrors(const string& s) const
 		case CANNOT_RENAME_FILE:
 			throw RunTimeErrorWithErrno("could not rename " + s);
 			break;
-		case CANNOT_DETERMINE_NAME_VERSION:
-			throw RunTimeErrorWithErrno("could not determine name / version " + s);
+		case CANNOT_DETERMINE_NAME_BUILDNR:
+			throw RunTimeErrorWithErrno("could not determine name / build number " + s);
 			break;
 		case EMPTY_PACKAGE:
 			throw RunTimeErrorWithErrno("could not synchronize " + s);
@@ -141,9 +124,6 @@ void Pkgdbh::treatErrors(const string& s) const
 			break;
 		case TOO_MANY_OPTIONS:
 			throw runtime_error(s+ ": to many options");
-			break;
-		case ONLY_ROOT_CAN_CONVERT_DB:
-			throw runtime_error(s + "only m_root can convert the database");
 			break;
 		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
 			throw runtime_error(s + " only m_root can install / upgrade / remove packages");
@@ -270,7 +250,7 @@ int Pkgdbh::getListOfPackages (const string& path)
     treatErrors(pathdb);
 	}
 	for (set<string>::iterator i = m_pkgFoldersList.begin();i != m_pkgFoldersList.end();++i) {
-		string_splited=split_keyValue(*i,"_");
+		string_splited=split_keyValue(*i,BUILD_DELIM);
 		if (string_splited.value.size()>0)
 			m_packagesList.insert(string_splited.parameter + " " + string_splited.value);
 	}
@@ -284,13 +264,11 @@ int Pkgdbh::getListOfPackages (const string& path)
 pair<string, pkginfo_t> Pkgdbh::getInfosPackage(const string& packageName)
 {
 	pair<string, pkginfo_t> result;
-	string name(packageName,0,packageName.find('_'));
-	string version = packageName;
-	result.second.version=version.erase(0, version.find('_') == string::npos ? string::npos : version.find('_') + 1);
+	string name(packageName,0,packageName.find(BUILD_DELIM));
+	string build = packageName;
+	result.second.build=strtoul((build.erase(0, build.find(BUILD_DELIM) == string::npos ? string::npos : build.find(BUILD_DELIM) + 1).c_str()),NULL,0);
 	result.first = name;
-	string package_foldername = name + "_" + version + "/";
-	result.second.run = getValueOfKey(m_root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
-	result.second.size = getValueOfKey(m_root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
+	string package_foldername = name + BUILD_DELIM + build + "/";
 	return result;
 }
 /* Populate the database with all details infos */
@@ -310,16 +288,9 @@ void Pkgdbh::getInstalledPackages(bool silent)
 		}
 		pkginfo_t info;
 		string name(*i,0, i->find(NAME_DELIM));
-		string version = *i;
-		version.erase(0, version.find(NAME_DELIM) == string::npos ? string::npos : version.find(NAME_DELIM) + 1);
-		string arch = version;
-		version.erase(version.find_last_of("-"),version.size());
-		arch.erase(0, arch.find_last_of("-")+1);
-		info.version = version;
-		info.arch = arch;
-		string package_foldername = name + "_" + version + "-" + arch + "/";
-		info.run = getValueOfKey(m_root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"run");
-		info.size = getValueOfKey(m_root + PKG_DB_DIR + package_foldername +PKG_META,PARAM_DELIM,"size_i");
+		string build = *i;
+		info.build = strtoul((build.erase(0, build.find(NAME_DELIM) == string::npos ? string::npos : build.find(NAME_DELIM) + 1).c_str()),NULL,0);
+		string package_foldername = name + BUILD_DELIM + build + "/";
 		// list of files
 		const string filelist = m_root + PKG_DB_DIR + package_foldername + PKG_FILES;
 		int fd = open(filelist.c_str(), O_RDONLY);
@@ -356,86 +327,6 @@ void Pkgdbh::getInstalledPackages(bool silent)
 		progressInfo();
 	}
 }
-void Pkgdbh::convertSpaceToNoSpaceDBFormat(const string& path)
-{
-	m_root = trimFileName(path + "/");
-	/* Convert from directories with spaces to directories without spaces */
-	const string packagedir = m_root + PKG_DB_DIR ;
-	if ( findFile(m_packagesList,packagedir) != 0 ) {
-		m_actualError = CANNOT_READ_FILE;
-		treatErrors(packagedir);
-	}
-
-	for (set<string>::iterator i = m_packagesList.begin();i != m_packagesList.end();++i) {
-
-		if ( ! (i->find(NAME_DELIM) == string::npos))
-		{
-			string name(*i,0, i->find(NAME_DELIM));
-			string version = *i;
-			version.erase(0, version.find(NAME_DELIM) == string::npos ? string::npos : version.find(NAME_DELIM) + 1);
-			const string packagenamedir_with_space = m_root + PKG_DB_DIR + name + " " + version;
-			const string packagenamedir_without_space = m_root + PKG_DB_DIR + name + "_" + version;
-			if (rename( packagenamedir_with_space.c_str(), packagenamedir_without_space.c_str() ) == -1 )
-			{
-				m_actualError = CANNOT_RENAME_FILE;
-				treatErrors(packagenamedir_with_space + " to " + packagenamedir_without_space);
-			}
-			cout << packagenamedir_with_space << " renamed in " << packagenamedir_without_space << endl;
-		}
-	}
-}
-void Pkgdbh::convertDBFormat()
-{
-	/* Convert from single db file to multi directories */
-
-	const string packagedir = m_root + PKG_DB_DIR ;
-	mkdir(packagedir.c_str(),0755);
-	cout << packagedir << endl;
-	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-
-		const string packagenamedir = m_root + PKG_DB_DIR + i->first + "_" + i-> second.version;
-		cout << packagenamedir << " created" << endl;
-		mkdir(packagenamedir.c_str(),0755);
-		const string fileslist = packagenamedir + PKG_FILES;
-		const string fileslist_new = fileslist + ".imcomplete_transaction";
-
-		int fd_new = creat(fileslist_new.c_str(),0444);
-
-		if (fd_new == -1)
-		{
-			m_actualError = CANNOT_CREATE_FILE;
-			treatErrors(fileslist_new);
-		}
-
-		stdio_filebuf<char> filebuf_new(fd_new, ios::out, getpagesize());
-
-		ostream db_new(&filebuf_new);
-		copy(i->second.files.begin(), i->second.files.end(), ostream_iterator<string>(db_new, "\n"));
-
-		db_new.flush();
-		if (!db_new)
-		{
-			m_actualError = CANNOT_WRITE_FILE;
-			treatErrors(fileslist_new);
-		}
-		// Synchronize file to disk
-		if (fsync(fd_new) == -1)
-		{
-			m_actualError = CANNOT_SYNCHRONIZE;
-			treatErrors(fileslist_new);
-		}
-
-		// Move new database into place
-		if (rename(fileslist_new.c_str(), fileslist.c_str()) == -1)
-		{
-			m_actualError = CANNOT_RENAME_FILE;
-			treatErrors(fileslist_new + " to " + fileslist);
-		}
-	}
-#ifndef NDEBUG
-  cerr << m_listOfInstPackages.size() << " packages written to database" << endl;
-#endif
-}
 void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 {
   set<string> metaFilesList;
@@ -453,8 +344,25 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 			info.files.erase(i);
 		}
 	}
+	set<string> fileContent;
+	if ( parseFile(fileContent,".META") == -1 ) {
+		m_actualError = CANNOT_FIND_FILE;
+		treatErrors(".META");
+	}
+	for (set<string>::iterator i = fileContent.begin();i != fileContent.end();++i) {
+		string s = *i;
+		string::size_type pos = s.find('=');
+		if (pos != string::npos) {
+			s = stripWhiteSpace(s.substr(0,pos));
+		}
+		if ( s == "build" ) {
+			cout << s << endl;
+			m_build = stripWhiteSpace(s.substr(pos+2));
+			break;
+		}
+	}
 	const string packagedir = m_root + PKG_DB_DIR ;
-	const string packagenamedir = m_root + PKG_DB_DIR + name + "_" + info.version + "-" + info.arch;
+	const string packagenamedir = m_root + PKG_DB_DIR + name + BUILD_DELIM +  m_build;
 
 	mkdir(packagenamedir.c_str(),0755);
 	for (set<string>::const_iterator i = metaFilesList.begin(); i!=  metaFilesList.end(); ++i)
@@ -476,7 +384,7 @@ void Pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 
 	m_listOfInstPackages[name] = info;
 	const string packagedir = m_root + PKG_DB_DIR ;
-	const string packagenamedir = m_root + PKG_DB_DIR + name + "_" + info.version + "-" + info.arch;
+	const string packagenamedir = m_root + PKG_DB_DIR + name + BUILD_DELIM +  m_build;
 	mkdir(packagenamedir.c_str(),0755);
 	const string fileslist = packagenamedir + PKG_FILES;
 	const string fileslist_new = fileslist + ".imcomplete_transaction";
@@ -525,9 +433,9 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
 	set<string> metaFilesList;
 	const string packagedir = m_root + PKG_DB_DIR ;
-	const string version = m_listOfInstPackages[name].version;
+	const string build = ultos(m_listOfInstPackages[name].build);
 	const string arch = m_listOfInstPackages[name].arch;
-	const string packagenamedir = m_root + PKG_DB_DIR + name + "_" + version + "-" + arch;
+	const string packagenamedir = m_root + PKG_DB_DIR + name + BUILD_DELIM + build;
 
 	if ( findFile(metaFilesList, packagenamedir) != 0 ) {
 		m_actualError = CANNOT_READ_FILE;
@@ -741,16 +649,16 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 
 	// Extract name, version and the arch from filename
 	string basename(filename, filename.rfind('/') + 1);
-	string name(basename, 0, basename.find(VERSION_DELIM));
+	string name(basename, 0, basename.find(BUILD_DELIM));
 	string version(basename, 0, basename.rfind(PKG_EXT));
-  version.erase(0, version.find(VERSION_DELIM) == string::npos ? string::npos : version.find(VERSION_DELIM) + 1);
+  version.erase(0, version.find(BUILD_DELIM) == string::npos ? string::npos : version.find(BUILD_DELIM) + 1);
 	string arch = version;
   version.erase(version.find_last_of("-"),version.size());
   arch.erase(0, arch.find_last_of("-")+1);
 
 	if (name.empty() || version.empty())
 	{
-		m_actualError = CANNOT_DETERMINE_NAME_VERSION;
+		m_actualError = CANNOT_DETERMINE_NAME_BUILDNR;
 		treatErrors(basename);
 	}
 
@@ -1137,7 +1045,7 @@ void Pkgdbh::print_version() const
 Db_lock::Db_lock(const string& m_root, bool exclusive)
 	: m_dir(0)
 {
-	const string dirname = trimFileName(m_root + string("/") + PKG_DB_DIR_OLD);
+	const string dirname = trimFileName(m_root + string("/") + PKG_DB_DIR);
 
 	if (!(m_dir = opendir(dirname.c_str())))
 		throw RunTimeErrorWithErrno("could not read directory " + dirname);
@@ -1158,51 +1066,6 @@ Db_lock::~Db_lock()
 	}
 }
 
-void Pkgdbh::db_open(const string& path)
-{
-  // Read database from single file
-  // Only need to convert from pkgutils to cards
-
-  m_root = trimFileName(path + "/");
-  const string filename = m_root + PKG_DB_OLD;
-
-  int fd = open(filename.c_str(), O_RDONLY);
-  if (fd == -1)
-	{
-		m_actualError = CANNOT_OPEN_FILE;
-    treatErrors(filename);
-	}
-  stdio_filebuf<char> filebuf(fd, ios::in, getpagesize());
-  istream in(&filebuf);
-  if (!in)
-	{
-		m_actualError = CANNOT_READ_FILE;
-		treatErrors(filename);
-	}
-  while (!in.eof()) {
-    // Read record
-    string name;
-    pkginfo_t info;
-    getline(in, name);
-    getline(in, info.version);
-    for (;;) {
-      string file;
-      getline(in, file);
-
-      if (file.empty())
-        break; // End of record
-
-      info.files.insert(info.files.end(), file);
-    }
-   if (!info.files.empty())
-        m_listOfInstPackages[name] = info;
-  }
-
-#ifndef NDEBUG
-  cerr << endl;
-  cerr << m_listOfInstPackages.size() << " packages found in database " << endl;
-#endif
-}
 /*******************     End of Members *********************/
 
 /*******************   Various fonctions ********************/

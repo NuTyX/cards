@@ -18,8 +18,8 @@
 //  USA.
 //
 
-#ifndef FILE_DOWNLOAD_H
-#define FILE_DOWNLOAD_H
+#ifndef FILEDOWNLOAD_H
+#define FILEDOWNLOAD_H
 
 
 #include <curl/curl.h>
@@ -77,5 +77,5 @@ class FileDownload
 	string m_MD5Sum;
 };
 
-#endif /* FILE_DOWNLOAD_H */
+#endif /* FILEDOWNLOAD_H */
 // vim:set ts=2 :
