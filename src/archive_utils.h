@@ -23,7 +23,7 @@
 #ifndef ARCHIVEUTILS_H
 #define ARCHIVEUTILS_H
 
-
+#include <time.h>
 #include <archive.h>
 #include <archive_entry.h>
 
@@ -51,7 +51,10 @@
 	archive_read_support_compression_xz((ar)); \
 	archive_read_support_format_tar((ar))
 #endif
+
 #define DEFAULT_BYTES_PER_BLOCK (20 * 512)
+#define METAFILE ".META"
+#define INFOFILE ".INFO"
 
 enum archive_error
 {
@@ -72,16 +75,30 @@ class ArchiveUtils
 
 	virtual void treatErrors(const std::string& s) const;
 
-	std::set<string> getFilesList();
-	void extractFiles(); // Installed files from the archive
-	void printMetaInfo();	// Print Out the MetaInfo
+	void extractFiles();     // Installed files from the archive
+
+	void printMeta();	       // Print Out the .META file
+	void printInfo();        // the .INFO file
+	void printPre();         // the .PRE file
+	void printPost();        // the .POST file
+	void printReadMe();      // and the .README file
+	void list();             // list the files
+	std::string name();      // return the name
+	std::string version();   // return the version
+	std::string builddate();
 
 	private:
+
+	void getFilesList();
+	void extractFileContent(const char * fileName);
+
+	struct archive* ar;
+	struct archive_entry* en;
+
+	itemList * m_contentFile;
+
 	std::string m_fileName;
 	std::set<string> m_filesList;
-	std::vector<string> m_metaInfo;
-	struct archive* m_archive;
-  struct archive_entry* m_entry;
 
 	archive_error m_actualError;
 };

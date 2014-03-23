@@ -8,13 +8,15 @@ using namespace std;
 int main (int argi, char * argv[])
 {
 	try {
-		ArchiveUtils au(argv[1]);
-/*		au.printMetaInfo();
-		set<string> list = au.getFilesList();
-		for (set<string>::iterator i = list.begin();i != list.end();++i) {
-			cout << *i << endl;
-		}*/
-		au.printMetaInfo();
+		ArchiveUtils  * au  = new ArchiveUtils(argv[1]) ;
+		string name = au->name() + " " + au->version() ;
+		au->list();
+		cout << endl << name << endl<<endl;
+		au->printInfo();
+		cout << endl;
+		au->printMeta();
+		cout << endl << "build On: " <<  au->builddate()<<endl;
+
 	}  catch (runtime_error& e) {
 			cerr << e.what() << endl;
 			return -1;

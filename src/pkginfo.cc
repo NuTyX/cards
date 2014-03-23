@@ -40,8 +40,8 @@ bool Pkginfo::isInstalled(const char * packageName)
 	string s_packageName = packageName;
 	int nPkg = getListOfPackages("");
 	if (nPkg > 0) {
-		for (set<string>::iterator i = m_pkgFoldersList.begin();i != m_pkgFoldersList.end();++i) {
-			string installedPackageName = (*i).substr(0,(*i).find(BUILD_DELIM));
+		for (set<string>::iterator i = m_packagesList.begin();i != m_packagesList.end();++i) {
+			string installedPackageName = *i;
 			if ( installedPackageName == s_packageName) {
 #ifndef NDEBUG
         cerr << s_packageName << endl;
@@ -149,9 +149,7 @@ void Pkginfo::run(int argc, char** argv)
 			// List installed packages
 			//
 			for (set<string>::const_iterator i = m_packagesList.begin(); i != m_packagesList.end(); ++i) {
-				string packageName = *i;
-				string name(packageName,0,packageName.find(' '));
-				cout << name << " ";
+				cout << *i << " ";
 			}
 			cout << endl;
 		} else if (o_list_mode) {
@@ -200,7 +198,7 @@ void Pkginfo::run(int argc, char** argv)
 						{
 							if ( k->find('/' + *i) != string::npos)
 							{
-								string dependencie = j->first + BUILD_DELIM + ultos(j->second.build);
+								string dependencie = j->first + ultos(j->second.build);
 								runtimeList.insert(dependencie);
 								break;
 								found = true;

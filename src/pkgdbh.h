@@ -175,9 +175,8 @@ protected:
 	string m_root;
 	string m_build;
 	packages_t m_listOfInstPackages; /* List of Installed packages */
-	set<string> m_pkgFoldersList;
 	set<string> m_packagesList;
-	set<string> FilesList;
+	set<string> m_filesList;
 	set<string> m_runtimeLibrairiesList;
 	packages_t m_dependancesList;
 
@@ -195,14 +194,6 @@ private:
 	DIR* m_dir;
 };
 
-/* class RunTimeErrorWithErrno : public runtime_error {
-public:
-	explicit RunTimeErrorWithErrno(const string& msg) throw()
-		: runtime_error(msg + string(": ") + strerror(errno)) {}
-	explicit RunTimeErrorWithErrno(const string& msg, int e) throw()
-		: runtime_error(msg + string(": ") + strerror(e)) {}
-};
-*/
 // Utility functions
 void assertArgument(char** argv, int argc, int index);
 void rotatingCursor();

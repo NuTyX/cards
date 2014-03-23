@@ -202,6 +202,17 @@ string getFirstValueOfKeyBeforeDelim(const string& s, char delimiter)
 		return s.substr( 0, pos );
 	return s;
 }
+itemList * parseDelimitedItemList(char * s, const char * delimiter)
+{
+	itemList * iL = initItemList();
+	char * pch;
+	pch = strtok (s,delimiter);
+	while ( pch != NULL) {	
+		addItemToItemList(iL,pch);
+		pch = strtok (NULL,delimiter);
+	}
+	return iL;
+}
 set<string> parseDelimitedList(const string& s, char delimiter)
 {
 	set<string> depList;

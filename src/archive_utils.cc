@@ -23,22 +23,35 @@
 ArchiveUtils::ArchiveUtils(const string& fileName)
 	: m_fileName(fileName)
 {
-	m_archive = archive_read_new();
+
+/*
+
+	 TODO Find a beter way, I'm affraid not possible
+
+	ar = archive_read_new();
+
 	INIT_ARCHIVE(m_archive);
 	if (archive_read_open_filename(m_archive,
 		m_fileName.c_str(),
 		DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK) {
 			m_actualError = CANNOT_OPEN_ARCHIVE;
 			treatErrors(m_fileName);
-	}
+	} 
+*/
+	
 }
 ArchiveUtils::~ArchiveUtils()
 {
+
 #if ARCHIVE_VERSION_NUMBER >= 3000000
-  archive_read_free(m_archive);
+  archive_read_free(ar);
 #else
-  archive_read_finish(m_archive);
-#endif
+  archive_read_finish(ar);
+#endif 
+
+	if ( m_contentFile != NULL ) {
+		freeItemList(m_contentFile);
+	}
 }
 void ArchiveUtils::treatErrors(const std::string& message) const
 {
@@ -57,35 +70,112 @@ void ArchiveUtils::treatErrors(const std::string& message) const
 			throw RunTimeErrorWithErrno("is not an archive " + message);
 	}
 }
-std::set<string> ArchiveUtils::getFilesList()
+void ArchiveUtils::getFilesList()
 {
-	for (unsigned int i = 0; archive_read_next_header(m_archive, &m_entry) ==
+	ar = archive_read_new();
+	INIT_ARCHIVE(ar);
+	if (archive_read_open_filename(ar,
+    m_fileName.c_str(),
+    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK) {
+      m_actualError = CANNOT_OPEN_ARCHIVE;
+      treatErrors(m_fileName);
+  }
+	for (unsigned int i = 0; archive_read_next_header(ar, &en) ==
 		ARCHIVE_OK; ++i) {
-			m_filesList.insert(archive_entry_pathname(m_entry));
-			mode_t mode = archive_entry_mode(m_entry);
+			m_filesList.insert(archive_entry_pathname(en));
+			mode_t mode = archive_entry_mode(en);
 			if (S_ISREG(mode) &&
-				archive_read_data_skip(m_archive) != ARCHIVE_OK) {
+				archive_read_data_skip(ar) != ARCHIVE_OK) {
 					m_actualError = CANNOT_READ_ARCHIVE;
 					treatErrors(m_fileName);
 			}
 	}
-	return m_filesList;
 }
-void ArchiveUtils::printMetaInfo()
+void ArchiveUtils::list()
 {
+	getFilesList();
+	for (set<string>::iterator i = m_filesList.begin();i != m_filesList.end();++i) {
+		cout << *i << endl;
+	}
+}
+void ArchiveUtils::extractFileContent(const char * fileName)
+{
+	ar = archive_read_new();
+	INIT_ARCHIVE(ar);
+	if (archive_read_open_filename(ar,
+    m_fileName.c_str(),
+    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK) {
+      m_actualError = CANNOT_OPEN_ARCHIVE;
+      treatErrors(m_fileName);
+  }
 	int64_t entry_size;
-	char *fileContents;
-	while (archive_read_next_header(m_archive,&m_entry) == ARCHIVE_OK) {
-		const char *currentFile = archive_entry_pathname(m_entry);
-		entry_size = archive_entry_size(m_entry);
-		fileContents = (char*)malloc(entry_size);
-		archive_read_data(m_archive,fileContents,entry_size);
-		if(strcmp(currentFile, ".META") == 0) {
-			fileContents[entry_size]='\0';
-			printf("%s",fileContents);
+	char * fC; // file content
+	while (archive_read_next_header(ar,&en) == ARCHIVE_OK) {
+		const char *currentFile = archive_entry_pathname(en);
+		entry_size = archive_entry_size(en);
+		fC = (char*)Malloc(entry_size);
+		archive_read_data(ar,fC,entry_size);
+		if(strcmp(currentFile, fileName) == 0) {
+			fC[entry_size]='\0';
+			m_contentFile = parseDelimitedItemList(fC, "\n");
+			break;
+			free(fC);
+		}
+	}
+}
+void ArchiveUtils::printMeta()
+{
+	extractFileContent(METAFILE);
+	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
+		cout << m_contentFile->items[i] << endl;
+	}
+}
+void ArchiveUtils::printInfo()
+{
+	extractFileContent(INFOFILE);
+	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
+		cout << m_contentFile->items[i] << endl;
+	}
+}
+string ArchiveUtils::name()
+{
+	string name;
+	extractFileContent(METAFILE);
+	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
+		if ( m_contentFile->items[i][0] == 'N' ) {
+			name = m_contentFile->items[i];
 			break;
 		}
-		free(fileContents);
 	}
-} 
+	return name.substr(2);
+}
+string ArchiveUtils::version()
+{
+	string version;
+	extractFileContent(METAFILE);
+	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
+		if ( m_contentFile->items[i][0] == 'V' ) {
+			version = m_contentFile->items[i];
+			break;
+		}
+	}
+	return version.substr(2);
+}
+string ArchiveUtils::builddate()
+{
+	char * c_time_s;
+	string buildtime;
+	extractFileContent(METAFILE);
+	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
+		if ( m_contentFile->items[i][0] == 'B' ) {
+			string buildtimel=m_contentFile->items[i];
+			buildtime=buildtimel.substr(2);
+			break;
+		}
+	}
+	time_t ct = strtoul(buildtime.c_str(),NULL,0);
+	c_time_s = ctime(&ct);
+	string build = c_time_s;
+	return build;
+}
 // vim:set ts=2 :

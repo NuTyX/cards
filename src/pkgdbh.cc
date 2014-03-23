@@ -126,7 +126,7 @@ void Pkgdbh::treatErrors(const string& s) const
 			throw runtime_error(s+ ": to many options");
 			break;
 		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
-			throw runtime_error(s + " only m_root can install / upgrade / remove packages");
+			throw runtime_error(s + " only root can install / upgrade / remove packages");
 			break;
 		case PACKAGE_ALLREADY_INSTALL:
 			throw runtime_error("package " + s + " allready installed (use -u to upgrade)");
@@ -220,12 +220,12 @@ void Pkgdbh::progressInfo() const
 			break;
 		case RM_PKG_FILES_START:
 			j=0;
-			cout << "Removing " << FilesList.size() << " files: ";
+			cout << "Removing " << m_filesList.size() << " files: ";
 			break;
 		case RM_PKG_FILES_RUN:
-			if ( FilesList.size()>100)
+			if ( m_filesList.size()>100)
 			{
-				i = j / ( FilesList.size() / 100);
+				i = j / ( m_filesList.size() / 100);
 				printf("%3d%%\b\b\b\b",i);
 			}
 			j++;
@@ -245,16 +245,10 @@ int Pkgdbh::getListOfPackages (const string& path)
 	keyValue string_splited;
 	m_root = trimFileName(path + "/");
 	const string pathdb =  m_root + PKG_DB_DIR;
-	if ( findFile(m_pkgFoldersList, pathdb) != 0 ) {
+	if ( findFile(m_packagesList, pathdb) != 0 ) {
 		m_actualError = CANNOT_READ_FILE;
     treatErrors(pathdb);
 	}
-	for (set<string>::iterator i = m_pkgFoldersList.begin();i != m_pkgFoldersList.end();++i) {
-		string_splited=split_keyValue(*i,BUILD_DELIM);
-		if (string_splited.value.size()>0)
-			m_packagesList.insert(string_splited.parameter + " " + string_splited.value);
-	}
-
 #ifndef NDEBUG
   cerr << "Number of Packages: " << m_packagesList.size() << endl;
 #endif
@@ -264,11 +258,10 @@ int Pkgdbh::getListOfPackages (const string& path)
 pair<string, pkginfo_t> Pkgdbh::getInfosPackage(const string& packageName)
 {
 	pair<string, pkginfo_t> result;
-	string name(packageName,0,packageName.find(BUILD_DELIM));
-	string build = packageName;
-	result.second.build=strtoul((build.erase(0, build.find(BUILD_DELIM) == string::npos ? string::npos : build.find(BUILD_DELIM) + 1).c_str()),NULL,0);
-	result.first = name;
-	string package_foldername = name + BUILD_DELIM + build + "/";
+	
+/*	string build = packageName.substr(packageName.length()-9,packageName.length());
+	result.second.build=strtoul((build.erase(0, build.find(BUILD_DELIM) == string::npos ? string::npos : build.find(BUILD_DELIM) + 1).c_str()),NULL,0); */
+	result.first = packageName;
 	return result;
 }
 /* Populate the database with all details infos */
@@ -287,12 +280,12 @@ void Pkgdbh::getInstalledPackages(bool silent)
 				progressInfo();
 		}
 		pkginfo_t info;
-		string name(*i,0, i->find(NAME_DELIM));
-		string build = *i;
-		info.build = strtoul((build.erase(0, build.find(NAME_DELIM) == string::npos ? string::npos : build.find(NAME_DELIM) + 1).c_str()),NULL,0);
-		string package_foldername = name + BUILD_DELIM + build + "/";
-		// list of files
-		const string filelist = m_root + PKG_DB_DIR + package_foldername + PKG_FILES;
+/*		string name = *i;
+		string build(*i,i->length() - 10,i->length());
+		info.build = strtoul(build.c_str(),NULL,0);
+		string package_foldername = name + build + "/";
+*/		// list of files
+		const string filelist = m_root + PKG_DB_DIR + *i + PKG_FILES;
 		int fd = open(filelist.c_str(), O_RDONLY);
 		if (fd == -1)
 		{
@@ -314,7 +307,7 @@ void Pkgdbh::getInstalledPackages(bool silent)
 				info.files.insert(info.files.end(), file);
 			}
 			if (!info.files.empty())
-				m_listOfInstPackages[name] = info;
+				m_listOfInstPackages[*i] = info;
 		}
 	}
 #ifndef NDEBUG
@@ -362,7 +355,7 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 		}
 	}
 	const string packagedir = m_root + PKG_DB_DIR ;
-	const string packagenamedir = m_root + PKG_DB_DIR + name + BUILD_DELIM +  m_build;
+	const string packagenamedir = m_root + PKG_DB_DIR + name ;
 
 	mkdir(packagenamedir.c_str(),0755);
 	for (set<string>::const_iterator i = metaFilesList.begin(); i!=  metaFilesList.end(); ++i)
@@ -384,7 +377,7 @@ void Pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 
 	m_listOfInstPackages[name] = info;
 	const string packagedir = m_root + PKG_DB_DIR ;
-	const string packagenamedir = m_root + PKG_DB_DIR + name + BUILD_DELIM +  m_build;
+	const string packagenamedir = m_root + PKG_DB_DIR + name ;
 	mkdir(packagenamedir.c_str(),0755);
 	const string fileslist = packagenamedir + PKG_FILES;
 	const string fileslist_new = fileslist + ".imcomplete_transaction";
@@ -435,7 +428,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 	const string packagedir = m_root + PKG_DB_DIR ;
 	const string build = ultos(m_listOfInstPackages[name].build);
 	const string arch = m_listOfInstPackages[name].arch;
-	const string packagenamedir = m_root + PKG_DB_DIR + name + BUILD_DELIM + build;
+	const string packagenamedir = m_root + PKG_DB_DIR + name;
 
 	if ( findFile(metaFilesList, packagenamedir) != 0 ) {
 		m_actualError = CANNOT_READ_FILE;
@@ -466,30 +459,30 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 /* Remove the physical files after followings some rules */
 void Pkgdbh::removePackageFiles(const string& name)
 {
-	FilesList = m_listOfInstPackages[name].files;
+	m_filesList = m_listOfInstPackages[name].files;
 	m_listOfInstPackages.erase(name);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
-	copy(FilesList.begin(), FilesList.end(), ostream_iterator<string>(cerr, "\n"));
+	copy(m_filesList.begin(), m_filesList.end(), ostream_iterator<string>(cerr, "\n"));
 	cerr << endl;
 #endif
 
 	// Don't delete files that still have references
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i)
 		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j)
-			FilesList.erase(*j);
+			m_filesList.erase(*j);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 2 (files that still have references excluded):" << endl;
-	copy(FilesList.begin(), FilesList.end(), ostream_iterator<string>(cerr, "\n"));
+	copy(m_filesList.begin(), m_filesList.end(), ostream_iterator<string>(cerr, "\n"));
 	cerr << endl;
 #endif
 
 	m_actualAction = RM_PKG_FILES_START;
 	progressInfo();
 	// Delete the files from bottom to up to make shure we delete the contents of any folder before
-	for (set<string>::const_reverse_iterator i = FilesList.rbegin(); i != FilesList.rend(); ++i) {
+	for (set<string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
 		m_actualAction = RM_PKG_FILES_RUN;
 		progressInfo();
 		const string filename = m_root + *i;
@@ -504,40 +497,40 @@ void Pkgdbh::removePackageFiles(const string& name)
 
 void Pkgdbh::removePackageFiles(const string& name, const set<string>& keep_list)
 {
-	FilesList = m_listOfInstPackages[name].files;
+	m_filesList = m_listOfInstPackages[name].files;
 	m_listOfInstPackages.erase(name);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
-	copy(FilesList.begin(), FilesList.end(), ostream_iterator<string>(cerr, "\n"));
+	copy(m_filesList.begin(), m_filesList.end(), ostream_iterator<string>(cerr, "\n"));
 	cerr << endl;
 #endif
 
 	// Don't delete files found in the keep list
 	for (set<string>::const_iterator i = keep_list.begin(); i != keep_list.end(); ++i)
-		FilesList.erase(*i);
+		m_filesList.erase(*i);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 2 (files that is in the keep list excluded):" << endl;
-	copy(FilesList.begin(), FilesList.end(), ostream_iterator<string>(cerr, "\n"));
+	copy(m_filesList.begin(), m_filesList.end(), ostream_iterator<string>(cerr, "\n"));
 	cerr << endl;
 #endif
 
 	// Don't delete files that still have references
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i)
 		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j)
-			FilesList.erase(*j);
+			m_filesList.erase(*j);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 3 (files that still have references excluded):" << endl;
-	copy(FilesList.begin(), FilesList.end(), ostream_iterator<string>(cerr, "\n"));
+	copy(m_filesList.begin(), m_filesList.end(), ostream_iterator<string>(cerr, "\n"));
 	cerr << endl;
 #endif
 
 	// Delete the files
 	m_actualAction = RM_PKG_FILES_START;
 	progressInfo();
-	for (set<string>::const_reverse_iterator i = FilesList.rbegin(); i != FilesList.rend(); ++i) {
+	for (set<string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
 		m_actualAction = RM_PKG_FILES_RUN;
 		progressInfo();
 		const string filename = m_root + *i;
