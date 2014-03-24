@@ -10,12 +10,14 @@ int main (int argi, char * argv[])
 	try {
 		ArchiveUtils  * au  = new ArchiveUtils(argv[1]) ;
 		string name = au->name() + " " + au->version() ;
-		au->list();
-		cout << endl << name << endl<<endl;
-		au->printInfo();
+//		au->list();
+//		cout << "Name: " <<  name << endl<<endl;
+//		au->printInfo();
 		cout << endl;
-		au->printMeta();
-		cout << endl << "build On: " <<  au->builddate()<<endl;
+//		au->printMeta();
+//		cout << "build On: " <<  au->builddate()<<endl;
+//		cout << "build Number: " <<  au->buildn()<<endl;
+		cout << "Number of files: " << au->size()<<endl;
 
 	}  catch (runtime_error& e) {
 			cerr << e.what() << endl;

@@ -38,7 +38,7 @@ ArchiveUtils::ArchiveUtils(const string& fileName)
 			treatErrors(m_fileName);
 	} 
 */
-	
+	m_size=0;	
 }
 ArchiveUtils::~ArchiveUtils()
 {
@@ -80,8 +80,8 @@ void ArchiveUtils::getFilesList()
       m_actualError = CANNOT_OPEN_ARCHIVE;
       treatErrors(m_fileName);
   }
-	for (unsigned int i = 0; archive_read_next_header(ar, &en) ==
-		ARCHIVE_OK; ++i) {
+	for (m_size = 0; archive_read_next_header(ar, &en) ==
+		ARCHIVE_OK; ++m_size) {
 			m_filesList.insert(archive_entry_pathname(en));
 			mode_t mode = archive_entry_mode(en);
 			if (S_ISREG(mode) &&
@@ -90,6 +90,18 @@ void ArchiveUtils::getFilesList()
 					treatErrors(m_fileName);
 			}
 	}
+}
+set<string> ArchiveUtils::setofFiles()
+{
+	getFilesList();
+	return m_filesList;
+}
+unsigned int ArchiveUtils::size()
+{
+	if (m_size == 0) {
+		getFilesList();
+	}
+	return m_size;
 }
 void ArchiveUtils::list()
 {
@@ -177,5 +189,19 @@ string ArchiveUtils::builddate()
 	c_time_s = ctime(&ct);
 	string build = c_time_s;
 	return build;
+}
+time_t ArchiveUtils::buildn()
+{
+	time_t epochVal;
+	string epochSVal;
+	extractFileContent(METAFILE);
+	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
+		if ( m_contentFile->items[i][0] == 'B' ) {
+			epochSVal = m_contentFile->items[i];
+			epochVal = strtoul((epochSVal.substr(2)).c_str(),NULL,0);
+			break;
+		}
+	}
+	return epochVal;
 }
 // vim:set ts=2 :

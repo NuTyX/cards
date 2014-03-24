@@ -259,36 +259,53 @@ pair<string, pkginfo_t> Pkgdbh::getInfosPackage(const string& packageName)
 {
 	pair<string, pkginfo_t> result;
 	
-/*	string build = packageName.substr(packageName.length()-9,packageName.length());
-	result.second.build=strtoul((build.erase(0, build.find(BUILD_DELIM) == string::npos ? string::npos : build.find(BUILD_DELIM) + 1).c_str()),NULL,0); */
 	result.first = packageName;
 	return result;
 }
 /* Populate the database with all details infos */
 void Pkgdbh::getInstalledPackages(bool silent)
 {
-	if (!silent)
-	{
+	if (!silent) {
 		m_actualAction = DB_OPEN_START;
 		progressInfo();
 	}
 	for (set<string>::iterator i = m_packagesList.begin();i != m_packagesList.end();++i) {
-		if (!silent)
-		{
+		if (!silent) {
 			m_actualAction = DB_OPEN_RUN;
 			if ( m_packagesList.size() > 100 )
 				progressInfo();
 		}
 		pkginfo_t info;
-/*		string name = *i;
-		string build(*i,i->length() - 10,i->length());
-		info.build = strtoul(build.c_str(),NULL,0);
-		string package_foldername = name + build + "/";
-*/		// list of files
+		const string metaFile = m_root + PKG_DB_DIR + *i + '/' + PKG_META;
+		itemList * contentFile = initItemList();
+		readFile(contentFile,metaFile.c_str());
+		for (unsigned int li=0; li< contentFile->count ; ++li) {
+			if ( contentFile->items[li][0] == 'B' ) {
+				string build = contentFile->items[li];
+				info.build = build.substr(2);
+			}
+			if ( contentFile->items[li][0] == 'V' ) {
+				string version = contentFile->items[li];
+				info.version = version.substr(2);
+			}
+			if ( contentFile->items[li][0] == 'a' ) {
+				string arch = contentFile->items[li];
+				info.arch = arch.substr(2);
+			}
+			if ( contentFile->items[li][0] == 'S' ) {
+				string size = contentFile->items[li];
+				info.size = size.substr(2);
+			}
+			if ( contentFile->items[li][0] == 'R' ) {
+				string run = contentFile->items[li];
+				info.run = run.substr(2) + ' ' + info.run ;
+			}	
+		}
+		freeItemList(contentFile);	
+		// list of files
 		const string filelist = m_root + PKG_DB_DIR + *i + PKG_FILES;
 		int fd = open(filelist.c_str(), O_RDONLY);
-		if (fd == -1)
-		{
+		if (fd == -1) {
 			m_actualError = CANNOT_OPEN_FILE;
 			treatErrors(filelist);
 		}
@@ -426,7 +443,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
 	set<string> metaFilesList;
 	const string packagedir = m_root + PKG_DB_DIR ;
-	const string build = ultos(m_listOfInstPackages[name].build);
+	const string build = m_listOfInstPackages[name].build;
 	const string arch = m_listOfInstPackages[name].arch;
 	const string packagenamedir = m_root + PKG_DB_DIR + name;
 
@@ -633,85 +650,27 @@ set<string> Pkgdbh::getConflictsFilesList(const string& name, const pkginfo_t& i
 
 	return files;
 }
-
 pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 {
 	pair<string, pkginfo_t> result;
-	struct archive* archive;
-	struct archive_entry* entry;
-
-	// Extract name, version and the arch from filename
+	ArchiveUtils packageArchive(filename.c_str());
 	string basename(filename, filename.rfind('/') + 1);
-	string name(basename, 0, basename.find(BUILD_DELIM));
-	string version(basename, 0, basename.rfind(PKG_EXT));
-  version.erase(0, version.find(BUILD_DELIM) == string::npos ? string::npos : version.find(BUILD_DELIM) + 1);
-	string arch = version;
-  version.erase(version.find_last_of("-"),version.size());
-  arch.erase(0, arch.find_last_of("-")+1);
-
-	if (name.empty() || version.empty())
-	{
+	m_filesNumber = packageArchive.size();
+	if (m_filesNumber == 0 ) {
+		m_actualError = EMPTY_PACKAGE;
+		treatErrors(basename);
+	}
+	string name = packageArchive.name();
+	if (name.empty() ) {
 		m_actualError = CANNOT_DETERMINE_NAME_BUILDNR;
 		treatErrors(basename);
 	}
-
 	result.first = name;
-	result.second.version = version;
-	result.second.arch = arch;
-
-	archive = archive_read_new();
-	INIT_ARCHIVE(archive);
-
-	if (archive_read_open_filename(archive,
-	    filename.c_str(),
-	    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
-		{
-			m_actualError = CANNOT_OPEN_FILE;
-			treatErrors(filename);
-			//throw RunTimeErrorWithErrno("could not open " + filename, archive_errno(archive));
-		}
-	m_actualAction = PKG_OPEN_START;
-	progressInfo();
-	for (m_filesNumber = 0; archive_read_next_header(archive, &entry) ==
-	     ARCHIVE_OK; ++m_filesNumber) {
-			m_actualAction = PKG_OPEN_RUN;
-			progressInfo();
-
-				result.second.files.insert(result.second.files.end(),
-					archive_entry_pathname(entry));
-
-		mode_t mode = archive_entry_mode(entry);
-
-		if (S_ISREG(mode) &&
-		    archive_read_data_skip(archive) != ARCHIVE_OK)
-			{
-				m_actualError = CANNOT_READ_FILE;
-				treatErrors(filename);
-			// throw RunTimeErrorWithErrno("could not read " + filename, archive_errno(archive));
-			}
+	set<string> fileList =  packageArchive.setofFiles();
+	for (set<string>::iterator i = fileList.begin();i != fileList.end();++i) {
+		result.second.files.insert(*i);
 	}
-
-	if (m_filesNumber == 0) {
-		if (archive_errno(archive) == 0)
-		{
-			m_actualError = EMPTY_PACKAGE;
-			treatErrors(filename);
-		}
-		else
-		{
-			m_actualError = CANNOT_READ_FILE;
-			treatErrors(filename);
-		}
-	}
-#if ARCHIVE_VERSION_NUMBER >= 3000000
-	archive_read_free(archive);
-#else
-	archive_read_finish(archive);
-#endif
-	// Retrieve number of files from the archive is complete
-	m_actualAction = PKG_OPEN_END;
-	progressInfo();
-	return result;
+	return result;	
 }
 void Pkgdbh::extractAndRunPREfromPackage(const string& filename)
 {

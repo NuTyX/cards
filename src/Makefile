@@ -39,6 +39,7 @@ TOOLSOBJECTS =	error_treat.o \
 CARDSOBJECTS =	error_treat.o \
 		md5.o \
 		string_utils.o \
+		archive_utils.o \
 		config_parser.o \
 		file_download.o \
 		compile_dependencies_utils.o \

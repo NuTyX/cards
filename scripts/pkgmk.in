@@ -637,11 +637,14 @@ build_package() {
 				if [ -f $PKGMK_ROOT/${name}.${group}.info ]; then
 					cp $SRC/${name}.${group}.info $PKG/.INFO
 				fi
+				
+				ARCH=`find $PKGMK_PACKAGE_DIR -name ${name}.${group}$PKGMK_BUILDVER-*|sed "s|$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER\-||"|cut -d "." -f1`
 				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-*|sed "s/\t/ /"|cut -d " " -f1`"
 				echo "S:$SIZE_I" > $PKG/.META
 				echo "N:$name.$group" >> $PKG/.META
 				echo "V:$version" >> $PKG/.META
 				echo "B:$PKGMK_BUILDVER" >> $PKG/.META
+				echo "a:$ARCH" >> $PKG/.META
 
 				for file in .INFO .META .PRE .POST .README; do
 					if [ -f $file ]; then
@@ -675,6 +678,7 @@ build_package() {
 					echo "N:$name.$LOCALE_GROUP" >> .META
 					echo "V:$version" >> .META
 					echo "B:$PKGMK_BUILDVER" >> .META
+					echo "a:any" >> .META
 					bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar \
 					.META
 					bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar \
@@ -702,6 +706,7 @@ build_package() {
 		echo "N:$name" >> $PKG/.META
 		echo "V:$version" >> $PKG/.META
 		echo "B:$PKGMK_BUILDVER" >> $PKG/.META
+		echo "a:$PKGMK_ARCH" >> $PKG/.META
 
 		# Need to sed otherwize it also takes the devel packages
 		for dep in `pkginfo --runtimedepfiles $PKG`; do

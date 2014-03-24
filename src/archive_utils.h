@@ -82,10 +82,13 @@ class ArchiveUtils
 	void printPre();         // the .PRE file
 	void printPost();        // the .POST file
 	void printReadMe();      // and the .README file
-	void list();             // list the files
+	void list();             // list the files to stdio
+	unsigned int size();              // Numbers of files in the archive
+	std::set<std::string> setofFiles(); // return a set of string 
 	std::string name();      // return the name
 	std::string version();   // return the version
-	std::string builddate();
+	std::string builddate(); // return the date like Mon Mar 24 10:16:00 2014
+	time_t buildn();    // return the epoch value
 
 	private:
 
@@ -95,6 +98,7 @@ class ArchiveUtils
 	struct archive* ar;
 	struct archive_entry* en;
 
+	unsigned int m_size;
 	itemList * m_contentFile;
 
 	std::string m_fileName;

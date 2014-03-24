@@ -147,7 +147,7 @@ int CardsDepends::depends()
 		}
 		for (unsigned int i = 0; i < sortPackagesList-> count;++i) {
 			string packageName = basename(sortPackagesList->items[i]);
-			string name(packageName,0,packageName.find('_'));
+			string name(packageName,0,packageName.find('@'));
 			if (m_argParser.isSet(CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES)) {
 				printf("%s\n",sortPackagesList-> items[i]);
 			} else {

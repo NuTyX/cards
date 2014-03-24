@@ -198,7 +198,7 @@ void Pkginfo::run(int argc, char** argv)
 						{
 							if ( k->find('/' + *i) != string::npos)
 							{
-								string dependencie = j->first + ultos(j->second.build);
+								string dependencie = j->first + j->second.build;
 								runtimeList.insert(dependencie);
 								break;
 								found = true;
@@ -281,12 +281,14 @@ void Pkginfo::run(int argc, char** argv)
 		} else if (o_details_mode) {
 			getInstalledPackages(false);
 			if (checkPackageNameExist(o_arg)) {
-				cout << "Name: " << o_arg << endl
-				<< "Arch: " << m_listOfInstPackages[o_arg].arch << endl
-				<< "Version: " << m_listOfInstPackages[o_arg].version << endl
-				<< "Build: " << m_listOfInstPackages[o_arg].build << endl
-				<< "Size : " << m_listOfInstPackages[o_arg].size << endl
-				<< "Depends on (run): " << m_listOfInstPackages[o_arg].run <<"."<< endl;
+				time_t ct = strtoul(m_listOfInstPackages[o_arg].build.c_str(),NULL,0);
+				char * c_time_s = ctime(&ct);
+				cout << "Name        : " << o_arg << endl
+						 << "Version     : " << m_listOfInstPackages[o_arg].version << endl
+						 << "Build date  : " << c_time_s
+				     << "Size        : " << m_listOfInstPackages[o_arg].size << endl
+				     << "Depends on  : " << m_listOfInstPackages[o_arg].run << endl
+						 << "Arch        : " << m_listOfInstPackages[o_arg].arch << endl;
 				}
 			} else if (o_owner_mode) {
 			//
