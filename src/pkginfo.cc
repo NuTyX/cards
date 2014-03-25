@@ -31,9 +31,7 @@
 
 int Pkginfo::getNumberOfPackages()
 {
-	int nPkg = getListOfPackages("");
-	getInstalledPackages(true);
-	return nPkg;
+	return getListOfPackages("");
 }
 bool Pkginfo::isInstalled(const char * packageName)
 {
@@ -284,6 +282,7 @@ void Pkginfo::run(int argc, char** argv)
 				time_t ct = strtoul(m_listOfInstPackages[o_arg].build.c_str(),NULL,0);
 				char * c_time_s = ctime(&ct);
 				cout << "Name        : " << o_arg << endl
+						 << "Description : " << m_listOfInstPackages[o_arg].description << endl
 						 << "Version     : " << m_listOfInstPackages[o_arg].version << endl
 						 << "Build date  : " << c_time_s
 				     << "Size        : " << m_listOfInstPackages[o_arg].size << endl

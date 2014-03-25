@@ -45,10 +45,6 @@
 #define PKG_POST_INSTALL ".POST"    
 
 #define PKG_REJECTED     "var/lib/pkg/rejected"
-#define BUILD_DELIM    '@'
-#define GROUP_DELIM      '.'
-#define NAME_DELIM			 ' '
-#define PARAM_DELIM      "="
 
 #define LDCONFIG         "/sbin/ldconfig"
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
@@ -117,6 +113,7 @@ RM_PKG_FILES_END
 };
 
 struct pkginfo_t {
+    string description;
     string build;
     string version;
     string arch;

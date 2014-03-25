@@ -85,9 +85,11 @@ class ArchiveUtils
 	void list();             // list the files to stdio
 	unsigned int size();              // Numbers of files in the archive
 	std::set<std::string> setofFiles(); // return a set of string 
-	std::string name();      // return the name
-	std::string version();   // return the version
-	std::string builddate(); // return the date like Mon Mar 24 10:16:00 2014
+	std::string name();       // return the name
+	std::string version();    // return the version
+	std::string description();// return the description	
+	std::string builddate();  // return the date like Mon Mar 24 10:16:00 2014
+
 	time_t buildn();    // return the epoch value
 
 	private:

@@ -280,6 +280,10 @@ void Pkgdbh::getInstalledPackages(bool silent)
 		itemList * contentFile = initItemList();
 		readFile(contentFile,metaFile.c_str());
 		for (unsigned int li=0; li< contentFile->count ; ++li) {
+			if ( contentFile->items[li][0] == 'D' ) {
+				string description = contentFile->items[li];
+				info.description = description.substr(2);
+			}
 			if ( contentFile->items[li][0] == 'B' ) {
 				string build = contentFile->items[li];
 				info.build = build.substr(2);

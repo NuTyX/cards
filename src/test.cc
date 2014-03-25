@@ -14,6 +14,7 @@ int main (int argi, char * argv[])
 //		cout << "Name: " <<  name << endl<<endl;
 //		au->printInfo();
 		cout << endl;
+		cout << "Description: "<< au->description()<<endl;
 //		au->printMeta();
 //		cout << "build On: " <<  au->builddate()<<endl;
 //		cout << "build Number: " <<  au->buildn()<<endl;

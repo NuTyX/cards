@@ -173,6 +173,18 @@ string ArchiveUtils::version()
 	}
 	return version.substr(2);
 }
+string ArchiveUtils::description()
+{
+	string description;
+	extractFileContent(METAFILE);
+	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
+		if ( m_contentFile->items[i][0] == 'D' ) {
+			description = m_contentFile->items[i];
+			break;
+		}
+	}
+	return description.substr(2);
+}
 string ArchiveUtils::builddate()
 {
 	char * c_time_s;
@@ -192,7 +204,7 @@ string ArchiveUtils::builddate()
 }
 time_t ArchiveUtils::buildn()
 {
-	time_t epochVal;
+	time_t epochVal = 0;
 	string epochSVal;
 	extractFileContent(METAFILE);
 	for (unsigned int i=0; i< m_contentFile->count ; ++i) {

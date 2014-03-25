@@ -416,7 +416,7 @@ check_footprint() {
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $TARGET ]; then
-			PKGMK_FOOTPRINT="$name.footprint"
+			PKGMK_FOOTPRINT="`echo $TARGET|sed "s/[0-9]*-[a-z,_,0-9]*-*.cards.tar.$PKGMK_COMPRESSION_MODE//"`.footprint"
 			make_footprint > $FILE.footprint
 			if [ -f $PKGMK_FOOTPRINT ]; then
 				sort -k 3 $PKGMK_FOOTPRINT > $FILE.footprint.orig
@@ -701,9 +701,11 @@ build_package() {
 		fi
 		TARGETS[i]="${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE"
 		add_metafiles
+		DESCR="`head -1 $PKGMK_ROOT/${name}.info`"
 		SIZE_I="`du -b --summarize $PKG|sed "s/\t/ /"|cut -d " " -f1`"
 		echo "S:$SIZE_I" > $PKG/.META
 		echo "N:$name" >> $PKG/.META
+		echo "D:$DESCR" >> $PKG/.META
 		echo "V:$version" >> $PKG/.META
 		echo "B:$PKGMK_BUILDVER" >> $PKG/.META
 		echo "a:$PKGMK_ARCH" >> $PKG/.META
@@ -836,7 +838,7 @@ update_footprint() {
 			error "Unable to update footprint. File '$TARGET' not found."
 			exit 1
 		fi
-		PKGMK_FOOTPRINT="$name.footprint"
+		PKGMK_FOOTPRINT="`echo $TARGET|sed "s/[0-9]*-[a-z,_,0-9]*-*.cards.tar.$PKGMK_COMPRESSION_MODE//"`.footprint"
 		check_file "$PKGMK_FOOTPRINT"
 		make_footprint > $PKGMK_FOOTPRINT
 		touch $TARGET
@@ -1098,6 +1100,8 @@ main() {
 	else
 		warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
 	fi
+
+	PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "`dirname $PKGMK_WORK_DIR`"
@@ -1223,7 +1227,7 @@ PKGMK_SIGNATURE="MD5SUM"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
-PKGMK_MD5SUM="`uname -m`.md5sum"
+PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 PKGMK_NOSTRIP=".nostrip"
 
 PKGMK_CLEAN_OLD="yes"

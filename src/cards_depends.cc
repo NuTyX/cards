@@ -151,7 +151,7 @@ int CardsDepends::depends()
 			if (m_argParser.isSet(CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES)) {
 				printf("%s\n",sortPackagesList-> items[i]);
 			} else {
-				if ( ! packagesInfo->isInstalled(name.c_str())) { // need to improved the perf
+				if ( ! packagesInfo->isInstalled(name.c_str())) {
 					printf("%s\n",sortPackagesList-> items[i]);
 			
 				}
