@@ -1,5 +1,4 @@
 include Makefile.inc
-
 DIRSRC = src
 
 DIRMAN = man
@@ -8,6 +7,8 @@ DIRSCRIPTS = scripts
 
 .PHONY: cards
 
+test:
+	$(MAKE) -C $(DIRSRC) test
 all:
 	$(MAKE) -C $(DIRSRC) all
 	$(MAKE) -C $(DIRSCRIPTS) all

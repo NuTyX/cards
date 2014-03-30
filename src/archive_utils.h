@@ -44,23 +44,30 @@
 	archive_read_support_filter_bzip2((ar)); \
 	archive_read_support_filter_xz((ar)); \
 	archive_read_support_format_tar((ar))
+#define FREE_ARCHIVE(ar) \
+	archive_read_free((ar))
 #else
 #define INIT_ARCHIVE(ar) \
 	archive_read_support_compression_gzip((ar)); \
 	archive_read_support_compression_bzip2((ar)); \
 	archive_read_support_compression_xz((ar)); \
 	archive_read_support_format_tar((ar))
+#define FREE_ARCHIVE(ar) \
+	archive_read_finish((ar))
 #endif
 
 #define DEFAULT_BYTES_PER_BLOCK (20 * 512)
 #define METAFILE ".META"
 #define INFOFILE ".INFO"
+#define MTREEFILE ".MTREE"
 
 enum archive_error
 {
 CANNOT_OPEN_ARCHIVE,
 CANNOT_READ_ARCHIVE,
 CANNOT_FIND_META_FILE,
+CANNOT_FIND_MTREE_FILE,
+CANNOT_FIND_NAME,
 EMPTY_ARCHIVE
 };
 
@@ -75,35 +82,36 @@ class ArchiveUtils
 
 	virtual void treatErrors(const std::string& s) const;
 
-	void extractFiles();     // Installed files from the archive
-
-	void printMeta();	       // Print Out the .META file
+	void printDeps();        // Print Out the dependencies
+	void printMeta();        // Print Out the .META file
 	void printInfo();        // the .INFO file
-	void printPre();         // the .PRE file
-	void printPost();        // the .POST file
-	void printReadMe();      // and the .README file
 	void list();             // list the files to stdio
-	unsigned int size();              // Numbers of files in the archive
-	std::set<std::string> setofFiles(); // return a set of string 
-	std::string name();       // return the name
-	std::string version();    // return the version
-	std::string description();// return the description	
-	std::string builddate();  // return the date like Mon Mar 24 10:16:00 2014
+	
 
+	unsigned int long size();              // Numbers of files in the archive
+	std::set<std::string> setofFiles(); // return a set of string 
+	std::string version();    // return the version of the package
+	std::string description();// return the description	of the package
+	std::string builddate();  // return the date like Mon Mar 24 10:16:00 2014
+	std::string name();				// return the name of the package
 	time_t buildn();    // return the epoch value
 
 	private:
+	
+	std::string getPackageName();
+	itemList *  extractFileContent(const char * fileName);
+	void getRunTimeDependencies();
 
-	void getFilesList();
-	void extractFileContent(const char * fileName);
 
-	struct archive* ar;
-	struct archive_entry* en;
+	unsigned int long m_size;
 
-	unsigned int m_size;
-	itemList * m_contentFile;
+	itemList * m_contentMtree;
+	itemList * m_contentMeta;
+	itemList * m_contentInfo;
 
+	std::vector<string> m_rtDependenciesList;
 	std::string m_fileName;
+	std::string m_packageName;
 	std::set<string> m_filesList;
 
 	archive_error m_actualError;

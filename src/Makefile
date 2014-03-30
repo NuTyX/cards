@@ -58,8 +58,14 @@ CARDSOBJECTS =	error_treat.o \
 
 LIBOBJECTS =  pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
 
+test:
+	$(CXX) error_treat.cc \
+	string_utils.cc archive_utils.cc \
+	test.cc -o ~/bin/au $(LDFLAGS)
+
 libs:
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
+
 
 all: pkgadd cards
 

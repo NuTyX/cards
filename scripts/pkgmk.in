@@ -416,7 +416,7 @@ check_footprint() {
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $TARGET ]; then
-			PKGMK_FOOTPRINT="`echo $TARGET|sed "s/[0-9]*-[a-z,_,0-9]*-*.cards.tar.$PKGMK_COMPRESSION_MODE//"`.footprint"
+			PKGMK_FOOTPRINT="`echo $TARGET|sed "s/[0-9]*-[a-z,_,0-9]*-*.cards.tar//"`.footprint"
 			make_footprint > $FILE.footprint
 			if [ -f $PKGMK_FOOTPRINT ]; then
 				sort -k 3 $PKGMK_FOOTPRINT > $FILE.footprint.orig
@@ -450,6 +450,8 @@ check_footprint() {
 make_work_dir() {
 	export PKG="$PKGMK_WORK_DIR/pkg"
 	export SRC="$PKGMK_WORK_DIR/src"
+	export TAR="$PKGMK_WORK_DIR/tar"
+
 	umask 022
 	
 	cd $PKGMK_ROOT
@@ -463,20 +465,6 @@ make_work_dir() {
 
 remove_work_dir() {
 	rm -rf $PKGMK_WORK_DIR
-}
-add_metafiles () {
-	if [ -f $PKGMK_ROOT/${name}.README ]; then
-		cp $PKGMK_ROOT/${name}.README $PKG/.README
-	fi
-	if [ -f $PKGMK_ROOT/${name}.pre-install ]; then
-		cp $PKGMK_ROOT/${name}.pre-install $PKG/.PRE
-	fi
-	if [ -f $PKGMK_ROOT/${name}.post-install ]; then
-		cp $PKGMK_ROOT/${name}.post-install $PKG/.POST
-	fi
-	if [ -f $PKGMK_ROOT/${name}.info ]; then
-		cp $PKGMK_ROOT/${name}.info $PKG/.INFO
-	fi
 }
 pack_lib() {
 	local DIR SUBDIR
@@ -551,23 +539,70 @@ pack_service() {
 		j=1
 	fi
 }
-compress_group_package() {
-	local ARCH
-	for ARCH in x86_64 i686 any; do
-		if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-$ARCH.cards.tar ]; then
-			info "compress ${group}" 
-			case $PKGMK_COMPRESSION_MODE in
-				gz)  gzip -9 $PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-$ARCH.cards.tar;;
-				bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-$ARCH.cards.tar;;
-				xz)  xz -z -9 $PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-$ARCH.cards.tar ;;
-			esac
-			TARGETS[i]="${name}.${group}$PKGMK_BUILDVER-$ARCH.cards.tar.$PKGMK_COMPRESSION_MODE"
-			info "Build result for ${TARGETS[i]}:"
-			bsdtar -t -v -f \
-			$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-$ARCH.cards.tar.$PKGMK_COMPRESSION_MODE \
-			|| BUILD_SUCCESSFUL = "no"
+
+add_meta_to_archive() {
+	local NAME SIZE_I DESCR
+	NAME="`echo $1|sed "s/[0-9]*-[a-z,_,0-9]*-*.cards.tar//"`"
+	
+	info  "Adding meta data to Archive $NAME"
+
+	mkdir -p $TAR
+	
+	cd $TAR
+
+	bsdtar xf $PKGMK_PACKAGE_DIR/$1
+
+	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
+	DESCR="`head -1 $PKGMK_ROOT/${name}.info`"
+	echo "N$NAME" > .META
+	echo "D$DESCR" >> .META
+	echo "S$SIZE_I" >> .META
+	echo "V$version" >> .META
+	echo "B$PKGMK_BUILDVER" >> .META
+	echo "a$PKGMK_ARCH" >> .META
+
+	for dep in `pkginfo --runtimedepfiles $TAR`; do
+		echo "R$dep" >> .META
+        done
+
+
+	if [ -f $PKGMK_ROOT/${NAME}.README ]; then
+                cp $PKGMK_ROOT/${NAME}.README .README
+	fi
+	if [ -f $PKGMK_ROOT/${NAME}.pre-install ]; then
+		cp $PKGMK_ROOT/${NAME}.pre-install .PRE
+	fi
+	if [ -f $PKGMK_ROOT/${NAME}.post-install ]; then
+		cp $PKGMK_ROOT/${NAME}.post-install .POST
+	fi
+	if [ -f $PKGMK_ROOT/${NAME}.info ]; then
+		cp $PKGMK_ROOT/${NAME}.info .INFO
+	fi
+
+	bsdtar -tf $PKGMK_PACKAGE_DIR/$1 > .MTREE
+
+	rm $PKGMK_PACKAGE_DIR/$1
+
+	for file in .META .MTREE .README .PRE .POST .INFO; do
+		if [ -f $file ]; then
+			bsdtar -r -f $PKGMK_PACKAGE_DIR/$1 \
+			$file
 		fi
 	done
+
+	bsdtar -r -f $PKGMK_PACKAGE_DIR/$1 *
+
+	cd ..
+	rm -r $TAR
+}
+
+compress_archive() {
+	info "compress $1"
+	case $PKGMK_COMPRESSION_MODE in
+		gz) gzip -9 $1;;
+		bz2) bzip2 -9  $1;;
+		xz)  xz -z -9 $1;;
+	esac
 }
 build_package() {
 	# TODO find a better solution for the hardcoded folders
@@ -582,9 +617,7 @@ build_package() {
 	
 	info "Building '$TARGET'."
 	
-	
 	unpack_source
-	
 		
 	cd $SRC
 	(set -e -x ; build)
@@ -625,40 +658,17 @@ build_package() {
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
-				if [ -f $PKGMK_ROOT/${name}.${group}.pre-install ]; then
-					cp $PKGMK_ROOT/${name}.${group}.pre-install $PKG/.PRE
-				fi
-				if [ -f $PKGMK_ROOT/${name}.${group}.post-install ]; then
-					cp $PKGMK_ROOT/${name}.${group}.post-install $PKG/.POST
-				fi
-				if [ -f $PKGMK_ROOT/${name}.${group}.README ]; then
-					cp $PKGMK_ROOT/${name}.${group}.README $PKG/.README
-				fi
-				if [ -f $PKGMK_ROOT/${name}.${group}.info ]; then
-					cp $SRC/${name}.${group}.info $PKG/.INFO
-				fi
 				
 				ARCH=`find $PKGMK_PACKAGE_DIR -name ${name}.${group}$PKGMK_BUILDVER-*|sed "s|$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER\-||"|cut -d "." -f1`
 				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-*|sed "s/\t/ /"|cut -d " " -f1`"
-				echo "S:$SIZE_I" > $PKG/.META
-				echo "N:$name.$group" >> $PKG/.META
-				echo "V:$version" >> $PKG/.META
-				echo "B:$PKGMK_BUILDVER" >> $PKG/.META
-				echo "a:$ARCH" >> $PKG/.META
 
-				for file in .INFO .META .PRE .POST .README; do
-					if [ -f $file ]; then
-						bsdtar -r -f \
-						$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-*.cards.tar \
-						$file  || abort_on_build "${name}.${group}$PKGMK_BUILDVER"
-						rm $file
-					fi
-				done
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
 					exit 1
 				fi
-				compress_group_package
+
+				TARGETS[i]="${name}.${group}$PKGMK_BUILDVER-$ARCH.cards.tar"
+
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
 					exit 1
@@ -672,66 +682,23 @@ build_package() {
 			for loc in `cd usr/share/locale/ && ls`; do
 				# Need to double check because glibc for exemple create a file in this directory
 				if [ -d usr/share/locale/$loc ];then
-					SIZE_I="`du -b --summarize $PKG/usr/share/locale/$loc|sed "s/\t/ /"|cut -d " " -f1`"
 					LOCALE_GROUP=`echo $loc|sed "s/_/-/g"`
-					echo "S:$SIZE_I" > .META
-					echo "N:$name.$LOCALE_GROUP" >> .META
-					echo "V:$version" >> .META
-					echo "B:$PKGMK_BUILDVER" >> .META
-					echo "a:any" >> .META
-					bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar \
-					.META
 					bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar \
 					usr/share/locale/$loc || abort_on_build "${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar"
 					rm -rf usr/share/locale/$loc
-					info "compress $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar"
-					case $PKGMK_COMPRESSION_MODE in
-						gz)  gzip -9 $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar;;
-						bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar;;
-						xz)  xz -z -9 $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar ;;
-					esac
-					TARGETS[i]="${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar.$PKGMK_COMPRESSION_MODE"
-					info "Build result for ${TARGETS[i]}:"
+
+					TARGETS[i]="${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar"
+				
 					i=$((i+1))
-					bsdtar -t -v -f \
-					$PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar.$PKGMK_COMPRESSION_MODE \
-					|| abort_on_build "${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar.$PKGMK_COMPRESSION_MODE"
 				fi
 			done
 		fi
-		TARGETS[i]="${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE"
-		add_metafiles
-		DESCR="`head -1 $PKGMK_ROOT/${name}.info`"
-		SIZE_I="`du -b --summarize $PKG|sed "s/\t/ /"|cut -d " " -f1`"
-		echo "S:$SIZE_I" > $PKG/.META
-		echo "N:$name" >> $PKG/.META
-		echo "D:$DESCR" >> $PKG/.META
-		echo "V:$version" >> $PKG/.META
-		echo "B:$PKGMK_BUILDVER" >> $PKG/.META
-		echo "a:$PKGMK_ARCH" >> $PKG/.META
 
-		# Need to sed otherwize it also takes the devel packages
-		for dep in `pkginfo --runtimedepfiles $PKG`; do
-			echo "R:$dep" >> $PKG/.META
-		done
-		
-		for file in .INFO .META .PRE .POST .README; do
-			if [ -f $file ]; then
-				bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar \
-				$file
-			fi
-		done
+		TARGETS[i]="${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar"
 
 		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar *
 
-                info "compress $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar"
-		case $PKGMK_COMPRESSION_MODE in
-			gz)  gzip -9 $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar;;
-			bz2) bzip2 -9  $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar;;
-			xz)  xz -z -9 $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar ;;
-		esac
-		info "Build result for $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE:"
-		bsdtar -t -v -f $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE
+
 		if [ $? = 0 ]; then
 			BUILD_SUCCESSFUL="yes"
 			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
@@ -742,14 +709,15 @@ build_package() {
 		fi
 	fi
 	
-	if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-		remove_work_dir
-	fi
 	
 	if [ "$BUILD_SUCCESSFUL" = "yes" ]; then
+		
 		for TARGET in ${TARGETS[@]}; do
-			info "Building '$TARGET' succeeded "
+			add_meta_to_archive $TARGET
 		done
+		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+			remove_work_dir
+		fi
 	else
 		if [ -f $TARGET ]; then
 			touch -r $PKGMK_ROOT/$PKGMK_PKGFILE $TARGET &> /dev/null
@@ -1205,6 +1173,13 @@ main() {
 	if [ "$PKGMK_INSTALL" != "no" ]; then
 		install_package
 	fi
+	if [ "$PKGMK_COMPRESS_PACKAGE"=="yes" ]; then
+		cd $PKGMK_PACKAGE_DIR
+		for TARGET in ${TARGETS[@]}; do
+			compress_archive $TARGET
+		done
+	fi
+
 	if [ "$PKGMK_KEEP_SOURCES" == "no" ]; then
 		remove_source
 	fi
@@ -1242,6 +1217,7 @@ PKGMK_PACKAGE_DIR="$PWD"
 PKGMK_WORK_DIR="$PWD/work"
 
 PKGMK_COMPRESSION_MODE="xz"
+PKGMK_COMPRESS_PACKAGE="yes"
 
 PKGMK_GROUPS=(devel man doc service)
 

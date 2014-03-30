@@ -207,7 +207,7 @@ itemList * parseDelimitedItemList(char * s, const char * delimiter)
 	itemList * iL = initItemList();
 	char * pch;
 	pch = strtok (s,delimiter);
-	while ( pch != NULL) {	
+	while ( pch != NULL && *pch != '\n') {	
 		addItemToItemList(iL,pch);
 		pch = strtok (NULL,delimiter);
 	}

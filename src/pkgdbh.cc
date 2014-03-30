@@ -282,27 +282,27 @@ void Pkgdbh::getInstalledPackages(bool silent)
 		for (unsigned int li=0; li< contentFile->count ; ++li) {
 			if ( contentFile->items[li][0] == 'D' ) {
 				string description = contentFile->items[li];
-				info.description = description.substr(2);
+				info.description = description.substr(1);
 			}
 			if ( contentFile->items[li][0] == 'B' ) {
 				string build = contentFile->items[li];
-				info.build = build.substr(2);
+				info.build = build.substr(1);
 			}
 			if ( contentFile->items[li][0] == 'V' ) {
 				string version = contentFile->items[li];
-				info.version = version.substr(2);
+				info.version = version.substr(1);
 			}
 			if ( contentFile->items[li][0] == 'a' ) {
 				string arch = contentFile->items[li];
-				info.arch = arch.substr(2);
+				info.arch = arch.substr(1);
 			}
 			if ( contentFile->items[li][0] == 'S' ) {
 				string size = contentFile->items[li];
-				info.size = size.substr(2);
+				info.size = size.substr(1);
 			}
 			if ( contentFile->items[li][0] == 'R' ) {
 				string run = contentFile->items[li];
-				info.run = run.substr(2) + ' ' + info.run ;
+				info.run = run.substr(1) + ' ' + info.run ;
 			}	
 		}
 		freeItemList(contentFile);	

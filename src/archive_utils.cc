@@ -23,34 +23,39 @@
 ArchiveUtils::ArchiveUtils(const string& fileName)
 	: m_fileName(fileName)
 {
+	m_contentMtree = NULL;
+	m_contentMeta = NULL;
+	m_contentInfo = NULL;
 
-/*
+	m_contentMeta = extractFileContent(METAFILE);
+ 	m_contentMtree = extractFileContent(MTREEFILE);
+ 	m_contentInfo = extractFileContent(INFOFILE);
 
-	 TODO Find a beter way, I'm affraid not possible
+	if ( m_contentMeta == NULL) {
+		m_actualError = CANNOT_FIND_META_FILE;
+		treatErrors(m_fileName);
+	}
+	if ( m_contentMtree == NULL) {
+		m_actualError = CANNOT_FIND_MTREE_FILE;
+		treatErrors(m_fileName);
+	}
+	m_packageName  = getPackageName();
+	for (unsigned int i = 0 ; i < m_contentMtree->count ; ++i) {
+		m_filesList.insert(m_contentMtree->items[i]);
+	}
 
-	ar = archive_read_new();
 
-	INIT_ARCHIVE(m_archive);
-	if (archive_read_open_filename(m_archive,
-		m_fileName.c_str(),
-		DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK) {
-			m_actualError = CANNOT_OPEN_ARCHIVE;
-			treatErrors(m_fileName);
-	} 
-*/
-	m_size=0;	
 }
 ArchiveUtils::~ArchiveUtils()
 {
-
-#if ARCHIVE_VERSION_NUMBER >= 3000000
-  archive_read_free(ar);
-#else
-  archive_read_finish(ar);
-#endif 
-
-	if ( m_contentFile != NULL ) {
-		freeItemList(m_contentFile);
+	if ( m_contentMeta != NULL ) {
+		freeItemList(m_contentMeta);
+	}
+	if ( m_contentInfo != NULL) {
+		freeItemList(m_contentInfo);
+	}
+	if ( m_contentMtree != NULL) {
+		freeItemList(m_contentMtree);
 	}
 }
 void ArchiveUtils::treatErrors(const std::string& message) const
@@ -66,52 +71,44 @@ void ArchiveUtils::treatErrors(const std::string& message) const
 		case CANNOT_FIND_META_FILE:
 			throw runtime_error("could not find the meta file " + message);
 			break;
+		case CANNOT_FIND_MTREE_FILE:
+			throw runtime_error("could not find the mtree file " + message);
+			break;
 		case EMPTY_ARCHIVE:
-			throw RunTimeErrorWithErrno("is not an archive " + message);
-	}
-}
-void ArchiveUtils::getFilesList()
-{
-	ar = archive_read_new();
-	INIT_ARCHIVE(ar);
-	if (archive_read_open_filename(ar,
-    m_fileName.c_str(),
-    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK) {
-      m_actualError = CANNOT_OPEN_ARCHIVE;
-      treatErrors(m_fileName);
-  }
-	for (m_size = 0; archive_read_next_header(ar, &en) ==
-		ARCHIVE_OK; ++m_size) {
-			m_filesList.insert(archive_entry_pathname(en));
-			mode_t mode = archive_entry_mode(en);
-			if (S_ISREG(mode) &&
-				archive_read_data_skip(ar) != ARCHIVE_OK) {
-					m_actualError = CANNOT_READ_ARCHIVE;
-					treatErrors(m_fileName);
-			}
+			throw runtime_error(message + " is not an archive");
+			break;
+		case CANNOT_FIND_NAME:
+			throw runtime_error(message + " is not a CARDS archive");
+			break;
 	}
 }
 set<string> ArchiveUtils::setofFiles()
 {
-	getFilesList();
 	return m_filesList;
 }
-unsigned int ArchiveUtils::size()
+unsigned int long ArchiveUtils::size()
 {
-	if (m_size == 0) {
-		getFilesList();
-	}
-	return m_size;
+	if (m_contentMtree != NULL)
+		return m_contentMtree->count;
+	else return 0;
 }
 void ArchiveUtils::list()
 {
-	getFilesList();
-	for (set<string>::iterator i = m_filesList.begin();i != m_filesList.end();++i) {
-		cout << *i << endl;
+	if ( m_contentMtree == NULL) {
+		cout << "Not found" << endl;
+	} else {
+		for (unsigned int  i = 0; i < m_contentMtree -> count ;++i) {
+			cout << m_contentMtree->items[i] << endl;
+		}
 	}
 }
-void ArchiveUtils::extractFileContent(const char * fileName)
+itemList * ArchiveUtils::extractFileContent(const char * fileName)
 {
+	
+	itemList * contentFile = NULL;
+	struct archive* ar;
+  struct archive_entry* ae;
+
 	ar = archive_read_new();
 	INIT_ARCHIVE(ar);
 	if (archive_read_open_filename(ar,
@@ -119,81 +116,116 @@ void ArchiveUtils::extractFileContent(const char * fileName)
     DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK) {
       m_actualError = CANNOT_OPEN_ARCHIVE;
       treatErrors(m_fileName);
-  }
+  } 
+	unsigned int i = 0;
 	int64_t entry_size;
-	char * fC; // file content
-	while (archive_read_next_header(ar,&en) == ARCHIVE_OK) {
-		const char *currentFile = archive_entry_pathname(en);
-		entry_size = archive_entry_size(en);
-		fC = (char*)Malloc(entry_size);
-		archive_read_data(ar,fC,entry_size);
+	while (archive_read_next_header(ar,&ae) == ARCHIVE_OK) {
+		const char *currentFile = archive_entry_pathname(ae);
 		if(strcmp(currentFile, fileName) == 0) {
+			entry_size = archive_entry_size(ae);
+			char *fC = (char*)Malloc(entry_size);
+			archive_read_data(ar,fC,entry_size);
 			fC[entry_size]='\0';
-			m_contentFile = parseDelimitedItemList(fC, "\n");
+			contentFile = parseDelimitedItemList(fC, "\n");
 			break;
-			free(fC);
+		}
+		++i;
+		if (i > 10 ) {
+			archive_read_close(ar);
+			FREE_ARCHIVE(ar);
+			return NULL; // no need to go further, it didn't find it
+		}
+	}
+	archive_read_close(ar);
+	FREE_ARCHIVE(ar);
+	return contentFile;
+}
+void ArchiveUtils::getRunTimeDependencies()
+{
+	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
+		if ( m_contentMeta->items[i][0] == 'R' ) {
+		string dependencie= m_contentMeta->items[i];
+		m_rtDependenciesList.push_back(dependencie.substr(1));
 		}
 	}
 }
+void ArchiveUtils::printDeps()
+{
+	getRunTimeDependencies();
+	for (vector<string>::const_iterator i = m_rtDependenciesList.begin();i!= m_rtDependenciesList.end();++i) {
+		cout << *i << endl;
+	}
+}
+
 void ArchiveUtils::printMeta()
 {
-	extractFileContent(METAFILE);
-	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
-		cout << m_contentFile->items[i] << endl;
+	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
+		cout << m_contentMeta->items[i] << endl;
 	}
 }
 void ArchiveUtils::printInfo()
 {
-	extractFileContent(INFOFILE);
-	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
-		cout << m_contentFile->items[i] << endl;
+	if ( m_contentInfo != NULL) {
+		for (unsigned int i=0; i< m_contentInfo->count ; ++i) {
+			cout << m_contentInfo->items[i] << endl;
+		}
 	}
 }
-string ArchiveUtils::name()
+string ArchiveUtils::getPackageName()
 {
 	string name;
-	extractFileContent(METAFILE);
-	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
-		if ( m_contentFile->items[i][0] == 'N' ) {
-			name = m_contentFile->items[i];
+	if  ( m_contentMeta == NULL ) {
+		m_actualError = CANNOT_FIND_NAME;
+		treatErrors(m_fileName);
+		return "";
+	}
+	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
+		if ( m_contentMeta->items[i][0] == 'N' ) {
+			name = m_contentMeta->items[i];
+			return name.substr(1);
 			break;
 		}
 	}
-	return name.substr(2);
+	m_actualError = CANNOT_FIND_NAME;
+	treatErrors(m_fileName);
+	return "";
+}
+string ArchiveUtils::name()
+{
+	return m_packageName;
 }
 string ArchiveUtils::version()
 {
 	string version;
-	extractFileContent(METAFILE);
-	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
-		if ( m_contentFile->items[i][0] == 'V' ) {
-			version = m_contentFile->items[i];
+	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
+		if ( m_contentMeta->items[i][0] == 'V' ) {
+			version = m_contentMeta->items[i];
+			return version.substr(1);
 			break;
 		}
 	}
-	return version.substr(2);
+	return "";
 }
 string ArchiveUtils::description()
 {
 	string description;
-	extractFileContent(METAFILE);
-	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
-		if ( m_contentFile->items[i][0] == 'D' ) {
-			description = m_contentFile->items[i];
+	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
+		if ( m_contentMeta->items[i][0] == 'D' ) {
+			description = m_contentMeta->items[i];
+			return description.substr(1);
 			break;
 		}
 	}
-	return description.substr(2);
+	return "";
 }
 string ArchiveUtils::builddate()
 {
 	char * c_time_s;
 	string buildtime;
-	extractFileContent(METAFILE);
-	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
-		if ( m_contentFile->items[i][0] == 'B' ) {
-			string buildtimel=m_contentFile->items[i];
-			buildtime=buildtimel.substr(2);
+	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
+		if ( m_contentMeta->items[i][0] == 'B' ) {
+			string buildtimel=m_contentMeta->items[i];
+			buildtime=buildtimel.substr(1);
 			break;
 		}
 	}
@@ -206,14 +238,14 @@ time_t ArchiveUtils::buildn()
 {
 	time_t epochVal = 0;
 	string epochSVal;
-	extractFileContent(METAFILE);
-	for (unsigned int i=0; i< m_contentFile->count ; ++i) {
-		if ( m_contentFile->items[i][0] == 'B' ) {
-			epochSVal = m_contentFile->items[i];
-			epochVal = strtoul((epochSVal.substr(2)).c_str(),NULL,0);
+	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
+		if ( m_contentMeta->items[i][0] == 'B' ) {
+			epochSVal = m_contentMeta->items[i];
+			epochVal = strtoul((epochSVal.substr(1)).c_str(),NULL,0);
+			return epochVal;
 			break;
 		}
 	}
-	return epochVal;
+	return 0;
 }
 // vim:set ts=2 :
