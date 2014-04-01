@@ -146,8 +146,9 @@ void Pkginfo::run(int argc, char** argv)
 			//
 			// List installed packages
 			//
-			for (set<string>::const_iterator i = m_packagesList.begin(); i != m_packagesList.end(); ++i) {
-				cout << *i << " ";
+			getInstalledPackages(false);
+			for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
+				cout << i->first << " " << i->second.version << endl;
 			}
 			cout << endl;
 		} else if (o_list_mode) {
@@ -281,13 +282,14 @@ void Pkginfo::run(int argc, char** argv)
 			if (checkPackageNameExist(o_arg)) {
 				time_t ct = strtoul(m_listOfInstPackages[o_arg].build.c_str(),NULL,0);
 				char * c_time_s = ctime(&ct);
-				cout << "Name        : " << o_arg << endl
-						 << "Description : " << m_listOfInstPackages[o_arg].description << endl
-						 << "Version     : " << m_listOfInstPackages[o_arg].version << endl
-						 << "Build date  : " << c_time_s
-				     << "Size        : " << m_listOfInstPackages[o_arg].size << endl
-				     << "Depends on  : " << m_listOfInstPackages[o_arg].run << endl
-						 << "Arch        : " << m_listOfInstPackages[o_arg].arch << endl;
+				cout << "Name           : " << o_arg << endl
+						 << "Description    : " << m_listOfInstPackages[o_arg].description << endl
+						 << "Version        : " << m_listOfInstPackages[o_arg].version << endl
+						 << "Build date     : " << c_time_s
+				     << "Size           : " << m_listOfInstPackages[o_arg].size << endl
+				     << "Depends on     : " << m_listOfInstPackages[o_arg].run << endl
+						 << "Number of Files: " << m_listOfInstPackages[o_arg].files.size()<< endl
+						 << "Arch           : " << m_listOfInstPackages[o_arg].arch << endl;
 				}
 			} else if (o_owner_mode) {
 			//

@@ -99,15 +99,15 @@ class ArchiveUtils
 	private:
 	
 	std::string getPackageName();
-	itemList *  extractFileContent(const char * fileName);
+	std::vector<string>  extractFileContent(const char * fileName);
 	void getRunTimeDependencies();
 
 
 	unsigned int long m_size;
 
-	itemList * m_contentMtree;
-	itemList * m_contentMeta;
-	itemList * m_contentInfo;
+	std::vector<string> m_contentMtree;
+	std::vector<string> m_contentMeta;
+	std::vector<string> m_contentInfo;
 
 	std::vector<string> m_rtDependenciesList;
 	std::string m_fileName;

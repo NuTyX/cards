@@ -30,6 +30,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <vector>
 #include <sys/types.h>
 
 using namespace std;
@@ -84,7 +85,7 @@ string stripWhiteSpace(const string& s);
 itemList * parseDelimitedItemList(char * s, const char * delimiter);
 
 /* populate a set of string with delimited string */
-set<string> parseDelimitedList(const string& s, char delimiter);
+vector<string> parseDelimitedList(const string& s, const char delimiter);
 
 /* make sure s1 starts with s2 */
 bool startsWith(const string& s, const string& with);

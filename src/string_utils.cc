@@ -213,19 +213,19 @@ itemList * parseDelimitedItemList(char * s, const char * delimiter)
 	}
 	return iL;
 }
-set<string> parseDelimitedList(const string& s, char delimiter)
+vector<string> parseDelimitedList(const string& s, const char delimiter)
 {
-	set<string> depList;
+	vector<string> depList;
 	if ( s.empty() )
 		return depList;
 	unsigned int start = 0, end = 0;
 
-	while ( (end = s.find(delimiter,start)) != string::npos )
+	while ( ( (end = s.find(delimiter,start)) != string::npos ) && ( start < s.size() ) ) 
 	{
-		depList.insert(s.substr( start, end - start ));
+		depList.push_back(s.substr( start, end - start ));
 		start = end +1;
 	}
-	depList.insert(s.substr(start));
+	depList.push_back(s.substr(start));
 	return depList;
 }
 		

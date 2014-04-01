@@ -76,14 +76,16 @@ void Pkgadd::run(int argc, char** argv)
 	//
 	{
 		Db_lock lock(o_root, true);
+		// Get the list of installed packages
 		getListOfPackages(o_root);
-		//Retrieving info about all the packages
+
+		// Retrieving info about all the packages
 		getInstalledPackages(false);
 
 		// Reading the archiving to find a list of files
 		pair<string, pkginfo_t> package = openArchivePackage(o_package);
 
-		// checking the rules
+		// Checking the rules
 		vector<rule_t> config_rules = readRulesFile();
 
 		bool installed = checkPackageNameExist(package.first);
@@ -101,7 +103,7 @@ void Pkgadd::run(int argc, char** argv)
 		set<string> non_install_files = applyInstallRules(package.first, package.second, config_rules);
 		if (!o_upgrade) {
 #ifndef NDEBUG
-			cerr << "Run extractAndRunPREfromPackage whithout upgrade" << endl;
+			cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
 #endif
 			// Run pre-install if exist
 			extractAndRunPREfromPackage(o_package);
@@ -143,10 +145,14 @@ void Pkgadd::run(int argc, char** argv)
 		// Post install
 		if (checkFileExist(PKG_POST_INSTALL))
 		{
+			m_actualAction = PKG_POSTINSTALL_START;
+			progressInfo();
 			process postinstall(SHELL,PKG_POST_INSTALL, 0 );
 			if (postinstall.executeShell()) {
 				exit(EXIT_FAILURE);
 			}
+			m_actualAction = PKG_POSTINSTALL_END;
+			progressInfo();
 		}
 		// Add the metadata about the package to the DB
 		moveMetaFilesPackage(package.first,package.second);

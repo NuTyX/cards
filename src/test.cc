@@ -11,7 +11,8 @@ int main (int argi, char * argv[])
 		ArchiveUtils  * au  = new ArchiveUtils(argv[1]) ;
 		cout << "Number of files: " << au->size() << endl;
 		cout << au->name() << " " << au->version() << endl;
-		au->list(); 
+		cout << au->description() << endl;
+		au->printInfo();
 	}  catch (runtime_error& e) {
 			cerr << e.what() << endl;
 			return -1;

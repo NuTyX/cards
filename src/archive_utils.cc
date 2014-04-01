@@ -23,40 +23,26 @@
 ArchiveUtils::ArchiveUtils(const string& fileName)
 	: m_fileName(fileName)
 {
-	m_contentMtree = NULL;
-	m_contentMeta = NULL;
-	m_contentInfo = NULL;
-
 	m_contentMeta = extractFileContent(METAFILE);
  	m_contentMtree = extractFileContent(MTREEFILE);
  	m_contentInfo = extractFileContent(INFOFILE);
 
-	if ( m_contentMeta == NULL) {
+	if ( m_contentMeta.size() == 0) {
 		m_actualError = CANNOT_FIND_META_FILE;
 		treatErrors(m_fileName);
 	}
-	if ( m_contentMtree == NULL) {
+	if ( m_contentMtree.size() == 0) {
 		m_actualError = CANNOT_FIND_MTREE_FILE;
 		treatErrors(m_fileName);
 	}
 	m_packageName  = getPackageName();
-	for (unsigned int i = 0 ; i < m_contentMtree->count ; ++i) {
-		m_filesList.insert(m_contentMtree->items[i]);
-	}
-
-
+	for (vector<string>::const_iterator i = m_contentMtree.begin(); i != m_contentMtree.end(); i++) {
+		string fileName = *i;
+		m_filesList.insert(fileName);
+	}		
 }
 ArchiveUtils::~ArchiveUtils()
 {
-	if ( m_contentMeta != NULL ) {
-		freeItemList(m_contentMeta);
-	}
-	if ( m_contentInfo != NULL) {
-		freeItemList(m_contentInfo);
-	}
-	if ( m_contentMtree != NULL) {
-		freeItemList(m_contentMtree);
-	}
 }
 void ArchiveUtils::treatErrors(const std::string& message) const
 {
@@ -88,24 +74,23 @@ set<string> ArchiveUtils::setofFiles()
 }
 unsigned int long ArchiveUtils::size()
 {
-	if (m_contentMtree != NULL)
-		return m_contentMtree->count;
+	if (m_contentMtree.size() != 0)
+		return m_contentMtree.size();
 	else return 0;
 }
 void ArchiveUtils::list()
 {
-	if ( m_contentMtree == NULL) {
+	if ( m_contentMtree.size() == 0) {
 		cout << "Not found" << endl;
 	} else {
-		for (unsigned int  i = 0; i < m_contentMtree -> count ;++i) {
-			cout << m_contentMtree->items[i] << endl;
+		for (vector<string>::const_iterator i = m_contentMtree.begin(); i != m_contentMtree.end(); i++) {
+			cout << *i << endl;
 		}
 	}
 }
-itemList * ArchiveUtils::extractFileContent(const char * fileName)
+vector<string> ArchiveUtils::extractFileContent(const char * fileName)
 {
-	
-	itemList * contentFile = NULL;
+	vector<string> contentFile;
 	struct archive* ar;
   struct archive_entry* ae;
 
@@ -125,15 +110,17 @@ itemList * ArchiveUtils::extractFileContent(const char * fileName)
 			entry_size = archive_entry_size(ae);
 			char *fC = (char*)Malloc(entry_size);
 			archive_read_data(ar,fC,entry_size);
-			fC[entry_size]='\0';
-			contentFile = parseDelimitedItemList(fC, "\n");
+			fC[entry_size-1]='\0';
+			string s_contentFile = fC;
+			// free(fC); // TODO Find out why no need to free this char pointer...
+			contentFile = parseDelimitedList(s_contentFile, '\n');
 			break;
 		}
 		++i;
 		if (i > 10 ) {
 			archive_read_close(ar);
 			FREE_ARCHIVE(ar);
-			return NULL; // no need to go further, it didn't find it
+			return contentFile; // no need to go further, it didn't find it
 		}
 	}
 	archive_read_close(ar);
@@ -142,10 +129,10 @@ itemList * ArchiveUtils::extractFileContent(const char * fileName)
 }
 void ArchiveUtils::getRunTimeDependencies()
 {
-	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
-		if ( m_contentMeta->items[i][0] == 'R' ) {
-		string dependencie= m_contentMeta->items[i];
-		m_rtDependenciesList.push_back(dependencie.substr(1));
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		string dependencie = *i;
+		if ( dependencie[0] == 'R' ) {
+			m_rtDependenciesList.push_back(dependencie.substr(1));
 		}
 	}
 }
@@ -159,29 +146,29 @@ void ArchiveUtils::printDeps()
 
 void ArchiveUtils::printMeta()
 {
-	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
-		cout << m_contentMeta->items[i] << endl;
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		cout << *i << endl;
 	}
 }
 void ArchiveUtils::printInfo()
 {
-	if ( m_contentInfo != NULL) {
-		for (unsigned int i=0; i< m_contentInfo->count ; ++i) {
-			cout << m_contentInfo->items[i] << endl;
+	if ( m_contentInfo.size() != 0) {
+		for (vector<string>::const_iterator i = m_contentInfo.begin(); i != m_contentInfo.end(); i++) {
+			cout << *i << endl;
 		}
 	}
 }
 string ArchiveUtils::getPackageName()
 {
 	string name;
-	if  ( m_contentMeta == NULL ) {
+	if  ( m_contentMeta.size() == 0 ) {
 		m_actualError = CANNOT_FIND_NAME;
 		treatErrors(m_fileName);
 		return "";
 	}
-	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
-		if ( m_contentMeta->items[i][0] == 'N' ) {
-			name = m_contentMeta->items[i];
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		name = *i;
+		if ( name[0] == 'N' ) {
 			return name.substr(1);
 			break;
 		}
@@ -197,9 +184,9 @@ string ArchiveUtils::name()
 string ArchiveUtils::version()
 {
 	string version;
-	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
-		if ( m_contentMeta->items[i][0] == 'V' ) {
-			version = m_contentMeta->items[i];
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		version = *i;
+		if ( version[0] == 'V' ) {
 			return version.substr(1);
 			break;
 		}
@@ -209,9 +196,9 @@ string ArchiveUtils::version()
 string ArchiveUtils::description()
 {
 	string description;
-	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
-		if ( m_contentMeta->items[i][0] == 'D' ) {
-			description = m_contentMeta->items[i];
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		description = *i;
+		if ( description[0] == 'D' ) {
 			return description.substr(1);
 			break;
 		}
@@ -221,11 +208,11 @@ string ArchiveUtils::description()
 string ArchiveUtils::builddate()
 {
 	char * c_time_s;
-	string buildtime;
-	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
-		if ( m_contentMeta->items[i][0] == 'B' ) {
-			string buildtimel=m_contentMeta->items[i];
-			buildtime=buildtimel.substr(1);
+	string bt,buildtime;
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		bt = *i;
+		if ( buildtime[0] == 'B' ) {
+			buildtime=bt.substr(1);
 			break;
 		}
 	}
@@ -238,9 +225,9 @@ time_t ArchiveUtils::buildn()
 {
 	time_t epochVal = 0;
 	string epochSVal;
-	for (unsigned int i=0; i< m_contentMeta->count ; ++i) {
-		if ( m_contentMeta->items[i][0] == 'B' ) {
-			epochSVal = m_contentMeta->items[i];
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++ ) {
+		epochSVal = *i;
+		if ( epochSVal[0] == 'B' ) {
 			epochVal = strtoul((epochSVal.substr(1)).c_str(),NULL,0);
 			return epochVal;
 			break;

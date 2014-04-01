@@ -245,17 +245,17 @@ get_package_list() {
 	local FILE i
 	i=0
 	if [ "$PKGMK_ARCH" == "x86_64" ]; then
-		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-x86_64.cards.tar.$PKGMK_COMPRESSION_MODE"`; do
+		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-x86_64.$PKGMK_PACKAGE_EXT*"`; do
 			TARGETS[i]=`basename $FILE`
 			i=$((i+1))
 		done
 	else
-		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-i686.cards.tar.$PKGMK_COMPRESSION_MODE"`; do
+		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-i686.$PKGMK_PACKAGE_EXT*"`; do
 			TARGETS[i]=`basename $FILE`
 			i=$((i+1))
 		done
 	fi
-	for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-any.cards.tar.$PKGMK_COMPRESSION_MODE"`; do
+	for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-any.$PKGMK_PACKAGE_EXT*"`; do
 		TARGETS[i]=`basename $FILE`
 		i=$((i+1))
 	done
@@ -416,7 +416,7 @@ check_footprint() {
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $TARGET ]; then
-			PKGMK_FOOTPRINT="`echo $TARGET|sed "s/[0-9]*-[a-z,_,0-9]*-*.cards.tar//"`.footprint"
+			PKGMK_FOOTPRINT="`echo $TARGET|sed "s/[0-9]*-[a-z,_,0-9]*-*.$PKGMK_PACKAGE_EXT//"`.footprint"
 			make_footprint > $FILE.footprint
 			if [ -f $PKGMK_FOOTPRINT ]; then
 				sort -k 3 $PKGMK_FOOTPRINT > $FILE.footprint.orig
@@ -458,7 +458,7 @@ make_work_dir() {
 	remove_work_dir
 	mkdir -p $SRC $PKG
 
-	if [ "$PKGMK_IGNORE_MD5SUM" = "no" ]; then
+	if [ "$PKGMK_IGNORE_MD5SUM" = "no" ] && [ "$PKGMK_INSTALL" != "no" ] && [ "$PKGMK_CLEANUP" = "no" ]; then
 		check_md5sum
 	fi
 }
@@ -475,7 +475,7 @@ pack_lib() {
 			fi
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}$build-$PKGMK_ARCH.cards.tar \
+				$PKGMK_PACKAGE_DIR/${name}.${group}$build-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -493,10 +493,11 @@ pack_devel() {
 		for SUBDIR in include lib/pkgconfig; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.cards.tar \
+				$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
+				
 			fi
 		done
 	done
@@ -507,7 +508,7 @@ pack_doc() {
 		for SUBDIR in doc gtk-doc; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.cards.tar \
+				$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -521,7 +522,7 @@ pack_man() {
 		for SUBDIR in info man; do
 			if [ -d $DIR/$SUBDIR  ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.cards.tar \
+				$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -533,16 +534,41 @@ pack_service() {
 	local DIR="etc/rc.d"
 	if [ -d $DIR ]; then
 		bsdtar -r -f \
-		$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.cards.tar \
+		$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
 		$DIR || BUILD_SUCCESSFUL="no"
 		rm -r $DIR
 		j=1
 	fi
 }
+add_meta_files() {
+	local NAME
+	NAME="`echo $1|sed "s/[0-9]*-[a-z,_,0-9]*-*.$PKGMK_PACKAGE_EXT//"`"
+	info "Adding meta files to Archive $NAME"
+	cd $PKG
+	if [ -f $PKGMK_ROOT/${NAME}.README ]; then
+		cp $PKGMK_ROOT/${NAME}.README .README
+	fi
+	if [ -f $PKGMK_ROOT/${NAME}.pre-install ]; then
+		cp $PKGMK_ROOT/${NAME}.pre-install .PRE
+	fi
+	if [ -f $PKGMK_ROOT/${NAME}.post-install ]; then
+		cp $PKGMK_ROOT/${NAME}.post-install .POST
+	fi
+	if [ -f $PKGMK_ROOT/${NAME}.info ]; then
+		cp $PKGMK_ROOT/${NAME}.info .INFO
+	fi
+	for file in .README .PRE .POST .INFO; do
+		if [ -f $file ]; then
+			bsdtar -r -f $PKGMK_PACKAGE_DIR/$1 \
+			$file
+			rm $file
+		fi
+	done
+}
 
 add_meta_to_archive() {
 	local NAME SIZE_I DESCR
-	NAME="`echo $1|sed "s/[0-9]*-[a-z,_,0-9]*-*.cards.tar//"`"
+	NAME="`echo $1|sed "s/[0-9]*-[a-z,_,0-9]*-*.$PKGMK_PACKAGE_EXT//"`"
 	
 	info  "Adding meta data to Archive $NAME"
 
@@ -564,20 +590,6 @@ add_meta_to_archive() {
 	for dep in `pkginfo --runtimedepfiles $TAR`; do
 		echo "R$dep" >> .META
         done
-
-
-	if [ -f $PKGMK_ROOT/${NAME}.README ]; then
-                cp $PKGMK_ROOT/${NAME}.README .README
-	fi
-	if [ -f $PKGMK_ROOT/${NAME}.pre-install ]; then
-		cp $PKGMK_ROOT/${NAME}.pre-install .PRE
-	fi
-	if [ -f $PKGMK_ROOT/${NAME}.post-install ]; then
-		cp $PKGMK_ROOT/${NAME}.post-install .POST
-	fi
-	if [ -f $PKGMK_ROOT/${NAME}.info ]; then
-		cp $PKGMK_ROOT/${NAME}.info .INFO
-	fi
 
 	bsdtar -tf $PKGMK_PACKAGE_DIR/$1 > .MTREE
 
@@ -629,9 +641,6 @@ build_package() {
 		
 		compress_manpages
 
-		if [ "$PKGMK_CLEAN_OLD" = "yes" ]; then
-			clean_old
-		fi
 		cd $PKG
 		i=0
 		j=0
@@ -658,22 +667,21 @@ build_package() {
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
-				
-				ARCH=`find $PKGMK_PACKAGE_DIR -name ${name}.${group}$PKGMK_BUILDVER-*|sed "s|$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER\-||"|cut -d "." -f1`
-				SIZE_I="`du -b $PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-*|sed "s/\t/ /"|cut -d " " -f1`"
+				if [ "$group" == "lib" ]; then
+					add_meta_files ${name}.${group}$PKGMK_BUILDVER-`uname -m`.$PKGMK_PACKAGE_EXT
+				else
+					add_meta_files ${name}.${group}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT
+				fi
 
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
 					exit 1
 				fi
 
-				TARGETS[i]="${name}.${group}$PKGMK_BUILDVER-$ARCH.cards.tar"
-
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
 					exit 1
 				fi
-				i=$((i+1))
 				j=0
 			fi
 			j=0
@@ -683,35 +691,30 @@ build_package() {
 				# Need to double check because glibc for exemple create a file in this directory
 				if [ -d usr/share/locale/$loc ];then
 					LOCALE_GROUP=`echo $loc|sed "s/_/-/g"`
-					bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar \
-					usr/share/locale/$loc || abort_on_build "${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar"
+					bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
+					usr/share/locale/$loc || abort_on_build "${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT"
 					rm -rf usr/share/locale/$loc
-
-					TARGETS[i]="${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.cards.tar"
-				
-					i=$((i+1))
+					add_meta_files ${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT
 				fi
 			done
 		fi
-
-		TARGETS[i]="${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar"
-
-		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar *
-
-
+		
+		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT *
+		add_meta_files ${name}$PKGMK_BUILDVER-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT
 		if [ $? = 0 ]; then
 			BUILD_SUCCESSFUL="yes"
 			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
 				warning "Footprint ignored."
 			else
-				check_footprint
+				 if [ "$PKGMK_INSTALL" = "no" ] || [ "$PKGMK_CLEANUP" = "no" ]; then
+					check_footprint
+				 fi
 			fi
 		fi
 	fi
 	
-	
 	if [ "$BUILD_SUCCESSFUL" = "yes" ]; then
-		
+		get_package_list		
 		for TARGET in ${TARGETS[@]}; do
 			add_meta_to_archive $TARGET
 		done
@@ -789,8 +792,10 @@ clean() {
 		fi
 	done
 }
-clean_old() {
-	find $PKGMK_PACKAGE_DIR/${name}*.cards.tar* -exec rm -v {} \; 2> /dev/null
+clean_up() {
+	find $PKGMK_PACKAGE_DIR/${name}*.$PKGMK_PACKAGE_EXT* -exec rm -v {} \; 2> /dev/null
+	find $PKGMK_ROOT -name "*.md5sum" -exec rm -v {} \; 2> /dev/null
+	find $PKGMK_ROOT -name "*.footprint" -exec rm -v {} \; 2> /dev/null
 }
 update_footprint() {
 	cd $PKGMK_PACKAGE_DIR
@@ -806,7 +811,7 @@ update_footprint() {
 			error "Unable to update footprint. File '$TARGET' not found."
 			exit 1
 		fi
-		PKGMK_FOOTPRINT="`echo $TARGET|sed "s/[0-9]*-[a-z,_,0-9]*-*.cards.tar.$PKGMK_COMPRESSION_MODE//"`.footprint"
+		PKGMK_FOOTPRINT="`echo $TARGET|sed "s/[0-9]*-[a-z,_,0-9]*-*.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE//"`.footprint"
 		check_file "$PKGMK_FOOTPRINT"
 		make_footprint > $PKGMK_FOOTPRINT
 		touch $TARGET
@@ -1081,7 +1086,7 @@ main() {
 	case $PKGMK_COMPRESSION_MODE in
 		gz|bz2|xz)
 			if [ -z $TARGETS ]; then
-				TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE"
+				TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
 			fi;;
 		*)
 			error "Compression mode '$PKGMK_COMPRESSION_MODE' not supported"
@@ -1149,7 +1154,7 @@ main() {
 	fi
 	# From here on it's need to check the base package not any group which means
 	if [ -z $TARGETS ]; then
-		TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.cards.tar.$PKGMK_COMPRESSION_MODE
+		TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 		if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
 			info "Package '$TARGET' is up to date."
 		else
@@ -1167,23 +1172,32 @@ main() {
 			fi
 		done
 	fi
-	if [ "$PKGMK_UPDATE_INDEX" != "no" ];then
-		update_index_html
-	fi
 	if [ "$PKGMK_INSTALL" != "no" ]; then
 		install_package
 	fi
-	if [ "$PKGMK_COMPRESS_PACKAGE"=="yes" ]; then
+	if [ "$PKGMK_COMPRESS_PACKAGE" = "yes" ]; then
 		cd $PKGMK_PACKAGE_DIR
 		for TARGET in ${TARGETS[@]}; do
-			compress_archive $TARGET
+			if [  "${TARGET:$((${#TARGET} - ${#PKGMK_PACKAGE_EXT} ))}" == "$PKGMK_PACKAGE_EXT" ]; then
+				compress_archive $TARGET
+			fi
 		done
+		if [ "$PKGMK_CLEANUP" != "yes" ]; then
+			if [ "$PKGMK_UPDATE_INDEX" != "no" ];then
+				update_index_html
+			fi
+		else
+			clean_up
+		fi
+		
+	else
+		if [ "$PKGMK_INSTALL" != "no" ]; then
+			clean_up
+			if [ "$PKGMK_KEEP_SOURCES" == "no" ]; then
+				remove_source
+			fi
+		fi
 	fi
-
-	if [ "$PKGMK_KEEP_SOURCES" == "no" ]; then
-		remove_source
-	fi
-
 	exit 0
 }
 
@@ -1198,6 +1212,8 @@ readonly PKGMK_ROOT="$PWD"
 PKGMK_BUILDVER=`date +%s`
 CARDS_CONFFILE="/etc/cards.conf"
 
+PKGMK_PACKAGE_EXT="cards.tar"
+
 PKGMK_SIGNATURE="MD5SUM"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
@@ -1205,7 +1221,7 @@ PKGMK_PKGFILE="Pkgfile"
 PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 PKGMK_NOSTRIP=".nostrip"
 
-PKGMK_CLEAN_OLD="yes"
+PKGMK_CLEANUP="no"
 
 PKGMK_SYNC_FILES="yes"
 

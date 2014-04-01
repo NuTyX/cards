@@ -190,15 +190,12 @@ void Pkgdbh::progressInfo() const
     case DB_OPEN_END:
       printf("100 %%\n");
       break;
-    case PKG_OPEN_START:
-      cout << "Extract the archive: " ;
-      break;
-    case PKG_OPEN_RUN:
-      rotatingCursor();
-      break;
-    case PKG_OPEN_END:
-      printf("100 %%\n");
-      break;
+		case PKG_PREINSTALL_START:
+			cout << "pre-install: start" << endl;
+			break;
+		case PKG_PREINSTALL_END:
+			cout << "pre-install: finish" << endl;
+			break;
     case PKG_INSTALL_START:
       j = 0;
       cout << "Installing "<< m_filesNumber << " files: ";
@@ -214,6 +211,12 @@ void Pkgdbh::progressInfo() const
     case PKG_INSTALL_END:
       printf("100 %%\n");
       break;
+		case PKG_POSTINSTALL_START:
+			cout << "post-install: start" << endl;
+			break;
+		case PKG_POSTINSTALL_END:
+			cout << "post-install: finish" << endl;
+			break;
 		case DB_ADD_PKG_START:
 			break;
 		case DB_ADD_PKG_END:
@@ -287,7 +290,7 @@ void Pkgdbh::getInstalledPackages(bool silent)
 			if ( contentFile->items[li][0] == 'B' ) {
 				string build = contentFile->items[li];
 				info.build = build.substr(1);
-			}
+			} 
 			if ( contentFile->items[li][0] == 'V' ) {
 				string version = contentFile->items[li];
 				info.version = version.substr(1);
@@ -303,7 +306,7 @@ void Pkgdbh::getInstalledPackages(bool silent)
 			if ( contentFile->items[li][0] == 'R' ) {
 				string run = contentFile->items[li];
 				info.run = run.substr(1) + ' ' + info.run ;
-			}	
+			}
 		}
 		freeItemList(contentFile);	
 		// list of files
@@ -358,6 +361,8 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 			info.files.erase(i);
 		}
 	}
+	metaFilesList.insert(".META");
+	metaFilesList.insert(".MTREE");
 	set<string> fileContent;
 	if ( parseFile(fileContent,".META") == -1 ) {
 		m_actualError = CANNOT_FIND_FILE;
@@ -455,8 +460,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 		m_actualError = CANNOT_READ_FILE;
 		treatErrors(packagenamedir);
 	}
-
-	if (metaFilesList.size() > 0)
+	if (metaFilesList.size() > 0) {
 		for (set<string>::iterator i = metaFilesList.begin(); i != metaFilesList.end();++i) {
 			const string filename = packagenamedir + "/" + *i;
 			if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
@@ -467,11 +471,11 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 				cout  << "File: " << filename << " is removed"<< endl;
 #endif
 			}
-		if( remove(packagenamedir.c_str()) == -1)
-		{
-			const char* msg = strerror(errno);
-			cerr << m_utilName << ": could not remove " << packagenamedir << ": " << msg << endl;
-		}
+	}
+	if( remove(packagenamedir.c_str()) == -1) {
+		const char* msg = strerror(errno);
+		cerr << m_utilName << ": could not remove " << packagenamedir << ": " << msg << endl;
+	}
 #ifndef NDEBUG
 	cout  << "Directory: " << packagenamedir << " is removed"<< endl;
 #endif
@@ -712,18 +716,18 @@ void Pkgdbh::extractAndRunPREfromPackage(const string& filename)
 		}
 
 	}
-#if ARCHIVE_VERSION_NUMBER >= 3000000
-        archive_read_free(archive);
-#else
-        archive_read_finish(archive);
-#endif
+	FREE_ARCHIVE(archive);
 	if (checkFileExist(PKG_PRE_INSTALL))
 	{
+		m_actualAction = PKG_PREINSTALL_START;
+  	progressInfo();	
 		process preinstall(SHELL,PKG_PRE_INSTALL, 0 );
 		if (preinstall.executeShell()) {
 			exit(EXIT_FAILURE);
 		}
 		removeFile(m_root,PKG_PRE_INSTALL);
+		m_actualAction = PKG_PREINSTALL_END;
+		progressInfo();
 	}
 	chdir(buf);
 }
@@ -827,11 +831,7 @@ void Pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 			treatErrors(filename);
 		}
 	}
-#if ARCHIVE_VERSION_NUMBER >= 3000000
-	archive_read_free(archive);
-#else
-	archive_read_finish(archive);
-#endif
+	FREE_ARCHIVE(archive);
 }
 void Pkgdbh::runLdConfig()
 {
@@ -887,11 +887,7 @@ void Pkgdbh::getFootprintPackage(string& filename)
 		//	throw RunTimeErrorWithErrno("could not read " + filename, archive_errno(archive));
 		}
 	}
-#if ARCHIVE_VERSION_NUMBER >= 3000000
-	archive_read_free(archive);
-#else
-  archive_read_finish(archive);
-#endif
+	FREE_ARCHIVE(archive);
 
 	// Too bad, there doesn't seem to be a way to reuse our archive
 	// instance
@@ -985,12 +981,7 @@ void Pkgdbh::getFootprintPackage(string& filename)
 			treatErrors(filename);
 		}
 	}
-#if ARCHIVE_VERSION_NUMBER >= 3000000
-	archive_read_free(archive);
-#else
-	archive_read_finish(archive);
-#endif
-
+	FREE_ARCHIVE(archive);
 }
 
 void Pkgdbh::print_version() const
