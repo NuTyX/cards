@@ -458,7 +458,7 @@ make_work_dir() {
 	remove_work_dir
 	mkdir -p $SRC $PKG
 
-	if [ "$PKGMK_IGNORE_MD5SUM" = "no" ] && [ "$PKGMK_INSTALL" != "no" ] && [ "$PKGMK_CLEANUP" = "no" ]; then
+	if [ "$PKGMK_IGNORE_MD5SUM" = "no" ]; then
 		check_md5sum
 	fi
 }
@@ -706,9 +706,7 @@ build_package() {
 			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
 				warning "Footprint ignored."
 			else
-				 if [ "$PKGMK_INSTALL" = "no" ] || [ "$PKGMK_CLEANUP" = "no" ]; then
-					check_footprint
-				 fi
+				check_footprint
 			fi
 		fi
 	fi
@@ -1073,7 +1071,39 @@ main() {
 	else
 		warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
 	fi
+	info "PKGMK_SYNC_FILES: $PKGMK_SYNC_FILES"
+	info "PKGMK_INSTALL: $PKGMK_INSTALL"
+	info "PKGMK_WORK_DIR: $PKGMK_WORK_DIR"
+	info "PKGMK_SOURCE_DIR: $PKGMK_SOURCE_DIR"
 
+	if [ "$PKGMK_INSTALL" = "no" ]; then
+		PKGMK_CLEANUP="no"
+		PKGMK_KEEP_SOURCES="yes"
+		warning "CLEANUP IGNORED"
+		warning "KEEP SOURCES"
+	else
+		info "PKGMK_KEEP_SOURCES: $PKGMK_CLEANUP"
+		info "PKGMK_CLEANUP: $PKGMK_CLEANUP"
+	fi
+	if [ "$PKGMK_CLEANUP" != "no" ]; then
+		PKGMK_UPDATE_INDEX="no"
+		PKGMK_IGNORE_FOOTPRINT="yes"
+		PKGMK_IGNORE_MD5SUM="yes"
+		warning "FOOTPRINT AND MD5SUM IGNORED"
+		warning "index.html AND MD5SUM files not generated"
+	else
+		info "PKGMK_UPDATE_INDEX: $PKGMK_UPDATE_INDEX"
+		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
+		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"	
+	fi
+	if [ -z "$PKGMK_UPDATE_INDEX" ]; then
+		info "index.html AND MD5SUM files will be generated"
+	fi
+
+	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
+	if [ "$PKGMK_COMPRESS_PACKAGE" != "no" ]; then
+		info "PKGMK_COMPRESSION_MODE: $PKGMK_COMPRESSION_MODE"
+	fi
 	PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
@@ -1103,7 +1133,7 @@ main() {
 		clean
 		exit 0
 	fi
-	if [ "$PKGMK_UPDATE_INDEX" == "yes" ]; then
+	if [ "$PKGMK_UPDATE_INDEX" = "yes" ]; then
 		update_index_html
 		exit 0
 	fi
@@ -1182,21 +1212,15 @@ main() {
 				compress_archive $TARGET
 			fi
 		done
-		if [ "$PKGMK_CLEANUP" != "yes" ]; then
-			if [ "$PKGMK_UPDATE_INDEX" != "no" ];then
-				update_index_html
-			fi
-		else
-			clean_up
-		fi
-		
-	else
-		if [ "$PKGMK_INSTALL" != "no" ]; then
-			clean_up
-			if [ "$PKGMK_KEEP_SOURCES" == "no" ]; then
-				remove_source
-			fi
-		fi
+	fi
+	if [ "$PKGMK_KEEP_SOURCES" != "yes" ]; then
+		remove_source
+	fi
+	if [ "$PKGMK_CLEANUP" != "no" ]; then
+		clean_up
+	fi
+	if [ "$PKGMK_UPDATE_INDEX" != "no" ];then
+		update_index_html
 	fi
 	exit 0
 }
