@@ -1029,7 +1029,7 @@ main() {
 	fi
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
-		warning "Footprint ignored."
+		warning "pkginfo NOT FOUND, footprint ignored."
 		PKGMK_IGNORE_FOOTPRINT="yes"
 	fi
 	local FILE TARGET PACKAGENAME
