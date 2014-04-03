@@ -667,12 +667,6 @@ build_package() {
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
-				if [ "$group" == "lib" ]; then
-					add_meta_files ${name}.${group}$PKGMK_BUILDVER-`uname -m`.$PKGMK_PACKAGE_EXT
-				else
-					add_meta_files ${name}.${group}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT
-				fi
-
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
 					exit 1
@@ -690,17 +684,13 @@ build_package() {
 			for loc in `cd usr/share/locale/ && ls`; do
 				# Need to double check because glibc for exemple create a file in this directory
 				if [ -d usr/share/locale/$loc ];then
-					LOCALE_GROUP=`echo $loc|sed "s/_/-/g"`
-					bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
-					usr/share/locale/$loc || abort_on_build "${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT"
+					bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${loc}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
+					usr/share/locale/$loc || abort_on_build "${name}.${loc}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT"
 					rm -rf usr/share/locale/$loc
-					add_meta_files ${name}.${LOCALE_GROUP}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT
 				fi
 			done
-		fi
-		
+		fi	
 		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT *
-		add_meta_files ${name}$PKGMK_BUILDVER-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT
 		if [ $? = 0 ]; then
 			BUILD_SUCCESSFUL="yes"
 			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
@@ -714,6 +704,7 @@ build_package() {
 	if [ "$BUILD_SUCCESSFUL" = "yes" ]; then
 		get_package_list		
 		for TARGET in ${TARGETS[@]}; do
+			add_meta_files $TARGET
 			add_meta_to_archive $TARGET
 		done
 		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
