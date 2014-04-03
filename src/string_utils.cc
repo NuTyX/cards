@@ -202,26 +202,15 @@ string getFirstValueOfKeyBeforeDelim(const string& s, char delimiter)
 		return s.substr( 0, pos );
 	return s;
 }
-itemList * parseDelimitedItemList(char * s, const char * delimiter)
-{
-	itemList * iL = initItemList();
-	char * pch;
-	pch = strtok (s,delimiter);
-	while ( pch != NULL && *pch != '\n') {	
-		addItemToItemList(iL,pch);
-		pch = strtok (NULL,delimiter);
-	}
-	return iL;
-}
 vector<string> parseDelimitedList(const string& s, const char delimiter)
 {
 	vector<string> depList;
 	if ( s.empty() )
 		return depList;
-	unsigned int start = 0, end = 0;
-
-	while ( ( (end = s.find(delimiter,start)) != string::npos ) && ( start < s.size() ) ) 
+	string::size_type start = 0, end = 0;
+	while (  (end = s.find(delimiter,start)) < string::npos   ) 
 	{
+		end = s.find(delimiter,start );
 		depList.push_back(s.substr( start, end - start ));
 		start = end +1;
 	}

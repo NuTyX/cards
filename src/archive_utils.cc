@@ -23,8 +23,17 @@
 ArchiveUtils::ArchiveUtils(const string& fileName)
 	: m_fileName(fileName)
 {
+#ifndef NDEBUG
+	cerr << "extractFileContent META" << endl;
+#endif
 	m_contentMeta = extractFileContent(METAFILE);
+#ifndef NDEBUG
+	cerr << "extractFileContent MTREE" << endl;
+#endif
  	m_contentMtree = extractFileContent(MTREEFILE);
+#ifndef NDEBUG
+	cerr << "extractFileContent INFO" << endl;
+#endif
  	m_contentInfo = extractFileContent(INFOFILE);
 
 	if ( m_contentMeta.size() == 0) {

@@ -662,6 +662,9 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 {
 	pair<string, pkginfo_t> result;
 	ArchiveUtils packageArchive(filename.c_str());
+#ifndef NDEBUG
+	cerr << "Number of files: " << packageArchive.size() << endl;
+#endif
 	string basename(filename, filename.rfind('/') + 1);
 	m_filesNumber = packageArchive.size();
 	if (m_filesNumber == 0 ) {
@@ -674,6 +677,9 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 		treatErrors(basename);
 	}
 	result.first = name;
+#ifndef NDEBUG
+	cerr << "name: " << name << endl;
+#endif
 	set<string> fileList =  packageArchive.setofFiles();
 	for (set<string>::iterator i = fileList.begin();i != fileList.end();++i) {
 		result.second.files.insert(*i);
