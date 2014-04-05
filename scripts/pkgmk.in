@@ -72,6 +72,10 @@ check_pkgfile() {
 	fi
 }
 
+get_pkgname() {
+	local NAME=`echo $1|sed "s/-i686.$PKGMK_PACKAGE_EXT//"|sed "s/-x86_64.$PKGMK_PACKAGE_EXT//"|sed "s/-any.$PKGMK_PACKAGE_EXT//"`
+	echo "${NAME:0:$((${#NAME} - 10 ))}"	
+}
 check_directory() {
 	if [ ! -d $1 ]; then
 		error "Directory '$1' does not exist."
@@ -416,7 +420,7 @@ check_footprint() {
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $TARGET ]; then
-			PKGMK_FOOTPRINT="`echo $TARGET|sed "s/[0-9]*-[a-z,_,0-9]*-*.$PKGMK_PACKAGE_EXT//"`.footprint"
+			PKGMK_FOOTPRINT="`get_pkgname $TARGET`".footprint
 			make_footprint > $FILE.footprint
 			if [ -f $PKGMK_FOOTPRINT ]; then
 				sort -k 3 $PKGMK_FOOTPRINT > $FILE.footprint.orig
@@ -450,7 +454,6 @@ check_footprint() {
 make_work_dir() {
 	export PKG="$PKGMK_WORK_DIR/pkg"
 	export SRC="$PKGMK_WORK_DIR/src"
-	export TAR="$PKGMK_WORK_DIR/tar"
 
 	umask 022
 	
@@ -540,9 +543,10 @@ pack_service() {
 		j=1
 	fi
 }
+
 add_meta_files() {
 	local NAME
-	NAME="`echo $1|sed "s/[0-9]*-[a-z,_,0-9]*-*.$PKGMK_PACKAGE_EXT//"`"
+	NAME="`get_pkgname $1`"
 	info "Adding meta files to Archive $NAME"
 	cd $PKG
 	if [ -f $PKGMK_ROOT/${NAME}.README ]; then
@@ -568,12 +572,13 @@ add_meta_files() {
 
 add_meta_to_archive() {
 	local NAME SIZE_I DESCR
-	NAME="`echo $1|sed "s/[0-9]*-[a-z,_,0-9]*-*.$PKGMK_PACKAGE_EXT//"`"
+	NAME="`get_pkgname $1`"
+
 	
 	info  "Adding meta data to Archive $NAME"
 
+	TAR="$PKGMK_WORK_DIR/tar"
 	mkdir -p $TAR
-	
 	cd $TAR
 
 	bsdtar xf $PKGMK_PACKAGE_DIR/$1
@@ -800,7 +805,7 @@ update_footprint() {
 			error "Unable to update footprint. File '$TARGET' not found."
 			exit 1
 		fi
-		PKGMK_FOOTPRINT="`echo $TARGET|sed "s/[0-9]*-[a-z,_,0-9]*-*.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE//"`.footprint"
+		PKGMK_FOOTPRINT="`get_pkgname $TARGET`".footprint
 		check_file "$PKGMK_FOOTPRINT"
 		make_footprint > $PKGMK_FOOTPRINT
 		touch $TARGET
