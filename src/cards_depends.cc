@@ -157,11 +157,12 @@ int CardsDepends::depends()
 				}
 			}
 		}
+		printf("%s\n",longPackageName); 
 		freeItemList(sortPackagesList);
 	}
 	freeItemList(filesList);
-	freePkgInfo(package);
 	freePkgList(packagesList);
+	freePkgInfo(package);
 	free(longPackageName);
 	delete packagesInfo;
 	return 0;

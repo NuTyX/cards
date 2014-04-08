@@ -22,6 +22,7 @@
 #  Version #VERSION#
 
 source /etc/pkgmk.conf
+
 if [ $# -lt 1 ]; then
         echo 1>&2
         echo 1>&2 'Usage: pkgmkall <Package> (pkgmkall kde par exemple)'
@@ -40,19 +41,23 @@ DRY=false
 if [ "$2" == "--dry" ];then
         DRY=true
 fi
+cards isinst $1 || exit 1
 TMP=`mktemp -d`
 cards depends $1 > $TMP/list
 if grep "missing packages" $TMP/list ; then
         erreur_deps
 fi
-# On supprime la dernière ligne cad le paquet passé en argument que l'on veut contruire
-LINE=`wc -l $TMP/list|cut -d " " -f1`
-sed -i "${LINE}d" $TMP/list
+# On supprime la dernière ligne cad
+# le paquet passé en argument que
+# l'on veut contruire
+# LINE=`wc -l $TMP/list|cut -d " " -f1`
+# sed -i "${LINE}d" $TMP/list
 
+cards isinst $
 for i in `cat $TMP/list`
 do
         cd $i
-        pkgmk -d -i
+        pkgmk -d -i || exit 1
 done
 if [ $DRY == true ]; then 
 	exit 0

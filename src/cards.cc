@@ -45,9 +45,11 @@ int main(int argc, char** argv)
 		CardsSync CS(cardsArgPars);
 		return CS.run();
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
-
-
+		cout << "Not yet implemented, be patient" << endl;
+		return 0;
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
+		cout << "Sorry, this function has to be completly review" << endl;
+		return 0;
 		if (getuid()) {
 			cerr << "Only root can install !!!" << endl;
 			return -1;
@@ -61,7 +63,8 @@ int main(int argc, char** argv)
 		return CD.level();
 	
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPINST) {
-
+		cout << "Not yet implemented, be patient" << endl;
+		return 0;
 
 	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
 
@@ -87,10 +90,13 @@ int main(int argc, char** argv)
 		packagesInfo->getNumberOfPackages();
 		if ( packagesInfo->isInstalled(argv[2]) )	{
 			cout << argv[2] << " is installed" << endl;
+			delete packagesInfo;
+			return 1;
 		} else {
-			 cout << argv[2] << " is not installed" << endl;
+			cout << argv[2] << " is not installed" << endl;
+			delete packagesInfo;
+			return 0;
 		}
-		delete packagesInfo;
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
 		Config config;
 		ConfigParser::parseConfig("/etc/cards.conf", config);
@@ -117,13 +123,20 @@ int main(int argc, char** argv)
 		cout << endl << "Number of availables ports : " << numberOfPorts << endl << endl;
 
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) {
+		cout << "Not yet implemented, be patient" << endl;
+		return 0;
 
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) {
+		cout << "Not yet implemented, be patient" << endl;
+		return 0;
 
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_DSEARCH) {
+		cout << "Not yet implemented, be patient" << endl;
+		return 0;
 
   } else if (cardsArgPars.command() == CardsArgumentParser::CMD_FSEARCH) {
-
+		cout << "Not yet implemented, be patient" << endl;
+		return 0;
 	} else {
 		cerr << "Supported commands so far:\n"
 		<< "  sync\n"
