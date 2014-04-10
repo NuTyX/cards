@@ -37,11 +37,9 @@ E_INSTALL=9    # error while installing the package via 'pkgadd'
 info() {
 	echo "=======> $1"
 }
-
 warning() {
 	info "WARNING: $1" >&2
 }
-
 error() {
 	info "ERROR: $1" >&2
 }
@@ -49,7 +47,6 @@ abort_on_build() {
         error $1
         exit $E_BUILD
 }
-
 get_filename() {
 	if [[ $1 =~ ^(http|https|ftp|file)://.*/(.+) ]]; then
 		echo "$PKGMK_SOURCE_DIR/${BASH_REMATCH[2]}"
@@ -57,7 +54,6 @@ get_filename() {
 		echo $1
 	fi
 }
-
 get_basename() {
 	local FILE="`echo $1 | sed 's|^.*://.*/||g'`"
 	echo $FILE
@@ -71,10 +67,43 @@ check_pkgfile() {
 		exit $E_PKGFILE
 	fi
 }
+get_package_name() {
+	local NAME EXT
+	if [  "${1:$((${#1} - ${#PKGMK_PACKAGE_EXT} ))}" == "$PKGMK_PACKAGE_EXT" ]; then
+		EXT=$PKGMK_PACKAGE_EXT
+	else
+		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
+	fi
+	NAME=`echo $1|sed "s/-i686.$EXT//"|sed "s/-x86_64.$EXT//"|sed "s/-any.$EXT//"`
 
-get_pkgname() {
-	local NAME=`echo $1|sed "s/-i686.$PKGMK_PACKAGE_EXT//"|sed "s/-x86_64.$PKGMK_PACKAGE_EXT//"|sed "s/-any.$PKGMK_PACKAGE_EXT//"`
 	echo "${NAME:0:$((${#NAME} - 10 ))}"	
+}
+get_package_builddate() {
+	local NAME BUILD_DATE EXT
+	if [  "${1:$((${#1} - ${#PKGMK_PACKAGE_EXT} ))}" == "$PKGMK_PACKAGE_EXT" ]; then
+		EXT=$PKGMK_PACKAGE_EXT
+	else
+		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
+	fi
+	NAME="`get_package_name $1`"
+	BUILD_DATE=`echo $1|sed "s/-i686.$EXT//"|sed "s/-x86_64.$EXT//"|sed "s/-any.$EXT//"`
+	echo "${BUILD_DATE:$((${#NAME}))}"
+}
+get_package_extension() {
+	local EXTENSION
+	if [  "${1:$((${#1} - ${#PKGMK_PACKAGE_EXT} ))}" == "$PKGMK_PACKAGE_EXT" ]; then
+		EXTENSION=".$PKGMK_PACKAGE_EXT"
+	else
+		EXTENSION=".$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
+	fi
+	echo $EXTENSION
+}
+get_package_arch() {
+	local NAME BUILD_DATE EXTENSION
+	NAME=`get_package_name $1`
+	BUILD_DATE=`get_package_builddate $1`
+	EXTENSION=`get_package_extension $1`
+	echo $1|sed "s/$NAME$BUILD_DATE//"|sed "s/$EXTENSION//"
 }
 check_directory() {
 	if [ ! -d $1 ]; then
@@ -88,7 +117,6 @@ check_directory() {
 		exit $E_DIR_PERM
 	fi
 }
-
 check_file() {
 	if [ -e $1 ] && [ ! -w $1 ]; then
 		error "File '$1' is not writable."
@@ -168,9 +196,8 @@ download_file() {
 	fi
 }
 sync_all_files() {
-	local DIR GROUP FILE URL DEPOT_URL
+	local LINE MD5SUM ARCH HEAD DIR FILE URL DEPOT_URL EXT BUILD_DATE
 	DIR=`dirname $PWD`
-	GROUP=`basename $DIR`
 	DEPOT_URL=`cat $CARDS_CONFFILE|grep ^dir|grep $DIR|cut -d " " -f2|cut -d "|" -f 2|sed "s/ //g"`
 	if [ ! "`type -p curl`" ]; then
 		error "Command 'curl' not found."
@@ -180,7 +207,24 @@ sync_all_files() {
 	if [ ! -f $PKGMK_SIGNATURE ]; then
 		downloads_file_with_curl  $PKGMK_SIGNATURE $URL/$PKGMK_SIGNATURE
 	fi
-	sed  "s/:/  /" $PKGMK_SIGNATURE > .md5
+	HEAD=`head -1 $PKGMK_SIGNATURE`
+	if [ ${HEAD:10:1} = ":" ]; then # Packages availables
+		BUILD_DATE="`echo $HEAD|cut -d ":" -f1`"
+		EXT="`echo $HEAD|cut -d ":" -f2`"
+		for LINE in `cat $PKGMK_SIGNATURE`;do
+			MD5SUM="`echo $LINE|cut -d ":" -f1`"
+			FILE="`echo $LINE|cut -d ":" -f2`"
+			ARCH="`echo $LINE|cut -d ":" -f3`"
+			if [ "$ARCH" != "" ]; then
+				echo "$MD5SUM  ${FILE}${BUILD_DATE}-${ARCH}${EXT}" >> .md5
+			else
+				echo  "$MD5SUM  ${FILE}" >> .md5
+			fi
+		done
+		sed -i "1d" .md5
+	else
+		sed  "s/:/  /" $PKGMK_SIGNATURE > .md5
+	fi
 	for FILE in $(cat .md5|cut -d " " -f 3);do
 		if [ ! -f $FILE ];then
 			downloads_file_with_curl $FILE $URL/$FILE
@@ -246,26 +290,14 @@ unpack_source() {
 	done
 }
 get_package_list() {
-	local FILE i
+	local ARCHFILE i
 	i=0
-	if [ "$PKGMK_ARCH" == "x86_64" ]; then
-		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-x86_64.$PKGMK_PACKAGE_EXT*"`; do
+	for ARCH in x86_64 i686 any; do
+		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-$ARCH.$PKGMK_PACKAGE_EXT*"`; do
 			TARGETS[i]=`basename $FILE`
 			i=$((i+1))
 		done
-	else
-		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-i686.$PKGMK_PACKAGE_EXT*"`; do
-			TARGETS[i]=`basename $FILE`
-			i=$((i+1))
-		done
-	fi
-	for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-any.$PKGMK_PACKAGE_EXT*"`; do
-		TARGETS[i]=`basename $FILE`
-		i=$((i+1))
 	done
-	if [ -z $TARGETS ]; then
-		warning "Package(s) not found(s)..."
-	fi
 }
 make_md5sum() {
 	local FILE LOCAL_FILENAMES
@@ -420,7 +452,7 @@ check_footprint() {
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $TARGET ]; then
-			PKGMK_FOOTPRINT="`get_pkgname $TARGET`".footprint
+			PKGMK_FOOTPRINT="`get_package_name $TARGET`".footprint
 			make_footprint > $FILE.footprint
 			if [ -f $PKGMK_FOOTPRINT ]; then
 				sort -k 3 $PKGMK_FOOTPRINT > $FILE.footprint.orig
@@ -546,7 +578,7 @@ pack_service() {
 
 add_meta_files() {
 	local NAME
-	NAME="`get_pkgname $1`"
+	NAME="`get_package_name $1`"
 	info "Adding meta files to Archive $NAME"
 	cd $PKG
 	if [ -f $PKGMK_ROOT/${NAME}.README ]; then
@@ -572,7 +604,7 @@ add_meta_files() {
 
 add_meta_to_archive() {
 	local NAME SIZE_I DESCR
-	NAME="`get_pkgname $1`"
+	NAME="`get_package_name $1`"
 
 	
 	info  "Adding meta data to Archive $NAME"
@@ -708,6 +740,10 @@ build_package() {
 	
 	if [ "$BUILD_SUCCESSFUL" = "yes" ]; then
 		get_package_list		
+        	if [ -z $TARGETS ]; then
+                	error "Package(s) not found(s)..."
+			exit 1
+        	fi
 		for TARGET in ${TARGETS[@]}; do
 			add_meta_files $TARGET
 			add_meta_to_archive $TARGET
@@ -729,7 +765,7 @@ install_package() {
 	if [ -z $TARGETS ]; then
 		get_package_list
 		if [ -z $TARGETS ]; then
-			error "Cannot Install"
+			error "Package(s) not found(s) nothing to install..."
 			exit 1
 		fi
 	fi
@@ -796,7 +832,7 @@ update_footprint() {
 	if [ -z $TARGETS ]; then
 		get_package_list
 		if [ -z $TARGETS ]; then		
-			error "Unable to update footprint."
+			error "Package(s) not found(s), unable to update footprint."
 			exit 1
 		fi
 	fi
@@ -805,7 +841,7 @@ update_footprint() {
 			error "Unable to update footprint. File '$TARGET' not found."
 			exit 1
 		fi
-		PKGMK_FOOTPRINT="`get_pkgname $TARGET`".footprint
+		PKGMK_FOOTPRINT="`get_package_name $TARGET`".footprint
 		check_file "$PKGMK_FOOTPRINT"
 		make_footprint > $PKGMK_FOOTPRINT
 		touch $TARGET
@@ -827,17 +863,33 @@ build_needed() {
 	fi
 	echo $RESULT
 }
-generate_md5sum()
+update_signature()
 {
+	local FILE MD5SUM EXT
 	cd $PKGMK_ROOT
-	if [ -f $PKGMK_SIGNATURE ]; then
-		rm $PKGMK_SIGNATURE
+	get_package_list
+	if [ ! -z $TARGETS ]; then
+		EXT="`get_package_extension $TARGETS`"
+		echo "`get_package_builddate $TARGETS`:$EXT" > $PKGMK_SIGNATURE
+		for TARGET in ${TARGETS[@]}; do
+			FILE=`basename $TARGET`
+			MD5SUM=`md5sum $TARGET|cut -d " " -f1`
+			echo "$MD5SUM:`get_package_name $TARGET`:`get_package_arch $TARGET|sed "s/-//"`" >> $PKGMK_SIGNATURE
+		done
+		for FILE in  ${name}*
+		do
+			if [ "${FILE:$((${#FILE} - ${#EXT} ))}" != "$EXT" ]; then
+				echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> $PKGMK_SIGNATURE
+			fi
+		done	
+	else
+		rm -f $PKGMK_SIGNATURE
+		for FILE in  ${name}*
+		do
+			echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> $PKGMK_SIGNATURE
+		done
 	fi
-	for FILE in Pkgfile `find . -type f -name "${name}*"`
-	do
-		FILE=`basename $FILE`
-		echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> $PKGMK_SIGNATURE
-	done
+	echo "`md5sum Pkgfile|cut -d " " -f1`:Pkgfile" >> $PKGMK_SIGNATURE
 }
 
 update_index_html()
@@ -864,7 +916,9 @@ else
 fi
 echo "" >> $PKGMK_ROOT/index.html
 
-generate_md5sum
+generate_signature
+
+update_signature
 
 for INPUT in `cat $PKGMK_SIGNATURE`
 do
@@ -929,7 +983,7 @@ print_help() {
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
 	echo "  -utd, --up-to-date          do not build, only check if package is up to date"
-	echo "  -ui,  --update-index        do not build, only update index.html"
+	echo "  -us,  --update-signature    do not build, only update MD5SUM signature file"
 	echo "  -uf,  --update-footprint    update footprint using result from last build"
 	echo "  -if,  --ignore-footprint    build package without checking footprint"
 	echo "  -in,  --ignore-new          build package, ignore new files in a footprint missmatch"
@@ -962,8 +1016,8 @@ parse_options() {
 				PKGMK_EXTRACT_ONLY="yes" ;;
 			-utd|--up-to-date)
 				PKGMK_UP_TO_DATE="yes" ;;
-			-ui|--update-index)
-				PKGMK_UPDATE_INDEX="yes" ;;
+			-us|--update-signature)
+				PKGMK_UPDATE_SIGNATURE="yes" ;;
 			-uf|--update-footprint)
 				PKGMK_UPDATE_FOOTPRINT="yes" ;;
 			-if|--ignore-footprint)
@@ -1082,18 +1136,18 @@ main() {
 		info "PKGMK_CLEANUP: $PKGMK_CLEANUP"
 	fi
 	if [ "$PKGMK_CLEANUP" != "no" ]; then
-		PKGMK_UPDATE_INDEX="no"
+		PKGMK_UPDATE_SIGNATURE="no"
 		PKGMK_IGNORE_FOOTPRINT="yes"
 		PKGMK_IGNORE_MD5SUM="yes"
 		warning "FOOTPRINT AND MD5SUM IGNORED"
-		warning "index.html AND MD5SUM files not generated"
+		warning "MD5SUM file will not be generated"
 	else
-		info "PKGMK_UPDATE_INDEX: $PKGMK_UPDATE_INDEX"
+		info "PKGMK_UPDATE_SIGNATURE: $PKGMK_UPDATE_SIGNATURE"
 		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
 		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"	
 	fi
-	if [ -z "$PKGMK_UPDATE_INDEX" ]; then
-		info "index.html AND MD5SUM files will be generated"
+	if [ -z "$PKGMK_UPDATE_SIGNATURE" ]; then
+		info "MD5SUM file will be generated"
 	fi
 
 	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
@@ -1129,8 +1183,8 @@ main() {
 		clean
 		exit 0
 	fi
-	if [ "$PKGMK_UPDATE_INDEX" = "yes" ]; then
-		update_index_html
+	if [ "$PKGMK_UPDATE_SIGNATURE" = "yes" ]; then
+		update_signature
 		exit 0
 	fi
 	if [ "$PKGMK_UPDATE_FOOTPRINT" = "yes" ]; then
@@ -1215,8 +1269,8 @@ main() {
 	if [ "$PKGMK_CLEANUP" != "no" ]; then
 		clean_up
 	fi
-	if [ "$PKGMK_UPDATE_INDEX" != "no" ];then
-		update_index_html
+	if [ "$PKGMK_UPDATE_SIGNATURE" != "no" ];then
+		update_signature
 	fi
 	exit 0
 }
@@ -1241,7 +1295,6 @@ PKGMK_PKGFILE="Pkgfile"
 PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 PKGMK_NOSTRIP=".nostrip"
 
-PKGMK_CLEANUP="no"
 
 PKGMK_SYNC_FILES="yes"
 
@@ -1250,10 +1303,14 @@ PKGMK_SOURCE_MIRRORS=()
 PKGMK_SOURCE_DIR="$PWD"
 
 PKGMK_PACKAGE_DIR="$PWD"
-PKGMK_WORK_DIR="$PWD/work"
-
 PKGMK_COMPRESSION_MODE="xz"
-PKGMK_COMPRESS_PACKAGE="yes"
+PKGMK_COMPRESS_PACKAGE="no"
+PKGMK_CLEANUP="yes"
+PKGMK_IGNORE_FOOTPRINT="yes"
+PKGMK_IGNORE_MD5SUM="yes"
+PKGMK_UPDATE_INDEX="no"
+PKGMK_KEEP_SOURCES="no"
+
 
 PKGMK_GROUPS=(devel man doc service)
 
@@ -1266,14 +1323,11 @@ PKGMK_DOWNLOAD_ONLY="no"
 PKGMK_EXTRACT_ONLY="no"
 PKGMK_UP_TO_DATE="no"
 PKGMK_UPDATE_FOOTPRINT="no"
-PKGMK_IGNORE_FOOTPRINT="no"
 PKGMK_IGNORE_NEW="yes"
 PKGMK_FORCE="no"
 PKGMK_KEEP_WORK="no"
-PKGMK_KEEP_SOURCES="yes"
 
 PKGMK_UPDATE_MD5SUM="no"
-PKGMK_IGNORE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"
 PKGMK_NO_STRIP="no"
 PKGMK_CLEAN="no"
