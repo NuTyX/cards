@@ -53,7 +53,6 @@ fi
 # LINE=`wc -l $TMP/list|cut -d " " -f1`
 # sed -i "${LINE}d" $TMP/list
 
-cards isinst $
 for i in `cat $TMP/list`
 do
         cd $i
@@ -61,17 +60,6 @@ do
 done
 if [ $DRY == true ]; then 
 	exit 0
-fi
-# Construction effective du paquet
-if [ $DRY == false ]; then
-        cd $1
-        # rm ${PKGMK_PACKAGE_DIR}/$1#*
-        # Si le paquet fait partie de la base, ce sera une maj sinon une install
-        if [ ! "`pkginfo -i|grep ^$1\ `" == "" ];then
-		cards update $1 >> /dev/null || erreur
-        else
-		cards install $1  > /dev/null || erreur
-        fi
 fi
 rm -r $TMP
 

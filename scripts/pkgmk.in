@@ -74,7 +74,7 @@ get_package_name() {
 	else
 		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 	fi
-	NAME=`echo $1|sed "s/-i686.$EXT//"|sed "s/-x86_64.$EXT//"|sed "s/-any.$EXT//"`
+	NAME=`echo $1|sed "s/i686.$EXT//"|sed "s/x86_64.$EXT//"|sed "s/any.$EXT//"`
 
 	echo "${NAME:0:$((${#NAME} - 10 ))}"	
 }
@@ -86,7 +86,7 @@ get_package_builddate() {
 		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 	fi
 	NAME="`get_package_name $1`"
-	BUILD_DATE=`echo $1|sed "s/-i686.$EXT//"|sed "s/-x86_64.$EXT//"|sed "s/-any.$EXT//"`
+	BUILD_DATE=`echo $1|sed "s/i686.$EXT//"|sed "s/x86_64.$EXT//"|sed "s/any.$EXT//"`
 	echo "${BUILD_DATE:$((${#NAME}))}"
 }
 get_package_extension() {
@@ -271,7 +271,11 @@ unpack_source() {
 		LOCAL_FILENAME=`get_filename $FILE`
 		case $LOCAL_FILENAME in
 			*.tar|*.tar.gz|*.tar.Z|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.lzma|*.zip|*.rpm)
-				COMMAND="bsdtar -p -o -C $SRC -xf $LOCAL_FILENAME" ;;
+				if [ "$PKGMK_IGNORE_UNPACK" != "yes" ];then
+					COMMAND="bsdtar -p -o -C $SRC -xf $LOCAL_FILENAME"
+				else
+					COMMAND="cp $LOCAL_FILENAME $SRC"
+				fi ;;
 			*)
 				COMMAND="cp $LOCAL_FILENAME $SRC" ;;
 		esac
@@ -293,7 +297,7 @@ get_package_list() {
 	local ARCHFILE i
 	i=0
 	for ARCH in x86_64 i686 any; do
-		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*-$ARCH.$PKGMK_PACKAGE_EXT*"`; do
+		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*$ARCH.$PKGMK_PACKAGE_EXT*"`; do
 			TARGETS[i]=`basename $FILE`
 			i=$((i+1))
 		done
@@ -510,7 +514,7 @@ pack_lib() {
 			fi
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}$build-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -528,7 +532,7 @@ pack_devel() {
 		for SUBDIR in include lib/pkgconfig; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -543,7 +547,7 @@ pack_doc() {
 		for SUBDIR in doc gtk-doc; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -557,7 +561,7 @@ pack_man() {
 		for SUBDIR in info man; do
 			if [ -d $DIR/$SUBDIR  ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -569,7 +573,7 @@ pack_service() {
 	local DIR="etc/rc.d"
 	if [ -d $DIR ]; then
 		bsdtar -r -f \
-		$PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
+		$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 		$DIR || BUILD_SUCCESSFUL="no"
 		rm -r $DIR
 		j=1
@@ -693,8 +697,8 @@ build_package() {
 					exit 1
 				fi
 			else
-				if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-* ]; then
-					rm $PKGMK_PACKAGE_DIR/${name}.${group}$PKGMK_BUILDVER-$PKGMK_BUILDVER-*
+				if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}* ]; then
+					rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}*
 				fi
 				pack_${group} 
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
@@ -717,17 +721,20 @@ build_package() {
 			fi
 			j=0
 		done
-		if [ -d usr/share/locale ]; then
-			for loc in `cd usr/share/locale/ && ls`; do
-				# Need to double check because glibc for exemple create a file in this directory
-				if [ -d usr/share/locale/$loc ];then
-					bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${loc}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT \
-					usr/share/locale/$loc || abort_on_build "${name}.${loc}$PKGMK_BUILDVER-any.$PKGMK_PACKAGE_EXT"
-					rm -rf usr/share/locale/$loc
-				fi
-			done
-		fi	
-		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT *
+		local DIR
+		for DIR in usr/share/locale opt/*/share/locale; do
+			if [ -d $DIR ]; then
+				for loc in `cd $DIR && ls`; do
+					# Need to double check because glibc for exemple create a file in this directory
+					if [ -d $DIR/$loc ];then
+						bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${loc}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+						$DIR/$loc || abort_on_build "${name}.${loc}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT}"
+						rm -rf $DIR/$loc
+					fi
+				done
+			fi
+		done	
+		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} *
 		if [ $? = 0 ]; then
 			BUILD_SUCCESSFUL="yes"
 			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
@@ -823,9 +830,18 @@ clean() {
 	done
 }
 clean_up() {
-	find $PKGMK_PACKAGE_DIR/${name}*.$PKGMK_PACKAGE_EXT* -exec rm -v {} \; 2> /dev/null
+	if [ -z $TARGETS ]; then
+		get_package_list
+	fi
+	if [ ! -z $TARGETS ]; then
+		for TARGET in ${TARGETS[@]}; do
+			rm -v $PKGMK_PACKAGE_DIR/$TARGET
+		done
+	fi	
+#	find $PKGMK_PACKAGE_DIR/${name}*.$PKGMK_PACKAGE_EXT* -exec rm -v {} \; 2> /dev/null
 	find $PKGMK_ROOT -name "*.md5sum" -exec rm -v {} \; 2> /dev/null
 	find $PKGMK_ROOT -name "*.footprint" -exec rm -v {} \; 2> /dev/null
+	unset TARGETS
 }
 update_footprint() {
 	cd $PKGMK_PACKAGE_DIR
@@ -1132,15 +1148,15 @@ main() {
 		warning "CLEANUP IGNORED"
 		warning "KEEP SOURCES"
 	else
-		info "PKGMK_KEEP_SOURCES: $PKGMK_CLEANUP"
+		info "PKGMK_KEEP_SOURCES: $PKGMK_KEEP_SOURCES"
 		info "PKGMK_CLEANUP: $PKGMK_CLEANUP"
 	fi
 	if [ "$PKGMK_CLEANUP" != "no" ]; then
-		PKGMK_UPDATE_SIGNATURE="no"
+# 		PKGMK_UPDATE_SIGNATURE="no"
 		PKGMK_IGNORE_FOOTPRINT="yes"
 		PKGMK_IGNORE_MD5SUM="yes"
 		warning "FOOTPRINT AND MD5SUM IGNORED"
-		warning "MD5SUM file will not be generated"
+#		warning "MD5SUM file will not be generated"
 	else
 		info "PKGMK_UPDATE_SIGNATURE: $PKGMK_UPDATE_SIGNATURE"
 		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
@@ -1166,7 +1182,7 @@ main() {
 	case $PKGMK_COMPRESSION_MODE in
 		gz|bz2|xz)
 			if [ -z $TARGETS ]; then
-				TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
+				TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
 			fi;;
 		*)
 			error "Compression mode '$PKGMK_COMPRESSION_MODE' not supported"
@@ -1180,7 +1196,7 @@ main() {
 	esac
 
 	if [ "$PKGMK_CLEAN" = "yes" ]; then
-		clean
+		clean_up
 		exit 0
 	fi
 	if [ "$PKGMK_UPDATE_SIGNATURE" = "yes" ]; then
@@ -1234,7 +1250,7 @@ main() {
 	fi
 	# From here on it's need to check the base package not any group which means
 	if [ -z $TARGETS ]; then
-		TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER-$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
+		TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 		if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
 			info "Package '$TARGET' is up to date."
 		else
@@ -1268,6 +1284,7 @@ main() {
 	fi
 	if [ "$PKGMK_CLEANUP" != "no" ]; then
 		clean_up
+		unset TARGETS
 	fi
 	if [ "$PKGMK_UPDATE_SIGNATURE" != "no" ];then
 		update_signature
@@ -1322,6 +1339,7 @@ PKGMK_RECURSIVE="no"
 PKGMK_DOWNLOAD="no"
 PKGMK_DOWNLOAD_ONLY="no"
 PKGMK_EXTRACT_ONLY="no"
+PKGMK_IGNORE_UNPACK="no"
 PKGMK_UP_TO_DATE="no"
 PKGMK_UPDATE_FOOTPRINT="no"
 PKGMK_IGNORE_NEW="yes"
