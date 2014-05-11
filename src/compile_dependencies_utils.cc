@@ -193,6 +193,12 @@ int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenci
 	Populate the List of dependance for each found package.
 	We need to check if each dependance exist if yes add the index reference to the list
 	if not printout a warning message
+	We check for TWO deps files, it's need because some binaries need manual add of deps like
+  xorg-server: xorg-font, may be some perl module, some icons theme what ever those are not
+	found automatically
+  kde: all the necessary apps
+  xfce4: same 
+  etc ...
 */	
 depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 {
@@ -204,7 +210,8 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 
 	char *fullPathfileName = (char*)Malloc (sizeof(char)*255);
 	char *name = (char*)Malloc(sizeof(char)*255);
-	char *depfile = (char*)Malloc(sizeof(char)*255);	
+	char *depfile1 = (char*)Malloc(sizeof(char)*255);	
+	char *depfile2 = (char*)Malloc(sizeof(char)*255);
 
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
 	name[ strchr(name,'@') - name ]='\0';
@@ -215,7 +222,8 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 
 	/* We check if any deps file exist */
 	
-	sprintf(depfile,"%s.deps",name);
+	sprintf(depfile1,"%s.deps",name);
+	sprintf(depfile2,"%s.run",name);
 	itemList *packageFilesList = initItemList();
 
 	bool found = false;
@@ -227,17 +235,26 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 			if ( strchr(packageFilesList->items[i],':') != NULL) {
 				name = strchr(packageFilesList->items[i],':');
 				name++;
-			if (strcmp(name,depfile) == 0 ) {
+			}
+			// If the file <name>.deps is found that's enough
+			if (strcmp(name,depfile1) == 0 ) {
+					sprintf(fullPathfileName,"%s/%s",filesList->items[nameIndex],name);
 					found = true;
 					break;
 				}
+			// If the file <name>.run is found means the .deps wasn't
+			if (strcmp(name,depfile2) == 0 ) {
+					sprintf(fullPathfileName,"%s/%s",filesList->items[nameIndex],name);
+					found = true;
+					break;
 			}
 		}
 	}
 	freeItemList(packageFilesList);
 	if (found) {
-		sprintf(fullPathfileName,"%s/%s.deps",filesList->items[nameIndex],name);
-		if ( (readFile(nameDeps,fullPathfileName)) != 0 ) {	
+
+
+		if ( (readFile(nameDeps,fullPathfileName)) != 0 ) {
 			cout << name << " not found... " << endl;
 		} else {
 			for (unsigned int i = 0; i < nameDeps->count;i++) {
@@ -269,7 +286,8 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 	}
 	freeItemList(nameDeps);
 	free(name);
-	free(depfile);
+	free(depfile1);
+	free(depfile2);
 	free(fullPathfileName);
 	return dependancesList;
 }

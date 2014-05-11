@@ -64,6 +64,7 @@ void Pkginfo::run(int argc, char** argv)
 	int o_details_mode = 0;
 	int o_librairies_mode = 0;
 	int o_runtime_mode = 0;
+  int o_epoc = 0;
 
 	string o_root;
 	string o_arg;
@@ -111,14 +112,18 @@ void Pkginfo::run(int argc, char** argv)
 			o_runtimedependencies_mode +=1;
 			o_arg = argv[i + 1];
 			i++;
+		} else if (option == "-b" || option == "--buildtime") {
+			assertArgument(argv, argc, i);
+			o_epoc +=1;
+			o_arg = argv[i + 1];
+			i++; 
 		} else {
 			m_actualError = INVALID_OPTION;
 			treatErrors(option);
 		}
 	}
-
 	if (o_runtimedependencies_mode + o_footprint_mode + o_details_mode + 
-	o_installed_mode + o_list_mode + o_owner_mode + 
+	o_installed_mode + o_list_mode + o_owner_mode + o_epoc +
 	o_footprint_mode + o_librairies_mode + o_runtime_mode == 0)
 	{
 		m_actualError = OPTION_MISSING;
@@ -135,154 +140,162 @@ void Pkginfo::run(int argc, char** argv)
 		//
 		getFootprintPackage(o_arg);
 	} else {
-		//
-		// Modes that require the database to be opened
-		//
-		{
+			//
+			// Modes that require the database to be opened
+			//
 			Db_lock lock(o_root, false);
 			getListOfPackages(o_root);
-		}
-		if (o_installed_mode) {
-			//
-			// List installed packages
-			//
-			getInstalledPackages(false);
-			for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-				cout << i->first << " " << i->second.version << endl;
-			}
-			cout << endl;
-		} else if (o_list_mode) {
-			//
-			// List package or file contents
-			//
-			getInstalledPackages(false);
-			if (checkPackageNameExist(o_arg)) {
-				copy(m_listOfInstPackages[o_arg].files.begin(), m_listOfInstPackages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
-			} else if (checkFileExist(o_arg)) {
-				pair<string, pkginfo_t> package = openArchivePackage(o_arg);
-				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
+			if (o_installed_mode) {
+				//
+				// List installed packages
+				//
+				getInstalledPackages(false);
+				for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
+					cout << i->first << " " << i->second.version << endl;
+				}
+				cout << endl;
+			} else if (o_list_mode) {
+				//
+				// List package or file contents
+				//
+				getInstalledPackages(false);
+				if (checkPackageNameExist(o_arg)) {
+					copy(m_listOfInstPackages[o_arg].files.begin(), m_listOfInstPackages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
+				} else if (checkFileExist(o_arg)) {
+					pair<string, pkginfo_t> package = openArchivePackage(o_arg);
+					copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
 			
-			} else {
-				m_actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
-				treatErrors(o_arg);
-			}
-		} else if (o_runtimedependencies_mode) {
-			//
-			// Get runtimedependencies of the file found in the directory path
-			//
-			getInstalledPackages(true); // get the list of installed package silently
-			regex_t r;
-			int Result;
-			regcomp(&r, ".", REG_EXTENDED | REG_NOSUB);
-			set<string>filenameList;
-			Result = findRecursiveFile (filenameList, const_cast<char*>(o_arg.c_str()), &r, WS_DEFAULT);
-			// get the list of library for all the possible files 
-			set<string> librairiesList;
-			for (set<string>::const_iterator i = filenameList.begin();i != filenameList.end();++i)
-				Result = getRuntimeLibrairiesList(librairiesList,*i);
-			// get the own package  for all the elf files dependencies libraries
+				} else {
+					m_actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
+					treatErrors(o_arg);
+				}
+			} else if (o_runtimedependencies_mode) {
+				//
+				// Get runtimedependencies of the file found in the directory path
+				//
+				getInstalledPackages(true); // get the list of installed package silently
+				regex_t r;
+				int Result;
+				regcomp(&r, ".", REG_EXTENDED | REG_NOSUB);
+				set<string>filenameList;
+				Result = findRecursiveFile (filenameList, const_cast<char*>(o_arg.c_str()), &r, WS_DEFAULT);
+				// get the list of library for all the possible files 
+				set<string> librairiesList;
+				for (set<string>::const_iterator i = filenameList.begin();i != filenameList.end();++i)
+					Result = getRuntimeLibrairiesList(librairiesList,*i);
+				// get the own package  for all the elf files dependencies libraries
 #ifndef NDEBUG
-			for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
-				cerr << *i<<endl;
-#endif
-			if ( (librairiesList.size() > 0 ) && (Result > -1) )
-			{
-				set<string> runtimeList;
 				for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
-				{
-					for (packages_t::const_iterator j = m_listOfInstPackages.begin(); j != m_listOfInstPackages.end();++j)
-					{
-						bool found = false;
-						for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k)
-						{
-							if ( k->find('/' + *i) != string::npos)
-							{
-								string dependencie = j->first + j->second.build;
-								runtimeList.insert(dependencie);
-								break;
-								found = true;
-							}
-						}
-						if ( found == true)
-						{
-							found = false;
-							break;
-						}
-					}
-				}
-				if (runtimeList.size()>0) {
-#ifndef NDEBUG
-					cerr << "Number of librairies founds: " << runtimeList.size() << endl;
+					cerr << *i<<endl;
 #endif
-					unsigned int s = 1;
-					for (set<string>::const_iterator i = runtimeList.begin();i!=runtimeList.end();++i) {
-						cout << *i << endl;
-						s++;
-					}
-					cout << endl;
-				}
-			}	
-		} else if (o_librairies_mode + o_runtime_mode > 0) {
-			getInstalledPackages(true); // get the list of installed package silently
-			set<string> librairiesList;
-			int Result = -1;
-			if (checkPackageNameExist(o_arg))
-			{
-				for (set<string>::const_iterator i = m_listOfInstPackages[o_arg].files.begin(); i != m_listOfInstPackages[o_arg].files.end(); ++i)
-				{
-					string filename('/' + *i);
-					Result = getRuntimeLibrairiesList(librairiesList,filename);
-				}
 				if ( (librairiesList.size() > 0 ) && (Result > -1) )
 				{
-					if (o_runtime_mode)
+					set<string> runtimeList;
+					for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
 					{
-						set<string> runtimeList;
-						for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
+						for (packages_t::const_iterator j = m_listOfInstPackages.begin(); j != m_listOfInstPackages.end();++j)
 						{
-							for (packages_t::const_iterator j = m_listOfInstPackages.begin(); j != m_listOfInstPackages.end();++j)
+							bool found = false;
+							for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k)
 							{
-								bool found = false;
-								for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k)
+								if ( k->find('/' + *i) != string::npos)
 								{
-									if ( k->find('/' + *i) != string::npos)
+									string dependencie = j->first + j->second.build;
+									runtimeList.insert(dependencie);
+									break;
+									found = true;
+								}
+							}
+							if ( found == true)
+							{
+								found = false;
+								break;
+							}
+						}
+					}
+					if (runtimeList.size()>0) {
+#ifndef NDEBUG
+						cerr << "Number of librairies founds: " << runtimeList.size() << endl;
+#endif
+						unsigned int s = 1;
+						for (set<string>::const_iterator i = runtimeList.begin();i!=runtimeList.end();++i) {
+							cout << *i << endl;
+							s++;
+						}
+						cout << endl;
+					}
+				}	
+			} else if (o_librairies_mode + o_runtime_mode > 0) {
+				getInstalledPackages(true); // get the list of installed package silently
+				set<string> librairiesList;
+				int Result = -1;
+				if (checkPackageNameExist(o_arg))
+				{
+					for (set<string>::const_iterator i = m_listOfInstPackages[o_arg].files.begin(); i != m_listOfInstPackages[o_arg].files.end(); ++i)
+					{
+						string filename('/' + *i);
+						Result = getRuntimeLibrairiesList(librairiesList,filename);
+					}
+					if ( (librairiesList.size() > 0 ) && (Result > -1) )
+					{
+						if (o_runtime_mode)
+						{
+							set<string> runtimeList;
+							for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
+							{
+								for (packages_t::const_iterator j = m_listOfInstPackages.begin(); j != m_listOfInstPackages.end();++j)
+								{
+									bool found = false;
+									for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k)
 									{
-										runtimeList.insert(j->first);
+										if ( k->find('/' + *i) != string::npos)
+										{
+											runtimeList.insert(j->first);
+											break;
+											found = true;
+										}
+									}
+									if (found == true)
+									{
+										found = false;
 										break;
-										found = true;
 									}
 								}
-								if (found == true)
-								{
-									found = false;
-									break;
-								}
 							}
-						}
-						if (runtimeList.size()>0)
-						{
+							if (runtimeList.size()>0)
+							{
 							unsigned int s = 1;
 							for (set<string>::const_iterator i = runtimeList.begin();i!=runtimeList.end();++i)
-							{
-								cout << *i;
-								s++;
-								if (s <= runtimeList.size())
-									cout << ",";
+								{
+									cout << *i;
+									s++;
+									if (s <= runtimeList.size())
+										cout << ",";
+								}
+								cout << endl;
 							}
-							cout << endl;
-						}
-					} else {
+						} else {
 							for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
 								cout << *i << endl;
+						}
 					}
+				}	
+			} else if (o_epoc) {
+				// get the building time of the package return 0 if not found
+				getInstalledPackages(true);
+				if (checkPackageNameExist(o_arg)) {
+					cout << m_listOfInstPackages[o_arg].build << endl;
+				} else {
+					cout << "0" << endl;
 				}
-			}	
-		} else if (o_details_mode) {
-			getInstalledPackages(false);
-			if (checkPackageNameExist(o_arg)) {
-				time_t ct = strtoul(m_listOfInstPackages[o_arg].build.c_str(),NULL,0);
-				char * c_time_s = ctime(&ct);
-				cout << "Name           : " << o_arg << endl
+				
+			} else if (o_details_mode) {
+				// get all the details of a package
+				getInstalledPackages(false);
+				if (checkPackageNameExist(o_arg)) {
+					time_t ct = strtoul(m_listOfInstPackages[o_arg].build.c_str(),NULL,0);
+					char * c_time_s = ctime(&ct);
+					cout << "Name           : " << o_arg << endl
 						 << "Description    : " << m_listOfInstPackages[o_arg].description << endl
 						 << "Version        : " << m_listOfInstPackages[o_arg].version << endl
 						 << "Build date     : " << c_time_s
@@ -341,6 +354,7 @@ void Pkginfo::printHelp() const
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl
+	     << "  -b, --buildtime <package>   return the name and the build time of the package" << endl
        << "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
        << "  --runtimedepfiles <path>    return on a single line all the runtime dependencies for the files found in the <path>" << endl
 	     << "  -r, --root <path>           specify alternative installation root" << endl
