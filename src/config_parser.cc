@@ -59,12 +59,17 @@ int ConfigParser::parseConfig(const string& fileName, Config& config)
 			string val = stripWhiteSpace(s.substr(pos));
 
 			if (key == "dir") {
-				pos = val.find('|');
-				if (pos != string::npos) {
-					string dir = stripWhiteSpace(val.substr(0,pos));
-					string url = stripWhiteSpace(val.substr(pos+1));
-					config.dirUrl[dir] = url;
+					config.dirUrl.push_back(val) ;
+			}
+			if (key == "arch") {
+				if (val != "i686") {
+					config.arch="x86_64";
+				} else {
+					config.arch="i686";
 				}
+			}
+			if (key == "locale") {
+				config.locale.push_back(val);
 			}
 		}
 	}

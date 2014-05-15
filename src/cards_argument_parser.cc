@@ -20,6 +20,7 @@
 
 #include "cards_argument_parser.h"
 
+ArgParser::APCmd CardsArgumentParser::CMD_CONFIG;
 ArgParser::APCmd CardsArgumentParser::CMD_SYNC;
 ArgParser::APCmd CardsArgumentParser::CMD_INSTALL;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPINST;
@@ -45,6 +46,10 @@ ArgParser::APOpt CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES;
 
 CardsArgumentParser::CardsArgumentParser()
 {
+	addCommand(CMD_CONFIG, "config",
+		"show info about cards configuration",
+		ArgParser::NONE, 0 , "");
+
 	addCommand(CMD_SYNC, "sync",
 		"synchronize local info with remote repository",
 		ArgParser::NONE, 0 , "");

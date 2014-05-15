@@ -29,6 +29,7 @@ class CardsArgumentParser : public ArgParser
 		CardsArgumentParser();
 		virtual ~CardsArgumentParser() {};
 
+		static ArgParser::APCmd CMD_CONFIG;
 		static ArgParser::APCmd CMD_SYNC;
 		static ArgParser::APCmd CMD_INFO;
 		static ArgParser::APCmd CMD_LIST;

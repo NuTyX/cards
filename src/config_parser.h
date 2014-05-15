@@ -24,13 +24,16 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <map>
 
-typedef std::map<std::string, std::string> dir_url;
-
+typedef std::vector<std::string> dir_url;
+typedef std::vector<std::string> locale_;
 struct Config
 {
 	Config() {}
+	locale_ locale;
+	std::string arch;
 	dir_url dirUrl;
 };
 

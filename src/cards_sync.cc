@@ -72,10 +72,16 @@ int CardsSync::run()
 
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
-		for (map<string,string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-		string prtDir = i -> first;
-		string url = i -> second;
-
+	for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+		string val = *i ;
+		string prtDir, url ;
+		string::size_type pos = val.find('|');
+		if (pos != string::npos) {
+			prtDir = stripWhiteSpace(val.substr(0,pos));
+			url = stripWhiteSpace(val.substr(pos+1));
+		} else {
+			continue;
+		}
 		string category = basename(const_cast<char*>(prtDir.c_str()));
 		cout << "Synchronising " << category << endl;
 		string remoteUrl = url  ;
@@ -220,7 +226,7 @@ int CardsSync::run()
 					string input = *i;
 					string dir  = input.substr(33);
 					string MD5File = prtDir + "/" + dir + "/" + m_repoFile;
-					unsigned int pos = input.find('@');
+					string::size_type pos = input.find('@');
 					if (pos != std::string::npos) {
 						string depFile = input.substr(33,pos - 33) + ".deps";
 						string destinationFile = prtDir + "/" + dir + "/" + depFile;
@@ -235,6 +241,9 @@ int CardsSync::run()
 							}
 							for (set<string>::const_iterator iF = filesList.begin(); iF != filesList.end(); iF++) {
 								string input = *iF;
+								if ( input[32] != ':') {
+									continue; // The first line is not starting with a md5sum value in case binaries exists
+								}
 								string file  = input.substr(33);
 								string MD5S = input.substr(0,32);
 								if ( file == depFile ) {
@@ -257,8 +266,12 @@ int CardsSync::run()
 								cerr << "Failed to parse " +  MD5File << endl;
 								return -1;
 							}
-							for (set<string>::const_iterator indFile = remoteFilesList.begin(); indFile != remoteFilesList.end(); indFile++) {
-								if ( indFile -> substr(33) == depFile ) {
+							for (set<string>::const_iterator i = remoteFilesList.begin(); i != remoteFilesList.end(); i++) {
+								string input = *i;
+								if ( input[32] != ':') {
+									continue; // The first line is not starting with a md5sum value in case binaries exists
+								}
+								if ( input.substr(33) == depFile ) {
 									cout << "f: " << destinationFile << endl;
 									FileDownload DepsPort(remoteUrl + "/" + dir  + "/" + depFile,
 										prtDir + "/" + dir,

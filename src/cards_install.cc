@@ -44,15 +44,21 @@ int cards_install(const char* packageName)
   ConfigParser::parseConfig("/etc/cards.conf", config);
 
 	string Url = "";
-	for (map<string,string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-
-		string prtDir = i -> first;
-		Url = i -> second;
-//  for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
-    if ( (findFile(filesList,prtDir.c_str())) != 0) {
-      return -1;
-    }
-  }
+	for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+		string val = *i ;
+		string prtDir;
+		string::size_type pos = val.find('|');
+		if (pos != string::npos) {
+			prtDir = stripWhiteSpace(val.substr(0,pos));
+			Url = stripWhiteSpace(val.substr(pos+1));
+		} else {
+			prtDir = val;
+			Url = "";
+  	}
+		if ( (findFile(filesList,prtDir.c_str())) != 0) {
+			return -1;
+		}
+	}
 
   char * longPackageName = NULL;
   if ( (longPackageName = getLongPackageName(filesList,packageName)) == NULL) {
