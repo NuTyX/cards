@@ -26,7 +26,6 @@
 
 #include <curl/curl.h>
 #include "cards_argument_parser.h"
-
 class CardsSync
 {
 public:
@@ -35,6 +34,7 @@ public:
 		const std::string& url,
 		const std::string& directory,
 		const std::string& repoFile);
+	virtual void treatErrors(const string& s) const;
 
 	int run ();
 
@@ -47,6 +47,7 @@ private:
 	const std::string m_baseDirectory;
 	const std::string m_remoteUrl;
 	std::string m_repoFile;
+	error m_actualError;
 
 	const CardsArgumentParser& m_argParser;
 	

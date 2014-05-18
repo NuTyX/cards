@@ -35,6 +35,7 @@ struct Config
 	locale_ locale;
 	std::string arch;
 	dir_url dirUrl;
+	dir_url baseDir;
 };
 
 class ConfigParser

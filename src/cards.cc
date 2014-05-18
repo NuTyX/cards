@@ -21,6 +21,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "file_download.h"
+#include "cards_base.h"
 #include "cards_sync.h"
 #include "cards_depends.h"
 #include "cards_install.h"
@@ -32,16 +33,18 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-
+	string command = basename(argv[1]);
 	try {
 		CardsArgumentParser cardsArgPars;
 		cardsArgPars.parse(argc, argv);
 		if (cardsArgPars.command() == CardsArgumentParser::CMD_CONFIG) {
 			Config config;
 			ConfigParser::parseConfig("/etc/cards.conf", config);
+			unsigned int index = 0;
+			string prtDir, url ;
 			for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+				index++;
 				string val = *i ;
-				string prtDir, url ;
 				string::size_type pos = val.find('|');
 				if (pos != string::npos) {
       		prtDir = stripWhiteSpace(val.substr(0,pos));
@@ -50,22 +53,26 @@ int main(int argc, char** argv)
 					prtDir = val;
 					url = "" ;
 				}
-				cout << "Directory: " << prtDir ;
+				cout << index << " Directory: " << prtDir ;
 				if ( url != "" ) {
 					cout << " from " << url  << endl;
 				} else {
 					cout << endl;
 				}
 			}
+			for (vector<string>::iterator i = config.baseDir.begin();i != config.baseDir.end();++i) {
+				cout << "Base System list directory: " << *i << endl;
+			}
 			cout <<   "Binaries : " << config.arch << endl;
 			for (vector<string>::iterator i = config.locale.begin();i != config.locale.end();++i) {
 				cout << "Locale   : " << *i << endl;
 			}
+			return EXIT_SUCCESS;
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_BASE) {
+			CardsBase CB(cardsArgPars);
+			CB.run(argc, argv);
+			return EXIT_SUCCESS;
 		} else	if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
-			if (getuid()) {
-				cerr << "Only root can sync !!!" << endl;
-				return -1;
-			}
 			CardsSync CS(cardsArgPars);
 			return CS.run();
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
@@ -74,32 +81,19 @@ int main(int argc, char** argv)
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 			cout << "Sorry, this function has to be completly review" << endl;
 			return 0;
-			if (getuid()) {
-				cerr << "Only root can install !!!" << endl;
-				return -1;
-		}
-		return cards_install(argv[2]);
-
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
-
 			CardsDepends CD(cardsArgPars);
 			return CD.level();
-	
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPINST) {
 			cout << "Not yet implemented, be patient" << endl;
 			return 0;
-
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
-
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			return CD.depends();
-
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			return CD.deptree();
-	
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LISTINST) {
-
 			Pkginfo * packagesInfo =  new Pkginfo;
 			itemList * commandList = initItemList();
 			addItemToItemList(commandList,"pkginfo");
@@ -142,8 +136,15 @@ int main(int argc, char** argv)
 			cout << "You need to cards sync first" << endl;
 			return 0;
 			} else {
+				string name, version, val;
 				for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
-					cout << *li << endl;
+					val = *li;
+					string::size_type pos = val.find('@');
+					if (pos != string::npos) {
+						name = val.substr(0,pos);
+						version = val.substr(pos+1);
+					cout << name + " " + version << endl;
+					}
 				}
 				numberOfPorts = numberOfPorts + localPackagesList.size();
 			}
@@ -182,7 +183,8 @@ int main(int argc, char** argv)
 		}
 		return 0;
 	} catch (runtime_error& e) {
-		cerr << e.what() << endl;
+		
+		cerr << "cards " << VERSION << " "<< command << ": " << e.what() << endl;
 		return -1;
 	}
 

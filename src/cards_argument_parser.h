@@ -30,6 +30,7 @@ class CardsArgumentParser : public ArgParser
 		virtual ~CardsArgumentParser() {};
 
 		static ArgParser::APCmd CMD_CONFIG;
+		static ArgParser::APCmd CMD_BASE;
 		static ArgParser::APCmd CMD_SYNC;
 		static ArgParser::APCmd CMD_INFO;
 		static ArgParser::APCmd CMD_LIST;
@@ -45,6 +46,7 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_FSEARCH;
 		static ArgParser::APCmd CMD_ISINST;
 
+		static ArgParser::APOpt OPT_HELP;
 		static ArgParser::APOpt OPT_SIGNATURE;
 		static ArgParser::APOpt OPT_DEPENDENCIES;
 		static ArgParser::APOpt OPT_SHOW_ALL_DEPENDENCIES;

@@ -21,6 +21,7 @@
 #include "cards_argument_parser.h"
 
 ArgParser::APCmd CardsArgumentParser::CMD_CONFIG;
+ArgParser::APCmd CardsArgumentParser::CMD_BASE;
 ArgParser::APCmd CardsArgumentParser::CMD_SYNC;
 ArgParser::APCmd CardsArgumentParser::CMD_INSTALL;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPINST;
@@ -40,6 +41,7 @@ ArgParser::APCmd CardsArgumentParser::CMD_SEARCH;
 ArgParser::APCmd CardsArgumentParser::CMD_DSEARCH;
 ArgParser::APCmd CardsArgumentParser::CMD_FSEARCH;
 
+ArgParser::APOpt CardsArgumentParser::OPT_HELP;
 ArgParser::APOpt CardsArgumentParser::OPT_SIGNATURE;
 ArgParser::APOpt CardsArgumentParser::OPT_DEPENDENCIES;
 ArgParser::APOpt CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES;
@@ -48,6 +50,10 @@ CardsArgumentParser::CardsArgumentParser()
 {
 	addCommand(CMD_CONFIG, "config",
 		"show info about cards configuration",
+		ArgParser::NONE, 0 , "");
+
+	addCommand(CMD_BASE, "base",
+		"return to a basic system, will remove all packages not listed in the Base System list directory",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_SYNC, "sync",
@@ -105,6 +111,10 @@ CardsArgumentParser::CardsArgumentParser()
 		"show file names in footprints matching 'pattern'",
 		ArgParser::EQ, 1, "<pattern>");
 
+	OPT_HELP.init("info",
+		'H',
+		"get some more info on the command");
+
 	OPT_SIGNATURE.init("signature",
 		's',
 		"get the signature of the port");
@@ -116,6 +126,8 @@ CardsArgumentParser::CardsArgumentParser()
 	OPT_SHOW_ALL_DEPENDENCIES.init("all",
     'a',
 		"show all the dependencies, included the one allready installed");
+
+	addOption(CMD_BASE, OPT_HELP,false);
 
 	addOption(CMD_SYNC, OPT_SIGNATURE,false);
 	addOption(CMD_SYNC, OPT_DEPENDENCIES, false);

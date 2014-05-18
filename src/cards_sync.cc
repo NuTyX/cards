@@ -34,7 +34,6 @@
 #include "config_parser.h"
 #include "cards_sync.h"
 
-
 using namespace std;
 
 const string CardsSync::DEFAULT_REPOFILE = "MD5SUM";
@@ -58,18 +57,44 @@ CardsSync::CardsSync ( const CardsArgumentParser& argParser,
 		m_repoFile = DEFAULT_REPOFILE;
 	}
 }
-
+void CardsSync::treatErrors(const string& s) const
+{
+	switch ( m_actualError )
+	{
+		case CANNOT_DOWNLOAD_FILE:
+			throw runtime_error("could not download " + s);
+			break;
+		case CANNOT_OPEN_FILE:
+			throw RunTimeErrorWithErrno("could not open " + s);
+			break;
+		case CANNOT_READ_FILE:
+			throw runtime_error("could not read " + s);
+			break;
+		case CANNOT_READ_DIRECTORY:
+			throw RunTimeErrorWithErrno("could not read directory " + s);
+			break;
+		case CANNOT_CREATE_DIRECTORY:
+			throw RunTimeErrorWithErrno("could not create directory " + s);
+			break;
+		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
+			throw runtime_error(s + " only root can install / sync / upgrade / remove packages");
+			break;
+	}
+}
 int CardsSync::run()
 {
+	if (getuid()) {
+		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		treatErrors("");
+	}
 	struct stat info;
 	if (stat(m_baseDirectory.c_str(), &info)) {
 		if (createRecursiveDirs(m_baseDirectory)) {
-			cerr << "Failed to create base directory "
-				<< m_baseDirectory << endl;
-			return -1;
+			m_actualError = CANNOT_CREATE_DIRECTORY;
+			treatErrors(m_baseDirectory);
 		}
 	}
-
+	
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
 	for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
@@ -92,26 +117,21 @@ int CardsSync::run()
 			prtDir,
 			m_repoFile, false);
 		if ( MD5Sum.downloadFile () != 0) {
-			cerr << "Failed to download " + remoteUrl + "/" << m_repoFile 
-				<< endl;
-			return -1;
+			m_actualError = CANNOT_DOWNLOAD_FILE;
+    	treatErrors(remoteUrl + "/" + m_repoFile);
 		}
 		set<string> localPackagesList,remotePackagesList,remoteFilesList;
 
 		if ( parseFile(remotePackagesList,categoryMD5sumFile.c_str()) != 0) {
-			cerr << "Failed to parse " 
-				<< categoryMD5sumFile << endl;
-			return -1;
+			m_actualError = CANNOT_READ_FILE;
+			treatErrors(categoryMD5sumFile);
 		}
-
 		// We need to remove the MD5SUM file
 		remove(categoryMD5sumFile.c_str());
-
 		// Let see what we have so for locally
 		if ( findFile( localPackagesList, prtDir) != 0 ) {
-			cerr << "Cannot read " << prtDir 
-				<< endl;
-				return -1;
+			m_actualError = CANNOT_READ_DIRECTORY;
+			treatErrors(prtDir);
 		}
 		// If they are some ports availables
 		if ( remotePackagesList.size() > 0 ) {
@@ -143,9 +163,8 @@ int CardsSync::run()
 						
 						set<string> filesToDelete;
 						if ( findFile(filesToDelete, prtDir + "/"+ localPackage) != 0 ){
-							cerr << "Cannot read " << prtDir + "/"+ localPackage 
-								<< endl;
-							return -1;
+							m_actualError = CANNOT_READ_FILE;
+							treatErrors(prtDir + "/"+ localPackage);
 						}
 						for (set<string>::const_iterator f = filesToDelete.begin(); f != filesToDelete.end(); f++) {
 							removeFile("/",prtDir + "/"+ localPackage + "/"+ *f);
@@ -190,9 +209,8 @@ int CardsSync::run()
 										m_repoFile,
 										input.substr(0,32),false);
 									if ( MD5SumPort.downloadFile() != 0) {
-										cerr << "Failed to download " + prtDir + "/" + dir
-											<< "/" + m_repoFile << endl ;
-										return -1;
+										m_actualError = CANNOT_DOWNLOAD_FILE;
+										treatErrors(prtDir + "/" + dir + "/" + m_repoFile);
 									}
 									if (MD5SumPort.checkMD5sum()) {
 										cout << " OK" << endl;
@@ -209,9 +227,8 @@ int CardsSync::run()
 							m_repoFile,
 							input.substr(0,32),false);
 						if ( MD5SumPort.downloadFile() != 0) {
-							cerr << "Failed to download " + prtDir + "/" + dir 
-								<< "/" + m_repoFile << endl ;
-							return -1;
+							m_actualError = CANNOT_DOWNLOAD_FILE;
+							treatErrors(prtDir + "/" + dir + "/" + m_repoFile);
 						}
 						if (MD5SumPort.checkMD5sum()) {
 							cout << " OK" << endl;
@@ -235,14 +252,13 @@ int CardsSync::run()
 							set<string> filesList;
 							string MD5FIle = prtDir + "/" + dir + "/" + m_repoFile;
 							if ( parseFile(filesList,MD5FIle.c_str()) != 0) {
-								cerr << "Failed to parse "
-									<< MD5FIle << endl;
-								return -1;
+								m_actualError = CANNOT_READ_FILE;
+								treatErrors(MD5FIle);
 							}
 							for (set<string>::const_iterator iF = filesList.begin(); iF != filesList.end(); iF++) {
 								string input = *iF;
-								if ( input[32] != ':') {
-									continue; // The first line is not starting with a md5sum value in case binaries exists
+								if ( input[10] == ':') {
+									continue; // The first line starting with a 10 digit epoc time in case binaries exists
 								}
 								string file  = input.substr(33);
 								string MD5S = input.substr(0,32);
@@ -254,8 +270,8 @@ int CardsSync::run()
 											depFile,
 											false);
 										if ( DepsPort.downloadFile() != 0) {
-											cerr << "Failed to download " + destinationFile << endl;
-											return -1;
+											m_actualError = CANNOT_DOWNLOAD_FILE;
+											treatErrors(destinationFile);
 										}
 										break;
 									}
@@ -263,13 +279,13 @@ int CardsSync::run()
 							}
 						} else { /* If deps file is not present download it */
 							if (parseFile(remoteFilesList, MD5File.c_str()) != 0 ) {
-								cerr << "Failed to parse " +  MD5File << endl;
-								return -1;
+								m_actualError = CANNOT_READ_FILE;
+								treatErrors(MD5File);
 							}
 							for (set<string>::const_iterator i = remoteFilesList.begin(); i != remoteFilesList.end(); i++) {
 								string input = *i;
-								if ( input[32] != ':') {
-									continue; // The first line is not starting with a md5sum value in case binaries exists
+								if ( input[10] == ':') {
+									continue; // The first line is starting with a 10 digit epoc time in case binaries exists
 								}
 								if ( input.substr(33) == depFile ) {
 									cout << "f: " << destinationFile << endl;
@@ -278,9 +294,8 @@ int CardsSync::run()
 										depFile,
 										false);
 									if ( DepsPort.downloadFile() != 0) {
-										cerr << "Failed to download " + prtDir + "/" + dir
-											<< "/" + depFile << endl;
-										return -1;
+										m_actualError = CANNOT_DOWNLOAD_FILE;
+										treatErrors(prtDir + "/" + dir + "/" + depFile);
 									}
 								}
 							}

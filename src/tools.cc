@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 
 		util->run(argc, argv);
 	} catch (runtime_error& e) {
-		cerr << name << ": " << e.what() << endl;
+		cerr << name <<  " " << VERSION << ": " << e.what() << endl;
 		return EXIT_FAILURE;
 	}
 

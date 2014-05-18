@@ -22,6 +22,8 @@
 #ifndef _ARGPARSER_H_
 #define _ARGPARSER_H_
 
+#include "error_treat.h"
+
 #include <map>
 #include <vector>
 #include <string>

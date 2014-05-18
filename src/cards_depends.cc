@@ -32,6 +32,27 @@
 
 // using namespace std;
 
+void CardsDepends::treatErrors(const string& s) const
+{
+	switch ( m_actualError )
+	{
+		case CANNOT_DOWNLOAD_FILE:
+			throw runtime_error("could not download " + s);
+			break;
+		case CANNOT_READ_FILE:
+			throw runtime_error("could not read " + s);
+			break;
+		case CANNOT_READ_DIRECTORY:
+			throw RunTimeErrorWithErrno("could not read directory " + s);
+			break;
+		case PACKAGE_NOT_FOUND:
+			throw runtime_error("package " + s + " not found");
+			break;
+		case CANNOT_GENERATE_LEVEL:
+			throw runtime_error("cannot generate the levels" + s);
+			break;
+	}
+}
 int CardsDepends::level()
 {
 	cout << "Generate Level, please wait ... " << endl;
@@ -51,8 +72,8 @@ int CardsDepends::level()
 			prtDir = val;
 		}
 		if ( (findFile(filesList,prtDir.c_str())) != 0) {
-			cerr << "Directory " << prtDir << " not found" << endl;
-			return -1;
+			m_actualError = CANNOT_READ_DIRECTORY;
+			treatErrors(prtDir);
 		}
 	}
 	for (unsigned int nInd=0;nInd <filesList->count;nInd++) {
@@ -64,8 +85,8 @@ int CardsDepends::level()
 	int niveau = generate_level (filesList,packagesList,0);
 	cout << "Level done " << endl;
 	if (niveau == 0 ) {
-		printf("Problem with genrate_level: %d\n",niveau);
-		return -1;
+		m_actualError = CANNOT_GENERATE_LEVEL;
+		treatErrors("0");
 	} else {
 #ifndef NDEBUG
 		printf("Number of level: %d\n",niveau);
@@ -115,8 +136,8 @@ int CardsDepends::depends()
 	}
 	char * longPackageName = NULL;
 	if ( (longPackageName = getLongPackageName(filesList,m_packageName)) == NULL) {
-		cout << "The package '" << m_packageName << "' is not found" << endl;
-		return -1;
+		m_actualError = PACKAGE_NOT_FOUND;
+		treatErrors(m_packageName);
 	}
 	for (unsigned int nInd=0;nInd <filesList->count;nInd++){
 		package = addInfoToPkgInfo(nInd);
@@ -126,8 +147,8 @@ int CardsDepends::depends()
 	int niveau = generate_level (filesList,packagesList,0);
 
 	if (niveau == 0 ) {
-		printf("Problem with genrate_level: %d\n",niveau);
-		return -1;
+		m_actualError = CANNOT_GENERATE_LEVEL;
+		treatErrors("0");
 	}
 	depList *dependenciesList = initDepsList();
 	if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,longPackageName,1) != 0 ) {
@@ -205,8 +226,8 @@ int CardsDepends::deptree()
 	}
 	char * longPackageName = NULL;
 	if ( (longPackageName = getLongPackageName(filesList,m_packageName)) == NULL) {
-		cout << "The package '" << m_packageName << "' is not found" << endl;
-		return -1;
+		m_actualError = PACKAGE_NOT_FOUND;
+		treatErrors(m_packageName);
 	}
 
 	for (unsigned int nInd=0;nInd <filesList->count;nInd++) {
@@ -268,8 +289,8 @@ int CardsDepends::deptree()
 								+ "/" + dir->d_name + "/" + name + ".deps";
 						if (checkFileExist(depFile)) {
 								if (parseFile(depsPackagesList,depFile.c_str()) != 0 ) {
-									cerr << "Cannot read " <<  depFile  << endl;
-									return -1;
+									m_actualError = CANNOT_READ_FILE;
+									treatErrors(depFile);
 								}
 						} else {
 							FileDownload DepsPort(remoteUrl + "/" + dirName  + "/" + name + ".deps",
@@ -277,12 +298,11 @@ int CardsDepends::deptree()
                     name + ".deps",
                     false);	
 							if ( DepsPort.downloadFile() != 0) {
-								cerr << "Failed to download " 
-              	  << depFile << endl ;
-            		return -1;
+								m_actualError = CANNOT_DOWNLOAD_FILE;
+								treatErrors(depFile);
 							} else if (parseFile(depsPackagesList,depFile.c_str()) != 0 ) {
-								cerr << "Cannot read " <<  depFile  << endl;
-								return -1;
+								m_actualError = CANNOT_READ_FILE;
+								treatErrors(depFile);
 							}
 						}
 					}

@@ -1,4 +1,4 @@
-// cards_depends.h
+// cards_base.h
 // 
 //  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
 // 
@@ -17,49 +17,26 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
-#ifndef CARDSDEPENDS_H
-#define CARDSDEPENDS_H
+#ifndef CARDSBASE_H
+#define CARDSBASE_H
 
-#include <string>
-#include <list>
-#include <map>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#include <locale.h>
-#include <string.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/file.h>
-
-#include <dirent.h>
-#include "string_utils.h"
+#include "pkgdbh.h"
 #include "cards_argument_parser.h"
-#include "compile_dependencies_utils.h"
 
-
-class CardsDepends
+class CardsBase : public Pkgdbh
 {
 public:
+	CardsBase(const CardsArgumentParser& argParser);
+//	virtual void treatErrors(const string& s) const;
 
-	CardsDepends (const CardsArgumentParser& argParser, const char * packageName)
-	: m_argParser(argParser),
-		m_packageName(packageName) {}
-
-	CardsDepends (const CardsArgumentParser& argParser)
-	: m_argParser(argParser) {}
-
-	virtual void treatErrors(const string& s) const;
-
-	int level();
-	int depends();
-	int deptree();
+	virtual void run(int argc, char** argv);
+	virtual void printHelp() const;
+	
 private:
+	const std::string m_baseDirectory;
 	const CardsArgumentParser& m_argParser;
-	const char* m_packageName;
-	error m_actualError;
+	
 };
 #endif
 // vim:set ts=2 :

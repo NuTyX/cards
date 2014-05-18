@@ -71,6 +71,9 @@ int ConfigParser::parseConfig(const string& fileName, Config& config)
 			if (key == "locale") {
 				config.locale.push_back(val);
 			}
+			if (key == "base") {
+				config.baseDir.push_back(val);
+			}
 		}
 	}
 	fclose(fp);

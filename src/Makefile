@@ -53,6 +53,7 @@ CARDSOBJECTS =	error_treat.o \
 		cards_sync.o \
 		cards_install.o \
 		cards_depends.o \
+		cards_base.o \
 		cards.o
 
 
