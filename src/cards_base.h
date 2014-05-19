@@ -28,7 +28,6 @@ class CardsBase : public Pkgdbh
 {
 public:
 	CardsBase(const CardsArgumentParser& argParser);
-//	virtual void treatErrors(const string& s) const;
 
 	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;

@@ -47,6 +47,7 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_ISINST;
 
 		static ArgParser::APOpt OPT_HELP;
+		static ArgParser::APOpt OPT_REMOVE_PACKAGES;
 		static ArgParser::APOpt OPT_SIGNATURE;
 		static ArgParser::APOpt OPT_DEPENDENCIES;
 		static ArgParser::APOpt OPT_SHOW_ALL_DEPENDENCIES;

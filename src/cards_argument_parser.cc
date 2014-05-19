@@ -42,6 +42,7 @@ ArgParser::APCmd CardsArgumentParser::CMD_DSEARCH;
 ArgParser::APCmd CardsArgumentParser::CMD_FSEARCH;
 
 ArgParser::APOpt CardsArgumentParser::OPT_HELP;
+ArgParser::APOpt CardsArgumentParser::OPT_REMOVE_PACKAGES;
 ArgParser::APOpt CardsArgumentParser::OPT_SIGNATURE;
 ArgParser::APOpt CardsArgumentParser::OPT_DEPENDENCIES;
 ArgParser::APOpt CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES;
@@ -115,6 +116,10 @@ CardsArgumentParser::CardsArgumentParser()
 		'H',
 		"get some more info on the command");
 
+	OPT_REMOVE_PACKAGES.init("remove",
+		'R',
+		"remove the packages founds, use with care.");
+
 	OPT_SIGNATURE.init("signature",
 		's',
 		"get the signature of the port");
@@ -128,9 +133,11 @@ CardsArgumentParser::CardsArgumentParser()
 		"show all the dependencies, included the one allready installed");
 
 	addOption(CMD_BASE, OPT_HELP,false);
+	addOption(CMD_BASE, OPT_REMOVE_PACKAGES,false);
 
 	addOption(CMD_SYNC, OPT_SIGNATURE,false);
 	addOption(CMD_SYNC, OPT_DEPENDENCIES, false);
+
 
 	addOption(CMD_DEPENDS, OPT_SHOW_ALL_DEPENDENCIES, false);
 }
