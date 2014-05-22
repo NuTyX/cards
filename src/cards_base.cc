@@ -60,12 +60,22 @@ void CardsBase::run(int argc, char** argv)
 		// Get the list of installed packages
 		getListOfPackages(o_root);
 
-		bool found;
 		string basePackageName,installPackageName,installFullPackageName;
-		set<string> removePackagesList;
+		set<string> removePackagesList,basePackagesList;
+		// For all the base packages list Directories
+		for (vector<string>::iterator bPF = config.baseDir.begin();bPF != config.baseDir.end();++bPF) {
+			string prtDir = *bPF;
+			// we get all the packages from the basePackageList directory
+			if ( findFile(basePackagesList, prtDir) != 0 ) {
+				m_actualError = CANNOT_READ_DIRECTORY;
+				treatErrors(prtDir);
+			}
+		}
+		if (basePackagesList.size() == 0) {
+			throw runtime_error("No package found for the base System" );
+		}
 		// For all the installed packages
 		for (set<string>::const_iterator iP = m_packagesList.begin(); iP != m_packagesList.end(); iP++) {
-			found = false;
 			installFullPackageName = *iP;
 			// We need to compare the base part if it not one
 			string::size_type pos = installFullPackageName.find('.');
@@ -74,34 +84,27 @@ void CardsBase::run(int argc, char** argv)
 			} else {
 				installPackageName = installFullPackageName;
 			}
-			set<string> basePackagesList;
-			// For all the base packages list Directories
-			for (vector<string>::iterator bPF = config.baseDir.begin();bPF != config.baseDir.end();++bPF) {
-				string prtDir = *bPF;
-				// we get all the packages from the basePackageList directory
-				if ( findFile(basePackagesList, prtDir) != 0 ) {
-					m_actualError = CANNOT_READ_DIRECTORY;
-			 		treatErrors(prtDir);
-				}
-				// Get all packages which are supposed to stay installed from the basePackageList
-				for (set<string>::const_iterator bi = basePackagesList.begin(); bi != basePackagesList.end(); bi++) {
-					string val = *bi;
-					string::size_type pos = val.find('@');
-					if (pos != string::npos) {
-						basePackageName = val.substr(0,pos);
-					}
-					if ( basePackageName == installPackageName) {
-						// Keep the found Package 
-						found = true;
-						break;
-					}
-				}
-				if (found) {
-					break;
+			bool found = false;
+			for(set<string>::const_iterator bP = basePackagesList.begin();bP != basePackagesList.end();bP++) {
+				string val = *bP;
+				string::size_type pos = val.find('@');
+				if (pos != string::npos) {
+					basePackageName = val.substr(0,pos);
 				} else {
-					removePackagesList.insert(installFullPackageName);
+					basePackageName = val;
+				}
+/*
+		If the install Package is in the list of packages of a base system
+		So we keep it and we can go out of the scan of the base package list for this
+		install package name
+*/
+				if ( basePackageName == installPackageName ) {	
+					found = true;
 					break;
 				}
+			}
+			if ( found == false) {
+				removePackagesList.insert(installFullPackageName);
 			}
 		}
 		if (removePackagesList.size() > 0) {

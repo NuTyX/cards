@@ -67,8 +67,10 @@ test:
 libs:
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
 
+all: pkgadd cards conf
 
-all: pkgadd cards
+conf:
+	sed -e "s/#ARCH#/`uname -m`/" cards.conf.in > cards.conf
 
 pkgadd: .tools_depend $(TOOLSOBJECTS)
 	$(CXX) $(TOOLSOBJECTS) -o $@ $(LDFLAGS)
@@ -89,6 +91,9 @@ endif
 ifeq (.tools_depend,$(wildcard .tools_depend))
 include .tools_depend
 endif
+
+%: %.conf.in
+	sed -e "s/#ARCH#/`uname -m`/" $< > $@
 
 .PHONY:	install clean distclean dist
 
@@ -111,6 +116,7 @@ clean:
 	rm -f pkgadd
 	rm -f pkgcrea
 	rm -f cards
+	rm -f cards.conf
 
 distclean: clean
 	rm -f pkgadd pkginfo pkgrm cards

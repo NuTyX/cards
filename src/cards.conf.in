@@ -39,7 +39,7 @@ dir /usr/ports/system
 ## if 32 bits: i686
 ##
 
-arch x86_64
+arch #ARCH#
 
 ##
 ## We can specify which locale we want, it's possible to mention as many locale we want
