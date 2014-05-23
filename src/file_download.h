@@ -27,6 +27,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include <utime.h>
+
 #include "string_utils.h"
 #include "file_utils.h"
 
@@ -60,6 +62,7 @@ class FileDownload
 	{
 		const char *filename;
 		long int filetime;
+		utimbuf acmodtime;
 		FILE *stream;
 	};
 

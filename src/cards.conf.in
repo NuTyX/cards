@@ -57,6 +57,5 @@ locale de
 ## Si l'on veut revenir à un système de base, les dossiers suivant doivent contenir des paquets
 ## In the following setting, packages from base system and server will not be touch
 
-base /usr/ports/server
 base /var/lib/pkg/saravane/system
 

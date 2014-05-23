@@ -282,12 +282,14 @@ int CardsSync::run()
 								m_actualError = CANNOT_READ_FILE;
 								treatErrors(MD5File);
 							}
+							bool found = false;
 							for (set<string>::const_iterator i = remoteFilesList.begin(); i != remoteFilesList.end(); i++) {
 								string input = *i;
 								if ( input[10] == ':') {
 									continue; // The first line is starting with a 10 digit epoc time in case binaries exists
 								}
 								if ( input.substr(33) == depFile ) {
+									found = true;
 									cout << "f: " << destinationFile << endl;
 									FileDownload DepsPort(remoteUrl + "/" + dir  + "/" + depFile,
 										prtDir + "/" + dir,
@@ -296,6 +298,29 @@ int CardsSync::run()
 									if ( DepsPort.downloadFile() != 0) {
 										m_actualError = CANNOT_DOWNLOAD_FILE;
 										treatErrors(prtDir + "/" + dir + "/" + depFile);
+									}
+									break;
+								} 
+							}
+							if ( found == false ) {
+								depFile = input.substr(33,pos - 33) + ".run";
+								for (set<string>::const_iterator i = remoteFilesList.begin(); i != remoteFilesList.end(); i++) {
+									string input = *i;
+									if ( input[10] == ':') {
+										continue; // The first line is starting with a 10 digit epoc time in case binaries exists
+									}
+									if ( input.substr(33) == depFile ) {
+										destinationFile = prtDir + "/" + dir + "/" + depFile;
+										cout << "f: " << destinationFile << endl;
+										FileDownload DepsPort(remoteUrl + "/" + dir  + "/" + depFile,
+											prtDir + "/" + dir,
+											depFile,
+											false);
+										if ( DepsPort.downloadFile() != 0) {
+											m_actualError = CANNOT_DOWNLOAD_FILE;
+											treatErrors(prtDir + "/" + dir + "/" + depFile);
+										}
+										break;
 									}
 								}
 							}

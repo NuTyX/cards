@@ -92,6 +92,11 @@ int FileDownload::downloadFile()
 	result=curl_easy_perform(curl);
 	if (m_destinationFile.stream) {
 		fclose(m_destinationFile.stream);
+		long int fT = 0;
+		curl_easy_getinfo(curl,CURLINFO_FILETIME,&fT);
+		m_destinationFile.acmodtime.actime = fT;
+		m_destinationFile.acmodtime.modtime = fT;
+		utime ( m_destinationFile.filename,&m_destinationFile.acmodtime);
 	}
 	return result;
 }
