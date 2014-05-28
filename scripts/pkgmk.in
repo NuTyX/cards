@@ -34,6 +34,7 @@ E_FOOTPRINT=7  # footprint check failure
 E_BUILD=8      # error while running 'build()'
 E_INSTALL=9    # error while installing the package via 'pkgadd'
 E_DEPS=10      # error while searching runtime deps via 'pkginfo -b'
+E_INFO=11      # .info file not found
 
 info() {
 	echo "=======> $1"
@@ -121,7 +122,7 @@ check_directory() {
 check_file() {
 	if [ -e $1 ] && [ ! -w $1 ]; then
 		error "File '$1' is not writable."
-		exit 1
+		exit $E_GENERAL
 	fi
 }
 downloads_file_with_curl() {
@@ -542,6 +543,16 @@ pack_devel() {
 		done
 	done
 }
+remove_devel() {
+	local DIR SUBDIR
+	for DIR in usr opt/*; do
+		for SUBDIR in include lib/pkgconfig; do
+			if [ -d $DIR/$SUBDIR ]; then
+				rm -r $DIR/$SUBDIR
+			fi
+		done
+	done
+}
 pack_doc() {
 	local DIR SUBDIR
 	for DIR in usr/share opt/*/share; do
@@ -550,8 +561,17 @@ pack_doc() {
 				bsdtar -r -f \
 				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
-				rm -r $DIR/$SUBDIR
 				j=1
+			fi
+		done
+	done
+}
+remove_doc() {
+	local DIR SUBDIR
+	for DIR in usr/share opt/*/share; do
+		for SUBDIR in doc gtk-doc; do
+			if [ -d $DIR/$SUBDIR ]; then
+				rm -r $DIR/$SUBDIR
 			fi
 		done
 	done
@@ -564,8 +584,17 @@ pack_man() {
 				bsdtar -r -f \
 				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
-				rm -r $DIR/$SUBDIR
 				j=1
+			fi
+		done
+	done
+}
+remove_man() {
+	local DIR SUBDIR
+	for DIR in usr/share opt/*/share; do
+		for SUBDIR in info man; do
+			if [ -d $DIR/$SUBDIR  ]; then
+				rm -r $DIR/$SUBDIR
 			fi
 		done
 	done
@@ -576,15 +605,18 @@ pack_service() {
 		bsdtar -r -f \
 		$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 		$DIR || BUILD_SUCCESSFUL="no"
-		rm -r $DIR
 		j=1
 	fi
 }
-
+remove_service() {
+	local DIR="etc/rc.d"
+	if [ -d $DIR ]; then
+		rm -r $DIR
+	fi
+}
 add_meta_files() {
 	local NAME
 	NAME="`get_package_name $1`"
-	info "Adding meta files to Archive $NAME"
 	cd $PKG
 	if [ -f $PKGMK_ROOT/${NAME}.README ]; then
 		cp $PKGMK_ROOT/${NAME}.README .README
@@ -674,7 +706,17 @@ compress_archive() {
 build_package() {
 	# TODO find a better solution for the hardcoded folders
 	local BUILD_SUCCESSFUL="no"
-	
+
+	if [ "$1" != "$TARGET" ]; then
+		if [ ! -z $TARGETS ]; then
+			for TARGET in ${TARGETS[@]}; do
+				error "$TARGET should be remove"
+			done
+			error "Remove the binaries first..."
+			exit $E_BUILD
+		fi
+	fi
+
 	check_file "$TARGET"
 	make_work_dir
 	
@@ -708,28 +750,26 @@ build_package() {
 					BUILD_SUCCESSFUL="yes"
 				else
 					error "Building '$TARGET' failed."
-					exit 1
+					exit $E_BUILD
 				fi
 			else
-				if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}* ]; then
-					rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}*
+				if [ "$1" != "$TARGET" ]; then
+					if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}* ]; then
+						rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}*
+					fi
+					pack_${group}
 				fi
-				pack_${group} 
+				remove_${group}
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
-                			exit 1
+                			exit $E_BUILD
 				fi
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
-					exit 1
-				fi
-
-				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
-					error "Building '$TARGET' failed."
-					exit 1
+					exit $E_BUILD
 				fi
 				j=0
 			fi
@@ -741,8 +781,10 @@ build_package() {
 				for loc in `cd $DIR && ls`; do
 					# Need to double check because glibc for exemple create a file in this directory
 					if [ -d $DIR/$loc ];then
-						bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${loc}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
-						$DIR/$loc || abort_on_build "${name}.${loc}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT}"
+						if [ "$1" != "$TARGET" ]; then
+							bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${loc}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+							$DIR/$loc || abort_on_build "${name}.${loc}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT}"
+						fi
 						rm -rf $DIR/$loc
 					fi
 				done
@@ -765,15 +807,20 @@ build_package() {
 	fi
 	
 	if [ "$BUILD_SUCCESSFUL" = "yes" ]; then
-		get_package_list		
-        	if [ -z $TARGETS ]; then
-                	error "Package(s) not found(s)..."
-			exit 1
-        	fi
-		for TARGET in ${TARGETS[@]}; do
-			add_meta_files $TARGET
-			add_meta_to_archive $TARGET
-		done
+		if [ "$1" != "$TARGET" ]; then
+			get_package_list		
+        		if [ -z $TARGETS ]; then
+                		error "Package(s) not found(s)..."
+				exit $E_BUILD
+        		fi
+			for TARGET in ${TARGETS[@]}; do
+				add_meta_files $TARGET
+				add_meta_to_archive $TARGET
+			done
+		else
+			add_meta_files `basename $TARGET`
+			add_meta_to_archive `basename $TARGET`
+		fi
 		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
 			remove_work_dir
 		fi
@@ -788,31 +835,31 @@ build_package() {
 
 install_package() {
 	local COMMAND
+	get_package_list
 	if [ -z $TARGETS ]; then
-		get_package_list
-		if [ -z $TARGETS ]; then
-			error "Package(s) not found(s) nothing to install..."
-			exit 1
-		fi
+		error "Package(s) not found(s) nothing to install..."
+		exit $E_INSTALL
 	fi
 	for TARGET in ${TARGETS[@]}; do
-		info "Installing '$TARGET'."
+		if [ "`get_package_arch $TARGET`" = "$PKGMK_ARCH" ] || [ "`get_package_arch $TARGET`" = "any" ]; then
+			info "Installing '$TARGET'."
 	
-		if [ "$PKGMK_INSTALL" = "install" ]; then
-			COMMAND="pkgadd $PKGMK_PACKAGE_DIR/$TARGET"
-		else
-			COMMAND="pkgadd -u $PKGMK_PACKAGE_DIR/$TARGET"
-		fi
+			if [ "$PKGMK_INSTALL" = "install" ]; then
+				COMMAND="pkgadd $PKGMK_PACKAGE_DIR/$TARGET"
+			else
+				COMMAND="pkgadd -u $PKGMK_PACKAGE_DIR/$TARGET"
+			fi
 	
-		cd $PKGMK_ROOT
-		echo "$COMMAND"
-		$COMMAND
+			cd $PKGMK_ROOT
+			echo "$COMMAND"
+			$COMMAND
 	
-		if [ $? = 0 ]; then
-			info "Installing '$TARGET' succeeded."
-		else
-			error "Installing '$TARGET' failed."
-			exit 1
+			if [ $? = 0 ]; then
+				info "Installing '$TARGET' succeeded."
+			else
+				error "Installing '$TARGET' failed."
+				exit $E_INSTALL
+			fi
 		fi
 	done
 }
@@ -867,13 +914,13 @@ update_footprint() {
 		get_package_list
 		if [ -z $TARGETS ]; then		
 			error "Package(s) not found(s), unable to update footprint."
-			exit 1
+			exit $E_FOOTPRINT
 		fi
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ ! -f $TARGET ]; then
 			error "Unable to update footprint. File '$TARGET' not found."
-			exit 1
+			exit $E_FOOTPRINT
 		fi
 		PKGMK_FOOTPRINT="`get_package_name $TARGET`".footprint
 		check_file "$PKGMK_FOOTPRINT"
@@ -945,8 +992,6 @@ echo -n "<pre><kbd>" >> $PKGMK_ROOT/index.html
 pushd $PKGMK_ROOT > /dev/null
 if [ -f  ${name}.info ]; then
   cat ${name}.info >> $PKGMK_ROOT/index.html
-else
-  warning "${name}.info doesn't exist"  
 fi
 echo "" >> $PKGMK_ROOT/index.html
 
@@ -1004,7 +1049,7 @@ interrupted() {
 		rm -rf $PKGMK_WORK_DIR
 	fi
 
-	exit 1
+	exit $E_GENERAL
 }
 
 print_help() {
@@ -1102,13 +1147,13 @@ main() {
 
         if [ ! -f $PKGMK_CONFFILE ]; then
                 error "File '$PKGMK_CONFFILE' not found."
-                exit 1
+                exit $E_GENERAL
         fi
         . $PKGMK_CONFFILE
 	if [ "$PKGMK_SYNC_FILES" == "yes" ]; then
 		if [ ! -f $CARDS_CONFFILE ]; then
 			error "$CARDS_CONFFILE not found"
-			exit 1
+			exit $E_GENERAL
 		fi
 	fi
 	PKGMK_ARCH=`uname -m`
@@ -1121,7 +1166,6 @@ main() {
 
 	PACKAGENAME=`basename $PKGMK_ROOT`
 	name="`echo $PACKAGENAME | cut  -d "@" -f1`"
-	info "name: ${name}"
 	version="`basename $PKGMK_ROOT | cut -d "@" -f2`"
 
 	if [ "$version" == "$name" ]; then
@@ -1132,30 +1176,24 @@ main() {
 		recursive "$@"
 		exit 0
 	fi
-
+	info  "PKGMK_SYNC_FILES: $PKGMK_SYNC_FILES"
 	if [ "$PKGMK_SYNC_FILES" == "yes" ]; then
 		if [ ! -f $PKGMK_PKGFILE ]; then
 			sync_all_files
 		fi
-	else
-		if [ ! -f $PKGMK_PKGFILE ]; then
-			info  "Variable PKGMK_SYNC_FILES set to \"no\""
-			error "File '$PKGMK_PKGFILE' not found"
-			exit 1
-		fi
 	fi
 	if [ ! -f $PKGMK_PKGFILE  ]; then
 		error "File '$PKGMK_PKGFILE' not found."
-		exit 1
+		exit $E_PKGFILE
 	fi
-
+	if [ ! -f ${name}.info ]; then
+		error "File '${name}.info' not found."
+		exit $E_INFO
+	fi
 	. $PKGMK_PKGFILE
-	if [ ! -z "$version" ]; then
-		info "version: $version"
-	else
+	if [ -z "$version" ]; then
 		warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
 	fi
-	info "PKGMK_SYNC_FILES: $PKGMK_SYNC_FILES"
 	info "PKGMK_INSTALL: $PKGMK_INSTALL"
 	info "PKGMK_WORK_DIR: $PKGMK_WORK_DIR"
 	info "PKGMK_SOURCE_DIR: $PKGMK_SOURCE_DIR"
@@ -1186,6 +1224,11 @@ main() {
 	if [ "$PKGMK_COMPRESS_PACKAGE" != "no" ]; then
 		info "PKGMK_COMPRESSION_MODE: $PKGMK_COMPRESSION_MODE"
 	fi
+
+	info "name: ${name}"
+	if [ ! -z "$version" ]; then
+		info "version: $version"
+	fi
 	PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
@@ -1202,7 +1245,7 @@ main() {
 			fi;;
 		*)
 			error "Compression mode '$PKGMK_COMPRESSION_MODE' not supported"
-			exit 1
+			exit $E_GENERAL
 			;;
 	esac
 	case $PKGMK_COMPRESSION_MODE in
@@ -1274,8 +1317,12 @@ main() {
 			build_package
 		fi
 	else
+		FOUND=false
 		for TARGET in ${TARGETS[@]}; do
 			if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
+				if [ "`get_package_arch $TARGET`" = "$PKGMK_ARCH" ]; then
+					FOUND=true
+				fi
 				info "Package '$TARGET' is up to date."
 			else
 				download_source
@@ -1284,11 +1331,20 @@ main() {
 			fi
 		done
 	fi
+	if [ ! -z $FOUND ] ; then
+		if [ $FOUND != true ];  then
+			download_source
+			PKGMK_BUILDVER="`get_package_builddate $TARGET`"
+			TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT
+			build_package $TARGET
+		fi
+	fi
 	if [ "$PKGMK_INSTALL" != "no" ]; then
 		install_package
 	fi
 	if [ "$PKGMK_COMPRESS_PACKAGE" = "yes" ]; then
 		cd $PKGMK_PACKAGE_DIR
+		get_package_list
 		for TARGET in ${TARGETS[@]}; do
 			if [  "${TARGET:$((${#TARGET} - ${#PKGMK_PACKAGE_EXT} ))}" == "$PKGMK_PACKAGE_EXT" ]; then
 				compress_archive $TARGET

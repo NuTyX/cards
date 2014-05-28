@@ -130,8 +130,6 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 	CURL *curl = CurrentProgress->curl;
 	double TotalTime = 0;
 	double SpeedDownload = 0;
-	long int FileTime = 0;
-	curl_easy_getinfo(curl,CURLINFO_FILETIME,&FileTime);
 	curl_easy_getinfo(curl,CURLINFO_SPEED_DOWNLOAD,&SpeedDownload);
 	curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &TotalTime);
 	fprintf(stderr,"\r%d b of %d b - %d b/sec - %d sec remain ",

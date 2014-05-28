@@ -139,6 +139,9 @@ int CardsSync::run()
 			if (localPackagesList.size() == 0 ) {
 				for (set<string>::const_iterator i = remotePackagesList.begin(); i != remotePackagesList.end(); i++) {
 					string input = *i;
+					if ( input.size() < 33) {
+						continue;
+					}
 					string dir = input.substr(33);
 					cout << "d: "  << prtDir << "/" << dir << endl;
 					string path = prtDir + "/" + dir;
@@ -192,6 +195,9 @@ int CardsSync::run()
 			if (m_argParser.isSet(CardsArgumentParser::OPT_SIGNATURE)) {
 				for (set<string>::const_iterator i = remotePackagesList.begin(); i != remotePackagesList.end(); i++) {
 					string input = *i;
+					if ( input.size() < 33 ) {
+						continue;
+					}
 					string dir = input.substr(33);
 					string destinationFile = prtDir + "/" + dir + "/" + m_repoFile;
 					/* If the MD5SUM File is present, need to check if it's uptodate
@@ -241,6 +247,9 @@ int CardsSync::run()
 			if (m_argParser.isSet(CardsArgumentParser::OPT_DEPENDENCIES)) {
 				for (set<string>::const_iterator i = remotePackagesList.begin(); i != remotePackagesList.end(); i++) {
 					string input = *i;
+					if ( input.size() < 33) {
+						continue;
+					}
 					string dir  = input.substr(33);
 					string MD5File = prtDir + "/" + dir + "/" + m_repoFile;
 					string::size_type pos = input.find('@');
@@ -257,7 +266,7 @@ int CardsSync::run()
 							}
 							for (set<string>::const_iterator iF = filesList.begin(); iF != filesList.end(); iF++) {
 								string input = *iF;
-								if ( input[10] == ':') {
+								if ( (input.size() < 10 ) || ( input[10] == ':') ) {
 									continue; // The first line starting with a 10 digit epoc time in case binaries exists
 								}
 								string file  = input.substr(33);
@@ -285,7 +294,7 @@ int CardsSync::run()
 							bool found = false;
 							for (set<string>::const_iterator i = remoteFilesList.begin(); i != remoteFilesList.end(); i++) {
 								string input = *i;
-								if ( input[10] == ':') {
+								if ((input.size() < 10 ) || ( input[10] == ':')) {
 									continue; // The first line is starting with a 10 digit epoc time in case binaries exists
 								}
 								if ( input.substr(33) == depFile ) {
@@ -306,7 +315,7 @@ int CardsSync::run()
 								depFile = input.substr(33,pos - 33) + ".run";
 								for (set<string>::const_iterator i = remoteFilesList.begin(); i != remoteFilesList.end(); i++) {
 									string input = *i;
-									if ( input[10] == ':') {
+									if ( (input.size() < 10 ) || ( input[10] == ':') ){
 										continue; // The first line is starting with a 10 digit epoc time in case binaries exists
 									}
 									if ( input.substr(33) == depFile ) {
