@@ -38,6 +38,7 @@ class FileDownload
 
 	FileDownload(std::string url, std::string dirName, std::string fileName, bool progress);
 	FileDownload(std::string url, std::string dirName, std::string fileName, std::string MD5Sum , bool progress);
+	FileDownload(std::vector<InfoFile> destinationFiles,bool progress);
 	~FileDownload()
 	{
 		curl_global_cleanup();
@@ -51,28 +52,21 @@ class FileDownload
 	static size_t writeToStreamHandle(void *buffer, size_t size, size_t nmemb, void *stream);
 	int updateProgress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
 	size_t writeToStream(void *buffer, size_t size, size_t nmemb, void *stream);
-	void initFileToDownload(const char * _file);
+	void initFileToDownload(std::string _url, std::string _file);
 
 	struct dwlProgress
 	{
 		double lastruntime;
 		CURL *curl;
 	};
-	struct DestinationFile
-	{
-		const char *filename;
-		long int filetime;
-		utimbuf acmodtime;
-		FILE *stream;
-	};
-
+	std::vector<InfoFile> m_destinationFiles;
 	void updateProgress();
 
 	CURL* curl;
 	CURLcode result;
 
 	dwlProgress 		m_downloadProgress;
-	DestinationFile	m_destinationFile;
+	InfoFile	m_destinationFile;
 
 	string m_url;
 	string m_downloadFileName;

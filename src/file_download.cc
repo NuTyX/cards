@@ -23,13 +23,40 @@
 #include <fstream>
 #include <iterator>
 
-	/*
-	* url is the complete url adress including the file
-	* dirName is the Destination folder 
-	* fileName is the file where to store
-	* progress if true, show what's going on
-	*/
+FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
+{
+	curl_global_init(CURL_GLOBAL_ALL);
+	curl = curl_easy_init();
+	if (! curl)
+		throw runtime_error ("Curl error");
+	if ( progress ) {
+		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+	} else {
+		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+	}
+	for (std::vector<InfoFile>::const_iterator i = downloadFiles.begin(); i != downloadFiles.end();++i)
+	{
+		m_url = i->url;
+		m_destinationFile.filename = i->filename;
+		m_destinationFile.dirname = i->dirname;
+		m_downloadFileName = i->dirname + i->filename;
+		m_MD5Sum = i->md5sum;
+		createRecursiveDirs(i->dirname);
+		initFileToDownload(m_url,m_downloadFileName);
+		if ( downloadFile() != CURLE_OK )
+			throw runtime_error ("download failed");
+		if ( ! checkMD5sum() )
+			throw runtime_error (m_downloadFileName + ": checksum error");
+		cout << m_downloadFileName << endl;
+	}
+}
 
+/*
+* url is the complete url adress including the file
+* dirName is the Destination folder
+* fileName is the file where to store
+* progress if true, show what's going on
+*/
 FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, bool progress)
 	: m_url(url),m_downloadFileName(dirName+"/"+fileName)
 {
@@ -40,7 +67,7 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 
 	createRecursiveDirs(dirName);
 
-	initFileToDownload(m_downloadFileName.c_str());
+	initFileToDownload(m_url, m_downloadFileName);
 	if ( progress ) {
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 	} else {
@@ -65,7 +92,7 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 
 	createRecursiveDirs(dirName);
 
-  initFileToDownload(m_downloadFileName.c_str());
+  initFileToDownload(m_url, m_downloadFileName);
 	if ( progress ) {
   	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 	} else {
@@ -96,14 +123,14 @@ int FileDownload::downloadFile()
 		curl_easy_getinfo(curl,CURLINFO_FILETIME,&fT);
 		m_destinationFile.acmodtime.actime = fT;
 		m_destinationFile.acmodtime.modtime = fT;
-		utime ( m_destinationFile.filename,&m_destinationFile.acmodtime);
+		utime ( m_destinationFile.filename.c_str(),&m_destinationFile.acmodtime);
 	}
 	return result;
 }
 
-void FileDownload::initFileToDownload(const char * _file)
+void FileDownload::initFileToDownload(std::string  _url, std::string  _file)
 {
-
+	m_destinationFile.url = _url;
   m_destinationFile.filename = _file;
   m_destinationFile.filetime = 0;
   m_destinationFile.stream = NULL;
@@ -115,10 +142,10 @@ void FileDownload::initFileToDownload(const char * _file)
 
 size_t FileDownload::writeToStream(void *buffer, size_t size, size_t nmemb, void *stream)
 {
-	DestinationFile *outputf = (DestinationFile *)stream;
+	InfoFile *outputf = (InfoFile *)stream;
 	if ( outputf && ! outputf->stream)
 	{
-		outputf->stream=fopen(outputf->filename, "w");
+		outputf->stream=fopen(outputf->filename.c_str(), "w");
 		if ( ! outputf->stream )
 			return -1;
 	}

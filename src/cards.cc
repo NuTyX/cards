@@ -74,7 +74,8 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 		} else	if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
 			CardsSync CS(cardsArgPars);
-			return CS.run();
+			CS.run();
+			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
 			cout << "Not yet implemented, be patient" << endl;
 			return 0;

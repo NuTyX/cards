@@ -36,7 +36,7 @@ public:
 		const std::string& repoFile);
 	virtual void treatErrors(const string& s) const;
 
-	int run ();
+	void run ();
 
 	static const std::string DEFAULT_REPOFILE;
 	static const int DEFAULT_TIMEOUT;
@@ -44,6 +44,7 @@ public:
 	
 private:
 
+	void deleteFolder(const string& folderName);
 	const std::string m_baseDirectory;
 	const std::string m_remoteUrl;
 	std::string m_repoFile;

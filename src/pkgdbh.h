@@ -35,7 +35,6 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-#define PKG_EXT          ".cards.tar."
 #define PKG_DB_DIR       "var/lib/pkg/DB/"
 #define PKG_FILES        "/files"
 #define PKG_META         "META"

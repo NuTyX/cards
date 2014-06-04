@@ -43,7 +43,6 @@ ArgParser::APCmd CardsArgumentParser::CMD_FSEARCH;
 
 ArgParser::APOpt CardsArgumentParser::OPT_HELP;
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE_PACKAGES;
-ArgParser::APOpt CardsArgumentParser::OPT_SIGNATURE;
 ArgParser::APOpt CardsArgumentParser::OPT_DEPENDENCIES;
 ArgParser::APOpt CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES;
 
@@ -120,10 +119,6 @@ CardsArgumentParser::CardsArgumentParser()
 		'R',
 		"remove the packages founds, use with care.");
 
-	OPT_SIGNATURE.init("signature",
-		's',
-		"get the signature of the port");
-
 	OPT_DEPENDENCIES.init("dependencies",
 		'd',
 		"get dependencies files");
@@ -135,7 +130,6 @@ CardsArgumentParser::CardsArgumentParser()
 	addOption(CMD_BASE, OPT_HELP,false);
 	addOption(CMD_BASE, OPT_REMOVE_PACKAGES,false);
 
-	addOption(CMD_SYNC, OPT_SIGNATURE,false);
 	addOption(CMD_SYNC, OPT_DEPENDENCIES, false);
 
 

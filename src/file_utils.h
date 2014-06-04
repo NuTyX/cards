@@ -39,6 +39,9 @@
 #include <cstring>
 #include <ext/stdio_filebuf.h>
 #include <sys/types.h>
+
+#include <utime.h>
+
 #include <sys/stat.h>
 #include <sys/file.h>
 #include <sys/param.h>
@@ -66,6 +69,17 @@ enum {
         WALK_BADPATTERN,
         WALK_NAMETOOLONG,
         WALK_BADIO
+};
+
+struct InfoFile
+{
+	std::string url;
+	std::string filename;
+	std::string dirname;
+	std::string md5sum;
+	long int filetime;
+	utimbuf acmodtime;
+	FILE *stream;
 };
 
 using namespace std;

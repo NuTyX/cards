@@ -81,264 +81,180 @@ void CardsSync::treatErrors(const string& s) const
 			break;
 	}
 }
-int CardsSync::run()
+void CardsSync::run()
 {
 	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
-	struct stat info;
-	if (stat(m_baseDirectory.c_str(), &info)) {
-		if (createRecursiveDirs(m_baseDirectory)) {
-			m_actualError = CANNOT_CREATE_DIRECTORY;
-			treatErrors(m_baseDirectory);
-		}
-	}
-	
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
+	InfoFile downloadFile;
+	string localPackageDirectory,remotePackageDirectory ;
+
 	for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
 		string val = *i ;
-		string prtDir, url ;
+		string categoryDir, url ;
 		string::size_type pos = val.find('|');
 		if (pos != string::npos) {
-			prtDir = stripWhiteSpace(val.substr(0,pos));
+			categoryDir = stripWhiteSpace(val.substr(0,pos));
 			url = stripWhiteSpace(val.substr(pos+1));
 		} else {
 			continue;
 		}
-		string category = basename(const_cast<char*>(prtDir.c_str()));
-		cout << "Synchronising " << category << endl;
-		string remoteUrl = url  ;
-		string categoryMD5sumFile = prtDir + "/" + m_repoFile ;
-
+		string category = basename(const_cast<char*>(categoryDir.c_str()));
+		string categoryMD5sumFile = categoryDir + "/" + m_repoFile ;
+		cout << "Synchronising " << categoryDir << " from " << url << endl;
+		categoryDir = categoryDir + "/";
 		// Get the MD5SUM file of the category
-		FileDownload MD5Sum(remoteUrl + "/" + m_repoFile,
-			prtDir,
+		FileDownload MD5Sum(url + "/" + m_repoFile,
+			categoryDir,
 			m_repoFile, false);
 		if ( MD5Sum.downloadFile () != 0) {
 			m_actualError = CANNOT_DOWNLOAD_FILE;
-    	treatErrors(remoteUrl + "/" + m_repoFile);
+			treatErrors(url + "/" + m_repoFile);
 		}
-		set<string> localPackagesList,remotePackagesList,remoteFilesList;
-
+		set<string> remotePackagesList;	
+		// We read the category MD5SUM file
 		if ( parseFile(remotePackagesList,categoryMD5sumFile.c_str()) != 0) {
 			m_actualError = CANNOT_READ_FILE;
 			treatErrors(categoryMD5sumFile);
 		}
-		// We need to remove the MD5SUM file
+		// and need to remove it
 		remove(categoryMD5sumFile.c_str());
-		// Let see what we have so for locally
-		if ( findFile( localPackagesList, prtDir) != 0 ) {
-			m_actualError = CANNOT_READ_DIRECTORY;
-			treatErrors(prtDir);
+		if ( remotePackagesList.size() == 0 ) {
+			cout << "no ports founds ..." << endl;
+			continue;
 		}
-		// If they are some ports availables
-		if ( remotePackagesList.size() > 0 ) {
-			// If no directories found
-			if (localPackagesList.size() == 0 ) {
-				for (set<string>::const_iterator i = remotePackagesList.begin(); i != remotePackagesList.end(); i++) {
-					string input = *i;
-					if ( input.size() < 33) {
-						continue;
-					}
-					string dir = input.substr(33);
-					cout << "d: "  << prtDir << "/" << dir << endl;
-					string path = prtDir + "/" + dir;
-					createRecursiveDirs(prtDir + "/" + dir);
-					}
-			} else {
-				// some directories found, Only download/remove/change the one needs
-				string localPackage,remotePackage ;
-				// obsolete ?
-				for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
-					bool found = false;
-					for (set<string>::const_iterator ri = remotePackagesList.begin(); ri != remotePackagesList.end(); ri++) {
-						localPackage = *li;
-						remotePackage = *ri;
-						if ( localPackage == remotePackage.substr(33)) {	
-							found = true;
-							break;
-						}
-					}
-					if ( ! found ) {
-						cout << "Deleting " << localPackage << endl;
-						
-						set<string> filesToDelete;
-						if ( findFile(filesToDelete, prtDir + "/"+ localPackage) != 0 ){
-							m_actualError = CANNOT_READ_FILE;
-							treatErrors(prtDir + "/"+ localPackage);
-						}
-						for (set<string>::const_iterator f = filesToDelete.begin(); f != filesToDelete.end(); f++) {
-							removeFile("/",prtDir + "/"+ localPackage + "/"+ *f);
-						}
-						removeFile("/",prtDir + "/"+localPackage);
-					}
+		set<string> localPackagesList;
+		// Check what we have so far
+		if ( findFile( localPackagesList, categoryDir) != 0 ) {
+			m_actualError = CANNOT_READ_DIRECTORY;
+			treatErrors(categoryDir);
+		}
+		for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
+			bool found = false;
+			for (set<string>::const_iterator ri = remotePackagesList.begin(); ri != remotePackagesList.end(); ri++) {
+				localPackageDirectory = *li;
+				remotePackageDirectory = *ri;
+				if ( remotePackageDirectory.size() < 34 ) {
+					m_actualError = CANNOT_READ_FILE;
+					treatErrors(remotePackageDirectory + "  missing info ...");
 				}
-				// New port ?
-				for (set<string>::const_iterator ri = remotePackagesList.begin(); ri != remotePackagesList.end(); ri++) {
-					bool found = false;
-					for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
-						localPackage = *li;
-						remotePackage = *ri;
-						if ( remotePackage.substr(33) == localPackage ) {
-							found = true;
-							break;
-						}
-					}
-					if ( ! found ) {
-						cout << "d: "<< remotePackage.substr(33) << endl;
-						createRecursiveDirs(prtDir + "/" + remotePackage.substr(33));
-					}
-				}		
+				if ( remotePackageDirectory[32] != ':' ) {
+					m_actualError = CANNOT_READ_FILE;
+					treatErrors( remotePackageDirectory + " wrong format... ");
+				}
+				// Check if the local Package is still in the depot by comparing the directories
+				if ( localPackageDirectory == remotePackageDirectory.substr(33)) {
+					found = true ;
+					break;	// found check the next local one
+				}
 			}
-			if (m_argParser.isSet(CardsArgumentParser::OPT_SIGNATURE)) {
-				for (set<string>::const_iterator i = remotePackagesList.begin(); i != remotePackagesList.end(); i++) {
-					string input = *i;
-					if ( input.size() < 33 ) {
-						continue;
-					}
-					string dir = input.substr(33);
-					string destinationFile = prtDir + "/" + dir + "/" + m_repoFile;
-					/* If the MD5SUM File is present, need to check if it's uptodate
-						 We need to check the MD5 sum of the local MD5SUM file against the list */
-					if ( checkFileExist( destinationFile )) {
-						for (set<string>::const_iterator ri = remotePackagesList.begin(); ri != remotePackagesList.end(); ri++) {
-							string remote_input = *ri;
-							string remote_dir = remote_input.substr(33);
-							string MD5S = remote_input.substr(0,32);
-							if ( remote_dir == dir ) {
-								if (! checkMD5sum(destinationFile.c_str(),MD5S.c_str())) {
-									cout << "f: " << destinationFile ;
-									FileDownload MD5SumPort(remoteUrl + "/" + dir + "/" + m_repoFile,
-										prtDir + "/" + dir,
-										m_repoFile,
-										input.substr(0,32),false);
-									if ( MD5SumPort.downloadFile() != 0) {
-										m_actualError = CANNOT_DOWNLOAD_FILE;
-										treatErrors(prtDir + "/" + dir + "/" + m_repoFile);
-									}
-									if (MD5SumPort.checkMD5sum()) {
-										cout << " OK" << endl;
-									} else {
-										cout << " FAIL !!!" << endl;
-									}
-								}
-							}
-						}
-					} else { /* If the MD5SUM File is not present download it */
-						cout << "f: " << destinationFile ;
-						FileDownload MD5SumPort(remoteUrl + "/" + dir + "/" + m_repoFile,
-							prtDir + "/" + dir,
-							m_repoFile,
-							input.substr(0,32),false);
-						if ( MD5SumPort.downloadFile() != 0) {
-							m_actualError = CANNOT_DOWNLOAD_FILE;
-							treatErrors(prtDir + "/" + dir + "/" + m_repoFile);
-						}
-						if (MD5SumPort.checkMD5sum()) {
-							cout << " OK" << endl;
-						} else {
-							cout << " FAIL !!!" << endl;
-						}
+			if ( ! found ) {
+				deleteFolder(categoryDir + localPackageDirectory);
+			}
+		}
+		vector<InfoFile> downloadFilesList;
+		// Checking for new ports
+		for (set<string>::const_iterator ri = remotePackagesList.begin(); ri != remotePackagesList.end(); ri++) {
+			string remotePackageMD5SUMDirectory = *ri;
+			remotePackageDirectory = remotePackageMD5SUMDirectory.substr(33) + "/";
+			downloadFile.url = url + "/" + remotePackageDirectory + m_repoFile;
+			downloadFile.dirname = categoryDir + remotePackageDirectory;
+			downloadFile.filename = m_repoFile;
+			downloadFile.md5sum = remotePackageMD5SUMDirectory.substr(0,32);
+			bool MD5SUMfound = false;
+			
+			for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
+				localPackageDirectory = *li + "/";
+				if ( remotePackageDirectory == localPackageDirectory ) {
+					if ( checkFileExist(downloadFile.dirname + m_repoFile)) {
+						MD5SUMfound = true;
+						break;
 					}
 				}
 			}
-			if (m_argParser.isSet(CardsArgumentParser::OPT_DEPENDENCIES)) {
-				for (set<string>::const_iterator i = remotePackagesList.begin(); i != remotePackagesList.end(); i++) {
-					string input = *i;
-					if ( input.size() < 33) {
-						continue;
+			if ( ! MD5SUMfound ) {
+				downloadFilesList.push_back(downloadFile);
+			}
+		}
+		if ( downloadFilesList.size() > 0 ) {
+			FileDownload FD(downloadFilesList,false);
+		}
+		downloadFilesList.clear();
+		/*
+		*  From here on we should have all the MD5SUM files
+		* We want to download the info file, let's check what's available in every folder by
+		* parsing the MD5SUM file
+		*/
+		for (set<string>::const_iterator ri = localPackagesList.begin(); ri != localPackagesList.end(); ri++) {
+			string localPackageDirectory = *ri;
+			string MD5SUMFile = categoryDir+localPackageDirectory + "/" + m_repoFile;
+			string packageName = *ri;
+			string::size_type pos = localPackageDirectory.find('@');
+			
+			if ( pos != std::string::npos) {
+				packageName = localPackageDirectory.substr(0,pos);
+			}
+			set<string> MD5SUMFileContent;
+			if ( parseFile(MD5SUMFileContent,MD5SUMFile.c_str()) != 0) {
+				m_actualError = CANNOT_READ_FILE;
+				treatErrors(MD5SUMFile);
+			}
+			for (set<string>::const_iterator i = MD5SUMFileContent.begin();i!=MD5SUMFileContent.end();++i) {
+				string input = *i;
+				if (input.size() < 33)
+					continue;
+				if (input.substr(33) == packageName + ".info" ) {
+					downloadFile.url = url + "/" + localPackageDirectory +"/"+ packageName + ".info";
+					downloadFile.dirname = categoryDir + localPackageDirectory +"/";
+					downloadFile.filename = packageName + ".info";
+					downloadFile.md5sum = input.substr(0,32);
+					if (! checkFileExist(downloadFile.dirname + downloadFile.filename)) {
+						downloadFilesList.push_back(downloadFile);
 					}
-					string dir  = input.substr(33);
-					string MD5File = prtDir + "/" + dir + "/" + m_repoFile;
-					string::size_type pos = input.find('@');
-					if (pos != std::string::npos) {
-						string depFile = input.substr(33,pos - 33) + ".deps";
-						string destinationFile = prtDir + "/" + dir + "/" + depFile;
-						/* If deps file is allready download, we check if it is Up to date */
-						if ( checkFileExist(destinationFile) ) {
-							set<string> filesList;
-							string MD5FIle = prtDir + "/" + dir + "/" + m_repoFile;
-							if ( parseFile(filesList,MD5FIle.c_str()) != 0) {
-								m_actualError = CANNOT_READ_FILE;
-								treatErrors(MD5FIle);
-							}
-							for (set<string>::const_iterator iF = filesList.begin(); iF != filesList.end(); iF++) {
-								string input = *iF;
-								if ( (input.size() < 10 ) || ( input[10] == ':') ) {
-									continue; // The first line starting with a 10 digit epoc time in case binaries exists
-								}
-								string file  = input.substr(33);
-								string MD5S = input.substr(0,32);
-								if ( file == depFile ) {
-									if (! checkMD5sum(destinationFile.c_str(),MD5S.c_str())) {
-										cout << "f: " << destinationFile << endl;
-										FileDownload DepsPort(remoteUrl + "/" + dir  + "/" + depFile,
-											prtDir + "/" + dir,
-											depFile,
-											false);
-										if ( DepsPort.downloadFile() != 0) {
-											m_actualError = CANNOT_DOWNLOAD_FILE;
-											treatErrors(destinationFile);
-										}
-										break;
-									}
-								}
-							}
-						} else { /* If deps file is not present download it */
-							if (parseFile(remoteFilesList, MD5File.c_str()) != 0 ) {
-								m_actualError = CANNOT_READ_FILE;
-								treatErrors(MD5File);
-							}
-							bool found = false;
-							for (set<string>::const_iterator i = remoteFilesList.begin(); i != remoteFilesList.end(); i++) {
-								string input = *i;
-								if ((input.size() < 10 ) || ( input[10] == ':')) {
-									continue; // The first line is starting with a 10 digit epoc time in case binaries exists
-								}
-								if ( input.substr(33) == depFile ) {
-									found = true;
-									cout << "f: " << destinationFile << endl;
-									FileDownload DepsPort(remoteUrl + "/" + dir  + "/" + depFile,
-										prtDir + "/" + dir,
-										depFile,
-										false);
-									if ( DepsPort.downloadFile() != 0) {
-										m_actualError = CANNOT_DOWNLOAD_FILE;
-										treatErrors(prtDir + "/" + dir + "/" + depFile);
-									}
-									break;
-								} 
-							}
-							if ( found == false ) {
-								depFile = input.substr(33,pos - 33) + ".run";
-								for (set<string>::const_iterator i = remoteFilesList.begin(); i != remoteFilesList.end(); i++) {
-									string input = *i;
-									if ( (input.size() < 10 ) || ( input[10] == ':') ){
-										continue; // The first line is starting with a 10 digit epoc time in case binaries exists
-									}
-									if ( input.substr(33) == depFile ) {
-										destinationFile = prtDir + "/" + dir + "/" + depFile;
-										cout << "f: " << destinationFile << endl;
-										FileDownload DepsPort(remoteUrl + "/" + dir  + "/" + depFile,
-											prtDir + "/" + dir,
-											depFile,
-											false);
-										if ( DepsPort.downloadFile() != 0) {
-											m_actualError = CANNOT_DOWNLOAD_FILE;
-											treatErrors(prtDir + "/" + dir + "/" + depFile);
-										}
-										break;
-									}
-								}
-							}
+				}
+				if (m_argParser.isSet(CardsArgumentParser::OPT_DEPENDENCIES)) {
+					if (input.substr(33) == packageName + ".deps" ) {
+						downloadFile.url = url + "/" + localPackageDirectory +"/"+ packageName + ".deps";
+						downloadFile.dirname = categoryDir + localPackageDirectory +"/";
+						downloadFile.filename = packageName + ".deps";
+						downloadFile.md5sum = input.substr(0,32);
+						if (! checkFileExist(downloadFile.dirname + downloadFile.filename)) {
+							downloadFilesList.push_back(downloadFile);
+						}
+					}
+					if (input.substr(33) == packageName + ".run" ) {
+						downloadFile.url = url + "/" + localPackageDirectory +"/"+ packageName + ".run";
+						downloadFile.dirname = categoryDir + localPackageDirectory +"/";
+						downloadFile.filename = packageName + ".run";
+						downloadFile.md5sum = input.substr(0,32);
+						if (! checkFileExist(downloadFile.dirname + downloadFile.filename)) {
+							downloadFilesList.push_back(downloadFile);
 						}
 					}
 				}
 			}
+		}
+		if ( downloadFilesList.size() > 0 ) {
+			FileDownload FD(downloadFilesList,false);
 		}
 	}
-	return 0;	
+}
+void CardsSync::deleteFolder(const string& folderName)
+{
+	set<string> filesToDelete;
+	if ( findFile(filesToDelete, folderName) != 0 ){
+			m_actualError = CANNOT_READ_FILE;
+			treatErrors(folderName);
+	}
+	for (set<string>::const_iterator f = filesToDelete.begin(); f != filesToDelete.end(); f++) {
+		string fileName = folderName + "/" + *f;
+		cout << "Deleting " << fileName << endl; 
+		removeFile("/",fileName);
+	}
+		cout << "Deleting " << folderName << endl;
+		removeFile("/",folderName);
 }
 // vim:set ts=2 :
