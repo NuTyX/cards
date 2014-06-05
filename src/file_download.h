@@ -59,7 +59,6 @@ class FileDownload
 		double lastruntime;
 		CURL *curl;
 	};
-	std::vector<InfoFile> m_destinationFiles;
 	void updateProgress();
 
 	CURL* curl;

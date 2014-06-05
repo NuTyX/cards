@@ -155,6 +155,12 @@ void CardsSync::run()
 				deleteFolder(categoryDir + localPackageDirectory);
 			}
 		}
+		localPackagesList.clear();
+		// We check again the local one because some are delete maybe
+		if ( findFile( localPackagesList, categoryDir) != 0 ) {
+			m_actualError = CANNOT_READ_DIRECTORY;
+			treatErrors(categoryDir);
+		}
 		vector<InfoFile> downloadFilesList;
 		// Checking for new ports
 		for (set<string>::const_iterator ri = remotePackagesList.begin(); ri != remotePackagesList.end(); ri++) {
@@ -169,9 +175,13 @@ void CardsSync::run()
 			for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
 				localPackageDirectory = *li + "/";
 				if ( remotePackageDirectory == localPackageDirectory ) {
+					string downloadFileName = downloadFile.dirname + m_repoFile;
 					if ( checkFileExist(downloadFile.dirname + m_repoFile)) {
-						MD5SUMfound = true;
-						break;
+						// is it still uptodate
+						if ( checkMD5sum(downloadFileName.c_str(),downloadFile.md5sum.c_str() ) ) {
+							MD5SUMfound = true;
+							break;
+						}
 					}
 				}
 			}
@@ -206,33 +216,38 @@ void CardsSync::run()
 				string input = *i;
 				if (input.size() < 33)
 					continue;
+				downloadFile.dirname = categoryDir + localPackageDirectory +"/";
+				downloadFile.md5sum = input.substr(0,32);
 				if (input.substr(33) == packageName + ".info" ) {
 					downloadFile.url = url + "/" + localPackageDirectory +"/"+ packageName + ".info";
-					downloadFile.dirname = categoryDir + localPackageDirectory +"/";
 					downloadFile.filename = packageName + ".info";
-					downloadFile.md5sum = input.substr(0,32);
+					string downloadFileName = downloadFile.dirname + packageName + ".info";
 					if (! checkFileExist(downloadFile.dirname + downloadFile.filename)) {
+						downloadFilesList.push_back(downloadFile);
+					} else if ( ! checkMD5sum(downloadFileName.c_str(),downloadFile.md5sum.c_str()) ) {
 						downloadFilesList.push_back(downloadFile);
 					}
 				}
 				if (m_argParser.isSet(CardsArgumentParser::OPT_DEPENDENCIES)) {
 					if (input.substr(33) == packageName + ".deps" ) {
 						downloadFile.url = url + "/" + localPackageDirectory +"/"+ packageName + ".deps";
-						downloadFile.dirname = categoryDir + localPackageDirectory +"/";
 						downloadFile.filename = packageName + ".deps";
-						downloadFile.md5sum = input.substr(0,32);
+						string downloadFileName = downloadFile.dirname + packageName + ".deps";
 						if (! checkFileExist(downloadFile.dirname + downloadFile.filename)) {
+							downloadFilesList.push_back(downloadFile);
+						} else if ( ! checkMD5sum(downloadFileName.c_str(),downloadFile.md5sum.c_str()) ) {
 							downloadFilesList.push_back(downloadFile);
 						}
 					}
 					if (input.substr(33) == packageName + ".run" ) {
 						downloadFile.url = url + "/" + localPackageDirectory +"/"+ packageName + ".run";
-						downloadFile.dirname = categoryDir + localPackageDirectory +"/";
 						downloadFile.filename = packageName + ".run";
-						downloadFile.md5sum = input.substr(0,32);
+						string downloadFileName = downloadFile.dirname + packageName + ".run";
 						if (! checkFileExist(downloadFile.dirname + downloadFile.filename)) {
 							downloadFilesList.push_back(downloadFile);
-						}
+						} else if ( ! checkMD5sum(downloadFileName.c_str(),downloadFile.md5sum.c_str()) ) {
+							downloadFilesList.push_back(downloadFile);
+						} 
 					}
 				}
 			}
