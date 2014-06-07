@@ -87,10 +87,7 @@ int cards_install(const char* packageName)
 
 	if (! checkFileExist("MD5SUM") ) {
 		FileDownload md5sumFile(url+"MD5SUM","./","MD5SUM",false);
-		if (md5sumFile.downloadFile() != 0 ) {
-			cerr << "MD5SUM not exist" << endl;
-			return -1;
-		}
+		md5sumFile.downloadFile();
 	}
 	if ( readFile ( packageFilesList,"MD5SUM" ) != 0 ) {
 		cerr << "Error while reading MD5SUM file" << endl;
@@ -108,10 +105,7 @@ int cards_install(const char* packageName)
 			if (!checkFileExist(file)) {
 				cout << "Downloading "<<  file << "..." << endl;
 				FileDownload packageArchive(url+file,"./",file,md5S,true);
-				if (packageArchive.downloadFile() != 0 ) {
-					cerr << "Failed to download " + file << endl;
-					return -1;
-				}
+				packageArchive.downloadFile();
 			}
 			Pkgadd * pkgToAdd = new Pkgadd;
 			itemList * commandList = initItemList();

@@ -37,7 +37,6 @@
 using namespace std;
 
 const string CardsSync::DEFAULT_REPOFILE = "MD5SUM";
-const int CardsSync::DEFAULT_TIMEOUT = 60;
 
 CardsSync::CardsSync (const CardsArgumentParser& argParser)
 	: m_argParser(argParser)
@@ -81,6 +80,24 @@ void CardsSync::treatErrors(const string& s) const
 			break;
 	}
 }
+unsigned int CardsSync::getLocalPackages(const string& path)
+{
+	m_localPackagesList.clear();
+	if ( findFile( m_localPackagesList, path) != 0 ) {
+		m_actualError = CANNOT_READ_DIRECTORY;
+		treatErrors(path);
+	}
+	return m_localPackagesList.size();
+}
+unsigned int CardsSync::getRemotePackages(const string& md5sumFile)
+{
+	m_remotePackagesList.clear();
+	if ( parseFile(m_remotePackagesList,md5sumFile.c_str()) != 0) {
+		m_actualError = CANNOT_READ_FILE;
+		treatErrors(md5sumFile);
+	}
+	return m_remotePackagesList.size();
+}
 void CardsSync::run()
 {
 	if (getuid()) {
@@ -92,7 +109,7 @@ void CardsSync::run()
 	InfoFile downloadFile;
 	string localPackageDirectory,remotePackageDirectory ;
 
-	for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+	for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
 		string val = *i ;
 		string categoryDir, url ;
 		string::size_type pos = val.find('|');
@@ -104,37 +121,26 @@ void CardsSync::run()
 		}
 		string category = basename(const_cast<char*>(categoryDir.c_str()));
 		string categoryMD5sumFile = categoryDir + "/" + m_repoFile ;
-		cout << "Synchronising " << categoryDir << " from " << url << endl;
+		cout << "Synchronizing " << categoryDir << " from " << url << endl;
 		categoryDir = categoryDir + "/";
 		// Get the MD5SUM file of the category
 		FileDownload MD5Sum(url + "/" + m_repoFile,
 			categoryDir,
 			m_repoFile, false);
-		if ( MD5Sum.downloadFile () != 0) {
-			m_actualError = CANNOT_DOWNLOAD_FILE;
-			treatErrors(url + "/" + m_repoFile);
-		}
-		set<string> remotePackagesList;	
+		MD5Sum.downloadFile();
 		// We read the category MD5SUM file
-		if ( parseFile(remotePackagesList,categoryMD5sumFile.c_str()) != 0) {
-			m_actualError = CANNOT_READ_FILE;
-			treatErrors(categoryMD5sumFile);
-		}
+		getRemotePackages(categoryMD5sumFile);
 		// and need to remove it
 		remove(categoryMD5sumFile.c_str());
-		if ( remotePackagesList.size() == 0 ) {
+		if ( m_remotePackagesList.size() == 0 ) {
 			cout << "no ports founds ..." << endl;
 			continue;
 		}
-		set<string> localPackagesList;
 		// Check what we have so far
-		if ( findFile( localPackagesList, categoryDir) != 0 ) {
-			m_actualError = CANNOT_READ_DIRECTORY;
-			treatErrors(categoryDir);
-		}
-		for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
+		getLocalPackages(categoryDir);
+		for (set<string>::const_iterator li = m_localPackagesList.begin(); li != m_localPackagesList.end(); ++li) {
 			bool found = false;
-			for (set<string>::const_iterator ri = remotePackagesList.begin(); ri != remotePackagesList.end(); ri++) {
+			for (set<string>::const_iterator ri = m_remotePackagesList.begin(); ri != m_remotePackagesList.end(); ++ri) {
 				localPackageDirectory = *li;
 				remotePackageDirectory = *ri;
 				if ( remotePackageDirectory.size() < 34 ) {
@@ -155,15 +161,12 @@ void CardsSync::run()
 				deleteFolder(categoryDir + localPackageDirectory);
 			}
 		}
-		localPackagesList.clear();
+
 		// We check again the local one because some are delete maybe
-		if ( findFile( localPackagesList, categoryDir) != 0 ) {
-			m_actualError = CANNOT_READ_DIRECTORY;
-			treatErrors(categoryDir);
-		}
+		getLocalPackages(categoryDir);		
 		vector<InfoFile> downloadFilesList;
 		// Checking for new ports
-		for (set<string>::const_iterator ri = remotePackagesList.begin(); ri != remotePackagesList.end(); ri++) {
+		for (set<string>::const_iterator ri = m_remotePackagesList.begin(); ri != m_remotePackagesList.end(); ++ri) {
 			string remotePackageMD5SUMDirectory = *ri;
 			remotePackageDirectory = remotePackageMD5SUMDirectory.substr(33) + "/";
 			downloadFile.url = url + "/" + remotePackageDirectory + m_repoFile;
@@ -172,7 +175,7 @@ void CardsSync::run()
 			downloadFile.md5sum = remotePackageMD5SUMDirectory.substr(0,32);
 			bool MD5SUMfound = false;
 			
-			for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
+			for (set<string>::const_iterator li = m_localPackagesList.begin(); li != m_localPackagesList.end(); ++li) {
 				localPackageDirectory = *li + "/";
 				if ( remotePackageDirectory == localPackageDirectory ) {
 					string downloadFileName = downloadFile.dirname + m_repoFile;
@@ -191,14 +194,16 @@ void CardsSync::run()
 		}
 		if ( downloadFilesList.size() > 0 ) {
 			FileDownload FD(downloadFilesList,false);
-		}
+		}		
+		// We check again the local one because maybe they was no one
+		getLocalPackages(categoryDir);	
 		downloadFilesList.clear();
 		/*
-		*  From here on we should have all the MD5SUM files
-		* We want to download the info file, let's check what's available in every folder by
+		*  From here on we should have all the MD5SUM files, by default if no parameters are given
+		* We just want to download the info file, let's check what's available in every folder by
 		* parsing the MD5SUM file
 		*/
-		for (set<string>::const_iterator ri = localPackagesList.begin(); ri != localPackagesList.end(); ri++) {
+		for (set<string>::const_iterator ri = m_localPackagesList.begin(); ri != m_localPackagesList.end(); ++ri) {
 			string localPackageDirectory = *ri;
 			string MD5SUMFile = categoryDir+localPackageDirectory + "/" + m_repoFile;
 			string packageName = *ri;
@@ -212,10 +217,19 @@ void CardsSync::run()
 				m_actualError = CANNOT_READ_FILE;
 				treatErrors(MD5SUMFile);
 			}
-			for (set<string>::const_iterator i = MD5SUMFileContent.begin();i!=MD5SUMFileContent.end();++i) {
+			for (set<string>::const_iterator i = MD5SUMFileContent.begin(); i != MD5SUMFileContent.end(); ++i) {
 				string input = *i;
-				if (input.size() < 33)
+				/* 
+					By default we dont want to know about version and extension of the binary,
+					if the size of the line is small then 32 + 1 caracters, it's the firt line.
+					Let's skip it
+				*/
+				if (input.size() < 11)
 					continue;
+
+				if (input[10] == ':')
+					continue;
+
 				downloadFile.dirname = categoryDir + localPackageDirectory +"/";
 				downloadFile.md5sum = input.substr(0,32);
 				if (input.substr(33) == packageName + ".info" ) {
@@ -228,32 +242,116 @@ void CardsSync::run()
 						downloadFilesList.push_back(downloadFile);
 					}
 				}
-				if (m_argParser.isSet(CardsArgumentParser::OPT_DEPENDENCIES)) {
-					if (input.substr(33) == packageName + ".deps" ) {
-						downloadFile.url = url + "/" + localPackageDirectory +"/"+ packageName + ".deps";
-						downloadFile.filename = packageName + ".deps";
-						string downloadFileName = downloadFile.dirname + packageName + ".deps";
+			}
+		}
+		if ( (m_argParser.isSet(CardsArgumentParser::OPT_PACKAGEFILES)) || 
+			(m_argParser.isSet(CardsArgumentParser::OPT_SYNCALL)) ) {
+			/*
+				If pkgfile is pass as option, we want to download everything
+				concerning the build of a package. Download everything except
+				the binaries
+			*/	
+			for (set<string>::const_iterator ri = m_localPackagesList.begin(); ri != m_localPackagesList.end(); ++ri) {
+				string localPackageDirectory = *ri;
+				string MD5SUMFile = categoryDir+localPackageDirectory + "/" + m_repoFile;
+				string packageName = *ri;
+				string::size_type pos = localPackageDirectory.find('@');
+				if ( pos != std::string::npos) {
+					packageName = localPackageDirectory.substr(0,pos);
+				}
+				set<string> MD5SUMFileContent;
+				if ( parseFile(MD5SUMFileContent,MD5SUMFile.c_str()) != 0) {
+					m_actualError = CANNOT_READ_FILE;
+					treatErrors(MD5SUMFile);
+				}
+				for (set<string>::const_iterator i = MD5SUMFileContent.begin(); i != MD5SUMFileContent.end(); ++i) {
+					string input = *i;
+					if (input.size() < 11)
+						continue;
+					if (input[10] == ':' ) {
+						continue;
+					}
+					downloadFile.dirname = categoryDir + localPackageDirectory +"/";
+					downloadFile.md5sum = input.substr(0,32);
+
+					string fileName = input.substr(33);
+					/*
+						If they is no extra separate column it's no a binary so
+						if not present or wrong MD5SUM, we get it.
+					*/
+					string::size_type pos = fileName.find(':');
+					if ( pos == std::string::npos) {
+						downloadFile.url = url + "/" + localPackageDirectory + "/" + fileName;
+						downloadFile.filename = fileName;
+						string downloadFileName = downloadFile.dirname + fileName;
 						if (! checkFileExist(downloadFile.dirname + downloadFile.filename)) {
 							downloadFilesList.push_back(downloadFile);
 						} else if ( ! checkMD5sum(downloadFileName.c_str(),downloadFile.md5sum.c_str()) ) {
 							downloadFilesList.push_back(downloadFile);
 						}
 					}
-					if (input.substr(33) == packageName + ".run" ) {
-						downloadFile.url = url + "/" + localPackageDirectory +"/"+ packageName + ".run";
-						downloadFile.filename = packageName + ".run";
-						string downloadFileName = downloadFile.dirname + packageName + ".run";
-						if (! checkFileExist(downloadFile.dirname + downloadFile.filename)) {
-							downloadFilesList.push_back(downloadFile);
-						} else if ( ! checkMD5sum(downloadFileName.c_str(),downloadFile.md5sum.c_str()) ) {
-							downloadFilesList.push_back(downloadFile);
-						} 
-					}
 				}
 			}
 		}
 		if ( downloadFilesList.size() > 0 ) {
 			FileDownload FD(downloadFilesList,false);
+		}
+		downloadFilesList.clear();
+		if (m_argParser.isSet(CardsArgumentParser::OPT_SYNCALL)) {
+			/*
+				If all is pass we want to download the binaries as well
+			*/
+			for (set<string>::const_iterator ri = m_localPackagesList.begin(); ri != m_localPackagesList.end(); ++ri) {
+				bool found = false;
+				string localPackageDirectory = *ri;
+				string MD5SUMFile = categoryDir+localPackageDirectory + "/" + m_repoFile;
+				string packageName = *ri;
+				string::size_type pos = localPackageDirectory.find('@');
+				if ( pos != std::string::npos) {
+					packageName = localPackageDirectory.substr(0,pos);
+				}
+				set<string> MD5SUMFileContent;
+				if ( parseFile(MD5SUMFileContent,MD5SUMFile.c_str()) != 0) {
+					m_actualError = CANNOT_READ_FILE;
+					treatErrors(MD5SUMFile);
+				}
+				string packageExtension = "";
+				string packageBuildDate = "";
+				for (set<string>::const_iterator i = MD5SUMFileContent.begin();i != MD5SUMFileContent.end(); ++i) {
+					string input = *i;
+					if (input.size() < 11)
+						continue;
+					if (input[10] == ':' ) {
+						packageExtension = input.substr(11,input.size());
+						packageBuildDate = input.substr(0,10);
+						found = true;
+						continue;
+					}
+					if (found) {	// This port have binaries available
+						downloadFile.dirname = categoryDir + localPackageDirectory +"/";
+						downloadFile.md5sum = input.substr(0,32);
+						string fileName = input.substr(33);
+						string::size_type pos = fileName.find(':');
+						if ( pos != std::string::npos) {
+							string fileName = input.substr(33,pos) +
+								packageBuildDate +
+								input.substr(34+pos) +
+								packageExtension;
+							downloadFile.url = url + "/" + localPackageDirectory + "/" + fileName;
+							downloadFile.filename = fileName;
+							string downloadFileName = downloadFile.dirname + fileName;
+							if (! checkFileExist(downloadFile.dirname + downloadFile.filename)) {
+								downloadFilesList.push_back(downloadFile);
+							} else if ( ! checkMD5sum(downloadFileName.c_str(),downloadFile.md5sum.c_str()) ) {
+									downloadFilesList.push_back(downloadFile);
+							}
+						}
+					}
+				}
+			}
+			if ( downloadFilesList.size() > 0 ) {
+				FileDownload FD(downloadFilesList,true);
+			}
 		}
 	}
 }

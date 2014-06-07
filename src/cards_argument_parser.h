@@ -48,7 +48,8 @@ class CardsArgumentParser : public ArgParser
 
 		static ArgParser::APOpt OPT_HELP;
 		static ArgParser::APOpt OPT_REMOVE_PACKAGES;
-		static ArgParser::APOpt OPT_DEPENDENCIES;
+		static ArgParser::APOpt OPT_PACKAGEFILES;
+		static ArgParser::APOpt OPT_SYNCALL;
 		static ArgParser::APOpt OPT_SHOW_ALL_DEPENDENCIES;
 		static ArgParser::APOpt OPT_LEVEL_SILENCE;
 

@@ -26,13 +26,13 @@
 FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
-	curl = curl_easy_init();
-	if (! curl)
+	m_curl = curl_easy_init();
+	if (! m_curl)
 		throw runtime_error ("Curl error");
 	if ( progress ) {
-		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 0L);
 	} else {
-		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
 	for (std::vector<InfoFile>::const_iterator i = downloadFiles.begin(); i != downloadFiles.end();++i)
 	{
@@ -43,10 +43,10 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 		m_MD5Sum = i->md5sum;
 		createRecursiveDirs(i->dirname);
 		initFileToDownload(m_url,m_downloadFileName);
-		if ( downloadFile() != CURLE_OK )
-			throw runtime_error ("download failed");
+
+		downloadFile();	
 		if ( ! checkMD5sum() )
-			throw runtime_error (m_downloadFileName + ": checksum error");
+			throw runtime_error (m_downloadFileName + " " + m_MD5Sum +": checksum error");
 		cout << m_downloadFileName << endl;
 	}
 }
@@ -61,17 +61,17 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 	: m_url(url),m_downloadFileName(dirName+"/"+fileName)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
-	curl = curl_easy_init();
-	if (! curl)
+	m_curl = curl_easy_init();
+	if (! m_curl)
 		throw runtime_error ("Curl error");
 
 	createRecursiveDirs(dirName);
 
 	initFileToDownload(m_url, m_downloadFileName);
 	if ( progress ) {
-		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 0L);
 	} else {
-		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
 }
 
@@ -86,46 +86,52 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
   : m_url(url),m_downloadFileName(dirName+"/"+fileName),m_MD5Sum(MD5Sum)
 {
   curl_global_init(CURL_GLOBAL_ALL);
-  curl = curl_easy_init();
-  if (! curl)
+  m_curl = curl_easy_init();
+  if (! m_curl)
     throw runtime_error ("Curl error");
 
 	createRecursiveDirs(dirName);
 
   initFileToDownload(m_url, m_downloadFileName);
 	if ( progress ) {
-  	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+  	curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 0L);
 	} else {
-		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
 }
 
-int FileDownload::downloadFile()
+void FileDownload::downloadFile()
 {
-	int result;
 	m_downloadProgress.lastruntime = 0;
-	m_downloadProgress.curl = curl;
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &FileDownload::writeToStreamHandle);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &m_destinationFile);
-	curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, &FileDownload::updateProgressHandle);
-	curl_easy_setopt(curl, CURLOPT_URL,m_url.c_str());
-	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION,1L);
-	curl_easy_setopt(curl, CURLOPT_FAILONERROR,1L);
-	curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, &m_downloadProgress);
-	curl_easy_setopt(curl, CURLOPT_FILETIME,1L);
+	m_downloadProgress.curl = m_curl;
+	
+	curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, &FileDownload::writeToStreamHandle);
+	curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &m_destinationFile);
+	curl_easy_setopt(m_curl, CURLOPT_PROGRESSFUNCTION, &FileDownload::updateProgressHandle);
+	curl_easy_setopt(m_curl, CURLOPT_URL,m_url.c_str());
+	curl_easy_setopt(m_curl, CURLOPT_FOLLOWLOCATION,1L);
+	curl_easy_setopt(m_curl, CURLOPT_FAILONERROR,1L);
+	curl_easy_setopt(m_curl, CURLOPT_PROGRESSDATA, &m_downloadProgress);
+	curl_easy_setopt(m_curl, CURLOPT_FILETIME,1L);
 #ifndef NDEBUG
-	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+	curl_easy_setopt(m_curl, CURLOPT_VERBOSE, 1L);
 #endif
-	result=curl_easy_perform(curl);
+	m_curlCode=curl_easy_perform(m_curl);
+	if ( m_curlCode != CURLE_OK) {
+		cerr << curl_easy_strerror(m_curlCode) << endl;		
+		throw runtime_error ( "\n\nURL   : " + 
+		m_url + "\nFILE  : " + 
+		m_downloadFileName + "\nMD5SUM: " + 
+		m_MD5Sum +"\n\n !!! download failed !!! \n");	
+	}
 	if (m_destinationFile.stream) {
 		fclose(m_destinationFile.stream);
 		long int fT = 0;
-		curl_easy_getinfo(curl,CURLINFO_FILETIME,&fT);
+		curl_easy_getinfo(m_curl,CURLINFO_FILETIME,&fT);
 		m_destinationFile.acmodtime.actime = fT;
 		m_destinationFile.acmodtime.modtime = fT;
 		utime ( m_destinationFile.filename.c_str(),&m_destinationFile.acmodtime);
 	}
-	return result;
 }
 
 void FileDownload::initFileToDownload(std::string  _url, std::string  _file)
@@ -135,7 +141,7 @@ void FileDownload::initFileToDownload(std::string  _url, std::string  _file)
   m_destinationFile.filetime = 0;
   m_destinationFile.stream = NULL;
   m_downloadProgress.lastruntime = 0;
-  m_downloadProgress.curl = curl;
+  m_downloadProgress.curl = m_curl;
 }
 
 

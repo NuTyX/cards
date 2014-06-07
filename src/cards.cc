@@ -78,16 +78,16 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
 			cout << "Not yet implemented, be patient" << endl;
-			return 0;
+			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 			cout << "Sorry, this function has to be completly review" << endl;
-			return 0;
+			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 			CardsDepends CD(cardsArgPars);
 			return CD.level();
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPINST) {
 			cout << "Not yet implemented, be patient" << endl;
-			return 0;
+			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			return CD.depends();
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
 			} else {
 				cout << argv[2] << " is not installed" << endl;
 				delete packagesInfo;
-				return 0;
+				return EXIT_SUCCESS;
 			}
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
 			Config config;
@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 			}
 			if (localPackagesList.size() == 0 ) {
 			cout << "You need to cards sync first" << endl;
-			return 0;
+			return EXIT_SUCCESS;
 			} else {
 				string name, version, val;
 				for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
@@ -153,19 +153,19 @@ int main(int argc, char** argv)
 
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) {
 			cout << "Not yet implemented, be patient" << endl;
-			return 0;
+			return EXIT_SUCCESS;
 
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) {
 			cout << "Not yet implemented, be patient" << endl;
-			return 0;
+			return EXIT_SUCCESS;
 
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DSEARCH) {
 			cout << "Not yet implemented, be patient" << endl;
-			return 0;
+			return EXIT_SUCCESS;
 
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_FSEARCH) {
 			cout << "Not yet implemented, be patient" << endl;
-			return 0;
+			return EXIT_SUCCESS;
 		} else {
 		cerr << "Supported commands so far:\n"
 		<< "  sync\n"
@@ -182,7 +182,7 @@ int main(int argc, char** argv)
 			<< " use cards <command> -h " << endl;
 		exit(-1);
 		}
-		return 0;
+		return EXIT_SUCCESS;
 	} catch (runtime_error& e) {
 		
 		cerr << "cards " << VERSION << " "<< command << ": " << e.what() << endl;

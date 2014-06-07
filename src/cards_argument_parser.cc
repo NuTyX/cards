@@ -43,7 +43,8 @@ ArgParser::APCmd CardsArgumentParser::CMD_FSEARCH;
 
 ArgParser::APOpt CardsArgumentParser::OPT_HELP;
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE_PACKAGES;
-ArgParser::APOpt CardsArgumentParser::OPT_DEPENDENCIES;
+ArgParser::APOpt CardsArgumentParser::OPT_PACKAGEFILES;
+ArgParser::APOpt CardsArgumentParser::OPT_SYNCALL;
 ArgParser::APOpt CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES;
 
 CardsArgumentParser::CardsArgumentParser()
@@ -119,9 +120,13 @@ CardsArgumentParser::CardsArgumentParser()
 		'R',
 		"remove the packages founds, use with care.");
 
-	OPT_DEPENDENCIES.init("dependencies",
-		'd',
-		"get dependencies files");
+	OPT_PACKAGEFILES.init("pkgfile",
+		'p',
+		"get the Pkgfile and others to be able to build the package(s)");
+
+	OPT_SYNCALL.init("bin",
+		'b',
+		"get the Pkgfile and others to be able to build the package(s) AND the binaries if they are available");
 
 	OPT_SHOW_ALL_DEPENDENCIES.init("all",
     'a',
@@ -130,8 +135,8 @@ CardsArgumentParser::CardsArgumentParser()
 	addOption(CMD_BASE, OPT_HELP,false);
 	addOption(CMD_BASE, OPT_REMOVE_PACKAGES,false);
 
-	addOption(CMD_SYNC, OPT_DEPENDENCIES, false);
-
+	addOption(CMD_SYNC, OPT_PACKAGEFILES, false);
+	addOption(CMD_SYNC, OPT_SYNCALL, false);
 
 	addOption(CMD_DEPENDS, OPT_SHOW_ALL_DEPENDENCIES, false);
 }

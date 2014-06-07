@@ -42,10 +42,10 @@ class FileDownload
 	~FileDownload()
 	{
 		curl_global_cleanup();
-		curl_easy_cleanup(curl);
+		curl_easy_cleanup(m_curl);
 	}
 	bool checkMD5sum();
-	int downloadFile();
+	void downloadFile();
 
 	private:
 	static int updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
@@ -61,16 +61,14 @@ class FileDownload
 	};
 	void updateProgress();
 
-	CURL* curl;
-	CURLcode result;
-
-	dwlProgress 		m_downloadProgress;
-	InfoFile	m_destinationFile;
-
-	string m_url;
-	string m_downloadFileName;
-	bool m_checkMD5;
-	string m_MD5Sum;
+	CURL*       m_curl;
+	CURLcode    m_curlCode;
+	dwlProgress m_downloadProgress;
+	InfoFile	  m_destinationFile;
+	string      m_url;
+	string      m_downloadFileName;
+	bool        m_checkMD5;
+	string      m_MD5Sum;
 };
 
 #endif /* FILEDOWNLOAD_H */
