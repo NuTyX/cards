@@ -28,11 +28,8 @@
  
 
 dir /var/lib/pkg/saravane/desktop|http://nutyx.meticul.eu/saravane/latest/desktop
-dir /usr/ports/desktop
 dir /var/lib/pkg/saravane/server|http://nutyx.meticul.eu/saravane/latest/server
-dir /usr/ports/server
 dir /var/lib/pkg/saravane/system|http://nutyx.meticul.eu/saravane/latest/system
-dir /usr/ports/system
 
 ##
 ## Cards need to know for which arch default is 64 bits: x86_64

@@ -41,6 +41,7 @@ class FileDownload
 	FileDownload(std::vector<InfoFile> destinationFiles,bool progress);
 	~FileDownload()
 	{
+		curl_slist_free_all(m_slist);
 		curl_global_cleanup();
 		curl_easy_cleanup(m_curl);
 	}
@@ -59,6 +60,7 @@ class FileDownload
 		double lastruntime;
 		CURL *curl;
 	};
+	struct curl_slist *m_slist;
 	void updateProgress();
 
 	CURL*       m_curl;

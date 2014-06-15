@@ -198,9 +198,17 @@ download_file() {
 	fi
 }
 sync_all_files() {
-	local LINE MD5SUM ARCH HEAD DIR FILE URL DEPOT_URL EXT BUILD_DATE
+	local LINE MD5SUM ARCH HEAD DIR FILE URL DEPOT_URL EXT BUILD_DATE TMPMD5
+	TMPMD5="/tmp/.md5"
+	if [ -f $TMPMD5 ]; then
+		rm $TMPMD5
+	fi
 	DIR=`dirname $PWD`
 	DEPOT_URL=`cat $CARDS_CONFFILE|grep ^dir|grep $DIR|cut -d " " -f2|cut -d "|" -f 2|sed "s/ //g"`
+	if [ -z $DEPOT_URL ]; then
+		error "$DIR not found in $CARDS_CONFFILE, cannot synchronise"
+		exit $E_GENERAL
+	fi
 	if [ ! "`type -p curl`" ]; then
 		error "Command 'curl' not found."
 		exit $E_GENERAL
@@ -218,22 +226,22 @@ sync_all_files() {
 			FILE="`echo $LINE|cut -d ":" -f2`"
 			ARCH="`echo $LINE|cut -d ":" -f3`"
 			if [ "$ARCH" != "" ]; then
-				echo "$MD5SUM  ${FILE}${BUILD_DATE}${ARCH}${EXT}" >> .md5
+				echo "$MD5SUM  ${FILE}${BUILD_DATE}${ARCH}${EXT}" >> $TMPMD5
 			else
-				echo  "$MD5SUM  ${FILE}" >> .md5
+				echo  "$MD5SUM  ${FILE}" >> $TMPMD5
 			fi
 		done
-		sed -i "1d" .md5
+		sed -i "1d" $TMPMD5
 	else
-		sed  "s/:/  /" $PKGMK_SIGNATURE > .md5
+		sed  "s/:/  /" $PKGMK_SIGNATURE > $TMPMD5
 	fi
-	for FILE in $(cat .md5|cut -d " " -f 3);do
+	for FILE in $(cat $TMPMD5|cut -d " " -f 3);do
 		if [ ! -f $FILE ];then
 			downloads_file_with_curl $FILE $URL/$FILE
+			grep $FILE $TMPMD5|md5sum -c -|| exit $E_GENERAL
 		fi
-		grep $FILE .md5|md5sum -c -|| exit $E_GENERAL
 	done
-	rm .md5
+	rm $TMPMD5
 }
 download_source() {
 	local FILE LOCAL_FILENAME
@@ -1178,9 +1186,7 @@ main() {
 	fi
 	info  "PKGMK_SYNC_FILES: $PKGMK_SYNC_FILES"
 	if [ "$PKGMK_SYNC_FILES" == "yes" ]; then
-		if [ ! -f $PKGMK_PKGFILE ]; then
-			sync_all_files
-		fi
+		sync_all_files
 	fi
 	if [ ! -f $PKGMK_PKGFILE  ]; then
 		error "File '$PKGMK_PKGFILE' not found."
@@ -1199,15 +1205,15 @@ main() {
 	info "PKGMK_SOURCE_DIR: $PKGMK_SOURCE_DIR"
 
 	if [ "$PKGMK_INSTALL" = "no" ]; then
-		PKGMK_CLEANUP="no"
+		PKGMK_CLEAN="no"
 		PKGMK_KEEP_SOURCES="yes"
-		warning "CLEANUP IGNORED"
+		warning "CLEAN IGNORED"
 		warning "KEEP SOURCES"
 	else
 		info "PKGMK_KEEP_SOURCES: $PKGMK_KEEP_SOURCES"
-		info "PKGMK_CLEANUP: $PKGMK_CLEANUP"
+		info "PKGMK_CLEAN: $PKGMK_CLEAN"
 	fi
-	if [ "$PKGMK_CLEANUP" != "no" ]; then
+	if [ "$PKGMK_CLEAN" != "no" ]; then
 		PKGMK_IGNORE_FOOTPRINT="yes"
 		PKGMK_IGNORE_MD5SUM="yes"
 		warning "FOOTPRINT AND MD5SUM IGNORED"
@@ -1354,7 +1360,7 @@ main() {
 	if [ "$PKGMK_KEEP_SOURCES" != "yes" ]; then
 		remove_source
 	fi
-	if [ "$PKGMK_CLEANUP" != "no" ]; then
+	if [ "$PKGMK_CLEAN" != "no" ]; then
 		clean_up
 		unset TARGETS
 	fi
@@ -1371,6 +1377,7 @@ export LC_ALL=POSIX
 readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
 readonly PKGMK_ROOT="$PWD"
+readonly PKGMK_PACKAGE_DIR="$PWD"
 
 PKGMK_BUILDVER=`date +%s`
 CARDS_CONFFILE="/etc/cards.conf"
@@ -1384,46 +1391,42 @@ PKGMK_PKGFILE="Pkgfile"
 PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 PKGMK_NOSTRIP=".nostrip"
 
-
-PKGMK_SYNC_FILES="yes"
-
-
-PKGMK_SOURCE_MIRRORS=()
-PKGMK_SOURCE_DIR="$PWD"
-
-PKGMK_PACKAGE_DIR="$PWD"
-PKGMK_WORK_DIR="$PWD/work"
-PKGMK_COMPRESSION_MODE="xz"
-PKGMK_COMPRESS_PACKAGE="no"
-PKGMK_CLEANUP="yes"
-PKGMK_IGNORE_FOOTPRINT="yes"
-PKGMK_IGNORE_MD5SUM="yes"
-PKGMK_UPDATE_INDEX="no"
 PKGMK_KEEP_SOURCES="no"
-
-
-PKGMK_GROUPS=(devel man doc service)
+PKGMK_CLEAN="yes"
+PKGMK_SYNC_FILES="no"
 
 PKGMK_LOG_DIR=/var/log/pkgbuild
 
+PKGMK_GROUPS=(devel man doc service)
+
+PKGMK_SOURCE_MIRRORS=()
+PKGMK_SOURCE_DIR="$PWD"
+PKGMK_WORK_DIR="$PWD/work"
+PKGMK_DOWNLOAD="no"
+PKGMK_IGNORE_FOOTPRINT="yes"
+PKGMK_IGNORE_NEW="yes"
+PKGMK_IGNORE_MD5SUM="yes"
+PKGMK_NO_STRIP="no"
+
+PKGMK_COMPRESSION_MODE="xz"
+
+PKGMK_COMPRESS_PACKAGE="no"
+
+PKGMK_UPDATE_INDEX="no"
+
 PKGMK_INSTALL="no"
 PKGMK_RECURSIVE="no"
-PKGMK_DOWNLOAD="no"
+
 PKGMK_DOWNLOAD_ONLY="no"
 PKGMK_EXTRACT_ONLY="no"
 PKGMK_IGNORE_UNPACK="no"
 PKGMK_UP_TO_DATE="no"
 PKGMK_UPDATE_FOOTPRINT="no"
-PKGMK_IGNORE_NEW="yes"
 PKGMK_FORCE="no"
 PKGMK_KEEP_WORK="no"
 
 PKGMK_UPDATE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"
-PKGMK_NO_STRIP="no"
-PKGMK_CLEAN="no"
-
-PKGMK_REPO="PKGDB"
 
 main "$@"
 

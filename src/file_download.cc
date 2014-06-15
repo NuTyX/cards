@@ -34,6 +34,8 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 	} else {
 		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
+	m_slist=NULL;
+	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
 	for (std::vector<InfoFile>::const_iterator i = downloadFiles.begin(); i != downloadFiles.end();++i)
 	{
 		m_url = i->url;
@@ -64,7 +66,8 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 	m_curl = curl_easy_init();
 	if (! m_curl)
 		throw runtime_error ("Curl error");
-
+	m_slist=NULL;
+	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
 	createRecursiveDirs(dirName);
 
 	initFileToDownload(m_url, m_downloadFileName);
@@ -104,7 +107,11 @@ void FileDownload::downloadFile()
 {
 	m_downloadProgress.lastruntime = 0;
 	m_downloadProgress.curl = m_curl;
-	
+	/*
+	TODO May be they is a more efficient way to do that but
+	for the moment we never want to use server side cache
+	*/
+	curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, m_slist);	
 	curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, &FileDownload::writeToStreamHandle);
 	curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &m_destinationFile);
 	curl_easy_setopt(m_curl, CURLOPT_PROGRESSFUNCTION, &FileDownload::updateProgressHandle);

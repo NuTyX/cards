@@ -149,7 +149,7 @@ void Pkgadd::run(int argc, char** argv)
 			progressInfo();
 			process postinstall(SHELL,PKG_POST_INSTALL, 0 );
 			if (postinstall.executeShell()) {
-				exit(EXIT_FAILURE);
+				cerr << "WARNING Run post-install FAILED. continue" << endl;
 			}
 			m_actualAction = PKG_POSTINSTALL_END;
 			progressInfo();
