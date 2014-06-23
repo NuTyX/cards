@@ -227,7 +227,7 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 	itemList *packageFilesList = initItemList();
 
 	bool found = false;
-	if ( (readFile(packageFilesList,fullPathfileName)) != 0 ) {
+	if ( (readFileStripSpace(packageFilesList,fullPathfileName)) != 0 ) {
 		cout << fullPathfileName << " not exist" << endl;
 	} else {
 		char *name = NULL;
@@ -254,7 +254,7 @@ depList *readDependenciesList(itemList *filesList, unsigned int nameIndex)
 	if (found) {
 
 
-		if ( (readFile(nameDeps,fullPathfileName)) != 0 ) {
+		if ( (readFileStripSpace(nameDeps,fullPathfileName)) != 0 ) {
 			cout << name << " not found... " << endl;
 		} else {
 			for (unsigned int i = 0; i < nameDeps->count;i++) {

@@ -96,6 +96,7 @@ void removeFile(const string& basedir, const string& filename);
 int findFile(set<string>& filesList, const string& basedir);
 int findFile(itemList *filenameList, const char *path);
 int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, int spec);
+int readFileStripSpace(itemList *fileContent, const char *fileName);
 int readFile(itemList *fileContent, const char *fileName);
 int parseFile(set<string>& fileContent, const char* fileName);
 int parseFile(vector<string>& fileContent, const char* fileName);

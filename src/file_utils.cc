@@ -303,6 +303,23 @@ int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, i
 	if (dir) closedir(dir);
 	return res ? res : errno ? WALK_BADIO : WALK_OK;
 }
+int readFileStripSpace(itemList* fileContent, const char* fileName)
+{
+	FILE* fp = NULL;
+	if ((fp = openFile (fileName)) == NULL ) {
+		return -1;
+	}
+	char input[1024];
+	while (fgets(input, 1024, fp)) {
+		input[strlen(input)-1] = '\0';
+		string inputS = input;
+		string stripString = stripWhiteSpace(inputS);
+		if (stripString.size() > 0)
+			addItemToItemList(fileContent,stripString.c_str());
+		}
+		fclose(fp);
+		return 0;	
+}
 int readFile(itemList* fileContent, const char* fileName)
 {
 	FILE* fp = NULL;
