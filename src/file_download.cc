@@ -24,6 +24,7 @@
 #include <iterator>
 
 FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
+	: m_progress(progress)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
 	m_curl = curl_easy_init();
@@ -45,11 +46,9 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 		m_MD5Sum = i->md5sum;
 		createRecursiveDirs(i->dirname);
 		initFileToDownload(m_url,m_downloadFileName);
-
 		downloadFile();	
 		if ( ! checkMD5sum() )
 			throw runtime_error (m_downloadFileName + " " + m_MD5Sum +": checksum error");
-		cout << m_downloadFileName << endl;
 	}
 }
 
@@ -60,7 +59,7 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 * progress if true, show what's going on
 */
 FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, bool progress)
-	: m_url(url),m_downloadFileName(dirName+"/"+fileName)
+	: m_url(url),m_downloadFileName(dirName+"/"+fileName),m_progress(progress)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
 	m_curl = curl_easy_init();
@@ -105,6 +104,8 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 
 void FileDownload::downloadFile()
 {
+	if (m_progress)
+		cout << m_downloadFileName << endl ;
 	m_downloadProgress.lastruntime = 0;
 	m_downloadProgress.curl = m_curl;
 	/*
@@ -123,7 +124,9 @@ void FileDownload::downloadFile()
 #ifndef NDEBUG
 	curl_easy_setopt(m_curl, CURLOPT_VERBOSE, 1L);
 #endif
-	m_curlCode=curl_easy_perform(m_curl);
+	m_curlCode = curl_easy_perform(m_curl);
+	if (m_progress)
+		cout << endl;
 	if ( m_curlCode != CURLE_OK) {
 		cerr << curl_easy_strerror(m_curlCode) << endl;		
 		throw runtime_error ( "\n\nURL   : " + 
@@ -172,8 +175,8 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 	double SpeedDownload = 0;
 	curl_easy_getinfo(curl,CURLINFO_SPEED_DOWNLOAD,&SpeedDownload);
 	curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &TotalTime);
-	fprintf(stderr,"\r%d b of %d b - %d b/sec - %d sec remain ",
-	(int)dlnow, (int)dltotal, (int)SpeedDownload, (int)((dltotal - dlnow)/SpeedDownload) );
+	fprintf(stderr,"\r%d Bytes - %d Bytes/Sec - %d%% - %d Sec remain ",
+	(int)dlnow, (int)SpeedDownload, (int)((dlnow/dltotal) * 100 ), (int)((dltotal - dlnow)/SpeedDownload) );
 	
 	return 0;
 }

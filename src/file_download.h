@@ -70,6 +70,7 @@ class FileDownload
 	string      m_url;
 	string      m_downloadFileName;
 	bool        m_checkMD5;
+	bool        m_progress;
 	string      m_MD5Sum;
 };
 

@@ -259,12 +259,12 @@ void CardsSync::run()
 				if ( pos != std::string::npos) {
 					packageName = localPackageDirectory.substr(0,pos);
 				}
-				set<string> MD5SUMFileContent;
+				vector<string> MD5SUMFileContent;
 				if ( parseFile(MD5SUMFileContent,MD5SUMFile.c_str()) != 0) {
 					m_actualError = CANNOT_READ_FILE;
 					treatErrors(MD5SUMFile);
 				}
-				for (set<string>::const_iterator i = MD5SUMFileContent.begin(); i != MD5SUMFileContent.end(); ++i) {
+				for (vector<string>::const_iterator i = MD5SUMFileContent.begin(); i != MD5SUMFileContent.end(); ++i) {
 					string input = *i;
 					if (input.size() < 11)
 						continue;
@@ -310,17 +310,19 @@ void CardsSync::run()
 				if ( pos != std::string::npos) {
 					packageName = localPackageDirectory.substr(0,pos);
 				}
-				set<string> MD5SUMFileContent;
+				vector<string> MD5SUMFileContent;
 				if ( parseFile(MD5SUMFileContent,MD5SUMFile.c_str()) != 0) {
 					m_actualError = CANNOT_READ_FILE;
 					treatErrors(MD5SUMFile);
 				}
 				string packageExtension = "";
 				string packageBuildDate = "";
-				for (set<string>::const_iterator i = MD5SUMFileContent.begin();i != MD5SUMFileContent.end(); ++i) {
+				for (vector<string>::const_iterator i = MD5SUMFileContent.begin();i != MD5SUMFileContent.end(); ++i) {
 					string input = *i;
-					if (input.size() < 11)
+					if (input.size() < 11) {
+						cout << "Wrong Format, field to small: " << input << endl;
 						continue;
+					}
 					if (input[10] == ':' ) {
 						packageExtension = input.substr(11,input.size());
 						packageBuildDate = input.substr(0,10);
