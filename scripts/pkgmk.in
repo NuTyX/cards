@@ -267,10 +267,9 @@ remove_source() {
 	local FILE LOCAL_FILENAME
 	for FILE in ${source[@]}; do
 		LOCAL_FILENAME=`get_filename $FILE`
-		if [  ! "$FILE" == "$LOCAL_FILENAME" ]; then
-			if [ -f $LOCAL_FILENAME ]; then
-				rm -v $LOCAL_FILENAME
-			fi
+		if [ -e $LOCAL_FILENAME ] && [ "$LOCAL_FILENAME" != "$FILE" ]; then
+			info "Removing $LOCAL_FILENAME"
+			rm -f $LOCAL_FILENAME
 		fi
 	done
 }
@@ -679,7 +678,7 @@ add_meta_to_archive() {
 		for rd in `cat $PKGMK_ROOT/${name}.run`; do
 			if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
 				error "Runtime dependencie $rd not found, cannot continue"
-				clean_up
+				clean
 				exit $E_DEPS;
 			fi
 				
@@ -886,31 +885,18 @@ recursive() {
 		fi
 	done
 }
-
 clean() {
-	local FILE LOCAL_FILENAME
-	
-	if [ -f $TARGET ]; then
-		info "Removing $TARGET"
-		rm -f $TARGET
-	fi
-	
-	for FILE in ${source[@]}; do
-		LOCAL_FILENAME=`get_filename $FILE`
-		if [ -e $LOCAL_FILENAME ] && [ "$LOCAL_FILENAME" != "$FILE" ]; then
-			info "Removing $LOCAL_FILENAME"
-			rm -f $LOCAL_FILENAME
-		fi
-	done
-}
-clean_up() {
-	if [ -z $TARGETS ]; then
-		get_package_list
-	fi
+	unset TARGETS
+	get_package_list
 	if [ ! -z $TARGETS ]; then
 		for TARGET in ${TARGETS[@]}; do
-			rm -v $PKGMK_PACKAGE_DIR/$TARGET
+			if [ -f $PKGMK_PACKAGE_DIR/$TARGET ]; then
+				info "Removing $TARGET"
+				rm -f $PKGMK_PACKAGE_DIR/$TARGET
+			fi
 		done
+	else
+		warning "$TARGETS not found"
 	fi	
 	find $PKGMK_ROOT -name "*.md5sum" -exec rm -v {} \; 2> /dev/null
 	find $PKGMK_ROOT -name "*.footprint" -exec rm -v {} \; 2> /dev/null
@@ -1063,8 +1049,8 @@ interrupted() {
 print_help() {
 	echo "usage: `basename $PKGMK_COMMAND` [options]"
 	echo "options:"
-	echo "  -i,   --install             build and install package"
-	echo "  -u,   --upgrade             build and install package (as upgrade)"
+	echo "  -i,   --install             build and install packages"
+	echo "  -u,   --upgrade             build and install packages (as upgrade)"
 	echo "  -r,   --recursive           search for and build packages recursively"
 	echo "  -d,   --download            download missing source file(s)"
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
@@ -1072,14 +1058,14 @@ print_help() {
 	echo "  -utd, --up-to-date          do not build, only check if package is up to date"
 	echo "  -us,  --update-signature    do not build, only update MD5SUM signature file"
 	echo "  -uf,  --update-footprint    update footprint using result from last build"
-	echo "  -if,  --ignore-footprint    build package without checking footprint"
-	echo "  -in,  --ignore-new          build package, ignore new files in a footprint missmatch"
+	echo "  -if,  --ignore-footprint    build packages without checking footprint"
+	echo "  -in,  --ignore-new          build packages, ignore new files in a footprint missmatch"
 	echo "  -um,  --update-md5sum       update md5sum"
-	echo "  -im,  --ignore-md5sum       build package without checking md5sum"
+	echo "  -im,  --ignore-md5sum       build packages without checking md5sum"
 	echo "  -cm,  --check-md5sum        do not build, only check md5sum"
 	echo "  -ns,  --no-strip            do not strip executable binaries or libraries"
-	echo "  -f,   --force               build package even if it appears to be up to date"
-	echo "  -c,   --clean               remove package and downloaded files"
+	echo "  -f,   --force               build packages even if it appears to be up to date"
+	echo "  -co,  --clean-only          do not build, only remove packages and downloaded files, update MD5SUM signature file"
 	echo "  -kw,  --keep-work           keep temporary working directory"
 	echo "  -cf,  --config-file <file>  use alternative configuration file"
 	echo "  -v,   --version             print version and exit "
@@ -1121,8 +1107,8 @@ parse_options() {
 				PKGMK_NO_STRIP="yes" ;;
 			-f|--force)
 				PKGMK_FORCE="yes" ;;
-			-c|--clean)
-				PKGMK_CLEAN="yes" ;;
+			-co|--clean-only)
+				PKGMK_CLEAN_ONLY="yes" ;;
 			-kw|--keep-work)
 				PKGMK_KEEP_WORK="yes" ;;
 			-cf|--config-file)
@@ -1260,8 +1246,10 @@ main() {
 		xz)  export COMPRESSION="-J" ;;
 	esac
 
-	if [ "$PKGMK_CLEAN" = "yes" ]; then
-		clean_up
+	if [ "$PKGMK_CLEAN_ONLY" = "yes" ]; then
+		clean
+		remove_source
+		update_signature
 		exit 0
 	fi
 	if [ "$PKGMK_UPDATE_SIGNATURE" = "yes" ]; then
@@ -1361,7 +1349,7 @@ main() {
 		remove_source
 	fi
 	if [ "$PKGMK_CLEAN" != "no" ]; then
-		clean_up
+		clean
 		unset TARGETS
 	fi
 	if [ "$PKGMK_UPDATE_SIGNATURE" != "no" ];then
