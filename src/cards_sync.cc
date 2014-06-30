@@ -144,11 +144,11 @@ void CardsSync::run()
 				localPackageDirectory = *li;
 				remotePackageDirectory = *ri;
 				if ( remotePackageDirectory.size() < 34 ) {
-					m_actualError = CANNOT_READ_FILE;
+					m_actualError = CANNOT_PARSE_FILE;
 					treatErrors(remotePackageDirectory + "  missing info ...");
 				}
 				if ( remotePackageDirectory[32] != ':' ) {
-					m_actualError = CANNOT_READ_FILE;
+					m_actualError = CANNOT_PARSE_FILE;
 					treatErrors( remotePackageDirectory + " wrong format... ");
 				}
 				// Check if the local Package is still in the depot by comparing the directories

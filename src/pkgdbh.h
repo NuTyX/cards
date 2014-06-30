@@ -135,7 +135,7 @@ protected:
 	string m_utilName;
 	string m_root;
 	string m_build;
-	packages_t m_listOfInstPackages; /* List of Installed packages */
+	packages_t m_listOfInstPackages;
 	set<string> m_packagesList;
 	set<string> m_filesList;
 	set<string> m_runtimeLibrairiesList;

@@ -41,7 +41,8 @@ ArgParser::APCmd CardsArgumentParser::CMD_SEARCH;
 ArgParser::APCmd CardsArgumentParser::CMD_DSEARCH;
 ArgParser::APCmd CardsArgumentParser::CMD_FSEARCH;
 
-ArgParser::APOpt CardsArgumentParser::OPT_HELP;
+ArgParser::APOpt CardsArgumentParser::OPT_BASE_HELP;
+ArgParser::APOpt CardsArgumentParser::OPT_INSTALL_DRY;
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE_PACKAGES;
 ArgParser::APOpt CardsArgumentParser::OPT_PACKAGEFILES;
 ArgParser::APOpt CardsArgumentParser::OPT_SYNCALL;
@@ -77,8 +78,8 @@ CardsArgumentParser::CardsArgumentParser()
 		ArgParser::EQ, 1, "<port>");
 
 	addCommand(CMD_INSTALL, "install",
-		"install ports",
-		 ArgParser::MIN, 1, "<port1 port2 ...>");
+		"install a binary package",
+		ArgParser::MIN, 1, "<package name>");
 
 	addCommand(CMD_LEVEL, "level",
 		"generate all the levels",
@@ -112,9 +113,13 @@ CardsArgumentParser::CardsArgumentParser()
 		"show file names in footprints matching 'pattern'",
 		ArgParser::EQ, 1, "<pattern>");
 
-	OPT_HELP.init("info",
+	OPT_BASE_HELP.init("info",
 		'H',
 		"get some more info on the command");
+
+	OPT_INSTALL_DRY.init("dry",
+		'N',
+		"run the command without installing");
 
 	OPT_REMOVE_PACKAGES.init("remove",
 		'R',
@@ -132,11 +137,15 @@ CardsArgumentParser::CardsArgumentParser()
     'a',
 		"show all the dependencies, included the one allready installed");
 
-	addOption(CMD_BASE, OPT_HELP,false);
+	addOption(CMD_BASE, OPT_BASE_HELP,false);
 	addOption(CMD_BASE, OPT_REMOVE_PACKAGES,false);
 
 	addOption(CMD_SYNC, OPT_PACKAGEFILES, false);
 	addOption(CMD_SYNC, OPT_SYNCALL, false);
+
+	addOption(CMD_INSTALL,OPT_INSTALL_DRY,false);
+
+
 
 	addOption(CMD_DEPENDS, OPT_SHOW_ALL_DEPENDENCIES, false);
 }

@@ -17,22 +17,49 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
-#ifndef CARDS_INSTALL_H
-#define CARDS_INSTALL_H
+#ifndef CARDSINSTALL_H
+#define CARDSINSTALL_H
 
 #include <string>
 #include <list>
-#include <map>
+#include <vector>
+
+#include "file_download.h"
+#include "file_utils.h"
 
 #include <curl/curl.h>
 
+#include "config_parser.h"
 #include "cards_argument_parser.h"
-#include "compile_dependencies_utils.h"
-
-#include "pkgadd.h"
+#include "pkgdbh.h"
 
 
-int cards_install(const char* packageName);
 
+class CardsInstall : public Pkgdbh {
+public:
+	CardsInstall (const CardsArgumentParser& argParser);
+
+	void printDependenciesList();
+	void install();
+
+	virtual void run(int argc, char** argv);
+	virtual void printHelp() const;
+
+private:
+	vector<string> getDirectDependencies();
+	void getSignatures();
+	void getDependencies();
+	bool getPackageFileName();
+
+	string m_packageName;
+	string m_packageFileName;
+	vector<string> m_MD5packagesNameVersionList;
+	vector<string> m_dependenciesList;
+	vector<string> m_packageNameList;
+	Config m_config;
+
+	
+	const CardsArgumentParser& m_argParser;
+};
 #endif
 // vim:set ts=2 :

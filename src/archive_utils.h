@@ -88,12 +88,15 @@ class ArchiveUtils
 	void list();             // list the files to stdio
 	
 
-	unsigned int long size();              // Numbers of files in the archive
-	std::set<std::string> setofFiles(); // return a set of string 
+	unsigned int long size();              	// Numbers of files in the archive
+	std::set<std::string> setofFiles(); 		// return a set of string
+	std::vector<std::string> listofDependencies(); // return a vector of dependencies
 	std::string version();    // return the version of the package
 	std::string description();// return the description	of the package
 	std::string builddate();  // return the date like Mon Mar 24 10:16:00 2014
 	std::string name();				// return the name of the package
+	std::string namebuildn();	// return the name + epochvalue
+	std::string epochBuildDate();		// return the epochvalue in string format
 	time_t buildn();    // return the epoch value
 
 	private:

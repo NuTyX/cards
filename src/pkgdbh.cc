@@ -77,6 +77,9 @@ void Pkgdbh::treatErrors(const string& s) const
 		case CANNOT_READ_FILE:
 			throw runtime_error("could not read " + s);
 			break;
+		case CANNOT_PARSE_FILE:
+			throw runtime_error("could not parse " + s);
+			break;
 		case CANNOT_READ_DIRECTORY:
 			throw RunTimeErrorWithErrno("could not read directory " + s);
 			break;
@@ -157,6 +160,9 @@ void Pkgdbh::treatErrors(const string& s) const
 			break;
 		case NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE:
 			throw runtime_error(s + " is neither an installed package nor a package file");
+			break;
+		case PACKAGE_NOT_FOUND:
+			throw runtime_error(s + " does not exist");
 			break;
 	}
 }

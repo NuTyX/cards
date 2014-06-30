@@ -80,7 +80,13 @@ int main(int argc, char** argv)
 			cout << "Not yet implemented, be patient" << endl;
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
-			cout << "Sorry, this function has to be completly review" << endl;
+			CardsInstall CI(cardsArgPars);
+			CI.run(argc, argv);
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALL_DRY)) {
+				CI.printDependenciesList();
+			} else {
+				CI.install();
+			}
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 			CardsDepends CD(cardsArgPars);

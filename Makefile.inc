@@ -27,7 +27,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.8.85.6
+VERSION = 0.9.80.0
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG

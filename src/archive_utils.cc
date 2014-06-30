@@ -186,6 +186,17 @@ string ArchiveUtils::getPackageName()
 	treatErrors(m_fileName);
 	return "";
 }
+string ArchiveUtils::namebuildn()
+{
+	return getPackageName() + epochBuildDate();
+}
+vector<string> ArchiveUtils::listofDependencies()
+{
+	m_rtDependenciesList.push_back(namebuildn());
+	getRunTimeDependencies();
+
+	return m_rtDependenciesList;
+}
 string ArchiveUtils::name()
 {
 	return m_packageName;
@@ -229,6 +240,18 @@ string ArchiveUtils::builddate()
 	c_time_s = ctime(&ct);
 	string build = c_time_s;
 	return build;
+}
+string ArchiveUtils::epochBuildDate()
+{
+	string epochSVal;
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++ ) {
+		epochSVal = *i;
+		if ( epochSVal[0] == 'B' ) {
+			return epochSVal.substr(1);
+			break;
+		}
+	}
+	return "";
 }
 time_t ArchiveUtils::buildn()
 {

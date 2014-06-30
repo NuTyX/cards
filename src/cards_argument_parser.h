@@ -46,7 +46,8 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_FSEARCH;
 		static ArgParser::APCmd CMD_ISINST;
 
-		static ArgParser::APOpt OPT_HELP;
+		static ArgParser::APOpt OPT_BASE_HELP;
+		static ArgParser::APOpt OPT_INSTALL_DRY;
 		static ArgParser::APOpt OPT_REMOVE_PACKAGES;
 		static ArgParser::APOpt OPT_PACKAGEFILES;
 		static ArgParser::APOpt OPT_SYNCALL;
