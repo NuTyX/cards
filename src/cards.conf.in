@@ -45,9 +45,6 @@ arch #ARCH#
 ##
 
 locale fr
-locale be
-locale de
-
 
 ##
 ## If need to come back to a base system, following folder(s) should contains packages

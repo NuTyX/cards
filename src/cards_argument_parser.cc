@@ -24,12 +24,8 @@ ArgParser::APCmd CardsArgumentParser::CMD_CONFIG;
 ArgParser::APCmd CardsArgumentParser::CMD_BASE;
 ArgParser::APCmd CardsArgumentParser::CMD_SYNC;
 ArgParser::APCmd CardsArgumentParser::CMD_INSTALL;
-ArgParser::APCmd CardsArgumentParser::CMD_DEPINST;
 
 ArgParser::APCmd CardsArgumentParser::CMD_LIST;
-ArgParser::APCmd CardsArgumentParser::CMD_LISTINST;
-ArgParser::APCmd CardsArgumentParser::CMD_ISINST;
-
 ArgParser::APCmd CardsArgumentParser::CMD_INFO;
 
 ArgParser::APCmd CardsArgumentParser::CMD_LEVEL;
@@ -38,11 +34,13 @@ ArgParser::APCmd CardsArgumentParser::CMD_DEPENDS;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPTREE;
 
 ArgParser::APCmd CardsArgumentParser::CMD_SEARCH;
-ArgParser::APCmd CardsArgumentParser::CMD_DSEARCH;
-ArgParser::APCmd CardsArgumentParser::CMD_FSEARCH;
 
 ArgParser::APOpt CardsArgumentParser::OPT_BASE_HELP;
+ArgParser::APOpt CardsArgumentParser::OPT_INSTALL_DEVEL;
 ArgParser::APOpt CardsArgumentParser::OPT_INSTALL_DRY;
+ArgParser::APOpt CardsArgumentParser::OPT_LIST_INSTALL;
+ArgParser::APOpt CardsArgumentParser::OPT_SEARCH_DESCRIPTION;
+ArgParser::APOpt CardsArgumentParser::OPT_SEARCH_FILE;
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE_PACKAGES;
 ArgParser::APOpt CardsArgumentParser::OPT_PACKAGEFILES;
 ArgParser::APOpt CardsArgumentParser::OPT_SYNCALL;
@@ -63,19 +61,12 @@ CardsArgumentParser::CardsArgumentParser()
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_INFO, "info",
-		"show info about a port",
-		ArgParser::EQ, 1 , "<port>");
+		"show info about a package",
+		ArgParser::EQ, 1 , "<package>");
 
 	addCommand(CMD_LIST, "list",
-		"show a list of available ports",
+		"show a list of available packages",
 		ArgParser::NONE, 0 , "");
-
-	addCommand(CMD_LISTINST, "listinst",
-		"show a list of installed ports",
-		ArgParser::NONE, 0 , "");
-	addCommand(CMD_ISINST, "isinst",
-		"print whether port is installed",
-		ArgParser::EQ, 1, "<port>");
 
 	addCommand(CMD_INSTALL, "install",
 		"install a binary package",
@@ -84,10 +75,6 @@ CardsArgumentParser::CardsArgumentParser()
 	addCommand(CMD_LEVEL, "level",
 		"generate all the levels",
 		ArgParser::NONE, 0 , "");
-
-	addCommand(CMD_DEPINST, "depinst",
-		"install ports and their dependencies",
-		ArgParser::MIN, 1, "<port1 port2 ...>"); 
 
 	addCommand(CMD_DIFF, "diff",
 		"list outdated packages (or check args for change)",
@@ -105,13 +92,17 @@ CardsArgumentParser::CardsArgumentParser()
 		"show port names containing 'expr'",
 		ArgParser::EQ, 1, "<expr>");
 
-	addCommand(CMD_DSEARCH, "dsearch",
-		"show ports containing 'expr' in the name or description",
-		ArgParser::EQ, 1, "<expr>");
+	OPT_LIST_INSTALL.init("inst",
+		'i',
+		"show a list of installed ports");
 
-	addCommand(CMD_FSEARCH, "fsearch",
-		"show file names in footprints matching 'pattern'",
-		ArgParser::EQ, 1, "<pattern>");
+	OPT_SEARCH_DESCRIPTION.init("descr",
+		'd',
+		"show ports containing 'expr' in the name or description");
+
+	OPT_SEARCH_FILE.init("file",
+		'f',
+		"show file names in footprints matching 'pattern'");
 
 	OPT_BASE_HELP.init("info",
 		'H',
@@ -120,6 +111,10 @@ CardsArgumentParser::CardsArgumentParser()
 	OPT_INSTALL_DRY.init("dry",
 		'N',
 		"run the command without installing");
+
+	OPT_INSTALL_DEVEL.init("dev",
+		'D',
+		"install the devel subpackages if available");
 
 	OPT_REMOVE_PACKAGES.init("remove",
 		'R',
@@ -143,8 +138,14 @@ CardsArgumentParser::CardsArgumentParser()
 	addOption(CMD_SYNC, OPT_PACKAGEFILES, false);
 	addOption(CMD_SYNC, OPT_SYNCALL, false);
 
-	addOption(CMD_INSTALL,OPT_INSTALL_DRY,false);
+	addOption(CMD_LIST,OPT_LIST_INSTALL, false);
 
+
+	addOption(CMD_SEARCH,OPT_SEARCH_DESCRIPTION, false);
+	addOption(CMD_SEARCH,OPT_SEARCH_FILE,false);
+
+	addOption(CMD_INSTALL,OPT_INSTALL_DRY,false);
+	addOption(CMD_INSTALL,OPT_INSTALL_DEVEL,false);
 
 
 	addOption(CMD_DEPENDS, OPT_SHOW_ALL_DEPENDENCIES, false);

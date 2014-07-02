@@ -91,35 +91,22 @@ int main(int argc, char** argv)
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 			CardsDepends CD(cardsArgPars);
 			return CD.level();
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPINST) {
-			cout << "Not yet implemented, be patient" << endl;
-			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			return CD.depends();
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			return CD.deptree();
-  	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LISTINST) {
-			Pkginfo * packagesInfo =  new Pkginfo;
-			itemList * commandList = initItemList();
-			addItemToItemList(commandList,"pkginfo");
-			addItemToItemList(commandList, "-i");
-			packagesInfo->run(commandList->count,commandList->items);
-			cout << endl << packagesInfo->getNumberOfPackages() << " packages installed" << endl;
-			freeItemList(commandList);
-			delete packagesInfo;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_ISINST) {
-			Pkginfo * packagesInfo =  new Pkginfo;
-			packagesInfo->getNumberOfPackages();
-			if ( packagesInfo->isInstalled(argv[2]) )	{
-				cout << argv[2] << " is installed" << endl;
+  	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_LIST_INSTALL)) {
+				Pkginfo * packagesInfo =  new Pkginfo;
+				itemList * commandList = initItemList();
+				addItemToItemList(commandList,"pkginfo");
+				addItemToItemList(commandList, "-i");
+				packagesInfo->run(commandList->count,commandList->items);
+				cout << endl << packagesInfo->getNumberOfPackages() << " packages installed" << endl;
+				freeItemList(commandList);
 				delete packagesInfo;
-				return 1;
-			} else {
-				cout << argv[2] << " is not installed" << endl;
-				delete packagesInfo;
-				return EXIT_SUCCESS;
 			}
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
 			Config config;
@@ -164,26 +151,13 @@ int main(int argc, char** argv)
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) {
 			cout << "Not yet implemented, be patient" << endl;
 			return EXIT_SUCCESS;
-
-  	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DSEARCH) {
-			cout << "Not yet implemented, be patient" << endl;
-			return EXIT_SUCCESS;
-
-  	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_FSEARCH) {
-			cout << "Not yet implemented, be patient" << endl;
-			return EXIT_SUCCESS;
 		} else {
 		cerr << "Supported commands so far:\n"
 		<< "  sync\n"
 		<< "  install\n"
-		<< "  depinst\n"
-		<< "  isinst\n"
 		<< "  info\n"
 		<< "  list\n"
-		<< "  listinst\n"
 		<< "  search\n"
-		<< "  dsearch\n"
-		<< "  fsearch\n"
 			<< "\n"
 			<< " use cards <command> -h " << endl;
 		exit(-1);

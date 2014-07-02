@@ -73,7 +73,7 @@ conf:
 	sed -e "s/#ARCH#/`uname -m`/" cards.conf.in > cards.conf
 
 pkgadd: .tools_depend $(TOOLSOBJECTS)
-	$(CXX) $(TOOLSOBJECTS) -o $@ $(LDFLAGS)
+	$(CXX) $(TOOLSOBJECTS) -o $@ -static $(LIBARCHIVELIBS) 
 
 cards:  .cards_depend $(CARDSOBJECTS)
 	$(CXX) $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
@@ -98,12 +98,12 @@ endif
 .PHONY:	install clean distclean dist
 
 install: all
-	install -D -m0755 pkgadd $(DESTDIR)$(BINDIR)/pkgadd
+	install -D -m0755 pkgadd $(DESTDIR)$(USRBINDIR)/pkgadd
 	install -D -m0755 cards $(DESTDIR)$(BINDIR)/cards
 	install -D -m0644 pkgadd.conf $(DESTDIR)$(ETCDIR)/pkgadd.conf
 	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf
-	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkgrm
-	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkginfo
+	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkgrm
+	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkginfo
 
 clean:
 	rm -f .tools_depend

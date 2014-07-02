@@ -37,8 +37,8 @@ pkgall: pkgmkall.in
 .PHONY:	install clean distclean dist
 
 install: all
-	install -D -m0755 pkgmk $(DESTDIR)$(BINDIR)/pkgmk
-	install -D -m0755 pkgmkall $(DESTDIR)$(BINDIR)/pkgmkall
+	install -D -m0755 pkgmk $(DESTDIR)$(USRBINDIR)/pkgmk
+	install -D -m0755 pkgmkall $(DESTDIR)$(USRBINDIR)/pkgmkall
 	install -D -m0644 pkgmk.conf $(DESTDIR)$(ETCDIR)/pkgmk.conf
 clean:
 	rm -f pkgmk

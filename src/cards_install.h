@@ -32,7 +32,7 @@
 #include "config_parser.h"
 #include "cards_argument_parser.h"
 #include "pkgdbh.h"
-
+#include "process.h"
 
 
 class CardsInstall : public Pkgdbh {
@@ -47,8 +47,11 @@ public:
 
 private:
 	vector<string> getDirectDependencies();
+	set<string> applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
+	void getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const;
+
 	void getSignatures();
-	void getDependencies();
+	void generateDependencies();
 	bool getPackageFileName();
 
 	string m_packageName;
@@ -60,6 +63,8 @@ private:
 
 	
 	const CardsArgumentParser& m_argParser;
+	// TODO make configurable from the command line
+	const string m_root; // absolute path of installation
 };
 #endif
 // vim:set ts=2 :

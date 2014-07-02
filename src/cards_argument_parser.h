@@ -34,20 +34,20 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_SYNC;
 		static ArgParser::APCmd CMD_INFO;
 		static ArgParser::APCmd CMD_LIST;
-		static ArgParser::APCmd CMD_LISTINST;
 		static ArgParser::APCmd CMD_INSTALL;
-		static ArgParser::APCmd CMD_DEPINST;
 		static ArgParser::APCmd CMD_DIFF;
 		static ArgParser::APCmd CMD_LEVEL;
 		static ArgParser::APCmd CMD_DEPENDS;
 		static ArgParser::APCmd CMD_DEPTREE;
 		static ArgParser::APCmd CMD_SEARCH;
-		static ArgParser::APCmd CMD_DSEARCH;
-		static ArgParser::APCmd CMD_FSEARCH;
 		static ArgParser::APCmd CMD_ISINST;
 
 		static ArgParser::APOpt OPT_BASE_HELP;
+		static ArgParser::APOpt OPT_LIST_INSTALL;
+		static ArgParser::APOpt OPT_SEARCH_FILE;
+		static ArgParser::APOpt OPT_SEARCH_DESCRIPTION;
 		static ArgParser::APOpt OPT_INSTALL_DRY;
+		static ArgParser::APOpt OPT_INSTALL_DEVEL;
 		static ArgParser::APOpt OPT_REMOVE_PACKAGES;
 		static ArgParser::APOpt OPT_PACKAGEFILES;
 		static ArgParser::APOpt OPT_SYNCALL;

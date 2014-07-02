@@ -44,6 +44,9 @@
 #define PKG_POST_INSTALL ".POST"    
 
 #define PKG_REJECTED     "var/lib/pkg/rejected"
+#define PKGADD_CONF      "etc/pkgadd.conf"
+#define PKGADD_CONF_MAXLINE	1024
+
 
 #define LDCONFIG         "/sbin/ldconfig"
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
@@ -87,6 +90,17 @@ struct pkginfo_t {
   };
 typedef map<string, pkginfo_t> packages_t;
 
+enum rule_event_t {
+	UPGRADE,
+	INSTALL
+};
+
+struct rule_t {
+	rule_event_t event;
+	string pattern;
+	bool action;
+};
+
 class Pkgdbh {
 public:
 
@@ -129,12 +143,17 @@ protected:
 	void installArchivePackage(const string& filename, const set<string>& keep_list, const set<string>& non_install_files);
 	void moveMetaFilesPackage(const string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
 	void installArchivePackage_2(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
+
+	void readRulesFile();
+	bool checkRuleAppliesToFile(const rule_t& rule, const string& file);
+
 	void getFootprintPackage(string& filename);
 	void runLdConfig();
 
 	string m_utilName;
 	string m_root;
 	string m_build;
+	vector<rule_t> m_actionRules;
 	packages_t m_listOfInstPackages;
 	set<string> m_packagesList;
 	set<string> m_filesList;

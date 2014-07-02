@@ -845,6 +845,62 @@ void Pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 	}
 	FREE_ARCHIVE(archive);
 }
+void Pkgdbh::readRulesFile()
+{
+	unsigned int linecount = 0;
+	const string filename = m_root + PKGADD_CONF;
+	ifstream in(filename.c_str());
+
+	if (in) {
+		while (!in.eof()) {
+			string line;
+			getline(in, line);
+			linecount++;
+			if (!line.empty() && line[0] != '#') {
+				if (line.length() >= PKGADD_CONF_MAXLINE) {
+					m_actualError = PKGADD_CONFIG_LINE_TOO_LONG;
+					treatErrors(filename + ":" + itos(linecount));
+				}
+				char event[PKGADD_CONF_MAXLINE];
+				char pattern[PKGADD_CONF_MAXLINE];
+				char action[PKGADD_CONF_MAXLINE];
+				char dummy[PKGADD_CONF_MAXLINE];
+				if (sscanf(line.c_str(), "%s %s %s %s", event, pattern, action, dummy) != 3) {
+					m_actualError = PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS;
+					treatErrors(filename + ":" + itos(linecount));
+				}
+				if (!strcmp(event, "UPGRADE") || !strcmp(event, "INSTALL")) {
+					rule_t rule;
+					rule.event = strcmp(event, "UPGRADE") ? INSTALL : UPGRADE;
+					rule.pattern = pattern;
+					if (!strcmp(action, "YES")) {
+						rule.action = true;
+					} else if (!strcmp(action, "NO")) {
+						rule.action = false;
+					} else {
+						m_actualError = PKGADD_CONFIG_UNKNOWN_ACTION;
+						treatErrors(filename + ":" + itos(linecount) + ": '" +
+							string(action));
+					}
+					m_actionRules.push_back(rule);
+				} else {
+					m_actualError = PKGADD_CONFIG_UNKNOWN_EVENT;
+					treatErrors(filename + ":" + itos(linecount) + ": '" +
+						string(event));
+				}
+			}
+		}
+		in.close();
+	}
+#ifndef NDEBUG
+	cerr << "Configuration:" << endl;
+	for (vector<rule_t>::const_iterator j = m_actionRules.begin(); j != m_actionRules.end(); j++) {
+		cerr << "\t" << (*j).pattern << "\t" << (*j).action << endl;
+	}
+	cerr << endl;
+#endif
+}
+
 void Pkgdbh::runLdConfig()
 {
 	// Only execute runLdConfig if /etc/ld.so.conf exists
@@ -853,6 +909,21 @@ void Pkgdbh::runLdConfig()
 		process ldconfig(LDCONFIG, args,0);
 		ldconfig.execute();
 	}
+}
+
+bool Pkgdbh::checkRuleAppliesToFile(const rule_t& rule, const string& file)
+{
+	regex_t preg;
+	bool ret;
+
+	if (regcomp(&preg, rule.pattern.c_str(), REG_EXTENDED | REG_NOSUB)) {
+		m_actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
+		treatErrors(rule.pattern);
+	}
+	ret = !regexec(&preg, file.c_str(), 0, 0, 0);
+	regfree(&preg);
+
+	return ret;
 }
 
 void Pkgdbh::getFootprintPackage(string& filename)

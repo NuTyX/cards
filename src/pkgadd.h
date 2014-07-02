@@ -28,20 +28,6 @@
 #include <vector>
 #include <set>
 
-#define PKGADD_CONF             "/etc/pkgadd.conf"
-#define PKGADD_CONF_MAXLINE     1024
-
-enum rule_event_t {
-	UPGRADE,
-	INSTALL
-};
-
-struct rule_t {
-	rule_event_t event;
-	string pattern;
-	bool action;
-};
-
 class Pkgadd : public Pkgdbh {
 public:
 	Pkgadd() : Pkgdbh("pkgadd") {}
@@ -49,11 +35,9 @@ public:
 	virtual void printHelp() const;
 
 private:
-	vector<rule_t> readRulesFile();
 	set<string> getKeepFileList(const set<string>& files, const vector<rule_t>& rules);
 	set<string> applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
 	void getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const;
-	bool checkRuleAppliesToFile(const rule_t& rule, const string& file);
 };
 
 #endif /* PKGADD_H */

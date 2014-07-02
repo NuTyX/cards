@@ -409,5 +409,4 @@ bool checkMD5sum(const char * fileName, const char * MD5Sum)
   }
   return same;
 }
-
 // vim:set ts=2 :

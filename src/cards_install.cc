@@ -20,7 +20,7 @@
 #include "cards_install.h"
 
 CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
-	: m_argParser(argParser)
+	: m_argParser(argParser), m_root("/")
 {
 }
 void CardsInstall::run(int argc, char** argv)
@@ -32,8 +32,6 @@ void CardsInstall::run(int argc, char** argv)
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
-	getListOfPackages("/"); //TODO need to adjust o_root ...
-	getInstalledPackages(false);
 	string url,categoryDir,categoryMD5sumFile, remotePackageDirectory ;
 	cout << "Synchronizing start ..." << endl;
 	for (vector<string>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
@@ -98,12 +96,12 @@ vector<string> CardsInstall::getDirectDependencies()
 }
 void CardsInstall::printDependenciesList()
 {
-	getDependencies();
+	generateDependencies();
 	for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
 		cout << *it << endl;
 	}
 }
-void CardsInstall::getDependencies()
+void CardsInstall::generateDependencies()
 {
 	vector<string> dependenciesWeMustAdd, 
 		packageDepschecked,
@@ -311,12 +309,119 @@ bool CardsInstall::getPackageFileName()
 }
 void CardsInstall::install()
 {
-	getDependencies();
+	Db_lock lock(m_root, true);
+
+	// Get the list of installed packages
+	getListOfPackages(m_root);
+
+	// Retrieving info about all the packages
+	getInstalledPackages(false);
+
+	// Generate the dependencies
+	generateDependencies();
+
+	// Checking the rules
+	readRulesFile();
+
+	// Lets go
 	for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
-		if	( checkPackageNameExist(*it)) {
+		m_packageName = *it;
+		if ( ! getPackageFileName() ) {
+			m_actualError = PACKAGE_NOT_FOUND;
+			treatErrors(m_packageName);
+		};
+		// Reading the archiving to find a list of files
+		pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
+
+		if  ( checkPackageNameExist(m_packageName)) {
 			cout << *it << " is allready installed, will not be reinstalled" << endl;
 			continue;
 		}
+		set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
+#ifndef NDEBUG
+	cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
+#endif
+		// Run pre-install if exist
+		extractAndRunPREfromPackage(m_packageFileName);
+
+		set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
+
+		if (! conflicting_files.empty()) {
+			copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
+			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
+			treatErrors("listed file(s) already installed, cannot continue... ");
+		}
+
+		set<string> keep_list;
+
+		// Installation progressInfo of the files on the HD
+		installArchivePackage(m_packageName, keep_list, non_install_files);
+
+		// Post install
+		if (checkFileExist(PKG_POST_INSTALL)) {
+			m_actualAction = PKG_POSTINSTALL_START;
+			progressInfo();
+			process postinstall(SHELL,PKG_POST_INSTALL, 0 );
+			if (postinstall.executeShell()) {
+				cerr << "WARNING Run post-install FAILED. continue" << endl;
+			}
+			m_actualAction = PKG_POSTINSTALL_END;
+			progressInfo();
+		}
+		// Add the metadata about the package to the DB
+		moveMetaFilesPackage(package.first,package.second);
+
+		// Add the info about the files to the DB
+		addPackageFilesRefsToDB(package.first, package.second);
+
+		runLdConfig();
+	}
+
+}
+set<string> CardsInstall::applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules)
+{
+	set<string> install_set;
+	set<string> non_install_set;
+	vector<rule_t> found;
+
+	getInstallRulesList(rules, INSTALL, found);
+
+	for (set<string>::const_iterator i = info.files.begin(); i != info.files.end(); i++) {
+		bool install_file = true;
+		for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
+			if (checkRuleAppliesToFile(*j, *i)) {
+				install_file = (*j).action;
+				break;
+			}
+		}
+
+		if (install_file)
+			install_set.insert(install_set.end(), *i);
+		else
+			non_install_set.insert(*i);
+	}
+	info.files.clear();
+	info.files = install_set;
+#ifndef NDEBUG
+	cerr << "Install set:" << endl;
+	for (set<string>::iterator j = info.files.begin(); j != info.files.end(); j++) {
+		cerr << "   " << (*j) << endl;
+	}
+	cerr << endl;
+
+	cerr << "Non-Install set:" << endl;
+	for (set<string>::iterator j = non_install_set.begin(); j != non_install_set.end(); j++) {
+		cerr << "   " << (*j) << endl;
+	}
+	cerr << endl;
+#endif
+	return non_install_set;
+}
+void CardsInstall::getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const
+{
+	for (vector<rule_t>::const_iterator i = rules.begin(); i != rules.end(); i++) {
+		if (i->event == event)
+			found.push_back(*i);
 	}
 }
 void CardsInstall::printHelp() const

@@ -86,7 +86,7 @@ void Pkgadd::run(int argc, char** argv)
 		pair<string, pkginfo_t> package = openArchivePackage(o_package);
 
 		// Checking the rules
-		vector<rule_t> config_rules = readRulesFile();
+		readRulesFile();
 
 		bool installed = checkPackageNameExist(package.first);
 		if (installed && !o_upgrade)
@@ -100,7 +100,7 @@ void Pkgadd::run(int argc, char** argv)
 			treatErrors(package.first);
 		}
 
-		set<string> non_install_files = applyInstallRules(package.first, package.second, config_rules);
+		set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
 		if (!o_upgrade) {
 #ifndef NDEBUG
 			cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
@@ -115,7 +115,7 @@ void Pkgadd::run(int argc, char** argv)
 			if (o_force) {
 				set<string> keep_list;
 				if (o_upgrade) // Don't remove files matching the rules in configuration
-					keep_list = getKeepFileList(conflicting_files, config_rules);
+					keep_list = getKeepFileList(conflicting_files, m_actionRules);
 				removePackageFilesRefsFromDB(conflicting_files, keep_list); // Remove unwanted conflicts
 			} else {
 				copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
@@ -131,7 +131,7 @@ void Pkgadd::run(int argc, char** argv)
 			// Remove metadata about the package removed
 			removePackageFilesRefsFromDB(package.first);
 
-			keep_list = getKeepFileList(package.second.files, config_rules);
+			keep_list = getKeepFileList(package.second.files, m_actionRules);
 			removePackageFiles(package.first, keep_list);
 
 #ifndef NDEBUG
@@ -172,71 +172,6 @@ void Pkgadd::printHelp() const
 	     << "  -r, --root <path>   specify alternative installation root" << endl
 	     << "  -v, --version       print version and exit" << endl
 	     << "  -h, --help          print help and exit" << endl;
-}
-
-vector<rule_t> Pkgadd::readRulesFile()
-{
-	vector<rule_t> rules;
-	unsigned int linecount = 0;
-	const string filename = m_root + PKGADD_CONF;
-	ifstream in(filename.c_str());
-
-	if (in) {
-		while (!in.eof()) {
-			string line;
-			getline(in, line);
-			linecount++;
-			if (!line.empty() && line[0] != '#') {
-				if (line.length() >= PKGADD_CONF_MAXLINE)
-				{
-					m_actualError = PKGADD_CONFIG_LINE_TOO_LONG;
-					treatErrors(filename + ":" + itos(linecount));
-				}
-				char event[PKGADD_CONF_MAXLINE];
-				char pattern[PKGADD_CONF_MAXLINE];
-				char action[PKGADD_CONF_MAXLINE];
-				char dummy[PKGADD_CONF_MAXLINE];
-				if (sscanf(line.c_str(), "%s %s %s %s", event, pattern, action, dummy) != 3)
-				{
-					m_actualError = PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS;
-					treatErrors(filename + ":" + itos(linecount));
-				}
-				if (!strcmp(event, "UPGRADE") || !strcmp(event, "INSTALL")) {
-					rule_t rule;
-					rule.event = strcmp(event, "UPGRADE") ? INSTALL : UPGRADE;
-					rule.pattern = pattern;
-					if (!strcmp(action, "YES")) {
-						rule.action = true;
-					} else if (!strcmp(action, "NO")) {
-						rule.action = false;
-					} else
-					{
-						m_actualError = PKGADD_CONFIG_UNKNOWN_ACTION;
-						treatErrors(filename + ":" + itos(linecount) + ": '" +
-								    string(action));
-					}
-
-					rules.push_back(rule);
-				} else
-				{
-					m_actualError = PKGADD_CONFIG_UNKNOWN_EVENT;
-					treatErrors(filename + ":" + itos(linecount) + ": '" +
-							    string(event));
-				}
-			}
-		}
-		in.close();
-	}
-
-#ifndef NDEBUG
-	cerr << "Configuration:" << endl;
-	for (vector<rule_t>::const_iterator j = rules.begin(); j != rules.end(); j++) {
-		cerr << "\t" << (*j).pattern << "\t" << (*j).action << endl;
-	}
-	cerr << endl;
-#endif
-
-	return rules;
 }
 
 set<string> Pkgadd::getKeepFileList(const set<string>& files, const vector<rule_t>& rules)
@@ -318,21 +253,5 @@ void Pkgadd::getInstallRulesList(const vector<rule_t>& rules, rule_event_t event
 	for (vector<rule_t>::const_iterator i = rules.begin(); i != rules.end(); i++)
 		if (i->event == event)
 			found.push_back(*i);
-}
-
-bool Pkgadd::checkRuleAppliesToFile(const rule_t& rule, const string& file)
-{
-	regex_t preg;
-	bool ret;
-
-	if (regcomp(&preg, rule.pattern.c_str(), REG_EXTENDED | REG_NOSUB))
-	{
-		m_actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
-		treatErrors(rule.pattern);
-	}
-	ret = !regexec(&preg, file.c_str(), 0, 0, 0);
-	regfree(&preg);
-
-	return ret;
 }
 // vim:set ts=2 :
