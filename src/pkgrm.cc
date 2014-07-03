@@ -65,10 +65,10 @@ void Pkgrm::run(int argc, char** argv)
 		Db_lock lock(o_root, true);
 
 		// Get the list of installed packages
-		getListOfPackages(o_root);
+		getListOfPackageNames(o_root);
 
 		// Retrieve info about all the packages
-		getInstalledPackages(false);
+		buildDatabaseWithDetailsInfos(false);
 
 		if (!checkPackageNameExist(o_package))
 		{

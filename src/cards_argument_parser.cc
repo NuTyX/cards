@@ -24,6 +24,7 @@ ArgParser::APCmd CardsArgumentParser::CMD_CONFIG;
 ArgParser::APCmd CardsArgumentParser::CMD_BASE;
 ArgParser::APCmd CardsArgumentParser::CMD_SYNC;
 ArgParser::APCmd CardsArgumentParser::CMD_INSTALL;
+ArgParser::APCmd CardsArgumentParser::CMD_REMOVE;
 
 ArgParser::APCmd CardsArgumentParser::CMD_LIST;
 ArgParser::APCmd CardsArgumentParser::CMD_INFO;
@@ -38,10 +39,11 @@ ArgParser::APCmd CardsArgumentParser::CMD_SEARCH;
 ArgParser::APOpt CardsArgumentParser::OPT_BASE_HELP;
 ArgParser::APOpt CardsArgumentParser::OPT_INSTALL_DEVEL;
 ArgParser::APOpt CardsArgumentParser::OPT_INSTALL_DRY;
+ArgParser::APOpt CardsArgumentParser::OPT_REMOVE_ALL;
 ArgParser::APOpt CardsArgumentParser::OPT_LIST_INSTALL;
 ArgParser::APOpt CardsArgumentParser::OPT_SEARCH_DESCRIPTION;
 ArgParser::APOpt CardsArgumentParser::OPT_SEARCH_FILE;
-ArgParser::APOpt CardsArgumentParser::OPT_REMOVE_PACKAGES;
+ArgParser::APOpt CardsArgumentParser::OPT_BASE_REMOVE;
 ArgParser::APOpt CardsArgumentParser::OPT_PACKAGEFILES;
 ArgParser::APOpt CardsArgumentParser::OPT_SYNCALL;
 ArgParser::APOpt CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES;
@@ -71,6 +73,10 @@ CardsArgumentParser::CardsArgumentParser()
 	addCommand(CMD_INSTALL, "install",
 		"install a binary package",
 		ArgParser::MIN, 1, "<package name>");
+
+	addCommand(CMD_REMOVE, "remove",
+		"remove a binary package",
+		ArgParser::EQ, 1 , "<package>");
 
 	addCommand(CMD_LEVEL, "level",
 		"generate all the levels",
@@ -116,9 +122,13 @@ CardsArgumentParser::CardsArgumentParser()
 		'D',
 		"install the devel subpackages if available");
 
-	OPT_REMOVE_PACKAGES.init("remove",
+	OPT_BASE_REMOVE.init("remove",
 		'R',
 		"remove the packages founds, use with care.");
+
+	OPT_REMOVE_ALL.init("all",
+		'S',
+		"remove the subpackages founds");
 
 	OPT_PACKAGEFILES.init("pkgfile",
 		'p',
@@ -133,13 +143,15 @@ CardsArgumentParser::CardsArgumentParser()
 		"show all the dependencies, included the one allready installed");
 
 	addOption(CMD_BASE, OPT_BASE_HELP,false);
-	addOption(CMD_BASE, OPT_REMOVE_PACKAGES,false);
+	addOption(CMD_BASE, OPT_BASE_REMOVE,false);
 
 	addOption(CMD_SYNC, OPT_PACKAGEFILES, false);
 	addOption(CMD_SYNC, OPT_SYNCALL, false);
 
+
 	addOption(CMD_LIST,OPT_LIST_INSTALL, false);
 
+	addOption(CMD_REMOVE,OPT_REMOVE_ALL, false);
 
 	addOption(CMD_SEARCH,OPT_SEARCH_DESCRIPTION, false);
 	addOption(CMD_SEARCH,OPT_SEARCH_FILE,false);

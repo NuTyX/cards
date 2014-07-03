@@ -183,12 +183,12 @@ void Pkgdbh::progressInfo() const
 		case PKG_MOVE_META_END:
 			break;
     case DB_OPEN_START:
-      cout << "Retrieve info about the " << m_packagesList.size() << " packages: ";
+      cout << "Retrieve info about the " << m_packageNamesList.size() << " packages: ";
       break;
     case DB_OPEN_RUN:
-      if ( m_packagesList.size()>100)
+      if ( m_packageNamesList.size()>100)
       {
-        i = j / ( m_packagesList.size() / 100);
+        i = j / ( m_packageNamesList.size() / 100);
         printf("%3d%%\b\b\b\b",i);
       }
       j++;
@@ -204,7 +204,12 @@ void Pkgdbh::progressInfo() const
 			break;
     case PKG_INSTALL_START:
       j = 0;
-      cout << "Installing "<< m_filesNumber << " files: ";
+      cout << "INSTALL: "
+				<< m_packageArchiveName
+				<< "-"
+				<< m_packageArchiveVersion
+				<< ", "
+				<< m_filesNumber << " files: ";
       break;
     case PKG_INSTALL_RUN:
       if ( m_filesNumber > 100)
@@ -229,7 +234,12 @@ void Pkgdbh::progressInfo() const
 			break;
 		case RM_PKG_FILES_START:
 			j=0;
-			cout << "Removing " << m_filesList.size() << " files: ";
+			cout << "REMOVE: " 
+				<< " Removing "
+				<< m_packageArchiveName
+				<< " "
+				<< m_filesList.size()
+				<< " files: ";
 			break;
 		case RM_PKG_FILES_RUN:
 			if ( m_filesList.size()>100)
@@ -249,19 +259,18 @@ void Pkgdbh::progressInfo() const
   }
 }
 /* Append to the "DB" the number of packages founds (directory containg a file named files */
-int Pkgdbh::getListOfPackages (const string& path)
+int Pkgdbh::getListOfPackageNames (const string& path)
 {
-	keyValue string_splited;
 	m_root = trimFileName(path + "/");
 	const string pathdb =  m_root + PKG_DB_DIR;
-	if ( findFile(m_packagesList, pathdb) != 0 ) {
+	if ( findFile(m_packageNamesList, pathdb) != 0 ) {
 		m_actualError = CANNOT_READ_FILE;
     treatErrors(pathdb);
 	}
 #ifndef NDEBUG
-  cerr << "Number of Packages: " << m_packagesList.size() << endl;
+  cerr << "Number of Packages: " << m_packageNamesList.size() << endl;
 #endif
-  return m_packagesList.size();
+  return m_packageNamesList.size();
 }
 /* get details infos of a package */
 pair<string, pkginfo_t> Pkgdbh::getInfosPackage(const string& packageName)
@@ -272,16 +281,16 @@ pair<string, pkginfo_t> Pkgdbh::getInfosPackage(const string& packageName)
 	return result;
 }
 /* Populate the database with all details infos */
-void Pkgdbh::getInstalledPackages(bool silent)
+void Pkgdbh::buildDatabaseWithDetailsInfos(bool silent)
 {
 	if (!silent) {
 		m_actualAction = DB_OPEN_START;
 		progressInfo();
 	}
-	for (set<string>::iterator i = m_packagesList.begin();i != m_packagesList.end();++i) {
+	for (set<string>::iterator i = m_packageNamesList.begin();i != m_packageNamesList.end();++i) {
 		if (!silent) {
 			m_actualAction = DB_OPEN_RUN;
-			if ( m_packagesList.size() > 100 )
+			if ( m_packageNamesList.size() > 100 )
 				progressInfo();
 		}
 		pkginfo_t info;
@@ -450,7 +459,7 @@ void Pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 
 bool Pkgdbh::checkPackageNameExist(const string& name)
 {
-	return (m_listOfInstPackages.find(name) != m_listOfInstPackages.end());
+	return (m_packageNamesList.find(name) != m_packageNamesList.end());
 }
 
 /* Remove meta data about the removed package */
@@ -530,7 +539,7 @@ void Pkgdbh::removePackageFiles(const string& name, const set<string>& keep_list
 {
 	m_filesList = m_listOfInstPackages[name].files;
 	m_listOfInstPackages.erase(name);
-
+	m_packageArchiveName =  name ;
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
 	copy(m_filesList.begin(), m_filesList.end(), ostream_iterator<string>(cerr, "\n"));
@@ -677,15 +686,13 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 		m_actualError = EMPTY_PACKAGE;
 		treatErrors(basename);
 	}
-	string name = packageArchive.name();
-	if (name.empty() ) {
+	m_packageArchiveName = packageArchive.name();
+	m_packageArchiveVersion = packageArchive.version();
+	if (m_packageArchiveName.empty() ) {
 		m_actualError = CANNOT_DETERMINE_NAME_BUILDNR;
 		treatErrors(basename);
 	}
-	result.first = name;
-#ifndef NDEBUG
-	cerr << "name: " << name << endl;
-#endif
+	result.first = m_packageArchiveName;
 	set<string> fileList =  packageArchive.setofFiles();
 	for (set<string>::iterator i = fileList.begin();i != fileList.end();++i) {
 		result.second.files.insert(*i);

@@ -25,7 +25,10 @@
 #include "cards_sync.h"
 #include "cards_depends.h"
 #include "cards_install.h"
+#include "cards_remove.h"
+
 #include "config_parser.h"
+
 #include "pkginfo.h"
 
 using namespace std;
@@ -87,6 +90,10 @@ int main(int argc, char** argv)
 			} else {
 				CI.install();
 			}
+			return EXIT_SUCCESS;
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_REMOVE) {
+			CardsRemove CR(cardsArgPars);
+			CR.run(argc, argv);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 			CardsDepends CD(cardsArgPars);
@@ -155,6 +162,7 @@ int main(int argc, char** argv)
 		cerr << "Supported commands so far:\n"
 		<< "  sync\n"
 		<< "  install\n"
+		<< "  remove\n"
 		<< "  info\n"
 		<< "  list\n"
 		<< "  search\n"

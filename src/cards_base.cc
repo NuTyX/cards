@@ -50,7 +50,7 @@ void CardsBase::run(int argc, char** argv)
 		// TODO give the possibility to do in alternate rootfs	
 		string o_root="/";
 
-		if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE_PACKAGES)) {	
+		if (m_argParser.isSet(CardsArgumentParser::OPT_BASE_REMOVE)) {	
 			if (getuid()) {
 				m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 				treatErrors("");
@@ -58,7 +58,7 @@ void CardsBase::run(int argc, char** argv)
 		}
 		Db_lock lock(o_root, true);
 		// Get the list of installed packages
-		getListOfPackages(o_root);
+		getListOfPackageNames(o_root);
 
 		string basePackageName,installPackageName,installFullPackageName;
 		set<string> removePackagesList,basePackagesList;
@@ -75,7 +75,7 @@ void CardsBase::run(int argc, char** argv)
 			throw runtime_error("No package found for the base System" );
 		}
 		// For all the installed packages
-		for (set<string>::const_iterator iP = m_packagesList.begin(); iP != m_packagesList.end(); iP++) {
+		for (set<string>::const_iterator iP = m_packageNamesList.begin(); iP != m_packageNamesList.end(); iP++) {
 			installFullPackageName = *iP;
 			// We need to compare the base part if it not one
 			string::size_type pos = installFullPackageName.find('.');
@@ -108,9 +108,9 @@ void CardsBase::run(int argc, char** argv)
 			}
 		}
 		if (removePackagesList.size() > 0) {
-			if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE_PACKAGES)) {	
+			if (m_argParser.isSet(CardsArgumentParser::OPT_BASE_REMOVE)) {	
 				// Retrieve info about all the packages
-				getInstalledPackages(false);
+				buildDatabaseWithDetailsInfos(false);
 
 				for (set<string>::const_iterator iR = removePackagesList.begin();iR != removePackagesList.end();iR++) {
 					// Remove metadata about the package removed

@@ -22,50 +22,65 @@
 #  Version #VERSION#
 
 source /etc/pkgmk.conf
+info() {
+	echo "=======> $1"
+}
+warning() {
+	info "WARNING: $1" >&2
+}
+error() {
+	info "ERROR: $1" >&2
+}
+get_basename() {
+	local FILE="`echo $1 | sed 's|^.*://.*/||g'`"
+	echo $FILE
+}
+	
 
 if [ $# -lt 1 ]; then
         echo 1>&2
-        echo 1>&2 'Usage: pkgmkall <Package> (pkgmkall kde par exemple)'
+        echo 1>&2 'Usage: gop <portfolder> (gop kde@4.1.2 for example)'
         echo 1>&2
         exit 1
 fi
-erreur_deps(){
-echo "Erreur de dépendances"
-rm -r $TMP
-exit 1
-}
-erreur() {
-echo "Erreur de compilation"
-rm -r $TMP
-exit 1
-}
-DRY=false
-if [ "$1" == "--dry" ];then
-        DRY=true
-	shift
+# Various checks
+if [ ! "`type -p git`" ]; then
+	error "Command 'git' not found."
+	exit
 fi
-if [ "`pkginfo -b $1`" != "0" ]; then 
-	echo "`basename $0` $VERSION: package $1 is installed"
+if [ ! "`type -p pkgmk`" ]; then
+	error "Command 'pkgmk' not found."
+	exit
+fi
+if [ ! -f .gitignore ]; then
+	error "File .gitignore not found."
 	exit 1
 fi
-TMP=`mktemp -d`
-cards depends $1| cut -d " " -f1 > $TMP/list
-if grep "WARNING" $TMP/list ; then
-        erreur_deps
+if [ ! -d `get_basename $1` ]; then
+	error "$1 is not a directory."
+	exit 1
 fi
-if [ $DRY == true ]; then
-# On supprime la dernière ligne cad
-# le paquet passé en argument que
-# l'on veut contruire
-	LINE=`wc -l $TMP/list|cut -d " " -f1`
-	sed -i "${LINE}d" $TMP/list
+name=`get_basename $1|cut -d "@" -f1`
+name=`basename $name`
+echo "name=$name"
+if  [ ! -f "$1/$name.info" ]; then
+	error "$1.info file is missing."
+	exit 1
 fi
 
-for i in `cat $TMP/list`
-do
-        cd $i
-        pkgmk -d -i || erreur
-done
-rm -r $TMP
+# If we arrive here, we can do the job
+cd $1
+
+rm -f ~*
+
+pkgmk -co
+cd -
+echo "git add $1"
+git add $1
+
+if  [ $# -eq 2 ]; then
+echo "git commit -m ..."
+git commit -m "$name, $2"
+fi
 
 # End of file

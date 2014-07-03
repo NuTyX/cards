@@ -23,12 +23,13 @@
 
 include ../Makefile.inc
 
-all: pkgmk pkgmkall
+all: pkgmk pkgmkall gop
 
 pkgmk: pkgmk.in
 
 pkgall: pkgmkall.in
 
+gop: gop.in
 
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
@@ -39,13 +40,15 @@ pkgall: pkgmkall.in
 install: all
 	install -D -m0755 pkgmk $(DESTDIR)$(USRBINDIR)/pkgmk
 	install -D -m0755 pkgmkall $(DESTDIR)$(USRBINDIR)/pkgmkall
+	install -D -m0755 gop $(DESTDIR)$(USRBINDIR)/gop
 	install -D -m0644 pkgmk.conf $(DESTDIR)$(ETCDIR)/pkgmk.conf
 clean:
 	rm -f pkgmk
 	rm -f pkgmkall
+	rm -f gop
 
 distclean: clean
 	rm -f pkgmk
 	rm -f pkgmkall
-
+	rm -f gop
 # End of file

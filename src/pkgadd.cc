@@ -77,10 +77,10 @@ void Pkgadd::run(int argc, char** argv)
 	{
 		Db_lock lock(o_root, true);
 		// Get the list of installed packages
-		getListOfPackages(o_root);
+		getListOfPackageNames(o_root);
 
 		// Retrieving info about all the packages
-		getInstalledPackages(false);
+		buildDatabaseWithDetailsInfos(false);
 
 		// Reading the archiving to find a list of files
 		pair<string, pkginfo_t> package = openArchivePackage(o_package);

@@ -52,6 +52,7 @@ CARDSOBJECTS =	error_treat.o \
 		pkginfo.o \
 		cards_sync.o \
 		cards_install.o \
+		cards_remove.o \
 		cards_depends.o \
 		cards_base.o \
 		cards.o

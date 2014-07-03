@@ -74,7 +74,9 @@ vector<string> CardsInstall::getDirectDependencies()
 
 	if ( checkPackageNameExist(m_packageName)) {
 		packageNameDeps.push_back(m_packageName);
-		cout << m_packageName << " allready installed" << endl;
+#ifndef NDEBUG
+		cerr << m_packageName << " allready installed" << endl;
+#endif
 		return packageNameDeps;
 	}
 	if ( getPackageFileName()) {
@@ -96,6 +98,7 @@ vector<string> CardsInstall::getDirectDependencies()
 }
 void CardsInstall::printDependenciesList()
 {
+	getListOfPackageNames(m_root);
 	generateDependencies();
 	for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
 		cout << *it << endl;
@@ -199,6 +202,9 @@ bool CardsInstall::getPackageFileName()
 			}
 		}
 	}
+	if (checkPackageNameExist(m_packageName)) {
+		return false;
+	}
 	if (found) {
 	/*
 		If found, the port should exist
@@ -294,6 +300,7 @@ bool CardsInstall::getPackageFileName()
 			which can be the case if allready install and/or from the basic
 			system
 		*/
+		if ( ! checkPackageNameExist(m_packageName)) 
 			cerr << "WARNING " << m_packageName << " not yet compiled... " << endl;
 		return false;
 	} else {
@@ -312,10 +319,10 @@ void CardsInstall::install()
 	Db_lock lock(m_root, true);
 
 	// Get the list of installed packages
-	getListOfPackages(m_root);
+	getListOfPackageNames(m_root);
 
 	// Retrieving info about all the packages
-	getInstalledPackages(false);
+	buildDatabaseWithDetailsInfos(false);
 
 	// Generate the dependencies
 	generateDependencies();
@@ -326,6 +333,8 @@ void CardsInstall::install()
 	// Lets go
 	for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
 		m_packageName = *it;
+		if ( checkPackageNameExist(m_packageName))
+			continue;
 		if ( ! getPackageFileName() ) {
 			m_actualError = PACKAGE_NOT_FOUND;
 			treatErrors(m_packageName);
@@ -355,7 +364,7 @@ void CardsInstall::install()
 		set<string> keep_list;
 
 		// Installation progressInfo of the files on the HD
-		installArchivePackage(m_packageName, keep_list, non_install_files);
+		installArchivePackage(m_packageFileName, keep_list, non_install_files);
 
 		// Post install
 		if (checkFileExist(PKG_POST_INSTALL)) {

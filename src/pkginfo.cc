@@ -31,14 +31,14 @@
 
 int Pkginfo::getNumberOfPackages()
 {
-	return getListOfPackages("");
+	return getListOfPackageNames("");
 }
 bool Pkginfo::isInstalled(const char * packageName)
 {
 	string s_packageName = packageName;
-	int nPkg = getListOfPackages("");
+	int nPkg = getListOfPackageNames("");
 	if (nPkg > 0) {
-		for (set<string>::iterator i = m_packagesList.begin();i != m_packagesList.end();++i) {
+		for (set<string>::iterator i = m_packageNamesList.begin();i != m_packageNamesList.end();++i) {
 			string installedPackageName = *i;
 			if ( installedPackageName == s_packageName) {
 #ifndef NDEBUG
@@ -144,21 +144,22 @@ void Pkginfo::run(int argc, char** argv)
 			// Modes that require the database to be opened
 			//
 			Db_lock lock(o_root, false);
-			getListOfPackages(o_root);
+			getListOfPackageNames(o_root);
 			if (o_installed_mode) {
 				//
 				// List installed packages
 				//
-				getInstalledPackages(false);
-				for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-					cout << i->first << " " << i->second.version << endl;
+//				buildDatabaseWithDetailsInfos(false);
+				for(set<string>::const_iterator i = m_packageNamesList.begin(); i !=  m_packageNamesList.end(); ++i) {
+//				for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
+						cout << *i <<  endl;
+//					cout << i->first <<  endl;
 				}
-				cout << endl;
 			} else if (o_list_mode) {
 				//
 				// List package or file contents
 				//
-				getInstalledPackages(false);
+				buildDatabaseWithDetailsInfos(false);
 				if (checkPackageNameExist(o_arg)) {
 					copy(m_listOfInstPackages[o_arg].files.begin(), m_listOfInstPackages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
 				} else if (checkFileExist(o_arg)) {
@@ -173,7 +174,7 @@ void Pkginfo::run(int argc, char** argv)
 				//
 				// Get runtimedependencies of the file found in the directory path
 				//
-				getInstalledPackages(true); // get the list of installed package silently
+				buildDatabaseWithDetailsInfos(true); // get the list of installed package silently
 				regex_t r;
 				int Result;
 				regcomp(&r, ".", REG_EXTENDED | REG_NOSUB);
@@ -226,7 +227,7 @@ void Pkginfo::run(int argc, char** argv)
 					}
 				}	
 			} else if (o_librairies_mode + o_runtime_mode > 0) {
-				getInstalledPackages(true); // get the list of installed package silently
+				buildDatabaseWithDetailsInfos(true); // get the list of installed package silently
 				set<string> librairiesList;
 				int Result = -1;
 				if (checkPackageNameExist(o_arg))
@@ -282,7 +283,7 @@ void Pkginfo::run(int argc, char** argv)
 				}	
 			} else if (o_epoc) {
 				// get the building time of the package return 0 if not found
-				getInstalledPackages(true);
+				buildDatabaseWithDetailsInfos(true);
 				if (checkPackageNameExist(o_arg)) {
 					cout << m_listOfInstPackages[o_arg].build << endl;
 				} else {
@@ -291,7 +292,7 @@ void Pkginfo::run(int argc, char** argv)
 				
 			} else if (o_details_mode) {
 				// get all the details of a package
-				getInstalledPackages(false);
+				buildDatabaseWithDetailsInfos(false);
 				if (checkPackageNameExist(o_arg)) {
 					time_t ct = strtoul(m_listOfInstPackages[o_arg].build.c_str(),NULL,0);
 					char * c_time_s = ctime(&ct);
@@ -308,7 +309,7 @@ void Pkginfo::run(int argc, char** argv)
 			//
 			// List owner(s) of file or directory
 			//
-			getInstalledPackages(false);
+			buildDatabaseWithDetailsInfos(false);
 			regex_t preg;
 			if (regcomp(&preg, o_arg.c_str(), REG_EXTENDED | REG_NOSUB))
 			{

@@ -35,6 +35,7 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_INFO;
 		static ArgParser::APCmd CMD_LIST;
 		static ArgParser::APCmd CMD_INSTALL;
+		static ArgParser::APCmd CMD_REMOVE;
 		static ArgParser::APCmd CMD_DIFF;
 		static ArgParser::APCmd CMD_LEVEL;
 		static ArgParser::APCmd CMD_DEPENDS;
@@ -48,7 +49,8 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APOpt OPT_SEARCH_DESCRIPTION;
 		static ArgParser::APOpt OPT_INSTALL_DRY;
 		static ArgParser::APOpt OPT_INSTALL_DEVEL;
-		static ArgParser::APOpt OPT_REMOVE_PACKAGES;
+		static ArgParser::APOpt OPT_BASE_REMOVE;
+		static ArgParser::APOpt OPT_REMOVE_ALL;
 		static ArgParser::APOpt OPT_PACKAGEFILES;
 		static ArgParser::APOpt OPT_SYNCALL;
 		static ArgParser::APOpt OPT_SHOW_ALL_DEPENDENCIES;

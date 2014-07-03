@@ -116,10 +116,10 @@ public:
 protected:
 	// Database
 
-	int getListOfPackages(const string& path );
+	int getListOfPackageNames(const string& path );
 	pair<string, pkginfo_t> getInfosPackage(const string& packageName);
-	void getInstalledPackages(bool silent);
-	void getInstalledPackages(const string& path);
+	void buildDatabaseWithDetailsInfos(bool silent);
+	void buildDatabaseWithDetailsInfos(const string& path);
 
 
 	void addPackageFilesRefsToDB(const string& name, const pkginfo_t& info);
@@ -149,13 +149,14 @@ protected:
 
 	void getFootprintPackage(string& filename);
 	void runLdConfig();
-
+	string m_packageArchiveName;
+	string m_packageArchiveVersion;
 	string m_utilName;
 	string m_root;
 	string m_build;
 	vector<rule_t> m_actionRules;
 	packages_t m_listOfInstPackages;
-	set<string> m_packagesList;
+	set<string> m_packageNamesList;
 	set<string> m_filesList;
 	set<string> m_runtimeLibrairiesList;
 	packages_t m_dependancesList;
