@@ -103,13 +103,14 @@ void CardsRemove::run(int argc, char** argv)
 			} else {
 				installPackageName = installFullPackageName;
 			}
-			if ( basePackageName == installPackageName ) {
+			if ( basePackageNameToRemove == installPackageName ) {
 				removePackagesList.insert(installFullPackageName);
 			}
 		}
 		if (removePackagesList.size() > 0) {
 			for (set<string>::const_iterator iR = removePackagesList.begin();iR != removePackagesList.end();iR++) {
 				bool found = false;
+				installPackageName = *iR;
 				// Lets check if the package is not part of the base system
 				for(set<string>::const_iterator bP = basePackagesList.begin();bP != basePackagesList.end();bP++) {
 					string val = *bP;
@@ -138,27 +139,27 @@ void CardsRemove::run(int argc, char** argv)
 					runLdConfig();
 				}
 			}
-		} else { // just remove the package it was ask
-			bool found = false;
-			for(set<string>::const_iterator bP = basePackagesList.begin();bP != basePackagesList.end();bP++) {
-				// Lets check if the package is not part of the base system
-				string val = *bP;
-				/*
-					If the install Package is in the list of packages of a base system
-					we keep it and we can go out of the scan of the base package list for this
-					install package name
-				*/
-				if ( val == m_packageName ) {
-					found = true;
-					break;
-				}
+		}
+	} else { // just remove the package it was ask
+		bool found = false;
+		for(set<string>::const_iterator bP = basePackagesList.begin();bP != basePackagesList.end();bP++) {
+			// Lets check if the package is not part of the base system
+			string val = *bP;
+			/*
+				If the install Package is in the list of packages of a base system
+				we keep it and we can go out of the scan of the base package list for this
+				install package name
+			*/
+			if ( val == m_packageName ) {
+				found = true;
+				break;
 			}
-			if ( found == false) {	
-				removePackageFilesRefsFromDB(m_packageName);
-				// Remove the files on hd
-				removePackageFiles(m_packageName);
-				runLdConfig();
-			}
+		}
+		if ( found == false) {	
+			removePackageFilesRefsFromDB(m_packageName);
+			// Remove the files on hd
+			removePackageFiles(m_packageName);
+			runLdConfig();
 		}
 	}
 }

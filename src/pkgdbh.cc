@@ -234,8 +234,7 @@ void Pkgdbh::progressInfo() const
 			break;
 		case RM_PKG_FILES_START:
 			j=0;
-			cout << "REMOVE: " 
-				<< " Removing "
+			cout << "REMOVE: "
 				<< m_packageArchiveName
 				<< " "
 				<< m_filesList.size()
@@ -501,6 +500,7 @@ void Pkgdbh::removePackageFiles(const string& name)
 {
 	m_filesList = m_listOfInstPackages[name].files;
 	m_listOfInstPackages.erase(name);
+	m_packageArchiveName =  name ;
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
