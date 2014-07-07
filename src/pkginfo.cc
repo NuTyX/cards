@@ -301,7 +301,6 @@ void Pkginfo::run(int argc, char** argv)
 						 << "Version        : " << m_listOfInstPackages[o_arg].version << endl
 						 << "Build date     : " << c_time_s
 				     << "Size           : " << m_listOfInstPackages[o_arg].size << endl
-				     << "Depends on     : " << m_listOfInstPackages[o_arg].run << endl
 						 << "Number of Files: " << m_listOfInstPackages[o_arg].files.size()<< endl
 						 << "Arch           : " << m_listOfInstPackages[o_arg].arch << endl;
 				}

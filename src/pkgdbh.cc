@@ -204,7 +204,7 @@ void Pkgdbh::progressInfo() const
 			break;
     case PKG_INSTALL_START:
       j = 0;
-      cout << "INSTALL: "
+      cout << "ADD: "
 				<< m_packageArchiveName
 				<< "-"
 				<< m_packageArchiveVersion
@@ -319,7 +319,7 @@ void Pkgdbh::buildDatabaseWithDetailsInfos(bool silent)
 			}
 			if ( contentFile->items[li][0] == 'R' ) {
 				string run = contentFile->items[li];
-				info.run = run.substr(1) + ' ' + info.run ;
+				info.dependencies.insert(run.substr(1));
 			}
 		}
 		freeItemList(contentFile);	

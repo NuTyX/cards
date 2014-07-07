@@ -89,8 +89,8 @@ class ArchiveUtils
 	
 
 	unsigned int long size();              	// Numbers of files in the archive
-	std::set<std::string> setofFiles(); 		// return a set of string
-	std::vector<std::string> listofDependencies(); // return a vector of dependencies
+	std::set<std::string> setofFiles(); 		// return a order set of string
+	std::set<std::string> listofDependencies(); // return an order set of dependencies
 	std::string version();    // return the version of the package
 	std::string description();// return the description	of the package
 	std::string builddate();  // return the date like Mon Mar 24 10:16:00 2014
@@ -112,7 +112,7 @@ class ArchiveUtils
 	std::vector<string> m_contentMeta;
 	std::vector<string> m_contentInfo;
 
-	std::vector<string> m_rtDependenciesList;
+	std::set<string> m_rtDependenciesList;
 	std::string m_fileName;
 	std::string m_packageName;
 	std::set<string> m_filesList;

@@ -83,9 +83,10 @@ struct pkginfo_t {
     string description;
     string build;
     string version;
+		string install;
     string arch;
-    string run;
     string size;
+		set<string> dependencies;
     set<string> files;
   };
 typedef map<string, pkginfo_t> packages_t;
@@ -155,11 +156,13 @@ protected:
 	string m_root;
 	string m_build;
 	vector<rule_t> m_actionRules;
+
 	packages_t m_listOfInstPackages;
+	packages_t m_listOfDepotPackages;
+
 	set<string> m_packageNamesList;
 	set<string> m_filesList;
 	set<string> m_runtimeLibrairiesList;
-	packages_t m_dependancesList;
 
 	action m_actualAction;
 	error m_actualError;

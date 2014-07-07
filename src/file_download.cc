@@ -104,8 +104,8 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 
 void FileDownload::downloadFile()
 {
-	if (m_progress)
-		cout << m_downloadFileName << endl ;
+//	if (m_progress)
+	cout << m_downloadFileName << endl ;
 	m_downloadProgress.lastruntime = 0;
 	m_downloadProgress.curl = m_curl;
 	/*

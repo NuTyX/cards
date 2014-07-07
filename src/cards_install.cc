@@ -33,7 +33,9 @@ void CardsInstall::run(int argc, char** argv)
 		treatErrors("");
 	}
 	string url,categoryDir,categoryMD5sumFile, remotePackageDirectory ;
-	cout << "Synchronizing start ..." << endl;
+#ifndef NDEBUG
+	cerr << "Synchronizing start ..." << endl;
+#endif
 	for (vector<string>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
 		string val = *i ;
 		string::size_type pos = val.find('|');
@@ -59,42 +61,49 @@ void CardsInstall::run(int argc, char** argv)
 		}
 		remove(categoryMD5sumFile.c_str());
 	}
-	cout << "Synchronizing done." << endl;
 #ifndef NDEBUG
+	cout << "Synchronizing done." << endl;
 	for (vector<string>::iterator i = m_MD5packagesNameVersionList.begin();i!=m_MD5packagesNameVersionList.end();++i) {
 		cerr << *i << endl ;
 	}
 	cerr << "Number of Packages: " << MD5packagesNameVersionList.size() << endl;
 #endif
 }
-vector<string> CardsInstall::getDirectDependencies()
+set<string> CardsInstall::getDirectDependencies()
 {
 
-	vector<string> packageNameDeps;
+	pkginfo_t infoDeps;
+	set<string> packageNameDeps;
 
 	if ( checkPackageNameExist(m_packageName)) {
-		packageNameDeps.push_back(m_packageName);
+		infoDeps.dependencies.insert(m_packageName);
+		packageNameDeps.insert(m_packageName);
 #ifndef NDEBUG
 		cerr << m_packageName << " allready installed" << endl;
 #endif
 		return packageNameDeps;
 	}
+	if ( m_listOfDepotPackages.find(m_packageName) != m_listOfDepotPackages.end() )
+		return  m_listOfDepotPackages[m_packageName].dependencies;
 	if ( getPackageFileName()) {
-		vector<string> packageNameBuildNDeps;
+		set<string> packageNameBuildNDeps;
 		ArchiveUtils packageArchive(m_packageFileName);
 		packageNameBuildNDeps = packageArchive.listofDependencies();
-		for (std::vector<string>::iterator it = packageNameBuildNDeps.begin();it != packageNameBuildNDeps.end();it++) {
+		for (std::set<string>::iterator it = packageNameBuildNDeps.begin();it != packageNameBuildNDeps.end();it++) {
 			string Name = *it;
-			packageNameDeps.push_back(Name.substr(0,Name.size()-10));
+			infoDeps.dependencies.insert(Name.substr(0,Name.size()-10));
 		}
 	} else {
 		/*
 			We consider that this package doens't have any deps 
 			Just add his name
 		*/
-		packageNameDeps.push_back(m_packageName);
+		infoDeps.dependencies.insert(m_packageName);
 	}
-	return packageNameDeps;
+
+	if(!infoDeps.dependencies.empty())
+		m_listOfDepotPackages[m_packageName] = infoDeps;
+	return infoDeps.dependencies;
 }
 void CardsInstall::printDependenciesList()
 {
@@ -107,52 +116,45 @@ void CardsInstall::printDependenciesList()
 void CardsInstall::generateDependencies()
 {
 	vector<string> dependenciesWeMustAdd, 
-		packageDepschecked,
 		depencenciestoSort; 
 	// Insert the final package first
 	dependenciesWeMustAdd.push_back(m_packageName);
-	std::vector<string>::iterator it;
+	std::vector<string>::iterator vit;
+	std::set<string>::iterator sit;
 	while ( ! dependenciesWeMustAdd.empty() ) {
-		it = dependenciesWeMustAdd.begin();
-		dependenciesWeMustAdd.erase(it);
-		bool found = false;
-		m_packageName = *it;
-		for ( std::vector<string>::iterator i = packageDepschecked.begin(); i != packageDepschecked.end();i++) {
-			if (m_packageName == *i) {
-#ifndef NDEBUG
-				cerr << "allready check: " << *i << endl;
-#endif
-				found = true;
-				break;
-			}
-		}
-		if (! found ) {
-			packageDepschecked.push_back(m_packageName);
-			vector<string> directDependencies = getDirectDependencies();
-			for ( it = directDependencies.begin(); it != directDependencies.end();it++) {
-				depencenciestoSort.push_back(*it);
-			}
-			it = directDependencies.begin();
-			directDependencies.erase(it);
-			if ( ! directDependencies.empty() ) {
-				for ( it = directDependencies.begin(); it != directDependencies.end();it++) {
-					dependenciesWeMustAdd.push_back(*it);
+		vit = dependenciesWeMustAdd.begin();
+		dependenciesWeMustAdd.erase(vit);
+		m_packageName = *vit;
+		set<string> directDependencies = getDirectDependencies();
+		depencenciestoSort.push_back(m_packageName);
+		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
+			if ( *sit == m_packageName )
+				continue;
+			for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
+				if ( *sit == *vit) {
+					dependenciesWeMustAdd.erase(vit);
+					break;
 				}
 			}
 		}
+		if ( ! directDependencies.empty() ) {
+			for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
+				if ( m_packageName != *sit )
+					dependenciesWeMustAdd.push_back(*sit);
+			}
+		}
 	}
-	std::vector<string>::reverse_iterator rit;
 	bool found = false ;
-	for ( rit = depencenciestoSort.rbegin(); rit != depencenciestoSort.rend();++rit) {
+	for ( std::vector<string>::reverse_iterator vrit = depencenciestoSort.rbegin(); vrit != depencenciestoSort.rend();++vrit) {
 		found = false ;
-		for ( it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
-			if ( *rit == *it ) {
+		for ( vit = m_dependenciesList.begin(); vit != m_dependenciesList.end();vit++) {
+			if ( *vrit == *vit ) {
 				found = true ;
 				break;
 			}
 		}
 		if (!found)
-			m_dependenciesList.push_back(*rit);
+			m_dependenciesList.push_back(*vrit);
 	}
 }
 bool CardsInstall::getPackageFileName()
@@ -307,7 +309,7 @@ bool CardsInstall::getPackageFileName()
 		/*
 			not found in any category this package name don't exist yet
 			TODO Need to make it clear for the user, at the moment just return false
-		 throwing an error and interrupt the process is a good idea ?
+			throwing an error and interrupt the process is a good idea ?
 		*/
 		m_actualError = PACKAGE_NOT_FOUND;
 		treatErrors(m_packageName);

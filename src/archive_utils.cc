@@ -141,14 +141,14 @@ void ArchiveUtils::getRunTimeDependencies()
 	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
 		string dependencie = *i;
 		if ( dependencie[0] == 'R' ) {
-			m_rtDependenciesList.push_back(dependencie.substr(1));
+			m_rtDependenciesList.insert(dependencie.substr(1));
 		}
 	}
 }
 void ArchiveUtils::printDeps()
 {
 	getRunTimeDependencies();
-	for (vector<string>::const_iterator i = m_rtDependenciesList.begin();i!= m_rtDependenciesList.end();++i) {
+	for (set<string>::const_iterator i = m_rtDependenciesList.begin();i!= m_rtDependenciesList.end();++i) {
 		cout << *i << endl;
 	}
 }
@@ -190,9 +190,9 @@ string ArchiveUtils::namebuildn()
 {
 	return getPackageName() + epochBuildDate();
 }
-vector<string> ArchiveUtils::listofDependencies()
+set<string> ArchiveUtils::listofDependencies()
 {
-	m_rtDependenciesList.push_back(namebuildn());
+	m_rtDependenciesList.insert(namebuildn());
 	getRunTimeDependencies();
 
 	return m_rtDependenciesList;

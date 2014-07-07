@@ -46,7 +46,7 @@ public:
 	virtual void printHelp() const;
 
 private:
-	vector<string> getDirectDependencies();
+	set<string> getDirectDependencies();
 	set<string> applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
 	void getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const;
 

@@ -31,6 +31,10 @@ warning() {
 error() {
 	info "ERROR: $1" >&2
 }
+error_commit(){
+	error "Something wrong with the commit"
+	exit 1
+}
 get_basename() {
 	local FILE="`echo $1 | sed 's|^.*://.*/||g'`"
 	echo $FILE
@@ -62,7 +66,8 @@ if [ ! -d `get_basename $1` ]; then
 fi
 name=`get_basename $1|cut -d "@" -f1`
 name=`basename $name`
-echo "name=$name"
+version=`get_basename $1|cut -d "@" -f2`
+
 if  [ ! -f "$1/$name.info" ]; then
 	error "$1.info file is missing."
 	exit 1
@@ -70,17 +75,12 @@ fi
 
 # If we arrive here, we can do the job
 cd $1
-
 rm -f ~*
-
 pkgmk -co
 cd -
-echo "git add $1"
-git add $1
-
+git add $1 || error_commit
 if  [ $# -eq 2 ]; then
-echo "git commit -m ..."
-git commit -m "$name, $2"
+	git commit -m "$name $version, $2" || error_commit
 fi
 
 # End of file
