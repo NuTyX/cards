@@ -55,6 +55,7 @@ CARDSOBJECTS =	error_treat.o \
 		cards_remove.o \
 		cards_depends.o \
 		cards_base.o \
+		cards_info.o \
 		cards.o
 
 

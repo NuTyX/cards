@@ -44,7 +44,18 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_ISINST;
 
 		static ArgParser::APOpt OPT_BASE_HELP;
+
 		static ArgParser::APOpt OPT_LIST_INSTALL;
+		static ArgParser::APOpt OPT_LIST_BINARIES;
+		static ArgParser::APOpt OPT_LIST_PORTS;
+
+		static ArgParser::APOpt OPT_INFO_INSTALL;
+		static ArgParser::APOpt OPT_INFO_BINARY;
+		static ArgParser::APOpt OPT_INFO_PORT;
+
+		static ArgParser::APOpt OPT_DIFF_BINARIES;
+		static ArgParser::APOpt OPT_DIFF_PORTS;
+
 		static ArgParser::APOpt OPT_SEARCH_FILE;
 		static ArgParser::APOpt OPT_SEARCH_DESCRIPTION;
 		static ArgParser::APOpt OPT_INSTALL_DRY;

@@ -26,6 +26,7 @@
 #include "cards_depends.h"
 #include "cards_install.h"
 #include "cards_remove.h"
+#include "cards_info.h"
 
 #include "config_parser.h"
 
@@ -80,7 +81,6 @@ int main(int argc, char** argv)
 			CS.run();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
-			cout << "Not yet implemented, be patient" << endl;
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 			CardsInstall CI(cardsArgPars);
@@ -105,66 +105,39 @@ int main(int argc, char** argv)
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			return CD.deptree();
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
+			CardsInfo CList(cardsArgPars);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_LIST_INSTALL)) {
-				Pkginfo * packagesInfo =  new Pkginfo;
-				itemList * commandList = initItemList();
-				addItemToItemList(commandList,"pkginfo");
-				addItemToItemList(commandList, "-i");
-				packagesInfo->run(commandList->count,commandList->items);
-				cout << endl << packagesInfo->getNumberOfPackages() << " packages installed" << endl;
-				freeItemList(commandList);
-				delete packagesInfo;
+				CList.listInstalled();
+			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_LIST_BINARIES)) {
+				CList.listBinaries();
+			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_LIST_PORTS)) {
+				CList.listPorts();
 			}
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
-			Config config;
-			ConfigParser::parseConfig("/etc/cards.conf", config);
-			unsigned int  numberOfPorts = 0;
-			set<string> localPackagesList;
-			for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-				string val = *i ;
-				string prtDir;
-				string::size_type pos = val.find('|');
-				if (pos != string::npos) {
-					prtDir = stripWhiteSpace(val.substr(0,pos));
-				} else {
-					prtDir = val;
-				}
-				if ( findFile(localPackagesList, prtDir) != 0 ) {
-					cerr << " Cannot read "  << prtDir << endl;
-				}
-			}
-			if (localPackagesList.size() == 0 ) {
-			cout << "You need to cards sync first" << endl;
 			return EXIT_SUCCESS;
-			} else {
-				string name, version, val;
-				for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
-					val = *li;
-					string::size_type pos = val.find('@');
-					if (pos != string::npos) {
-						name = val.substr(0,pos);
-						version = val.substr(pos+1);
-					cout << name + " " + version << endl;
-					}
-				}
-				numberOfPorts = numberOfPorts + localPackagesList.size();
-			}
-			cout << endl << "Number of availables ports : " << numberOfPorts << endl << endl;
-
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) {
-			cout << "Not yet implemented, be patient" << endl;
+			CardsInfo CInfo(cardsArgPars);
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_INFO_INSTALL)) {
+				CInfo.infoInstall();
+			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_INFO_BINARY)) {
+				CInfo.infoBinary();
+			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_INFO_PORT)) {
+				CInfo.infoPort();
+			}
 			return EXIT_SUCCESS;
 
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) {
-			cout << "Not yet implemented, be patient" << endl;
 			return EXIT_SUCCESS;
 		} else {
 		cerr << "Supported commands so far:\n"
+		<< "  config\n"
+		<< "  base\n"
 		<< "  sync\n"
+		<< "  depends\n"
 		<< "  install\n"
 		<< "  remove\n"
 		<< "  info\n"
 		<< "  list\n"
+		<< "  diff\n"
 		<< "  search\n"
 			<< "\n"
 			<< " use cards <command> -h " << endl;
@@ -176,7 +149,5 @@ int main(int argc, char** argv)
 		cerr << "cards " << VERSION << " "<< command << ": " << e.what() << endl;
 		return -1;
 	}
-
 }
-
 // vim:set ts=2 :

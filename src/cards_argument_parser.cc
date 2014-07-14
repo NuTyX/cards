@@ -28,9 +28,9 @@ ArgParser::APCmd CardsArgumentParser::CMD_REMOVE;
 
 ArgParser::APCmd CardsArgumentParser::CMD_LIST;
 ArgParser::APCmd CardsArgumentParser::CMD_INFO;
+ArgParser::APCmd CardsArgumentParser::CMD_DIFF;
 
 ArgParser::APCmd CardsArgumentParser::CMD_LEVEL;
-ArgParser::APCmd CardsArgumentParser::CMD_DIFF;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPENDS;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPTREE;
 
@@ -40,7 +40,18 @@ ArgParser::APOpt CardsArgumentParser::OPT_BASE_HELP;
 ArgParser::APOpt CardsArgumentParser::OPT_INSTALL_DEVEL;
 ArgParser::APOpt CardsArgumentParser::OPT_INSTALL_DRY;
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE_ALL;
+
 ArgParser::APOpt CardsArgumentParser::OPT_LIST_INSTALL;
+ArgParser::APOpt CardsArgumentParser::OPT_LIST_BINARIES;
+ArgParser::APOpt CardsArgumentParser::OPT_LIST_PORTS;
+
+ArgParser::APOpt CardsArgumentParser::OPT_INFO_INSTALL;
+ArgParser::APOpt CardsArgumentParser::OPT_INFO_BINARY;
+ArgParser::APOpt CardsArgumentParser::OPT_INFO_PORT;
+
+ArgParser::APOpt CardsArgumentParser::OPT_DIFF_BINARIES;
+ArgParser::APOpt CardsArgumentParser::OPT_DIFF_PORTS;
+
 ArgParser::APOpt CardsArgumentParser::OPT_SEARCH_DESCRIPTION;
 ArgParser::APOpt CardsArgumentParser::OPT_SEARCH_FILE;
 ArgParser::APOpt CardsArgumentParser::OPT_BASE_REMOVE;
@@ -95,12 +106,40 @@ CardsArgumentParser::CardsArgumentParser()
 		ArgParser::EQ, 1,"<port>");
 
 	addCommand(CMD_SEARCH, "search",
-		"show port names containing 'expr'",
+		"search a binary or a port names containing 'expr'",
 		ArgParser::EQ, 1, "<expr>");
 
-	OPT_LIST_INSTALL.init("inst",
+	OPT_LIST_INSTALL.init("list-installed",
 		'i',
-		"show a list of installed ports");
+		"show a list of installed binaries");
+
+	OPT_LIST_BINARIES.init("list-binaries",
+		'b',
+		"show a list of available binaries in depot");
+
+	OPT_LIST_PORTS.init("list-ports",
+		'p',
+		"show a list of available ports");
+
+	OPT_INFO_INSTALL.init("info-install",
+		'i',
+		"show information about an installed package");
+
+	OPT_INFO_BINARY.init("info-binary",
+		'b',
+		"show information about a binary available in depot");
+
+	OPT_INFO_PORT.init("info-port",
+		'p',
+		"show information about a port");
+
+	OPT_DIFF_BINARIES.init("diff-binaries",
+		'b',
+		"show diff between installed packages and availables packages in depot");
+
+	OPT_DIFF_PORTS.init("diff-ports",
+		'p',
+		"show diff between installed packages and availables ports");
 
 	OPT_SEARCH_DESCRIPTION.init("descr",
 		'd',
@@ -150,6 +189,15 @@ CardsArgumentParser::CardsArgumentParser()
 
 
 	addOption(CMD_LIST,OPT_LIST_INSTALL, false);
+	addOption(CMD_LIST,OPT_LIST_BINARIES, false);
+	addOption(CMD_LIST,OPT_LIST_PORTS, false);
+
+	addOption(CMD_INFO,OPT_INFO_INSTALL, false);
+	addOption(CMD_INFO,OPT_INFO_BINARY, false);
+	addOption(CMD_INFO,OPT_INFO_PORT, false);
+
+	addOption(CMD_DIFF,OPT_DIFF_BINARIES, false);
+	addOption(CMD_DIFF,OPT_DIFF_PORTS, false);
 
 	addOption(CMD_REMOVE,OPT_REMOVE_ALL, false);
 
