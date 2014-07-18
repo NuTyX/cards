@@ -104,21 +104,25 @@ void CardsSync::run()
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
+	if ( ! (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) &&
+			! (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) &&
+			! (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) ) {
+	
+		throw runtime_error("missing option -i, -b OR -p");
+	}
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
 	InfoFile downloadFile;
 	string localPackageDirectory,remotePackageDirectory ;
 
-	for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
-		string val = *i ;
-		string categoryDir, url ;
-		string::size_type pos = val.find('|');
-		if (pos != string::npos) {
-			categoryDir = stripWhiteSpace(val.substr(0,pos));
-			url = stripWhiteSpace(val.substr(pos+1));
-		} else {
+	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
+		DirUrl DU = *i ;
+		if (DU.Url == "" ) {
 			continue;
 		}
+		string categoryDir, url ;
+		categoryDir = DU.Dir;
+		url = DU.Url;
 		string category = basename(const_cast<char*>(categoryDir.c_str()));
 		string categoryMD5sumFile = categoryDir + "/" + m_repoFile ;
 		cout << "Synchronizing " << categoryDir << " from " << url << endl;
@@ -244,8 +248,8 @@ void CardsSync::run()
 				}
 			}
 		}
-		if ( (m_argParser.isSet(CardsArgumentParser::OPT_PACKAGEFILES)) || 
-			(m_argParser.isSet(CardsArgumentParser::OPT_SYNCALL)) ) {
+		if ( (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) || 
+			(m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) ) {
 			/*
 				If pkgfile is pass as option, we want to download everything
 				concerning the build of a package. Download everything except
@@ -297,7 +301,7 @@ void CardsSync::run()
 			FileDownload FD(downloadFilesList,false);
 		}
 		downloadFilesList.clear();
-		if (m_argParser.isSet(CardsArgumentParser::OPT_SYNCALL)) {
+		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
 			/*
 				If all is pass we want to download the binaries as well
 			*/

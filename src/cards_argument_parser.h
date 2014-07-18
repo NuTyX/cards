@@ -45,26 +45,18 @@ class CardsArgumentParser : public ArgParser
 
 		static ArgParser::APOpt OPT_BASE_HELP;
 
-		static ArgParser::APOpt OPT_LIST_INSTALL;
-		static ArgParser::APOpt OPT_LIST_BINARIES;
-		static ArgParser::APOpt OPT_LIST_PORTS;
+		static ArgParser::APOpt OPT_FORCE;
+		static ArgParser::APOpt OPT_UPDATE;
 
-		static ArgParser::APOpt OPT_INFO_INSTALL;
-		static ArgParser::APOpt OPT_INFO_BINARY;
-		static ArgParser::APOpt OPT_INFO_PORT;
-
-		static ArgParser::APOpt OPT_DIFF_BINARIES;
-		static ArgParser::APOpt OPT_DIFF_PORTS;
+		static ArgParser::APOpt OPT_INSTALLED;
+		static ArgParser::APOpt OPT_BINARIES;
+		static ArgParser::APOpt OPT_PORTS;
 
 		static ArgParser::APOpt OPT_SEARCH_FILE;
 		static ArgParser::APOpt OPT_SEARCH_DESCRIPTION;
-		static ArgParser::APOpt OPT_INSTALL_DRY;
-		static ArgParser::APOpt OPT_INSTALL_DEVEL;
-		static ArgParser::APOpt OPT_BASE_REMOVE;
-		static ArgParser::APOpt OPT_REMOVE_ALL;
-		static ArgParser::APOpt OPT_PACKAGEFILES;
-		static ArgParser::APOpt OPT_SYNCALL;
-		static ArgParser::APOpt OPT_SHOW_ALL_DEPENDENCIES;
+		static ArgParser::APOpt OPT_DRY;
+		static ArgParser::APOpt OPT_REMOVE;
+		static ArgParser::APOpt OPT_ALL;
 		static ArgParser::APOpt OPT_LEVEL_SILENCE;
 
 		std::string getAppIdentification() const

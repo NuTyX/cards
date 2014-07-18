@@ -44,19 +44,14 @@ int main(int argc, char** argv)
 		if (cardsArgPars.command() == CardsArgumentParser::CMD_CONFIG) {
 			Config config;
 			ConfigParser::parseConfig("/etc/cards.conf", config);
+		
 			unsigned int index = 0;
 			string prtDir, url ;
-			for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+			for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
 				index++;
-				string val = *i ;
-				string::size_type pos = val.find('|');
-				if (pos != string::npos) {
-      		prtDir = stripWhiteSpace(val.substr(0,pos));
-      		url = stripWhiteSpace(val.substr(pos+1));
-				} else {
-					prtDir = val;
-					url = "" ;
-				}
+				DirUrl DU = *i ;
+      	prtDir = DU.Dir;
+      	url = DU.Url;
 				cout << index << " Directory: " << prtDir ;
 				if ( url != "" ) {
 					cout << " from " << url  << endl;
@@ -85,7 +80,7 @@ int main(int argc, char** argv)
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 			CardsInstall CI(cardsArgPars);
 			CI.run(argc, argv);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALL_DRY)) {
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
 				CI.printDependenciesList();
 			} else {
 				CI.install();
@@ -106,21 +101,23 @@ int main(int argc, char** argv)
 			return CD.deptree();
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
 			CardsInfo CList(cardsArgPars);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_LIST_INSTALL)) {
+			CList.run(argc, argv);
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) {
 				CList.listInstalled();
-			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_LIST_BINARIES)) {
+			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
 				CList.listBinaries();
-			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_LIST_PORTS)) {
+			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
 				CList.listPorts();
 			}
 			return EXIT_SUCCESS;
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) {
 			CardsInfo CInfo(cardsArgPars);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_INFO_INSTALL)) {
+			CInfo.run(argc, argv);
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) {
 				CInfo.infoInstall();
-			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_INFO_BINARY)) {
+			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
 				CInfo.infoBinary();
-			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_INFO_PORT)) {
+			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
 				CInfo.infoPort();
 			}
 			return EXIT_SUCCESS;

@@ -58,11 +58,14 @@ private:
 	void generateDependencies();
 	bool getPackageFileName();
 
+	unsigned int getRemotePackages(const string& md5sumFile);
+
 	string m_packageName;
 	string m_packageFileName;
 	vector<string> m_MD5packagesNameVersionList;
 	vector<string> m_dependenciesList;
 	vector<string> m_packageNameList;
+	set<string> m_remotePackagesList;
 	Config m_config;
 
 	

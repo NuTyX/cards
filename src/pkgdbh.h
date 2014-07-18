@@ -80,15 +80,15 @@ RM_PKG_FILES_END
 };
 
 struct pkginfo_t {
-    string description;
-    string build;
-    string version;
-		string install;
-    string arch;
-    string size;
-		set<string> dependencies;
-    set<string> files;
-  };
+	string description;
+	string build;
+	string version;
+	string install;
+	string arch;
+	string size;
+	set<string> dependencies;
+	set<string> files;
+};
 typedef map<string, pkginfo_t> packages_t;
 
 enum rule_event_t {

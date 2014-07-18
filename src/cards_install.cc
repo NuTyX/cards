@@ -36,28 +36,25 @@ void CardsInstall::run(int argc, char** argv)
 #ifndef NDEBUG
 	cerr << "Synchronizing start ..." << endl;
 #endif
-	for (vector<string>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
-		string val = *i ;
-		string::size_type pos = val.find('|');
-		if (pos != string::npos) {
-			categoryDir = stripWhiteSpace(val.substr(0,pos));
-			url = stripWhiteSpace(val.substr(pos+1));
-			categoryMD5sumFile = categoryDir + "/MD5SUM" ;
-			// Download the MD5SUM file of the category silently
-			FileDownload MD5Sum(url + "/MD5SUM",
-				categoryDir,
-				"MD5SUM", false);
-			MD5Sum.downloadFile();
-			vector<string> MD5SUMFileContent;
-			if ( parseFile(MD5SUMFileContent,categoryMD5sumFile.c_str()) != 0) {
-				m_actualError = CANNOT_READ_FILE;
-				treatErrors(categoryMD5sumFile);
-			}
-			for ( vector<string>::iterator i = MD5SUMFileContent.begin();i!=MD5SUMFileContent.end();++i) {
-				m_MD5packagesNameVersionList.push_back(val + "|" + *i);
-			}
-		} else {
+	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
+		if ( i->Url == "" ) {
 			continue;
+		}
+		categoryDir = i->Dir;
+		url = i->Url;
+		categoryMD5sumFile = categoryDir + "/MD5SUM" ;
+		// Download the MD5SUM file of the category silently
+		FileDownload MD5Sum(url + "/MD5SUM",
+			categoryDir,
+			"MD5SUM", false);
+		MD5Sum.downloadFile();
+		vector<string> MD5SUMFileContent;
+		if ( parseFile(MD5SUMFileContent,categoryMD5sumFile.c_str()) != 0) {
+			m_actualError = CANNOT_READ_FILE;
+			treatErrors(categoryMD5sumFile);
+		}
+		for ( vector<string>::iterator i = MD5SUMFileContent.begin();i!=MD5SUMFileContent.end();++i) {
+			m_MD5packagesNameVersionList.push_back( categoryDir + "|" + url + "|" + *i);
 		}
 		remove(categoryMD5sumFile.c_str());
 	}
@@ -66,7 +63,7 @@ void CardsInstall::run(int argc, char** argv)
 	for (vector<string>::iterator i = m_MD5packagesNameVersionList.begin();i!=m_MD5packagesNameVersionList.end();++i) {
 		cerr << *i << endl ;
 	}
-	cerr << "Number of Packages: " << MD5packagesNameVersionList.size() << endl;
+	cerr << "Number of Packages: " << m_MD5packagesNameVersionList.size() << endl;
 #endif
 }
 set<string> CardsInstall::getDirectDependencies()

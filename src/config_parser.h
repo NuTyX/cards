@@ -26,24 +26,47 @@
 #include <vector>
 #include <list>
 #include <map>
+#include "file_download.h"
 
-typedef std::vector<std::string> dir_url;
-typedef std::vector<std::string> locale_;
-struct Config
-{
+struct fileList {
+	std::string basePackageName;
+	std::string md5SUM;
+	std::string version;
+	std::vector<std::string> Files;
+};
+
+struct DirUrl {
+	std::string Dir;
+	std::string Url;
+};
+
+struct portsDirectory {
+	std::string Dir;
+	std::string Url;
+	std::vector<fileList> basePackageList;
+}; 
+struct Config {
 	Config() {}
-	locale_ locale;
 	std::string arch;
-	dir_url dirUrl;
-	dir_url baseDir;
+	std::vector<std::string> locale;
+	std::vector<DirUrl> dirUrl;
+	std::vector<std::string> baseDir;
 };
 
 class ConfigParser
 {
 	public:
+		ConfigParser(const std::string& fileName);
+		int parseConfig(const std::string& fileName);
 		static std::string stripWhiteSpace(const std::string& input);
 		static int parseConfig(const std::string& fileName,
 			Config& config);
+		int parseMD5sumCategoryDirectory();
+		int parseBasePackageList();
+	private:
+		string m_configFileName;
+		Config m_config;
+		std::vector<portsDirectory> m_packageList;
 };
 #endif /* CONFIGPARSER_H */
 // vim:set ts=2 :

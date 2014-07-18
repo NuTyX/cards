@@ -26,17 +26,19 @@ CardsInfo::CardsInfo(const CardsArgumentParser& argParser)
 }
 void CardsInfo::run(int argc, char** argv)
 {
+	getListOfPackageNames(m_root);
+	buildDatabaseWithDetailsInfos(false);
 }
 void CardsInfo::listInstalled()
 {
-	getListOfPackageNames(m_root);
-	for(set<string>::const_iterator i = m_packageNamesList.begin(); i !=  m_packageNamesList.end(); ++i) {
-		cout << *i <<  endl;
+	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
+		cout << i->first << " " << i->second.version << endl;
 	}
+	cout << endl << "Number of installed packages: " <<  m_packageNamesList.size() << endl << endl;
 }
 void CardsInfo::listBinaries()
 {
-	cout << "List of Binaries" << endl;
+
 }
 void CardsInfo::listPorts()
 {
@@ -44,15 +46,8 @@ void CardsInfo::listPorts()
 	ConfigParser::parseConfig("/etc/cards.conf", config);
 	unsigned int  numberOfPorts = 0;
 	set<string> localPackagesList;
-	for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-		string val = *i ;
-		string prtDir;
-		string::size_type pos = val.find('|');
-		if (pos != string::npos) {
-			prtDir = stripWhiteSpace(val.substr(0,pos));
-		} else {
-			prtDir = val;
-		}
+	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+		string prtDir = i->Dir ;
 		if ( findFile(localPackagesList, prtDir) != 0 ) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(prtDir);
@@ -86,5 +81,14 @@ void CardsInfo::infoPort()
 }
 void CardsInfo::printHelp() const
 {
+}
+unsigned int CardsInfo::getRemotePackages(const string& md5sumFile)
+{
+	m_remotePackagesList.clear();
+	if ( parseFile(m_remotePackagesList,md5sumFile.c_str()) != 0) {
+		 m_actualError = CANNOT_READ_FILE;
+		treatErrors(md5sumFile);
+	}
+	return m_remotePackagesList.size();
 }
 // vim:set ts=2 :

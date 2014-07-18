@@ -81,7 +81,7 @@ void CardsRemove::run(int argc, char** argv)
 
 	buildDatabaseWithDetailsInfos(false);
 			
-	if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE_ALL)) {
+	if (m_argParser.isSet(CardsArgumentParser::OPT_ALL)) {
 		string::size_type pos = m_packageName.find('.');
 		if (pos != string::npos) {
 			basePackageNameToRemove = m_packageName.substr(0,pos);

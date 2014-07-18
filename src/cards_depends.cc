@@ -62,15 +62,9 @@ int CardsDepends::level()
 	itemList *filesList = initItemList();
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
-  for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-		string val = *i ;
-		string prtDir;
-		string::size_type pos = val.find('|');
-		if (pos != string::npos) {
-			prtDir = stripWhiteSpace(val.substr(0,pos));
-		} else {
-			prtDir = val;
-		}
+  for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+		DirUrl DU  = *i ;
+		string prtDir = DU.Dir;
 		if ( (findFile(filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(prtDir);
@@ -121,15 +115,9 @@ int CardsDepends::depends()
 	itemList *filesList = initItemList();
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
-  for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-    string val = *i ;
-    string prtDir;
-    string::size_type pos = val.find('|');
-    if (pos != string::npos) {
-      prtDir = stripWhiteSpace(val.substr(0,pos));
-    } else {
-      prtDir = val;
-    }
+  for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+    DirUrl DU  ;
+    string prtDir = DU.Dir;
 		if ( (findFile(filesList,prtDir.c_str())) != 0) {
 			return -1;
 		}
@@ -180,7 +168,7 @@ int CardsDepends::depends()
 		for (unsigned int i = 0; i < sortPackagesList-> count;++i) {
 			string packageName = basename(sortPackagesList->items[i]);
 			string name(packageName,0,packageName.find('@'));
-			if (m_argParser.isSet(CardsArgumentParser::OPT_SHOW_ALL_DEPENDENCIES)) {
+			if (m_argParser.isSet(CardsArgumentParser::OPT_ALL)) {
 				printf("%s\n",sortPackagesList-> items[i]);
 			} else {
 				if ( ! packagesInfo->isInstalled(name.c_str())) {
@@ -211,15 +199,9 @@ int CardsDepends::deptree()
 
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
-	for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-		string val = *i ;
-		string prtDir;
-		string::size_type pos = val.find('|');
-		if (pos != string::npos) {
-			prtDir = stripWhiteSpace(val.substr(0,pos));
-		} else {
-			prtDir = val;
-		}
+	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+		DirUrl DU  = *i ;
+		string prtDir = DU.Dir;
 		if ( (findFile(filesList,prtDir.c_str())) != 0) {
 			return -1;
 		}
@@ -257,16 +239,14 @@ int CardsDepends::deptree()
 	string name = "";
 	set<string> localPackagesList, depsPackagesList;
 
-  for (vector<string>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-    string val = *i ;
+  for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+    DirUrl DU = *i ;
+		if ( DU.Url == "") {
+			continue;
+		}
     string prtDir, Url ;
-    string::size_type pos = val.find('|');
-    if (pos != string::npos) {
-      prtDir = stripWhiteSpace(val.substr(0,pos));
-      Url = stripWhiteSpace(val.substr(pos+1));
-    } else {
-      continue;
-    }
+    prtDir = DU.Dir;
+    Url = DU.Url;
 //	for (unsigned int indCat = 0; indCat < config.prtDir.size();++indCat) {
 		string category = basename(const_cast<char*>(prtDir.c_str()));
 		string remoteUrl = Url + "/" + category;
