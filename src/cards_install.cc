@@ -59,7 +59,7 @@ void CardsInstall::run(int argc, char** argv)
 		remove(categoryMD5sumFile.c_str());
 	}
 #ifndef NDEBUG
-	cout << "Synchronizing done." << endl;
+	cerr << "Synchronizing done." << endl;
 	for (vector<string>::iterator i = m_MD5packagesNameVersionList.begin();i!=m_MD5packagesNameVersionList.end();++i) {
 		cerr << *i << endl ;
 	}
@@ -180,7 +180,7 @@ bool CardsInstall::getPackageFileName()
 		if (pos != string::npos) {
 			url = stripWhiteSpace(tmpUrl.substr(0,pos));
 #ifndef NDEBUG
-			cout << url << endl;
+			cerr << url << endl;
 #endif
 		}
 		PackageDirectory = tmpUrl.substr(pos+1);
@@ -329,25 +329,33 @@ void CardsInstall::install()
 	// Checking the rules
 	readRulesFile();
 
-	// Lets go
-	for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
-		m_packageName = *it;
-		if ( checkPackageNameExist(m_packageName))
-			continue;
+	set<string> keep_list;
+
+	// For the moment if option upgrade is passed only the final package is upgrade and it has to be allready
+	// installed.
+	if  ( m_argParser.isSet(CardsArgumentParser::OPT_UPDATE)) {
+		if ( ! checkPackageNameExist(m_packageName) ) {
+			m_actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
+			treatErrors(m_packageName);
+		}
 		if ( ! getPackageFileName() ) {
 			m_actualError = PACKAGE_NOT_FOUND;
 			treatErrors(m_packageName);
-		};
+		}
+
 		// Reading the archiving to find a list of files
 		pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
 
-		if  ( checkPackageNameExist(m_packageName)) {
-			cout << *it << " is allready installed, will not be reinstalled" << endl;
-			continue;
-		}
 		set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
+
+		// Remove metadata about the package removed
+		removePackageFilesRefsFromDB(m_packageName);
+
+		keep_list = getKeepFileList(package.second.files, m_actionRules);
+		removePackageFiles(package.first, keep_list);
+
 #ifndef NDEBUG
-	cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
+		cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
 #endif
 		// Run pre-install if exist
 		extractAndRunPREfromPackage(m_packageFileName);
@@ -360,7 +368,7 @@ void CardsInstall::install()
 			treatErrors("listed file(s) already installed, cannot continue... ");
 		}
 
-		set<string> keep_list;
+		
 
 		// Installation progressInfo of the files on the HD
 		installArchivePackage(m_packageFileName, keep_list, non_install_files);
@@ -381,10 +389,88 @@ void CardsInstall::install()
 
 		// Add the info about the files to the DB
 		addPackageFilesRefsToDB(package.first, package.second);
+	} 
+	if  ( ! m_argParser.isSet(CardsArgumentParser::OPT_UPDATE)) {
+		// Lets go it's not an update
+		for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
+			m_packageName = *it;
 
-		runLdConfig();
+			if ( checkPackageNameExist(m_packageName))
+				continue;
+
+			if ( ! getPackageFileName() ) {
+				m_actualError = PACKAGE_NOT_FOUND;
+				treatErrors(m_packageName);
+			}
+			// Reading the archiving to find a list of files
+			pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
+
+			if  ( checkPackageNameExist(m_packageName) ) {
+				m_actualError = PACKAGE_ALLREADY_INSTALL;
+				treatErrors(m_packageName);
+			}
+			set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
+#ifndef NDEBUG
+			cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
+#endif
+			// Run pre-install if exist
+			extractAndRunPREfromPackage(m_packageFileName);
+
+			set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
+
+			if (! conflicting_files.empty()) {
+				copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
+				m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
+				treatErrors("listed file(s) already installed, cannot continue... ");
+			}
+
+			// Installation progressInfo of the files on the HD
+			installArchivePackage(m_packageFileName, keep_list, non_install_files);
+
+			// Post install
+			if (checkFileExist(PKG_POST_INSTALL)) {
+				m_actualAction = PKG_POSTINSTALL_START;
+				progressInfo();
+				process postinstall(SHELL,PKG_POST_INSTALL, 0 );
+				if (postinstall.executeShell()) {
+					cerr << "WARNING Run post-install FAILED. continue" << endl;
+				}
+				m_actualAction = PKG_POSTINSTALL_END;
+				progressInfo();
+			}
+			// Add the metadata about the package to the DB
+			moveMetaFilesPackage(package.first,package.second);
+
+			// Add the info about the files to the DB
+			addPackageFilesRefsToDB(package.first, package.second);
+		}
 	}
+	runLdConfig();
+}
+set<string> CardsInstall::getKeepFileList(const set<string>& files, const vector<rule_t>& rules)
+{
+	set<string> keep_list;
+	vector<rule_t> found;
 
+	getInstallRulesList(rules, UPGRADE, found);
+
+	for (set<string>::const_iterator i = files.begin(); i != files.end(); i++) {
+		for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
+			if (checkRuleAppliesToFile(*j, *i)) {
+				if (!(*j).action)
+					keep_list.insert(keep_list.end(), *i);
+				break;
+			}
+		}
+	}
+#ifndef NDEBUG
+	cerr << "Keep list:" << endl;
+	for (set<string>::const_iterator j = keep_list.begin(); j != keep_list.end(); j++) {
+		cerr << "   " << (*j) << endl;
+	}
+	cerr << endl;
+#endif
+	return keep_list;
 }
 set<string> CardsInstall::applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules)
 {

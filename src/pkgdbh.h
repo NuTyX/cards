@@ -81,9 +81,9 @@ RM_PKG_FILES_END
 
 struct pkginfo_t {
 	string description;
-	string build;
+	time_t build; // date of build
 	string version;
-	string install;
+	time_t install; // date of installation
 	string arch;
 	string size;
 	set<string> dependencies;

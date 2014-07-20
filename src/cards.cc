@@ -75,8 +75,6 @@ int main(int argc, char** argv)
 			CardsSync CS(cardsArgPars);
 			CS.run();
 			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
-			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 			CardsInstall CI(cardsArgPars);
 			CI.run(argc, argv);
@@ -101,28 +99,51 @@ int main(int argc, char** argv)
 			return CD.deptree();
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
 			CardsInfo CList(cardsArgPars);
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
+				CList.listBinaries();
+				return EXIT_SUCCESS;
+			}
 			CList.run(argc, argv);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) {
 				CList.listInstalled();
-			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
-				CList.listBinaries();
 			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
 				CList.listPorts();
 			}
 			return EXIT_SUCCESS;
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) {
 			CardsInfo CInfo(cardsArgPars);
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
+				CInfo.infoBinary();
+				return EXIT_SUCCESS;	
+			}
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
+				if (getuid()) {
+					cout << "You need to be root to get info about availables ports" << endl;
+					return EXIT_SUCCESS;
+				}
+				CInfo.infoPort();
+				return EXIT_SUCCESS;
+			}
 			CInfo.run(argc, argv);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) {
 				CInfo.infoInstall();
-			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
-				CInfo.infoBinary();
-			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
-				CInfo.infoPort();
 			}
 			return EXIT_SUCCESS;
-
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
+			CardsInfo CInfo(cardsArgPars);
+			CInfo.run(argc, argv);
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
+				CInfo.diffPorts();
+				return EXIT_SUCCESS;
+			}
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
+				CInfo.diffBinaries();
+				return EXIT_SUCCESS;
+			}
+			return EXIT_SUCCESS;
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) {
+			CardsInfo CInfo(cardsArgPars);
+			CInfo.search();
 			return EXIT_SUCCESS;
 		} else {
 		cerr << "Supported commands so far:\n"

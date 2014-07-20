@@ -303,7 +303,7 @@ void Pkgdbh::buildDatabaseWithDetailsInfos(bool silent)
 			}
 			if ( contentFile->items[li][0] == 'B' ) {
 				string build = contentFile->items[li];
-				info.build = build.substr(1);
+				info.build = strtoul(build.substr(1).c_str(),NULL,0);
 			} 
 			if ( contentFile->items[li][0] == 'V' ) {
 				string version = contentFile->items[li];
@@ -466,7 +466,6 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
 	set<string> metaFilesList;
 	const string packagedir = m_root + PKG_DB_DIR ;
-	const string build = m_listOfInstPackages[name].build;
 	const string arch = m_listOfInstPackages[name].arch;
 	const string packagenamedir = m_root + PKG_DB_DIR + name;
 

@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <sstream>
 
 int Pkginfo::getNumberOfPackages()
 {
@@ -150,7 +151,7 @@ void Pkginfo::run(int argc, char** argv)
 				// List installed packages
 				//
 //				buildDatabaseWithDetailsInfos(false);
-				for(set<string>::const_iterator i = m_packageNamesList.begin(); i !=  m_packageNamesList.end(); ++i) {
+				for(set<string>::const_iterator i = m_packageNamesList.begin(); i != m_packageNamesList.end(); ++i) {
 //				for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
 						cout << *i <<  endl;
 //					cout << i->first <<  endl;
@@ -201,7 +202,7 @@ void Pkginfo::run(int argc, char** argv)
 							{
 								if ( k->find('/' + *i) != string::npos)
 								{
-									string dependencie = j->first + j->second.build;
+									string dependencie = j->first + static_cast<ostringstream*>( &(ostringstream() <<  j->second.build ))->str();
 									runtimeList.insert(dependencie);
 									break;
 									found = true;
@@ -294,8 +295,8 @@ void Pkginfo::run(int argc, char** argv)
 				// get all the details of a package
 				buildDatabaseWithDetailsInfos(false);
 				if (checkPackageNameExist(o_arg)) {
-					time_t ct = strtoul(m_listOfInstPackages[o_arg].build.c_str(),NULL,0);
-					char * c_time_s = ctime(&ct);
+//					time_t ct = strtoul(m_listOfInstPackages[o_arg].build.c_str(),NULL,0);
+					char * c_time_s = ctime(&m_listOfInstPackages[o_arg].build);
 					cout << "Name           : " << o_arg << endl
 						 << "Description    : " << m_listOfInstPackages[o_arg].description << endl
 						 << "Version        : " << m_listOfInstPackages[o_arg].version << endl

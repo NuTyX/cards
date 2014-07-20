@@ -48,8 +48,8 @@ ArgParser::APOpt CardsArgumentParser::OPT_INSTALLED;
 ArgParser::APOpt CardsArgumentParser::OPT_BINARIES;
 ArgParser::APOpt CardsArgumentParser::OPT_PORTS;
 
-ArgParser::APOpt CardsArgumentParser::OPT_SEARCH_DESCRIPTION;
 ArgParser::APOpt CardsArgumentParser::OPT_SEARCH_FILE;
+
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
 
 CardsArgumentParser::CardsArgumentParser()
@@ -99,7 +99,7 @@ CardsArgumentParser::CardsArgumentParser()
 		ArgParser::EQ, 1,"<port>");
 
 	addCommand(CMD_SEARCH, "search",
-		"search a binary or a port names containing 'expr'",
+		"search for ports names, binaries names or description containing the 'expr'. Minimum 2 characters are requierd. ",
 		ArgParser::EQ, 1, "<expr>");
 
 	OPT_FORCE.init("force",
@@ -122,12 +122,8 @@ CardsArgumentParser::CardsArgumentParser()
 		'p',
 		"     this option deal with availables ports");
 
-	OPT_SEARCH_DESCRIPTION.init("descr",
-		'd',
-		"show ports containing 'expr' in the name or description");
-
 	OPT_SEARCH_FILE.init("file",
-		'f',
+		'F',
 		"show file names in footprints matching 'pattern'");
 
 	OPT_BASE_HELP.init("info",
@@ -165,10 +161,6 @@ CardsArgumentParser::CardsArgumentParser()
 
 	addOption(CMD_REMOVE,OPT_ALL, false);
 	addOption(CMD_REMOVE,OPT_DRY, false);
-
-	addOption(CMD_SEARCH,OPT_INSTALLED, false);
-	addOption(CMD_SEARCH,OPT_BINARIES,false);
-	addOption(CMD_SEARCH,OPT_PORTS, false);
 
 	addOption(CMD_INSTALL,OPT_UPDATE,false);
 	addOption(CMD_INSTALL,OPT_FORCE,false);

@@ -34,6 +34,10 @@
 #include "pkgdbh.h"
 #include "process.h"
 
+struct DiffVers {
+  std::string installed;
+  std::string available;
+};
 
 class CardsInfo : public Pkgdbh {
 public:
@@ -46,8 +50,9 @@ public:
 	void infoInstall();
 	void infoBinary();
 	void infoPort();
-	void showDiff();
-	void showDetails(const string& packageName);
+	void diffPorts();
+	void diffBinaries();
+	void search();
 
 	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;

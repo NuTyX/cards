@@ -28,11 +28,21 @@
 #include <map>
 #include "file_download.h"
 
-struct fileList {
+
+struct PackageFilesList {
+	std::string md5SUM;
+	std::string name;
+	std::string arch;
+};
+
+struct FileList {
 	std::string basePackageName;
+	std::string description;
 	std::string md5SUM;
 	std::string version;
-	std::vector<std::string> Files;
+	time_t buildDate;
+	std::string extention;
+	std::vector<PackageFilesList> packageFilesList;
 };
 
 struct DirUrl {
@@ -40,10 +50,10 @@ struct DirUrl {
 	std::string Url;
 };
 
-struct portsDirectory {
+struct PortsDirectory {
 	std::string Dir;
 	std::string Url;
-	std::vector<fileList> basePackageList;
+	std::vector<FileList> basePackageList;
 }; 
 struct Config {
 	Config() {}
@@ -58,15 +68,66 @@ class ConfigParser
 	public:
 		ConfigParser(const std::string& fileName);
 		int parseConfig(const std::string& fileName);
-		static std::string stripWhiteSpace(const std::string& input);
 		static int parseConfig(const std::string& fileName,
 			Config& config);
+/**
+ * \parse the MD5SUM file which belong to the category found
+ * in the configuration file cards.conf
+ *
+ */
 		int parseMD5sumCategoryDirectory();
+/**
+ * \download the MD5SUM of each port
+ */
+		int parsePortsList();
+
+/**
+ * \parse the MD5SUM of a port directory
+ * if it found a first line with the date of construction
+ * and the extension of the archive then it populate
+ * the list of packages
+ */
 		int parseBasePackageList();
+
+/*
+ *  \parse the info file for each basePackage
+ *	add the description of the port found in the first line of the info file
+ */
+		int parsePackageInfoList();
+
+/*
+ *  \return the version of the port name
+ */
+		string getPortVersion (const string& portName);
+
+/*
+ *  \return true if port name exist
+ */ 
+		bool checkPortExist(const string& portName);
+
+/*
+ *	\return true if binarie name exist
+ */
+		bool checkBinaryExist(const string& packageName);
+
+/*
+ *	\return the build time of the binary 
+ */
+		time_t getBinaryBuildTime (const string& portName);
+
+/*
+ * \return true if one or more occurencies found
+ */
+		bool search(const string& s);
+
+		unsigned int getBinaryPackageList();
+		bool getBinaryPackageInfo(const string& packageName);
+		bool getPortInfo(const string& portName);
+
 	private:
 		string m_configFileName;
 		Config m_config;
-		std::vector<portsDirectory> m_packageList;
+		std::vector<PortsDirectory> m_packageList;
 };
 #endif /* CONFIGPARSER_H */
 // vim:set ts=2 :
