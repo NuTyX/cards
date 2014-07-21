@@ -116,7 +116,7 @@ int CardsDepends::depends()
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
   for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-    DirUrl DU  ;
+    DirUrl DU = *i;
     string prtDir = DU.Dir;
 		if ( (findFile(filesList,prtDir.c_str())) != 0) {
 			return -1;
