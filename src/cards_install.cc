@@ -25,46 +25,12 @@ CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
 }
 void CardsInstall::run(int argc, char** argv)
 {
-	
+	m_configParser = new ConfigParser("/etc/cards.conf");
 	m_packageName = m_argParser.otherArguments()[0];
 	ConfigParser::parseConfig("/etc/cards.conf", m_config);
-	if (getuid()) {
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		treatErrors("");
-	}
-	string url,categoryDir,categoryMD5sumFile, remotePackageDirectory ;
-#ifndef NDEBUG
-	cerr << "Synchronizing start ..." << endl;
-#endif
-	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
-		if ( i->Url == "" ) {
-			continue;
-		}
-		categoryDir = i->Dir;
-		url = i->Url;
-		categoryMD5sumFile = categoryDir + "/MD5SUM" ;
-		// Download the MD5SUM file of the category silently
-		FileDownload MD5Sum(url + "/MD5SUM",
-			categoryDir,
-			"MD5SUM", false);
-		MD5Sum.downloadFile();
-		vector<string> MD5SUMFileContent;
-		if ( parseFile(MD5SUMFileContent,categoryMD5sumFile.c_str()) != 0) {
-			m_actualError = CANNOT_READ_FILE;
-			treatErrors(categoryMD5sumFile);
-		}
-		for ( vector<string>::iterator i = MD5SUMFileContent.begin();i!=MD5SUMFileContent.end();++i) {
-			m_MD5packagesNameVersionList.push_back( categoryDir + "|" + url + "|" + *i);
-		}
-		remove(categoryMD5sumFile.c_str());
-	}
-#ifndef NDEBUG
-	cerr << "Synchronizing done." << endl;
-	for (vector<string>::iterator i = m_MD5packagesNameVersionList.begin();i!=m_MD5packagesNameVersionList.end();++i) {
-		cerr << *i << endl ;
-	}
-	cerr << "Number of Packages: " << m_MD5packagesNameVersionList.size() << endl;
-#endif
+	m_configParser->parseMD5sumCategoryDirectory();
+        m_configParser->parsePortsList();
+        m_configParser->parseBasePackageList();
 }
 set<string> CardsInstall::getDirectDependencies()
 {
@@ -82,7 +48,11 @@ set<string> CardsInstall::getDirectDependencies()
 	}
 	if ( m_listOfDepotPackages.find(m_packageName) != m_listOfDepotPackages.end() )
 		return  m_listOfDepotPackages[m_packageName].dependencies;
-	if ( getPackageFileName()) {
+	if ( m_configParser->checkBinaryExist(m_packageName)) {
+		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
+		if ( ! checkFileExist(m_packageFileName)) {
+			m_configParser->downloadPackageFileName(m_packageName);
+		}
 		set<string> packageNameBuildNDeps;
 		ArchiveUtils packageArchive(m_packageFileName);
 		packageNameBuildNDeps = packageArchive.listofDependencies();
@@ -154,165 +124,80 @@ void CardsInstall::generateDependencies()
 			m_dependenciesList.push_back(*vrit);
 	}
 }
-bool CardsInstall::getPackageFileName()
+void CardsInstall::update()
 {
-	string basePackageName, packageFileName, categoryDir, url, PackageDirectory; 	
-	string::size_type pos = m_packageName.rfind('.');
-	bool found = false;
+	Db_lock lock(m_root, true);
 
-	if (pos != string::npos) {
-		basePackageName=m_packageName.substr(0,pos);
-	} else {
-		basePackageName=m_packageName;
-	}
+	// Get the list of installed packages
+	getListOfPackageNames(m_root);
 
-	for (vector<string>::iterator i = m_MD5packagesNameVersionList.begin();i != m_MD5packagesNameVersionList.end(); ++i) {
-		string val = *i ;
-		string::size_type pos = val.find('|');
-		if (pos != string::npos) {
-			categoryDir = stripWhiteSpace(val.substr(0,pos));
-#ifndef NDEBUG
-			cerr << categoryDir << endl;
-#endif
-		}
-		string tmpUrl = val.substr(pos+1);
-		pos = tmpUrl.find('|');
-		if (pos != string::npos) {
-			url = stripWhiteSpace(tmpUrl.substr(0,pos));
-#ifndef NDEBUG
-			cerr << url << endl;
-#endif
-		}
-		PackageDirectory = tmpUrl.substr(pos+1);
-		if ( PackageDirectory.size() < 34 ) {
-			m_actualError = CANNOT_PARSE_FILE;
-			treatErrors(PackageDirectory + ": missing info");
-		}
-		if ( PackageDirectory[32] != ':' ) {
-			m_actualError = CANNOT_PARSE_FILE;
-			treatErrors(PackageDirectory + ": wrong format");
-		}
-		pos = PackageDirectory.find('@');
-		if (pos != string::npos) {
-			string packageName = PackageDirectory.substr(33,pos - 33);
-			if ( basePackageName == packageName ) {
-				found = true;
-				break;
-			}
-		}
+	// Retrieving info about all the packages
+	buildDatabaseWithDetailsInfos(false);
+
+	if ( ! checkPackageNameExist(m_packageName) ) {
+		m_actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
+		treatErrors(m_packageName);
 	}
-	if (checkPackageNameExist(m_packageName)) {
-		return false;
-	}
-	if (found) {
-	/*
-		If found, the port should exist
-		We should check if the binary package is available
-		MD5SUMFile is /var/lib/pkg/saravane/server/alsa-lib@1.2.3.4/MD5SUM
-	*/
-		string packageDirectoryName = categoryDir + "/" + PackageDirectory.substr(33)+"/";
-		string MD5SUMFile = packageDirectoryName + "/MD5SUM";
-		if ( ! checkFileExist(MD5SUMFile) ) {
-			FileDownload MD5Sum(url + "/" + PackageDirectory.substr(33)+"/MD5SUM",
-				categoryDir+ "/" + PackageDirectory.substr(33)+"/",
-				"MD5SUM", false);
-			MD5Sum.downloadFile();
+	if ( m_configParser->checkBinaryExist(m_packageName)) {
+		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
+		if ( ! checkFileExist(m_packageFileName)) {
+			m_configParser->downloadPackageFileName(m_packageName);
 		}
-	/*
-		We have the /var/lib/pkg/saravane/server/alsa-lib@1.2.3.4/MD5SUM file 
-		Need to check if the binary is available
-	*/
-		bool found = false;
-		vector<string> MD5SUMFileContent;
-		if ( parseFile(MD5SUMFileContent,MD5SUMFile.c_str()) != 0) {
-			m_actualError = CANNOT_READ_FILE;
-			treatErrors(MD5SUMFile);
-		}
-		string packageExtension = "";
-		string packageBuildDate = "";
-		for (vector<string>::const_iterator i = MD5SUMFileContent.begin();i != MD5SUMFileContent.end(); ++i) {
-			string input = *i;
-			if (input.size() < 11) {
-				cout << "Wrong Format, field to small: " << input << endl;
-				continue;
-			}
-			if (input[10] == ':' ) {	// There is a chance to find what we are looking for
-				packageBuildDate = input.substr(0,10);
-				packageExtension = input.substr(11,input.size());
-				found = true;
-				continue;
-			}
-			if (found) {
-		/*
-			They are some binaries, the one I need exist ?
-		*/
-				string packageNameMD5SUM = input.substr(0,32);
-				string fileNameArch = input.substr(33);
-				string::size_type pos = fileNameArch.find(':');
-				if ( pos != std::string::npos) { // format input OK (md5sum:name:arch)
-					string myFileName;
-					string fileName = input.substr(33,pos) +
-						packageBuildDate +
-						input.substr(34+pos) +
-						packageExtension;
-					if ( m_packageName == basePackageName ) {
-					/*
-						package we are looking for
-						IS the base package means it's
-						arch is define in /etc/cards.conf
-					*/
-						myFileName = m_packageName +
-							packageBuildDate +
-							m_config.arch +
-							packageExtension;
-							
-					} else {
-					/*
-						package we are loocking for
-						IS a sub package with "any" as arch
-					*/
-						myFileName = input.substr(33,pos) +
-							packageBuildDate +
-							"any" +
-							packageExtension;
-					}
-					if ( myFileName == fileName ) {	// Finally that's the one we need
-						m_packageFileName = packageDirectoryName + fileName;
-						if (! checkFileExist(m_packageFileName)) {
-						// Ok need to download it
-							FileDownload packageFileNameArchive(url + "/" +
-								PackageDirectory.substr(33) + "/" +
-								fileName,
-								categoryDir+ "/" + PackageDirectory.substr(33)+"/",
-								fileName,true);
-							packageFileNameArchive.downloadFile();
-						}
-						// YEEESSS we got it
-						return true;
-					}
-				}
-			}	
-		}
-		/*
-			if we arrive here it means that they was no binaries found yet
-			So we assume the package is exist but has no runtime dependencies
-			which can be the case if allready install and/or from the basic
-			system
-		*/
-		if ( ! checkPackageNameExist(m_packageName)) 
-			cerr << "WARNING " << m_packageName << " not yet compiled... " << endl;
-		return false;
 	} else {
-		/*
-			not found in any category this package name don't exist yet
-			TODO Need to make it clear for the user, at the moment just return false
-			throwing an error and interrupt the process is a good idea ?
-		*/
 		m_actualError = PACKAGE_NOT_FOUND;
 		treatErrors(m_packageName);
-		return false;
 	}
-}
+	m_packageFileName = m_configParser->getPackageFileName(m_packageName);
+	set<string> keep_list;
+
+	// Reading the archiving to find a list of files
+	pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
+
+	// Checking the rules
+	readRulesFile();
+
+	set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
+
+	set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
+
+	if (! conflicting_files.empty()) {
+		copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
+		 m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
+	}
+
+	// Remove metadata about the package removed
+	removePackageFilesRefsFromDB(package.first);
+
+	keep_list = getKeepFileList(package.second.files, m_actionRules);
+
+	removePackageFiles(package.first, keep_list);
+
+#ifndef NDEBUG
+	cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
+#endif
+	// Run pre-install if exist
+	extractAndRunPREfromPackage(m_packageFileName);
+
+
+	// Installation progressInfo of the files on the HD
+	installArchivePackage(m_packageFileName, keep_list, non_install_files);
+	// Post install
+	if (checkFileExist(PKG_POST_INSTALL)) {
+		m_actualAction = PKG_POSTINSTALL_START;
+		progressInfo();
+		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
+		if (postinstall.executeShell()) {
+			cerr << "WARNING Run post-install FAILED." << endl;
+		}
+		m_actualAction = PKG_POSTINSTALL_END;
+		progressInfo();
+	}
+	// Add the metadata about the package to the DB
+	moveMetaFilesPackage(package.first,package.second);
+	// Add the info about the files to the DB
+	addPackageFilesRefsToDB(package.first, package.second);
+	runLdConfig();
+}	
 void CardsInstall::install()
 {
 	Db_lock lock(m_root, true);
@@ -323,6 +208,11 @@ void CardsInstall::install()
 	// Retrieving info about all the packages
 	buildDatabaseWithDetailsInfos(false);
 
+	if  ( checkPackageNameExist(m_packageName) ) {
+		m_actualError = PACKAGE_ALLREADY_INSTALL;
+		treatErrors (m_packageName);
+	}
+
 	// Generate the dependencies
 	generateDependencies();
 
@@ -331,29 +221,22 @@ void CardsInstall::install()
 
 	set<string> keep_list;
 
-	// For the moment if option upgrade is passed only the final package is upgrade and it has to be allready
-	// installed.
-	if  ( m_argParser.isSet(CardsArgumentParser::OPT_UPDATE)) {
-		if ( ! checkPackageNameExist(m_packageName) ) {
-			m_actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
-			treatErrors(m_packageName);
-		}
-		if ( ! getPackageFileName() ) {
+	// Let's go
+	for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
+		m_packageName = *it;
+
+		if ( ! m_configParser->checkBinaryExist(m_packageName)) {
 			m_actualError = PACKAGE_NOT_FOUND;
 			treatErrors(m_packageName);
 		}
-
+		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
 		// Reading the archiving to find a list of files
 		pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
 
+		if  ( checkPackageNameExist(m_packageName) ) {
+			continue;
+		}
 		set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
-
-		// Remove metadata about the package removed
-		removePackageFilesRefsFromDB(m_packageName);
-
-		keep_list = getKeepFileList(package.second.files, m_actionRules);
-		removePackageFiles(package.first, keep_list);
-
 #ifndef NDEBUG
 		cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
 #endif
@@ -367,8 +250,6 @@ void CardsInstall::install()
 			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
 			treatErrors("listed file(s) already installed, cannot continue... ");
 		}
-
-		
 
 		// Installation progressInfo of the files on the HD
 		installArchivePackage(m_packageFileName, keep_list, non_install_files);
@@ -389,63 +270,8 @@ void CardsInstall::install()
 
 		// Add the info about the files to the DB
 		addPackageFilesRefsToDB(package.first, package.second);
-	} 
-	if  ( ! m_argParser.isSet(CardsArgumentParser::OPT_UPDATE)) {
-		// Lets go it's not an update
-		for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
-			m_packageName = *it;
-
-			if ( checkPackageNameExist(m_packageName))
-				continue;
-
-			if ( ! getPackageFileName() ) {
-				m_actualError = PACKAGE_NOT_FOUND;
-				treatErrors(m_packageName);
-			}
-			// Reading the archiving to find a list of files
-			pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
-
-			if  ( checkPackageNameExist(m_packageName) ) {
-				m_actualError = PACKAGE_ALLREADY_INSTALL;
-				treatErrors(m_packageName);
-			}
-			set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
-#ifndef NDEBUG
-			cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
-#endif
-			// Run pre-install if exist
-			extractAndRunPREfromPackage(m_packageFileName);
-
-			set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
-
-			if (! conflicting_files.empty()) {
-				copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
-				m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
-				treatErrors("listed file(s) already installed, cannot continue... ");
-			}
-
-			// Installation progressInfo of the files on the HD
-			installArchivePackage(m_packageFileName, keep_list, non_install_files);
-
-			// Post install
-			if (checkFileExist(PKG_POST_INSTALL)) {
-				m_actualAction = PKG_POSTINSTALL_START;
-				progressInfo();
-				process postinstall(SHELL,PKG_POST_INSTALL, 0 );
-				if (postinstall.executeShell()) {
-					cerr << "WARNING Run post-install FAILED. continue" << endl;
-				}
-				m_actualAction = PKG_POSTINSTALL_END;
-				progressInfo();
-			}
-			// Add the metadata about the package to the DB
-			moveMetaFilesPackage(package.first,package.second);
-
-			// Add the info about the files to the DB
-			addPackageFilesRefsToDB(package.first, package.second);
-		}
+		runLdConfig();
 	}
-	runLdConfig();
 }
 set<string> CardsInstall::getKeepFileList(const set<string>& files, const vector<rule_t>& rules)
 {

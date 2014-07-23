@@ -22,6 +22,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstring>
+#include <sstream>
 
 #include "config_parser.h"
 #include "error_treat.h"
@@ -226,6 +227,28 @@ int ConfigParser::parsePackageInfoList()
 	}
 	return 0;
 }
+void ConfigParser::downloadPackageFileName(const std::string& packageName)
+{
+	if ( m_p->name == packageName) {
+#ifndef NDEBUG
+		cerr << packageName << endl;
+#endif
+		string build = static_cast<ostringstream*>( &(ostringstream() <<  m_j->buildDate ))->str();
+		string url = m_i->Url + "/" + m_j->basePackageName + "@" + m_j->version + "/" + m_p->name + build + m_p-> arch + m_j->extention;
+		string dir = m_i->Dir + "/" + m_j->basePackageName + "@" + m_j->version;
+		string fileName = m_p->name + build + m_p-> arch + m_j->extention;
+#ifndef NDEBUG
+		cerr << url << " " 
+		<< dir << " " 
+		<< fileName << " "
+		<< m_p->md5SUM << " "
+		<< endl;
+#endif
+		//TODO Check MD5SUM
+		FileDownload FD(url,dir,fileName,true);
+		FD.downloadFile();
+	}
+}
 unsigned int ConfigParser::getBinaryPackageList()
 {
 	unsigned int numberOfBinaries = 0;
@@ -335,10 +358,12 @@ bool ConfigParser::checkPortExist(const string& portName)
 bool ConfigParser::checkBinaryExist(const string& packageName)
 {
 	bool found = false;
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {
-				if ( p->name == packageName ) {
+	for (m_i = m_packageList.begin();m_i !=  m_packageList.end();++m_i) {
+		for (m_j = m_i->basePackageList.begin(); m_j != m_i->basePackageList.end();++m_j) {
+			for (m_p = m_j->packageFilesList.begin(); m_p != m_j ->packageFilesList.end();++m_p) {
+				if ( m_p->name == packageName ) {
+					m_packageFileName =  m_i ->Dir + "/" + m_j->basePackageName + "@" + m_j->version + "/" + m_p->name 
+					+ static_cast<ostringstream*>( &(ostringstream() <<  m_j->buildDate ))->str() + m_p-> arch + m_j->extention;
 					found = true;
 					break;
 				}
@@ -350,6 +375,12 @@ bool ConfigParser::checkBinaryExist(const string& packageName)
 			break;
 	}
 	return found;
+}
+string ConfigParser::getPackageFileName(const string& packageName)
+{
+	m_packageFileName = packageName;
+	checkBinaryExist(packageName);
+	return m_packageFileName;
 }
 time_t ConfigParser::getBinaryBuildTime (const string& packageName)
 {

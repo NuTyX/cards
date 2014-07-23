@@ -40,6 +40,7 @@ public:
 	CardsInstall (const CardsArgumentParser& argParser);
 
 	void printDependenciesList();
+	void update();
 	void install();
 
 	virtual void run(int argc, char** argv);
@@ -61,10 +62,11 @@ private:
 	vector<string> m_MD5packagesNameVersionList;
 	vector<string> m_dependenciesList;
 	vector<string> m_packageNameList;
-	Config m_config;
 
-	
+	ConfigParser  * m_configParser;
+	Config m_config;
 	const CardsArgumentParser& m_argParser;
+
 	// TODO make configurable from the command line
 	const string m_root; // absolute path of installation
 };

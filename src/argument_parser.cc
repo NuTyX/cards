@@ -332,7 +332,10 @@ bool ArgParser::isSet(int key) const
     return m_setOptions.find(key) != m_setOptions.end();
 }
 
-
+void ArgParser::printHelp(const string& cmd)
+{
+	cerr << generateHelpForCommand(cmd) << endl;	
+}
 std::string ArgParser::getOptionValue(const APOpt& key) const
 {
     return m_setOptions.find(key.id)->second;

@@ -221,6 +221,12 @@ public:
 	 */
 	virtual std::string getAppIdentification() const { return ""; }
 
+
+	/**
+	 * \return the help of the command
+	 */
+	void printHelp(const std::string& cmd);
+
 private:
 
 	std::string generateHelpForCommand(const std::string& command) const;

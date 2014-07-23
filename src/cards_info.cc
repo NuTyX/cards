@@ -193,17 +193,25 @@ void CardsInfo::diffBinaries()
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
 		if (! cp->checkBinaryExist(i->first))
 			continue;
-		time_t newVersion = cp->getBinaryBuildTime(i->first);
-		if ( i->second.build < newVersion ) {
-			char * c_time_s = ctime(&i->second.build);
-			c_time_s[strlen(c_time_s)-1]='\0';
-			string instVers = c_time_s;
-			c_time_s = ctime(&newVersion);
-			c_time_s[strlen(c_time_s)-1]='\0';
-			string availVers = c_time_s;
-			result.push_back(pair<string, string>(i->first, instVers + "   " + availVers));
+		string newVersion = cp->getPortVersion(i->first);
+		if ( i->second.version != newVersion ) {
+			result.push_back(pair<string, string>(i->first, i->second.version + "   " + newVersion));
 			if (i->first.length() > widthPackageName)
 				widthPackageName = i->first.length();
+		} else {
+			time_t newVersion = cp->getBinaryBuildTime(i->first);
+
+			if ( i->second.build < newVersion ) {
+				char * c_time_s = ctime(&i->second.build);
+				c_time_s[strlen(c_time_s)-1]='\0';
+				string instVers = c_time_s;
+				c_time_s = ctime(&newVersion);
+				c_time_s[strlen(c_time_s)-1]='\0';
+				string availVers = c_time_s;
+				result.push_back(pair<string, string>(i->first, instVers + "   " + availVers));
+				if (i->first.length() > widthPackageName)
+					widthPackageName = i->first.length();
+			}
 		}
 	}
 	if (result.size() > 2) {

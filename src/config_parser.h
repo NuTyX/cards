@@ -82,6 +82,10 @@ class ConfigParser
 		int parsePortsList();
 
 /**
+ * \download the packagefileName
+ */
+		void downloadPackageFileName(const std::string& packageFileName);
+/**
  * \parse the MD5SUM of a port directory
  * if it found a first line with the date of construction
  * and the extension of the archive then it populate
@@ -98,34 +102,43 @@ class ConfigParser
 /*
  *  \return the version of the port name
  */
-		string getPortVersion (const string& portName);
+		string getPortVersion (const std::string& portName);
 
 /*
  *  \return true if port name exist
  */ 
-		bool checkPortExist(const string& portName);
+		bool checkPortExist(const std::string& portName);
 
 /*
  *	\return true if binarie name exist
  */
-		bool checkBinaryExist(const string& packageName);
+		bool checkBinaryExist(const std::string& packageName);
 
+/*
+ *     \return the location and the filename of the package if exist else
+ *	return the packageName
+ */
+		std::string getPackageFileName(const std::string& packageName);
 /*
  *	\return the build time of the binary 
  */
-		time_t getBinaryBuildTime (const string& portName);
+		time_t getBinaryBuildTime (const std::string& portName);
 
 /*
  * \return true if one or more occurencies found
  */
-		bool search(const string& s);
+		bool search(const std::string& s);
 
 		unsigned int getBinaryPackageList();
-		bool getBinaryPackageInfo(const string& packageName);
-		bool getPortInfo(const string& portName);
+		bool getBinaryPackageInfo(const std::string& packageName);
+		bool getPortInfo(const std::string& portName);
 
 	private:
-		string m_configFileName;
+		std::vector<PortsDirectory>::iterator m_i;
+		std::vector<FileList>::iterator m_j;
+		std::vector<PackageFilesList>::iterator m_p;	
+		std::string m_packageFileName;
+		std::string m_configFileName;
 		Config m_config;
 		std::vector<PortsDirectory> m_packageList;
 };
