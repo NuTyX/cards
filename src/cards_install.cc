@@ -230,12 +230,13 @@ void CardsInstall::install()
 			treatErrors(m_packageName);
 		}
 		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
-		// Reading the archiving to find a list of files
-		pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
 
 		if  ( checkPackageNameExist(m_packageName) ) {
 			continue;
 		}
+
+		// Reading the archiving to find a list of files
+		pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
 		set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
 #ifndef NDEBUG
 		cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
