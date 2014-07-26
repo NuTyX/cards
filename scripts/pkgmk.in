@@ -673,9 +673,9 @@ add_meta_to_archive() {
 		echo "R$dep" >> .META
         done
 	
-	if [ -f $PKGMK_ROOT/${name}.run ]; then
+	if [ -f $PKGMK_ROOT/${NAME}.run ]; then
 		info "Adding runtime deps to Archive $NAME"
-		for rd in `cat $PKGMK_ROOT/${name}.run`; do
+		for rd in `cat $PKGMK_ROOT/${NAME}.run`; do
 			if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
 				error "Runtime dependencie $rd not found, cannot continue"
 				clean
