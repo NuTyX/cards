@@ -56,8 +56,14 @@ set<string> CardsInstall::getDirectDependencies()
 		set<string> packageNameBuildNDeps;
 		ArchiveUtils packageArchive(m_packageFileName);
 		packageNameBuildNDeps = packageArchive.listofDependencies();
+#ifndef NDEBUG
+	//	cerr << "Deps of : " << m_packageFileName << endl;
+#endif
 		for (std::set<string>::iterator it = packageNameBuildNDeps.begin();it != packageNameBuildNDeps.end();it++) {
 			string Name = *it;
+#ifndef NDEBUG
+//			cerr << Name.substr(0,Name.size()-10)  << endl;
+#endif
 			infoDeps.dependencies.insert(Name.substr(0,Name.size()-10));
 		}
 	} else {
@@ -65,11 +71,19 @@ set<string> CardsInstall::getDirectDependencies()
 			We consider that this package doens't have any deps 
 			Just add his name
 		*/
+#ifndef NDEBUG
+		cerr << m_packageName << " allready installed" << endl;
+#endif
 		infoDeps.dependencies.insert(m_packageName);
 	}
 
 	if(!infoDeps.dependencies.empty())
 		m_listOfDepotPackages[m_packageName] = infoDeps;
+#ifndef NDEBUG
+	for (std::set<string>::iterator it = infoDeps.dependencies.begin();it != infoDeps.dependencies.end();it++) {
+		cerr << *it << endl;
+	}
+#endif
 	return infoDeps.dependencies;
 }
 void CardsInstall::printDependenciesList()
@@ -90,15 +104,27 @@ void CardsInstall::generateDependencies()
 	std::set<string>::iterator sit;
 	while ( ! dependenciesWeMustAdd.empty() ) {
 		vit = dependenciesWeMustAdd.begin();
-		dependenciesWeMustAdd.erase(vit);
+#ifndef NDEBUG
+		cerr << "vit = " << *vit << endl;
+#endif
 		m_packageName = *vit;
+		dependenciesWeMustAdd.erase(vit);
 		set<string> directDependencies = getDirectDependencies();
+#ifndef NDEBUG
+		for (std::set<string>::iterator it = directDependencies.begin();it != directDependencies.end();it++) {
+    cerr << "dd: " << *it << " ";
+  }
+		cerr << endl;
+#endif
 		depencenciestoSort.push_back(m_packageName);
 		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
 			if ( *sit == m_packageName )
 				continue;
 			for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
 				if ( *sit == *vit) {
+#ifndef NDEBUG
+					cerr << "erase: " << *vit << endl;
+#endif
 					dependenciesWeMustAdd.erase(vit);
 					break;
 				}
@@ -106,10 +132,20 @@ void CardsInstall::generateDependencies()
 		}
 		if ( ! directDependencies.empty() ) {
 			for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
-				if ( m_packageName != *sit )
+				if ( m_packageName != *sit ) {
+#ifndef NDEBUG
+					cerr << "push back: " << *sit << endl;
+#endif
 					dependenciesWeMustAdd.push_back(*sit);
+				}
 			}
 		}
+#ifndef NDEBUG
+		for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
+			cerr << *vit << ", ";
+		}
+		cerr << endl << "End of while" << endl;
+#endif
 	}
 	bool found = false ;
 	for ( std::vector<string>::reverse_iterator vrit = depencenciestoSort.rbegin(); vrit != depencenciestoSort.rend();++vrit) {
