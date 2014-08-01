@@ -78,7 +78,7 @@ int ArgParser::addCommand(APCmd& cmd,
     APCmd apcmd;
     apcmd.id = m_cmdIdCounter;
 
-    PREDEFINED_CMD_HELP.init("help", 'h', "Print this help message");
+    PREDEFINED_CMD_HELP.init("help", 'h', "\tPrint this help message");
 
     // add predefined commands
     addOption(cmd, PREDEFINED_CMD_HELP, false);

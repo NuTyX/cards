@@ -26,6 +26,8 @@
 #include <fstream>
 #include <sys/stat.h>
 
+using namespace std;
+
 void *Malloc(size_t s)
 {
 	void *p;

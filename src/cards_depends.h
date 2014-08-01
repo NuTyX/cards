@@ -51,12 +51,16 @@ public:
 	CardsDepends (const CardsArgumentParser& argParser)
 	: m_argParser(argParser) {}
 
-	virtual void treatErrors(const string& s) const;
-
-	int level();
-	int depends();
+	virtual void treatErrors(const std::string& s) const;
+	int level();	
+	void showdependencies();
+	std::vector<string> getdependencies();
 	int deptree();
+
 private:
+	int depends();
+	
+	std::vector<string> m_dependenciesList;
 	const CardsArgumentParser& m_argParser;
 	const char* m_packageName;
 	error m_actualError;

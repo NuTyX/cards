@@ -174,17 +174,27 @@ void removeFile(const string& basedir, const string& filename)
     free(path);
   }
 }
-int findFile(itemList* filesList, const char* path)
+int findDir(itemList* filesList, const char* path)
 {
 	DIR *d;
+	DIR *sd;
 	struct dirent *dir;
 	d = opendir(path);
 	char fullPath[255];
 	if (d) {
 		while ((dir = readdir(d)) != NULL) {
-			if ( dir->d_name[0] != '.' ) { // ignore any .directories 
+			if ( dir->d_name[0] != '.' ) { // ignore any .directories
 				sprintf(fullPath,"%s/%s",path,dir->d_name);
-				addItemToItemList(filesList,fullPath);
+				sd = opendir(fullPath);
+				/* want to make shure its not a regular file
+					maybe a beter way ?
+				*/
+				if (sd) {
+					addItemToItemList(filesList,fullPath);
+					closedir(sd);
+				} else {
+					cerr << "WARNING "<< fullPath << " is NOT a directory..."<< endl;
+				}
 			}
 		}
 		closedir(d);

@@ -27,6 +27,7 @@
 #include "cards_install.h"
 #include "cards_remove.h"
 #include "cards_info.h"
+#include "cards_create.h"
 
 #include "config_parser.h"
 
@@ -67,6 +68,25 @@ int main(int argc, char** argv)
 				cout << "Locale   : " << *i << endl;
 			}
 			return EXIT_SUCCESS;
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_CREATE) {
+			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
+			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
+				cardsArgPars.printHelp("create");
+				return EXIT_SUCCESS;
+			}
+			// go back to a base system
+			CardsBase CB(cardsArgPars);
+			CB.run(argc, argv);
+			// get the list of the dependencies
+			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
+			vector<string> listOfDeps = CD.getdependencies();
+			// install all the dependencies
+			CardsInstall CI(cardsArgPars);
+			CI.install(listOfDeps);
+			// compilation of the final port
+			CardsCreate CC(cardsArgPars);
+			CC.run(argc, argv); 
+			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_BASE) {
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
 			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
@@ -106,7 +126,8 @@ int main(int argc, char** argv)
 			return CD.level();
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
-			return CD.depends();
+			CD.showdependencies();
+			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			return CD.deptree();
@@ -180,6 +201,7 @@ int main(int argc, char** argv)
 		cerr << "Supported commands so far:\n"
 		<< "  config\n"
 		<< "  base\n"
+		<< "  create\n"
 		<< "  sync\n"
 		<< "  depends\n"
 		<< "  install\n"

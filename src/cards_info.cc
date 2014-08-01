@@ -22,6 +22,8 @@
 
 #include "cards_info.h"
 
+using namespace std;
+
 CardsInfo::CardsInfo(const CardsArgumentParser& argParser)
 	:  m_argParser(argParser), m_root("/")
 {

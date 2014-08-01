@@ -44,6 +44,8 @@
 #include <fcntl.h>
 #include <libgen.h>
 
+using namespace std;
+
 using __gnu_cxx::stdio_filebuf;
 
 Pkgdbh::Pkgdbh(const string& name)
@@ -62,6 +64,9 @@ void Pkgdbh::treatErrors(const string& s) const
 {
 	switch ( m_actualError )
 	{
+		case CANNOT_CREATE_DIRECTORY:
+		case CANNOT_GENERATE_LEVEL:
+			break;
 		case CANNOT_DOWNLOAD_FILE:
 			throw runtime_error("could not download " + s);
 			break;

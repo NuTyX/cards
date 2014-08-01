@@ -25,15 +25,13 @@ ArgParser::APCmd CardsArgumentParser::CMD_BASE;
 ArgParser::APCmd CardsArgumentParser::CMD_SYNC;
 ArgParser::APCmd CardsArgumentParser::CMD_INSTALL;
 ArgParser::APCmd CardsArgumentParser::CMD_REMOVE;
-
+ArgParser::APCmd CardsArgumentParser::CMD_CREATE;
 ArgParser::APCmd CardsArgumentParser::CMD_LIST;
 ArgParser::APCmd CardsArgumentParser::CMD_INFO;
 ArgParser::APCmd CardsArgumentParser::CMD_DIFF;
-
 ArgParser::APCmd CardsArgumentParser::CMD_LEVEL;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPENDS;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPTREE;
-
 ArgParser::APCmd CardsArgumentParser::CMD_SEARCH;
 
 ArgParser::APOpt CardsArgumentParser::OPT_BASE_HELP;
@@ -48,9 +46,8 @@ ArgParser::APOpt CardsArgumentParser::OPT_INSTALLED;
 ArgParser::APOpt CardsArgumentParser::OPT_BINARIES;
 ArgParser::APOpt CardsArgumentParser::OPT_PORTS;
 
-ArgParser::APOpt CardsArgumentParser::OPT_SEARCH_FILE;
-
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
+
 
 CardsArgumentParser::CardsArgumentParser()
 {
@@ -59,7 +56,7 @@ CardsArgumentParser::CardsArgumentParser()
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_BASE, "base",
-		"return to a basic system, will remove all packages not listed in the Base System list directory",
+		"return to a basic system.\n\t\t\tIt will remove all packages not listed in the\n\t\t\tBase System list directory.",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_SYNC, "sync",
@@ -99,48 +96,48 @@ CardsArgumentParser::CardsArgumentParser()
 		ArgParser::EQ, 1,"<port>");
 
 	addCommand(CMD_SEARCH, "search",
-		"search for ports names, binaries names or description containing the 'expr'. Minimum 2 characters are requierd. ",
+		"search for ports names\n\t\t\tbinaries names or description containing the 'expr'.\n\t\t\tMinimum 2 characters are requierd.",
 		ArgParser::EQ, 1, "<expr>");
+
+	addCommand(CMD_CREATE, "create",
+		"create the binaries.\n\t\t\tAll the dependencies need for a successfull creation\n\t\t\thave to be compiled and up to date. If not the command will abort.",
+		ArgParser::EQ, 1, "<port>");
 
 	OPT_FORCE.init("force",
 		'f',
-		"  option to force the demand action.");
+		"\toption to force the demand action.");
 
 	OPT_UPDATE.init("update",
 		'u',
-		" update the concerned object(s).");
+		"\tupdate the concerned object(s).");
 
 	OPT_INSTALLED.init("installed",
 		'i',
-		" this option deal with the installed packages");
+		"this option deal with the installed packages");
 
 	OPT_BINARIES.init("binaries",
 		'b',
-		"  this option deal with binaries available in depot");
+		"\tthis option deal with binaries available in depot");
 
 	OPT_PORTS.init("ports",
 		'p',
-		"     this option deal with availables ports");
-
-	OPT_SEARCH_FILE.init("file",
-		'F',
-		"show file names in footprints matching 'pattern'");
+		"\tthis option deal with availables ports");
 
 	OPT_BASE_HELP.init("info",
 		'H',
-		"   get some more info on the command");
+		"\tget some more info on the command");
 
 	OPT_DRY.init("dry",
 		'n',
-		"    run the command without doing the action");
+		"\trun the command without doing the action");
 
 	OPT_REMOVE.init("remove",
 		'r',
-		" remove the packages founds, use with care.");
+		"\tremove the packages founds, use with care.");
 
 	OPT_ALL.init("all",
 		'a',
-		"    all the concerned objects");
+		"\tall the concerned objects");
 
 	addOption(CMD_SYNC, OPT_INSTALLED, false);
 	addOption(CMD_SYNC, OPT_PORTS, false);
@@ -170,7 +167,10 @@ CardsArgumentParser::CardsArgumentParser()
 	addOption(CMD_BASE, OPT_DRY,false);
 	addOption(CMD_BASE, OPT_REMOVE,false);
 	addOption(CMD_BASE, OPT_BASE_HELP,false);
-	
+
+	addOption(CMD_CREATE, OPT_DRY,false);
+	addOption(CMD_CREATE, OPT_REMOVE,false);
+
 	addOption(CardsArgumentParser::CMD_DEPENDS, OPT_ALL, false);
 }
 // vim:set ts=2 :

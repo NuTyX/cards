@@ -30,12 +30,62 @@
 #include "cards_depends.h"
 #include "config_parser.h"
 
-// using namespace std;
+using namespace std;
 
+
+vector<string> CardsDepends::getdependencies()
+{
+	depends();
+#ifndef NDEBUG
+	for (std::vector<string>::iterator i = m_dependenciesList.begin();i !=  m_dependenciesList.end();++i) {
+		cerr << *i << endl;
+	}
+#endif
+	return m_dependenciesList;
+}
+void CardsDepends::showdependencies()
+{
+	depends();
+	for (std::vector<string>::iterator it = m_dependenciesList.begin();it != m_dependenciesList.end();it++) {
+		cout << *it << endl;
+	}
+}
 void CardsDepends::treatErrors(const string& s) const
 {
 	switch ( m_actualError )
 	{
+		case CANNOT_CREATE_DIRECTORY:
+		case CANNOT_CREATE_FILE:
+		case CANNOT_WRITE_FILE:
+		case CANNOT_SYNCHRONIZE:
+		case CANNOT_RENAME_FILE:
+		case CANNOT_DETERMINE_NAME_BUILDNR:
+		case EMPTY_PACKAGE:
+		case CANNOT_FORK:
+		case WAIT_PID_FAILED:
+		case DATABASE_LOCKED:
+		case CANNOT_LOCK_DIRECTORY:
+		case CANNOT_REMOVE_FILE:
+		case CANNOT_RENAME_DIRECTORY:
+		case OPTION_ONE_ARGUMENT:
+		case INVALID_OPTION:
+		case OPTION_MISSING:
+		case TOO_MANY_OPTIONS:
+		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
+		case PACKAGE_ALLREADY_INSTALL:
+		case PACKAGE_NOT_INSTALL:
+		case PACKAGE_NOT_PREVIOUSLY_INSTALL:
+		case LISTED_FILES_ALLREADY_INSTALLED:
+		case PKGADD_CONFIG_LINE_TOO_LONG:
+		case PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS:
+		case PKGADD_CONFIG_UNKNOWN_ACTION:
+		case PKGADD_CONFIG_UNKNOWN_EVENT:
+		case CANNOT_COMPILE_REGULAR_EXPRESSION:
+		case NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE:
+		case CANNOT_OPEN_FILE:
+		case CANNOT_FIND_FILE:
+		case CANNOT_PARSE_FILE:
+			break;
 		case CANNOT_DOWNLOAD_FILE:
 			throw runtime_error("could not download " + s);
 			break;
@@ -55,7 +105,7 @@ void CardsDepends::treatErrors(const string& s) const
 }
 int CardsDepends::level()
 {
-	cout << "Generate Level, please wait ... " << endl;
+	cerr << "Generate Level, please wait ... " << endl;
 	pkgInfo *package = NULL;
 	pkgList *packagesList = initPkgList();
 
@@ -65,25 +115,33 @@ int CardsDepends::level()
   for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
 		DirUrl DU  = *i ;
 		string prtDir = DU.Dir;
-		if ( (findFile(filesList,prtDir.c_str())) != 0) {
+		if ( (findDir(filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(prtDir);
 		}
+#ifndef NDEBUG
+		cerr << i->Dir << " " << i->Url  << endl;
+#endif
 	}
+#ifndef NDEBUG
+	cerr << filesList->count << endl;
+#endif
 	for (unsigned int nInd=0;nInd <filesList->count;nInd++) {
+#ifndef NDEBUG
+		cerr << nInd << " " << filesList->items[nInd] << endl;
+#endif
 		package = addInfoToPkgInfo(nInd);
 		addPkgToPkgList(packagesList,package);
 		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
 	}
-	cout << "Generate Level, please wait ... " << endl;
 	int niveau = generate_level (filesList,packagesList,0);
-	cout << "Level done " << endl;
+	cerr << "Level done " << endl;
 	if (niveau == 0 ) {
 		m_actualError = CANNOT_GENERATE_LEVEL;
 		treatErrors("0");
 	} else {
 #ifndef NDEBUG
-		printf("Number of level: %d\n",niveau);
+		cerr << "Number of level: " << niveau << endl;
 #endif
 	}
 	depList *dependenciesList = initDepsList();
@@ -108,18 +166,17 @@ int CardsDepends::depends()
 {
 	pkgInfo *package = NULL;
 	pkgList *packagesList = initPkgList();
-
 	Pkginfo * packagesInfo = new Pkginfo;
 	packagesInfo->getNumberOfPackages();
- 
 	itemList *filesList = initItemList();
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
   for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
     DirUrl DU = *i;
     string prtDir = DU.Dir;
-		if ( (findFile(filesList,prtDir.c_str())) != 0) {
-			return -1;
+		if ( (findDir(filesList,prtDir.c_str())) != 0) {
+			m_actualError = CANNOT_READ_DIRECTORY;
+			treatErrors(prtDir);
 		}
 	}
 	char * longPackageName = NULL;
@@ -133,7 +190,6 @@ int CardsDepends::depends()
 		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
 	}
 	int niveau = generate_level (filesList,packagesList,0);
-
 	if (niveau == 0 ) {
 		m_actualError = CANNOT_GENERATE_LEVEL;
 		treatErrors("0");
@@ -172,12 +228,11 @@ int CardsDepends::depends()
 				printf("%s\n",sortPackagesList-> items[i]);
 			} else {
 				if ( ! packagesInfo->isInstalled(name.c_str())) {
-					printf("%s\n",sortPackagesList-> items[i]);
-			
+					m_dependenciesList.push_back(sortPackagesList-> items[i]);
 				}
 			}
 		}
-		printf("%s\n",longPackageName); 
+		m_dependenciesList.push_back(longPackageName);
 		freeItemList(sortPackagesList);
 	}
 	freeItemList(filesList);
@@ -202,8 +257,9 @@ int CardsDepends::deptree()
 	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
 		DirUrl DU  = *i ;
 		string prtDir = DU.Dir;
-		if ( (findFile(filesList,prtDir.c_str())) != 0) {
-			return -1;
+		if ( (findDir(filesList,prtDir.c_str())) != 0) {
+			m_actualError = CANNOT_READ_DIRECTORY;
+			treatErrors(prtDir);
 		}
 	}
 	char * longPackageName = NULL;

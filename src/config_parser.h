@@ -72,10 +72,19 @@ class ConfigParser
 			Config& config);
 /**
  * \parse the MD5SUM file which belong to the category found
- * in the configuration file cards.conf
- *
- */
+ * in the configuration file cards.conf. It populate the 
+ * the m_packageList.basePackageName part by looking
+ * the download MD5SUM file of each activate category
+ **/
 		int parseMD5sumCategoryDirectory();
+
+/**
+ * \parse the directory directly based on what we have locally.
+ * This method is used in the case of synchronisation with the mirror
+ * is NOT possible. 
+ **/
+		int parseCategoryDirectory();
+
 /**
  * \download the MD5SUM of each port
  */
@@ -85,6 +94,15 @@ class ConfigParser
  * \download the packagefileName
  */
 		void downloadPackageFileName(const std::string& packageFileName);
+
+/**
+ *
+ * \parse the basePackage Directory for binary package
+ *  return a list of packages found 
+ * 
+ */
+	set<string> getListOfPackagesFromDirectory(const string path);
+
 /**
  * \parse the MD5SUM of a port directory
  * if it found a first line with the date of construction
@@ -115,7 +133,7 @@ class ConfigParser
 		bool checkBinaryExist(const std::string& packageName);
 
 /*
- *     \return the location and the filename of the package if exist else
+ *  \return the location and the filename of the package if exist else
  *	return the packageName
  */
 		std::string getPackageFileName(const std::string& packageName);
@@ -129,6 +147,10 @@ class ConfigParser
  */
 		bool search(const std::string& s);
 
+/*
+ * \printout the list of available binaries packages
+ *
+ */
 		unsigned int getBinaryPackageList();
 		bool getBinaryPackageInfo(const std::string& packageName);
 		bool getPortInfo(const std::string& portName);

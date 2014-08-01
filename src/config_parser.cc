@@ -90,6 +90,34 @@ int ConfigParser::parseMD5sumCategoryDirectory()
 #endif
 	return 0;
 }
+int ConfigParser::parseCategoryDirectory()
+{
+	parseConfig(m_configFileName);
+	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
+		PortsDirectory pD;
+		FileList fL;
+		pD.Dir = i->Dir;
+		set<string> localPackagesList;
+		string::size_type pos;
+		if ( findFile( localPackagesList, pD.Dir) != 0 ) {
+			cerr << "cannot read directory "  << pD.Dir <<endl;
+			return -1;
+		}
+		
+		for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); ++li) {
+			pos = li->find('@');
+			if (pos != string::npos) {
+				fL.basePackageName = li->substr(0,pos);
+				fL.version = li->substr(pos+1);
+			} else {
+				fL.basePackageName = *li;
+				fL.version = "";
+			}
+		}
+		localPackagesList.clear();
+	}
+	return 0;
+}
 int ConfigParser::parsePortsList()
 {
 	InfoFile downloadFile;
@@ -117,6 +145,13 @@ int ConfigParser::parsePortsList()
 		FileDownload FD(downloadFilesList,false);
 	}
 	return 0;
+}
+set<string> ConfigParser::getListOfPackagesFromDirectory(const string path)
+{
+	set<string> listOfPackages;	
+	string MD5SUMFile = path + "/MD5SUM";
+	return listOfPackages;
+	
 }
 int ConfigParser::parseBasePackageList()
 {

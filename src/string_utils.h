@@ -33,14 +33,13 @@
 #include <vector>
 #include <sys/types.h>
 
-using namespace std;
 
 void *Malloc(size_t s);
 
 struct keyValue 
 {
-    string parameter;
-    string value;
+    std::string parameter;
+    std::string value;
 };
 
 /* itemList is a list of *char dynamically allocated */
@@ -56,42 +55,42 @@ void addItemToItemList(itemList *list, const char *item);
 void freeItemList(itemList *list);
 
 template <class T>
-void split( const string& s, char del,
+void split( const std::string& s, char del,
             T& target,
             int startPos=0, bool useEmpty=true  );
 
-keyValue split_keyValue(string s, char delimiter);
-set<string> getKeysList(string file, string delimiter);
-string getValueOfKey(string file, string delimiter,string parameter);
+keyValue split_keyValue(std::string s, char delimiter);
+std::set<std::string> getKeysList(std::string file, std::string delimiter);
+std::string getValueOfKey(std::string file, std::string delimiter,std::string parameter);
 
-string itos(unsigned int value);
-string ultos(unsigned long int value);
+std::string itos(unsigned int value);
+std::string ultos(unsigned long int value);
 
-string mtos(mode_t mode);
-string trim_filename(const string& filename);
+std::string mtos(mode_t mode);
+std::string trim_filename(const std::string& filename);
 
 /*param s the string to be searched, param delimiter the delimiter char 
 return the value after the first occurance of a delimiter */
-string getFirstValueOfKeyAfterDelim(const string& s, char delimiter);
+std::string getFirstValueOfKeyAfterDelim(const std::string& s, char delimiter);
 
 /*param s the string to be searched param delimiter  the delimiter char
 return the value before the first occurance of a delimiter */
-string getFirstValueOfKeyBeforeDelim(const string& s, char delimiter);
+std::string getFirstValueOfKeyBeforeDelim(const std::string& s, char delimiter);
 
 /* strip whitespace in the beginning and end of string, return a stripped string */
-string stripWhiteSpace(const string& s);
+std::string stripWhiteSpace(const std::string& s);
 
 /* populate a set of string with delimited string */
-vector<string> parseDelimitedList(const string& s, const char delimiter);
+std::vector<std::string> parseDelimitedList(const std::string& s, const char delimiter);
 
 /* make sure s1 starts with s2 */
-bool startsWith(const string& s, const string& with);
+bool startsWith(const std::string& s, const std::string& with);
 
 /* make sure s1 starts with s2 */
-bool starts_with_no_case(const string& s1, const string& s2);
+bool starts_with_no_case(const std::string& s1, const std::string& s2);
 
-string convertToLowerCase(const string& s);
-string convertToUpperCase(const string& s);
+std::string convertToLowerCase(const std::string& s);
+std::string convertToUpperCase(const std::string& s);
 
 /* split a string into parts
 	param s string to be split
@@ -101,18 +100,18 @@ string convertToUpperCase(const string& s);
 
 	return a list of string */
 template <class T>
-void split( const string& s, char del,
+void split( const std::string& s, char del,
             T& target,
             int startPos, bool useEmpty )
 {
-    string line = s;
+    std::string line = s;
 
-    string::size_type pos;
+    std::string::size_type pos;
     int offset = startPos;
-    while ( ( pos = line.find( del, offset ) ) != string::npos ) {
+    while ( ( pos = line.find( del, offset ) ) != std::string::npos ) {
         offset = 0;
 
-        string val = line.substr( 0, pos );
+        std::string val = line.substr( 0, pos );
         if ( useEmpty || !stripWhiteSpace( val ).empty() ) {
             target.push_back( val );
         }

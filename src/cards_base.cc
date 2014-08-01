@@ -50,10 +50,6 @@ void CardsBase::run(int argc, char** argv)
 		// TODO give the possibility to do in alternate rootfs	
 		string o_root="/";
 		
-		if ( ! m_argParser.isSet(CardsArgumentParser::OPT_REMOVE) &&
-			! m_argParser.isSet(CardsArgumentParser::OPT_DRY) ) {
-			throw runtime_error("Option missing -n or -r ");
-		}
 		if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {	
 			if (getuid()) {
 				m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;

@@ -20,6 +20,8 @@
 
 #include "archive_utils.h"
 
+using namespace std;
+
 ArchiveUtils::ArchiveUtils(const string& fileName)
 	: m_fileName(fileName)
 {

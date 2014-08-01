@@ -32,6 +32,15 @@ void CardsInstall::run(int argc, char** argv)
         m_configParser->parsePortsList();
         m_configParser->parseBasePackageList();
 }
+set<string> CardsInstall::findPackages(const string& path)
+{
+	set<string> packageList;
+	if (findFile(packageList, path) != 0) {
+		m_actualError = CANNOT_READ_DIRECTORY;
+		treatErrors(path);
+	}
+	return packageList;
+}
 set<string> CardsInstall::getDirectDependencies()
 {
 
@@ -198,7 +207,8 @@ void CardsInstall::update()
 
 	if (! conflicting_files.empty()) {
 		copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
-		 m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
+		m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
+		treatErrors("listed file(s) already installed, cannot continue... ");	
 	}
 
 	// Remove metadata about the package removed
@@ -308,6 +318,13 @@ void CardsInstall::install()
 		// Add the info about the files to the DB
 		addPackageFilesRefsToDB(package.first, package.second);
 		runLdConfig();
+	}
+}
+void CardsInstall::install(const vector<string>& dependenciesList)
+{
+	std::vector<string> listOfPackages;
+	for (std::vector<string>::const_iterator it = dependenciesList.begin(); it != dependenciesList.end();it++) {
+		cout << "INSTALL ALL FROM: " << *it << endl;
 	}
 }
 set<string> CardsInstall::getKeepFileList(const set<string>& files, const vector<rule_t>& rules)

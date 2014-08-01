@@ -42,11 +42,17 @@ public:
 	void printDependenciesList();
 	void update();
 	void install();
-
+	void install(const vector<string>& dependenciesList);
 	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;
 
 private:
+	/* 
+	 * this methode is only checking what available in the path passed as argument
+	 * It only call  by the public method install(dependenciesList) 
+	 * It is used by packagers and for the bot.
+	*/
+	set<string> findPackages(const string& path);
 	set<string> getDirectDependencies();
 	set<string> applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
 	set<string> getKeepFileList(const set<string>& files, const vector<rule_t>& rules);

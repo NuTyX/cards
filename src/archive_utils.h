@@ -102,20 +102,20 @@ class ArchiveUtils
 	private:
 	
 	std::string getPackageName();
-	std::vector<string>  extractFileContent(const char * fileName);
+	std::vector<std::string>  extractFileContent(const char * fileName);
 	void getRunTimeDependencies();
 
 
 	unsigned int long m_size;
 
-	std::vector<string> m_contentMtree;
-	std::vector<string> m_contentMeta;
-	std::vector<string> m_contentInfo;
+	std::vector<std::string> m_contentMtree;
+	std::vector<std::string> m_contentMeta;
+	std::vector<std::string> m_contentInfo;
 
-	std::set<string> m_rtDependenciesList;
+	std::set<std::string> m_rtDependenciesList;
 	std::string m_fileName;
 	std::string m_packageName;
-	std::set<string> m_filesList;
+	std::set<std::string> m_filesList;
 
 	archive_error m_actualError;
 };

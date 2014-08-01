@@ -80,16 +80,16 @@ RM_PKG_FILES_END
 };
 
 struct pkginfo_t {
-	string description;
+	std::string description;
 	time_t build; // date of build
-	string version;
+	std::string version;
 	time_t install; // date of installation
-	string arch;
-	string size;
-	set<string> dependencies;
-	set<string> files;
+	std::string arch;
+	std::string size;
+	std::set<std::string> dependencies;
+	std::set<std::string> files;
 };
-typedef map<string, pkginfo_t> packages_t;
+typedef std::map<std::string, pkginfo_t> packages_t;
 
 enum rule_event_t {
 	UPGRADE,
@@ -98,7 +98,7 @@ enum rule_event_t {
 
 struct rule_t {
 	rule_event_t event;
-	string pattern;
+	std::string pattern;
 	bool action;
 };
 
@@ -106,63 +106,63 @@ class Pkgdbh {
 public:
 
 	Pkgdbh() {}	
-	explicit Pkgdbh(const string& name);
+	explicit Pkgdbh(const std::string& name);
 	virtual ~Pkgdbh() {}
 	virtual void run(int argc, char** argv) = 0; // Need to be redefine in derivated class
 	virtual void printHelp() const = 0; // help info is depending of the derivated class
 	virtual void progressInfo() const; // progressInfo info
-	virtual void treatErrors(const string& s) const; 
+	virtual void treatErrors(const std::string& s) const; 
 	void print_version() const;
 
 protected:
 	// Database
 
-	int getListOfPackageNames(const string& path );
-	pair<string, pkginfo_t> getInfosPackage(const string& packageName);
+	int getListOfPackageNames(const std::string& path );
+	std::pair<std::string, pkginfo_t> getInfosPackage(const std::string& packageName);
 	void buildDatabaseWithDetailsInfos(bool silent);
-	void buildDatabaseWithDetailsInfos(const string& path);
+	void buildDatabaseWithDetailsInfos(const std::string& path);
 
 
-	void addPackageFilesRefsToDB(const string& name, const pkginfo_t& info);
-	void addPackageFilesRefsToDB_2(const string& name, const pkginfo_t& info);
-	bool checkPackageNameExist(const string& name);
-	bool checkPackageNameExist_2(const string& name);	
+	void addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& info);
+	void addPackageFilesRefsToDB_2(const std::string& name, const pkginfo_t& info);
+	bool checkPackageNameExist(const std::string& name);
+	bool checkPackageNameExist_2(const std::string& name);	
 	/* Remove the physical files after followings some rules */
-	void removePackageFiles(const string& name);
+	void removePackageFiles(const std::string& name);
 	
-	void removePackageFiles(const string& name, const set<string>& keep_list);
+	void removePackageFiles(const std::string& name, const std::set<std::string>& keep_list);
 
 	/* Remove meta data about the removed package */
-	void removePackageFilesRefsFromDB(const string& name);
-	void removePackageFilesRefsFromDB_2(const string& name, const set<string>& keep_list);
-	void removePackageFilesRefsFromDB(set<string> files, const set<string>& keep_list);
-	set<string> getConflictsFilesList(const string& name, const pkginfo_t& info);
+	void removePackageFilesRefsFromDB(const std::string& name);
+	void removePackageFilesRefsFromDB_2(const std::string& name, const std::set<std::string>& keep_list);
+	void removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list);
+	std::set<std::string> getConflictsFilesList(const std::string& name, const pkginfo_t& info);
 
 	// Tar.gz
-	pair<string, pkginfo_t> openArchivePackage(const string& filename);
-	void extractAndRunPREfromPackage(const string& filename);
-	void installArchivePackage(const string& filename, const set<string>& keep_list, const set<string>& non_install_files);
-	void moveMetaFilesPackage(const string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
-	void installArchivePackage_2(const string& filename, const set<string>& keep_list, const set<string>& non_install_files) const;
+	std::pair<std::string, pkginfo_t> openArchivePackage(const std::string& filename);
+	void extractAndRunPREfromPackage(const std::string& filename);
+	void installArchivePackage(const std::string& filename, const std::set<std::string>& keep_list, const std::set<std::string>& non_install_files);
+	void moveMetaFilesPackage(const std::string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
+	void installArchivePackage_2(const std::string& filename, const std::set<std::string>& keep_list, const std::set<std::string>& non_install_files) const;
 
 	void readRulesFile();
-	bool checkRuleAppliesToFile(const rule_t& rule, const string& file);
+	bool checkRuleAppliesToFile(const rule_t& rule, const std::string& file);
 
-	void getFootprintPackage(string& filename);
+	void getFootprintPackage(std::string& filename);
 	void runLdConfig();
-	string m_packageArchiveName;
-	string m_packageArchiveVersion;
-	string m_utilName;
-	string m_root;
-	string m_build;
-	vector<rule_t> m_actionRules;
+	std::string m_packageArchiveName;
+	std::string m_packageArchiveVersion;
+	std::string m_utilName;
+	std::string m_root;
+	std::string m_build;
+	std::vector<rule_t> m_actionRules;
 
 	packages_t m_listOfInstPackages;
 	packages_t m_listOfDepotPackages;
 
-	set<string> m_packageNamesList;
-	set<string> m_filesList;
-	set<string> m_runtimeLibrairiesList;
+	std::set<std::string> m_packageNamesList;
+	std::set<std::string> m_filesList;
+	std::set<std::string> m_runtimeLibrairiesList;
 
 	action m_actualAction;
 	error m_actualError;
