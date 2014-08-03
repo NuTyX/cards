@@ -43,9 +43,10 @@ public:
 	void update();
 	void install();
 	void install(const vector<string>& dependenciesList);
+	void create();
 	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;
-
+	
 private:
 	/* 
 	 * this methode is only checking what available in the path passed as argument
@@ -62,6 +63,7 @@ private:
 	void getSignatures();
 	void generateDependencies();
 	bool getPackageFileName();
+	void addPackagesList();
 
 	string m_packageName;
 	string m_packageFileName;

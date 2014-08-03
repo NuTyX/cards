@@ -48,11 +48,18 @@ ArgParser::APOpt CardsArgumentParser::OPT_PORTS;
 
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
 
+ArgParser::APOpt CardsArgumentParser::OPT_OUTOFDATE;
+
 
 CardsArgumentParser::CardsArgumentParser()
 {
 	addCommand(CMD_CONFIG, "config",
-		"show info about cards configuration",
+		"show info about cards configuration.\n\t\t\t\
+It can show the defined Directories where alls the packages are located.\n\t\t\t\
+the locale which are going to be installed\n\t\t\t\
+the architecture of your machine\n\t\t\t\
+the base system directory\n\t\t\t\
+the logfile directory",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_BASE, "base",
@@ -64,7 +71,9 @@ CardsArgumentParser::CardsArgumentParser()
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_INFO, "info",
-		"show info about a package",
+		"show info about a package.\n\t\t\t\
+It can be an installed one, a port or\n\t\t\t\
+a binary available in the depot",
 		ArgParser::EQ, 1 , "<package>");
 
 	addCommand(CMD_LIST, "list",
@@ -72,7 +81,12 @@ CardsArgumentParser::CardsArgumentParser()
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_INSTALL, "install",
-		"install a binary package",
+		"install a binary package.\n\t\t\t\
+It will first download the request package, then\n\t\t\t\
+it will analyse it and download it's dependancies, then\n\t\t\t\
+analyse them and so on. When all the dependancies\n\t\t\t\
+are downloaded, they will be installed in the right order\n\t\t\t\
+then finally the request package will be installed",
 		ArgParser::MIN, 1, "<package name>");
 
 	addCommand(CMD_REMOVE, "remove",
@@ -80,19 +94,28 @@ CardsArgumentParser::CardsArgumentParser()
 		ArgParser::MIN, 1 , "<package>");
 
 	addCommand(CMD_LEVEL, "level",
-		"generate all the levels",
+		"generate all the levels.\n\t\t\t\
+This command is used for the packager.\n\t\t\t\
+It allow to see which package depends on which\n\t\t\t\
+for the compilation only",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_DIFF, "diff",
-		"list outdated packages",
+		"list outdated packages.\n\t\t\t\
+It can be checked against ports and binaries",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_DEPENDS, "depends",
-		"show dependencies for the port",
+		"show dependencies for the port.\n\t\t\t\
+This command is used for the packager.\n\t\t\t\
+It allow to see which package depends on\n\t\t\t\
+the package, for the compilation only",
 		ArgParser::EQ, 1,"<port>");
 
 	addCommand(CMD_DEPTREE, "deptree",
-		"show dependencies tree for the port",
+		"show dependencies tree for the port.\n\t\t\t\
+It's mainly use to know if they are no duplicate call\n\t\t\t\
+of any dependency.",
 		ArgParser::EQ, 1,"<port>");
 
 	addCommand(CMD_SEARCH, "search",
@@ -100,7 +123,10 @@ CardsArgumentParser::CardsArgumentParser()
 		ArgParser::EQ, 1, "<expr>");
 
 	addCommand(CMD_CREATE, "create",
-		"create the binaries.\n\t\t\tAll the dependencies need for a successfull creation\n\t\t\thave to be compiled and up to date. If not the command will abort.",
+		"create the binaries.\n\t\t\tAll the dependencies need for a successfull creation\n\t\t\t\
+have to be compiled and up to date.\n\t\t\tIf not the command will abort.\n\t\t\t\
+A compilation logfile can be define in /etc/cards.conf as:\n\t\t\t\
+logdir /var/log/pkgbuild for exemple.",
 		ArgParser::EQ, 1, "<port>");
 
 	OPT_FORCE.init("force",
@@ -139,15 +165,20 @@ CardsArgumentParser::CardsArgumentParser()
 		'a',
 		"\tall the concerned objects");
 
+	OPT_OUTOFDATE.init("old",
+		'o',
+		"\tcheck old packages");
+
 	addOption(CMD_SYNC, OPT_INSTALLED, false);
 	addOption(CMD_SYNC, OPT_PORTS, false);
 	addOption(CMD_SYNC, OPT_BINARIES, false);
 
 
 	
-	addOption(CMD_LIST,OPT_INSTALLED, false);
-	addOption(CMD_LIST,OPT_BINARIES, false);
-	addOption(CMD_LIST,OPT_PORTS, false);
+	addOption(CMD_LIST, OPT_INSTALLED, false);
+	addOption(CMD_LIST, OPT_BINARIES, false);
+	addOption(CMD_LIST, OPT_PORTS, false);
+	addOption(CMD_LIST, OPT_OUTOFDATE, false);
 
 	addOption(CMD_INFO,OPT_INSTALLED, false);
 	addOption(CMD_INFO,OPT_BINARIES, false);

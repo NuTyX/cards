@@ -21,6 +21,7 @@
 #include <sstream>
 
 #include "cards_info.h"
+#include "cards_depends.h"
 
 using namespace std;
 
@@ -81,6 +82,42 @@ void CardsInfo::listPorts()
 		cout << "You need to cards sync first or/and check your /etc/cards.conf file." << endl;
 	} else {
 		cout << endl << "Number of available ports: " << numberOfPorts << endl << endl;
+	}
+}
+void CardsInfo::listOutOfDate()
+{
+	
+  ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
+  cp->parseCategoryDirectory();
+  cp->parsePortsList();
+  cp->parseBasePackageList();
+  set<string> result = cp->getListOutOfDate();
+	
+  if (result.size() > 0) {
+		string packageName = "";
+		std::string::size_type pos;
+		CardsDepends CD(m_argParser);
+		vector<LevelName> packagesLevelList = CD.getlevel();
+		if (packagesLevelList.size() > 0) {
+			for (vector<LevelName>::iterator i = packagesLevelList.begin();i != packagesLevelList.end();i++) {
+				for (set<string>::const_iterator j = result.begin(); j != result.end(); ++j) {
+					packageName = "/" + *j + "@";
+#ifndef NDEBUG
+					cerr << *j << endl;
+					cerr << packageName << endl;
+					cerr << i->l << " " << i->name << endl;
+#endif
+					pos = i->name.find(packageName);
+					if (pos != std::string::npos) {
+						cout << i->l << ": " << *j << endl;
+						break;
+					}
+				} 
+    	}
+			cout << endl << "Number of ports which need to be updated: " << result.size() << endl << endl;
+		} else {
+			cout << "Check dependencies with cards level command ..." << endl;
+		}
 	}
 }
 void CardsInfo::infoInstall()

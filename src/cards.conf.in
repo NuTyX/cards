@@ -32,6 +32,13 @@ dir /var/lib/pkg/saravane/server|http://nutyx.meticul.eu/saravane/latest/server
 dir /var/lib/pkg/saravane/system|http://nutyx.meticul.eu/saravane/latest/system
 
 ##
+##
+## Cards can log the output of the creation of the final package if 
+## the following variable is set: the compilation will be logged
+
+logdir /var/log/pkgbuild
+
+##
 ## Cards need to know for which arch default is 64 bits: x86_64
 ## if 32 bits: i686
 ##

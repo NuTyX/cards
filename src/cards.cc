@@ -27,7 +27,6 @@
 #include "cards_install.h"
 #include "cards_remove.h"
 #include "cards_info.h"
-#include "cards_create.h"
 
 #include "config_parser.h"
 
@@ -67,6 +66,9 @@ int main(int argc, char** argv)
 			for (vector<string>::iterator i = config.locale.begin();i != config.locale.end();++i) {
 				cout << "Locale   : " << *i << endl;
 			}
+			if ( config.logdir != "") {
+				cout << "log directory: " << config.logdir << endl;
+			}
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_CREATE) {
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
@@ -84,8 +86,7 @@ int main(int argc, char** argv)
 			CardsInstall CI(cardsArgPars);
 			CI.install(listOfDeps);
 			// compilation of the final port
-			CardsCreate CC(cardsArgPars);
-			CC.run(argc, argv); 
+			CI.create();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_BASE) {
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
@@ -123,7 +124,8 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 			CardsDepends CD(cardsArgPars);
-			return CD.level();
+			CD.showlevel();
+			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			CD.showdependencies();
@@ -134,11 +136,16 @@ int main(int argc, char** argv)
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) &&
 			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) ) {
+			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) &&
+			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_OUTOFDATE)) ) {
 				cardsArgPars.printHelp("list");
 				return EXIT_SUCCESS;
-			}
+			}			
 			CardsInfo CList(cardsArgPars);
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_OUTOFDATE)) {
+				CList.listOutOfDate();
+				return EXIT_SUCCESS;
+			}
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
 				CList.listBinaries();
 				return EXIT_SUCCESS;

@@ -39,6 +39,10 @@
 #include "cards_argument_parser.h"
 #include "compile_dependencies_utils.h"
 
+struct LevelName {
+	int l;
+	std::string name;
+};
 
 class CardsDepends
 {
@@ -52,15 +56,35 @@ public:
 	: m_argParser(argParser) {}
 
 	virtual void treatErrors(const std::string& s) const;
-	int level();	
+
 	void showdependencies();
-	std::vector<string> getdependencies();
+	void showlevel();
+	
+	std::vector<string>& getdependencies();
+	std::vector<LevelName>& getlevel();
+
 	int deptree();
 
 private:
+	/*
+	* Populate the List of dependance for each found package.
+	* We need to check if each dependance exist if yes add the index reference to the list
+	* if not printout a warning message
+	* We check for TWO deps files, it's need because some binaries need manual add of deps like
+	* xorg-server: xorg-font, may be some perl module, some icons theme what ever those are not
+	* found automatically
+	* kde: all the necessary apps
+	* xfce4: same
+	*/
+	depList *readDependenciesList(itemList *filesList, unsigned int nameIndex);
+
 	int depends();
-	
+	int level();
+
 	std::vector<string> m_dependenciesList;
+	std::vector<LevelName> m_levelList;
+	std::set<string> m_missingDepsList;
+	
 	const CardsArgumentParser& m_argParser;
 	const char* m_packageName;
 	error m_actualError;

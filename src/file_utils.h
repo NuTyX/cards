@@ -55,7 +55,7 @@
 #include <errno.h>
 #include <err.h>
 
-#define S_CARD_MODE S_ISVTX|S_IRWXU|S_IXGRP|S_IXOTH|S_IRGRP|S_IROTH
+#define S_CARDS_MODE  0755
 
 #define WS_NONE         0
 #define WS_RECURSIVE    (1 << 0)

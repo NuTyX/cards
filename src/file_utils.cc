@@ -242,12 +242,12 @@ bool createRecursiveDirs(const string& path)
       {
         *p='\0';
         if(access(opath, 0))
-          mkdir(opath,S_CARD_MODE);
+          mkdir(opath,S_CARDS_MODE);
         *p = '/';
       }
     }
     if(access(opath, 0))
-      mkdir(opath,S_CARD_MODE);
+      mkdir(opath,S_CARDS_MODE);
     return true;
   }
   return false;

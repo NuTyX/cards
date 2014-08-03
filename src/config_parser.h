@@ -58,6 +58,7 @@ struct PortsDirectory {
 struct Config {
 	Config() {}
 	std::string arch;
+	std::string logdir;
 	std::vector<std::string> locale;
 	std::vector<DirUrl> dirUrl;
 	std::vector<std::string> baseDir;
@@ -101,7 +102,7 @@ class ConfigParser
  *  return a list of packages found 
  * 
  */
-	set<string> getListOfPackagesFromDirectory(const string path);
+	set<string> getListOfPackagesFromDirectory(const std::string& path);
 
 /**
  * \parse the MD5SUM of a port directory
@@ -111,11 +112,26 @@ class ConfigParser
  */
 		int parseBasePackageList();
 
+/**
+ *
+ * \return a list of ports which has to be compiled OR
+ *  has to be updated
+ *
+ */
+		set<string> getListOutOfDate();
+
 /*
  *  \parse the info file for each basePackage
  *	add the description of the port found in the first line of the info file
  */
 		int parsePackageInfoList();
+
+/*
+ *	\return the folder of the port name
+ *
+ */
+		string getPortDir (const std::string& portName);
+
 
 /*
  *  \return the version of the port name

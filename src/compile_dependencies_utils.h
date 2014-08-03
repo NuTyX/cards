@@ -66,7 +66,6 @@ typedef struct
 /*** depList: Create the list, Add dependence to the list, free the list  ***/
 depList *initDepsList(void);
 void addDepToDepList(depList *list, unsigned int nameIndex, int niveau);
-depList *readDependenciesList(itemList *listFiles, unsigned int nameIndex);
 void freeDepList(depList *list);
 
 /*** pkgInfo: create the pkg, Add info, free the pkgInfo  ***/
@@ -82,7 +81,6 @@ void freePkgList(pkgList *packagesList);
 int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList,unsigned int niveau);
 int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList,const char* pkgName, unsigned int niveau);
 
-depList *readDependenciesList(itemList *listFiles, unsigned int nameIndex);
 int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int niveau);
 
 char *getLongPackageName(itemList *filesList, const char * packageName);

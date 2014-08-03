@@ -33,7 +33,7 @@ public:
 	Pkginfo() : Pkgdbh("pkginfo") {}
 	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;
-	bool isInstalled(const char* packageName);
+	bool isInstalled(const string& packageName);
 	int getNumberOfPackages();
 };
 

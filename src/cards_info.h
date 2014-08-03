@@ -47,6 +47,7 @@ public:
 	void listInstalled();
 	void listBinaries();
 	void listPorts();
+	void listOutOfDate();
 	void infoInstall();
 	void infoBinary();
 	void infoPort();

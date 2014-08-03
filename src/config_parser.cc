@@ -113,7 +113,9 @@ int ConfigParser::parseCategoryDirectory()
 				fL.basePackageName = *li;
 				fL.version = "";
 			}
+			pD.basePackageList.push_back(fL);
 		}
+		m_packageList.push_back(pD);
 		localPackagesList.clear();
 	}
 	return 0;
@@ -146,12 +148,23 @@ int ConfigParser::parsePortsList()
 	}
 	return 0;
 }
-set<string> ConfigParser::getListOfPackagesFromDirectory(const string path)
+set<string> ConfigParser::getListOfPackagesFromDirectory(const string& path)
 {
-	set<string> listOfPackages;	
-	string MD5SUMFile = path + "/MD5SUM";
-	return listOfPackages;
-	
+	set<string> listOfPackages; 
+	// For each category activate in cards.conf
+	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+		// For each directory found in this category
+		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			if ( path != i->Dir + "/" + j->basePackageName + "@" + j->version)
+				continue;
+			// If we are dealing with the correct path ...
+			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {
+				if ( ( p->arch == "any" ) || ( p->arch == m_config.arch) )
+					listOfPackages.insert(p->name);
+			}
+		}
+	}
+	return listOfPackages;	
 }
 int ConfigParser::parseBasePackageList()
 {
@@ -162,6 +175,9 @@ int ConfigParser::parseBasePackageList()
 */
 	// For each category activate in cards.conf
 	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+#ifndef NDEBUG
+		cerr << i->Dir << endl;
+#endif
 		// For each directory found in this category
 		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			// MD5SUMFile = /var/lib/pkg/saravane/server/alsa-lib@1.2.3.4/MD5SUM
@@ -172,6 +188,8 @@ int ConfigParser::parseBasePackageList()
 				cerr << " ... continue with next" << endl;
 				continue;
 			}
+			j->buildDate = 0;
+			j->extention = "";
 			PackageFilesList PFL;
 			for (vector<string>::const_iterator i = MD5SUMFileContent.begin();i != MD5SUMFileContent.end(); ++i) {
 				string input = *i;
@@ -211,6 +229,20 @@ int ConfigParser::parseBasePackageList()
 		}
 	}
 	return 0;
+}
+set<string> ConfigParser::getListOutOfDate()
+{
+	set<string> listOfPackages;
+	// For each category activate in cards.conf
+	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+		// For each directory found in this category
+		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			if ( j->extention == "" ) {
+				listOfPackages.insert(j->basePackageName);
+			}
+		}
+	}
+	return listOfPackages;
 }
 int ConfigParser::parsePackageInfoList()
 {
@@ -357,6 +389,23 @@ bool ConfigParser::getBinaryPackageInfo(const string& packageName)
 		}
 	}
 	return found;
+}
+string ConfigParser::getPortDir (const std::string& portName)
+{
+	string portDir = "";
+	bool found = false;
+	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			if ( j->basePackageName == portName ) {
+				portDir = i->Dir + "/" + j->basePackageName + "@" + j->version;
+				found = true;
+				break;
+			}
+		}
+		if (found)
+			break;
+	}
+	return portDir;
 }
 string ConfigParser::getPortVersion (const string& portName)
 {
@@ -530,6 +579,9 @@ int ConfigParser::parseConfig(const string& fileName)
 					m_config.arch="i686";
 				}
 			}
+			if (key == "logdir") {
+				m_config.logdir = val;
+			}
 			if (key == "locale") {
 				m_config.locale.push_back(val);
 			}
@@ -582,7 +634,10 @@ int ConfigParser::parseConfig(const string& fileName, Config& config)
 							DU.Dir = stripWhiteSpace(val);
 							DU.Url = "";
 					}					
-					config.dirUrl.push_back(DU) ;
+					config.dirUrl.push_back(DU);
+			}
+			if (key == "logdir") {
+					config.logdir = val;
 			}
 			if (key == "arch") {
 				if (val != "i686") {

@@ -29,8 +29,8 @@ void CardsInstall::run(int argc, char** argv)
 	m_packageName = m_argParser.otherArguments()[0];
 	ConfigParser::parseConfig("/etc/cards.conf", m_config);
 	m_configParser->parseMD5sumCategoryDirectory();
-        m_configParser->parsePortsList();
-        m_configParser->parseBasePackageList();
+	m_configParser->parsePortsList();
+	m_configParser->parseBasePackageList();
 }
 set<string> CardsInstall::findPackages(const string& path)
 {
@@ -262,6 +262,32 @@ void CardsInstall::install()
 	// Generate the dependencies
 	generateDependencies();
 
+	// Add the locales if any defined
+	if (m_config.locale.size() > 0) {
+		vector<string> tmpList;
+		string packageName = "";
+		for (std::vector<string>::iterator i = m_config.locale.begin();i != m_config.locale.end();++i) {
+			for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
+				packageName = *j + "." + *i;
+				if ( m_configParser->checkBinaryExist(packageName)) {
+    			m_packageFileName = m_configParser->getPackageFileName(packageName);
+    			if ( ! checkFileExist(m_packageFileName)) {
+      			m_configParser->downloadPackageFileName(packageName);
+    			}
+					tmpList.push_back(packageName);
+				}
+			}
+		}
+		if (tmpList.size() > 0 ) {
+			for (std::vector<string>::iterator i = tmpList.begin();i != tmpList.end();++i) {
+				m_dependenciesList.push_back(*i);
+			}
+		}
+	}
+	addPackagesList();
+}
+void CardsInstall::addPackagesList()
+{
 	// Checking the rules
 	readRulesFile();
 
@@ -270,17 +296,16 @@ void CardsInstall::install()
 	// Let's go
 	for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
 		m_packageName = *it;
-
-		if ( ! m_configParser->checkBinaryExist(m_packageName)) {
-			m_actualError = PACKAGE_NOT_FOUND;
-			treatErrors(m_packageName);
-		}
 		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
 
 		if  ( checkPackageNameExist(m_packageName) ) {
 			continue;
 		}
 
+		if ( ! m_configParser->checkBinaryExist(m_packageName)) {
+			m_actualError = PACKAGE_NOT_FOUND;
+			treatErrors(m_packageName);
+		}
 		// Reading the archiving to find a list of files
 		pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
 		set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
@@ -322,9 +347,174 @@ void CardsInstall::install()
 }
 void CardsInstall::install(const vector<string>& dependenciesList)
 {
-	std::vector<string> listOfPackages;
+
+	Db_lock lock(m_root, true);
+
+	// Get the list of installed packages
+	getListOfPackageNames(m_root);
+
+	// Retrieving info about all the packages
+	buildDatabaseWithDetailsInfos(false);
+	m_configParser = new ConfigParser("/etc/cards.conf");
+	m_configParser->parseCategoryDirectory();
+	m_configParser->parsePortsList();
+	m_configParser->parseBasePackageList();
+	std::set<string> listOfPackages;
+
 	for (std::vector<string>::const_iterator it = dependenciesList.begin(); it != dependenciesList.end();it++) {
-		cout << "INSTALL ALL FROM: " << *it << endl;
+		listOfPackages = m_configParser->getListOfPackagesFromDirectory(*it);
+		for (std::set<string>::const_iterator i = listOfPackages.begin(); i != listOfPackages.end();i++) {
+			if ( ! checkPackageNameExist(*i) ) {
+				if ( m_configParser->checkBinaryExist(*i)) {
+					cout << "ADD FOR INSTALL: " << *i << endl;
+					m_dependenciesList.push_back(*i);
+				}
+			}
+		}
+	}
+	addPackagesList();
+	
+}
+void CardsInstall::create()
+{
+	m_packageName = const_cast<char*>(m_argParser.otherArguments()[0].c_str());
+	ConfigParser::parseConfig("/etc/cards.conf", m_config);
+	m_configParser = new ConfigParser("/etc/cards.conf");
+	m_configParser->parseCategoryDirectory();
+	m_configParser->parsePortsList();
+	string pkgdir = m_configParser->getPortDir(m_packageName);
+	if (pkgdir == "" ) {
+		m_actualError = PACKAGE_NOT_FOUND;
+		treatErrors(m_packageName);
+	}
+	string timestamp;
+	string commandName = "cards create: ";
+	string message;
+	int fdlog = -1;
+
+	if ( m_config.logdir != "" ) {
+		if ( ! createRecursiveDirs(m_config.logdir) ) {
+			m_actualError = CANNOT_CREATE_DIRECTORY;
+			treatErrors(m_config.logdir);
+		}
+		string logFile = m_config.logdir + "/" + m_packageName + ".log";
+		unlink( logFile.c_str() );
+		fdlog = open(logFile.c_str(),O_APPEND | O_WRONLY | O_CREAT, 0666 );
+		if ( fdlog == -1 ) {
+			m_actualError = CANNOT_OPEN_FILE;
+			treatErrors(logFile);
+		}
+	}
+	message = commandName + pkgdir + " package(s)";
+	cout << message << endl;
+
+	if ( m_config.logdir != "" ) {		
+		write( fdlog, message.c_str(), message.length());
+		time_t startTime;
+		time(&startTime);
+		timestamp = ctime(&startTime);
+		timestamp = " starting build " + timestamp;
+		write( fdlog, timestamp.c_str(), timestamp.length());
+		write( fdlog, "\n", 1 );
+	}
+	chdir( pkgdir.c_str() );
+
+	string runscriptCommand = "sh";
+	string cmd = "pkgmk";
+	string args = "-d ";
+
+	process makeprocess( cmd, args, fdlog );
+	int result = 0 ;
+	result = makeprocess.executeShell();
+#ifndef NDEBUG
+	cerr << result << endl;
+#endif
+	switch ( result )
+	{
+			case 1:
+				throw runtime_error("General error");
+				break;
+			case 2:
+				throw runtime_error("Error Invalid Pkgfile");
+				break;
+			case 3:
+				throw runtime_error("Error Sources /build directory missing or missing read/write permission");
+				break;
+			case 4:
+				throw runtime_error("Error during download of sources file(s)");
+				break;
+			case 5:
+				throw runtime_error("Error during unpacking of sources file(s)");
+				break;
+			case 6:
+				throw runtime_error("Error md5sum from sources Checking");
+				break;
+			case 7:
+				throw runtime_error("Error footprint Checking");
+				break;
+			case 8:
+				throw runtime_error("Error while running 'build()'");
+				break;
+			case 10:
+				throw runtime_error("Error searching runtime dependancies");
+				break;
+			case 11:
+				throw runtime_error(pkgdir + "/" + m_packageName +".info not found");
+				break;
+	}
+	if (result > 0) { //TODO find out why return code is wrong
+		m_actualError = CANNOT_PARSE_FILE;
+		treatErrors(pkgdir+ "/Pkgfile");
+	} 
+	if ( m_config.logdir != "" ) {
+		time_t endTime;
+		time(&endTime);
+		timestamp = ctime(&endTime);
+		timestamp = commandName + "build done " + timestamp;
+
+		write( fdlog, "\n", 1 );
+		write( fdlog, timestamp.c_str(), timestamp.length());
+		write( fdlog, "\n", 1 );
+	}
+
+	// Let's install them
+	m_configParser->parseBasePackageList();
+	
+	m_dependenciesList.clear();
+	// Let's install them now
+	std::set<string> listOfPackages = m_configParser->getListOfPackagesFromDirectory(pkgdir);
+	for (std::set<string>::const_iterator i = listOfPackages.begin(); i != listOfPackages.end();i++) {
+		if ( ! checkPackageNameExist(*i) ) {
+			if ( m_configParser->checkBinaryExist(*i)) {
+				message = "ADD FOR INSTALL: " + *i ;
+				cout << message << endl;
+				if ( m_config.logdir != "" ) {
+					write( fdlog, message.c_str(), message.length());
+					write( fdlog, "\n", 1 );
+				}
+				m_dependenciesList.push_back(*i);
+			}
+		} else {
+				message = "WARNING: " + *i + " is ALLREADY installed";
+				cout << message << endl;
+				if ( m_config.logdir != "" ) {
+					write( fdlog, message.c_str(), message.length()); 
+					write( fdlog, "\n", 1 );
+				}
+		}
+	}
+
+	addPackagesList();
+
+	if ( m_config.logdir != "" ) {
+		time_t finishTime;
+		time(&finishTime);
+		timestamp = ctime(&finishTime);
+		timestamp = commandName + "finish " + timestamp;
+		write( fdlog, "\n", 1 );
+		write( fdlog, timestamp.c_str(), timestamp.length());
+		write( fdlog, "\n", 1 );
+		close ( fdlog );
 	}
 }
 set<string> CardsInstall::getKeepFileList(const set<string>& files, const vector<rule_t>& rules)
