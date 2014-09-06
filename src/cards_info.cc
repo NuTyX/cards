@@ -67,15 +67,8 @@ void CardsInfo::listPorts()
 			treatErrors(prtDir);
 		}
 	}
-	string name, version;
 	for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
-		string val = *li;
-		string::size_type pos = val.find('@');
-		if (pos != string::npos) {
-			name = val.substr(0,pos);
-			version = val.substr(pos+1);
-			cout << name + " " + version << endl;
-		}
+		cout << *li << endl;
 	}
 	numberOfPorts = numberOfPorts + localPackagesList.size();
 	if ( ( config.dirUrl.size() == 0 ) || (localPackagesList.size() == 0 ) ) {
@@ -101,7 +94,7 @@ void CardsInfo::listOutOfDate()
 		if (packagesLevelList.size() > 0) {
 			for (vector<LevelName>::iterator i = packagesLevelList.begin();i != packagesLevelList.end();i++) {
 				for (set<string>::const_iterator j = result.begin(); j != result.end(); ++j) {
-					packageName = "/" + *j + "@";
+					packageName = "/" + *j;
 #ifndef NDEBUG
 					cerr << *j << endl;
 					cerr << packageName << endl;

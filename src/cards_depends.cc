@@ -44,7 +44,7 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	char *depfile2 = (char*)Malloc(sizeof(char)*255);
 
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
-	name[ strchr(name,'@') - name ]='\0';
+//	name[ strchr(name,'@') - name ]='\0';
 
 	sprintf(fullPathfileName,"%s/MD5SUM",filesList->items[nameIndex]);
 	itemList *nameDeps = initItemList();
@@ -63,7 +63,12 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 		char *name = NULL;
 		for (unsigned int i = 0; i < packageFilesList->count;i++) {
 			if ( strchr(packageFilesList->items[i],':') != NULL) {
+
 				name = strchr(packageFilesList->items[i],':');
+#ifndef NDEBUG
+				cerr << "name: " << name << endl;
+#endif
+
 				name++;
 			}
 			// If the file <name>.deps is found that's enough
@@ -92,7 +97,10 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 				char *name = (char*)Malloc(sizeof(char)*255);
 				for(j = 0; j < filesList->count; j++) {
 					sprintf(name,"%s",basename(filesList->items[j]));
-					name[ strchr(name,'@') - name ]='\0';
+#ifndef NDEBUG
+					cerr << "name: " << name << endl;
+#endif
+					// name[ strchr(name,'@') - name ]='\0';
 					char * dep = strdup ( nameDeps->items[i]);
 					if ( strchr(dep,'.') != NULL) {
 						dep[strchr(dep,'.') - dep ]= '\0';
@@ -257,7 +265,7 @@ int CardsDepends::level()
 #endif
 	}
 #ifndef NDEBUG
-	cerr << filesList->count << endl;
+	cerr << "number of files: " << filesList->count << endl;
 #endif
 	for (unsigned int nInd=0;nInd <filesList->count;nInd++) {
 #ifndef NDEBUG

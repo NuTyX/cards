@@ -280,9 +280,9 @@ char *getLongPackageName(itemList *filesList, const char * packageName)
 	unsigned int i = 0 ;
 	for (i = 0; i < filesList->count;i++) {
 		name = strdup(filesList->items[i]);
-		name[strchr(name,'@') - name] = '\0';
+//		name[strchr(name,'@') - name] = '\0';
 		if ( strcmp ( basename(name), packageName ) == 0 ) {
-			name[strlen(name)]='@';
+//			name[strlen(name)]='@';
 			found = true ;
 			break;
 		}

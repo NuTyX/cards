@@ -75,8 +75,11 @@ int ConfigParser::parseMD5sumCategoryDirectory()
 			if (pos != string::npos) {
 				fL.basePackageName = stripWhiteSpace(tmpName.substr(0,pos));
 				fL.version = stripWhiteSpace(tmpName.substr(pos+1));
-				pD.basePackageList.push_back(fL);
+			} else {
+				fL.basePackageName = stripWhiteSpace(tmpName);
+				fL.version = "";
 			}
+			pD.basePackageList.push_back(fL);
 		}
 		m_packageList.push_back(pD);
 	}
@@ -129,16 +132,16 @@ int ConfigParser::parsePortsList()
 		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			/*
 				We should check if the MD5SUM of the port is available
-				MD5SUMFile is /var/lib/pkg/saravane/server/alsa-lib@1.2.3.4/MD5SUM
+				MD5SUMFile is /var/lib/pkg/saravane/server/alsa-lib/MD5SUM
 			*/
-			if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "@" + j->version + "/MD5SUM") ) {
-				downloadFile.url = i->Url + "/" + j->basePackageName  + "@" + j->version + "/MD5SUM";
-				downloadFile.dirname = i->Dir + "/" + j->basePackageName  + "@" + j->version;
+			if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "/MD5SUM") ) {
+				downloadFile.url = i->Url + "/" + j->basePackageName  + "/MD5SUM";
+				downloadFile.dirname = i->Dir + "/" + j->basePackageName;
 				downloadFile.filename = "/MD5SUM";
 				downloadFile.md5sum = j-> md5SUM;
 				downloadFilesList.push_back(downloadFile);
 #ifndef NDEBUG
-				cerr << i->Dir + "/" + j->basePackageName  + "@" + j->version << endl;
+				cerr << i->Dir + "/" + j->basePackageName  << endl;
 #endif
 			}
 		}
@@ -155,7 +158,7 @@ set<string> ConfigParser::getListOfPackagesFromDirectory(const string& path)
 	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
 		// For each directory found in this category
 		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			if ( path != i->Dir + "/" + j->basePackageName + "@" + j->version)
+			if ( path != i->Dir + "/" + j->basePackageName)
 				continue;
 			// If we are dealing with the correct path ...
 			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {
@@ -171,7 +174,7 @@ int ConfigParser::parseBasePackageList()
 /*
  From here we can check if the binaries are available
  We have to parse the file 
- /var/lib/pkg/saravane/server/alsa-lib@1.2.3.4/MD5SUM
+ /var/lib/pkg/saravane/server/alsa-lib/MD5SUM
 */
 	// For each category activate in cards.conf
 	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
@@ -180,8 +183,8 @@ int ConfigParser::parseBasePackageList()
 #endif
 		// For each directory found in this category
 		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			// MD5SUMFile = /var/lib/pkg/saravane/server/alsa-lib@1.2.3.4/MD5SUM
-			string MD5SUMFile = i->Dir + "/" + j->basePackageName  + "@" + j->version + "/MD5SUM";
+			// MD5SUMFile = /var/lib/pkg/saravane/server/alsa-lib/MD5SUM
+			string MD5SUMFile = i->Dir + "/" + j->basePackageName  + "/MD5SUM";
 			vector<string> MD5SUMFileContent;
 			if ( parseFile(MD5SUMFileContent,MD5SUMFile.c_str()) != 0) {
 				cerr << "Cannot read the file: " << MD5SUMFile << endl;
@@ -259,14 +262,14 @@ int ConfigParser::parsePackageInfoList()
 				cerr << p->md5SUM << " " << p->name << endl << endl;
 #endif
 				if ( p->name == j->basePackageName + ".info" ){
-					if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "@" + j->version + "/" + p->name) ) {
-							downloadFile.url = i->Url + "/" + j->basePackageName  + "@" + j->version + "/" + p->name;
-							downloadFile.dirname = i->Dir + "/" + j->basePackageName  + "@" + j->version;
+					if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "/" + p->name) ) {
+							downloadFile.url = i->Url + "/" + j->basePackageName  + "/" + p->name;
+							downloadFile.dirname = i->Dir + "/" + j->basePackageName;
 							downloadFile.filename = "/"+p->name;
 							downloadFile.md5sum = p-> md5SUM;
 							downloadFilesList.push_back(downloadFile);
 #ifndef NDEBUG
-							cerr << i->Dir + "/" + j->basePackageName  + "@" + j->version + "/" + p->name << endl;
+							cerr << i->Dir + "/" + j->basePackageName  + "/" + p->name << endl;
 #endif
 					}
 				}
@@ -281,7 +284,7 @@ int ConfigParser::parsePackageInfoList()
  */
 	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
 		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			string infoFile = i->Dir + "/" + j->basePackageName  + "@" + j->version + "/" + j->basePackageName + ".info";
+			string infoFile = i->Dir + "/" + j->basePackageName  + "/" + j->basePackageName + ".info";
 			vector<string> infoFileContent;
 			if ( parseFile(infoFileContent,infoFile.c_str()) != 0) {
 				cerr << "Cannot read the file: " << infoFile << endl;
@@ -301,8 +304,8 @@ void ConfigParser::downloadPackageFileName(const std::string& packageName)
 		cerr << packageName << endl;
 #endif
 		string build = static_cast<ostringstream*>( &(ostringstream() <<  m_j->buildDate ))->str();
-		string url = m_i->Url + "/" + m_j->basePackageName + "@" + m_j->version + "/" + m_p->name + build + m_p-> arch + m_j->extention;
-		string dir = m_i->Dir + "/" + m_j->basePackageName + "@" + m_j->version;
+		string url = m_i->Url + "/" + m_j->basePackageName + "/" + m_p->name + build + m_p-> arch + m_j->extention;
+		string dir = m_i->Dir + "/" + m_j->basePackageName;
 		string fileName = m_p->name + build + m_p-> arch + m_j->extention;
 #ifndef NDEBUG
 		cerr << url << " " 
@@ -397,7 +400,7 @@ string ConfigParser::getPortDir (const std::string& portName)
 	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
 		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			if ( j->basePackageName == portName ) {
-				portDir = i->Dir + "/" + j->basePackageName + "@" + j->version;
+				portDir = i->Dir + "/" + j->basePackageName;
 				found = true;
 				break;
 			}
@@ -446,7 +449,7 @@ bool ConfigParser::checkBinaryExist(const string& packageName)
 		for (m_j = m_i->basePackageList.begin(); m_j != m_i->basePackageList.end();++m_j) {
 			for (m_p = m_j->packageFilesList.begin(); m_p != m_j ->packageFilesList.end();++m_p) {
 				if ( m_p->name == packageName ) {
-					m_packageFileName =  m_i ->Dir + "/" + m_j->basePackageName + "@" + m_j->version + "/" + m_p->name 
+					m_packageFileName =  m_i ->Dir + "/" + m_j->basePackageName + "/" + m_p->name 
 					+ static_cast<ostringstream*>( &(ostringstream() <<  m_j->buildDate ))->str() + m_p-> arch + m_j->extention;
 					found = true;
 					break;
