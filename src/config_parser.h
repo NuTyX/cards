@@ -120,6 +120,12 @@ class ConfigParser
  */
 		set<string> getListOutOfDate();
 
+/**
+ * \parse the Pkgfile for each basePackage
+ * add the version of the port found in the Pkgfile
+ *
+ */
+		int parsePackagePkgfileList();
 /*
  *  \parse the info file for each basePackage
  *	add the description of the port found in the first line of the info file

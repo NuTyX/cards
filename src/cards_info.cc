@@ -88,19 +88,22 @@ void CardsInfo::listOutOfDate()
 	
   if (result.size() > 0) {
 		string packageName = "";
+		string nameToFind = "";
 		std::string::size_type pos;
 		CardsDepends CD(m_argParser);
 		vector<LevelName> packagesLevelList = CD.getlevel();
 		if (packagesLevelList.size() > 0) {
 			for (vector<LevelName>::iterator i = packagesLevelList.begin();i != packagesLevelList.end();i++) {
 				for (set<string>::const_iterator j = result.begin(); j != result.end(); ++j) {
-					packageName = "/" + *j;
+					packageName = "/" + *j + "/";
+					
 #ifndef NDEBUG
 					cerr << *j << endl;
 					cerr << packageName << endl;
 					cerr << i->l << " " << i->name << endl;
 #endif
-					pos = i->name.find(packageName);
+					nameToFind = i->name + "/";
+					pos = nameToFind.find(packageName);
 					if (pos != std::string::npos) {
 						cout << i->l << ": " << *j << endl;
 						break;
@@ -149,6 +152,7 @@ void CardsInfo::infoPort()
 	cp->parseMD5sumCategoryDirectory();
 	cp->parsePortsList();
 	cp->parsePackageInfoList();
+	cp->parsePackagePkgfileList();
 	if ( ! cp->getPortInfo(m_argParser.otherArguments()[0]) ) {
 		cout << m_argParser.otherArguments()[0] << " not found " << endl;
 	}
@@ -162,7 +166,7 @@ void CardsInfo::diffPorts()
 
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
 	cp->parseMD5sumCategoryDirectory();
-
+	cp->parsePackagePkgfileList();
 	vector<pair<string, DiffVers > > result;
 	DiffVers DV;
 	DV.installed="Installed";

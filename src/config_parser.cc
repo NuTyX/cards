@@ -247,6 +247,58 @@ set<string> ConfigParser::getListOutOfDate()
 	}
 	return listOfPackages;
 }
+int ConfigParser::parsePackagePkgfileList()
+{
+	InfoFile downloadFile;
+	vector<InfoFile> downloadFilesList;
+	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {
+#ifndef NDEBUG
+				cerr << p->md5SUM << " " << p->name << endl << endl;
+#endif
+				if ( p->name == "Pkgfile" ){
+					if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "/" + p->name) ) {
+						downloadFile.url = i->Url + "/" + j->basePackageName  + "/" + p->name;
+						downloadFile.dirname = i->Dir + "/" + j->basePackageName;
+						downloadFile.filename = "/"+p->name;
+						downloadFile.md5sum = p-> md5SUM;
+						downloadFilesList.push_back(downloadFile);
+#ifndef NDEBUG
+						cerr << i->Dir + "/" + j->basePackageName  + "/" + p->name << endl;
+#endif
+					}
+				}
+			}
+		}
+	}
+	if ( downloadFilesList.size() > 0 ) {
+		FileDownload FD(downloadFilesList,false);
+	}
+/*
+ * Time to add the version
+ */
+	std::string::size_type pos;
+	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			string pkgFile = i->Dir + "/" + j->basePackageName  + "/Pkgfile";
+			vector<string> pkgFileContent;
+			if ( parseFile(pkgFileContent,pkgFile.c_str()) != 0) {
+				cerr << "Cannot read the file: " << pkgFile << endl;
+				cerr << " ... continue with next" << endl;
+				continue;
+			}
+			for (vector<string>::const_iterator p = pkgFileContent.begin();p != pkgFileContent.end();++p) {
+				string line = stripWhiteSpace(*p);
+				pos = line.find("version=");
+				if ( (pos != std::string::npos) && ( pos == 0 ) ) { // should be at the begin of the line after space stripping
+					j->version = line.substr(pos+8); // lenght of "version="
+				}
+			}
+		} 
+	}
+	return 0;
+}
 int ConfigParser::parsePackageInfoList()
 {
 /*
@@ -263,13 +315,13 @@ int ConfigParser::parsePackageInfoList()
 #endif
 				if ( p->name == j->basePackageName + ".info" ){
 					if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "/" + p->name) ) {
-							downloadFile.url = i->Url + "/" + j->basePackageName  + "/" + p->name;
-							downloadFile.dirname = i->Dir + "/" + j->basePackageName;
-							downloadFile.filename = "/"+p->name;
-							downloadFile.md5sum = p-> md5SUM;
-							downloadFilesList.push_back(downloadFile);
+						downloadFile.url = i->Url + "/" + j->basePackageName  + "/" + p->name;
+						downloadFile.dirname = i->Dir + "/" + j->basePackageName;
+						downloadFile.filename = "/"+p->name;
+						downloadFile.md5sum = p-> md5SUM;
+						downloadFilesList.push_back(downloadFile);
 #ifndef NDEBUG
-							cerr << i->Dir + "/" + j->basePackageName  + "/" + p->name << endl;
+						cerr << i->Dir + "/" + j->basePackageName  + "/" + p->name << endl;
 #endif
 					}
 				}

@@ -27,9 +27,9 @@
 ##                                               /...
  
 
-dir /var/lib/pkg/saravane/desktop|http://nutyx.meticul.eu/saravane/latest/desktop
-dir /var/lib/pkg/saravane/server|http://nutyx.meticul.eu/saravane/latest/server
-dir /var/lib/pkg/saravane/system|http://nutyx.meticul.eu/saravane/latest/system
+dir /var/lib/pkg/saravane/desktop|http://downloads.nutyx.org/saravane/latest/desktop
+dir /var/lib/pkg/saravane/server|http://downloads.nutyx.org/saravane/latest/server
+dir /var/lib/pkg/saravane/system|http://downloads.nutyx.org/saravane/latest/system
 
 ##
 ##
