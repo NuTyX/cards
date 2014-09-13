@@ -23,8 +23,6 @@
 #define PROCESS_H
 
 #include <string>
-using namespace std;
-
   
 /* To execute a process 
 	Arguments:
@@ -36,7 +34,7 @@ using namespace std;
 class process
 {
 public:
-	process( const string& app, const string& args, int fileDescriptorLog=0 );
+	process( const std::string& app, const std::string& args, int fileDescriptorLog=0 );
 	/* execute the process
 		return the exit status of the application */
 	int execute();

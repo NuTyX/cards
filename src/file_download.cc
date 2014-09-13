@@ -212,5 +212,7 @@ bool FileDownload::checkMD5sum()
 	}
 	return same;
 }
-
+bool FileDownload::checkUpToDate()
+{
+}
 // vim:set ts=2 :

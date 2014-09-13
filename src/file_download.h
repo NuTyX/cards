@@ -54,7 +54,7 @@ class FileDownload
 	int updateProgress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
 	size_t writeToStream(void *buffer, size_t size, size_t nmemb, void *stream);
 	void initFileToDownload(std::string _url, std::string _file);
-
+	bool checkUpToDate();
 	struct dwlProgress
 	{
 		double lastruntime;

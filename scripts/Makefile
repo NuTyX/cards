@@ -23,11 +23,10 @@
 
 include ../Makefile.inc
 
-all: pkgmk gop
+all: pkgmk
 
 pkgmk: pkgmk.in
 
-gop: gop.in
 
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
@@ -37,13 +36,11 @@ gop: gop.in
 
 install: all
 	install -D -m0755 pkgmk $(DESTDIR)$(USRBINDIR)/pkgmk
-	install -D -m0755 gop $(DESTDIR)$(USRBINDIR)/gop
 	install -D -m0644 pkgmk.conf $(DESTDIR)$(ETCDIR)/pkgmk.conf
 clean:
 	rm -f pkgmk
-	rm -f gop
 
 distclean: clean
 	rm -f pkgmk
-	rm -f gop
+
 # End of file

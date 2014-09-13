@@ -62,7 +62,7 @@ CARDSOBJECTS =	error_treat.o \
 LIBOBJECTS =  pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
 
 test:
-	$(CXX) -DDEBUG error_treat.cc md5.cc string_utils.cc \
+	$(CXX) -DNDEBUG error_treat.cc md5.cc string_utils.cc \
 	file_utils.cc archive_utils.cc  config_parser.h \
 	config_parser.cc file_download.cc \
 	test.cc -o ~/bin/au $(LDFLAGS) $(LIBCURLLIBS)

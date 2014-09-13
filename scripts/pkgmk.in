@@ -699,7 +699,7 @@ add_meta_to_archive() {
 	bsdtar -r -f $PKGMK_PACKAGE_DIR/$1 *
 
 	cd ..
-	rm -r $TAR
+	rm -rf $TAR
 }
 
 compress_archive() {
@@ -1155,16 +1155,9 @@ main() {
 		warning "pkginfo NOT FOUND, footprint ignored."
 		PKGMK_IGNORE_FOOTPRINT="yes"
 	fi
-	local FILE TARGET PACKAGENAME
+	local FILE TARGET 
 
-
-	PACKAGENAME=`basename $PKGMK_ROOT`
-	name="`echo $PACKAGENAME | cut  -d "@" -f1`"
-	version="`basename $PKGMK_ROOT | cut -d "@" -f2`"
-
-	if [ "$version" == "$name" ]; then
-		unset version
-	fi
+	name=`basename $PKGMK_ROOT`
 
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
 		recursive "$@"
@@ -1183,8 +1176,23 @@ main() {
 		exit $E_INFO
 	fi
 	. $PKGMK_PKGFILE
+	if [ -z $group ]; then
+		group="`echo $name | cut -d "-" -f1`"
+	fi
+	if [ "$group" == "$name" ]; then
+		unset group
+	fi
 	if [ -z "$version" ]; then
-		warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+		if [ ! -z "$group" ];then
+			if [ -f ../$group/$PKGMK_PKGFILE ];then
+				. ../$group/$PKGMK_PKGFILE
+				. $PKGMK_PKGFILE
+			else
+				warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+			fi
+		else
+			warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+		fi
 	fi
 	info "PKGMK_INSTALL: $PKGMK_INSTALL"
 	info "PKGMK_WORK_DIR: $PKGMK_WORK_DIR"
@@ -1220,6 +1228,9 @@ main() {
 	info "name: ${name}"
 	if [ ! -z "$version" ]; then
 		info "version: $version"
+	fi
+	if [ ! -z "$group" ]; then
+		info "group: $group"
 	fi
 	PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 	check_directory "$PKGMK_SOURCE_DIR"
@@ -1383,7 +1394,6 @@ PKGMK_KEEP_SOURCES="no"
 PKGMK_CLEAN="yes"
 PKGMK_SYNC_FILES="no"
 
-PKGMK_LOG_DIR=/var/log/pkgbuild
 
 PKGMK_GROUPS=(devel man doc service)
 
