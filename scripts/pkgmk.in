@@ -945,7 +945,7 @@ update_signature()
 	get_package_list
 	if [ ! -z $TARGETS ]; then
 		EXT="`get_package_extension $TARGETS`"
-		echo "`get_package_builddate $TARGETS`:$EXT" > $PKGMK_SIGNATURE
+		echo "`get_package_builddate $TARGETS`:$EXT:$version" > $PKGMK_SIGNATURE
 		for TARGET in ${TARGETS[@]}; do
 			FILE=`basename $TARGET`
 			MD5SUM=`md5sum $TARGET|cut -d " " -f1`

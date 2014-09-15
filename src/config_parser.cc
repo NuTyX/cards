@@ -218,11 +218,19 @@ int ConfigParser::parseBasePackageList()
 
 				/*
 				 * Let's check if the first line is something like:
-				 * 1401638336:.cards.tar.xz
+				 * 1401638336:.cards.tar.xz:4.14.1
 				*/
 				if (input[10] == ':' ) {	// There is a chance to find what we are looking for
 					j->buildDate = strtoul(input.substr(0,10).c_str(),NULL,0);
-					j->extention = input.substr(11,input.size());
+					string extension_version = input.substr(11,input.size());
+					string::size_type pos = extension_version.find(':');
+					if ( pos != std::string::npos) {
+						j->extention = extension_version.substr(0,pos);
+						j->version = extension_version.substr(pos+1);
+					} else {
+						j->extention = input.substr(11,input.size());
+						j->version = "N.A.";
+					}
 #ifndef NDEBUG
 					cerr << j->basePackageName << ": " << j->buildDate << " " << j->extention << endl;
 #endif
