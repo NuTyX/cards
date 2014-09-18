@@ -341,17 +341,15 @@ void CardsSync::run()
 				string localPackageDirectory = *ri;
 				string MD5SUMFile = categoryDir+localPackageDirectory + "/" + m_repoFile;
 				string packageName = *ri;
-				string::size_type pos = localPackageDirectory.find('@');
-				if ( pos != std::string::npos) {
-					packageName = localPackageDirectory.substr(0,pos);
-				}
+				string::size_type pos = 0;
 				vector<string> MD5SUMFileContent;
 				if ( parseFile(MD5SUMFileContent,MD5SUMFile.c_str()) != 0) {
 					m_actualError = CANNOT_READ_FILE;
 					treatErrors(MD5SUMFile);
 				}
-				string packageExtension = "";
 				string packageBuildDate = "";
+				string packageExtension = "";
+				string packageVersion = "";
 				for (vector<string>::const_iterator i = MD5SUMFileContent.begin();i != MD5SUMFileContent.end(); ++i) {
 					string input = *i;
 					if (input.size() < 11) {
@@ -359,9 +357,17 @@ void CardsSync::run()
 						continue;
 					}
 					if (input[10] == ':' ) {
-						packageExtension = input.substr(11,input.size());
 						packageBuildDate = input.substr(0,10);
+						packageExtension = input.substr(11,input.size());
+						pos = packageExtension.find(':');
+						if ( pos != std::string::npos) { // This package have a version
+							packageVersion = packageExtension.substr(pos+1);
+							packageExtension = input.substr(11, pos);
+						}
 						found = true;
+#ifndef NDEBUG
+						cerr << packageBuildDate  << " " << packageExtension << " " <<  packageVersion << endl;
+#endif
 						continue;
 					}
 					if (found) {	// This port have binaries available
