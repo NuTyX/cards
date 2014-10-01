@@ -46,12 +46,13 @@ set<string> CardsInstall::getDirectDependencies()
 
 	pkginfo_t infoDeps;
 	set<string> packageNameDeps;
-
+#ifndef NDEBUG
+	cerr << "----> Begin of Direct Dependencies" << endl;
+#endif
 	if ( checkPackageNameExist(m_packageName)) {
-		infoDeps.dependencies.insert(m_packageName);
-		packageNameDeps.insert(m_packageName);
 #ifndef NDEBUG
 		cerr << m_packageName << " allready installed" << endl;
+		cerr << "----> NO Direct Dependencies" << endl;
 #endif
 		return packageNameDeps;
 	}
@@ -66,12 +67,12 @@ set<string> CardsInstall::getDirectDependencies()
 		ArchiveUtils packageArchive(m_packageFileName);
 		packageNameBuildNDeps = packageArchive.listofDependencies();
 #ifndef NDEBUG
-	//	cerr << "Deps of : " << m_packageFileName << endl;
+		cerr << "Direct Deps of : " << m_packageFileName << endl;
 #endif
 		for (std::set<string>::iterator it = packageNameBuildNDeps.begin();it != packageNameBuildNDeps.end();it++) {
 			string Name = *it;
 #ifndef NDEBUG
-//			cerr << Name.substr(0,Name.size()-10)  << endl;
+			cerr << Name.substr(0,Name.size()-10)  << " is a direct dep of " << m_packageFileName << endl;
 #endif
 			infoDeps.dependencies.insert(Name.substr(0,Name.size()-10));
 		}
@@ -83,15 +84,12 @@ set<string> CardsInstall::getDirectDependencies()
 #ifndef NDEBUG
 		cerr << m_packageName << " allready installed" << endl;
 #endif
-		infoDeps.dependencies.insert(m_packageName);
 	}
 
 	if(!infoDeps.dependencies.empty())
 		m_listOfDepotPackages[m_packageName] = infoDeps;
 #ifndef NDEBUG
-	for (std::set<string>::iterator it = infoDeps.dependencies.begin();it != infoDeps.dependencies.end();it++) {
-		cerr << *it << endl;
-	}
+	cerr << "----> End of Direct Dependencies" << endl;
 #endif
 	return infoDeps.dependencies;
 }
@@ -113,47 +111,92 @@ void CardsInstall::generateDependencies()
 	std::set<string>::iterator sit;
 	while ( ! dependenciesWeMustAdd.empty() ) {
 		vit = dependenciesWeMustAdd.begin();
-#ifndef NDEBUG
-		cerr << "vit = " << *vit << endl;
-#endif
 		m_packageName = *vit;
-		dependenciesWeMustAdd.erase(vit);
-		set<string> directDependencies = getDirectDependencies();
 #ifndef NDEBUG
-		for (std::set<string>::iterator it = directDependencies.begin();it != directDependencies.end();it++) {
-    cerr << "dd: " << *it << " ";
-  }
-		cerr << endl;
+		cerr << "--> Begin of Main WHILE\n m_packageName = " << m_packageName  << endl;
 #endif
-		depencenciestoSort.push_back(m_packageName);
+		/* If m_packageName is allready installed no need checkit*/
+		if ( checkPackageNameExist(m_packageName)) {
+#ifndef NDEBUG
+			cerr << m_packageName << " is allready installed no need checkit" << endl;
+#endif			
+			dependenciesWeMustAdd.erase(vit);
+			continue;
+		}
+		dependenciesWeMustAdd.erase(vit); /* Erase the first one in the dependenciesWeMustAdd list */
+		set<string> directDependencies = getDirectDependencies();
+		/* If m_packageName is allready in the depencenciestoSort list  AND ...*/
+		bool found = false;
+		for ( vit = depencenciestoSort.begin(); vit != depencenciestoSort.end();++vit) {
+			if ( m_packageName == *vit ) {
+				found=true;
+				break;
+			}
+		}
+		/* ... AND m_packageName have dependencies, no need to check it again */
+
+		if ( (found) && (! directDependencies.empty() ) ) {
+#ifndef NDEBUG
+			cerr << m_packageName << " is allready in the depencenciestoSort list and HAVE some dependencies, no need to check it again" << endl;
+#endif
+//			dependenciesWeMustAdd.erase(vit);
+			continue;
+		}
+		if ( ! checkPackageNameExist(m_packageName)) {
+#ifndef NDEBUG
+			for (std::set<string>::iterator it = directDependencies.begin();it != directDependencies.end();it++) {
+				cerr << "dd: " << *it << " ";
+			}
+			cerr << endl;
+#endif
+			if ( ! checkPackageNameExist(m_packageName)) {
+#ifndef NDEBUG
+				cerr << m_packageName << " push back in dependenciestoSort" << endl;
+#endif
+				depencenciestoSort.push_back(m_packageName);
+			}
+		}
 		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
-			if ( *sit == m_packageName )
+			if ( *sit == m_packageName ) {
+#ifndef NDEBUG
+				cerr << m_packageName << " allready found in directDependencies" << endl;
+#endif
 				continue;
+			}
 			for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
 				if ( *sit == *vit) {
 #ifndef NDEBUG
-					cerr << "erase: " << *vit << endl;
+					cerr << *vit << " erase from dependenciesWeMustAdd" << endl;
 #endif
 					dependenciesWeMustAdd.erase(vit);
 					break;
 				}
 			}
 		}
-		if ( ! directDependencies.empty() ) {
+		if (  ! directDependencies.empty() ) {
 			for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
 				if ( m_packageName != *sit ) {
+					if ( ! checkPackageNameExist(*sit)) {
 #ifndef NDEBUG
-					cerr << "push back: " << *sit << endl;
+						cerr << *sit << " not installed, push back in dependenciesWeMustAdd" << endl;
 #endif
-					dependenciesWeMustAdd.push_back(*sit);
+
+						dependenciesWeMustAdd.push_back(*sit);
+					}
 				}
 			}
 		}
 #ifndef NDEBUG
+		cerr << "dependenciesWeMustAdd: " << endl;
 		for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
 			cerr << *vit << ", ";
 		}
-		cerr << endl << "End of while" << endl;
+		cerr << endl << "depencenciestoSort: " << endl;
+		for ( vit = depencenciestoSort.begin(); vit != depencenciestoSort.end();++vit) {
+			cerr << *vit << ", ";
+		}
+		
+		cerr << endl << "--> End of Main WHILE" << endl << endl;
 #endif
 	}
 	bool found = false ;
