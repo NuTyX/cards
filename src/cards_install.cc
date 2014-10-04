@@ -135,13 +135,13 @@ void CardsInstall::generateDependencies()
 		}
 		/* ... AND m_packageName have dependencies, no need to check it again */
 
-		if ( (found) && (! directDependencies.empty() ) ) {
+/*		if ( (found) && (! directDependencies.empty() ) ) {  TODO Need to find a beter algo for this. 
 #ifndef NDEBUG
 			cerr << m_packageName << " is allready in the depencenciestoSort list and HAVE some dependencies, no need to check it again" << endl;
 #endif
 //			dependenciesWeMustAdd.erase(vit);
 			continue;
-		}
+		} */
 		if ( ! checkPackageNameExist(m_packageName)) {
 #ifndef NDEBUG
 			for (std::set<string>::iterator it = directDependencies.begin();it != directDependencies.end();it++) {

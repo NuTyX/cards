@@ -470,6 +470,28 @@ string ConfigParser::getPortDir (const std::string& portName)
 	}
 	return portDir;
 }
+string ConfigParser::getBasePackageName(const string& packageName)
+{
+	string basePackageName = "";
+	bool found = false;
+	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			for (std::vector<PackageFilesList>::iterator k = j->packageFilesList.begin(); k != j ->packageFilesList.end();++k) {
+				if ( k->name == packageName ) {
+					basePackageName = j->basePackageName;
+					found = true;
+					break;
+				}
+			}
+			if (found)
+				break;
+		}
+		if (found)
+			break;
+	}
+	return basePackageName;
+}
+
 string ConfigParser::getPortVersion (const string& portName)
 {
 	string version = "";

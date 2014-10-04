@@ -229,6 +229,9 @@ void CardsInfo::diffBinaries()
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
 		if (! cp->checkBinaryExist(i->first))
 			continue;
+		string baseName = cp->getBasePackageName(i->first);
+		if ( i->first != baseName)
+			continue;
 		string newVersion = cp->getPortVersion(i->first);
 		if ( i->second.version != newVersion ) {
 			result.push_back(pair<string, string>(i->first, i->second.version + "   " + newVersion));

@@ -138,12 +138,16 @@ class ConfigParser
  */
 		string getPortDir (const std::string& portName);
 
+/*
+ *      \return the basename of the packagename
+ *
+ */
+		string getBasePackageName(const string& packageName);
 
 /*
  *  \return the version of the port name
  */
 		string getPortVersion (const std::string& portName);
-
 /*
  *  \return true if port name exist
  */ 
