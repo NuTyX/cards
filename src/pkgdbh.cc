@@ -137,7 +137,7 @@ void Pkgdbh::treatErrors(const string& s) const
 			throw runtime_error(s + " only root can install / upgrade / remove packages");
 			break;
 		case PACKAGE_ALLREADY_INSTALL:
-			throw runtime_error("package " + s + " allready installed (use -u to upgrade)");
+			throw runtime_error("package " + s + " already installed (use -u to upgrade)");
 			break;
 		case PACKAGE_NOT_INSTALL:
 			throw runtime_error("package " + s + " not yet installed");
@@ -146,7 +146,7 @@ void Pkgdbh::treatErrors(const string& s) const
 			throw runtime_error("package " + s + " not previously installed (skip -u to install)");
 			break;
 		case LISTED_FILES_ALLREADY_INSTALLED:
-			throw runtime_error(s + "listed file(s) allready installed (use -f to ignore and overwrite)");
+			throw runtime_error(s + "listed file(s) already installed (use -f to ignore and overwrite)");
 			break;
 		case PKGADD_CONFIG_LINE_TOO_LONG:
 			throw RunTimeErrorWithErrno(s + ": line too long, aborting");

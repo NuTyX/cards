@@ -213,7 +213,7 @@ sync_all_files() {
 		error "Command 'curl' not found."
 		exit $E_GENERAL
 	fi
-	URL="$DEPOT_URL/${name}@$version"
+	URL="$DEPOT_URL/${name}"
 	if [ ! -f $PKGMK_SIGNATURE ]; then
 		downloads_file_with_curl  $PKGMK_SIGNATURE $URL/$PKGMK_SIGNATURE
 	fi

@@ -51,7 +51,7 @@ set<string> CardsInstall::getDirectDependencies()
 #endif
 	if ( checkPackageNameExist(m_packageName)) {
 #ifndef NDEBUG
-		cerr << m_packageName << " allready installed" << endl;
+		cerr << m_packageName << " already installed" << endl;
 		cerr << "----> NO Direct Dependencies" << endl;
 #endif
 		return packageNameDeps;
@@ -82,7 +82,7 @@ set<string> CardsInstall::getDirectDependencies()
 			Just add his name
 		*/
 #ifndef NDEBUG
-		cerr << m_packageName << " allready installed" << endl;
+		cerr << m_packageName << " already installed" << endl;
 #endif
 	}
 
@@ -115,17 +115,17 @@ void CardsInstall::generateDependencies()
 #ifndef NDEBUG
 		cerr << "--> Begin of Main WHILE\n m_packageName = " << m_packageName  << endl;
 #endif
-		/* If m_packageName is allready installed no need checkit*/
+		/* If m_packageName is already installed no need checkit*/
 		if ( checkPackageNameExist(m_packageName)) {
 #ifndef NDEBUG
-			cerr << m_packageName << " is allready installed no need checkit" << endl;
+			cerr << m_packageName << " is already installed no need checkit" << endl;
 #endif			
 			dependenciesWeMustAdd.erase(vit);
 			continue;
 		}
 		dependenciesWeMustAdd.erase(vit); /* Erase the first one in the dependenciesWeMustAdd list */
 		set<string> directDependencies = getDirectDependencies();
-		/* If m_packageName is allready in the depencenciestoSort list  AND ...*/
+		/* If m_packageName is already in the depencenciestoSort list  AND ...*/
 		bool found = false;
 		for ( vit = depencenciestoSort.begin(); vit != depencenciestoSort.end();++vit) {
 			if ( m_packageName == *vit ) {
@@ -137,7 +137,7 @@ void CardsInstall::generateDependencies()
 
 /*		if ( (found) && (! directDependencies.empty() ) ) {  TODO Need to find a beter algo for this. 
 #ifndef NDEBUG
-			cerr << m_packageName << " is allready in the depencenciestoSort list and HAVE some dependencies, no need to check it again" << endl;
+			cerr << m_packageName << " is already in the depencenciestoSort list and HAVE some dependencies, no need to check it again" << endl;
 #endif
 //			dependenciesWeMustAdd.erase(vit);
 			continue;
@@ -159,7 +159,7 @@ void CardsInstall::generateDependencies()
 		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
 			if ( *sit == m_packageName ) {
 #ifndef NDEBUG
-				cerr << m_packageName << " allready found in directDependencies" << endl;
+				cerr << m_packageName << " already found in directDependencies" << endl;
 #endif
 				continue;
 			}
