@@ -66,10 +66,10 @@ void ArchiveUtils::treatErrors(const std::string& message) const
 			throw runtime_error("could not read the archive " + message);
 			break;
 		case CANNOT_FIND_META_FILE:
-			throw runtime_error("could not find the meta file " + message);
+			throw runtime_error("invalid meta data in file " + message);
 			break;
 		case CANNOT_FIND_MTREE_FILE:
-			throw runtime_error("could not find the mtree file " + message);
+			throw runtime_error("invalid mtree in file " + message);
 			break;
 		case EMPTY_ARCHIVE:
 			throw runtime_error(message + " is not an archive");

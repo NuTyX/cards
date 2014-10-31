@@ -45,6 +45,7 @@ void Pkginfo::run(int argc, char** argv)
 	//
   int o_runtimedependencies_mode = 0;
 	int o_footprint_mode = 0;
+	int o_archiveinfo = 0;
 	int o_installed_mode = 0;
 	int o_list_mode = 0;
 	int o_owner_mode = 0;
@@ -84,6 +85,11 @@ void Pkginfo::run(int argc, char** argv)
 			o_owner_mode += 1;
 			o_arg = argv[i + 1];
 			i++;
+		} else if (option == "-a" || option == "--archive") {
+			assertArgument(argv, argc, i);
+			o_archiveinfo += 1;
+			o_arg = argv[i + 1];
+			i++;
 		} else if (option == "-f" || option == "--footprint") {
 			assertArgument(argv, argc, i);
 			o_footprint_mode += 1;
@@ -110,16 +116,29 @@ void Pkginfo::run(int argc, char** argv)
 		}
 	}
 	if (o_runtimedependencies_mode + o_footprint_mode + o_details_mode + 
-	o_installed_mode + o_list_mode + o_owner_mode + o_epoc +
+	o_installed_mode + o_list_mode + o_owner_mode + o_epoc + o_archiveinfo +
 	o_footprint_mode + o_librairies_mode + o_runtime_mode == 0)
 	{
 		m_actualError = OPTION_MISSING;
 		treatErrors(o_arg);
 	}
-	if (o_runtimedependencies_mode + o_footprint_mode + o_installed_mode + o_list_mode + o_owner_mode > 1)
+	if (o_runtimedependencies_mode + o_footprint_mode + o_installed_mode + o_archiveinfo + o_list_mode + o_owner_mode > 1)
 	{
 		m_actualError = TOO_MANY_OPTIONS;
 		treatErrors(o_arg);
+	}
+	if (o_archiveinfo) {
+		ArchiveUtils  * au  = new ArchiveUtils(argv[2]) ;
+		cout << "Name           : " << au->name() << endl
+			<< "Description    : " << au->description() << endl
+			<< "Version        : " << au->version() << endl
+			<< "Build date     : " << au->epochBuildDate() << endl;
+		cout << "Dependencies   : ";
+		set<string> depList = au->listofDependencies();
+		for (set<string>::const_iterator i = depList.begin();i != depList.end();i++) {
+			cout << *i << " ";
+		}
+		cout << endl;
 	}
 	if (o_footprint_mode) { // Make footprint
 		getFootprintPackage(o_arg);
@@ -308,6 +327,7 @@ void Pkginfo::printHelp() const
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl
+       << "  -a, --archive <file>        print Name, Version, BuildDate and Deps of the <file>" << endl
 	     << "  -b, --buildtime <package>   return the name and the build time of the package" << endl
        << "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
        << "  --runtimedepfiles <path>    return on a single line all the runtime dependencies for the files found in the <path>" << endl

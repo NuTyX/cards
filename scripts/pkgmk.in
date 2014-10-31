@@ -203,45 +203,50 @@ sync_all_files() {
 	if [ -f $TMPMD5 ]; then
 		rm $TMPMD5
 	fi
-	DIR=`dirname $PWD`
-	DEPOT_URL=`cat $CARDS_CONFFILE|grep ^dir|grep $DIR|cut -d " " -f2|cut -d "|" -f 2|sed "s/ //g"`
-	if [ -z $DEPOT_URL ]; then
+	LINE=`dirname $PWD`
+	DIR=`cat $CARDS_CONFFILE|grep ^dir|grep $LINE|cut -d " " -f2|cut -d "|" -f 1|sed "s| ||g"`
+	if [ -z $DIR ]; then
 		error "$DIR not found in $CARDS_CONFFILE, cannot synchronise"
 		exit $E_GENERAL
 	fi
-	if [ ! "`type -p curl`" ]; then
-		error "Command 'curl' not found."
-		exit $E_GENERAL
-	fi
-	URL="$DEPOT_URL/${name}"
-	if [ ! -f $PKGMK_SIGNATURE ]; then
-		downloads_file_with_curl  $PKGMK_SIGNATURE $URL/$PKGMK_SIGNATURE
-	fi
-	HEAD=`head -1 $PKGMK_SIGNATURE`
-	if [ ${HEAD:10:1} = ":" ]; then # Packages availables
-		BUILD_DATE="`echo $HEAD|cut -d ":" -f1`"
-		EXT="`echo $HEAD|cut -d ":" -f2`"
-		for LINE in `cat $PKGMK_SIGNATURE`;do
-			MD5SUM="`echo $LINE|cut -d ":" -f1`"
-			FILE="`echo $LINE|cut -d ":" -f2`"
-			ARCH="`echo $LINE|cut -d ":" -f3`"
-			if [ "$ARCH" != "" ]; then
-				echo "$MD5SUM  ${FILE}${BUILD_DATE}${ARCH}${EXT}" >> $TMPMD5
-			else
-				echo  "$MD5SUM  ${FILE}" >> $TMPMD5
+	DEPOT_URL=`cat $CARDS_CONFFILE|grep ^dir|grep $LINE|cut -d " " -f2|sed "s|$DIR||"|sed "s| ||g"|sed "s,|,,"`
+	if [ -z $DEPOT_URL ]; then
+		warning "URL not found for $DIR in $CARDS_CONFFILE, ignore synchronising"
+	else
+		if [ ! "`type -p curl`" ]; then
+			error "Command 'curl' not found."
+			exit $E_GENERAL
+		fi
+		URL="$DEPOT_URL/${name}"
+		if [ ! -f $PKGMK_SIGNATURE ]; then
+			downloads_file_with_curl  $PKGMK_SIGNATURE $URL/$PKGMK_SIGNATURE
+		fi
+		HEAD=`head -1 $PKGMK_SIGNATURE`
+		if [ ${HEAD:10:1} = ":" ]; then # Packages availables
+			BUILD_DATE="`echo $HEAD|cut -d ":" -f1`"
+			EXT="`echo $HEAD|cut -d ":" -f2`"
+			for LINE in `cat $PKGMK_SIGNATURE`;do
+				MD5SUM="`echo $LINE|cut -d ":" -f1`"
+				FILE="`echo $LINE|cut -d ":" -f2`"
+				ARCH="`echo $LINE|cut -d ":" -f3`"
+				if [ "$ARCH" != "" ]; then
+					echo "$MD5SUM  ${FILE}${BUILD_DATE}${ARCH}${EXT}" >> $TMPMD5
+				else
+					echo  "$MD5SUM  ${FILE}" >> $TMPMD5
+				fi
+			done
+			sed -i "1d" $TMPMD5
+		else
+			sed  "s/:/  /" $PKGMK_SIGNATURE > $TMPMD5
+		fi
+		for FILE in $(cat $TMPMD5|cut -d " " -f 3);do
+			if [ ! -f $FILE ];then
+				downloads_file_with_curl $FILE $URL/$FILE
+				grep $FILE $TMPMD5|md5sum -c -|| exit $E_GENERAL
 			fi
 		done
-		sed -i "1d" $TMPMD5
-	else
-		sed  "s/:/  /" $PKGMK_SIGNATURE > $TMPMD5
+		rm $TMPMD5
 	fi
-	for FILE in $(cat $TMPMD5|cut -d " " -f 3);do
-		if [ ! -f $FILE ];then
-			downloads_file_with_curl $FILE $URL/$FILE
-			grep $FILE $TMPMD5|md5sum -c -|| exit $E_GENERAL
-		fi
-	done
-	rm $TMPMD5
 }
 download_source() {
 	local FILE LOCAL_FILENAME
@@ -1053,6 +1058,7 @@ print_help() {
 	echo "  -u,   --upgrade             build and install packages (as upgrade)"
 	echo "  -r,   --recursive           search for and build packages recursively"
 	echo "  -d,   --download            download missing source file(s)"
+	echo "  -cv,  --show-version-only   do not build, only show the version of the port and exit"
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
 	echo "  -utd, --up-to-date          do not build, only check if package is up to date"
@@ -1087,6 +1093,8 @@ parse_options() {
 				PKGMK_DOWNLOAD_ONLY="yes" ;;
 			-eo|--extract-only)
 				PKGMK_EXTRACT_ONLY="yes" ;;
+			-cv|--show-version-only)
+				PKGMK_SHOW_VERSION="yes";;
 			-utd|--up-to-date)
 				PKGMK_UP_TO_DATE="yes" ;;
 			-us|--update-signature)
@@ -1163,9 +1171,9 @@ main() {
 		recursive "$@"
 		exit 0
 	fi
-	info  "PKGMK_SYNC_FILES: $PKGMK_SYNC_FILES"
 	if [ "$PKGMK_SYNC_FILES" == "yes" ]; then
-		sync_all_files
+		warning  "PKGMK_SYNC_FILES: $PKGMK_SYNC_FILES"
+		[ "$PKGMK_FORCE" == "yes" ] || sync_all_files
 	fi
 	if [ ! -f $PKGMK_PKGFILE  ]; then
 		error "File '$PKGMK_PKGFILE' not found."
@@ -1194,6 +1202,10 @@ main() {
 			warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
 		fi
 	fi
+	if [ "$PKGMK_SHOW_VERSION" == "yes" ]; then
+		echo "$version"
+		exit 0
+	fi
 	info "PKGMK_INSTALL: $PKGMK_INSTALL"
 	info "PKGMK_WORK_DIR: $PKGMK_WORK_DIR"
 	info "PKGMK_SOURCE_DIR: $PKGMK_SOURCE_DIR"
@@ -1212,11 +1224,15 @@ main() {
 		PKGMK_IGNORE_MD5SUM="yes"
 		warning "FOOTPRINT AND MD5SUM IGNORED"
 	else
-		info "PKGMK_UPDATE_SIGNATURE: $PKGMK_UPDATE_SIGNATURE"
+		if [ "$PKGMK_UPDATE_SIGNATURE" != "yes" ]; then
+			info "PKGMK_IGNORE_SIGNATURE: $PKGMK_IGNORE_SIGNATURE"
+		else
+			info "PKGMK_UPDATE_SIGNATURE: $PKGMK_UPDATE_SIGNATURE"
+		fi
 		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
 		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"	
 	fi
-	if [ -z "$PKGMK_UPDATE_SIGNATURE" ]; then
+	if [ "$PKGMK_IGNORE_SIGNATURE"  != "yes" ]; then
 		info "MD5SUM file will be generated"
 	fi
 
@@ -1363,7 +1379,7 @@ main() {
 		clean
 		unset TARGETS
 	fi
-	if [ "$PKGMK_UPDATE_SIGNATURE" != "no" ];then
+	if [ "$PKGMK_IGNORE_SIGNATURE" != "yes" ];then
 		update_signature
 	fi
 	exit 0
@@ -1404,13 +1420,13 @@ PKGMK_DOWNLOAD="no"
 PKGMK_IGNORE_FOOTPRINT="yes"
 PKGMK_IGNORE_NEW="yes"
 PKGMK_IGNORE_MD5SUM="yes"
+PKGMK_IGNORE_SIGNATURE="no"
+
 PKGMK_NO_STRIP="no"
 
 PKGMK_COMPRESSION_MODE="xz"
 
 PKGMK_COMPRESS_PACKAGE="no"
-
-PKGMK_UPDATE_INDEX="no"
 
 PKGMK_INSTALL="no"
 PKGMK_RECURSIVE="no"
