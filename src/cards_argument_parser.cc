@@ -123,8 +123,9 @@ of any dependency.",
 		ArgParser::EQ, 1, "<expr>");
 
 	addCommand(CMD_CREATE, "create",
-		"create the binaries.\n\t\t\tAll the dependencies need for a successfull creation\n\t\t\t\
-have to be compiled and up to date.\n\t\t\tIf not the command will abort.\n\t\t\t\
+		"create the binary.\n\t\t\tAll dependencies must be compiled and up to date\n\t\t\t\
+for the creation of the final package without failures.\n\t\t\t\
+If dependencies are missing, the command will abort.\n\t\t\t\
 A compilation logfile can be define in /etc/cards.conf as:\n\t\t\t\
 logdir /var/log/pkgbuild for exemple.",
 		ArgParser::EQ, 1, "<port>");

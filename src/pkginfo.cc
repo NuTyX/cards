@@ -129,11 +129,10 @@ void Pkginfo::run(int argc, char** argv)
 	}
 	if (o_archiveinfo) {
 		ArchiveUtils  * au  = new ArchiveUtils(argv[2]) ;
-		cout << "Name           : " << au->name() << endl
-			<< "Description    : " << au->description() << endl
-			<< "Version        : " << au->version() << endl
-			<< "Build date     : " << au->epochBuildDate() << endl;
-		cout << "Dependencies   : ";
+		cout	<< au->name() << " Description    : " << au->description() << endl
+			<< au->name() << " Version        : " << au->version() << endl
+			<< au->name() << " Build date     : " << au->epochBuildDate() << endl;
+		cout << au->name() << " Dependencies   : ";
 		set<string> depList = au->listofDependencies();
 		for (set<string>::const_iterator i = depList.begin();i != depList.end();i++) {
 			cout << *i << " ";

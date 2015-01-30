@@ -176,7 +176,6 @@ download_file() {
 
 		if [ $error != 0 ]; then
 			while true; do
-				echo "wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $1"
 				wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $1
 				error=$?
 				if [ $error != 0 ] && [ "$RESUME_CMD" ]; then
@@ -666,7 +665,7 @@ add_meta_to_archive() {
 
 
 	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
-	DESCR="`head -1 $PKGMK_ROOT/${name}.info`"
+	DESCR="`cat $PKGMK_ROOT/Pkgfile|grep -i desc|cut -d : -f2| sed "s/^ //"`"
 	echo "N$NAME" > .META
 	echo "D$DESCR" >> .META
 	echo "S$SIZE_I" >> .META
@@ -678,9 +677,9 @@ add_meta_to_archive() {
 		echo "R$dep" >> .META
         done
 	
-	if [ -f $PKGMK_ROOT/${NAME}.run ]; then
+	if [ ! -z $run ]; then
 		info "Adding runtime deps to Archive $NAME"
-		for rd in `cat $PKGMK_ROOT/${NAME}.run`; do
+		for rd in ${run[@]}; do
 			if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
 				error "Runtime dependencie $rd not found, cannot continue"
 				clean
@@ -787,19 +786,31 @@ build_package() {
 			fi
 			j=0
 		done
-		local DIR
+		if [ ! -z PKGMK_LOCALES ]; then
+			local DIR PKGMK_LOCALE LOC
+			for DIR in usr/share/locale opt/*/share/locale; do
+				if [ -d $DIR ]; then
+					for LOC in `cd $DIR && ls`; do
+						# Need to double check because glibc for exemple create a file in this directory
+						if [ -d $DIR/$LOC ];then
+							for PKGMK_LOCALE in ${PKGMK_LOCALES[@]}; do
+								if [ "$PKGMK_LOCALE" == "$LOC" ]; then
+									if [ "$1" != "$TARGET" ]; then
+										bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${LOC}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+										$DIR/$LOC || abort_on_build "${name}.${LOC}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT}"
+									fi
+									rm -rf $DIR/$LOC
+									break
+								fi
+							done
+						fi
+					done
+				fi
+			done
+		fi
 		for DIR in usr/share/locale opt/*/share/locale; do
 			if [ -d $DIR ]; then
-				for loc in `cd $DIR && ls`; do
-					# Need to double check because glibc for exemple create a file in this directory
-					if [ -d $DIR/$loc ];then
-						if [ "$1" != "$TARGET" ]; then
-							bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${loc}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
-							$DIR/$loc || abort_on_build "${name}.${loc}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT}"
-						fi
-						rm -rf $DIR/$loc
-					fi
-				done
+				rm -rf $DIR
 			fi
 		done
 		if [ "`ls|wc -l`" != "0" ]; then
@@ -1179,10 +1190,6 @@ main() {
 		error "File '$PKGMK_PKGFILE' not found."
 		exit $E_PKGFILE
 	fi
-	if [ ! -f ${name}.info ]; then
-		error "File '${name}.info' not found."
-		exit $E_INFO
-	fi
 	. $PKGMK_PKGFILE
 	if [ -z $group ]; then
 		group="`echo $name | cut -d "-" -f1`"
@@ -1412,6 +1419,7 @@ PKGMK_SYNC_FILES="no"
 
 
 PKGMK_GROUPS=(devel man doc service)
+PKGMK_LOCALES=(fr de it es nl pt da nn sv fi)
 
 PKGMK_SOURCE_MIRRORS=()
 PKGMK_SOURCE_DIR="$PWD"

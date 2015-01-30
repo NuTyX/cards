@@ -44,48 +44,20 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	char *depfile2 = (char*)Malloc(sizeof(char)*255);
 
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
-//	name[ strchr(name,'@') - name ]='\0';
-
 	sprintf(fullPathfileName,"%s/MD5SUM",filesList->items[nameIndex]);
 	itemList *nameDeps = initItemList();
 
-	/* We check if any deps file exist */
 	sprintf(depfile1,"%s.deps",name);
 	sprintf(depfile2,"%s.run",name);
-	itemList *packageFilesList = initItemList();
 	string missingDep = "";
 	bool found = false;
-	if ( (readFileStripSpace(packageFilesList,fullPathfileName)) != 0 ) {
-		missingDep = fullPathfileName;
-		missingDep += " not exist";
-		m_missingDepsList.insert(missingDep);
-	} else {
-		char *name = NULL;
-		for (unsigned int i = 0; i < packageFilesList->count;i++) {
-			if ( strchr(packageFilesList->items[i],':') != NULL) {
+	sprintf(fullPathfileName,"%s/%s",filesList->items[nameIndex],depfile1);
 
-				name = strchr(packageFilesList->items[i],':');
-#ifndef NDEBUG
-				cerr << "name: " << name << endl;
-#endif
-
-				name++;
-			}
-			// If the file <name>.deps is found that's enough
-			if (strcmp(name,depfile1) == 0 ) {
-				sprintf(fullPathfileName,"%s/%s",filesList->items[nameIndex],name);
-				found = true;
-				break;
-			}
-			// If the file <name>.run is found means the .deps wasn't
-			if (strcmp(name,depfile2) == 0 ) {
-				sprintf(fullPathfileName,"%s/%s",filesList->items[nameIndex],name);
-				found = true;
-				break;
-			}
-		}
+	found = checkFileExist(fullPathfileName);
+	if ( !found) {
+		sprintf(fullPathfileName,"%s/%s",filesList->items[nameIndex],depfile2);
+		found = checkFileExist(fullPathfileName);
 	}
-	freeItemList(packageFilesList);
 	if (found) {
 		if ( (readFileStripSpace(nameDeps,fullPathfileName)) != 0 ) {
 			missingDep = name;
@@ -100,7 +72,6 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 #ifndef NDEBUG
 					cerr << "name: " << name << endl;
 #endif
-					// name[ strchr(name,'@') - name ]='\0';
 					char * dep = strdup ( nameDeps->items[i]);
 					if ( strchr(dep,'.') != NULL) {
 						dep[strchr(dep,'.') - dep ]= '\0';
@@ -124,7 +95,63 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 				}
 			}
 		}
-	}
+	} else {
+  // Last chance, check for dependencies in Pkgfile
+		sprintf(fullPathfileName,"%s/Pkgfile",filesList->items[nameIndex]);
+		found = checkFileExist(fullPathfileName);
+		if (found) {
+#ifndef NDEBUG
+			cerr << fullPathfileName << endl;
+#endif
+			list<string> deps;
+			FILE* fp = fopen(fullPathfileName, "r" );
+			if ( fp == NULL ) {
+				return NULL;
+			}
+			const int length = BUFSIZ;
+			char input[length];
+			string line;
+			while ( fgets( input, length, fp ) ) {
+				line = stripWhiteSpace( input );
+        if ( line[0] == '#' ) {
+					while ( !line.empty() &&
+						( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
+							line = line.substr( 1 );
+						}
+					string::size_type pos = line.find( ':' );
+					if ( pos != string::npos ) {
+						if ( startsWithNoCase( line, "dep" ) ) {
+#ifndef NDEBUG
+							cerr << line << endl;
+#endif
+							string depends = stripWhiteSpace( getValue( line, ':' ) );
+#ifndef NDEBUG
+							cerr << depends << endl;
+#endif
+							replaceAll( depends, " ", "," );
+							replaceAll( depends, ",,", "," );
+ 							split( depends, ',', deps, 0,true);
+							break;
+						}
+					}
+				}
+			}
+			fclose( fp );
+			if ( deps.size() >0 ) {
+				unsigned j = 0;
+				char *name = (char*)Malloc(sizeof(char)*255);
+				for(list<string>::const_iterator i = deps.begin(); i != deps.end(); ++i) {
+					for(j = 0; j < filesList->count; j++) {
+						sprintf(name,"%s",basename(filesList->items[j]));
+						if (strcmp(i->c_str(),name) == 0 ) {
+							addDepToDepList(dependancesList,j,0);
+							break;
+						}
+					}
+				}
+			}
+		}
+  }
 	freeItemList(nameDeps);
 	free(name);
 	free(depfile1);
@@ -140,7 +167,6 @@ vector<LevelName>& CardsDepends::getlevel()
 		cerr << i->name<< endl;
 	}
 #endif
-
 	return m_levelList;
 }
 vector<string>& CardsDepends::getdependencies()
@@ -374,7 +400,7 @@ int CardsDepends::depends()
 			}
 			currentNiveau++;
 		}
-//		m_dependenciesList.push_back(longPackageName);
+		m_dependenciesList.push_back(longPackageName);
 	}
 	freeItemList(filesList);
 	freePkgList(packagesList);
@@ -488,10 +514,10 @@ int CardsDepends::deptree()
 			cerr << "Cannot find " << m_packageName << endl;
 			return -1;
 		}
-	}
-	if (localPackagesList.size() == 0 ) {
-		cout << "You need to 'cards sync first" << endl;
-		return -1;
+		if (localPackagesList.size() == 0 ) {
+			cout << "You need to 'cards' sync first"<< endl;
+			return -1;
+		}
 	}
 	freeItemList(filesList);
 	// TODO Findou why it's segmentfault

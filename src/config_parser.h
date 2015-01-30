@@ -178,6 +178,14 @@ class ConfigParser
  *
  */
 		unsigned int getBinaryPackageList();
+
+/*
+ * \printout the list of available ports which are compiled
+ *  return a list of name version
+ *
+ */
+    unsigned int getPortsList();
+
 		bool getBinaryPackageInfo(const std::string& packageName);
 		bool getPortInfo(const std::string& portName);
 

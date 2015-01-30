@@ -54,20 +54,17 @@ itemList *initItemList(void);
 void addItemToItemList(itemList *list, const char *item);
 void freeItemList(itemList *list);
 
-template <class T>
-void split( const std::string& s, char del,
-            T& target,
-            int startPos=0, bool useEmpty=true  );
 
-keyValue split_keyValue(std::string s, char delimiter);
+keyValue splitKeyValue(std::string s, char delimiter);
 std::set<std::string> getKeysList(std::string file, std::string delimiter);
 std::string getValueOfKey(std::string file, std::string delimiter,std::string parameter);
+std::string getValue(const std::string& s, char delimiter);
 
 std::string itos(unsigned int value);
 std::string ultos(unsigned long int value);
 
 std::string mtos(mode_t mode);
-std::string trim_filename(const std::string& filename);
+std::string trimFileName(const std::string& filename);
 
 /*param s the string to be searched, param delimiter the delimiter char 
 return the value after the first occurance of a delimiter */
@@ -87,10 +84,11 @@ std::vector<std::string> parseDelimitedList(const std::string& s, const char del
 bool startsWith(const std::string& s, const std::string& with);
 
 /* make sure s1 starts with s2 */
-bool starts_with_no_case(const std::string& s1, const std::string& s2);
+bool startsWithNoCase(const std::string& s1, const std::string& s2);
 
 std::string convertToLowerCase(const std::string& s);
 std::string convertToUpperCase(const std::string& s);
+std::string replaceAll( std::string& in, const std::string& oldString, const std::string& newString );
 
 /* split a string into parts
 	param s string to be split

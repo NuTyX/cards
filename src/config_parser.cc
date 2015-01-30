@@ -411,6 +411,30 @@ unsigned int ConfigParser::getBinaryPackageList()
 	}
 	return numberOfBinaries;
 }
+unsigned int ConfigParser::getPortsList()
+{
+	unsigned int numberOfPorts = 0;
+	// For each defined category
+	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+		// For each directory found in this category
+#ifndef NDEBUG
+		cerr << i->Dir << " " << i->Url << endl;
+#endif
+		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+#ifndef NDEBUG
+			cerr << j->basePackageName << " "
+				<< j->description << " "
+				<< j->md5SUM << " "
+				<< j->version << " "
+				<< j->buildDate << " "
+				<< j->extention << endl ;
+#endif
+			cout << j->basePackageName << " " << j->version  << " " << j->description << endl;
+			numberOfPorts++;
+		}
+	}
+	return numberOfPorts;
+}
 bool ConfigParser::getPortInfo(const string& portName)
 {
 	bool found = false;

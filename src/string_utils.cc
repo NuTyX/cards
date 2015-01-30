@@ -71,7 +71,7 @@ void freeItemList(itemList *list)
 	free(list);
 }
 
-keyValue split_keyValue(string s, char delimiter)
+keyValue splitKeyValue(string s, char delimiter)
 {
 	keyValue pv;
 	string entry;
@@ -121,14 +121,21 @@ string getValueOfKey(string file, char delimiter,string parameter)
       getline(in, line);
 			
       if ((line[0] != '#' ) && ( line.find(delimiter) > 0) && ( line.size() > 0)) {
-        pv = split_keyValue(stripWhiteSpace(line),delimiter);
+        pv = splitKeyValue(stripWhiteSpace(line),delimiter);
         property_list[pv.parameter]=pv.value;
       }
     }
   }
   return stripWhiteSpace(property_list[parameter]);
 }
-
+string getValue( const string& s, char delimiter )
+{
+	string::size_type pos = s.find( delimiter );
+	if ( pos != string::npos && pos+1 < s.length() ) {
+		return s.substr( pos + 1 );
+	}
+	return "";
+}
 string itos(unsigned int value)
 {
   static char buf[20];
@@ -240,7 +247,7 @@ string stripWhiteSpace(const string& s)
 	}
 	return line;
 }
-bool starts_with_no_case(const string& s1, const string& s2)
+bool startsWithNoCase(const string& s1, const string& s2)
 {
 	string::const_iterator p1 = s1.begin();
 	string::const_iterator p2 = s2.begin();
@@ -272,5 +279,13 @@ string convertToUpperCase(const string& s)
 		result += toupper( s[i] );
 	}
 	return result;
+}
+string replaceAll( string& in, const string& oldString, const string& newString )
+{
+	size_t pos;
+	while ( (pos = in.find( oldString )) != string::npos ) {
+		in = in.replace( pos, oldString.length(), newString );
+	}
+	return in;
 }
 // vim:set ts=2 :
