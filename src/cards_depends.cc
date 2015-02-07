@@ -138,15 +138,26 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 			}
 			fclose( fp );
 			if ( deps.size() >0 ) {
+				bool found=false;
 				unsigned j = 0;
 				char *name = (char*)Malloc(sizeof(char)*255);
 				for(list<string>::const_iterator i = deps.begin(); i != deps.end(); ++i) {
+					found=false;
 					for(j = 0; j < filesList->count; j++) {
 						sprintf(name,"%s",basename(filesList->items[j]));
 						if (strcmp(i->c_str(),name) == 0 ) {
 							addDepToDepList(dependancesList,j,0);
+							found=true;
 							break;
 						}
+					}
+					if(!found) {
+						missingDep = "WARNING ";
+						missingDep += *i;
+						missingDep += " from ";
+						missingDep += filesList->items[nameIndex];
+						missingDep += " NOT FOUND ...";
+						m_missingDepsList.insert(missingDep);
 					}
 				}
 			}
@@ -196,7 +207,7 @@ void CardsDepends::showdependencies()
 			} else {
 					name = packageName;
 			}
-			if ( ! packagesInfo.isInstalled(name)) {	
+			if ( ! packagesInfo.isInstalled(name)) {
 				cout << *it << endl;
 			}
 		}
@@ -207,7 +218,8 @@ void CardsDepends::showlevel()
 	cout << "Generate Level, please wait ..." << endl;
 	level();
 	cout << "Level done" << endl;
-	if (m_missingDepsList.size() == 0 ) { 
+
+	if ( (m_missingDepsList.size() == 0 ) || ( m_argParser.isSet(CardsArgumentParser::OPT_FORCE))) {
 		for (std::vector<LevelName>::iterator it = m_levelList.begin();it != m_levelList.end();it++) {
 			cout << it->l << ": " << it->name << endl;
 		}

@@ -284,12 +284,13 @@ int ConfigParser::parsePackagePkgfileList()
 		FileDownload FD(downloadFilesList,false);
 	}
 /*
- * Time to add the version
+ * Time to add the various informations
  */
 	std::string::size_type pos;
 	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
 		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			string pkgFile = i->Dir + "/" + j->basePackageName  + "/Pkgfile";
+			j->fileDate = modifyTimeFile(pkgFile);
 			vector<string> pkgFileContent;
 			if ( parseFile(pkgFileContent,pkgFile.c_str()) != 0) {
 				cerr << "Cannot read the file: " << pkgFile << endl;
@@ -298,9 +299,22 @@ int ConfigParser::parsePackagePkgfileList()
 			}
 			for (vector<string>::const_iterator p = pkgFileContent.begin();p != pkgFileContent.end();++p) {
 				string line = stripWhiteSpace(*p);
-				pos = line.find("version=");
-				if ( (pos != std::string::npos) && ( pos == 0 ) ) { // should be at the begin of the line after space stripping
-					j->version = line.substr(pos+8); // lenght of "version="
+				if ( line.substr( 0, 8 ) == "version=" ){
+					j->version = getValueBefore( getValue( line, '=' ), '#' );
+					j->version = stripWhiteSpace( j->version );
+				} else if ( line[0] == '#' ) {
+					while ( !line.empty() &&
+							( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
+						line = line.substr( 1 );
+					}
+					pos = line.find(':');
+					if ( pos != string::npos ) {
+						if ( startsWithNoCase( line, "desc" ) ) {
+							j->description = stripWhiteSpace( getValue( line, ':' ) );
+						} else if ( startsWithNoCase( line, "url" ) ) {
+							j->URL = stripWhiteSpace( getValue( line, ':' ) );
+						}
+					}
 				}
 			}
 		} 
@@ -429,7 +443,7 @@ unsigned int ConfigParser::getPortsList()
 				<< j->buildDate << " "
 				<< j->extention << endl ;
 #endif
-			cout << j->basePackageName << " " << j->version  << " " << j->description << endl;
+			cout << j->basePackageName << " " << j->version << endl;
 			numberOfPorts++;
 		}
 	}
@@ -446,7 +460,9 @@ bool ConfigParser::getPortInfo(const string& portName)
 				found = true;
 				cout << "Name           : " << portName << endl
 					<< "Description    : " << j->description << endl
+					<< "URL            : " << j->URL << endl
 					<< "Version        : " << j->version << endl
+					<< "Date of Pkgfile: " << j->fileDate
 					<< "Local Directory: " << i->Dir << endl;
 			}
 		}
@@ -608,28 +624,25 @@ bool ConfigParser::search(const string& s)
 	std::string::size_type pos;
 	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
 		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {
-				if ( convertToLowerCase(s) == p->name ) {
-					packageToInsert = j->basePackageName + " " + j->version + ": " + j->description;
-					packageList.insert(packageToInsert);
-					found = true;
-					break;
-				}
-				pos = p->name.find(convertToLowerCase(s));
-				if (pos != std::string::npos) {
-					packageToInsert = j->basePackageName + " " + j->version +": " + j->description;
-					packageList.insert(packageToInsert);
-					found = true;
-					break;
-				}
-				pos = convertToLowerCase(j->description).find(convertToLowerCase(s));
-				if (pos != std::string::npos) {
-					packageToInsert = j->basePackageName + " " + j->version +": " + j->description;
-					packageList.insert(packageToInsert);
-					found = true;
-					break;
-				}
-				
+			if ( convertToLowerCase(s) == j->basePackageName ) {
+				packageToInsert = j->basePackageName + " " + j->version + " " + j->description;
+				packageList.insert(packageToInsert);
+				found = true;
+				break;
+			}
+			pos = j->basePackageName.find(convertToLowerCase(s));
+			if (pos != std::string::npos) {
+				packageToInsert = j->basePackageName + " " + j->version +" " + j->description;
+				packageList.insert(packageToInsert);
+				found = true;
+				break;
+			}
+			pos = convertToLowerCase(j->description).find(convertToLowerCase(s));
+			if (pos != std::string::npos) {
+				packageToInsert = j->basePackageName + " " + j->version +" " + j->description;
+				packageList.insert(packageToInsert);
+				found = true;
+				break;
 			}
 		}
 	}

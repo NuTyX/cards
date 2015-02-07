@@ -38,8 +38,10 @@ struct PackageFilesList {
 struct FileList {
 	std::string basePackageName;
 	std::string description;
+	std::string URL;
 	std::string md5SUM;
 	std::string version;
+	std::string fileDate;
 	time_t buildDate;
 	std::string extention;
 	std::vector<PackageFilesList> packageFilesList;

@@ -25,6 +25,9 @@
 ##                                      /alsa-utils.info
 ##                                      /alsa-utils.post-install
 ##                                      /...
+
+dir /usr/ports/desktop
+dir /usr/ports/console
  
 dir /var/lib/pkg/saravane/desktop|http://downloads.nutyx.org/saravane/#ARCH#/desktop
 dir /var/lib/pkg/saravane/console|http://downloads.nutyx.org/saravane/#ARCH#/console

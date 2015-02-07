@@ -77,6 +77,18 @@ string trimFileName(const string& filename)
 
   return result;
 }
+string modifyTimeFile(const string& filename)
+{
+	string sTimeFile = "";
+	char * c_time_s;
+	struct stat buf;
+	if (lstat(filename.c_str(), &buf) == -1) {
+		return sTimeFile;
+	}
+	c_time_s = ctime(&buf.st_mtime);
+	sTimeFile = c_time_s;
+	return sTimeFile;
+}
 bool checkFileExist(const string& filename)
 {
   struct stat buf;

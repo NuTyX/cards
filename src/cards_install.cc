@@ -409,7 +409,9 @@ void CardsInstall::install(const vector<string>& dependenciesList)
 		for (std::set<string>::const_iterator i = listOfPackages.begin(); i != listOfPackages.end();i++) {
 			if ( ! checkPackageNameExist(*i) ) {
 				if ( m_configParser->checkBinaryExist(*i)) {
-					cout << "ADD FOR INSTALL: " << *i << endl;
+#ifndef NDEBUG
+					cerr << "Add for install: " << *i << endl;
+#endif
 					m_dependenciesList.push_back(*i);
 				}
 			}

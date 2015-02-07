@@ -136,6 +136,14 @@ string getValue( const string& s, char delimiter )
 	}
 	return "";
 }
+string getValueBefore( const string& s, char del )
+{
+	string::size_type pos = s.find( del );
+	if ( pos != string::npos ) {
+		return s.substr( 0, pos );
+	}
+	return s;
+}
 string itos(unsigned int value)
 {
   static char buf[20];

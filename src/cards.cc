@@ -170,10 +170,6 @@ int main(int argc, char** argv)
 				return EXIT_SUCCESS;	
 			}
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
-				if (getuid()) {
-					cout << "You need to be root to get info about availables ports" << endl;
-					return EXIT_SUCCESS;
-				}
 				CInfo.infoPort();
 				return EXIT_SUCCESS;
 			}

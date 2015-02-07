@@ -59,7 +59,7 @@ keyValue splitKeyValue(std::string s, char delimiter);
 std::set<std::string> getKeysList(std::string file, std::string delimiter);
 std::string getValueOfKey(std::string file, std::string delimiter,std::string parameter);
 std::string getValue(const std::string& s, char delimiter);
-
+std::string getValueBefore( const std::string& s, char del );
 std::string itos(unsigned int value);
 std::string ultos(unsigned long int value);
 

@@ -56,26 +56,12 @@ void CardsInfo::listBinaries()
 }
 void CardsInfo::listPorts()
 {
-	Config config;
-	ConfigParser::parseConfig("/etc/cards.conf", config);
+	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
 	unsigned int  numberOfPorts = 0;
-	set<string> localPackagesList;
-	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-		string prtDir = i->Dir ;
-		if ( findFile(localPackagesList, prtDir) != 0 ) {
-			m_actualError = CANNOT_READ_DIRECTORY;
-			treatErrors(prtDir);
-		}
-	}
-	for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); li++) {
-		cout << *li << endl;
-	}
-	numberOfPorts = numberOfPorts + localPackagesList.size();
-	if ( ( config.dirUrl.size() == 0 ) || (localPackagesList.size() == 0 ) ) {
-		cout << "You need to cards sync first or/and check your /etc/cards.conf file." << endl;
-	} else {
-		cout << endl << "Number of available ports: " << numberOfPorts << endl << endl;
-	}
+  cp->parseCategoryDirectory();
+  cp->parsePackagePkgfileList();
+	numberOfPorts = cp->getPortsList();
+	cout << endl << "Number of available ports: " << numberOfPorts << endl << endl;
 }
 void CardsInfo::listOutOfDate()
 {
@@ -149,9 +135,7 @@ void CardsInfo::infoBinary()
 void CardsInfo::infoPort()
 {
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parseMD5sumCategoryDirectory();
-	cp->parsePortsList();
-	cp->parsePackageInfoList();
+	cp->parseCategoryDirectory();
 	cp->parsePackagePkgfileList();
 	if ( ! cp->getPortInfo(m_argParser.otherArguments()[0]) ) {
 		cout << m_argParser.otherArguments()[0] << " not found " << endl;
@@ -265,17 +249,9 @@ void CardsInfo::diffBinaries()
 }
 void CardsInfo::search()
 {
-	if (getuid()) {
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		treatErrors("search on binaries: ");
-	}
-
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-
-	cp->parseMD5sumCategoryDirectory();
-	cp->parsePortsList();
-	cp->parseBasePackageList();
-	cp->parsePackageInfoList();
+	cp->parseCategoryDirectory();
+	cp->parsePackagePkgfileList();
 
 	if ( ! cp->search(m_argParser.otherArguments()[0]) ) {
 		cout << "no occurence found" << endl;

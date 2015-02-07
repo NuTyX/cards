@@ -204,5 +204,7 @@ logdir /var/log/pkgbuild for exemple.",
 	addOption(CMD_CREATE, OPT_REMOVE,false);
 
 	addOption(CardsArgumentParser::CMD_DEPENDS, OPT_ALL, false);
+
+	addOption(CardsArgumentParser::CMD_LEVEL,OPT_FORCE,false);
 }
 // vim:set ts=2 :
