@@ -83,6 +83,7 @@ struct pkginfo_t {
 	std::string description;
 	time_t build; // date of build
 	std::string version;
+	std::string release;
 	time_t install; // date of installation
 	std::string arch;
 	std::string size;
@@ -105,7 +106,7 @@ struct rule_t {
 class Pkgdbh {
 public:
 
-	Pkgdbh() {}	
+	Pkgdbh() {}
 	explicit Pkgdbh(const std::string& name);
 	virtual ~Pkgdbh() {}
 	virtual void run(int argc, char** argv) = 0; // Need to be redefine in derivated class
@@ -113,12 +114,14 @@ public:
 	virtual void progressInfo() const; // progressInfo info
 	virtual void treatErrors(const std::string& s) const; 
 	void print_version() const;
+	int getNumberOfPackages();
 
 protected:
 	// Database
 
 	int getListOfPackageNames(const std::string& path );
 	std::pair<std::string, pkginfo_t> getInfosPackage(const std::string& packageName);
+	void buildDatabaseWithNameVersion();
 	void buildDatabaseWithDetailsInfos(bool silent);
 	void buildDatabaseWithDetailsInfos(const std::string& path);
 

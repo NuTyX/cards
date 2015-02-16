@@ -177,7 +177,45 @@ bool checkPermissionsEqual(const string& file1, const string& file2)
     (buf1.st_uid == buf2.st_uid) &&
     (buf1.st_gid == buf2.st_gid);
 }
-
+void cleanupMetaFiles(const string& basedir)
+{
+	if ( checkFileExist( basedir + "/.INFO") ) {
+#ifndef NDEBUG
+		cerr << basedir << "/.INFO removed" << endl;
+#endif
+		removeFile ( basedir, "/.INFO");
+	}
+	if ( checkFileExist( basedir + "/.META") ) {
+#ifndef NDEBUG
+		cerr << basedir << "/.META removed" << endl;
+#endif
+		removeFile ( basedir, "/.META");
+	}
+	if ( checkFileExist ( basedir + "/.PRE" ) ) {
+#ifndef NDEBUG
+		cerr << basedir << "/.PRE removed" << endl;
+#endif
+		removeFile ( basedir, "/.PRE");
+	}
+	if ( checkFileExist ( basedir + "/.POST" ) ) {
+#ifndef NDEBUG
+		cerr << basedir << "/.POST removed" << endl;
+#endif
+		removeFile ( basedir , "/.POST");
+	}
+	if ( checkFileExist ( basedir + "/.MTREE" ) ) {
+#ifndef NDEBUG
+		cerr << basedir << "/.MTREE removed" << endl;
+#endif
+		removeFile ( basedir, "/.MTREE");
+	}
+	if ( checkFileExist ( basedir + "/.README" ) ) {
+#ifndef NDEBUG
+		cerr << basedir << "/.README" << endl;
+#endif
+		removeFile ( basedir, "/.README");
+	}
+}
 void removeFile(const string& basedir, const string& filename)
 {
   if (filename != basedir && !remove(filename.c_str())) {

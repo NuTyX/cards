@@ -2,7 +2,7 @@
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,10 +30,6 @@
 #include <unistd.h>
 #include <sstream>
 
-int Pkginfo::getNumberOfPackages()
-{
-	return getListOfPackageNames("");
-}
 bool Pkginfo::isInstalled(const string& packageName)
 {
 	return checkPackageNameExist(packageName);
@@ -131,6 +127,7 @@ void Pkginfo::run(int argc, char** argv)
 		ArchiveUtils  * au  = new ArchiveUtils(argv[2]) ;
 		cout	<< au->name() << " Description    : " << au->description() << endl
 			<< au->name() << " Version        : " << au->version() << endl
+			<< au->name() << " Release        : " << au->release() << endl
 			<< au->name() << " Build date     : " << au->epochBuildDate() << endl;
 		cout << au->name() << " Dependencies   : ";
 		set<string> depList = au->listofDependencies();
@@ -145,8 +142,9 @@ void Pkginfo::run(int argc, char** argv)
 		Db_lock lock(o_root, false);
 		getListOfPackageNames(o_root);
 		if (o_installed_mode) {	// List installed packages
-			for(set<string>::const_iterator i = m_packageNamesList.begin(); i != m_packageNamesList.end(); ++i) {
-				cout << *i <<  endl;
+			buildDatabaseWithNameVersion();
+			for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
+				cout << i->first << " " << i->second.version << endl;
 			}
 		} else if (o_list_mode) {	// List package or file contents
 			buildDatabaseWithDetailsInfos(false);
@@ -276,6 +274,7 @@ void Pkginfo::run(int argc, char** argv)
 				cout << "Name           : " << o_arg << endl
 						 << "Description    : " << m_listOfInstPackages[o_arg].description << endl
 						 << "Version        : " << m_listOfInstPackages[o_arg].version << endl
+						 << "Release        : " << m_listOfInstPackages[o_arg].release << endl
 						 << "Build date     : " << c_time_s
 				     << "Size           : " << m_listOfInstPackages[o_arg].size << endl
 						 << "Number of Files: " << m_listOfInstPackages[o_arg].files.size()<< endl
@@ -326,7 +325,7 @@ void Pkginfo::printHelp() const
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl
-       << "  -a, --archive <file>        print Name, Version, BuildDate and Deps of the <file>" << endl
+       << "  -a, --archive <file>        print Name, Version, Release, BuildDate and Deps of the <file>" << endl
 	     << "  -b, --buildtime <package>   return the name and the build time of the package" << endl
        << "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
        << "  --runtimedepfiles <path>    return on a single line all the runtime dependencies for the files found in the <path>" << endl

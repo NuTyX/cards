@@ -1,7 +1,7 @@
 //  archive_utils.h
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
-//  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -92,6 +92,7 @@ class ArchiveUtils
 	std::set<std::string> setofFiles(); 		// return a order set of string
 	std::set<std::string> listofDependencies(); // return an order set of dependencies
 	std::string version();    // return the version of the package
+	std::string release();		// return the release of the package
 	std::string description();// return the description	of the package
 	std::string builddate();  // return the date like Mon Mar 24 10:16:00 2014
 	std::string name();				// return the name of the package

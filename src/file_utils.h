@@ -93,6 +93,7 @@ bool checkFileEmpty(const string& filename);
 bool checkFilesEqual(const string& file1, const string& file2);
 bool checkPermissionsEqual(const string& file1, const string& file2);
 bool createRecursiveDirs(const string& pathname);
+void cleanupMetaFiles(const string& basedir);
 void removeFile(const string& basedir, const string& filename);
 int findFile(set<string>& filesList, const string& basedir);
 int findDir(itemList *filenameList, const char *path);

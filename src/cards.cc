@@ -1,6 +1,6 @@
 // cards.cc
 //
-//  Copyright (c) 2014 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014-2015 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -140,7 +140,7 @@ int main(int argc, char** argv)
 			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_OUTOFDATE)) ) {
 				cardsArgPars.printHelp("list");
 				return EXIT_SUCCESS;
-			}			
+			}
 			CardsInfo CList(cardsArgPars);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_OUTOFDATE)) {
 				CList.listOutOfDate();
@@ -219,9 +219,8 @@ int main(int argc, char** argv)
 		}
 		return EXIT_SUCCESS;
 	} catch (runtime_error& e) {
-		
 		cerr << "cards " << VERSION << " "<< command << ": " << e.what() << endl;
-		return -1;
+		return EXIT_FAILURE;
 	}
 }
 // vim:set ts=2 :

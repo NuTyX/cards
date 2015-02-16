@@ -1,6 +1,6 @@
 // archive_utils.cc
 //
-// Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+// Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
 //
 // This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -210,6 +210,18 @@ string ArchiveUtils::version()
 		version = *i;
 		if ( version[0] == 'V' ) {
 			return version.substr(1);
+			break;
+		}
+	}
+	return "";
+}
+string ArchiveUtils::release()
+{
+	string release;
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		release=*i;
+		if ( release[0] == 'r' ) {
+			return release.substr(1);
 			break;
 		}
 	}

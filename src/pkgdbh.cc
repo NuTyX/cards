@@ -2,7 +2,7 @@
 //
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -51,6 +51,10 @@ using __gnu_cxx::stdio_filebuf;
 Pkgdbh::Pkgdbh(const string& name)
 	: m_utilName(name)
 {
+	if ( m_root.empty() ) {
+		m_root="/";
+	}
+	cleanupMetaFiles(m_root);
 	// Ignore signals
 /*	struct sigaction sa;
 	memset(&sa, 0, sizeof(sa));
@@ -262,6 +266,10 @@ void Pkgdbh::progressInfo() const
 			break;
   }
 }
+int Pkgdbh::getNumberOfPackages()
+{
+  return getListOfPackageNames("");
+}
 /* Append to the "DB" the number of packages founds (directory containg a file named files */
 int Pkgdbh::getListOfPackageNames (const string& path)
 {
@@ -283,6 +291,28 @@ pair<string, pkginfo_t> Pkgdbh::getInfosPackage(const string& packageName)
 	
 	result.first = packageName;
 	return result;
+}
+/* Populate the database with Name and version only */
+void Pkgdbh::buildDatabaseWithNameVersion()
+{
+	if (m_packageNamesList.empty() ) {
+		getListOfPackageNames (m_root);
+	}
+	for (set<string>::iterator i = m_packageNamesList.begin();i != m_packageNamesList.end();++i) {
+		pkginfo_t info;
+		const string metaFile = m_root + PKG_DB_DIR + *i + '/' + PKG_META;
+		itemList * contentFile = initItemList();
+		readFile(contentFile,metaFile.c_str());
+		for (unsigned int li=0; li< contentFile->count ; ++li) {
+			if ( contentFile->items[li][0] == 'V' ) {
+				string version = contentFile->items[li];
+				info.version = version.substr(1);
+				m_listOfInstPackages[*i] = info;
+				break;
+			}
+		}
+		freeItemList(contentFile);
+	}
 }
 /* Populate the database with all details infos */
 void Pkgdbh::buildDatabaseWithDetailsInfos(bool silent)
@@ -313,6 +343,10 @@ void Pkgdbh::buildDatabaseWithDetailsInfos(bool silent)
 			if ( contentFile->items[li][0] == 'V' ) {
 				string version = contentFile->items[li];
 				info.version = version.substr(1);
+			}
+			if ( contentFile->items[li][0] == 'r' ) {
+				string release = contentFile->items[li];
+				info.release = release.substr(1);
 			}
 			if ( contentFile->items[li][0] == 'a' ) {
 				string arch = contentFile->items[li];
@@ -380,8 +414,8 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 			info.files.erase(i);
 		}
 	}
+	removeFile ( m_root, "/.MTREE");
 	metaFilesList.insert(".META");
-	metaFilesList.insert(".MTREE");
 	set<string> fileContent;
 	if ( parseFile(fileContent,".META") == -1 ) {
 		m_actualError = CANNOT_FIND_FILE;
