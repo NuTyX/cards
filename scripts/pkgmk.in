@@ -4,7 +4,7 @@
 # 
 #  Copyright (c) 2000-2005 Per Liden
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -539,6 +539,16 @@ pack_lib() {
 		done
 	done
 }
+remove_lib() {
+	local DIR SUBDIR
+	for DIR in usr opt/*; do
+		for SUBDIR in lib lib64;do
+			if [ -d $DIR/$SUBDIR ]; then
+				rm -r $DIR/$SUBDIR
+			fi
+		done
+	done
+}
 pack_devel() {
 	local DIR SUBDIR
 	for DIR in usr opt/*; do
@@ -670,14 +680,14 @@ add_meta_to_archive() {
 	echo "D$DESCR" >> .META
 	echo "S$SIZE_I" >> .META
 	echo "V$version" >> .META
+	echo "r$release" >> .META
 	echo "B$PKGMK_BUILDVER" >> .META
 	echo "a$PKGMK_ARCH" >> .META
 
 	for dep in `pkginfo --runtimedepfiles $TAR`; do
 		echo "R$dep" >> .META
         done
-	
-	if [ ! -z $run ]; then
+	if [ ! -z $run ] && [ "$NAME" == "$name" ]; then
 		info "Adding runtime deps to Archive $NAME"
 		for rd in ${run[@]}; do
 			if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
@@ -685,7 +695,17 @@ add_meta_to_archive() {
 				clean
 				exit $E_DEPS;
 			fi
-				
+			echo "R$rd`pkginfo -b $rd`" >> .META
+		done
+	fi
+	if [ -f $PKGMK_ROOT/${NAME}.run ]; then
+		info "Adding runtime deps to Archive $NAME"
+		for rd in `cat $PKGMK_ROOT/${NAME}.run`; do
+			if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
+				error "Runtime dependencie $rd not found, cannot continue"
+				clean
+				exit $E_DEPS;
+			fi
 			echo "R$rd`pkginfo -b $rd`" >> .META
 		done
 	fi
