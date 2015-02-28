@@ -32,7 +32,7 @@ ConfigParser::ConfigParser(const std::string& fileName)
 	: m_configFileName(fileName)
 {
 }
-int ConfigParser::parseMD5sumCategoryDirectory()
+int ConfigParser::parsePkgRepoCategoryDirectory()
 {
 	parseConfig(m_configFileName);
 	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
@@ -43,20 +43,20 @@ int ConfigParser::parseMD5sumCategoryDirectory()
 		pD.Dir = i->Dir;
 		pD.Url = i->Url;
 		
-		string categoryMD5sumFile = i->Dir + "/MD5SUM" ;
-		FileDownload MD5Sum(i->Url + "/MD5SUM",
+		string categoryMD5sumFile = i->Dir + "/.PKGREPO" ;
+		FileDownload MD5Sum(i->Url + "/.PKGREPO",
 			i->Dir,
-			"MD5SUM", false);
+			"PKGREPO", false);
 		MD5Sum.downloadFile();
 		
-		vector<string> MD5SUMFileContent;
+		vector<string> PKGREPOFileContent;
 
-		if ( parseFile(MD5SUMFileContent,categoryMD5sumFile.c_str()) != 0) {
-			cerr << "cannot read file MD5SUM" << endl;
+		if ( parseFile(PKGREPOFileContent,categoryMD5sumFile.c_str()) != 0) {
+			cerr << "cannot read file PKGREPO" << endl;
 			return -1;
 		}
 		remove(categoryMD5sumFile.c_str());
-		for ( vector<string>::iterator i = MD5SUMFileContent.begin();i!=MD5SUMFileContent.end();++i) {
+		for ( vector<string>::iterator i = PKGREPOFileContent.begin();i!=PKGREPOFileContent.end();++i) {
 			string val = *i;
 			if ( i->size() <  34 ) {
 				cerr << "missing info" << endl;
@@ -131,13 +131,13 @@ int ConfigParser::parsePortsList()
 	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
 		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			/*
-				We should check if the MD5SUM of the port is available
-				MD5SUMFile is /var/lib/pkg/saravane/server/alsa-lib/MD5SUM
+				We should check if the PKGREPO of the port is available
+				PKGREPOFile is /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
 			*/
-			if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "/MD5SUM") ) {
-				downloadFile.url = i->Url + "/" + j->basePackageName  + "/MD5SUM";
+			if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "/.PKGREPO") ) {
+				downloadFile.url = i->Url + "/" + j->basePackageName  + "/.PKGREPO";
 				downloadFile.dirname = i->Dir + "/" + j->basePackageName;
-				downloadFile.filename = "/MD5SUM";
+				downloadFile.filename = "/.PKGREPO";
 				downloadFile.md5sum = j-> md5SUM;
 				downloadFilesList.push_back(downloadFile);
 #ifndef NDEBUG
@@ -174,7 +174,7 @@ int ConfigParser::parseBasePackageList()
 /*
  From here we can check if the binaries are available
  We have to parse the file 
- /var/lib/pkg/saravane/server/alsa-lib/MD5SUM
+ /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
 */
 	// For each category activate in cards.conf
 	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
@@ -183,18 +183,18 @@ int ConfigParser::parseBasePackageList()
 #endif
 		// For each directory found in this category
 		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			// MD5SUMFile = /var/lib/pkg/saravane/server/alsa-lib/MD5SUM
-			string MD5SUMFile = i->Dir + "/" + j->basePackageName  + "/MD5SUM";
-			vector<string> MD5SUMFileContent;
-			if ( parseFile(MD5SUMFileContent,MD5SUMFile.c_str()) != 0) {
-				cerr << "Cannot read the file: " << MD5SUMFile << endl;
+			// PKGREPOFile = /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
+			string PKGREPOFile = i->Dir + "/" + j->basePackageName  + "/.PKGREPO";
+			vector<string> PKGREPOFileContent;
+			if ( parseFile(PKGREPOFileContent,PKGREPOFile.c_str()) != 0) {
+				cerr << "Cannot read the file: " << PKGREPOFile << endl;
 				cerr << " ... continue with next" << endl;
 				continue;
 			}
 			j->buildDate = 0;
 			j->extention = "";
 			PackageFilesList PFL;
-			for (vector<string>::const_iterator i = MD5SUMFileContent.begin();i != MD5SUMFileContent.end(); ++i) {
+			for (vector<string>::const_iterator i = PKGREPOFileContent.begin();i != PKGREPOFileContent.end(); ++i) {
 				string input = *i;
 				if (input.size() < 11) {
 					cerr << "[" << input << "]: Wrong format field to small" << endl;
@@ -388,7 +388,7 @@ void ConfigParser::downloadPackageFileName(const std::string& packageName)
 		<< m_p->md5SUM << " "
 		<< endl;
 #endif
-		//TODO Check MD5SUM
+		//TODO Check PKGREPO
 		FileDownload FD(url,dir,fileName,true);
 		FD.downloadFile();
 	}

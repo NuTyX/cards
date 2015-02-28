@@ -339,7 +339,19 @@ void Pkgdbh::buildDatabaseWithDetailsInfos(bool silent)
 			if ( contentFile->items[li][0] == 'B' ) {
 				string build = contentFile->items[li];
 				info.build = strtoul(build.substr(1).c_str(),NULL,0);
-			} 
+			}
+			if ( contentFile->items[li][0] == 'U' ) {
+				string url = contentFile->items[li];
+				info.url = url.substr(1);
+			}
+			if ( contentFile->items[li][0] == 'M' ) {
+				string maintainer = contentFile->items[li];
+				info.maintainer = maintainer.substr(1);
+			}
+			if ( contentFile->items[li][0] == 'P' ) {
+				string packager = contentFile->items[li];
+				info.packager = packager.substr(1);
+			}
 			if ( contentFile->items[li][0] == 'V' ) {
 				string version = contentFile->items[li];
 				info.version = version.substr(1);

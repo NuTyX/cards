@@ -126,6 +126,9 @@ void Pkginfo::run(int argc, char** argv)
 	if (o_archiveinfo) {
 		ArchiveUtils  * au  = new ArchiveUtils(argv[2]) ;
 		cout	<< au->name() << " Description    : " << au->description() << endl
+			<< au->name() << " URL            : " << au->url() << endl
+			<< au->name() << " Maintainer(s)  : " << au->maintainer() << endl
+			<< au->name() << " Packager(s)    : " << au->packager() << endl
 			<< au->name() << " Version        : " << au->version() << endl
 			<< au->name() << " Release        : " << au->release() << endl
 			<< au->name() << " Build date     : " << au->epochBuildDate() << endl;
@@ -273,6 +276,9 @@ void Pkginfo::run(int argc, char** argv)
 				char * c_time_s = ctime(&m_listOfInstPackages[o_arg].build);
 				cout << "Name           : " << o_arg << endl
 						 << "Description    : " << m_listOfInstPackages[o_arg].description << endl
+						 << "URL            : " << m_listOfInstPackages[o_arg].url << endl
+						 << "Maintainer(s)  : " << m_listOfInstPackages[o_arg].maintainer << endl
+						 << "Packager(s)    : " << m_listOfInstPackages[o_arg].packager << endl
 						 << "Version        : " << m_listOfInstPackages[o_arg].version << endl
 						 << "Release        : " << m_listOfInstPackages[o_arg].release << endl
 						 << "Build date     : " << c_time_s

@@ -227,6 +227,18 @@ string ArchiveUtils::release()
 	}
 	return "";
 }
+string ArchiveUtils::url()
+{
+	string url;
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		url = *i;
+		if ( url[0] == 'U' ) {
+			return url.substr(1);
+			break;
+		}
+	}
+	return "";
+}
 string ArchiveUtils::description()
 {
 	string description;
@@ -238,6 +250,30 @@ string ArchiveUtils::description()
 		}
 	}
 	return "";
+}
+string ArchiveUtils::maintainer()
+{
+  string maintainer;
+  for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+    maintainer = *i;
+    if ( maintainer[0] == 'M' ) {
+      return maintainer.substr(1);
+      break;
+    }
+  }
+  return "";
+}
+string ArchiveUtils::packager()
+{
+  string maintainer;
+  for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+    maintainer = *i;
+    if ( maintainer[0] == 'P' ) {
+      return maintainer.substr(1);
+      break;
+    }
+  }
+  return "";
 }
 string ArchiveUtils::builddate()
 {

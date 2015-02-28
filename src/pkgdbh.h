@@ -84,6 +84,9 @@ struct pkginfo_t {
 	time_t build; // date of build
 	std::string version;
 	std::string release;
+	std::string url;
+	std::string packager;
+	std::string maintainer;
 	time_t install; // date of installation
 	std::string arch;
 	std::string size;

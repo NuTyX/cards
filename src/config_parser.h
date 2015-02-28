@@ -74,12 +74,12 @@ class ConfigParser
 		static int parseConfig(const std::string& fileName,
 			Config& config);
 /**
- * \parse the MD5SUM file which belong to the category found
+ * \parse the .PKGREPO file which belong to the category found
  * in the configuration file cards.conf. It populate the 
  * the m_packageList.basePackageName part by looking
- * the download MD5SUM file of each activate category
+ * the download .PKGREPO file of each activate category
  **/
-		int parseMD5sumCategoryDirectory();
+		int parsePkgRepoCategoryDirectory();
 
 /**
  * \parse the directory directly based on what we have locally.
@@ -89,7 +89,7 @@ class ConfigParser
 		int parseCategoryDirectory();
 
 /**
- * \download the MD5SUM of each port
+ * \download the .PKGREPO of each port
  */
 		int parsePortsList();
 
@@ -107,7 +107,7 @@ class ConfigParser
 	set<string> getListOfPackagesFromDirectory(const std::string& path);
 
 /**
- * \parse the MD5SUM of a port directory
+ * \parse the .PKGREPO of a port directory
  * if it found a first line with the date of construction
  * and the extension of the archive then it populate
  * the list of packages

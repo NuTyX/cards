@@ -48,7 +48,7 @@ void CardsInfo::listBinaries()
 		treatErrors("list of binaries: ");
 	}
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parseMD5sumCategoryDirectory();
+	cp->parsePkgRepoCategoryDirectory();
 	cp->parsePortsList();
 	cp->parseBasePackageList();
 	cout << endl << "Number of availables binaries: " << cp->getBinaryPackageList() << endl;
@@ -108,7 +108,11 @@ void CardsInfo::infoInstall()
 		char * c_time_s = ctime(&m_listOfInstPackages[m_argParser.otherArguments()[0]].build);
 		cout << "Name           : " << m_argParser.otherArguments()[0] << endl
 			<< "Description    : " << m_listOfInstPackages[m_argParser.otherArguments()[0]].description << endl
+			<< "URL            : " << m_listOfInstPackages[m_argParser.otherArguments()[0]].url << endl
+			<< "Maintainer(s)  : " << m_listOfInstPackages[m_argParser.otherArguments()[0]].maintainer << endl
+			<< "Packager(s)    : " << m_listOfInstPackages[m_argParser.otherArguments()[0]].packager << endl
 			<< "Version        : " << m_listOfInstPackages[m_argParser.otherArguments()[0]].version << endl
+			<< "Release        : " << m_listOfInstPackages[m_argParser.otherArguments()[0]].release << endl
 			<< "Build date     : " << c_time_s
 			<< "Size           : " << m_listOfInstPackages[m_argParser.otherArguments()[0]].size << endl
 			<< "Number of Files: " << m_listOfInstPackages[m_argParser.otherArguments()[0]].files.size()<< endl
@@ -124,7 +128,7 @@ void CardsInfo::infoBinary()
 		treatErrors("info on binaries: ");
 	}
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parseMD5sumCategoryDirectory();
+	cp->parsePkgRepoCategoryDirectory();
 	cp->parsePortsList();
 	cp->parseBasePackageList();
 	cp->parsePackageInfoList();
@@ -149,7 +153,7 @@ void CardsInfo::diffPorts()
 	}
 
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parseMD5sumCategoryDirectory();
+	cp->parsePkgRepoCategoryDirectory();
 	cp->parsePackagePkgfileList();
 	vector<pair<string, DiffVers > > result;
 	DiffVers DV;
@@ -199,7 +203,7 @@ void CardsInfo::diffBinaries()
 	}
 
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parseMD5sumCategoryDirectory();
+	cp->parsePkgRepoCategoryDirectory();
 	cp->parsePortsList();
 	cp->parseBasePackageList();
 

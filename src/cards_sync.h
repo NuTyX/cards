@@ -37,14 +37,14 @@ public:
 	virtual void treatErrors(const string& s) const;
 
 	void run ();
-
+	void run2();
 	static const std::string DEFAULT_REPOFILE;
  
 	
 private:
 
 	unsigned int getLocalPackages(const string& path);
-	unsigned int getRemotePackages(const string& md5sumFile);
+	unsigned int getRemotePackages(const string& pkgrepoFile);
 
 	void deleteFolder(const string& folderName);
 

@@ -44,7 +44,7 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	char *depfile2 = (char*)Malloc(sizeof(char)*255);
 
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
-	sprintf(fullPathfileName,"%s/MD5SUM",filesList->items[nameIndex]);
+	sprintf(fullPathfileName,"%s/.PKGREPO",filesList->items[nameIndex]);
 	itemList *nameDeps = initItemList();
 
 	sprintf(depfile1,"%s.deps",name);

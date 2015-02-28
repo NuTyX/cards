@@ -400,12 +400,13 @@ int parseFile(set<string>& fileContent, const char* fileName)
 	if ((fp = openFile (fileName)) == NULL ) {
 		return -1;
 	}
-
-  char input[1024];
-  while (fgets(input, 1024, fp)) {
-    input[strlen(input)-1] = '\0';
-    string inputString = input;
-    fileContent.insert(inputString);
+	const int length = BUFSIZ;
+  char input[length];
+	string line;
+  while (fgets(input, length, fp)) {
+		input[strlen(input)-1] = '\0';
+		line = input;
+    fileContent.insert(line);
   }
   fclose(fp);
   return 0;
@@ -417,11 +418,13 @@ int parseFile(vector<string>& fileContent, const char* fileName)
 	if ((fp = openFile (fileName)) == NULL ) {
 		return -1;
 	}
-	char input[1024];
-	while (fgets(input, 1024, fp)) {
+	const int length = BUFSIZ;
+	char input[length];
+	string line;
+	while (fgets(input, length, fp)) {
 		input[strlen(input)-1] = '\0';
-		string inputString = input;
-		fileContent.push_back(inputString);
+		line = input;
+		fileContent.push_back(line);
 	}
 	fclose(fp);
 	return 0;

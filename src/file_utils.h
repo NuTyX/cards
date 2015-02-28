@@ -104,6 +104,27 @@ int parseFile(set<string>& fileContent, const char* fileName);
 int parseFile(vector<string>& fileContent, const char* fileName);
 bool findMD5sum(const string& fileName, unsigned char* result);
 bool checkMD5sum(const char * fileName, const char * MD5Sum);
+/* read a file
+   return it into a template container */
+template <class T>
+int parseFile( T& target, const char* fileName)
+{
+	FILE *fp = NULL;
+	if (( fp = openFile (fileName)) == NULL ) {
+		return -1;
+	}
+	const int length = BUFSIZ;
+	char input[length];
+	string line;
+	while (fgets(input, length, fp)) {
+		input[strlen(input)-1] = '\0';
+		line = input;
+		target.push_back(line);
+	}
+	fclose(fp);
+	return 0;
+}
+
 
 #endif /* FILE_UTILS_H */
 // vim:set ts=2 :

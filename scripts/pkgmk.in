@@ -34,7 +34,6 @@ E_FOOTPRINT=7  # footprint check failure
 E_BUILD=8      # error while running 'build()'
 E_INSTALL=9    # error while installing the package via 'pkgadd'
 E_DEPS=10      # error while searching runtime deps via 'pkginfo -b'
-E_INFO=11      # .info file not found
 
 info() {
 	echo "=======> $1"
@@ -217,17 +216,17 @@ sync_all_files() {
 			exit $E_GENERAL
 		fi
 		URL="$DEPOT_URL/${name}"
-		if [ ! -f $PKGMK_SIGNATURE ]; then
-			downloads_file_with_curl  $PKGMK_SIGNATURE $URL/$PKGMK_SIGNATURE
+		if [ ! -f $PKGMK_REPO ]; then
+			downloads_file_with_curl  $PKGMK_REPO $URL/$PKGMK_REPO
 		fi
-		HEAD=`head -1 $PKGMK_SIGNATURE`
-		if [ ${HEAD:10:1} = ":" ]; then # Packages availables
-			BUILD_DATE="`echo $HEAD|cut -d ":" -f1`"
-			EXT="`echo $HEAD|cut -d ":" -f2`"
-			for LINE in `cat $PKGMK_SIGNATURE`;do
-				MD5SUM="`echo $LINE|cut -d ":" -f1`"
-				FILE="`echo $LINE|cut -d ":" -f2`"
-				ARCH="`echo $LINE|cut -d ":" -f3`"
+		HEAD=`head -1 $PKGMK_REPO`
+		if [ ${HEAD:10:1} = "#" ]; then # Packages availables
+			BUILD_DATE="`echo $HEAD|cut -d "#" -f1`"
+			EXT="`echo $HEAD|cut -d "#" -f2`"
+			for LINE in `cat $PKGMK_REPO`;do
+				MD5SUM="`echo $LINE|cut -d "#" -f1`"
+				FILE="`echo $LINE|cut -d "#" -f2`"
+				ARCH="`echo $LINE|cut -d "#" -f3`"
 				if [ "$ARCH" != "" ]; then
 					echo "$MD5SUM  ${FILE}${BUILD_DATE}${ARCH}${EXT}" >> $TMPMD5
 				else
@@ -236,7 +235,7 @@ sync_all_files() {
 			done
 			sed -i "1d" $TMPMD5
 		else
-			sed  "s/:/  /" $PKGMK_SIGNATURE > $TMPMD5
+			sed  "s/#/  /" $PKGMK_REPO > $TMPMD5
 		fi
 		for FILE in $(cat $TMPMD5|cut -d " " -f 3);do
 			if [ ! -f $FILE ];then
@@ -648,10 +647,7 @@ add_meta_files() {
 	if [ -f $PKGMK_ROOT/${NAME}.post-install ]; then
 		cp $PKGMK_ROOT/${NAME}.post-install .POST
 	fi
-	if [ -f $PKGMK_ROOT/${NAME}.info ]; then
-		cp $PKGMK_ROOT/${NAME}.info .INFO
-	fi
-	for file in .README .PRE .POST .INFO; do
+	for file in .README .PRE .POST; do
 		if [ -f $file ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/$1 \
 			$file
@@ -661,10 +657,9 @@ add_meta_files() {
 }
 
 add_meta_to_archive() {
-	local NAME SIZE_I DESCR
+	local NAME SIZE_I DESC URL PACK MAINT
 	NAME="`get_package_name $1`"
 
-	
 	info  "Adding meta data to Archive $NAME"
 
 	TAR="$PKGMK_WORK_DIR/tar"
@@ -673,11 +668,16 @@ add_meta_to_archive() {
 
 	bsdtar xf $PKGMK_PACKAGE_DIR/$1
 
-
 	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
-	DESCR="`cat $PKGMK_ROOT/Pkgfile|grep -i desc|cut -d : -f2| sed "s/^ //"`"
+	DESC="`cat $PKGMK_ROOT/Pkgfile|grep -i desc|cut -d : -f1 --complement| sed "s/ *//"`"
+	URL="`cat $PKGMK_ROOT/Pkgfile|grep -i url|cut -d : -f1 --complement| sed "s/ *//"`"
+	PACK="`cat $PKGMK_ROOT/Pkgfile|grep -i pack|cut -d : -f1 --complement| sed "s/ *//"`"
+	MAINT="`cat $PKGMK_ROOT/Pkgfile|grep -i maint|cut -d : -f1 --complement| sed "s/ *//"`"
 	echo "N$NAME" > .META
-	echo "D$DESCR" >> .META
+	echo "D$DESC" >> .META
+	echo "U$URL" >> .META
+	echo "M$MAINT" >> .META
+	echo "P$PACK" >> .META
 	echo "S$SIZE_I" >> .META
 	echo "V$version" >> .META
 	echo "r$release" >> .META
@@ -909,6 +909,7 @@ install_package() {
 
 recursive() {
 	local ARGS FILE DIR
+	[ -f $PKGMK_REPO ] && rm -v $PKGMK_REPO
 	
 	ARGS=`echo "$@" | sed -e "s/--recursive//g" -e "s/-r//g"`
 
@@ -974,103 +975,75 @@ build_needed() {
 	fi
 	echo $RESULT
 }
-update_signature()
+
+update_category_repo()
+{
+	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER
+	if [ -f $PKGMK_REPO ]; then
+		HEAD=`head -1 $PKGMK_REPO`
+		if [ "${HEAD:10:1}" = "#" ]; then 
+			BUILD_DATE="`echo $HEAD|cut -d "#" -f1`"
+			VERSION="`echo $HEAD|cut -d "#" -f3`"
+			RELEASE="`echo $HEAD|cut -d "#" -f4`"
+			DESCRIPTION="`echo $HEAD|cut -d "#" -f5`"
+			URL="`echo $HEAD|cut -d "#" -f6`"
+			MAINTAINER="`echo $HEAD|cut -d "#" -f7`"
+			PACKAGER="`echo $HEAD|cut -d "#" -f8`"
+			[ -f ../$PKGMK_REPO ] && sed -i "/#$name#/d" ../$PKGMK_REPO
+			echo "`md5sum $PKGMK_REPO|cut -d " " -f1`#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER" \
+			>> ../$PKGMK_REPO
+		fi
+	fi
+}
+update_repo()
 {
 	local FILE MD5SUM EXT
 	cd $PKGMK_ROOT
 	get_package_list
 	if [ ! -z $TARGETS ]; then
 		EXT="`get_package_extension $TARGETS`"
-		echo "`get_package_builddate $TARGETS`:$EXT:$version" > $PKGMK_SIGNATURE
+		echo -n "`get_package_builddate $TARGETS`#$EXT#$version#$release" > $PKGMK_REPO
+		for string in desc url maint pack; do 
+			if [ ! -z "`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^$string|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`" ]; then 
+				echo -n "#"`cat Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^$string|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`"" \
+				>> .PKGREPO
+			else
+				echo -n "#n.a" >> .PKGREPO
+			fi
+		done
+		printf "\n" >> .PKGREPO
+		### TODO To make it compatible I will remove it sometimes
+		# echo "`get_package_builddate $TARGETS`:$EXT:$version" > MD5SUM
+		###
 		for TARGET in ${TARGETS[@]}; do
 			FILE=`basename $TARGET`
 			MD5SUM=`md5sum $TARGET|cut -d " " -f1`
-			echo "$MD5SUM:`get_package_name $TARGET`:`get_package_arch $TARGET|sed "s/-//"`" >> $PKGMK_SIGNATURE
+			echo "$MD5SUM#`get_package_name $TARGET`#`get_package_arch $TARGET|sed "s/-//"`" >> $PKGMK_REPO
 		done
 		for FILE in  ${name}*
 		do
+			[ ! -f "$FILE" ] && break
 			if [ "${FILE:$((${#FILE} - ${#EXT} ))}" != "$EXT" ]; then
-				echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> $PKGMK_SIGNATURE
+				echo "`md5sum $FILE|cut -d " " -f1`#$FILE" >> $PKGMK_REPO
 			fi
-		done	
+		done
 	else
-		rm -f $PKGMK_SIGNATURE
+		rm -f $PKGMK_REPO
 		for FILE in  ${name}*
 		do
-			echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> $PKGMK_SIGNATURE
+			[ ! -f "$FILE" ] && break
+			echo "`md5sum $FILE|cut -d " " -f1`#$FILE" >> $PKGMK_REPO
 		done
+		### TODO To make it compatible I will remove it sometimes
+		# [ -f  $PKGMK_REPO ] && cp $PKGMK_REPO MD5SUM
+		###
 	fi
-	echo "`md5sum Pkgfile|cut -d " " -f1`:Pkgfile" >> $PKGMK_SIGNATURE
+	echo "`md5sum Pkgfile|cut -d " " -f1`#Pkgfile" >> $PKGMK_REPO
+	### TODO To make it compatible
+	# echo "`md5sum Pkgfile|cut -d " " -f1`:Pkgfile" >> MD5SUM
+	###
 }
 
-update_index_html()
-{
-	cat > $PKGMK_ROOT/index.html << "EOF"
- <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
- <head>
-  <meta charset="utf-8" />
-EOF
-echo "<title>${name} $version</title>" >> $PKGMK_ROOT/index.html
-cat >> $PKGMK_ROOT/index.html << "EOF"
- </head>
- <body>
-EOF
-echo "<h4>${name} $version `date +%Y%m%d`</h4>" >> $PKGMK_ROOT/index.html
-echo -n "<pre><kbd>" >> $PKGMK_ROOT/index.html
-pushd $PKGMK_ROOT > /dev/null
-if [ -f  ${name}.info ]; then
-  cat ${name}.info >> $PKGMK_ROOT/index.html
-fi
-echo "" >> $PKGMK_ROOT/index.html
-
-generate_signature
-
-update_signature
-
-for INPUT in `cat $PKGMK_SIGNATURE`
-do
-   FILE=`echo $INPUT|cut -d ":" -f2`
-   MD5=`echo $INPUT|cut -d ":" -f1`
-   echo "$MD5 $FILE `du -b  --summarize $FILE|sed "s/\t/ /" | cut -d " " -f1`" >> $PKGMK_ROOT/index.html
-done
-# popd > /dev/null
-cat >> $PKGMK_ROOT/index.html << "EOF"
-  </kbd></pre>
-EOF
-for file in `find $PKGMK_ROOT -type f -name "*.jpg"`
-do 
-  pict_ext=`basename $file|cut -d "." -f2`
-  if [ "$pict_ext" == "jpg" ]; then
-    picture="`basename $file`"
-    pictures="$pictures $picture"
-  fi
-done
-if [ "$pictures" != "" ]; then
-	echo "  <h4>Screenshot(s):</h4>
-   <table>" >> $PKGMK_ROOT/index.html
-	for pict in ${pictures}; do
-		echo "    <tr><td><img src="$pict"></td></tr>" >> $PKGMK_ROOT/index.html
-	done
-	echo "   </table>"  >> $PKGMK_ROOT/index.html
-fi
-
-if [ -f ${name}.deps ]; then
-  echo "  <h4>Dependencies needs for the compilation:</h4>" >> $PKGMK_ROOT/index.html
-  cat ${name}.deps >> $PKGMK_ROOT/index.html
-fi
-if [ -f ${name}.README ]; then
-  echo "  <h4>README info</h4>" >> $PKGMK_ROOT/index.html
-  echo -n "  <pre><kbd>" >> $PKGMK_ROOT/index.html
-  cat ${name}.README >> $PKGMK_ROOT/index.html
-fi
-cat >> $PKGMK_ROOT/index.html << "EOF"
-  </kbd></pre>
- </body>
-</html>
-EOF
-}
 interrupted() {
 	echo ""
 	error "Interrupted."
@@ -1093,7 +1066,7 @@ print_help() {
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
 	echo "  -utd, --up-to-date          do not build, only check if package is up to date"
-	echo "  -us,  --update-signature    do not build, only update MD5SUM signature file"
+	echo "  -ur,  --update-repo         do not build, only update the $PKGMK_REPO file"
 	echo "  -uf,  --update-footprint    update footprint using result from last build"
 	echo "  -if,  --ignore-footprint    build packages without checking footprint"
 	echo "  -in,  --ignore-new          build packages, ignore new files in a footprint missmatch"
@@ -1102,7 +1075,7 @@ print_help() {
 	echo "  -cm,  --check-md5sum        do not build, only check md5sum"
 	echo "  -ns,  --no-strip            do not strip executable binaries or libraries"
 	echo "  -f,   --force               build packages even if it appears to be up to date"
-	echo "  -co,  --clean-only          do not build, only remove packages and downloaded files, update MD5SUM signature file"
+	echo "  -co,  --clean-only          do not build, only remove packages and downloaded files, update $PKGMK_REPO file"
 	echo "  -kw,  --keep-work           keep temporary working directory"
 	echo "  -cf,  --config-file <file>  use alternative configuration file"
 	echo "  -v,   --version             print version and exit "
@@ -1128,8 +1101,10 @@ parse_options() {
 				PKGMK_SHOW_VERSION="yes";;
 			-utd|--up-to-date)
 				PKGMK_UP_TO_DATE="yes" ;;
-			-us|--update-signature)
-				PKGMK_UPDATE_SIGNATURE="yes" ;;
+			-uc|--update-category)
+				PKGMK_UPDATE_CATEGORY="yes";;
+			-ur|--update-repo)
+				PKGMK_UPDATE_REPO="yes" ;;
 			-uf|--update-footprint)
 				PKGMK_UPDATE_FOOTPRINT="yes" ;;
 			-if|--ignore-footprint)
@@ -1251,16 +1226,16 @@ main() {
 		PKGMK_IGNORE_MD5SUM="yes"
 		warning "FOOTPRINT AND MD5SUM IGNORED"
 	else
-		if [ "$PKGMK_UPDATE_SIGNATURE" != "yes" ]; then
-			info "PKGMK_IGNORE_SIGNATURE: $PKGMK_IGNORE_SIGNATURE"
+		if [ "$PKGMK_UPDATE_REPO" != "yes" ]; then
+			info "PKGMK_IGNORE_REPO: $PKGMK_IGNORE_REPO"
 		else
-			info "PKGMK_UPDATE_SIGNATURE: $PKGMK_UPDATE_SIGNATURE"
+			info "PKGMK_UPDATE_REPO: $PKGMK_UPDATE_REPO"
 		fi
 		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
 		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"	
 	fi
-	if [ "$PKGMK_IGNORE_SIGNATURE"  != "yes" ]; then
-		info "MD5SUM file will be generated"
+	if [ "$PKGMK_IGNORE_REPO"  != "yes" ]; then
+		info "$PKGMK_REPO file will be generated"
 	fi
 
 	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
@@ -1303,11 +1278,15 @@ main() {
 	if [ "$PKGMK_CLEAN_ONLY" = "yes" ]; then
 		clean
 		remove_source
-		update_signature
+		update_repo
 		exit 0
 	fi
-	if [ "$PKGMK_UPDATE_SIGNATURE" = "yes" ]; then
-		update_signature
+	if [ "$PKGMK_UPDATE_CATEGORY" = "yes" ]; then
+		update_category_repo
+		exit 0
+	fi
+	if [ "$PKGMK_UPDATE_REPO" = "yes" ]; then
+		update_repo
 		exit 0
 	fi
 	if [ "$PKGMK_UPDATE_FOOTPRINT" = "yes" ]; then
@@ -1406,8 +1385,8 @@ main() {
 		clean
 		unset TARGETS
 	fi
-	if [ "$PKGMK_IGNORE_SIGNATURE" != "yes" ];then
-		update_signature
+	if [ "$PKGMK_IGNORE_REPO" != "yes" ];then
+		update_repo
 	fi
 	exit 0
 }
@@ -1426,7 +1405,7 @@ CARDS_CONFFILE="/etc/cards.conf"
 
 PKGMK_PACKAGE_EXT="cards.tar"
 
-PKGMK_SIGNATURE="MD5SUM"
+PKGMK_REPO=".PKGREPO"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
@@ -1443,12 +1422,13 @@ PKGMK_LOCALES=(fr de it es nl pt da nn sv fi)
 
 PKGMK_SOURCE_MIRRORS=()
 PKGMK_SOURCE_DIR="$PWD"
+PKGMK_CATEGORY="$PWD"
 PKGMK_WORK_DIR="$PWD/work"
 PKGMK_DOWNLOAD="no"
 PKGMK_IGNORE_FOOTPRINT="yes"
 PKGMK_IGNORE_NEW="yes"
 PKGMK_IGNORE_MD5SUM="yes"
-PKGMK_IGNORE_SIGNATURE="no"
+PKGMK_IGNORE_REPO="no"
 
 PKGMK_NO_STRIP="no"
 
