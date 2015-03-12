@@ -22,15 +22,30 @@
 CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
 	: m_argParser(argParser), m_root("/")
 {
+	if ( m_argParser.isSet(CardsArgumentParser::OPT_FORCE)) {
+		m_force=true;
+	} else {
+		m_force=false;
+	}
 }
 void CardsInstall::run(int argc, char** argv)
 {
 	m_configParser = new ConfigParser("/etc/cards.conf");
-	m_packageName = m_argParser.otherArguments()[0];
-	ConfigParser::parseConfig("/etc/cards.conf", m_config);
-	m_configParser->parseMD5sumCategoryDirectory();
-	m_configParser->parsePortsList();
-	m_configParser->parseBasePackageList();
+	string::size_type pos = m_argParser.otherArguments()[0].find("cards.tar");
+	if ( pos != std::string::npos) {
+		m_archive=true;
+		m_packageFileName = m_argParser.otherArguments()[0];
+	} else if ( checkFileExist(m_argParser.otherArguments()[0])) {
+		m_archive=true;
+		m_packageFileName = m_argParser.otherArguments()[0];
+	} else {
+		m_archive=false;
+		m_packageName = m_argParser.otherArguments()[0];
+		ConfigParser::parseConfig("/etc/cards.conf", m_config);
+		m_configParser->parseMD5sumCategoryDirectory();
+		m_configParser->parsePortsList();
+		m_configParser->parseBasePackageList();
+	}
 }
 set<string> CardsInstall::findPackages(const string& path)
 {
@@ -126,10 +141,8 @@ void CardsInstall::generateDependencies()
 		dependenciesWeMustAdd.erase(vit); /* Erase the first one in the dependenciesWeMustAdd list */
 		set<string> directDependencies = getDirectDependencies();
 		/* If m_packageName is already in the depencenciestoSort list  AND ...*/
-		bool found = false;
 		for ( vit = depencenciestoSort.begin(); vit != depencenciestoSort.end();++vit) {
 			if ( m_packageName == *vit ) {
-				found=true;
 				break;
 			}
 		}
@@ -221,26 +234,34 @@ void CardsInstall::update()
 
 	// Retrieving info about all the packages
 	buildDatabaseWithDetailsInfos(false);
-
-	if ( ! checkPackageNameExist(m_packageName) ) {
-		m_actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
-		treatErrors(m_packageName);
-	}
-	if ( m_configParser->checkBinaryExist(m_packageName)) {
-		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
-		if ( ! checkFileExist(m_packageFileName)) {
-			m_configParser->downloadPackageFileName(m_packageName);
+	if ( ! m_archive ) {
+		if ( ! checkPackageNameExist(m_packageName) ) {
+			m_actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
+			treatErrors(m_packageName);
 		}
-	} else {
-		m_actualError = PACKAGE_NOT_FOUND;
-		treatErrors(m_packageName);
+		if ( m_configParser->checkBinaryExist(m_packageName)) {
+			m_packageFileName = m_configParser->getPackageFileName(m_packageName);
+			if ( ! checkFileExist(m_packageFileName)) {
+				m_configParser->downloadPackageFileName(m_packageName);
+			}
+		} else {
+			m_actualError = PACKAGE_NOT_FOUND;
+			treatErrors(m_packageName);
+		}
+		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
 	}
-	m_packageFileName = m_configParser->getPackageFileName(m_packageName);
+
 	set<string> keep_list;
 
 	// Reading the archiving to find a list of files
 	pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
 
+	bool installed = checkPackageNameExist(package.first);
+
+	if (!installed) {
+		m_actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
+		treatErrors(package.first);
+	}
 	// Checking the rules
 	readRulesFile();
 
@@ -249,9 +270,15 @@ void CardsInstall::update()
 	set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
 
 	if (! conflicting_files.empty()) {
-		copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
-		m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
-		treatErrors("listed file(s) already installed, cannot continue... ");	
+		if (m_force) {
+			set<string> keep_list;
+			keep_list = getKeepFileList(conflicting_files, m_actionRules);
+			removePackageFilesRefsFromDB(conflicting_files, keep_list); // Remove unwanted conflicts
+		} else {
+			copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
+			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
+			treatErrors("listed file(s) already installed, cannot continue... ");	
+		}
 	}
 
 	// Remove metadata about the package removed
@@ -293,50 +320,96 @@ void CardsInstall::install()
 
 	// Get the list of installed packages
 	getListOfPackageNames(m_root);
-
 	// Retrieving info about all the packages
 	buildDatabaseWithDetailsInfos(false);
 
-	if  ( checkPackageNameExist(m_packageName) ) {
-		m_actualError = PACKAGE_ALLREADY_INSTALL;
-		treatErrors (m_packageName);
-	}
+	if (m_archive) {
+		addPackage();
+	} else  {
+		if  ( checkPackageNameExist(m_packageName) ) {
+			m_actualError = PACKAGE_ALLREADY_INSTALL;
+			treatErrors (m_packageName);
+		}
+		// Generate the dependencies
+		generateDependencies();
 
-	// Generate the dependencies
-	generateDependencies();
-
-	// Add the locales if any defined
-	if (m_config.locale.size() > 0) {
-		vector<string> tmpList;
-		string packageName = "";
-		for (std::vector<string>::iterator i = m_config.locale.begin();i != m_config.locale.end();++i) {
-			for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
-				packageName = *j + "." + *i;
-				if ( m_configParser->checkBinaryExist(packageName)) {
-    			m_packageFileName = m_configParser->getPackageFileName(packageName);
-    			if ( ! checkFileExist(m_packageFileName)) {
-      			m_configParser->downloadPackageFileName(packageName);
-    			}
-					tmpList.push_back(packageName);
+		// Add the locales if any defined
+		if (m_config.locale.size() > 0) {
+			vector<string> tmpList;
+			string packageName = "";
+			for (std::vector<string>::iterator i = m_config.locale.begin();i != m_config.locale.end();++i) {
+				for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
+					packageName = *j + "." + *i;
+					if ( m_configParser->checkBinaryExist(packageName)) {
+						m_packageFileName = m_configParser->getPackageFileName(packageName);
+						if ( ! checkFileExist(m_packageFileName)) {
+							m_configParser->downloadPackageFileName(packageName);
+						}
+						tmpList.push_back(packageName);
+					}
+				}
+			}
+			if (tmpList.size() > 0 ) {
+				for (std::vector<string>::iterator i = tmpList.begin();i != tmpList.end();++i) {
+					m_dependenciesList.push_back(*i);
 				}
 			}
 		}
-		if (tmpList.size() > 0 ) {
-			for (std::vector<string>::iterator i = tmpList.begin();i != tmpList.end();++i) {
-				m_dependenciesList.push_back(*i);
-			}
-		}
+		addPackagesList();
 	}
-	addPackagesList();
 }
-void CardsInstall::addPackagesList()
+void CardsInstall::addPackage()
 {
 	// Checking the rules
 	readRulesFile();
 
 	set<string> keep_list;
 
-	// Let's go
+	// Reading the archiving to find a list of files
+	pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
+	set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
+#ifndef NDEBUG
+	cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
+#endif
+	// Run pre-install if exist
+	extractAndRunPREfromPackage(m_packageFileName);
+
+	set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
+
+	if (! conflicting_files.empty()) {
+		if (m_force) {
+			set<string> keep_list;
+			removePackageFilesRefsFromDB(conflicting_files, keep_list); // Remove unwanted conflicts
+		} else {
+			copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
+			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
+			treatErrors("listed file(s) already installed, cannot continue... ");
+		}
+	}
+
+	// Installation progressInfo of the files on the HD
+	installArchivePackage(m_packageFileName, keep_list, non_install_files);
+
+	// Post install
+	if (checkFileExist(PKG_POST_INSTALL)) {
+		m_actualAction = PKG_POSTINSTALL_START;
+		progressInfo();
+		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
+		if (postinstall.executeShell()) {
+			cerr << "WARNING Run post-install FAILED. continue" << endl;
+		}
+		m_actualAction = PKG_POSTINSTALL_END;
+		progressInfo();
+	}
+	// Add the metadata about the package to the DB
+	moveMetaFilesPackage(package.first,package.second);
+
+	// Add the info about the files to the DB
+	addPackageFilesRefsToDB(package.first, package.second);
+	runLdConfig();
+}
+void CardsInstall::addPackagesList()
+{
 	for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
 		m_packageName = *it;
 		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
@@ -349,43 +422,7 @@ void CardsInstall::addPackagesList()
 			m_actualError = PACKAGE_NOT_FOUND;
 			treatErrors(m_packageName);
 		}
-		// Reading the archiving to find a list of files
-		pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
-		set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
-#ifndef NDEBUG
-		cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
-#endif
-		// Run pre-install if exist
-		extractAndRunPREfromPackage(m_packageFileName);
-
-		set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
-
-		if (! conflicting_files.empty()) {
-			copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
-			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
-			treatErrors("listed file(s) already installed, cannot continue... ");
-		}
-
-		// Installation progressInfo of the files on the HD
-		installArchivePackage(m_packageFileName, keep_list, non_install_files);
-
-		// Post install
-		if (checkFileExist(PKG_POST_INSTALL)) {
-			m_actualAction = PKG_POSTINSTALL_START;
-			progressInfo();
-			process postinstall(SHELL,PKG_POST_INSTALL, 0 );
-			if (postinstall.executeShell()) {
-				cerr << "WARNING Run post-install FAILED. continue" << endl;
-			}
-			m_actualAction = PKG_POSTINSTALL_END;
-			progressInfo();
-		}
-		// Add the metadata about the package to the DB
-		moveMetaFilesPackage(package.first,package.second);
-
-		// Add the info about the files to the DB
-		addPackageFilesRefsToDB(package.first, package.second);
-		runLdConfig();
+		addPackage();
 	}
 }
 void CardsInstall::install(const vector<string>& dependenciesList)

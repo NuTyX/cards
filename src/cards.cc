@@ -97,13 +97,21 @@ int main(int argc, char** argv)
 			CardsBase CB(cardsArgPars);
 			CB.run(argc, argv);
 			return EXIT_SUCCESS;
-		} else	if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
-			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) ) {
-				cardsArgPars.printHelp("sync");
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_QUERY) {
+			CardsInfo Query(cardsArgPars);
+			Query.run(argc, argv);
+			Query.getOwner();
+			return EXIT_SUCCESS;
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_FILES) {
+			CardsInfo CFList(cardsArgPars);
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
+			} else {
+				CFList.run(argc, argv);
+				CFList.listOfFiles();
 				return EXIT_SUCCESS;
-			} 
+			}
+			return EXIT_SUCCESS;
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
 			CardsSync CS(cardsArgPars);
 			CS.run();
 			return EXIT_SUCCESS;
@@ -112,9 +120,11 @@ int main(int argc, char** argv)
 			CI.run(argc, argv);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
 				CI.printDependenciesList();
-			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_UPDATE)) {
+				return EXIT_SUCCESS;
+			}
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_UPDATE)) {
 				CI.update();
-			} else {
+			}	else {
 				CI.install();
 			}
 			return EXIT_SUCCESS;
@@ -134,13 +144,6 @@ int main(int argc, char** argv)
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			return CD.deptree();
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
-			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_OUTOFDATE)) ) {
-				cardsArgPars.printHelp("list");
-				return EXIT_SUCCESS;
-			}
 			CardsInfo CList(cardsArgPars);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_OUTOFDATE)) {
 				CList.listOutOfDate();
@@ -151,19 +154,13 @@ int main(int argc, char** argv)
 				return EXIT_SUCCESS;
 			}
 			CList.run(argc, argv);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) {
-				CList.listInstalled();
-			} else if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
+			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
 				CList.listPorts();
+			} else {
+				CList.listInstalled();
 			}
 			return EXIT_SUCCESS;
   	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) {
-			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) ) {
-				cardsArgPars.printHelp("info");
-				return EXIT_SUCCESS;
-			}
 			CardsInfo CInfo(cardsArgPars);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
 				CInfo.infoBinary();
@@ -172,26 +169,20 @@ int main(int argc, char** argv)
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
 				CInfo.infoPort();
 				return EXIT_SUCCESS;
-			}
-			CInfo.run(argc, argv);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_INSTALLED)) {
+			} else {
+				CInfo.run(argc, argv);
 				CInfo.infoInstall();
+				return EXIT_SUCCESS;
 			}
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
-			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) ) {
-				cardsArgPars.printHelp("diff");
-				return EXIT_SUCCESS;
-			}
 			CardsInfo CInfo(cardsArgPars);
 			CInfo.run(argc, argv);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
 				
 				CInfo.diffPorts();
 				return EXIT_SUCCESS;
-			}
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
+			} else {
 				CInfo.diffBinaries();
 				return EXIT_SUCCESS;
 			}
@@ -200,27 +191,10 @@ int main(int argc, char** argv)
 			CardsInfo CInfo(cardsArgPars);
 			CInfo.search();
 			return EXIT_SUCCESS;
-		} else {
-		cerr << "Supported commands so far:\n"
-		<< "  config\n"
-		<< "  base\n"
-		<< "  create\n"
-		<< "  sync\n"
-		<< "  depends\n"
-		<< "  install\n"
-		<< "  remove\n"
-		<< "  info\n"
-		<< "  list\n"
-		<< "  diff\n"
-		<< "  search\n"
-			<< "\n"
-			<< " use cards <command> -h " << endl;
-		exit(-1);
 		}
-		return EXIT_SUCCESS;
 	} catch (runtime_error& e) {
-		cerr << "cards " << VERSION << " "<< command << ": " << e.what() << endl;
-		return EXIT_FAILURE;
+			cerr << "cards " << VERSION << " "<< command << ": " << e.what() << endl;
+			return EXIT_FAILURE;
 	}
 }
 // vim:set ts=2 :

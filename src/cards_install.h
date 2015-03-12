@@ -64,6 +64,7 @@ private:
 	void generateDependencies();
 	bool getPackageFileName();
 	void addPackagesList();
+	void addPackage();
 
 	string m_packageName;
 	string m_packageFileName;
@@ -77,6 +78,8 @@ private:
 
 	// TODO make configurable from the command line
 	const string m_root; // absolute path of installation
+	bool m_force;
+	bool m_archive;
 };
 #endif
 // vim:set ts=2 :

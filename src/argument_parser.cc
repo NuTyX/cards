@@ -52,6 +52,7 @@ ArgParser::~ArgParser()
 
 int ArgParser::addCommand(APCmd& cmd,
                           const std::string& name,
+                          const std::string& shortInfo,
                           const std::string& description,
                           ArgNumberCheck argNumberCheck,
                           int argNumber,
@@ -68,6 +69,7 @@ int ArgParser::addCommand(APCmd& cmd,
     command->argNumber = argNumber;
     command->argNumberCheck = argNumberCheck;
 
+    command->shortInfo = shortInfo;
     command->description = description;
     command->otherArguments = otherArguments;
 
@@ -152,8 +154,8 @@ void ArgParser::parse(int argc, char** argv)
         if (argv[i][0] != '-') {
             if (!commandFound) {
                 if (m_commands.find(argv[i]) == m_commands.end()) {
-                    parseError("Non option / Non command argument '" +
-                               string(argv[i]) + "'");
+                    parseError("Non option / Non command argument \033[1;31m" +
+                               string(argv[i]) + NORMAL);
                 }
 
                 cmd = m_commands[argv[i]];
@@ -254,10 +256,10 @@ void ArgParser::parse(int argc, char** argv)
         it = cmd->mandatoryOptions.begin();
         for (; it != cmd->mandatoryOptions.end(); ++it) {
             if (!isSet(it->second->id)) {
-                parseError("Command '" + cmd->name +
-                           "' requires option " +
+                parseError("Command " + cmd->name +
+                           " requires option " +
                            string("-") + it->second->shortName +
-                           string(" | ") +
+                           string(",  ") +
                            string("--") + it->second->longName + " not found",
                            cmd->name);
             }
@@ -269,7 +271,7 @@ void ArgParser::parse(int argc, char** argv)
         case EQ:
             if (m_otherArguments.size() != cmd->argNumber) {
                 ostringstream ostr;
-                ostr << cmd->name
+                ostr << BLUE << cmd->name << NORMAL
                      << " takes exactly "
                      << cmd->argNumber
                      << (cmd->argNumber == 1 ? " argument." : " arguments.");
@@ -280,7 +282,7 @@ void ArgParser::parse(int argc, char** argv)
         case MIN:
             if (m_otherArguments.size() < cmd->argNumber) {
                 ostringstream ostr;
-                ostr << cmd->name
+                ostr << BLUE << cmd->name << NORMAL
                      << " takes at least "
                      << cmd->argNumber
                      << (cmd->argNumber == 1 ? " argument." : " arguments.");
@@ -291,7 +293,7 @@ void ArgParser::parse(int argc, char** argv)
         case MAX:
             if (m_otherArguments.size() > cmd->argNumber) {
                 ostringstream ostr;
-                ostr << cmd->name
+                ostr << BLUE << cmd->name << NORMAL
                      << " takes at most "
                      << cmd->argNumber
                      << (cmd->argNumber == 1 ? " argument." : " arguments.");
@@ -348,90 +350,105 @@ std::string ArgParser::appName() const
 
 std::string ArgParser::generateHelpForCommand(const std::string& command) const
 {
-    std::map<std::string, Command*>::const_iterator cit =
-        m_commands.find(command);
+	std::map<std::string, Command*>::const_iterator cit =
+		m_commands.find(command);
 
-    if (cit == m_commands.end()) {
-        return "";
-    }
+	if (cit == m_commands.end()) {
+		return "";
+	}
 
-    const Command * const  cmd = cit->second;
-    string help = "";;
+	const Command * const  cmd = cit->second;
+	string help = "\n";
+	help += ACTION;
+	help += "\t\t\t" + cmd->shortInfo;
+	help += "\n\n";
+	help += USAGE;
+	help += "\t\t\t" ;
+	help += BLUE + m_appName + " " + cmd->name + " ";
+	help += OPTIONS;
+	help += " " + cmd->otherArguments + "\n\n";
+	help += DESCRIPTION;
+	help += "\t\t" + cmd->description;
+	help += "\n\n";
 
-    help += "command '" + cmd->name + " " + cmd->otherArguments + "'\n";
-    help += "  " + cmd->description;
-    help += "\n\n";
 
+	std::map<int, Option*>::const_iterator it = cmd->mandatoryOptions.begin();
+	if (it != cmd->mandatoryOptions.end()) {
+		help += REQUIRED;
+		help += ":\n";
+		for (; it != cmd->mandatoryOptions.end(); ++it) {
+			help += generateOptionString(it->second);
+		}
+	}
 
-    std::map<int, Option*>::const_iterator it = cmd->mandatoryOptions.begin();
-    if (it != cmd->mandatoryOptions.end()) {
-        help += "  Required: \n";
-        for (; it != cmd->mandatoryOptions.end(); ++it) {
-            help += generateOptionString(it->second);
-        }
-    }
+	it = cmd->options.begin();
+	if (it != cmd->options.end()) {
+		help += OPTIONS;
+		help += ":\n";
+		for (; it != cmd->options.end(); ++it) {
+			help += generateOptionString(it->second);
+		}
+	}
 
-    it = cmd->options.begin();
-    if (it != cmd->options.end()) {
-        help += "  Optional: \n";
-        for (; it != cmd->options.end(); ++it) {
-            help += generateOptionString(it->second);
-        }
-    }
-
-    return help;
+	return help;
 }
 
 string ArgParser::generateOptionString(Option* o) const
 {
-    string help = "    ";
+	string help = "  ";
 
-    if (o->shortName) {
-        help += "-";
-        help += o->shortName;
+	if (o->shortName) {
+		help += "-";
+		help += o->shortName;
 
-        if (o->requiresValue && o->valueName != "") {
-            help += " " + o->valueName;
-        }
+		if (o->requiresValue && o->valueName != "") {
+			help += " " + o->valueName;
+		}
 
-        help += " | ";
-    }
+		help += ", ";
+	}
 
-    if (o->longName != "") {
-        help += "--";
+	if (o->longName != "") {
+		help += "--";
 
-        help += o->longName;
-        if (o->requiresValue && o->valueName != "") {
-            help += "=" + o->valueName;
-        }
+		help += o->longName;
+		if (o->requiresValue && o->valueName != "") {
+			help += "=" + o->valueName;
+		}
 
-        help += "    ";
-        help += o->description;
-        help += "\n";
-    }
+		help += "    ";
+		help += o->description;
+		help += "\n";
+	}
 
-    return help;
+	return help;
 }
 
 std::string ArgParser::generateUsage() const
 {
-    string usage = getAppIdentification() +
-        "USAGE: " + m_appName +
-        " COMMAND [OPTIONS] <arguments>\n\n";
-    usage += "  Where COMMAND is one of the following:\n";
+	string usage = getAppIdentification() +
+  	USAGE;
+	usage += " ";
+	usage += BLUE + m_appName + " ";
+	usage += COMMAND;
+	usage += " ";
+	usage += OPTIONS;
+	usage += " <arguments>\n\n Where ";
+	usage += COMMAND;
+	usage += " is one of the following:\n\n";
 
-    std::map<std::string, Command*>::const_iterator it;
-    it = m_commands.begin();
-    for (; it != m_commands.end(); ++it) {
-        usage += "    " + it->first + "\t\t" +
-            it->second->description + "\n";
-    }
+	std::map<std::string, Command*>::const_iterator it;
+	it = m_commands.begin();
+	for (; it != m_commands.end(); ++it) {
+        usage += BLUE + it->first + WHITE + "\t\t" +
+            it->second->shortInfo + "\n" + NORMAL;
+	}
 
-    return usage;
+	return usage;
 }
 
 const std::vector<std::string>& ArgParser::otherArguments() const
 {
-    return m_otherArguments;
+	return m_otherArguments;
 }
 // vim:set ts=2 :

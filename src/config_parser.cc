@@ -321,56 +321,6 @@ int ConfigParser::parsePackagePkgfileList()
 	}
 	return 0;
 }
-int ConfigParser::parsePackageInfoList()
-{
-/*
- * Let's downloads the one which are missing
- */
-	InfoFile downloadFile;
-	vector<InfoFile> downloadFilesList;
-
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {
-#ifndef NDEBUG
-				cerr << p->md5SUM << " " << p->name << endl << endl;
-#endif
-				if ( p->name == j->basePackageName + ".info" ){
-					if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "/" + p->name) ) {
-						downloadFile.url = i->Url + "/" + j->basePackageName  + "/" + p->name;
-						downloadFile.dirname = i->Dir + "/" + j->basePackageName;
-						downloadFile.filename = "/"+p->name;
-						downloadFile.md5sum = p-> md5SUM;
-						downloadFilesList.push_back(downloadFile);
-#ifndef NDEBUG
-						cerr << i->Dir + "/" + j->basePackageName  + "/" + p->name << endl;
-#endif
-					}
-				}
-			}
-		}
-	}
-	if ( downloadFilesList.size() > 0 ) {
-		FileDownload FD(downloadFilesList,false);
-	}
-/*
- * Time to add the description line
- */
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			string infoFile = i->Dir + "/" + j->basePackageName  + "/" + j->basePackageName + ".info";
-			vector<string> infoFileContent;
-			if ( parseFile(infoFileContent,infoFile.c_str()) != 0) {
-				cerr << "Cannot read the file: " << infoFile << endl;
-				cerr << " ... continue with next" << endl;
-				continue;
-			}
-			vector<string>::const_iterator i = infoFileContent.begin();
-			j->description = *i;
-		}
-	}
-	return 0;
-}
 void ConfigParser::downloadPackageFileName(const std::string& packageName)
 {
 	if ( m_p->name == packageName) {

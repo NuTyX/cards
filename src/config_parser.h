@@ -128,11 +128,6 @@ class ConfigParser
  *
  */
 		int parsePackagePkgfileList();
-/*
- *  \parse the info file for each basePackage
- *	add the description of the port found in the first line of the info file
- */
-		int parsePackageInfoList();
 
 /*
  *	\return the folder of the port name

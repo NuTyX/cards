@@ -317,8 +317,8 @@ void Pkginfo::run(int argc, char** argv)
 }
 void Pkginfo::printHelp() const
 {
-	cout << "usage: " << m_utilName << " [options]" << endl
-	     << "options:" << endl
+	cout << USAGE << m_utilName << " [options]" << endl
+	     << OPTIONS << endl
 	     << "  -i, --installed             list installed packages" << endl
        << "  -d, --details               list details about the <package>" << endl
        << "  -L, --librairies            list all the runtime librairies for the <package>" << endl

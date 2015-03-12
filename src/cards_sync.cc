@@ -135,12 +135,6 @@ void CardsSync::run()
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
-	if ( ! (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) &&
-			! (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) &&
-			! (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) ) {
-	
-		throw runtime_error("missing option -i, -b OR -p");
-	}
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
 	InfoFile downloadFile;
@@ -235,50 +229,8 @@ void CardsSync::run()
 		downloadFilesList.clear();
 		/*
 		*  From here on we should have all the MD5SUM files, by default if no parameters are given
-		* We just want to download the info file, let's check what's available in every folder by
-		* parsing the MD5SUM file
+		* we are happy with MD5SUM file
 		*/
-		for (set<string>::const_iterator ri = m_localPackagesList.begin(); ri != m_localPackagesList.end(); ++ri) {
-			string localPackageDirectory = *ri;
-			string MD5SUMFile = categoryDir+localPackageDirectory + "/" + m_repoFile;
-			string packageName = *ri;
-			string::size_type pos = localPackageDirectory.find('@');
-			
-			if ( pos != std::string::npos) {
-				packageName = localPackageDirectory.substr(0,pos);
-			}
-			set<string> MD5SUMFileContent;
-			if ( parseFile(MD5SUMFileContent,MD5SUMFile.c_str()) != 0) {
-				m_actualError = CANNOT_READ_FILE;
-				treatErrors(MD5SUMFile);
-			}
-			for (set<string>::const_iterator i = MD5SUMFileContent.begin(); i != MD5SUMFileContent.end(); ++i) {
-				string input = *i;
-				/* 
-					By default we dont want to know about version and extension of the binary,
-					if the size of the line is small then 32 + 1 caracters, it's the firt line.
-					Let's skip it
-				*/
-				if (input.size() < 11)
-					continue;
-
-				if (input[10] == ':')
-					continue;
-
-				downloadFile.dirname = categoryDir + localPackageDirectory +"/";
-				downloadFile.md5sum = input.substr(0,32);
-				if (input.substr(33) == packageName + ".info" ) {
-					downloadFile.url = url + "/" + localPackageDirectory +"/"+ packageName + ".info";
-					downloadFile.filename = packageName + ".info";
-					string downloadFileName = downloadFile.dirname + packageName + ".info";
-					if (! checkFileExist(downloadFile.dirname + downloadFile.filename)) {
-						downloadFilesList.push_back(downloadFile);
-					} else if ( ! checkMD5sum(downloadFileName.c_str(),downloadFile.md5sum.c_str()) ) {
-						downloadFilesList.push_back(downloadFile);
-					}
-				}
-			}
-		}
 		if ( (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) || 
 			(m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) ) {
 			/*

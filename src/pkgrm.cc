@@ -86,8 +86,8 @@ void Pkgrm::run(int argc, char** argv)
 }
 void Pkgrm::printHelp() const
 {
-	cout << "usage: " << m_utilName << " [options] <package>" << endl
-	     << "options:" << endl
+	cout << USAGE << m_utilName << " [options] <package>" << endl
+	     << OPTIONS << endl
 	     << "  -r, --root <path>   specify alternative installation root" << endl
 	     << "  -v, --version       print version and exit" << endl
 	     << "  -h, --help          print help and exit" << endl;
