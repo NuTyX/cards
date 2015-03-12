@@ -165,8 +165,8 @@ void Pkgadd::run(int argc, char** argv)
 }
 void Pkgadd::printHelp() const
 {
-	cout << "usage: " << m_utilName << " [options] <file>" << endl
-	     << "options:" << endl
+	cout << USAGE << m_utilName << " [options] <file>" << endl
+	     << OPTIONS << endl
 	     << "  -u, --upgrade       upgrade package with the same name" << endl
 	     << "  -f, --force         force install, overwrite conflicting files" << endl
 	     << "  -r, --root <path>   specify alternative installation root" << endl

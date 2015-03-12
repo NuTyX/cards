@@ -31,8 +31,10 @@ class CardsArgumentParser : public ArgParser
 
 		static ArgParser::APCmd CMD_CONFIG;
 		static ArgParser::APCmd CMD_BASE;
+		static ArgParser::APCmd CMD_FILES;
 		static ArgParser::APCmd CMD_SYNC;
 		static ArgParser::APCmd CMD_INFO;
+		static ArgParser::APCmd CMD_QUERY;
 		static ArgParser::APCmd CMD_LIST;
 		static ArgParser::APCmd CMD_INSTALL;
 		static ArgParser::APCmd CMD_CREATE;
@@ -52,6 +54,8 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APOpt OPT_BINARIES;
 		static ArgParser::APOpt OPT_PORTS;
 		static ArgParser::APOpt OPT_OUTOFDATE;
+
+		static ArgParser::APOpt OPT_IGNORE;
 
 		static ArgParser::APOpt OPT_DRY;
 		static ArgParser::APOpt OPT_REMOVE;

@@ -22,6 +22,22 @@
 #ifndef ERRORTREAT_H
 #define ERRORTREAT_H
 
+#define RED "\033[1;31m"
+#define GREEN "\033[1;32m"
+#define YELLOW "\033[1;33m"
+#define BLUE "\033[1;34m"
+#define MAGENTA "\033[1;35m"
+#define CYAN "\033[1;36m"
+#define WHITE "\033[1;37m"
+#define NORMAL "\033[1;0m"
+
+#define ACTION "\033[1;33maction:\033[1;0m"
+#define USAGE "\033[1;33musage: \033[1;0m"
+#define OPTIONS "\033[1;33moptions\033[1;0m"
+#define REQUIRED "\033[1;33mrequired\033[1;0m"
+#define DESCRIPTION  "\033[1;33mdescription: \033[1;0m"
+#define COMMAND "\033[1;34mcommand\033[1;0m"
+
 #include <cstring>
 #include <string>
 #include <stdexcept>

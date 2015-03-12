@@ -196,7 +196,7 @@ void CardsDepends::showdependencies()
 	packagesInfo.getNumberOfPackages();
 	depends();
 	for (std::vector<string>::iterator it = m_dependenciesList.begin();it != m_dependenciesList.end();it++) {
-		if (m_argParser.isSet(CardsArgumentParser::OPT_ALL)) {
+		if (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) {
 			cout << *it << endl;
 		} else {
 			string packageName = basename(const_cast<char*>(it->c_str()));
@@ -219,7 +219,7 @@ void CardsDepends::showlevel()
 	level();
 	cout << "Level done" << endl;
 
-	if ( (m_missingDepsList.size() == 0 ) || ( m_argParser.isSet(CardsArgumentParser::OPT_FORCE))) {
+	if ( (m_missingDepsList.size() == 0 ) || ( m_argParser.isSet(CardsArgumentParser::OPT_IGNORE))) {
 		for (std::vector<LevelName>::iterator it = m_levelList.begin();it != m_levelList.end();it++) {
 			cout << it->l << ": " << it->name << endl;
 		}

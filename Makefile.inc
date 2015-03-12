@@ -28,7 +28,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 0.10.91.91
+VERSION = NO IDEA
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG

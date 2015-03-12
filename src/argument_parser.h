@@ -22,6 +22,7 @@
 #ifndef _ARGPARSER_H_
 #define _ARGPARSER_H_
 
+
 #include "error_treat.h"
 
 #include <map>
@@ -92,6 +93,7 @@ public:
 		int id;
 		std::string m_longName;
 		char m_shortName;
+		std::string m_shortInfo;
 		std::string m_description;
 		bool m_valueRequired;
 		std::string m_valueName;
@@ -118,7 +120,6 @@ private:
 	public:
 		int id;
 		std::string description;
-
 		char shortName;
 		std::string longName;
 
@@ -133,6 +134,7 @@ private:
 		int id;
 		std::string name;
 		std::string description;
+		std::string shortInfo;
 		ArgNumberCheck argNumberCheck;
 		unsigned int argNumber;
 		std::string otherArguments;
@@ -155,6 +157,7 @@ public:
 	 *
 	 * \param cmd a reference to the command; use it to compare the actually selected command against this one after parsing
 	 * \param name the name of the command to be parsed from the command line
+   * \param shortInfo a short description, used for general help screen
 	 * \param description a description, used for the help screens
 	 * \param argNumberCheck what kind of argument number checking
 	 * \param argNumber optional number of arguments
@@ -162,6 +165,7 @@ public:
 	 */
 	int addCommand(APCmd& cmd,
 				   const std::string& name,
+           const std::string& shortInfo,
 				   const std::string& description,
 				   ArgNumberCheck argNumberCheck,
 				   const int argNumber=-1,

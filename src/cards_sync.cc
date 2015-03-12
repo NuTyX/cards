@@ -161,12 +161,6 @@ void CardsSync::run()
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
-	if ( ! (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) &&
-			! (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) &&
-			! (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) ) {
-	
-		throw runtime_error("missing option -i, -b OR -p");
-	}
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
 	InfoFile downloadFile;
@@ -262,6 +256,10 @@ void CardsSync::run()
 		// We check again the local one because maybe they was no one
 		getLocalPackages(categoryDir);	
 		downloadFilesList.clear();
+		/*
+		*  From here on we should have all the MD5SUM files, by default if no parameters are given
+		* we are happy with the PKGREPO file
+		*/
 		if ( (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) || 
 			(m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) ) {
 			/*

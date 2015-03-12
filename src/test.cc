@@ -9,7 +9,7 @@ using namespace std;
 int main (int argi, char * argv[])
 {
 	try {
-		ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
+/*		ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
 		cp->parseMD5sumCategoryDirectory();
 		cp->parseBasePackageList();
 		cp->parsePackageInfoList();
@@ -28,6 +28,11 @@ int main (int argi, char * argv[])
 //		}
 //		au->printMeta();
 //		cout << packageDate << endl;
+*/
+	cout << RED << "Red" << NORMAL << endl;
+	cout << "Normal" << endl;
+	cout << YELLOW << "Yellow" << NORMAL << endl;
+
 	}  catch (runtime_error& e) {
 			cerr << e.what() << endl;
 			return -1;

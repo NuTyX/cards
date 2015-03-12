@@ -657,7 +657,11 @@ add_meta_files() {
 }
 
 add_meta_to_archive() {
+<<<<<<< HEAD
 	local NAME SIZE_I DESC URL PACK MAINT
+=======
+	local NAME SIZE_I DESC
+>>>>>>> 0.10
 	NAME="`get_package_name $1`"
 
 	info  "Adding meta data to Archive $NAME"
@@ -668,16 +672,26 @@ add_meta_to_archive() {
 
 	bsdtar xf $PKGMK_PACKAGE_DIR/$1
 
+#	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
+#	DESC="`cat $PKGMK_ROOT/Pkgfile|grep -i desc|cut -d : -f1 --complement| sed "s/ *//"`"
+#	URL="`cat $PKGMK_ROOT/Pkgfile|grep -i url|cut -d : -f1 --complement| sed "s/ *//"`"
+#	PACK="`cat $PKGMK_ROOT/Pkgfile|grep -i pack|cut -d : -f1 --complement| sed "s/ *//"`"
+#	MAINT="`cat $PKGMK_ROOT/Pkgfile|grep -i maint|cut -d : -f1 --complement| sed "s/ *//"`"
+#	echo "N$NAME" > .META
+#	echo "D$DESC" >> .META
+#	echo "U$URL" >> .META
+#	echo "M$MAINT" >> .META
+#	echo "P$PACK" >> .META
+# =======
+	if [ ! -z "`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^desc|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`" ]; then
+		DESC="`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^desc|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`"
+	else
+		DESC="n.a"
+	fi
 	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
-	DESC="`cat $PKGMK_ROOT/Pkgfile|grep -i desc|cut -d : -f1 --complement| sed "s/ *//"`"
-	URL="`cat $PKGMK_ROOT/Pkgfile|grep -i url|cut -d : -f1 --complement| sed "s/ *//"`"
-	PACK="`cat $PKGMK_ROOT/Pkgfile|grep -i pack|cut -d : -f1 --complement| sed "s/ *//"`"
-	MAINT="`cat $PKGMK_ROOT/Pkgfile|grep -i maint|cut -d : -f1 --complement| sed "s/ *//"`"
 	echo "N$NAME" > .META
 	echo "D$DESC" >> .META
-	echo "U$URL" >> .META
-	echo "M$MAINT" >> .META
-	echo "P$PACK" >> .META
+# >>>>>>> 0.10
 	echo "S$SIZE_I" >> .META
 	echo "V$version" >> .META
 	echo "r$release" >> .META
@@ -1246,6 +1260,9 @@ main() {
 	info "name: ${name}"
 	if [ ! -z "$version" ]; then
 		info "version: $version"
+	fi
+	if [ ! -z "$release" ]; then
+		info "release: $release"
 	fi
 	if [ ! -z "$group" ]; then
 		info "group: $group"

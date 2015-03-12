@@ -34,6 +34,46 @@ void CardsInfo::run(int argc, char** argv)
 	getListOfPackageNames(m_root);
 	buildDatabaseWithDetailsInfos(false);
 }
+void CardsInfo::getOwner()
+{
+	string sfile = m_argParser.otherArguments()[0];
+	regex_t preg;
+	if (regcomp(&preg, sfile.c_str(), REG_EXTENDED | REG_NOSUB)) {
+		m_actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
+		treatErrors(sfile);
+	}
+	vector<pair<string, string> > result;
+	result.push_back(pair<string, string>("Package", "File"));
+	unsigned int width = result.begin()->first.length(); // Width of "Package"
+#ifndef NDEBUG
+	cerr << sfile << endl;
+#endif
+	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
+		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j) {
+			const string file('/' + *j);
+			if (!regexec(&preg, file.c_str(), 0, 0, 0)) {
+				result.push_back(pair<string, string>(i->first, *j));
+				if (i->first.length() > width) {
+					width = i->first.length();
+				}
+			}
+		}
+	}
+	regfree(&preg);
+	if (result.size() > 1) {
+		for (vector<pair<string, string> >::const_iterator i = result.begin(); i != result.end(); ++i) {
+			cout << left << setw(width + 2) << i->first << i->second << endl;
+		}
+	} else {
+			cout << m_utilName << ": no owner(s) found" << endl;
+	}
+}
+void CardsInfo::listOfFiles()
+{
+	if (checkPackageNameExist(m_argParser.otherArguments()[0])) {
+		copy(m_listOfInstPackages[m_argParser.otherArguments()[0]].files.begin(), m_listOfInstPackages[m_argParser.otherArguments()[0]].files.end(), ostream_iterator<string>(cout, "\n"));
+	}
+}
 void CardsInfo::listInstalled()
 {
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
@@ -43,15 +83,15 @@ void CardsInfo::listInstalled()
 }
 void CardsInfo::listBinaries()
 {
-	if (getuid()) {
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		treatErrors("list of binaries: ");
-	}
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
+//<<<<<<< HEAD
 	cp->parsePkgRepoCategoryDirectory();
+/*=======
+	cp->parseCategoryDirectory();
+>>>>>>> 0.10 */
 	cp->parsePortsList();
 	cp->parseBasePackageList();
-	cout << endl << "Number of availables binaries: " << cp->getBinaryPackageList() << endl;
+	cout << endl << "Number of availables binaries: " << cp->getBinaryPackageList() << endl<< endl;
 	
 }
 void CardsInfo::listPorts()
@@ -123,15 +163,14 @@ void CardsInfo::infoInstall()
 }
 void CardsInfo::infoBinary()
 {
-	if (getuid()) {
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		treatErrors("info on binaries: ");
-	}
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
+//<<<<<<< HEAD
 	cp->parsePkgRepoCategoryDirectory();
+/* =======
+	cp->parseCategoryDirectory();
+>>>>>>> 0.10 */
 	cp->parsePortsList();
 	cp->parseBasePackageList();
-	cp->parsePackageInfoList();
 	if ( ! cp->getBinaryPackageInfo(m_argParser.otherArguments()[0]) ) {
 		cout << m_argParser.otherArguments()[0] << " not found " << endl;
 	}
@@ -147,13 +186,12 @@ void CardsInfo::infoPort()
 }
 void CardsInfo::diffPorts()
 {
-	if (getuid()) {
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		treatErrors("diff on ports: ");
-	}
-
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
+//<<<<<<< HEAD
 	cp->parsePkgRepoCategoryDirectory();
+/*=======
+	cp->parseCategoryDirectory();
+>>>>>>> 0.10 */
 	cp->parsePackagePkgfileList();
 	vector<pair<string, DiffVers > > result;
 	DiffVers DV;
@@ -197,22 +235,25 @@ void CardsInfo::diffPorts()
 }
 void CardsInfo::diffBinaries()
 {
-	if (getuid()) {
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		treatErrors("diff on binaries: ");
-	}
-
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
+// <<<<<<< HEAD
 	cp->parsePkgRepoCategoryDirectory();
+/* =======
+	cp->parseCategoryDirectory();
+>>>>>>> 0.10 */
 	cp->parsePortsList();
 	cp->parseBasePackageList();
+	vector<pair<string, DiffVers > > result;
+	DiffVers DV;
+	DV.installed="Installed";
+	DV.available="Available in the depot of binaries"	;
 
-	vector<pair<string, string > > result;
-
-	result.push_back(pair<string, string>("Package",
-	"Installed                  Available in the depot of binaries"));
-	result.push_back(pair<string, string>("", ""));
+	result.push_back(pair<string, DiffVers >("Package", DV));
+	DV.installed="";
+	DV.available="";
+	result.push_back(pair<string, DiffVers >("", DV));
 	unsigned int widthPackageName = result.begin()->first.length();
+	unsigned int widthInstalled = result.begin()->second.installed.length();
 
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
 		if (! cp->checkBinaryExist(i->first))
@@ -222,7 +263,9 @@ void CardsInfo::diffBinaries()
 			continue;
 		string newVersion = cp->getPortVersion(i->first);
 		if ( i->second.version != newVersion ) {
-			result.push_back(pair<string, string>(i->first, i->second.version + "   " + newVersion));
+			DV.installed = i->second.version;
+			DV.available = newVersion;
+			result.push_back(pair<string, DiffVers> (i->first, DV));
 			if (i->first.length() > widthPackageName)
 				widthPackageName = i->first.length();
 		} else {
@@ -235,7 +278,9 @@ void CardsInfo::diffBinaries()
 				c_time_s = ctime(&newVersion);
 				c_time_s[strlen(c_time_s)-1]='\0';
 				string availVers = c_time_s;
-				result.push_back(pair<string, string>(i->first, instVers + "   " + availVers));
+				DV.installed=instVers;
+				DV.available=availVers;
+				result.push_back(pair<string, DiffVers>(i->first, DV));
 				if (i->first.length() > widthPackageName)
 					widthPackageName = i->first.length();
 			}
@@ -243,8 +288,8 @@ void CardsInfo::diffBinaries()
 	}
 	if (result.size() > 2) {
 		cout << endl << "Differences between installed packages and the depot of binaries:" << endl << endl;
-		for (vector<pair<string, string> >::const_iterator i = result.begin(); i != result.end(); ++i) {
-			cout << left << setw(widthPackageName + 2) << i->first << i->second << endl;
+		for (vector<pair<string, DiffVers> >::const_iterator i = result.begin(); i != result.end(); ++i) {
+			cout << left << setw(widthPackageName + 2) << i->first << setw(widthInstalled + 2) << i->second.installed << " " << i->second.available << endl;
 		}
 		cout << endl << result.size() - 2 << " packages are differents." << endl << endl;
 	} else {

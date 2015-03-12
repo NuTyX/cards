@@ -44,6 +44,8 @@ public:
 	CardsInfo (const CardsArgumentParser& argParser);
 
 	void printDependenciesList();
+	void getOwner();
+	void listOfFiles();
 	void listInstalled();
 	void listBinaries();
 	void listPorts();
