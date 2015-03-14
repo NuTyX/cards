@@ -1000,7 +1000,7 @@ update_signature()
 		rm -f $PKGMK_SIGNATURE
 		for FILE in  ${name}*
 		do
-			echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> $PKGMK_SIGNATURE
+			[ -f $FILE ] && echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> $PKGMK_SIGNATURE
 		done
 	fi
 	echo "`md5sum Pkgfile|cut -d " " -f1`:Pkgfile" >> $PKGMK_SIGNATURE

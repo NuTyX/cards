@@ -103,8 +103,8 @@ int ConfigParser::parseCategoryDirectory()
 		set<string> localPackagesList;
 		string::size_type pos;
 		if ( findFile( localPackagesList, pD.Dir) != 0 ) {
-			cerr << "cannot read directory "  << pD.Dir <<endl;
-			return -1;
+			cerr << YELLOW << "continue with the next entry" << NORMAL << endl;
+			continue;
 		}
 		
 		for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); ++li) {
