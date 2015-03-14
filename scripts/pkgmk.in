@@ -657,11 +657,11 @@ add_meta_files() {
 }
 
 add_meta_to_archive() {
-<<<<<<< HEAD
+# <<<<<<< HEAD
 	local NAME SIZE_I DESC URL PACK MAINT
-=======
-	local NAME SIZE_I DESC
->>>>>>> 0.10
+# =======
+# 	local NAME SIZE_I DESC
+# >>>>>>> 0.10
 	NAME="`get_package_name $1`"
 
 	info  "Adding meta data to Archive $NAME"
@@ -1045,8 +1045,12 @@ update_repo()
 		rm -f $PKGMK_REPO
 		for FILE in  ${name}*
 		do
-			[ ! -f "$FILE" ] && break
-			echo "`md5sum $FILE|cut -d " " -f1`#$FILE" >> $PKGMK_REPO
+# <<<<<<< HEAD
+#			[ ! -f "$FILE" ] && break
+#			echo "`md5sum $FILE|cut -d " " -f1`#$FILE" >> $PKGMK_REPO
+# =======
+			[ -f $FILE ] && echo "`md5sum $FILE|cut -d " " -f1`:$FILE" >> $PKGMK_SIGNATURE
+# >>>>>>> 0.10
 		done
 		### TODO To make it compatible I will remove it sometimes
 		# [ -f  $PKGMK_REPO ] && cp $PKGMK_REPO MD5SUM

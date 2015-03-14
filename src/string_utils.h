@@ -21,6 +21,9 @@
 
 #ifndef STRING_UTILS_H
 #define STRING_UTILS_H
+
+#include "error_treat.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

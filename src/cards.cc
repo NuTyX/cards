@@ -76,9 +76,11 @@ int main(int argc, char** argv)
 				cardsArgPars.printHelp("create");
 				return EXIT_SUCCESS;
 			}
-			// go back to a base system
-			CardsBase CB(cardsArgPars);
-			CB.run(argc, argv);
+			if  ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
+				// go back to a base system
+				CardsBase CB(cardsArgPars);
+				CB.run(argc, argv);
+			}
 			// get the list of the dependencies
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			vector<string> listOfDeps = CD.getdependencies();

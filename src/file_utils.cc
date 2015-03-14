@@ -270,7 +270,7 @@ int findFile(set<string>& filesList, const string& path)
     }
     closedir(d);
   } else {
-		cerr << "Cannot open " << path << endl;
+		cerr << YELLOW << path << " not exist." << NORMAL << endl;
 		return -1;
 	}
   return 0;
