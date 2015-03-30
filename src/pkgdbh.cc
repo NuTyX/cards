@@ -31,7 +31,6 @@
 #include <cstdio>
 #include <cstring>
 #include <cerrno>
-#include <csignal>
 #include <ext/stdio_filebuf.h>
 #include <pwd.h>
 #include <grp.h>
@@ -100,6 +99,9 @@ void Pkgdbh::treatErrors(const string& s) const
 			break;
 		case CANNOT_RENAME_FILE:
 			throw RunTimeErrorWithErrno("could not rename " + s);
+			break;
+		case CANNOT_COPY_FILE:
+			throw RunTimeErrorWithErrno("could not copy " + s);
 			break;
 		case CANNOT_DETERMINE_NAME_BUILDNR:
 			throw RunTimeErrorWithErrno("could not determine name / build number " + s);
@@ -454,10 +456,15 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 		char * destFile = const_cast<char*>(i->c_str());
 		destFile++;
 		string file = packagenamedir + "/" + destFile;
-		if (rename(i->c_str(), file.c_str()) == -1)
-		{
+		if (rename(i->c_str(), file.c_str()) == -1) {
 			m_actualError = CANNOT_RENAME_FILE;
 			treatErrors( *i + " to " + file);
+		}
+		if ( *i == ".POST" ) {
+			if (copyFile(i->c_str(), file.c_str()) == -1) {
+				m_actualError = CANNOT_COPY_FILE;
+				treatErrors( file  + " to " + *i);
+			}
 		}
 	}
 	m_actualAction = PKG_MOVE_META_END;
@@ -1132,8 +1139,18 @@ void Pkgdbh::print_version() const
 Db_lock::Db_lock(const string& m_root, bool exclusive)
 	: m_dir(0)
 {
-	const string dirname = trimFileName(m_root + string("/") + PKG_DB_DIR);
+  // Ignore signals
+  memset(&m_sa, 0, sizeof(m_sa));
+  m_sa.sa_handler = SIG_IGN;
+  sigaction(SIGHUP, &m_sa, NULL);
+  sigaction(SIGINT, &m_sa, NULL);
+  sigaction(SIGQUIT, &m_sa, NULL);
+  sigaction(SIGTERM, &m_sa, NULL);
 
+	const string dirname = trimFileName(m_root + string("/") + PKG_DB_DIR);
+#ifndef NDEBUG
+	cerr << "Lock the database " << dirname << endl;
+#endif
 	if (!(m_dir = opendir(dirname.c_str())))
 		throw RunTimeErrorWithErrno("could not read directory " + dirname);
 
@@ -1147,12 +1164,19 @@ Db_lock::Db_lock(const string& m_root, bool exclusive)
 
 Db_lock::~Db_lock()
 {
+	m_sa.sa_handler = SIG_DFL;
+	signal(SIGHUP,SIG_DFL);
+	signal(SIGINT,SIG_DFL);
+	signal(SIGQUIT,SIG_DFL);
+	signal(SIGTERM,SIG_DFL);
 	if (m_dir) {
 		flock(dirfd(m_dir), LOCK_UN);
 		closedir(m_dir);
 	}
+#ifndef NDEBUG
+	cerr << "Unlock the database " << m_dir << endl;
+#endif
 }
-
 /*******************     End of Members *********************/
 
 /*******************   Various fonctions ********************/

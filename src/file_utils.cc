@@ -224,6 +224,25 @@ void removeFile(const string& basedir, const string& filename)
     free(path);
   }
 }
+int copyFile( const char *  destFile, const char *  origFile)
+{
+	FILE * infile  = fopen(origFile,  "rb");
+	FILE * outfile = fopen(destFile, "wb");
+
+	const int size = 16384;
+	char buffer[size];
+
+	while (!feof(infile)) {
+		int n = fread(buffer, 1, size, infile);
+		fwrite(buffer, 1, n, outfile);
+	}
+
+	fflush(outfile);
+
+	fclose(infile);
+	fclose(outfile);
+	return 0;
+}
 int findDir(itemList* filesList, const char* path)
 {
 	DIR *d;

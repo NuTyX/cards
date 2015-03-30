@@ -47,16 +47,15 @@ void CardsBase::run(int argc, char** argv)
 		Config config;
 		ConfigParser::parseConfig("/etc/cards.conf", config);
 
-		// TODO give the possibility to do in alternate rootfs	
+		// TODO give the possibility to do in alternate rootfs
 		string o_root="/";
 		
-		if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {	
+		if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {
 			if (getuid()) {
 				m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 				treatErrors("");
 			}
 		}
-		Db_lock lock(o_root, true);
 		// Get the list of installed packages
 		getListOfPackageNames(o_root);
 
@@ -98,7 +97,7 @@ void CardsBase::run(int argc, char** argv)
 		So we keep it and we can go out of the scan of the base package list for this
 		install package name
 */
-				if ( basePackageName == installPackageName ) {	
+				if ( basePackageName == installPackageName ) {
 					found = true;
 					break;
 				}
@@ -108,9 +107,11 @@ void CardsBase::run(int argc, char** argv)
 			}
 		}
 		if (removePackagesList.size() > 0) {
-			if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {	
+			if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {
 				// Retrieve info about all the packages
 				buildDatabaseWithDetailsInfos(false);
+				// Lock the Database, any interruption forbidden
+				Db_lock lock(o_root, true);
 
 				for (set<string>::const_iterator iR = removePackagesList.begin();iR != removePackagesList.end();iR++) {
 					// Remove metadata about the package removed

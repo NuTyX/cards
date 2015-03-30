@@ -30,6 +30,7 @@
 #include <map>
 #include <iostream>
 #include <stdexcept>
+#include <csignal>
 #include <cerrno>
 #include <cstring>
 #include <sys/types.h>
@@ -180,8 +181,10 @@ class Db_lock {
 public:
 	Db_lock(const string& m_root, bool exclusive);
 	~Db_lock();
+
 private:
 	DIR* m_dir;
+	struct sigaction m_sa;
 };
 
 // Utility functions

@@ -35,7 +35,7 @@ public:
 private:
 	const std::string m_baseDirectory;
 	const CardsArgumentParser& m_argParser;
-	
+
 };
 #endif
 // vim:set ts=2 :

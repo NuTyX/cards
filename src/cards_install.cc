@@ -227,8 +227,6 @@ void CardsInstall::generateDependencies()
 }
 void CardsInstall::update()
 {
-	Db_lock lock(m_root, true);
-
 	// Get the list of installed packages
 	getListOfPackageNames(m_root);
 
@@ -268,6 +266,9 @@ void CardsInstall::update()
 	set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
 
 	set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
+
+	// Lock the database, any interruption forbidden
+	Db_lock lock(m_root, true);
 
 	if (! conflicting_files.empty()) {
 		if (m_force) {
@@ -316,8 +317,6 @@ void CardsInstall::update()
 }	
 void CardsInstall::install()
 {
-	Db_lock lock(m_root, true);
-
 	// Get the list of installed packages
 	getListOfPackageNames(m_root);
 	// Retrieving info about all the packages
@@ -360,11 +359,14 @@ void CardsInstall::install()
 }
 void CardsInstall::addPackage()
 {
+	// Lock the database, any interruption forbidden
+	Db_lock lock(m_root, true);
+
 	// Checking the rules
 	readRulesFile();
 
 	set<string> keep_list;
-
+	
 	// Reading the archiving to find a list of files
 	pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
 	set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
@@ -427,9 +429,6 @@ void CardsInstall::addPackagesList()
 }
 void CardsInstall::install(const vector<string>& dependenciesList)
 {
-
-	Db_lock lock(m_root, true);
-
 	// Get the list of installed packages
 	getListOfPackageNames(m_root);
 

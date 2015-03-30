@@ -201,7 +201,7 @@ If -f is passed as optional argument, it will force the install means overwrite 
 	addOption(CMD_INSTALL,OPT_FORCE,false);
 
 	addOption(CMD_BASE, OPT_DRY,false);
-	addOption(CMD_BASE, OPT_REMOVE,true);
+	addOption(CMD_BASE, OPT_REMOVE,false);
 	addOption(CMD_BASE, OPT_BASE_HELP,false);
 
 	addOption(CMD_CREATE, OPT_DRY,false);

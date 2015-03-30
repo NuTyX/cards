@@ -50,8 +50,8 @@ int main(int argc, char** argv)
 			for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
 				index++;
 				DirUrl DU = *i ;
-      	prtDir = DU.Dir;
-      	url = DU.Url;
+				prtDir = DU.Dir;
+				url = DU.Url;
 				cout << index << " Directory: " << prtDir ;
 				if ( url != "" ) {
 					cout << " from " << url  << endl;
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			return CD.deptree();
-  	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
 			CardsInfo CList(cardsArgPars);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_OUTOFDATE)) {
 				CList.listOutOfDate();
@@ -162,7 +162,7 @@ int main(int argc, char** argv)
 				CList.listInstalled();
 			}
 			return EXIT_SUCCESS;
-  	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) {
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) {
 			CardsInfo CInfo(cardsArgPars);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
 				CInfo.infoBinary();
@@ -189,7 +189,7 @@ int main(int argc, char** argv)
 				return EXIT_SUCCESS;
 			}
 			return EXIT_SUCCESS;
-  	} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) {
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) {
 			CardsInfo CInfo(cardsArgPars);
 			CInfo.search();
 			return EXIT_SUCCESS;

@@ -40,7 +40,7 @@ void Pkgadd::run(int argc, char** argv)
 	string o_package;
 	bool o_upgrade = false;
 	bool o_force = false;
-
+	Db_lock  * pLock = NULL;
 	for (int i = 1; i < argc; i++) {
 		string option(argv[i]);
 		if (option == "-r" || option == "--root") {
@@ -75,7 +75,6 @@ void Pkgadd::run(int argc, char** argv)
 	// Install/upgrade package
 	//
 	{
-		Db_lock lock(o_root, true);
 		// Get the list of installed packages
 		getListOfPackageNames(o_root);
 
@@ -113,10 +112,12 @@ void Pkgadd::run(int argc, char** argv)
 
 		if (!conflicting_files.empty()) {
 			if (o_force) {
+				pLock = new Db_lock(o_root, true);
 				set<string> keep_list;
 				if (o_upgrade) // Don't remove files matching the rules in configuration
 					keep_list = getKeepFileList(conflicting_files, m_actionRules);
 				removePackageFilesRefsFromDB(conflicting_files, keep_list); // Remove unwanted conflicts
+				delete pLock;
 			} else {
 				copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
 				m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
@@ -125,23 +126,32 @@ void Pkgadd::run(int argc, char** argv)
 		}
 
 		set<string> keep_list;
-
 		if (o_upgrade) {
-
+			pLock = new Db_lock(o_root, true);
 			// Remove metadata about the package removed
 			removePackageFilesRefsFromDB(package.first);
 
 			keep_list = getKeepFileList(package.second.files, m_actionRules);
 			removePackageFiles(package.first, keep_list);
-
+			delete pLock;
 #ifndef NDEBUG
 			cerr << "Run extractAndRunPREfromPackage after upgrade" << endl;
 #endif
 			// Run pre-install if exist
 			extractAndRunPREfromPackage(o_package);
 		}
+
+		pLock = new Db_lock(o_root, true);
 		// Installation progressInfo of the files on the HD
 		installArchivePackage(o_package, keep_list, non_install_files);
+
+		// Add the metadata about the package to the DB
+		moveMetaFilesPackage(package.first,package.second);
+
+		// Add the info about the files to the DB
+		addPackageFilesRefsToDB(package.first, package.second);
+		delete pLock;
+
 		// Post install
 		if (checkFileExist(PKG_POST_INSTALL))
 		{
@@ -153,13 +163,8 @@ void Pkgadd::run(int argc, char** argv)
 			}
 			m_actualAction = PKG_POSTINSTALL_END;
 			progressInfo();
+			removeFile(o_root,PKG_POST_INSTALL);
 		}
-		// Add the metadata about the package to the DB
-		moveMetaFilesPackage(package.first,package.second);
-
-		// Add the info about the files to the DB
-		addPackageFilesRefsToDB(package.first, package.second);
-
 		runLdConfig();
 	}
 }

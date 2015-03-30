@@ -95,6 +95,7 @@ bool checkPermissionsEqual(const string& file1, const string& file2);
 bool createRecursiveDirs(const string& pathname);
 void cleanupMetaFiles(const string& basedir);
 void removeFile(const string& basedir, const string& filename);
+int copyFile(const char *  destFile, const char *  origFile);
 int findFile(set<string>& filesList, const string& basedir);
 int findDir(itemList *filenameList, const char *path);
 int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, int spec);
