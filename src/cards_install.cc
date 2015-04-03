@@ -28,6 +28,20 @@ CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
 		m_force=false;
 	}
 }
+CardsInstall::CardsInstall(const CardsArgumentParser& argParser,
+	const string& packageName)
+	: m_argParser(argParser), m_packageName(packageName), m_root("/")
+{
+}
+CardsInstall::CardsInstall (const CardsArgumentParser& argParser,
+	const vector<string>& listOfPackages)
+	:m_argParser(argParser), m_dependenciesList(listOfPackages), m_root("/")
+{
+	for (std::vector<string>::const_iterator it = listOfPackages.begin(); it != listOfPackages.end();it++) {
+		m_packageName = basename(const_cast<char*>(it->c_str()));
+		create();
+	}
+}
 void CardsInstall::run(int argc, char** argv)
 {
 	m_configParser = new ConfigParser("/etc/cards.conf");
@@ -118,8 +132,8 @@ void CardsInstall::printDependenciesList()
 }
 void CardsInstall::generateDependencies()
 {
-	vector<string> dependenciesWeMustAdd, 
-		depencenciestoSort; 
+	vector<string> dependenciesWeMustAdd,
+		depencenciestoSort;
 	// Insert the final package first
 	dependenciesWeMustAdd.push_back(m_packageName);
 	std::vector<string>::iterator vit;
@@ -359,9 +373,7 @@ void CardsInstall::install()
 }
 void CardsInstall::addPackage()
 {
-	// Lock the database, any interruption forbidden
-	Db_lock lock(m_root, true);
-
+	Db_lock  * pLock = NULL;
 	// Checking the rules
 	readRulesFile();
 
@@ -389,8 +401,17 @@ void CardsInstall::addPackage()
 		}
 	}
 
+	// Lock the database, any interruption forbidden
+	pLock = new Db_lock(m_root, true);
 	// Installation progressInfo of the files on the HD
 	installArchivePackage(m_packageFileName, keep_list, non_install_files);
+
+	// Add the metadata about the package to the DB
+	moveMetaFilesPackage(package.first,package.second);
+
+	// Add the info about the files to the DB
+	addPackageFilesRefsToDB(package.first, package.second);
+	delete pLock;
 
 	// Post install
 	if (checkFileExist(PKG_POST_INSTALL)) {
@@ -402,12 +423,9 @@ void CardsInstall::addPackage()
 		}
 		m_actualAction = PKG_POSTINSTALL_END;
 		progressInfo();
+		removeFile(m_root,PKG_POST_INSTALL);
 	}
-	// Add the metadata about the package to the DB
-	moveMetaFilesPackage(package.first,package.second);
 
-	// Add the info about the files to the DB
-	addPackageFilesRefsToDB(package.first, package.second);
 	runLdConfig();
 }
 void CardsInstall::addPackagesList()
@@ -458,11 +476,9 @@ void CardsInstall::install(const vector<string>& dependenciesList)
 }
 void CardsInstall::create()
 {
-	m_packageName = const_cast<char*>(m_argParser.otherArguments()[0].c_str());
 	ConfigParser::parseConfig("/etc/cards.conf", m_config);
 	m_configParser = new ConfigParser("/etc/cards.conf");
 	m_configParser->parseCategoryDirectory();
-	m_configParser->parsePortsList();
 	string pkgdir = m_configParser->getPortDir(m_packageName);
 	if (pkgdir == "" ) {
 		m_actualError = PACKAGE_NOT_FOUND;

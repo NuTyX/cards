@@ -57,11 +57,12 @@ public:
 
 	virtual void treatErrors(const std::string& s) const;
 
-	void showdependencies();
-	void showlevel();
+	void showDependencies();
+	void showLevel();
 	
-	std::vector<string>& getdependencies();
-	std::vector<LevelName>& getlevel();
+	std::vector<string>& getDependencies();
+	std::vector<string>& getNeededDependencies();
+	std::vector<LevelName>& getLevel();
 
 	int deptree();
 
@@ -82,6 +83,7 @@ private:
 	int level();
 
 	std::vector<string> m_dependenciesList;
+	std::vector<string> m_neededDependenciesList;
 	std::vector<LevelName> m_levelList;
 	std::set<string> m_missingDepsList;
 	

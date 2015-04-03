@@ -47,21 +47,22 @@ using namespace std;
 
 using __gnu_cxx::stdio_filebuf;
 
-Pkgdbh::Pkgdbh(const string& name)
-	: m_utilName(name)
+Pkgdbh::Pkgdbh()
 {
+	// TODO fix this some times very ugly
 	if ( m_root.empty() ) {
 		m_root="/";
 	}
 	cleanupMetaFiles(m_root);
-	// Ignore signals
-/*	struct sigaction sa;
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_handler = SIG_IGN;
-	sigaction(SIGHUP, &sa, 0);
-	sigaction(SIGINT, &sa, 0);
-	sigaction(SIGQUIT, &sa, 0);
-	sigaction(SIGTERM, &sa, 0); */
+}
+Pkgdbh::Pkgdbh(const string& name)
+	: m_utilName(name)
+{
+	// TODO fix this some times very ugly
+	if ( m_root.empty() ) {
+		m_root="/";
+	}
+	cleanupMetaFiles(m_root);
 }
 void Pkgdbh::treatErrors(const string& s) const
 {

@@ -70,6 +70,17 @@ int main(int argc, char** argv)
 				cout << "log directory: " << config.logdir << endl;
 			}
 			return EXIT_SUCCESS;
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPCREATE) {
+			// get the list of the dependencies
+			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
+			vector<string> listOfPackages = CD.getNeededDependencies();
+			if ( listOfPackages.size() == 0) {
+				cout << "The package " << cardsArgPars.otherArguments()[0] << " is already installed" << endl;
+				return EXIT_SUCCESS;
+			}
+			// create (compile and install) the List of deps (including the final package)
+			CardsInstall CI(cardsArgPars,listOfPackages);
+			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_CREATE) {
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
 			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
@@ -83,9 +94,9 @@ int main(int argc, char** argv)
 			}
 			// get the list of the dependencies
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
-			vector<string> listOfDeps = CD.getdependencies();
+			vector<string> listOfDeps = CD.getDependencies();
 			// install all the dependencies
-			CardsInstall CI(cardsArgPars);
+			CardsInstall CI(cardsArgPars,cardsArgPars.otherArguments()[0]);
 			CI.install(listOfDeps);
 			// compilation of the final port
 			CI.create();
@@ -136,11 +147,11 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 			CardsDepends CD(cardsArgPars);
-			CD.showlevel();
+			CD.showLevel();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
-			CD.showdependencies();
+			CD.showDependencies();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));

@@ -110,7 +110,7 @@ struct rule_t {
 class Pkgdbh {
 public:
 
-	Pkgdbh() {}
+	Pkgdbh();
 	explicit Pkgdbh(const std::string& name);
 	virtual ~Pkgdbh() {}
 	virtual void run(int argc, char** argv) = 0; // Need to be redefine in derivated class

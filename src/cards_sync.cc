@@ -64,6 +64,7 @@ void CardsSync::treatErrors(const string& s) const
 		case CANNOT_PARSE_FILE:
 		case CANNOT_WRITE_FILE:
 		case CANNOT_SYNCHRONIZE:
+		case CANNOT_COPY_FILE:
 		case CANNOT_RENAME_FILE:
 		case CANNOT_DETERMINE_NAME_BUILDNR:
 		case EMPTY_PACKAGE:

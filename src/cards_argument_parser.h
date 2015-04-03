@@ -37,6 +37,7 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_QUERY;
 		static ArgParser::APCmd CMD_LIST;
 		static ArgParser::APCmd CMD_INSTALL;
+		static ArgParser::APCmd CMD_DEPCREATE;
 		static ArgParser::APCmd CMD_CREATE;
 		static ArgParser::APCmd CMD_REMOVE;
 		static ArgParser::APCmd CMD_DIFF;

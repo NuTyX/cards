@@ -23,7 +23,6 @@
 #include <set>
 #include <string>
 
-#include "file_download.h"
 #include "file_utils.h"
 #include "compile_dependencies_utils.h"
 
@@ -194,6 +193,7 @@ int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenci
 */
 int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int niveau)
 {
+
 #ifndef NDEBUG
 	printf("List des %d paquets\n",packagesList->count);
 	for (unsigned int nameIndex = 0; nameIndex < packagesList->count; nameIndex++) {
@@ -266,8 +266,12 @@ int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int ni
 #endif
 	if ( found != 0) {
 		generate_level (filesList,packagesList,niveau + 1);
-	} else
+	} else {
+#ifndef NDEBUG
+		cerr << "generate_level() FINISH" << endl;
+#endif
 		return niveau;
+	}
 }
 
 /* Return the full path with the name including 

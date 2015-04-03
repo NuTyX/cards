@@ -38,6 +38,8 @@
 class CardsInstall : public Pkgdbh {
 public:
 	CardsInstall (const CardsArgumentParser& argParser);
+	CardsInstall (const CardsArgumentParser& argParser, const string& packageName);
+	CardsInstall (const CardsArgumentParser& argParser, const vector<string>& listOfPackages);
 
 	void printDependenciesList();
 	void update();

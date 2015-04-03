@@ -16,19 +16,14 @@
 ## and that we do specify the parent folder of the set of packages category:
 ## The content of a folder package look like this in the case of:
 ##
-## /var/lib/pkg/saravane/console/alsa-utils/MD5SUM
-##                                      /Pkgfile
-##                                      /alsa-utils123468110i686.cards.tar.xz
-##                                      /alsa-utils123468110x86_64.cards.tar.xz
-##                                      /alsa-utils.doc123468110any.cards.tar.xz
-##                                      /alsa-utils.deps
-##                                      /alsa-utils.info
-##                                      /alsa-utils.post-install
-##                                      /...
+## /var/lib/pkg/saravane/console/alsa-utils/.PKGREPO
+##                                         /Pkgfile
+##                                         /alsa-utils123468110i686.cards.tar.xz
+##                                         /alsa-utils123468110x86_64.cards.tar.xz
+##                                         /alsa-utils.doc123468110any.cards.tar.xz
+##                                         /alsa-utils.post-install
+##                                         /...
 
-dir /usr/ports/desktop
-dir /usr/ports/console
- 
 dir /var/lib/pkg/saravane/desktop|http://downloads.nutyx.org/saravane/#ARCH#/desktop
 dir /var/lib/pkg/saravane/console|http://downloads.nutyx.org/saravane/#ARCH#/console
 dir /var/lib/pkg/saravane/base|http://downloads.nutyx.org/saravane/#ARCH#/base
@@ -60,5 +55,5 @@ locale fr
 ## Si l'on veut revenir à un système de base, les dossiers suivant doivent contenir des paquets
 ## In the following setting, packages from base system and server will not be touch
 
-base /var/lib/pkg/saravane/system
+base /var/lib/pkg/saravane/base
 

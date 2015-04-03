@@ -84,11 +84,8 @@ void CardsInfo::listInstalled()
 void CardsInfo::listBinaries()
 {
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-//<<<<<<< HEAD
-	cp->parsePkgRepoCategoryDirectory();
-/*=======
+//cp->parsePkgRepoCategoryDirectory();
 	cp->parseCategoryDirectory();
->>>>>>> 0.10 */
 	cp->parsePortsList();
 	cp->parseBasePackageList();
 	cout << endl << "Number of availables binaries: " << cp->getBinaryPackageList() << endl<< endl;
@@ -117,7 +114,7 @@ void CardsInfo::listOutOfDate()
 		string nameToFind = "";
 		std::string::size_type pos;
 		CardsDepends CD(m_argParser);
-		vector<LevelName> packagesLevelList = CD.getlevel();
+		vector<LevelName> packagesLevelList = CD.getLevel();
 		if (packagesLevelList.size() > 0) {
 			for (vector<LevelName>::iterator i = packagesLevelList.begin();i != packagesLevelList.end();i++) {
 				for (set<string>::const_iterator j = result.begin(); j != result.end(); ++j) {
@@ -164,11 +161,8 @@ void CardsInfo::infoInstall()
 void CardsInfo::infoBinary()
 {
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-//<<<<<<< HEAD
-	cp->parsePkgRepoCategoryDirectory();
-/* =======
+//cp->parsePkgRepoCategoryDirectory();
 	cp->parseCategoryDirectory();
->>>>>>> 0.10 */
 	cp->parsePortsList();
 	cp->parseBasePackageList();
 	if ( ! cp->getBinaryPackageInfo(m_argParser.otherArguments()[0]) ) {
@@ -187,11 +181,8 @@ void CardsInfo::infoPort()
 void CardsInfo::diffPorts()
 {
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-//<<<<<<< HEAD
-	cp->parsePkgRepoCategoryDirectory();
-/*=======
+//cp->parsePkgRepoCategoryDirectory();
 	cp->parseCategoryDirectory();
->>>>>>> 0.10 */
 	cp->parsePackagePkgfileList();
 	vector<pair<string, DiffVers > > result;
 	DiffVers DV;
@@ -236,11 +227,8 @@ void CardsInfo::diffPorts()
 void CardsInfo::diffBinaries()
 {
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-// <<<<<<< HEAD
-	cp->parsePkgRepoCategoryDirectory();
-/* =======
+//cp->parsePkgRepoCategoryDirectory();
 	cp->parseCategoryDirectory();
->>>>>>> 0.10 */
 	cp->parsePortsList();
 	cp->parseBasePackageList();
 	vector<pair<string, DiffVers > > result;

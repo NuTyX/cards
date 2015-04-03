@@ -44,7 +44,6 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	char *depfile2 = (char*)Malloc(sizeof(char)*255);
 
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
-	sprintf(fullPathfileName,"%s/.PKGREPO",filesList->items[nameIndex]);
 	itemList *nameDeps = initItemList();
 
 	sprintf(depfile1,"%s.deps",name);
@@ -52,7 +51,6 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	string missingDep = "";
 	bool found = false;
 	sprintf(fullPathfileName,"%s/%s",filesList->items[nameIndex],depfile1);
-
 	found = checkFileExist(fullPathfileName);
 	if ( !found) {
 		sprintf(fullPathfileName,"%s/%s",filesList->items[nameIndex],depfile2);
@@ -170,17 +168,43 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	free(fullPathfileName);
 	return dependancesList;
 }
-vector<LevelName>& CardsDepends::getlevel()
+vector<LevelName>& CardsDepends::getLevel()
 {
 	level();
 #ifndef NDEBUG
 	for (vector<LevelName>::iterator i = m_levelList.begin();i != m_levelList.end();i++) {
 		cerr << i->name<< endl;
-	}
+	} 
 #endif
 	return m_levelList;
 }
-vector<string>& CardsDepends::getdependencies()
+vector<string>& CardsDepends::getNeededDependencies()
+{
+	Pkginfo packagesInfo;
+	packagesInfo.getNumberOfPackages();
+	depends();
+
+	for (std::vector<string>::iterator it = m_dependenciesList.begin();it != m_dependenciesList.end();it++) {
+		string packageName = basename(const_cast<char*>(it->c_str()));
+		string::size_type pos = packageName.find('@');
+		string name = "";
+		if ( pos != string::npos) {
+				name= packageName.substr(0,pos);
+		} else {
+				name = packageName;
+		}
+		if ( ! packagesInfo.isInstalled(name)) {
+			m_neededDependenciesList.push_back(*it);
+		}
+	}
+#ifndef NDEBUG
+	for (std::vector<string>::iterator i = m_neededDependenciesList.begin();i !=  m_neededDependenciesList.end();++i) {
+		cerr << *i << endl;
+	}
+#endif
+	return m_neededDependenciesList;
+}
+vector<string>& CardsDepends::getDependencies()
 {
 	depends();
 #ifndef NDEBUG
@@ -190,34 +214,25 @@ vector<string>& CardsDepends::getdependencies()
 #endif
 	return m_dependenciesList;
 }
-void CardsDepends::showdependencies()
+void CardsDepends::showDependencies()
 {
 	Pkginfo packagesInfo;
 	packagesInfo.getNumberOfPackages();
 	depends();
-	for (std::vector<string>::iterator it = m_dependenciesList.begin();it != m_dependenciesList.end();it++) {
-		if (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) {
+	if (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) {
+		for (std::vector<string>::iterator it = m_dependenciesList.begin();it != m_dependenciesList.end();it++) {
 			cout << *it << endl;
-		} else {
-			string packageName = basename(const_cast<char*>(it->c_str()));
-			string::size_type pos = packageName.find('@');
-			string name = "";
-			if ( pos != string::npos) {
-					name= packageName.substr(0,pos);
-			} else {
-					name = packageName;
-			}
-			if ( ! packagesInfo.isInstalled(name)) {
+		}
+	}else {
+		getNeededDependencies();
+		for (std::vector<string>::iterator it = m_neededDependenciesList.begin();it != m_neededDependenciesList.end();it++) {
 				cout << *it << endl;
-			}
 		}
 	}
 }
-void CardsDepends::showlevel()
+void CardsDepends::showLevel()
 {
-	cout << "Generate Level, please wait ..." << endl;
 	level();
-	cout << "Level done" << endl;
 
 	if ( (m_missingDepsList.size() == 0 ) || ( m_argParser.isSet(CardsArgumentParser::OPT_IGNORE))) {
 		for (std::vector<LevelName>::iterator it = m_levelList.begin();it != m_levelList.end();it++) {
@@ -237,6 +252,7 @@ void CardsDepends::treatErrors(const string& s) const
 		case CANNOT_CREATE_FILE:
 		case CANNOT_WRITE_FILE:
 		case CANNOT_SYNCHRONIZE:
+		case CANNOT_COPY_FILE:
 		case CANNOT_RENAME_FILE:
 		case CANNOT_DETERMINE_NAME_BUILDNR:
 		case EMPTY_PACKAGE:
@@ -345,6 +361,9 @@ int CardsDepends::level()
 // TODO findout why segmentfault	
 //freePkgInfo(package);
 	freePkgList(packagesList);
+#ifndef NDEBUG
+	cerr << "Level() FINISH" << endl;
+#endif
 	return 0;
 }
 int CardsDepends::depends()
@@ -412,13 +431,17 @@ int CardsDepends::depends()
 			}
 			currentNiveau++;
 		}
-		m_dependenciesList.push_back(longPackageName);
 	}
+	m_dependenciesList.push_back(longPackageName);
 	freeItemList(filesList);
 	freePkgList(packagesList);
 // TODO findout why it's segment fault
 //	freePkgInfo(package);
 	free(longPackageName);
+#ifndef NDEBUG
+  cerr << "depends() FINISH" << endl;
+#endif
+
 	return 0;
 }
 int CardsDepends::deptree()

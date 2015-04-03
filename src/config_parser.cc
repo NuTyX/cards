@@ -135,11 +135,13 @@ int ConfigParser::parsePortsList()
 				PKGREPOFile is /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
 			*/
 			if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "/.PKGREPO") ) {
-				downloadFile.url = i->Url + "/" + j->basePackageName  + "/.PKGREPO";
-				downloadFile.dirname = i->Dir + "/" + j->basePackageName;
-				downloadFile.filename = "/.PKGREPO";
-				downloadFile.md5sum = j-> md5SUM;
-				downloadFilesList.push_back(downloadFile);
+				if ( i->Url.size() > 0 ) {
+					downloadFile.url = i->Url + "/" + j->basePackageName  + "/.PKGREPO";
+					downloadFile.dirname = i->Dir + "/" + j->basePackageName;
+					downloadFile.filename = "/.PKGREPO";
+					downloadFile.md5sum = j-> md5SUM;
+					downloadFilesList.push_back(downloadFile);
+				}
 #ifndef NDEBUG
 				cerr << i->Dir + "/" + j->basePackageName  << endl;
 #endif
@@ -187,8 +189,7 @@ int ConfigParser::parseBasePackageList()
 			string PKGREPOFile = i->Dir + "/" + j->basePackageName  + "/.PKGREPO";
 			vector<string> PKGREPOFileContent;
 			if ( parseFile(PKGREPOFileContent,PKGREPOFile.c_str()) != 0) {
-				cerr << "Cannot read the file: " << PKGREPOFile << endl;
-				cerr << " ... continue with next" << endl;
+				// cerr << "Cannot read the file: " << PKGREPOFile <<  "... continue with next" << endl;
 				continue;
 			}
 			j->buildDate = 0;
@@ -200,16 +201,14 @@ int ConfigParser::parseBasePackageList()
 					cerr << "[" << input << "]: Wrong format field to small" << endl;
 					continue;
 				}
-				if ( input[10] != ':' ) {	// It's not the first line ...
-					PFL.md5SUM = input.substr(0,32);
-					string fileNameArch = input.substr(33);
-					string::size_type pos = fileNameArch.find(':');
-					if ( pos != std::string::npos) { // format is: md5sum:name:arch
-						PFL.name = input.substr(33,pos);
-						PFL.arch = input.substr(pos+34);
-					} else {
-						PFL.arch = "";
-						PFL.name = input.substr(33); // format is: md5sum:name means not a binary
+				if ( input[10] != '#' ) {	// It's not the first line ...
+					cout << input << endl;
+					vector<string> infos;
+					split( input, '#', infos, 0,true);
+					PFL.md5SUM = infos[0];
+					PFL.name = infos[1];
+					if ( infos[2].size() > 0 ) {
+						PFL.arch = infos[2];
 					}
 #ifndef NDEBUG
 					cerr << j->basePackageName << ": "<< PFL.md5SUM << " " << PFL.name << " " << PFL.arch << endl;
@@ -218,19 +217,14 @@ int ConfigParser::parseBasePackageList()
 
 				/*
 				 * Let's check if the first line is something like:
-				 * 1401638336:.cards.tar.xz:4.14.1
+				 * 1401638336#.cards.tar.xz#4.14.1#..#..#..
 				*/
-				if (input[10] == ':' ) {	// There is a chance to find what we are looking for
-					j->buildDate = strtoul(input.substr(0,10).c_str(),NULL,0);
-					string extension_version = input.substr(11,input.size());
-					string::size_type pos = extension_version.find(':');
-					if ( pos != std::string::npos) {
-						j->extention = extension_version.substr(0,pos);
-						j->version = extension_version.substr(pos+1);
-					} else {
-						j->extention = input.substr(11,input.size());
-						j->version = "N.A.";
-					}
+				if (input[10] == '#' ) {	// There is a chance to find what we are looking for
+					vector<string> infos;
+					split( input, '#', infos, 0,true);
+					j->buildDate = strtoul(infos[0].c_str(),NULL,0);
+					j->extention = infos[1];
+					j->version = infos[2];
 #ifndef NDEBUG
 					cerr << j->basePackageName << ": " << j->buildDate << " " << j->extention << endl;
 #endif
@@ -302,6 +296,9 @@ int ConfigParser::parsePackagePkgfileList()
 				if ( line.substr( 0, 8 ) == "version=" ){
 					j->version = getValueBefore( getValue( line, '=' ), '#' );
 					j->version = stripWhiteSpace( j->version );
+				} else if ( line.substr( 0, 8 ) == "release=" ){
+					j->release = getValueBefore( getValue( line, '=' ), '#' );
+					j->release = stripWhiteSpace( j->release );
 				} else if ( line[0] == '#' ) {
 					while ( !line.empty() &&
 							( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
@@ -412,6 +409,9 @@ bool ConfigParser::getPortInfo(const string& portName)
 					<< "Description    : " << j->description << endl
 					<< "URL            : " << j->URL << endl
 					<< "Version        : " << j->version << endl
+					<< "Release        : " << j->release << endl
+					<< "Maintainer     : " << j->maintainer << endl
+					<< "Packager       : " << j->packager << endl
 					<< "Date of Pkgfile: " << j->fileDate
 					<< "Local Directory: " << i->Dir << endl;
 			}

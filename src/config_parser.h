@@ -41,6 +41,9 @@ struct FileList {
 	std::string URL;
 	std::string md5SUM;
 	std::string version;
+	std::string release;
+	std::string packager;
+	std::string maintainer;
 	std::string fileDate;
 	time_t buildDate;
 	std::string extention;

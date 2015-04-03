@@ -27,6 +27,7 @@ ArgParser::APCmd CardsArgumentParser::CMD_QUERY;
 ArgParser::APCmd CardsArgumentParser::CMD_SYNC;
 ArgParser::APCmd CardsArgumentParser::CMD_INSTALL;
 ArgParser::APCmd CardsArgumentParser::CMD_REMOVE;
+ArgParser::APCmd CardsArgumentParser::CMD_DEPCREATE;
 ArgParser::APCmd CardsArgumentParser::CMD_CREATE;
 ArgParser::APCmd CardsArgumentParser::CMD_LIST;
 ArgParser::APCmd CardsArgumentParser::CMD_INFO;
@@ -131,6 +132,11 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		"search for <expr>.",
 "It can be in ports names, in binaries names, in ports description or binaries description. The <expr> must be 2 characters minimum.",
 		ArgParser::EQ, 1, "<expr>");
+
+	addCommand(CMD_DEPCREATE, "depcreate",
+		"create a package AND it's dependencies from the recept found in the ports.",
+"This command is used for the packager. All the dependencies include the final package will be compiled.",
+		ArgParser::EQ,1 , "<package>");
 
 	addCommand(CMD_CREATE, "create",
 		"create a package from the recept found in the port.",
