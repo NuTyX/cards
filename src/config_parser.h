@@ -29,12 +29,37 @@
 #include "file_download.h"
 
 
-struct PackageFilesList {
+struct PortFilesList {
 	std::string md5SUM;
 	std::string name;
 	std::string arch;
 };
 
+/**
+ * \representation of the .PKGREPO file which belong to the category directory
+ * define in the configuration file cards.conf.
+ **/
+struct BasePackageInfo {
+	std::string md5SUM;
+	std::string s_buildDate;
+	std::string basePackageName;
+	std::string extention;
+	std::string version;
+	std::string release;
+	std::string description;
+	std::string URL;
+	std::string maintainer;
+	std::string packager;
+	std::string fileDate;
+	time_t buildDate;
+	std::vector<PortFilesList> portFilesList;
+};
+
+/**
+ * \representation of the .PKGREPO file locate in each port directory.
+ * The difference with the category .PKGFILE, it contains the list of
+ * possible files (binaries, Pkgfile, README etc)
+ **/
 struct FileList {
 	std::string basePackageName;
 	std::string description;
@@ -45,9 +70,10 @@ struct FileList {
 	std::string packager;
 	std::string maintainer;
 	std::string fileDate;
+	std::string s_buildDate;
 	time_t buildDate;
 	std::string extention;
-	std::vector<PackageFilesList> packageFilesList;
+	std::vector<PortFilesList> portFilesList;
 };
 
 struct DirUrl {
@@ -58,7 +84,7 @@ struct DirUrl {
 struct PortsDirectory {
 	std::string Dir;
 	std::string Url;
-	std::vector<FileList> basePackageList;
+	std::vector<BasePackageInfo> basePackageList;
 }; 
 struct Config {
 	Config() {}
@@ -89,12 +115,12 @@ class ConfigParser
  * This method is used in the case of synchronisation with the mirror
  * is NOT possible. 
  **/
-		int parseCategoryDirectory();
+		void parseCategoryDirectory();
 
 /**
  * \download the .PKGREPO of each port
  */
-		int parsePortsList();
+		void parsePortsList();
 
 /**
  * \download the packagefileName
@@ -115,7 +141,7 @@ class ConfigParser
  * and the extension of the archive then it populate
  * the list of packages
  */
-		int parseBasePackageList();
+		void parseBasePackageList();
 
 /**
  *
@@ -190,13 +216,13 @@ class ConfigParser
 		bool getPortInfo(const std::string& portName);
 
 	private:
-		std::vector<PortsDirectory>::iterator m_i;
-		std::vector<FileList>::iterator m_j;
-		std::vector<PackageFilesList>::iterator m_p;	
+		std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
+		std::vector<BasePackageInfo>::iterator m_BasePackageInfo_i;
+		std::vector<PortFilesList>::iterator m_PortFilesList_i;
 		std::string m_packageFileName;
 		std::string m_configFileName;
 		Config m_config;
-		std::vector<PortsDirectory> m_packageList;
+		std::vector<PortsDirectory> m_portsDirectoryList;
 };
 #endif /* CONFIGPARSER_H */
 // vim:set ts=2 :

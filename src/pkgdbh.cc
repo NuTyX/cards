@@ -306,7 +306,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 		const string metaFile = m_root + PKG_DB_DIR + *i + '/' + PKG_META;
 		itemList * contentFile = initItemList();
 		readFile(contentFile,metaFile.c_str());
-		for (unsigned int li=0; li< contentFile->count ; ++li) {
+		for (unsigned int li=0; li < contentFile->count ; ++li) {
 			if ( contentFile->items[li][0] == 'V' ) {
 				string version = contentFile->items[li];
 				info.version = version.substr(1);

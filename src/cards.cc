@@ -112,14 +112,12 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_QUERY) {
 			CardsInfo Query(cardsArgPars);
-			Query.run(argc, argv);
 			Query.getOwner();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_FILES) {
 			CardsInfo CFList(cardsArgPars);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
 			} else {
-				CFList.run(argc, argv);
 				CFList.listOfFiles();
 				return EXIT_SUCCESS;
 			}
@@ -166,7 +164,6 @@ int main(int argc, char** argv)
 				CList.listBinaries();
 				return EXIT_SUCCESS;
 			}
-			CList.run(argc, argv);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
 				CList.listPorts();
 			} else {
@@ -183,16 +180,13 @@ int main(int argc, char** argv)
 				CInfo.infoPort();
 				return EXIT_SUCCESS;
 			} else {
-				CInfo.run(argc, argv);
 				CInfo.infoInstall();
 				return EXIT_SUCCESS;
 			}
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
 			CardsInfo CInfo(cardsArgPars);
-			CInfo.run(argc, argv);
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
-				
 				CInfo.diffPorts();
 				return EXIT_SUCCESS;
 			} else {

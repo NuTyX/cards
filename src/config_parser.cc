@@ -38,71 +38,86 @@ int ConfigParser::parsePkgRepoCategoryDirectory()
 	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
 		if ( i->Url.size() == 0 )
 			continue;
-		PortsDirectory pD;
-		FileList fL;
-		pD.Dir = i->Dir;
-		pD.Url = i->Url;
-		
-		string categoryMD5sumFile = i->Dir + "/.PKGREPO" ;
-		FileDownload MD5Sum(i->Url + "/.PKGREPO",
-			i->Dir,
-			"PKGREPO", false);
-		MD5Sum.downloadFile();
-		
-		vector<string> PKGREPOFileContent;
+		PortsDirectory portsDirectory;
+		portsDirectory.Dir = i->Dir;
+		portsDirectory.Url = i->Url;
+		BasePackageInfo basePkgInfo;
+		string categoryPkgRepoFile = i->Dir + "/.PKGREPO" ;
+		if ( ! checkFileExist(categoryPkgRepoFile)) {
+			FileDownload PkgRepoFile(i->Url + "/.PKGREPO",
+				i->Dir,
+				".PKGREPO", false);
+			PkgRepoFile.downloadFile();
+		}
+		vector<string> PkgRepoFileContent;
 
-		if ( parseFile(PKGREPOFileContent,categoryMD5sumFile.c_str()) != 0) {
+		if ( parseFile(PkgRepoFileContent,categoryPkgRepoFile.c_str()) != 0) {
 			cerr << "cannot read file PKGREPO" << endl;
 			return -1;
 		}
-		remove(categoryMD5sumFile.c_str());
-		for ( vector<string>::iterator i = PKGREPOFileContent.begin();i!=PKGREPOFileContent.end();++i) {
-			string val = *i;
-			if ( i->size() <  34 ) {
+		for ( vector<string>::iterator i = PkgRepoFileContent.begin();i!=PkgRepoFileContent.end();++i) {
+			string input = *i;
+			if ( input.size() <  34 ) {
 				cerr << "missing info" << endl;
 				continue;
 			}
-			if ( val[32] != ':' ) {
+			if ( ( input[32] != '#' ) || ( input[43] != '#' ) ) {
 				cerr << "wrong  info" << endl;
 				continue;
 			}
-			string::size_type pos = val.find(':');
-			if (pos != string::npos) {
-				fL.md5SUM = stripWhiteSpace(val.substr(0,pos));
+			vector<string> infos;
+			split( input, '#', infos, 0,true);
+			if ( infos[0].size() > 0 ) {
+				basePkgInfo.md5SUM = infos[0];
 			}
-			string tmpName = val.substr(pos+1);
-			pos = tmpName.find('@');
-			if (pos != string::npos) {
-				fL.basePackageName = stripWhiteSpace(tmpName.substr(0,pos));
-				fL.version = stripWhiteSpace(tmpName.substr(pos+1));
-			} else {
-				fL.basePackageName = stripWhiteSpace(tmpName);
-				fL.version = "";
+			if ( infos[1].size() > 0 ) {
+				basePkgInfo.s_buildDate = infos[1];
 			}
-			pD.basePackageList.push_back(fL);
+			if ( infos[2].size() > 0 ) {
+				basePkgInfo.basePackageName = infos[2];
+			}
+			if ( infos[3].size() > 0 ) {
+				basePkgInfo.version = infos[3];
+			}
+			if ( infos[4].size() > 0 ) {
+				basePkgInfo.release = infos[4];
+			}
+			if ( infos[5].size() > 0 ) {
+				basePkgInfo.description = infos[5];
+			}
+			if ( infos[6].size() > 0 ) {
+				basePkgInfo.URL = infos[6];
+			}
+			if ( infos[7].size() > 0 ) {
+				basePkgInfo.maintainer = infos[7];
+			}
+			if ( infos[8].size() > 0 ) {
+				basePkgInfo.packager = infos[8];
+			}
+			portsDirectory.basePackageList.push_back(basePkgInfo);
 		}
-		m_packageList.push_back(pD);
+		m_portsDirectoryList.push_back(portsDirectory);
 	}
 #ifndef NDEBUG
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		PortsDirectory pD = *i;
-		for (std::vector<FileList>::iterator j = pD.basePackageList.begin(); j != pD.basePackageList.end();++j) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		PortsDirectory portsDirectory = *i;
+		for (std::vector<BasePackageInfo>::iterator j = portsDirectory.basePackageList.begin(); j != portsDirectory.basePackageList.end();++j) {
 			cerr << i->Url << " "<< i->Dir << " " << j->basePackageName  << " " << j->version << " "  << j->md5SUM << endl;
 		}
 	}
 #endif
 	return 0;
 }
-int ConfigParser::parseCategoryDirectory()
+void ConfigParser::parseCategoryDirectory()
 {
 	parseConfig(m_configFileName);
 	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
-		PortsDirectory pD;
-		FileList fL;
-		pD.Dir = i->Dir;
+		PortsDirectory portsDirectory;
+		BasePackageInfo basePkgInfo;
+		portsDirectory.Dir = i->Dir;
 		set<string> localPackagesList;
 		string::size_type pos;
-		if ( findFile( localPackagesList, pD.Dir) != 0 ) {
+		if ( findFile( localPackagesList, portsDirectory.Dir) != 0 ) {
 			cerr << YELLOW << "continue with the next entry" << NORMAL << endl;
 			continue;
 		}
@@ -110,30 +125,29 @@ int ConfigParser::parseCategoryDirectory()
 		for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); ++li) {
 			pos = li->find('@');
 			if (pos != string::npos) {
-				fL.basePackageName = li->substr(0,pos);
-				fL.version = li->substr(pos+1);
+				basePkgInfo.basePackageName = li->substr(0,pos);
+				basePkgInfo.version = li->substr(pos+1);
 			} else {
-				fL.basePackageName = *li;
-				fL.version = "";
+				basePkgInfo.basePackageName = *li;
+				basePkgInfo.version = "";
 			}
-			pD.basePackageList.push_back(fL);
+			portsDirectory.basePackageList.push_back(basePkgInfo);
 		}
-		m_packageList.push_back(pD);
+		m_portsDirectoryList.push_back(portsDirectory);
 		localPackagesList.clear();
 	}
-	return 0;
 }
-int ConfigParser::parsePortsList()
+void ConfigParser::parsePortsList()
 {
 	InfoFile downloadFile;
 	vector<InfoFile> downloadFilesList;
 
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			/*
 				We should check if the PKGREPO of the port is available
-				PKGREPOFile is /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
-			*/
+				.PKGREPO file is /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
+
 			if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "/.PKGREPO") ) {
 				if ( i->Url.size() > 0 ) {
 					downloadFile.url = i->Url + "/" + j->basePackageName  + "/.PKGREPO";
@@ -145,25 +159,24 @@ int ConfigParser::parsePortsList()
 #ifndef NDEBUG
 				cerr << i->Dir + "/" + j->basePackageName  << endl;
 #endif
-			}
+			} */
 		}
 	}
-	if ( downloadFilesList.size() > 0 ) {
+/*	if ( downloadFilesList.size() > 0 ) {
 		FileDownload FD(downloadFilesList,false);
-	}
-	return 0;
+	} */
 }
 set<string> ConfigParser::getListOfPackagesFromDirectory(const string& path)
 {
 	set<string> listOfPackages; 
 	// For each category activate in cards.conf
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		// For each directory found in this category
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			if ( path != i->Dir + "/" + j->basePackageName)
 				continue;
 			// If we are dealing with the correct path ...
-			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {
+			for (std::vector<PortFilesList>::iterator p = j->portFilesList.begin(); p != j ->portFilesList.end();++p) {
 				if ( ( p->arch == "any" ) || ( p->arch == m_config.arch) )
 					listOfPackages.insert(p->name);
 			}
@@ -171,7 +184,7 @@ set<string> ConfigParser::getListOfPackagesFromDirectory(const string& path)
 	}
 	return listOfPackages;	
 }
-int ConfigParser::parseBasePackageList()
+void ConfigParser::parseBasePackageList()
 {
 /*
  From here we can check if the binaries are available
@@ -179,23 +192,23 @@ int ConfigParser::parseBasePackageList()
  /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
 */
 	// For each category activate in cards.conf
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 #ifndef NDEBUG
 		cerr << i->Dir << endl;
 #endif
 		// For each directory found in this category
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			// PKGREPOFile = /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
-			string PKGREPOFile = i->Dir + "/" + j->basePackageName  + "/.PKGREPO";
-			vector<string> PKGREPOFileContent;
-			if ( parseFile(PKGREPOFileContent,PKGREPOFile.c_str()) != 0) {
-				// cerr << "Cannot read the file: " << PKGREPOFile <<  "... continue with next" << endl;
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			// .PKGREPO file = /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
+			string PkgRepoFile = i->Dir + "/" + j->basePackageName  + "/.PKGREPO";
+			vector<string> PkgRepoFileContent;
+			if ( parseFile(PkgRepoFileContent,PkgRepoFile.c_str()) != 0) {
+				// cerr << "Cannot read the file: " << .PKGREPO file <<  "... continue with next" << endl;
 				continue;
 			}
-			j->buildDate = 0;
+			j->s_buildDate = "";
 			j->extention = "";
-			PackageFilesList PFL;
-			for (vector<string>::const_iterator i = PKGREPOFileContent.begin();i != PKGREPOFileContent.end(); ++i) {
+			PortFilesList PFL;
+			for (vector<string>::const_iterator i = PkgRepoFileContent.begin();i != PkgRepoFileContent.end(); ++i) {
 				string input = *i;
 				if (input.size() < 11) {
 					cerr << "[" << input << "]: Wrong format field to small" << endl;
@@ -229,19 +242,18 @@ int ConfigParser::parseBasePackageList()
 					cerr << j->basePackageName << ": " << j->buildDate << " " << j->extention << endl;
 #endif
 				}
-				j->packageFilesList.push_back(PFL);
+				j->portFilesList.push_back(PFL);
 			}
 		}
 	}
-	return 0;
 }
 set<string> ConfigParser::getListOutOfDate()
 {
 	set<string> listOfPackages;
 	// For each category activate in cards.conf
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		// For each directory found in this category
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			if ( j->extention == "" ) {
 				listOfPackages.insert(j->basePackageName);
 			}
@@ -253,9 +265,9 @@ int ConfigParser::parsePackagePkgfileList()
 {
 	InfoFile downloadFile;
 	vector<InfoFile> downloadFilesList;
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			for (std::vector<PortFilesList>::iterator p = j->portFilesList.begin(); p != j ->portFilesList.end();++p) {
 #ifndef NDEBUG
 				cerr << p->md5SUM << " " << p->name << endl << endl;
 #endif
@@ -281,8 +293,8 @@ int ConfigParser::parsePackagePkgfileList()
  * Time to add the various informations
  */
 	std::string::size_type pos;
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			string pkgFile = i->Dir + "/" + j->basePackageName  + "/Pkgfile";
 			j->fileDate = modifyTimeFile(pkgFile);
 			vector<string> pkgFileContent;
@@ -320,19 +332,19 @@ int ConfigParser::parsePackagePkgfileList()
 }
 void ConfigParser::downloadPackageFileName(const std::string& packageName)
 {
-	if ( m_p->name == packageName) {
+	if ( m_PortFilesList_i->name == packageName) {
 #ifndef NDEBUG
 		cerr << packageName << endl;
 #endif
-		string build = static_cast<ostringstream*>( &(ostringstream() <<  m_j->buildDate ))->str();
-		string url = m_i->Url + "/" + m_j->basePackageName + "/" + m_p->name + build + m_p-> arch + m_j->extention;
-		string dir = m_i->Dir + "/" + m_j->basePackageName;
-		string fileName = m_p->name + build + m_p-> arch + m_j->extention;
+		string build = static_cast<ostringstream*>( &(ostringstream() <<  m_BasePackageInfo_i->buildDate ))->str();
+		string url = m_PortsDirectory_i->Url + "/" + m_BasePackageInfo_i->basePackageName + "/" + m_PortFilesList_i->name + build + m_PortFilesList_i-> arch + m_BasePackageInfo_i->extention;
+		string dir = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName;
+		string fileName = m_PortFilesList_i->name + build + m_PortFilesList_i-> arch + m_BasePackageInfo_i->extention;
 #ifndef NDEBUG
 		cerr << url << " " 
 		<< dir << " " 
 		<< fileName << " "
-		<< m_p->md5SUM << " "
+		<< m_PortFilesList_i->md5SUM << " "
 		<< endl;
 #endif
 		//TODO Check PKGREPO
@@ -344,22 +356,22 @@ unsigned int ConfigParser::getBinaryPackageList()
 {
 	unsigned int numberOfBinaries = 0;
 	// For each defined category
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		// For each directory found in this category
 #ifndef NDEBUG
 		cerr << i->Dir << " " << i->Url << endl;
 #endif
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 #ifndef NDEBUG
 			cerr << j->basePackageName << " " 
 					<< j->description << " " 
 					<< j->md5SUM << " " 
 					<< j->version << " " 
-					<< j->buildDate << " " 
+					<< j->s_buildDate << " "
 					<< j->extention << endl ;
 #endif
 			// For each package found 
-			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {
+			for (std::vector<PortFilesList>::iterator p = j->portFilesList.begin(); p != j ->portFilesList.end();++p) {
 #ifndef NDEBUG
 				cerr << p->md5SUM << " " << p->name << " " << p->arch << endl << endl;
 #endif
@@ -376,18 +388,18 @@ unsigned int ConfigParser::getPortsList()
 {
 	unsigned int numberOfPorts = 0;
 	// For each defined category
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		// For each directory found in this category
 #ifndef NDEBUG
 		cerr << i->Dir << " " << i->Url << endl;
 #endif
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 #ifndef NDEBUG
 			cerr << j->basePackageName << " "
 				<< j->description << " "
 				<< j->md5SUM << " "
 				<< j->version << " "
-				<< j->buildDate << " "
+				<< j->s_buildDate << " "
 				<< j->extention << endl ;
 #endif
 			cout << j->basePackageName << " " << j->version << endl;
@@ -400,9 +412,9 @@ bool ConfigParser::getPortInfo(const string& portName)
 {
 	bool found = false;
 	// For each defined category
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		// For each directory found in this category
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			if ( j->basePackageName == portName ) {
 				found = true;
 				cout << "Name           : " << portName << endl
@@ -423,10 +435,10 @@ bool ConfigParser::getBinaryPackageInfo(const string& packageName)
 {
 	bool found = false;
 	// For each defined category
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		// For each directory found in this category
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {	
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			for (std::vector<PortFilesList>::iterator p = j->portFilesList.begin(); p != j ->portFilesList.end();++p) {
 				if ( p->name == packageName ) {
 					char * c_time_s = ctime(&j->buildDate);
 					found = true;
@@ -447,8 +459,8 @@ string ConfigParser::getPortDir (const std::string& portName)
 {
 	string portDir = "";
 	bool found = false;
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			if ( j->basePackageName == portName ) {
 				portDir = i->Dir + "/" + j->basePackageName;
 				found = true;
@@ -464,9 +476,9 @@ string ConfigParser::getBasePackageName(const string& packageName)
 {
 	string basePackageName = "";
 	bool found = false;
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			for (std::vector<PackageFilesList>::iterator k = j->packageFilesList.begin(); k != j ->packageFilesList.end();++k) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			for (std::vector<PortFilesList>::iterator k = j->portFilesList.begin(); k != j ->portFilesList.end();++k) {
 				if ( k->name == packageName ) {
 					basePackageName = j->basePackageName;
 					found = true;
@@ -486,8 +498,8 @@ string ConfigParser::getPortVersion (const string& portName)
 {
 	string version = "";
 	bool found = false;
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			if ( j->basePackageName == portName ) {
 				found = true;
 				version = j->version;
@@ -502,8 +514,8 @@ string ConfigParser::getPortVersion (const string& portName)
 bool ConfigParser::checkPortExist(const string& portName)
 {
 	bool found = false;
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			if ( j->basePackageName == portName ) {
 				found = true;
 				break;
@@ -517,15 +529,20 @@ bool ConfigParser::checkPortExist(const string& portName)
 bool ConfigParser::checkBinaryExist(const string& packageName)
 {
 	bool found = false;
-	for (m_i = m_packageList.begin();m_i !=  m_packageList.end();++m_i) {
-		for (m_j = m_i->basePackageList.begin(); m_j != m_i->basePackageList.end();++m_j) {
-			for (m_p = m_j->packageFilesList.begin(); m_p != m_j ->packageFilesList.end();++m_p) {
-				if ( m_p->name == packageName ) {
-					m_packageFileName =  m_i ->Dir + "/" + m_j->basePackageName + "/" + m_p->name 
-					+ static_cast<ostringstream*>( &(ostringstream() <<  m_j->buildDate ))->str() + m_p-> arch + m_j->extention;
-					found = true;
-					break;
-				}
+	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
+		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
+			if ( m_BasePackageInfo_i->basePackageName == packageName ) {
+				found = true;
+				break;
+//			for (m_PortFilesList_i = m_BasePackageInfo_i->portFilesList.begin(); m_PortFilesList_i != m_BasePackageInfo_i ->portFilesList.end();++m_PortFilesList_i) {
+//				cout << m_BasePackageInfo_i->basePackageName << "|" << m_PortFilesList_i->name << "|" << endl;
+//				if ( m_BasePackageInfo_i->basePackageName == packageName ) {
+//				if ( m_PortFilesList_i->name == packageName ) {
+//					m_packageFileName =  m_PortsDirectory_i ->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/" + m_PortFilesList_i->name
+//					+ static_cast<ostringstream*>( &(ostringstream() <<  m_BasePackageInfo_i->buildDate ))->str() + m_PortFilesList_i-> arch + m_BasePackageInfo_i->extention;
+//					found = true;
+//					break;
+//				}
 			}
 			if (found)
 				break;
@@ -545,9 +562,9 @@ time_t ConfigParser::getBinaryBuildTime (const string& packageName)
 {
 	time_t buildTime = 0;
 	bool found = false;
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			for (std::vector<PackageFilesList>::iterator p = j->packageFilesList.begin(); p != j ->packageFilesList.end();++p) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			for (std::vector<PortFilesList>::iterator p = j->portFilesList.begin(); p != j ->portFilesList.end();++p) {
 				if ( p->name == packageName ) {
 					found = true;
 					buildTime = j->buildDate;
@@ -572,8 +589,8 @@ bool ConfigParser::search(const string& s)
 	set<string> packageList;
 	string packageToInsert;
 	std::string::size_type pos;
-	for (std::vector<PortsDirectory>::iterator i = m_packageList.begin();i !=  m_packageList.end();++i) {
-		for (std::vector<FileList>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			if ( convertToLowerCase(s) == j->basePackageName ) {
 				packageToInsert = j->basePackageName + " " + j->version + " " + j->description;
 				packageList.insert(packageToInsert);

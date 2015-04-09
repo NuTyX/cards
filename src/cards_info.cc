@@ -32,10 +32,13 @@ CardsInfo::CardsInfo(const CardsArgumentParser& argParser)
 void CardsInfo::run(int argc, char** argv)
 {
 	getListOfPackageNames(m_root);
-	buildDatabaseWithDetailsInfos(false);
+	buildDatabaseWithNameVersion();
 }
 void CardsInfo::getOwner()
 {
+	getListOfPackageNames(m_root);
+	buildDatabaseWithDetailsInfos(false);
+
 	string sfile = m_argParser.otherArguments()[0];
 	regex_t preg;
 	if (regcomp(&preg, sfile.c_str(), REG_EXTENDED | REG_NOSUB)) {
@@ -70,12 +73,17 @@ void CardsInfo::getOwner()
 }
 void CardsInfo::listOfFiles()
 {
+	getListOfPackageNames(m_root);
+	buildDatabaseWithDetailsInfos(false);
 	if (checkPackageNameExist(m_argParser.otherArguments()[0])) {
 		copy(m_listOfInstPackages[m_argParser.otherArguments()[0]].files.begin(), m_listOfInstPackages[m_argParser.otherArguments()[0]].files.end(), ostream_iterator<string>(cout, "\n"));
 	}
 }
 void CardsInfo::listInstalled()
 {
+	getListOfPackageNames(m_root);
+	buildDatabaseWithNameVersion();
+
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
 		cout << i->first << " " << i->second.version << endl;
 	}
@@ -84,7 +92,6 @@ void CardsInfo::listInstalled()
 void CardsInfo::listBinaries()
 {
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-//cp->parsePkgRepoCategoryDirectory();
 	cp->parseCategoryDirectory();
 	cp->parsePortsList();
 	cp->parseBasePackageList();
@@ -141,6 +148,8 @@ void CardsInfo::listOutOfDate()
 }
 void CardsInfo::infoInstall()
 {
+	getListOfPackageNames(m_root);
+	buildDatabaseWithDetailsInfos(false);
 	if (checkPackageNameExist(m_argParser.otherArguments()[0])) {
 		char * c_time_s = ctime(&m_listOfInstPackages[m_argParser.otherArguments()[0]].build);
 		cout << "Name           : " << m_argParser.otherArguments()[0] << endl
@@ -160,10 +169,9 @@ void CardsInfo::infoInstall()
 }
 void CardsInfo::infoBinary()
 {
+	// FIXME Not working any more
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-//cp->parsePkgRepoCategoryDirectory();
 	cp->parseCategoryDirectory();
-	cp->parsePortsList();
 	cp->parseBasePackageList();
 	if ( ! cp->getBinaryPackageInfo(m_argParser.otherArguments()[0]) ) {
 		cout << m_argParser.otherArguments()[0] << " not found " << endl;
@@ -181,7 +189,6 @@ void CardsInfo::infoPort()
 void CardsInfo::diffPorts()
 {
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-//cp->parsePkgRepoCategoryDirectory();
 	cp->parseCategoryDirectory();
 	cp->parsePackagePkgfileList();
 	vector<pair<string, DiffVers > > result;
@@ -226,11 +233,9 @@ void CardsInfo::diffPorts()
 }
 void CardsInfo::diffBinaries()
 {
+	buildDatabaseWithNameVersion();
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-//cp->parsePkgRepoCategoryDirectory();
-	cp->parseCategoryDirectory();
-	cp->parsePortsList();
-	cp->parseBasePackageList();
+	cp->parsePkgRepoCategoryDirectory();
 	vector<pair<string, DiffVers > > result;
 	DiffVers DV;
 	DV.installed="Installed";
@@ -247,8 +252,6 @@ void CardsInfo::diffBinaries()
 		if (! cp->checkBinaryExist(i->first))
 			continue;
 		string baseName = cp->getBasePackageName(i->first);
-		if ( i->first != baseName)
-			continue;
 		string newVersion = cp->getPortVersion(i->first);
 		if ( i->second.version != newVersion ) {
 			DV.installed = i->second.version;
@@ -256,6 +259,8 @@ void CardsInfo::diffBinaries()
 			result.push_back(pair<string, DiffVers> (i->first, DV));
 			if (i->first.length() > widthPackageName)
 				widthPackageName = i->first.length();
+		}
+/* FIXME
 		} else {
 			time_t newVersion = cp->getBinaryBuildTime(i->first);
 
@@ -272,7 +277,7 @@ void CardsInfo::diffBinaries()
 				if (i->first.length() > widthPackageName)
 					widthPackageName = i->first.length();
 			}
-		}
+		} */
 	}
 	if (result.size() > 2) {
 		cout << endl << "Differences between installed packages and the depot of binaries:" << endl << endl;
