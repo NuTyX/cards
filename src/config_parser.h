@@ -38,6 +38,10 @@ struct PortFilesList {
 /**
  * \representation of the .PKGREPO file which belong to the category directory
  * define in the configuration file cards.conf.
+ *************************************************
+ * 73193bfc1cb30fe02a880ed088ed7590#1414192958#aalib#1.4rc5##n.a#n.a#n.a#n.a#.cards.tar.xz
+ * 650ed499ce78791d45b91aaf7f91b445#1428615787#firefox#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org#.cards.tar.xz
+ *************************************************
  **/
 struct BasePackageInfo {
 	std::string md5SUM;
@@ -59,6 +63,14 @@ struct BasePackageInfo {
  * \representation of the .PKGREPO file locate in each port directory.
  * The difference with the category .PKGFILE, it contains the list of
  * possible files (binaries, Pkgfile, README etc)
+ * Exemple of firefox/.PKGREPO contents:
+ ******************************************************
+ * 1428615787#.cards.tar.xz#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org
+ * ada2187e655daaec9195802b955cce4b#firefox#i686
+ * 30413e9eac84e9a727c9f89fda341fb0#firefox.devel#any
+ * 23e6f253809cdac206693c84a56184be#firefox.post-install
+ * d47bfe8887dbbad7effc320ddf116d2e#Pkgfile
+ *******************************************************
  **/
 struct FileList {
 	std::string basePackageName;
@@ -107,23 +119,48 @@ class ConfigParser
  * in the configuration file cards.conf. It populate the 
  * the m_packageList.basePackageName part by looking
  * the download .PKGREPO file of each activate category
+ * 
+ * Depends on: m_config.dirUrl
+ *
+ * populate: m_portsDirectoryList (Dir, Url, BasePackageInfo for each possible port found in Dir)
+ * with the contents of the category .PKGREPO file
+ *
  **/
-		int parsePkgRepoCategoryDirectory();
+		void parsePkgRepoCategoryDirectory();
 
 /**
  * \parse the directory directly based on what we have locally.
  * This method is used in the case of synchronisation with the mirror
- * is NOT possible. 
+ * is NOT possible. If they are no directories, they will be nothing add
+ *
+ * Depends on: m_config.dirUrl
+ *
+ * populate:  m_portsDirectoryList  ( Dir, BasePackageInfo->basePackageName only )
+ *
  **/
 		void parseCategoryDirectory();
 
 /**
- * \download the .PKGREPO of each port
+ * \download the .PKGREPO of packageName
+ *
+ * Depends on: parsePkgRepoCategoryDirectory
+ *
+ * populate: nothing
+ * 
+ * add: the .PKGREPO of the packageName port from the mirror
+ *
  */
-		void parsePortsList();
+		void downloadPortsPkgRepo(const std::string& packageName);
 
 /**
  * \download the packagefileName
+ *
+ * Depends on: parsePkgRepoCategoryDirectory
+ *
+ * populater: nothing
+ *
+ * add: The packageFileName from the mirror
+ *
  */
 		void downloadPackageFileName(const std::string& packageFileName);
 
@@ -140,6 +177,11 @@ class ConfigParser
  * if it found a first line with the date of construction
  * and the extension of the archive then it populate
  * the list of packages
+ *
+ * Depends on: parsePkgRepoCategoryDirectory
+ *
+ * Populate: m_portFilesList (md5SUM.name,arch)
+ *
  */
 		void parseBasePackageList();
 
@@ -147,6 +189,10 @@ class ConfigParser
  *
  * \return a list of ports which has to be compiled OR
  *  has to be updated
+ *
+ * Depends on: parsePkgRepoCategoryDirectory
+ *
+ * Populate: nothing
  *
  */
 		set<string> getListOutOfDate();
@@ -156,7 +202,7 @@ class ConfigParser
  * add the version of the port found in the Pkgfile
  *
  */
-		int parsePackagePkgfileList();
+		void parsePackagePkgfileList();
 
 /*
  *	\return the folder of the port name
@@ -187,6 +233,10 @@ class ConfigParser
 /*
  *  \return the location and the filename of the package if exist else
  *	return the packageName
+ *
+ *  Depends on: parsePkgRepoCategoryDirectory
+ *
+ *  Populate: nothing
  */
 		std::string getPackageFileName(const std::string& packageName);
 /*
@@ -219,9 +269,13 @@ class ConfigParser
 		std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
 		std::vector<BasePackageInfo>::iterator m_BasePackageInfo_i;
 		std::vector<PortFilesList>::iterator m_PortFilesList_i;
+
+		std::vector<PortFilesList> m_portFilesList;
+
 		std::string m_packageFileName;
 		std::string m_configFileName;
 		Config m_config;
+
 		std::vector<PortsDirectory> m_portsDirectoryList;
 };
 #endif /* CONFIGPARSER_H */

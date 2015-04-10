@@ -992,11 +992,12 @@ build_needed() {
 
 update_category_repo()
 {
-	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER
+	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION
 	if [ -f $PKGMK_REPO ]; then
 		HEAD=`head -1 $PKGMK_REPO`
 		if [ "${HEAD:10:1}" = "#" ]; then 
 			BUILD_DATE="`echo $HEAD|cut -d "#" -f1`"
+			EXTENSION="`echo $HEAD|cut -d "#" -f2`"
 			VERSION="`echo $HEAD|cut -d "#" -f3`"
 			RELEASE="`echo $HEAD|cut -d "#" -f4`"
 			DESCRIPTION="`echo $HEAD|cut -d "#" -f5`"
@@ -1004,7 +1005,7 @@ update_category_repo()
 			MAINTAINER="`echo $HEAD|cut -d "#" -f7`"
 			PACKAGER="`echo $HEAD|cut -d "#" -f8`"
 			[ -f ../$PKGMK_REPO ] && sed -i "/#$name#/d" ../$PKGMK_REPO
-			echo "`md5sum $PKGMK_REPO|cut -d " " -f1`#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER" \
+			echo "`md5sum $PKGMK_REPO|cut -d " " -f1`#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION" \
 			>> ../$PKGMK_REPO
 		fi
 	fi

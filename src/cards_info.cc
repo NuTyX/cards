@@ -93,7 +93,6 @@ void CardsInfo::listBinaries()
 {
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
 	cp->parseCategoryDirectory();
-	cp->parsePortsList();
 	cp->parseBasePackageList();
 	cout << endl << "Number of availables binaries: " << cp->getBinaryPackageList() << endl<< endl;
 	
@@ -109,10 +108,9 @@ void CardsInfo::listPorts()
 }
 void CardsInfo::listOutOfDate()
 {
-	
+	// FIXME not working anymore
   ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
   cp->parseCategoryDirectory();
-  cp->parsePortsList();
   cp->parseBasePackageList();
   set<string> result = cp->getListOutOfDate();
 	

@@ -45,7 +45,9 @@ CardsInstall::CardsInstall (const CardsArgumentParser& argParser,
 void CardsInstall::run(int argc, char** argv)
 {
 	m_configParser = new ConfigParser("/etc/cards.conf");
+	// Is it a file (an archive) or a packagename
 	string::size_type pos = m_argParser.otherArguments()[0].find("cards.tar");
+
 	if ( pos != std::string::npos) {
 		m_archive=true;
 		m_packageFileName = m_argParser.otherArguments()[0];
@@ -54,11 +56,12 @@ void CardsInstall::run(int argc, char** argv)
 		m_packageFileName = m_argParser.otherArguments()[0];
 	} else {
 		m_archive=false;
+		// Its a packagename
 		m_packageName = m_argParser.otherArguments()[0];
 		ConfigParser::parseConfig("/etc/cards.conf", m_config);
+		// get following datas
+		// 6467b1da053830c331e1a97458c4f385#1428614644#firefox#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org#.cards.tar.xz
 		m_configParser->parsePkgRepoCategoryDirectory();
-		m_configParser->parsePortsList();
-		m_configParser->parseBasePackageList();
 	}
 }
 set<string> CardsInstall::findPackages(const string& path)
@@ -92,6 +95,7 @@ set<string> CardsInstall::getDirectDependencies()
 		if ( ! checkFileExist(m_packageFileName)) {
 			m_configParser->downloadPackageFileName(m_packageName);
 		}
+
 		set<string> packageNameBuildNDeps;
 		ArchiveUtils packageArchive(m_packageFileName);
 		packageNameBuildNDeps = packageArchive.listofDependencies();
@@ -345,7 +349,6 @@ void CardsInstall::install()
 		}
 		// Generate the dependencies
 		generateDependencies();
-
 		// Add the locales if any defined
 		if (m_config.locale.size() > 0) {
 			vector<string> tmpList;
@@ -454,7 +457,6 @@ void CardsInstall::install(const vector<string>& dependenciesList)
 	buildDatabaseWithDetailsInfos(false);
 	m_configParser = new ConfigParser("/etc/cards.conf");
 	m_configParser->parseCategoryDirectory();
-	m_configParser->parsePortsList();
 	m_configParser->parseBasePackageList();
 	std::set<string> listOfPackages;
 
