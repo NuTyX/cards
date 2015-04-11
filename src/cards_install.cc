@@ -356,6 +356,9 @@ void CardsInstall::install()
 			for (std::vector<string>::iterator i = m_config.locale.begin();i != m_config.locale.end();++i) {
 				for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
 					packageName = *j + "." + *i;
+#ifndef NDEBUG
+					cout << packageName << endl;
+#endif
 					if ( m_configParser->checkBinaryExist(packageName)) {
 						m_packageFileName = m_configParser->getPackageFileName(packageName);
 						if ( ! checkFileExist(m_packageFileName)) {
@@ -433,8 +436,14 @@ void CardsInstall::addPackage()
 }
 void CardsInstall::addPackagesList()
 {
+#ifndef NDEBUG
+	cerr << "Number of Packages : " << m_dependenciesList.size()<< endl;
+#endif
 	for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
 		m_packageName = *it;
+#ifndef NDEBUG
+		cerr << m_packageName << endl;
+#endif
 		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
 
 		if  ( checkPackageNameExist(m_packageName) ) {

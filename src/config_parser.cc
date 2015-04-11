@@ -180,7 +180,7 @@ void ConfigParser::downloadPortsPkgRepo(const string& packageName)
 			downloadFilesList.push_back(downloadFile);
 	}
 #ifndef NDEBUG
-	cerr << i->Dir + "/" + j->basePackageName  << endl;
+	cerr << m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName  << endl;
 #endif
 	if ( downloadFilesList.size() > 0 ) {
 		FileDownload FD(downloadFilesList,false);
@@ -234,7 +234,7 @@ void ConfigParser::parseBasePackageList()
 				}
 			}
 #ifndef NDEBUG
-			cerr << m_BasePackageInfo_i->basePackageName << ": "<< PortFilesList.md5SUM << " " << PortFilesList.name << " " << PortFilesList.arch << endl;
+			cerr << m_BasePackageInfo_i->basePackageName << ": " << portFilesList.md5SUM << " " << portFilesList.name << " " << portFilesList.arch << endl;
 #endif
 		}
 
@@ -396,10 +396,16 @@ void ConfigParser::parsePackagePkgfileList()
 }
 void ConfigParser::downloadPackageFileName(const std::string& packageName)
 {
+	string basePackageName = packageName;
+	string::size_type pos = packageName.find('.');
+	if (pos != string::npos) {
+		basePackageName=packageName.substr(0,pos);
+	}
+
 	bool found = false;
 	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i != m_portsDirectoryList.end();++m_PortsDirectory_i) {
 		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin();m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
-			if ( m_BasePackageInfo_i->basePackageName == packageName) {
+			if ( m_BasePackageInfo_i->basePackageName == basePackageName) {
 				found=true;
 				break;
 			}
@@ -407,14 +413,12 @@ void ConfigParser::downloadPackageFileName(const std::string& packageName)
 		if (found)
 			break;
 	}
-
 	if (found) {
 #ifndef NDEBUG
 		cerr << packageName << endl;
 #endif
-		if ( ! checkFileExist (m_PortsDirectory_i->Dir + "/" + packageName + "/.PKGREPO"))
-			downloadPortsPkgRepo(packageName);
-
+		if ( ! checkFileExist (m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO"))
+			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
 		parseBasePackageList();
 
 		for ( m_PortFilesList_i = m_portFilesList.begin();m_PortFilesList_i != m_portFilesList.end();++m_PortFilesList_i) {
@@ -612,28 +616,42 @@ bool ConfigParser::checkPortExist(const string& portName)
 }
 bool ConfigParser::checkBinaryExist(const string& packageName)
 {
-	bool found = false;
+
+	string basePackageName = packageName;
+	string::size_type pos = packageName.find('.');
+	if (pos != string::npos) {
+		basePackageName=packageName.substr(0,pos);
+	}
+
+	bool baseBinaryfound = false;
+	bool Binaryfound = false;
 	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
 		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
-			if ( m_BasePackageInfo_i->basePackageName == packageName ) {
-				found = true;
+			if ( m_BasePackageInfo_i->basePackageName == basePackageName ) {
+				baseBinaryfound = true;
 				break;
 			}
 		}
-		if (found)
+		if (baseBinaryfound)
 					break;
 	}
-	if (found) {
-		if ( ! checkFileExist ( m_PortsDirectory_i->Dir + "/" + packageName + "/.PKGREPO"))
-			downloadPortsPkgRepo(packageName);
+	if (baseBinaryfound) {
+		if ( ! checkFileExist ( m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO"))
+			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
 		parseBasePackageList();
 		for ( m_PortFilesList_i = m_portFilesList.begin();m_PortFilesList_i != m_portFilesList.end();++m_PortFilesList_i) {
-			if (m_PortFilesList_i->name == packageName)
-			break;
+			if (m_PortFilesList_i->name == packageName) {
+				Binaryfound = true;
+				break;
+			}
 		}
-		m_packageFileName = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/" + packageName + m_BasePackageInfo_i->s_buildDate + m_PortFilesList_i-> arch + m_BasePackageInfo_i->extention;
+		if (Binaryfound)
+			m_packageFileName = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/" + packageName + m_BasePackageInfo_i->s_buildDate + m_PortFilesList_i-> arch + m_BasePackageInfo_i->extention;
+#ifndef NDEBUG
+		cerr << packageName << " is " << m_packageFileName << endl;
+#endif
 	}
-	return found;
+	return Binaryfound;
 }
 string ConfigParser::getPackageFileName(const string& packageName)
 {

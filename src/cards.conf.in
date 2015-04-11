@@ -28,6 +28,7 @@
 #
 # dir /usr/ports/desktop
 # dir /usr/ports/console
+# dir /usr/ports/base
 
 dir /var/lib/pkg/saravane/desktop|http://downloads.nutyx.org/saravane/#ARCH#/desktop
 dir /var/lib/pkg/saravane/console|http://downloads.nutyx.org/saravane/#ARCH#/console
@@ -61,3 +62,4 @@ locale fr
 ## In the following setting, packages from base system and server will not be touch
 
 base /var/lib/pkg/saravane/base
+base /usr/ports/base
