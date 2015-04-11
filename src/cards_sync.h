@@ -36,8 +36,8 @@ public:
 		const std::string& repoFile);
 	virtual void treatErrors(const string& s) const;
 
-	void run ();
-	void run2();
+	void run_old ();
+	void run();
 	static const std::string DEFAULT_REPOFILE;
  
 	

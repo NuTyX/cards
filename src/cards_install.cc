@@ -577,8 +577,8 @@ void CardsInstall::create()
 	}
 
 	// Let's install them
-	m_configParser->parseBasePackageList();
-	
+	m_configParser->parseBasePackageList(m_packageName);
+
 	m_dependenciesList.clear();
 	// Let's install them now
 	std::set<string> listOfPackages = m_configParser->getListOfPackagesFromDirectory(pkgdir);

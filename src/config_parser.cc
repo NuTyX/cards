@@ -234,7 +234,7 @@ void ConfigParser::parseBasePackageList()
 				}
 			}
 #ifndef NDEBUG
-			cerr << j->basePackageName << ": "<< PFL.md5SUM << " " << PFL.name << " " << PFL.arch << endl;
+			cerr << m_BasePackageInfo_i->basePackageName << ": "<< PortFilesList.md5SUM << " " << PortFilesList.name << " " << PortFilesList.arch << endl;
 #endif
 		}
 
@@ -260,6 +260,56 @@ void ConfigParser::parseBasePackageList()
 			continue;
 		}
 		m_portFilesList.push_back(portFilesList);
+	}
+}
+void ConfigParser::parseBasePackageList(const std::string& packageName)
+{
+	bool found=false;
+	// For each category activate in cards.conf
+	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
+#ifndef NDEBUG
+		cerr << m_PortsDirectory_i->Dir << endl;
+#endif
+		for ( m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
+			if ( m_BasePackageInfo_i->basePackageName == packageName ) {
+				found=true;
+				vector<string> PkgRepoFileContent;
+				string PkgRepoFile = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName  + "/.PKGREPO";
+				parseFile(PkgRepoFileContent,PkgRepoFile.c_str());
+				PortFilesList portFilesList;
+				for (vector<string>::const_iterator i = PkgRepoFileContent.begin();i != PkgRepoFileContent.end(); ++i) {
+					string input = *i;
+					if (input.size() < 11) {
+						cerr << "[" << input << "]: Wrong format field to small" << endl;
+						continue;
+					}
+					if ( input[10] != '#' ) { // It's not the first line, then it can be one of our files
+						vector<string> infos;
+						split( input, '#', infos, 0,true);
+						portFilesList.md5SUM = infos[0];
+						portFilesList.name = infos[1];
+						if ( infos.size() > 2 ) {
+							if ( infos[2].size() > 0 ) {
+								portFilesList.arch = infos[2];
+							}
+						}
+#ifndef NDEBUG
+						cerr << m_BasePackageInfo_i->basePackageName << ": "<< portFilesList.md5SUM << " " << portFilesList.name << " " << portFilesList.arch << endl;
+#endif
+					}
+					if (input[10] == '#' ) {
+						vector<string> infos;
+						split( input, '#', infos, 0,true);
+						m_BasePackageInfo_i->s_buildDate = infos[0];
+						m_BasePackageInfo_i->extention = infos[1];
+						m_BasePackageInfo_i->version = infos[2];
+					}
+					m_BasePackageInfo_i->portFilesList.push_back(portFilesList);
+				}
+			}
+		}
+		if (found)
+			break;
 	}
 }
 set<string> ConfigParser::getListOutOfDate()

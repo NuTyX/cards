@@ -1439,8 +1439,8 @@ PKGMK_CLEAN="yes"
 PKGMK_SYNC_FILES="no"
 
 
-PKGMK_GROUPS=(devel man doc service)
-PKGMK_LOCALES=(fr de it es nl pt da nn sv fi)
+PKGMK_GROUPS=()
+PKGMK_LOCALES=(fr)
 
 PKGMK_SOURCE_MIRRORS=()
 PKGMK_SOURCE_DIR="$PWD"

@@ -130,7 +130,7 @@ unsigned int CardsSync::getRemotePackages(const string& pkgrepoFile)
 	}
 	return m_remotePackagesList.size();
 }
-void CardsSync::run2()
+void CardsSync::run()
 {
 	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
@@ -155,8 +155,9 @@ void CardsSync::run2()
 			m_repoFile, false);
 		PKGRepo.downloadFile();
 	}
+	// FIXME Create all the directory if needed
 }
-void CardsSync::run()
+void CardsSync::run_old()
 {
 	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;

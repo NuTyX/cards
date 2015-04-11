@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
 			CardsSync CS(cardsArgPars);
-			CS.run2();
+			CS.run();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 			CardsInstall CI(cardsArgPars);

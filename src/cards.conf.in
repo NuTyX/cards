@@ -24,6 +24,11 @@
 ##                                         /alsa-utils.post-install
 ##                                         /...
 
+## Uncomment following lines if you want to compile your own ports
+#
+# dir /usr/ports/desktop
+# dir /usr/ports/console
+
 dir /var/lib/pkg/saravane/desktop|http://downloads.nutyx.org/saravane/#ARCH#/desktop
 dir /var/lib/pkg/saravane/console|http://downloads.nutyx.org/saravane/#ARCH#/console
 dir /var/lib/pkg/saravane/base|http://downloads.nutyx.org/saravane/#ARCH#/base

@@ -187,6 +187,14 @@ class ConfigParser
 
 /**
  *
+ * \parse the .PKGREPO of all the packageName directory
+ * If we found new one
+ *
+ */
+		void parseBasePackageList(const std::string& packageName);
+
+/**
+ *
  * \return a list of ports which has to be compiled OR
  *  has to be updated
  *
