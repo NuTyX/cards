@@ -36,6 +36,7 @@ ArgParser::APCmd CardsArgumentParser::CMD_LEVEL;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPENDS;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPTREE;
 ArgParser::APCmd CardsArgumentParser::CMD_SEARCH;
+ArgParser::APCmd CardsArgumentParser::CMD_PURGE;
 
 ArgParser::APOpt CardsArgumentParser::OPT_BASE_HELP;
 
@@ -59,44 +60,44 @@ ArgParser::APOpt CardsArgumentParser::OPT_OUTOFDATE;
 CardsArgumentParser::CardsArgumentParser()
 {
 	addCommand(CMD_CONFIG, "config",
-		"print info about cards configuration.",
+		"\tprint info about cards configuration.",
 "It can show the defined Directories where alls the packages are located. The locale which are going to be installed, the architecture of your machine, the base system directory and the logfile directory",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_BASE, "base",
-		"return to a basic system.",
+		"\treturn to a basic system.",
 "You should never use this command unless you knows exactly what it means.\n\n\
 It will REMOVE ALL THE PACKAGES not listed in the base system list directory.\n\n\
 It is mainly used for the packager.",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_FILES, "files",
-		"list the file(s) of the package.",
+		"\tlist the file(s) of the package.",
 "If -b is passed as optional argument, it will be the files list of a binary available in the depot",
 		ArgParser::EQ, 1 , "<package>");
 
 	addCommand(CMD_SYNC, "sync",
-		"synchronize local and remote metadatas.",
-"If -p or -b are passed as optional arguments, it will synchronize respectively all the ports or all the ports and all the binaries.",
+		"\tsynchronize local and remote metadatas.",
+"",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_QUERY, "query",
-		"list owner(s) of file(s) matching the query",
+		"\tlist owner(s) of file(s) matching the query",
 "",
 		ArgParser::EQ, 1 , "<pattern>");
 
 	addCommand(CMD_INFO, "info",
-		"print info about a package.",
+		"\tprint info about a package.",
 "If -p or -b are passed as optional arguments, it will be the info of a port or the info of a binary available in the depot",
 		ArgParser::EQ, 1 , "<package>");
 
 	addCommand(CMD_LIST, "list",
-		"list installed packages.",
+		"\tlist installed packages.",
 "If -p or -b are passed as optional arguments, It will respectively list the local available ports or the remote available binaries.",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_INSTALL, "install",
-		"install a <package> or a <file>.",
+		"\tinstall a <package> or a <file>.",
 "If the argument is a package name, it will first download the request package, then analyse it and finally download it's dependencies, then analyse them and so on. When all the dependencies are downloaded, they will be installed in the right order then finally the request package will be installed.\n\
 If the argument is a file, it will simply installed it. The file can have any name as long it's a valid package.\n\
 If -u is passed as optional argument, it will upgrade the package.\n\
@@ -104,32 +105,32 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		ArgParser::EQ, 1, "<package> | <file>");
 
 	addCommand(CMD_REMOVE, "remove",
-		"remove a package.",
+		"\tremove a package.",
 "",
 		ArgParser::EQ, 1 , "<package>");
 
 	addCommand(CMD_LEVEL, "level",
-		"generate all the levels.",
+		"\tgenerate all the levels.",
 "This command is used for the packager. It allow to see which package depends on which dependencie. It is used for the compilation of a port.",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_DIFF, "diff",
-		"list outdated packages.",
+		"\tlist outdated packages.",
 "If -p is passed, the list is checked against founds Pkgfile ports",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_DEPENDS, "depends",
-		"list the dependencies of the port.",
+		"\tlist the dependencies of the port.",
 "This command is used for the packager. It shows the list of the dependencies of the package. It is used for the compilation of a port.",
 		ArgParser::EQ, 1,"<port>");
 
 	addCommand(CMD_DEPTREE, "deptree",
-		"list the dependencies tree of the port.",
+		"\tlist the dependencies tree of the port.",
 "It's mainly use to know if they are no duplicate call of any dependency.",
 		ArgParser::EQ, 1,"<port>");
 
 	addCommand(CMD_SEARCH, "search",
-		"search for <expr>.",
+		"\tsearch for <expr>.",
 "It can be in ports names, in binaries names, in ports description or binaries description. The <expr> must be 2 characters minimum.",
 		ArgParser::EQ, 1, "<expr>");
 
@@ -139,9 +140,14 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		ArgParser::EQ,1 , "<package>");
 
 	addCommand(CMD_CREATE, "create",
-		"create a package from the recept found in the port.",
+		"\tcreate a package from the recept found in the port.",
 "This command is used for the packager. All the dependencies must be compiled, up to date and available for the creation of the final package. If somes dependencies are missing, the command will abort. A compilation logfile can be define in /etc/cards.conf as: logdir /var/log/pkgbuild for exemple.",
 		ArgParser::EQ, 1, "<package>");
+
+	addCommand(CMD_PURGE, "purge",
+		"\tremove archives from installed packages.",
+"This command can be used if you want to save some space on the harddisk. It will delete all the downloads binaries which are located in the binaries sections directories.",
+		ArgParser::NONE, 0 , "");
 
 	OPT_FORCE.init("force",
 		'f',
@@ -187,8 +193,6 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		'I',
 		"\tIgnore errors and list the level anyway.");
 
-	addOption(CMD_SYNC, OPT_PORTS, false);
-	addOption(CMD_SYNC, OPT_BINARIES, false);
 
 	addOption(CMD_FILES, OPT_BINARIES, false);
 	

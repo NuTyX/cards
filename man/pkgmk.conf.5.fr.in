@@ -63,39 +63,45 @@ Si défini comme 'no', pkgmk va supprimé les symboles de test dans les paquets 
 .br
 Défaut: 'no'
 .TP
+\fBPKGMK_IGNORE__REPO='STRING'\fP
+Option pour déactiver la génération du fichier .PKGREPO. A ne changer que si vous compilez votre port via la commande \fB/pkgmk\fP.
+.br
+Défaut: 'no'
+.TP
+fBPKGMK_COMPRESSION_PACKAGE='STRING'\fP
+Option pour activer la compresssion du paquet produit.
+.br
+Défaut: 'no'
+.TP
 \fBPKGMK_COMPRESSION_MODE='STRING'\fP
 Option pour sélectionner le mode de compression des paquets binaires. Valeurs de chaîne possibles sont: gz, bz2 et xz.
 .br
 Défaut: 'xz'
-.TP
-\fBPKGMK_LOG_DIR='STRING'\fP
-Défini le dossier pour les logs de contruction des paquets.
-.br
-Défaut:
 .TP
 \fBPKGMK_KEEP_SOURCES='STRING'\fP
 Si défini comme 'yes', pkgmk garde les sources du paquet dans tous les cas, si 'no' ceux-ci sont supprimés après une construction réussie.
 .br
 Défaut: 'no'
 .TP
-\fBPKGMK_CLEAN_OLD='STRING'\fP
+\fBPKGMK_CLEAN='STRING'\fP
 Si défini comme 'yes', pkgmk supprime les anciens paquets avant de produire le(s) nouveau(x) et ce après une construction réussie.
 .br
 Défaut: 'yes'
 .TP
-\fBPKGMK_DOWNLOAD_BIN='STRING'\fP
-Si défini comme 'yes', pkgmk utilise le paquet déjà disponible sur le mirroir défini dans le fichier \fI/etc/pkg-get.conf\fP. Si le binaire est disponible, il sera donc téléchargé et le paquet binaire ne devra pas être compilé.
-.br
-Défaut: 'no'
-.TP
 \fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
 Si défini, pkgmk fera une tentative de séparation du paquet produit en sous groupes. Chaque groupe étant défini dans cette variable. Une fonction par défaut est exécutée si cette même fonction n'est pas trouvée dans le Pkgfile. (EXPERIMENTAL)
 .br
-Défaut: '(lib devel man doc service)'
+Défaut: '()' Aucun sous paquet ne sera produit, sauf si défini dans le Pkgfile
+Valeurs possibles: '(lib devel man doc service)'
+.TP
+\fBPKGMK_LOCALES=('STRING1' .. 'STRINGN')
+Si défini, pkgmk fera une tentative de produire les locales définies. Chaque locale est définie dans cette variable.
+.br
+Défaut: '(fr)'
 .SH VOIR AUSSI
 pkgmk(8)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2010 CRUX team (http://crux.nu).
-pkgmk (cards)  2013-2014 Thierry Nuttens NuTyX team (http://www.nutyx.org).
+pkgmk (cards)  2013-2015 Thierry Nuttens NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

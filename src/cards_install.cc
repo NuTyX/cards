@@ -37,6 +37,10 @@ CardsInstall::CardsInstall (const CardsArgumentParser& argParser,
 	const vector<string>& listOfPackages)
 	:m_argParser(argParser), m_dependenciesList(listOfPackages), m_root("/")
 {
+	if (getuid()) {
+		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		treatErrors("");
+	}
 	for (std::vector<string>::const_iterator it = listOfPackages.begin(); it != listOfPackages.end();it++) {
 		m_packageName = basename(const_cast<char*>(it->c_str()));
 		create();
@@ -44,6 +48,10 @@ CardsInstall::CardsInstall (const CardsArgumentParser& argParser,
 }
 void CardsInstall::run(int argc, char** argv)
 {
+	if (getuid()) {
+			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+			treatErrors("");
+	}
 	m_configParser = new ConfigParser("/etc/cards.conf");
 	// Is it a file (an archive) or a packagename
 	string::size_type pos = m_argParser.otherArguments()[0].find("cards.tar");

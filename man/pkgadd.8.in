@@ -59,6 +59,6 @@ Configuration file.
 pkgrm(8), pkginfo(8), pkgmk(8), rejmerge(8)
 .SH COPYRIGHT
 pkgadd (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
-pkgadd (cards) is Copyright (c) 2013-2014 Thierry Nuttens (c) 2013-2014 NuTyX team (http://www.nutyx.org).
+pkgadd (cards) is Copyright (c) 2013-2015 Thierry Nuttens (c) 2013-2015 NuTyX team (http://www.nutyx.org).
 pkgadd (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

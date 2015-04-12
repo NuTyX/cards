@@ -38,6 +38,7 @@ public:
 
 	void run_old ();
 	void run();
+	void purge();
 	static const std::string DEFAULT_REPOFILE;
  
 	

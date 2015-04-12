@@ -135,6 +135,9 @@ void ConfigParser::parseCategoryDirectory()
 {
 	parseConfig(m_configFileName);
 	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
+		// We don't want to check the folders which can sync with any mirror
+		if ( i->Url.size() > 0 )
+			continue;
 		PortsDirectory portsDirectory;
 		BasePackageInfo basePkgInfo;
 		portsDirectory.Dir = i->Dir;
@@ -387,6 +390,10 @@ void ConfigParser::parsePackagePkgfileList()
 							j->description = stripWhiteSpace( getValue( line, ':' ) );
 						} else if ( startsWithNoCase( line, "url" ) ) {
 							j->URL = stripWhiteSpace( getValue( line, ':' ) );
+						} else if ( startsWithNoCase( line, "pac" ) ) {
+							j->packager = stripWhiteSpace( getValue( line, ':' ) );
+						} else if ( startsWithNoCase( line, "mai" ) ) {
+							j->maintainer = stripWhiteSpace( getValue( line, ':' ) );
 						}
 					}
 				}
@@ -458,16 +465,8 @@ unsigned int ConfigParser::getBinaryPackageList()
 					<< j->s_buildDate << " "
 					<< j->extention << endl ;
 #endif
-			// For each package found 
-			for (std::vector<PortFilesList>::iterator p = j->portFilesList.begin(); p != j ->portFilesList.end();++p) {
-#ifndef NDEBUG
-				cerr << p->md5SUM << " " << p->name << " " << p->arch << endl << endl;
-#endif
-				if ( p->arch != "") {
-					numberOfBinaries++;
-					cout << p->name << " " << j->version << endl;
-				}
-			}	
+			numberOfBinaries++;
+			cout << j->basePackageName << " " << j->version << endl;	
 		}
 	}
 	return numberOfBinaries;
@@ -490,7 +489,7 @@ unsigned int ConfigParser::getPortsList()
 				<< j->s_buildDate << " "
 				<< j->extention << endl ;
 #endif
-			cout << j->basePackageName << " " << j->version << endl;
+			cout << j->basePackageName << " " << j->version <<  endl;
 			numberOfPorts++;
 		}
 	}
@@ -501,6 +500,8 @@ bool ConfigParser::getPortInfo(const string& portName)
 	bool found = false;
 	// For each defined category
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		if (i->Url.size() > 0 )
+			continue;
 		// For each directory found in this category
 		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
 			if ( j->basePackageName == portName ) {
@@ -526,20 +527,20 @@ bool ConfigParser::getBinaryPackageInfo(const string& packageName)
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		// For each directory found in this category
 		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			for (std::vector<PortFilesList>::iterator p = j->portFilesList.begin(); p != j ->portFilesList.end();++p) {
-				if ( p->name == packageName ) {
-					char * c_time_s = ctime(&j->buildDate);
-					found = true;
-					cout << "Name           : " << packageName << endl
-						<< "Description    : " << j->description << endl
-						<< "Version        : " << j->version << endl
-						<< "Build date     : " << c_time_s
-						<< "Arch           : " << p->arch << endl
-						<< "Url            : " << i->Url << endl
-						<< "Local Directory: " << i->Dir << endl;
-				}
+			if ( j->basePackageName == packageName ) {
+				char * c_time_s = ctime(&j->buildDate);
+				found = true;
+				cout << "Name           : " << packageName << endl
+					<< "Description    : " << j->description << endl
+					<< "Version        : " << j->version << endl
+					<< "Build date     : " << c_time_s
+					<< "Url            : " << i->Url << endl
+					<< "Local Directory: " << i->Dir << endl;
+				break;
 			}
 		}
+		if (found)
+			break;
 	}
 	return found;
 }
@@ -584,11 +585,17 @@ string ConfigParser::getBasePackageName(const string& packageName)
 
 string ConfigParser::getPortVersion (const string& portName)
 {
+  string basePortName = portName;
+  string::size_type pos = portName.find('.');
+  if (pos != string::npos) {
+    basePortName=portName.substr(0,pos);
+  }
+
 	string version = "";
 	bool found = false;
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			if ( j->basePackageName == portName ) {
+			if ( j->basePackageName == basePortName ) {
 				found = true;
 				version = j->version;
 				break;

@@ -5,7 +5,7 @@ pkgmk \- make software package
 \fBpkgmk [options]\fP
 .SH DESCRIPTION
 \fBpkgmk\fP is a \fIpackage management\fP utility, which makes
-a software package. A \fIpackage\fP is an archive of files (.pkg.tar.gz, .pkg.tar.bz2 or .pkg.tar.xz)
+a software package. A \fIpackage\fP is an archive of files (.cards.tar.gz, .cards.tar.bz2, .cards.tar.xz or .cards.tar)
 that can be installed using pkgadd(8).
 
 To prepare to use pkgmk, you must write a file named \fIPkgfile\fP
@@ -34,8 +34,20 @@ Download missing source file(s).
 .B "\-do, \-\-download\-only"
 Do not build, only download missing source file(s).
 .TP
+.B "\-eo, \-\-extract-only"
+Extract only the sources file(s), do not build anything.
+.TP
+.B "\-cv, \-\-show-version-only"
+Do not build, only print the version of the package.
+.TP
 .B "\-utd, \-\-up\-to\-date"
 Do not build, only check if the package is up to date.
+.TP
+.B "\-uc, \-\-update\-category"
+Do not build, only update the .PKGREPO file of the category located in the parent directory.
+.TP
+.B "\-ur, \-\-update\-repo"
+Do not build, only update the .PKGREPO file of the port.
 .TP
 .B "\-uf, \-\-update\-footprint"
 Update footprint and treat last build as successful.
@@ -58,7 +70,7 @@ Do not strip executable binaries or libraries.
 .B "\-f, \-\-force"
 Build package even if it appears to be up to date.
 .TP
-.B "\-c, \-\-clean"
+.B "\-co, \-\-clean\-only"
 Remove the (previously built) package and the downloaded source files.
 .TP
 .B "\-kw, \-\-keep-work"
@@ -82,6 +94,9 @@ Package footprint (used for regression testing).
 .TP
 .B ".md5sum"
 MD5 checksum of source files.
+.TP
+.B ".PKGREPO"
+Information for installing the package with cards
 .TP
 .B "/etc/pkgmk.conf"
 Global package make configuration.
@@ -119,10 +134,13 @@ An error occured while running the build function.
 .TP
 .B 9
 An error occured while installing the package via pkgadd.
+.TP
+.B 10
+An error occured while searching the runtime dependencies via 'pkginfo -b'
 .SH SEE ALSO
 pkgmk.conf(5), pkgadd(8), pkgrm(8), pkginfo(8), rejmerge(8), wget(1)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
-pkgmk (cards) is Copyright (c)  2013-2014 NuTyX and Copyright (c)  2013-2014 NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is Copyright (c)  2013-2015 NuTyX and Copyright (c)  2013-2015 NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

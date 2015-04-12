@@ -360,7 +360,7 @@ std::string ArgParser::generateHelpForCommand(const std::string& command) const
 	const Command * const  cmd = cit->second;
 	string help = "\n";
 	help += ACTION;
-	help += "\t\t\t" + cmd->shortInfo;
+	help += "\t\t" + cmd->shortInfo;
 	help += "\n\n";
 	help += USAGE;
 	help += "\t\t\t" ;
@@ -440,7 +440,7 @@ std::string ArgParser::generateUsage() const
 	std::map<std::string, Command*>::const_iterator it;
 	it = m_commands.begin();
 	for (; it != m_commands.end(); ++it) {
-        usage += BLUE + it->first + WHITE + "\t\t" +
+        usage += BLUE + it->first + WHITE + "\t" +
             it->second->shortInfo + "\n" + NORMAL;
 	}
 

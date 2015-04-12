@@ -45,6 +45,7 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_DEPENDS;
 		static ArgParser::APCmd CMD_DEPTREE;
 		static ArgParser::APCmd CMD_SEARCH;
+		static ArgParser::APCmd CMD_PURGE;
 
 		static ArgParser::APOpt OPT_BASE_HELP;
 

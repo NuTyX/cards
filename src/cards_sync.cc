@@ -108,7 +108,7 @@ void CardsSync::treatErrors(const string& s) const
 			throw RunTimeErrorWithErrno("could not create directory " + s);
 			break;
 		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
-			throw runtime_error(s + " only root can install / sync / upgrade / remove packages");
+			throw runtime_error(s + " only root can install / sync / purge / upgrade / remove packages");
 			break;
 	}
 }
@@ -141,7 +141,7 @@ void CardsSync::run()
 	ConfigParser::parseConfig("/etc/cards.conf", config);
 	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
 		DirUrl DU = *i ;
-		if (DU.Url == "" ) {
+		if (DU.Url.size() == 0 ) {
 			continue;
 		}
 		string categoryDir, url ;
@@ -149,13 +149,30 @@ void CardsSync::run()
 		url = DU.Url;
 		string category = basename(const_cast<char*>(categoryDir.c_str()));
 		string categoryPKGREPOFile = categoryDir + "/" + m_repoFile ;
-		// cout << "Synchronizing " << categoryDir << " from " << url << endl;
 		FileDownload PKGRepo(url + "/" + m_repoFile,
 			categoryDir,
 			m_repoFile, false);
 		PKGRepo.downloadFile();
 	}
-	// FIXME Create all the directory if needed
+}
+void CardsSync::purge()
+{
+	if (getuid()) {
+			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+			treatErrors("");
+	}
+	Config config;
+	ConfigParser::parseConfig("/etc/cards.conf", config);
+
+	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
+		if ( i->Url.size() == 0)
+			continue;
+		if ( getLocalPackages(i->Dir) == 0 )
+			continue;
+		for (set<string>::const_iterator dir = m_localPackagesList.begin(); dir != m_localPackagesList.end(); ++dir) {
+			deleteFolder(i->Dir + "/" + *dir);
+		}
+	}
 }
 void CardsSync::run_old()
 {
@@ -395,10 +412,10 @@ void CardsSync::deleteFolder(const string& folderName)
 	}
 	for (set<string>::const_iterator f = filesToDelete.begin(); f != filesToDelete.end(); f++) {
 		string fileName = folderName + "/" + *f;
-		cout << "Deleting " << fileName << endl; 
+		if (f->size() > 0)
+			cout << "Deleting " << fileName << endl; 
 		removeFile("/",fileName);
-	}
-		cout << "Deleting " << folderName << endl;
-		removeFile("/",folderName);
+	}	
+	removeFile("/",folderName);
 }
 // vim:set ts=2 :

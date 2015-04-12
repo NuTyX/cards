@@ -1062,7 +1062,18 @@ update_repo()
 	# echo "`md5sum Pkgfile|cut -d " " -f1`:Pkgfile" >> MD5SUM
 	###
 }
-
+clean_repo_files()
+{
+	cd $PKGMK_ROOT
+	if [ -f $PKGMK_REPO ]; then
+		rm $PKGMK_REPO
+		info "Removing $PKGMK_REPO"
+	fi
+	if [ -f MD5SUM ]; then
+		rm MD5SUM
+		info "Removing MD5SUM"
+	fi
+}
 interrupted() {
 	echo ""
 	error "Interrupted."
@@ -1253,8 +1264,8 @@ main() {
 		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
 		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"	
 	fi
-	if [ "$PKGMK_IGNORE_REPO"  != "yes" ]; then
-		info "$PKGMK_REPO file will be generated"
+	if [ "$PKGMK_IGNORE_REPO"  == "yes" ]; then
+		info "$PKGMK_REPO file will be deleted"
 	fi
 
 	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
@@ -1406,8 +1417,11 @@ main() {
 	if [ "$PKGMK_CLEAN" != "no" ]; then
 		clean
 		unset TARGETS
+		if [ "$PKGMK_IGNORE_REPO" == "yes" ];then
+			clean_repo_files
+		fi
 	fi
-	if [ "$PKGMK_IGNORE_REPO" != "yes" ];then
+	if [ "$PKGMK_IGNORE_REPO" != "yes" ] && [ "$PKGMK_CLEAN" != "yes" ]; then
 		update_repo
 	fi
 	exit 0

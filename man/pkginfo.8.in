@@ -12,6 +12,12 @@ or that reside in a particular directory.
 .B "\-i, \-\-installed"
 List installed packages and their version.
 .TP
+.B "\-d, \-\-details"
+List all available details about the package.
+.TP
+.B "\-L \-\-librairies"
+List all the runtime librairies owned by the specified <package>
+.TP
 .B "\-l, \-\-list <package|file>"
 List files owned by the specified <package> or contained in <file>.
 .TP
@@ -21,6 +27,18 @@ List owner(s) of file(s) matching <pattern>.
 .B "\-f, \-\-footprint <file>"
 Print footprint for <file>. This feature is mainly used by pkgmk(8)
 for creating and comparing footprints.
+.TP
+.B "\-a, \-\-archive <file>"
+Print name, version, Release, BuildDate and dependencies of the <file>
+.TP
+.B "\-b, \-\-buildtime <package>"
+Print on a single line the name and the build time of the package.
+.TP
+.B "\-R, \-\-runtimedep <package>"
+Print on a single line all the runtime dependencies.
+.TP
+.B "\-\-runtimedepfiles <path>"
+Print on a single line all the runtime dependencies for the files found in the <path>
 .TP
 .B "\-r, \-\-root <path>"
 Specify alternative installation root (default is "/"). This
@@ -38,6 +56,6 @@ Print help and exit.
 pkgadd(8), pkgrm(8), pkgmk(8), rejmerge(8)
 .SH COPYRIGHT
 pkginfo (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
-pkginfo (cards) is Copyright (c)  2013-2014 Thierry Nuttens (c)  2013-2014 NuTyX team (http://www.nutyx.org).
+pkginfo (cards) is Copyright (c)  2013-2015 Thierry Nuttens (c)  2013-2015 NuTyX team (http://www.nutyx.org).
 pkginfo (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

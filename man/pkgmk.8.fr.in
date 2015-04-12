@@ -4,7 +4,7 @@ pkgmk \- Construire un paquet
 .SH SYNOPSIS
 \fBpkgmk [options]\fP
 .SH DESCRIPTION
-\fBpkgmk\fP est un utilitaire de \fIgestionnaire de paquets\fP, qui produit un paquet binaire. Un \fIpaquet\fP est une  archive de fichiers (.pkg.tar.gz, .pkg.tar.bz2 or .pkg.tar.xz) pouvant être installée en utilisant pkgadd(8).
+\fBpkgmk\fP est un utilitaire de \fIgestionnaire de paquets\fP, qui produit un paquet binaire. Un \fIpaquet\fP est une  archive de fichiers (.cards.tar.gz, .pkg.cards.bz2, .cards.tar.xz ou .cards.tar) pouvant être installée en utilisant pkgadd(8).
 
 Pour pouvoir utiliser pkgmk, vous devez écrire un fichier appelé \fIPkgfile\fP
 qui décrit comment le paquet doit être construit. Une fois le fichier \fIPkgfile\fP créé, chaque fois que vous changez certains fichiers sources, vous exécutez simplement la commande pkgmk pour mettre le paquet à jour. Le programme pkgmk utilise  le fichier \fIPkgfile\fP et la date de la dernière modification des fichiers sources pour décider si le paquet doit être mis à jour. Cette fonctionnalitée est configurable.
@@ -27,8 +27,20 @@ Télécharge les fichiers sources manquants.
 .B "\-do, \-\-download\-only"
 Ne construit pas, télécharge uniquement les fichiers sources manquants.
 .TP
+.B "\-eo, \-\-extract\-only"
+Ne construit pas, extrait uniquement les fichiers sources.
+.TP
+.B "\-cv, \-\-show\-version\-only"
+Ne construit pas, affiche uniquement la version du port.
+.TP
 .B "\-utd, \-\-up\-to\-date"
 Ne construit pas, vérifie uniquement si le paquet est à jour.
+.TP
+.B "\-uc, \-\-update\-category"
+Met à jour le fichier .PKGREPO de la categorie, cad le fichier .PKGREPO qui se trouve dans le dossier parent.
+.TP
+.B "\-ur, \-\-update\-repo"
+Met à jour le fichier .PKGREPO du paquet.
 .TP
 .B "\-uf, \-\-update\-footprint"
 Met à jour la signature footprint et considère la dernière construction comme valable.
@@ -51,7 +63,7 @@ Ne supprimes pas les symboles de tests dans les binaires our librairies à la fi
 .B "\-f, \-\-force"
 Construit le paquet même si celui-ci semble être à jour.
 .TP
-.B "\-c, \-\-clean"
+.B "\-co, \-\-clean\-only"
 Supprime le paquet binaire (précédement construit) et les fichiers sources téléchargées.
 .TP
 .B "\-kw, \-\-keep-work"
@@ -75,6 +87,9 @@ La signature footprint du paquet (used for regression testing).
 .TP
 .B ".md5sum"
 Somme MD5 des fichiers sources.
+.TP
+.B ".PKGREPO"
+Information pour installer le paquet via cards
 .TP
 .B "/etc/pkgmk.conf"
 Fichier global de configuration des paquets.
@@ -112,10 +127,13 @@ Une erreur s'est produite pendant la construction du paquet.
 .TP
 .B 9
 Une erreur s'est produite durant l'installation du paquet  via pkgadd.
+.TP
+.B 10
+Une erreur s'est produite pendant la recherche des dépendances runtime via la commande 'pkginfo -b'
 .SH VOIR AUSSI
 pkgmk.conf(5), pkgadd(8), pkgrm(8), pkginfo(8), rejmerge(8), wget(1)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2010 CRUX team (http://crux.nu).
-pkgmk (cards) is Copyright (c)  2013-2014 NuTyX and Copyright (c)  2013-2014 NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is Copyright (c)  2013-2015 NuTyX and Copyright (c)  2013-2015 NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

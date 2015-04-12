@@ -126,6 +126,10 @@ int main(int argc, char** argv)
 			CardsSync CS(cardsArgPars);
 			CS.run();
 			return EXIT_SUCCESS;
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_PURGE) {
+			CardsSync CS(cardsArgPars);
+			CS.purge();
+			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 			CardsInstall CI(cardsArgPars);
 			CI.run(argc, argv);

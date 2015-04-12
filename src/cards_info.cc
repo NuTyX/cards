@@ -92,9 +92,8 @@ void CardsInfo::listInstalled()
 void CardsInfo::listBinaries()
 {
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parseCategoryDirectory();
-	cp->parseBasePackageList();
-	cout << endl << "Number of availables binaries: " << cp->getBinaryPackageList() << endl<< endl;
+	cp->parsePkgRepoCategoryDirectory();
+	cout << endl << "Minimum number of availables binaries: " << cp->getBinaryPackageList() << " (sub packages not included)"<< endl<< endl;
 	
 }
 void CardsInfo::listPorts()
@@ -108,7 +107,7 @@ void CardsInfo::listPorts()
 }
 void CardsInfo::listOutOfDate()
 {
-	// FIXME not working anymore
+	// FIXME not working anymore, I guess this will change as well in the future
   ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
   cp->parseCategoryDirectory();
   cp->parseBasePackageList();
@@ -167,10 +166,8 @@ void CardsInfo::infoInstall()
 }
 void CardsInfo::infoBinary()
 {
-	// FIXME Not working any more
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parseCategoryDirectory();
-	cp->parseBasePackageList();
+	cp->parsePkgRepoCategoryDirectory();
 	if ( ! cp->getBinaryPackageInfo(m_argParser.otherArguments()[0]) ) {
 		cout << m_argParser.otherArguments()[0] << " not found " << endl;
 	}
@@ -186,6 +183,7 @@ void CardsInfo::infoPort()
 }
 void CardsInfo::diffPorts()
 {
+	buildDatabaseWithNameVersion();
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
 	cp->parseCategoryDirectory();
 	cp->parsePackagePkgfileList();
@@ -202,8 +200,9 @@ void CardsInfo::diffPorts()
 	unsigned int widthInstalled = result.begin()->second.installed.length();
 
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-		if (! cp->checkPortExist(i->first))
+		if (! cp->checkPortExist(i->first)) {
 			continue;
+		}
 		string newVersion = cp->getPortVersion(i->first);
 #ifndef NDEBUG
 		cerr << i->first << " " << i->second.version << " " << newVersion << endl;	
@@ -290,8 +289,7 @@ void CardsInfo::diffBinaries()
 void CardsInfo::search()
 {
 	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parseCategoryDirectory();
-	cp->parsePackagePkgfileList();
+	cp->parsePkgRepoCategoryDirectory();
 
 	if ( ! cp->search(m_argParser.otherArguments()[0]) ) {
 		cout << "no occurence found" << endl;

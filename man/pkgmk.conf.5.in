@@ -68,39 +68,45 @@ If set to 'no', pkgmk will strip built binaries.
 .br
 Default: 'no'
 .TP
+\fBPKGMK_IGNORE_REPO='STRING'\fP
+Option to disable the generation of the .PKGREPO file. Only set it if you compile your port via the \fB/pkgmk\fP command.
+.br
+Default: 'no'
+.TP
+\fBPKGMK_COMPRESSION_PACKAGE='STRING'\fP
+Option to activate the compression of the package produced.
+.br
+Default: 'no'
+.TP
 \fBPKGMK_COMPRESSION_MODE='STRING'\fP
 Option to select the mode used to compress the packages. Valid strings are gz, bz2 and xz.
 .br
 Default: 'xz'
-.TP
-\fBPKGMK_LOG_DIR='STRING'\fP
-Define the log folder of the build.
-.br
-Default: '/var/log/pkgbuild'
 .TP
 \fBPKGMK_KEEP_SOURCES='STRING'\fP
 If set to 'yes', pkgmk will keep the sources codes of the build. If 'no', they will be delete after a successfull build.
 .br
 Default: 'no'
 .TP
-\fBPKGMK_CLEAN_OLD='STRING'\fP
+\fBPKGMK_CLEAN='STRING'\fP
 If set to 'yes', pkgmk will delete any version of the package before producing the new(s) one(s) after a successfull build.
 .br
 Default: 'yes'
 .TP
-\fBPKGMK_DOWNLOAD_BIN='STRING'\fP
-If set to 'yes', pkgmk will try to download and install the available package from the mirror define in \fI/etc/pkg-get.conf\fP. If the binary is available, it will then be download and the package(s) will not be compiled.
-.br
-Default: 'no'
-.TP
 \fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
-If set, pkgmk will try to split the produced package into groups. Each group is define in this variable. A default function is executed if this same function is not found in the Pkgfile. (EXPERIMENTAL)
+If set, pkgmk will try to split the produced package into groups. Each group is define in this variable. A default function is executed if this same function is not found in the Pkgfile.
 .br
-Default: '(lib devel man doc service)'
+Default: '()' No sub package will be produced except if define in the Pkgfile
+Possible values: '(lib devel man doc service)'
+.TP
+\fBPKGMK_LOCALES=('STRING1' .. 'STRINGN')
+If set, pkgmk will try to produced the specified locales. Each locale is define in this variable.
+.br
+Default: '(fr)'
 .SH SEE ALSO
 pkgmk(8)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
-pkgmk (cards) is Copyright (c)  2013-2014 Thierry Nuttens (c)  2013-2014 NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is Copyright (c)  2013-2015 Thierry Nuttens NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.
