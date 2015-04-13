@@ -23,7 +23,7 @@
 
 include ../Makefile.inc
 
-MANPAGES = pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr pkgmk.conf.5 pkgmk.conf.5.fr
+MANPAGES = cards.8 pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr cards.conf.5 pkgmk.conf.5 pkgmk.conf.5.fr
 
 all: man mantxt
 
