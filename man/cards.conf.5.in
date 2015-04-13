@@ -1,0 +1,80 @@
+
+
+.PU
+.TH cards.conf 5
+.SH "NAME"
+.LP 
+cards.conf - Configuration file for cards
+
+.SH "DESCRIPTION"
+This file, by default
+.IR /etc/cards.conf ,
+is read by cards (see cards(8))
+.LP
+It might look like this:
+.IP
+.nf
+###
+# cards.conf
+
+# root directories
+dir /usr/ports/lxde
+dir /usr/ports/desktop
+dir /usr/ports/console
+dir /usr/ports/base
+
+dir /var/lib/pkg/saravane/desktop|http://downloads.nutyx.org/saravane/x86_64/desktop
+dir /var/lib/pkg/saravane/console|http://downloads.nutyx.org/saravane/x86_64/console
+dir /var/lib/pkg/saravane/base|http://downloads.nutyx.org/saravane/x86_64/base
+
+
+# write a log file
+
+logdir /var/log/pkgbuild
+
+# arch
+
+arch x86_64
+
+# locales
+
+locale fr
+
+# base system
+
+base /usr/ports/base
+.fi
+
+.LP
+There are a few values to be configured: the location where to look
+for the ports, the location of the log file and the location of the 
+base system packages.
+
+.LP
+Every line can contain one configuration option. The format of the lines
+is
+.B <key> <value>.
+The valid keys are
+.B dir
+The value for 
+.B prtdir 
+is a directory, or a directory|an URL
+
+.LP
+The log options are
+.B logfile
+which represent the file path of the logs
+
+.LP
+The order of the dir options is important, as if a port is in multiple
+directories, cards will use the one found first (directories listed
+first have precedence)
+
+.LP
+If you specify an url in after a | symbol, it will used binaries from this url. In our exemple, we
+will used the default mirror from nutyx.org.
+
+.SH "AUTHORS"
+Thierry Nuttens <tnut@nutyx.org>
+.SH "SEE ALSO"
+cards(8), pkgmk(8) pkgadd(8), ports(8)

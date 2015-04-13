@@ -1,0 +1,279 @@
+.\" man page for cards
+.\" 
+.\" .PU
+.TH "cards" "8" "" "" ""
+.SH "NAME"
+.LP 
+cards \- the NuTyX package management tool including pkgutils from CRUX (see http://www.crux.nu) with some extra features
+.SH "SYNOPSIS"
+.B cards command [options] <arguments>
+.br 
+.SH "DESCRIPTION"
+cards which stand for Create Add Remove and Downloads Systemis a package management tool which provides 
+all the basic functionality for a package management system. It can works with the
+local ports tree AND the available binaries from the mirror. It is fully compatible with ports(8) and
+pkgmk(8)/pkgadd(8). It offers the following features:
+
+.PP
+.TP 
+\ \ \ \(bu
+abstract ports installation/update from file system
+
+.TP 
+\ \ \ \(bu
+install/update a list of packages with one command
+
+.TP 
+\ \ \ \(bu
+list dependencies for a list of packages
+
+.TP 
+\ \ \ \(bu
+show information about binaries or ports 
+
+.TP 
+\ \ \ \(bu
+search within the binaries or within the ports
+
+.TP
+\ \ \ \(bu
+able to return to a base system in case of compiling for a bot build to make shure all the dependencies are mentionned.
+.PP 
+
+.SH "SCENARIOS"
+
+
+.B ports
+
+In this scenario, cards basically installing and upgrading packages, using
+the script pkgmk. It deals with the ports. Additionally, you don't have be in the port's
+directory to call cards. cards will search for the respective port
+itself in a list of directories specified in cards.conf. This
+allows you to just install or update a package, without caring where
+it actually is located on your file system.
+
+.B binaries
+
+In another more classical scenario, cards will install, upgrade binaries packages available 
+from the define mirror specified in cards.conf. 
+
+.PP 
+
+cards also offers some features like searching binaries or ports by name,
+showing information about binaries or ports (without installing them of course)
+and can list the dependencies listed in the Pkgfile, and provide a
+complete dependency list for a port. Note that dependencies can be checked if
+they are really existing. A command can be used to list all the packages 
+(or dependencies) per level of compilation.
+
+.PP 
+
+cards have a show configuration mode so you can check how the configuration
+file is. Use the config command for this (see also: COMMAND)
+
+.SH "RETURN VALUE"
+cards returns 0 on success and a non-zero value otherwise (exact
+value -> meaning mapping to be determined...)
+
+.SH "COMMANDS"
+cards uses so called commands, which always have to be the first 
+non-option argument passed. This is very similar to
+.B git(1).
+[command] can be one of the following:
+
+
+.TP 
+.B install [\-\-margs] <package>
+Binaries scenario: install the package. It will download the binary package,
+check for any dependencies, download the dependencies. Onces all the dependencies
+are download. cards will install all the packages in the right order.
+
+.TP 
+.B depcreate [\-\-margs] [\-\-aargs] [\-\-log] <package1> [<package2> ...]
+Ports scenario: compile and install the package and it's dependencies in the listed order including their dependencies.
+Note that outdated packages won't be updated.
+
+.TP 
+.B remove <package>
+All scenarios: remove the <package>
+
+.TP
+.B config
+All scenarios: print the actual configuration of cards. It shows the order of ports and binaries directories,
+the base directory containing all the package which should be keep when a 
+.B cards base -r
+command is given. It shows also the arch defined (i686 or x86_64), the locale which going to be installed with the
+.B cards install
+command, and the defined log directory which will be used by the 
+.B cards depcreate
+and
+.B cards create
+commands.
+
+.TP 
+.B diff [-p]
+Binaries scenario: show differences between installed packages and binaries available on the mirror.
+
+Ports scenario: If option [-p|--ports] is given, it will shows differences between installed packages
+and ports in the ports tree.
+
+.TP 
+.B search <expr>
+Search in the binaries for 
+.B expr
+in their name and description
+
+.TP 
+.B files <package>
+Print all the files belonging to the <package> 
+
+.TP 
+.B query <pattern>
+Search in all installed package for files matching the
+.B pattern
+as file name in the database.
+
+.TP 
+.B info [-p] [-b] <package>
+if passed with -b option, print available info about the binary
+.B package
+if passed with -p option, print available info about the port
+.B package
+if no option is passed, print available info about the installed
+.B package
+
+.TP 
+.B depends <package>
+Ports scenario: print a recursive list of dependencies to install the package passed
+as argument. if option -i is passed, it shows all the dependencies, included the installed ones.
+
+.TP 
+.B deptree <package>
+print a tree of the dependencies of the package
+.B package. 
+
+.TP 
+.B list [\-p|\-b]
+List installed packages. If option -p is passed, it shows a list of ports available in the ports tree.
+It's basically the same as
+.B ports \-l
+but looks in all directories specified in
+.B /etc/cards.conf.
+If option -b is passed, it shows a list of binaries available in the miror server.
+
+.TP
+.B sync
+Binaries scenario: synchronize local and remote metadatas from the mirror defined in
+.B /etc/cards.conf.
+
+.TP
+.B level
+Ports scenario: print all the ports available in the order of compilation (per level)
+
+.TP
+.B create <package>
+Bot scenario: only used in the bot server. It goes back to a base system, install all the dependencies 
+from the founded binaries and then compile and installed the final package.
+
+.TP
+.B base -r
+All scenarios: return to a minimalist base system. This command should be only used when you compile your own package or it is a bot server.
+It actually check whats are the packages found in the 'base directories' define in the
+.B /etc/cards.conf
+file. If no directory are defined, this command will abort.
+
+.SH "OPTIONS"
+
+.TP
+.B -f
+Force install of the package in
+.B cards install
+command
+
+.TP
+.B -i
+Shows installed package in
+.B cards depends
+command
+
+.TP
+.B -n
+dry mode in 
+.B cards create, cards base
+commands. It does not make the action but only shows what will happens
+
+.TP
+.B -a
+remove all the sub packages as well if they exists in
+.B cards remove
+command
+
+.TP
+.B -b
+print info about the binary in
+.B cards info
+command. List available binaries in
+.B cards list
+command.
+
+.TP
+.B -p
+print info about the port in
+.B cards info
+command. List available ports in
+.B cards list
+command.
+
+.TP
+.B -I
+ignore error and list the level anyway in 
+.B cards level
+command.
+
+.TP
+.B -u
+update the binary package in
+.B cards install
+command.
+
+.SH "CONFIGURATION"
+.TP 
+See man cards.conf(5)
+
+.SH "EXAMPLES"
+
+.B Binaries scenario:
+.TP
+.B cards install irssi
+download the binary from the mirror, check for dependencies,
+
+.B Ports scenario:
+.TP 
+.B cards install irssi
+download the binary from the mirror, check for dependencies, downloads the dependencies, install them and then install irssi, with one simple command
+
+.TP
+.B cards install -u openssl
+download the binary from the mirror, upgrade openssl
+
+
+.TP
+.B cards search browser
+Search in the metadata packages containing 'browser' in they name or description.
+
+.SH
+
+.B Ports scenario:
+.TP 
+.B cards depcreate mplayer
+downloads the sources, compile and install all the dependencies of mplayer and mplayer.
+
+.TP 
+.B cards info -p kdelibs
+show info about kdelibs port.
+
+
+.SH "AUTHORS"
+Thierry Nuttens <tnut@nutyx.org>
+.SH "SEE ALSO"
+cards.conf(5), pkgmk(8), pkgadd(8), ports(8)
