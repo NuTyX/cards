@@ -46,7 +46,7 @@ able to return to a base system in case of compiling for a bot build to make shu
 .B ports
 
 In this scenario, cards basically installing and upgrading packages, using
-the script pkgmk. It deals with the ports. Additionally, you don't have be in the port's
+the script pkgmk. It deals with the ports. Additionally, you don't have to be in the port's
 directory to call cards. cards will search for the respective port
 itself in a list of directories specified in cards.conf. This
 allows you to just install or update a package, without caring where
@@ -55,7 +55,12 @@ it actually is located on your file system.
 .B binaries
 
 In another more classical scenario, cards will install, upgrade binaries packages available 
-from the define mirror specified in cards.conf. 
+from the define mirror specified in cards.conf. In this scenario, cards deals with packages
+and subpackages. For exemple the glibc package is separate in glibc, glibc.devel, glibc.man, glibc.fr, and so on.
+For this reason, it is
+.B NOT
+recommended to mixte both scenarios unless you knows exactly what you are doing and are able to
+interpret the errors messages when compiling your ports with binaries dependencies.
 
 .PP 
 
@@ -182,6 +187,15 @@ It actually check whats are the packages found in the 'base directories' define 
 .B /etc/cards.conf
 file. If no directory are defined, this command will abort.
 
+.TP
+.B purge
+All scenarios: Cleanup all the archives of the binaries found in the folders synchronised with any mirror. By default, folders are:
+.B /var/lib/pkg/saravane/base
+,
+.B /var/lib/pkg/saravane/console
+and
+.B /var/lib/pkg/saravane/desktop
+
 .SH "OPTIONS"
 
 .TP
@@ -222,6 +236,8 @@ print info about the port in
 .B cards info
 command. List available ports in
 .B cards list
+command. List the difference of versions between installed packages and available one in the ports in
+.B cards diff
 command.
 
 .TP

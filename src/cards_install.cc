@@ -592,12 +592,15 @@ void CardsInstall::create()
 		write( fdlog, timestamp.c_str(), timestamp.length());
 		write( fdlog, "\n", 1 );
 	}
-
-	// Let's install them
+	if ( ! checkFileExist( pkgdir + "/.PKGREPO")) {
+		m_actualError = CANNOT_FIND_FILE;
+		treatErrors(pkgdir+ "/.PKGREPO");
+	}
+	// Get the list of files
 	m_configParser->parseBasePackageList(m_packageName);
 
 	m_dependenciesList.clear();
-	// Let's install them now
+	// Let's install the found binaries now
 	std::set<string> listOfPackages = m_configParser->getListOfPackagesFromDirectory(pkgdir);
 	for (std::set<string>::const_iterator i = listOfPackages.begin(); i != listOfPackages.end();i++) {
 		if ( ! checkPackageNameExist(*i) ) {

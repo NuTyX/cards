@@ -116,11 +116,7 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_FILES) {
 			CardsInfo CFList(cardsArgPars);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
-			} else {
-				CFList.listOfFiles();
-				return EXIT_SUCCESS;
-			}
+			CFList.listOfFiles();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
 			CardsSync CS(cardsArgPars);

@@ -200,6 +200,9 @@ set<string> ConfigParser::getListOfPackagesFromDirectory(const string& path)
 				continue;
 			// If we are dealing with the correct path ...
 			for (std::vector<PortFilesList>::iterator p = j->portFilesList.begin(); p != j ->portFilesList.end();++p) {
+#ifndef NDEBUG
+				cerr << p->md5SUM << "|" << p->name << "|" << p->arch   << endl;
+#endif
 				if ( ( p->arch == "any" ) || ( p->arch == m_config.arch) )
 					listOfPackages.insert(p->name);
 			}
@@ -234,6 +237,9 @@ void ConfigParser::parseBasePackageList()
 			if ( infos.size() > 2 ) {
 				if ( infos[2].size() > 0 ) {
 					portFilesList.arch = infos[2];
+				} else  {
+				// If there are only 2 fields then it's not a binary go on with next one
+					continue;
 				}
 			}
 #ifndef NDEBUG
@@ -268,6 +274,7 @@ void ConfigParser::parseBasePackageList()
 void ConfigParser::parseBasePackageList(const std::string& packageName)
 {
 	bool found=false;
+	vector<string> infos;
 	// For each category activate in cards.conf
 	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
 #ifndef NDEBUG
@@ -287,14 +294,22 @@ void ConfigParser::parseBasePackageList(const std::string& packageName)
 						continue;
 					}
 					if ( input[10] != '#' ) { // It's not the first line, then it can be one of our files
-						vector<string> infos;
-						split( input, '#', infos, 0,true);
+#ifndef NDEBUG
+						cerr << "input: " << input << endl;
+#endif
+						infos.clear();
+						split( input, '#', infos, 0, false);
+#ifndef NDEBUG
+						cerr << "Number of fields: " << infos.size()<< endl;
+#endif
 						portFilesList.md5SUM = infos[0];
 						portFilesList.name = infos[1];
 						if ( infos.size() > 2 ) {
 							if ( infos[2].size() > 0 ) {
 								portFilesList.arch = infos[2];
 							}
+						} else {
+								portFilesList.arch = "";
 						}
 #ifndef NDEBUG
 						cerr << m_BasePackageInfo_i->basePackageName << ": "<< portFilesList.md5SUM << " " << portFilesList.name << " " << portFilesList.arch << endl;

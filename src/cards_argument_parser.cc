@@ -72,8 +72,8 @@ It is mainly used for the packager.",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_FILES, "files",
-		"\tlist the file(s) of the package.",
-"If -b is passed as optional argument, it will be the files list of a binary available in the depot",
+		"\tlist the file(s) of the installed <package>.",
+"",
 		ArgParser::EQ, 1 , "<package>");
 
 	addCommand(CMD_SYNC, "sync",
@@ -193,9 +193,6 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		'I',
 		"\tIgnore errors and list the level anyway.");
 
-
-	addOption(CMD_FILES, OPT_BINARIES, false);
-	
 	addOption(CMD_LIST, OPT_BINARIES, false);
 	addOption(CMD_LIST, OPT_PORTS, false);
 	addOption(CMD_LIST, OPT_OUTOFDATE, false);

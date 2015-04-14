@@ -308,6 +308,8 @@ int CardsDepends::level()
 	Config config;
 	ConfigParser::parseConfig("/etc/cards.conf", config);
   for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+		if ( i->Url.size() > 0)
+			continue;
 		DirUrl DU  = *i ;
 		string prtDir = DU.Dir;
 		if ( (findDir(filesList,prtDir.c_str())) != 0) {
