@@ -1,7 +1,7 @@
 .\" man page for cards
 .\" 
 .\" .PU
-.TH "cards" "8" "" "" ""
+.TH "cards #VERSION#" "8" "" "" ""
 .SH "NAME"
 .LP 
 cards \- the NuTyX package management tool including pkgutils from CRUX (see http://www.crux.nu) with some extra features
@@ -254,7 +254,7 @@ command.
 
 .SH "CONFIGURATION"
 .TP 
-See man cards.conf(5)
+See man cards.conf(5) and pkgmk.conf(5)
 
 .SH "EXAMPLES"
 

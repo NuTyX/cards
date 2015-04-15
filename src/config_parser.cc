@@ -36,23 +36,21 @@ void ConfigParser::parsePkgRepoCategoryDirectory()
 {
 	parseConfig(m_configFileName);
 	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
-		if ( i->Url.size() == 0 )
-			continue;
 		PortsDirectory portsDirectory;
 		portsDirectory.Dir = i->Dir;
 		portsDirectory.Url = i->Url;
 		BasePackageInfo basePkgInfo;
 		string categoryPkgRepoFile = i->Dir + "/.PKGREPO" ;
 		if ( ! checkFileExist(categoryPkgRepoFile)) {
-			FileDownload PkgRepoFile(i->Url + "/.PKGREPO",
-				i->Dir,
-				".PKGREPO", false);
-			PkgRepoFile.downloadFile();
+			if ( i->Url.size() > 0 ) {
+				cout << "You should used " << YELLOW << "cards sync" << NORMAL << " for " << i->Dir << endl;
+			}
+			continue;
 		}
 		vector<string> PkgRepoFileContent;
 
 		if ( parseFile(PkgRepoFileContent,categoryPkgRepoFile.c_str()) != 0) {
-			cerr << "cannot read file PKGREPO" << endl;
+			cerr << "cannot read file .PKGREPO" << endl;
 			continue;
 		}
 

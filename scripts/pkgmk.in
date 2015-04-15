@@ -60,11 +60,17 @@ get_basename() {
 	echo $FILE
 }
 check_pkgfile() {
+	local NAME_TEST
 	if [ "${name}" == "" ]; then
 		error "Variable 'name' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	elif [ "`type -t build`" != "function" ]; then
 		error "Function 'build' not specified in $PKGMK_PKGFILE."
+		exit $E_PKGFILE
+	fi
+	NAME_TEST=`echo "${name}" | sed 's@^[a-z][a-z0-9_-]*$@@g'`
+	if [ "$NAME_TEST" != "" ]; then
+		error "Variable 'name' contains illegal characters."
 		exit $E_PKGFILE
 	fi
 }
@@ -1097,7 +1103,9 @@ print_help() {
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
 	echo "  -utd, --up-to-date          do not build, only check if package is up to date"
 	echo "  -ur,  --update-repo         do not build, only update the $PKGMK_REPO file"
+	echo "  -uc,  --update-category     do not build, only update the $PKGMK_REPO file of the category means from the parent directory"
 	echo "  -uf,  --update-footprint    update footprint using result from last build"
+	echo "  -ic,  --ignore-category     build packages without update the $PKGMK_REPO file of the category means from the parent directory"
 	echo "  -if,  --ignore-footprint    build packages without checking footprint"
 	echo "  -in,  --ignore-new          build packages, ignore new files in a footprint missmatch"
 	echo "  -um,  --update-md5sum       update md5sum"
@@ -1145,6 +1153,10 @@ parse_options() {
 				PKGMK_UPDATE_MD5SUM="yes" ;;
 			-im|--ignore-md5sum)
 				PKGMK_IGNORE_MD5SUM="yes" ;;
+			-ic|--ignore-category)
+				PKGMK_IGNORE_CATEGORY="yes" ;;
+			-ir|--ignore-repo)
+				PKGMK_IGNORE_REPO="yes" ;;
 			-cm|--check-md5sum)
 				PKGMK_CHECK_MD5SUM="yes" ;;
 			-ns|--no-strip)
@@ -1424,6 +1436,9 @@ main() {
 	if [ "$PKGMK_IGNORE_REPO" != "yes" ] && [ "$PKGMK_CLEAN" != "yes" ]; then
 		update_repo
 	fi
+	if [ "$PKGMK_IGNORE_CATEGORY" != "yes" ]; then
+		update_category_repo
+	fi
 	exit 0
 }
 
@@ -1465,6 +1480,7 @@ PKGMK_IGNORE_FOOTPRINT="yes"
 PKGMK_IGNORE_NEW="yes"
 PKGMK_IGNORE_MD5SUM="yes"
 PKGMK_IGNORE_REPO="no"
+PKGMK_IGNORE_CATEGORY="yes"
 
 PKGMK_NO_STRIP="no"
 

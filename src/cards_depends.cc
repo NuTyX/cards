@@ -218,8 +218,8 @@ void CardsDepends::showDependencies()
 {
 	Pkginfo packagesInfo;
 	packagesInfo.getNumberOfPackages();
-	depends();
 	if (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) {
+		depends();
 		for (std::vector<string>::iterator it = m_dependenciesList.begin();it != m_dependenciesList.end();it++) {
 			cout << *it << endl;
 		}

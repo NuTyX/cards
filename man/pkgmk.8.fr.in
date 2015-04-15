@@ -39,6 +39,9 @@ Ne construit pas, vérifie uniquement si le paquet est à jour.
 .B "\-uc, \-\-update\-category"
 Met à jour le fichier .PKGREPO de la categorie, cad le fichier .PKGREPO qui se trouve dans le dossier parent.
 .TP
+.B "\-ic, \-\-ignore\-category"
+Construit le paquet sans mettre à jour le fichier .PKGREPO de la categorie, cad le fichier .PKGREPO qui se trouve dans le dossier parent.
+.TP
 .B "\-ur, \-\-update\-repo"
 Met à jour le fichier .PKGREPO du paquet.
 .TP
