@@ -301,19 +301,33 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 	if (m_packageNamesList.empty() ) {
 		getListOfPackageNames (m_root);
 	}
+	bool vf = false;
+	bool rf = false;
 	for (set<string>::iterator i = m_packageNamesList.begin();i != m_packageNamesList.end();++i) {
 		pkginfo_t info;
 		const string metaFile = m_root + PKG_DB_DIR + *i + '/' + PKG_META;
 		itemList * contentFile = initItemList();
 		readFile(contentFile,metaFile.c_str());
+		vf = false;
+		rf = false;
 		for (unsigned int li=0; li < contentFile->count ; ++li) {
 			if ( contentFile->items[li][0] == 'V' ) {
 				string version = contentFile->items[li];
 				info.version = version.substr(1);
+				vf = true;
+			}
+			if ( contentFile->items[li][0] == 'r' ) {
+				string release = contentFile->items[li];
+				info.release = release.substr(1);
+				rf = true;
+			}
+			if ( vf && rf ) {
 				m_listOfInstPackages[*i] = info;
 				break;
 			}
 		}
+		if ( ! rf )
+			m_listOfInstPackages[*i] = info;
 		freeItemList(contentFile);
 	}
 }

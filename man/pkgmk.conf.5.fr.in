@@ -29,11 +29,6 @@ Défini le dossier pour le stockage des archives sources.
 .br
 Défaut: dossier de Pkgfile.
 .TP
-\fBPKGMK_PACKAGE_DIR='STRING'\fR
-Défini le dossier de destination du paquet.
-.br
-Défaut: dossier /srv/NuTyX/release.
-.TP
 \fBPKGMK_WORK_DIR='STRING'\fP
 Défini le dossier pour la construction des paquets.
 .br

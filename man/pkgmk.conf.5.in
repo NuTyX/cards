@@ -34,11 +34,6 @@ Set directory for downloaded source archives.
 .br
 Default: directory of Pkgfile.
 .TP
-\fBPKGMK_PACKAGE_DIR='STRING'\fR
-Set directory for built packages.
-.br
-Default: directory of Pkgfile.
-.TP
 \fBPKGMK_WORK_DIR='STRING'\fP
 Set directory for building packages.
 .br

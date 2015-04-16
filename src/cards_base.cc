@@ -41,9 +41,6 @@ CardsBase::CardsBase(const CardsArgumentParser& argParser)
 }
 void CardsBase::run(int argc, char** argv)
 {
-	if (m_argParser.isSet(CardsArgumentParser::OPT_BASE_HELP)) {
-		printHelp();
-	} else {
 		Config config;
 		ConfigParser::parseConfig("/etc/cards.conf", config);
 
@@ -127,7 +124,6 @@ void CardsBase::run(int argc, char** argv)
 				}
 			}
 		}
-	}
 }
 void CardsBase::printHelp() const
 {

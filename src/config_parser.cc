@@ -74,6 +74,7 @@ void ConfigParser::parsePkgRepoCategoryDirectory()
 			if ( infos.size() > 1 ) {
 				if ( infos[1].size() > 0 ) {
 					basePkgInfo.s_buildDate = infos[1];
+					basePkgInfo.buildDate = strtoul(infos[1].c_str(),NULL,0);
 				}
 			}
 			if ( infos.size() > 2 ) {
@@ -545,9 +546,13 @@ bool ConfigParser::getBinaryPackageInfo(const string& packageName)
 				found = true;
 				cout << "Name           : " << packageName << endl
 					<< "Description    : " << j->description << endl
+					<< "URL            : " << j->URL << endl
 					<< "Version        : " << j->version << endl
+					<< "Release        : " << j->release << endl
+					<< "Maintainer     : " << j->maintainer << endl
+					<< "Packager       : " << j->packager << endl
 					<< "Build date     : " << c_time_s
-					<< "Url            : " << i->Url << endl
+					<< "Binary Url     : " << i->Url << endl
 					<< "Local Directory: " << i->Dir << endl;
 				break;
 			}

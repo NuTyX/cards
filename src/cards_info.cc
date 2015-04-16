@@ -85,7 +85,11 @@ void CardsInfo::listInstalled()
 	buildDatabaseWithNameVersion();
 
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-		cout << i->first << " " << i->second.version << endl;
+		cout << i->first << " " << i->second.version;
+		if (i->second.release.size()>0) {
+			cout << "-" << i->second.release;
+		}
+		cout << endl;
 	}
 	cout << endl << "Number of installed packages: " <<  m_packageNamesList.size() << endl << endl;
 }

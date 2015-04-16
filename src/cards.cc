@@ -41,6 +41,51 @@ int main(int argc, char** argv)
 	try {
 		CardsArgumentParser cardsArgPars;
 		cardsArgPars.parse(argc, argv);
+		if (cardsArgPars.command() == CardsArgumentParser::CMD_HELP) {
+			cout << "Usage: " << BLUE << cardsArgPars.appName()  << " command " << NORMAL << "[options]"<< endl;
+
+			cout << "where possible " << BLUE << "command" << NORMAL<< " are:" << endl;
+
+			cout << GREEN << "\nINFORMATION" << NORMAL << endl;
+			cout << BLUE << "  help" << NORMAL << "                       show this help" << endl;
+			cout << BLUE << "  list" << NORMAL << " [-b][-p]              show a list of installed packages" << endl
+				<< "                             available binaries" << endl
+				<< "                             available ports" << endl;
+
+			cout << BLUE << "  info" << NORMAL << " [-b][-p] <package>    print info about install package" << endl
+				<< "                             available binaries" << endl
+				<< "                             available ports" << endl;
+			cout << BLUE << "  config" << NORMAL << "                     show the configuration of your " <<  cardsArgPars.appName() << endl;
+			cout << BLUE << "  level" << NORMAL << "                      show all the ports founds. The list is showned by order \
+of compilation" << endl;
+			cout << GREEN << "\nPORTS SPECIFIC SCENARIO" << NORMAL << endl;
+			cout << BLUE << "  depends" << NORMAL << " [i] <port>         show dependencies for the port in compilation order." << endl
+				<< "                             If -i it will shows the installed dependencies as well." << endl;
+			cout << BLUE << "  deptree" << NORMAL << " <port>             show dependencies in a tree" << endl;
+			cout << BLUE << "  depcreate" << NORMAL << " <port>           compile and install the port and its dependencies." << endl;
+			cout << BLUE << "  create" << NORMAL << " <port>              install all the dependencies from binaries and then compile the port." << endl;
+
+			cout << GREEN << "\nDIFFERENCES / CHECK FOR UPDATES" << NORMAL << endl;
+			cout << BLUE << "  diff" << NORMAL << " [-p]                  list outdated packages" << endl
+				<< "                             list outdated ports" << endl;
+			cout << GREEN << "\nSEARCHING" << NORMAL << endl;
+			cout << BLUE << "  search" << NORMAL << " <expr>              show port names or description containing 'expr'" << endl;
+			cout << BLUE << "  query" << NORMAL << "  <file>              list owner of file(s) matching the query" << endl;
+			cout << BLUE << "  files" << NORMAL << "  <package>           list the file(s) owned by the <package>" << endl;
+			cout << "\nSYNCHRONISATION" << NORMAL << endl;
+			cout << BLUE << "  sync" << NORMAL << "                       synchronize the local and remote meta datas" << endl;
+			cout << GREEN << "\nINSTALL, UPDATE and REMOVAL" << NORMAL << endl;
+			cout << BLUE << "  install" << NORMAL << " [-u][-f] <package> install the binary found on the mirror." << endl
+				<< "                             If -u it will upgrade the installed package" << endl
+				<< "                             If -f it will force the installation in case of files conflicts." << endl;
+			cout << BLUE << "  remove" << NORMAL << " [-a] <package>      remove the installed package." << endl
+				<< "                             If -a it will remove the sub-package as well." << endl;
+			cout << GREEN << "\nBASE SYSTEM" << NORMAL << endl;
+			cout << BLUE << "  base" << NORMAL << " -r                    return to a base system." << endl
+				<< "                             You need to have a valid 'base' directory" << endl
+				<< "                             define in /etc/cards.conf otherwise it will fails." << endl;
+			return EXIT_SUCCESS;
+		}
 		if (cardsArgPars.command() == CardsArgumentParser::CMD_CONFIG) {
 			Config config;
 			ConfigParser::parseConfig("/etc/cards.conf", config);

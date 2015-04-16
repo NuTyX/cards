@@ -20,6 +20,7 @@
 
 #include "cards_argument_parser.h"
 
+ArgParser::APCmd CardsArgumentParser::CMD_HELP;
 ArgParser::APCmd CardsArgumentParser::CMD_CONFIG;
 ArgParser::APCmd CardsArgumentParser::CMD_BASE;
 ArgParser::APCmd CardsArgumentParser::CMD_FILES;
@@ -38,7 +39,6 @@ ArgParser::APCmd CardsArgumentParser::CMD_DEPTREE;
 ArgParser::APCmd CardsArgumentParser::CMD_SEARCH;
 ArgParser::APCmd CardsArgumentParser::CMD_PURGE;
 
-ArgParser::APOpt CardsArgumentParser::OPT_BASE_HELP;
 
 ArgParser::APOpt CardsArgumentParser::OPT_FORCE;
 ArgParser::APOpt CardsArgumentParser::OPT_UPDATE;
@@ -59,6 +59,11 @@ ArgParser::APOpt CardsArgumentParser::OPT_OUTOFDATE;
 
 CardsArgumentParser::CardsArgumentParser()
 {
+	addCommand(CMD_HELP, "help",
+		"\tshows help about cards",
+"You can also check 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.conf'",
+	ArgParser::NONE, 0 , "");
+
 	addCommand(CMD_CONFIG, "config",
 		"\tprint info about cards configuration.",
 "It can show the defined Directories where alls the packages are located. The locale which are going to be installed, the architecture of your machine, the base system directory and the logfile directory",
@@ -169,10 +174,6 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		'p',
 		"\tAvailable ports.");
 
-	OPT_BASE_HELP.init("info",
-		'H',
-		"\tGet some more info on the command.");
-
 	OPT_DRY.init("dry",
 		'n',
 		"\t\tNot doing the action. Only show (if possible) what will be done.");
@@ -209,7 +210,6 @@ If -f is passed as optional argument, it will force the install means overwrite 
 
 	addOption(CMD_BASE, OPT_DRY,false);
 	addOption(CMD_BASE, OPT_REMOVE,false);
-	addOption(CMD_BASE, OPT_BASE_HELP,false);
 
 	addOption(CMD_CREATE, OPT_DRY,false);
 	addOption(CMD_CREATE, OPT_REMOVE,true);
