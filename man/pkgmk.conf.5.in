@@ -89,7 +89,7 @@ If set to 'yes', pkgmk will keep the sources codes of the build. If 'no', they w
 Default: 'no'
 .TP
 \fBPKGMK_CLEAN='STRING'\fP
-If set to 'yes', pkgmk will delete any version of the package before producing the new(s) one(s) after a successfull build.
+If set to 'yes', pkgmk will delete the package(s) after a successfull build and a successful install of them.
 .br
 Default: 'yes'
 .TP

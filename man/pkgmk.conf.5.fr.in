@@ -84,7 +84,7 @@ Si défini comme 'yes', pkgmk garde les sources du paquet dans tous les cas, si 
 Défaut: 'no'
 .TP
 \fBPKGMK_CLEAN='STRING'\fP
-Si défini comme 'yes', pkgmk supprime les anciens paquets avant de produire le(s) nouveau(x) et ce après une construction réussie.
+Si défini comme 'yes', pkgmk supprime le(s) paquet(s) produit(s) après une construction ET une installation réussie de ce(s) dernier(s).
 .br
 Défaut: 'yes'
 .TP

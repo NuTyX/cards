@@ -254,13 +254,13 @@ void ConfigParser::parseBasePackageList()
 			vector<string> infos;
 			split( input, '#', infos, 0,true);
 			if (m_BasePackageInfo_i->s_buildDate != infos[0] ) {
-				cerr << m_BasePackageInfo_i->s_buildDate << " != " << infos[0] << endl;
+				cerr << m_BasePackageInfo_i->basePackageName << ": " << m_BasePackageInfo_i->s_buildDate << " != " << infos[0] << endl;
 			}
 			if (m_BasePackageInfo_i->extention != infos[1]) {
-				cerr << m_BasePackageInfo_i->extention << " != " << infos[1] << endl;
+				cerr << m_BasePackageInfo_i->basePackageName << ": " << m_BasePackageInfo_i->extention << " != " << infos[1] << endl;
 			}
 			if (m_BasePackageInfo_i->version != infos[2] ) {
-				cerr << m_BasePackageInfo_i->version << " != " << infos[2] << endl;
+				cerr << m_BasePackageInfo_i->basePackageName << ": " << m_BasePackageInfo_i->version << " != " << infos[2] << endl;
 			}
 #ifndef NDEBUG
 			cerr << m_BasePackageInfo_i->basePackageName << ": " << m_BasePackageInfo_i->buildDate << " " << m_BasePackageInfo_i->extention << endl;
@@ -661,8 +661,14 @@ bool ConfigParser::checkBinaryExist(const string& packageName)
 					break;
 	}
 	if (baseBinaryfound) {
-		if ( ! checkFileExist ( m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO"))
+		if ( ! checkFileExist ( m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO")) {
 			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
+		}
+		string pkgRepoFile= m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO";
+		string pkgReporMD5sum = m_BasePackageInfo_i->md5SUM;
+		if ( ! checkMD5sum( pkgRepoFile.c_str(), pkgReporMD5sum.c_str())) {
+			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
+		}
 		parseBasePackageList();
 		for ( m_PortFilesList_i = m_portFilesList.begin();m_PortFilesList_i != m_portFilesList.end();++m_PortFilesList_i) {
 			if (m_PortFilesList_i->name == packageName) {

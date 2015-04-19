@@ -43,7 +43,7 @@ CardsInstall::CardsInstall (const CardsArgumentParser& argParser,
 	}
 	for (std::vector<string>::const_iterator it = listOfPackages.begin(); it != listOfPackages.end();it++) {
 		m_packageName = basename(const_cast<char*>(it->c_str()));
-		create();
+		createBinaries();
 	}
 }
 void CardsInstall::run(int argc, char** argv)
@@ -473,11 +473,14 @@ void CardsInstall::install(const vector<string>& dependenciesList)
 	// Retrieving info about all the packages
 	buildDatabaseWithDetailsInfos(false);
 	m_configParser = new ConfigParser("/etc/cards.conf");
-	m_configParser->parseCategoryDirectory();
-	m_configParser->parseBasePackageList();
+	m_configParser->parsePkgRepoCategoryDirectory();
 	std::set<string> listOfPackages;
-
+	string packageName;
 	for (std::vector<string>::const_iterator it = dependenciesList.begin(); it != dependenciesList.end();it++) {
+		packageName = basename(const_cast<char*>(it->c_str()));
+		if ( packageName == m_argParser.otherArguments()[0])
+			break;
+		m_configParser->parseBasePackageList(packageName);
 		listOfPackages = m_configParser->getListOfPackagesFromDirectory(*it);
 		for (std::set<string>::const_iterator i = listOfPackages.begin(); i != listOfPackages.end();i++) {
 			if ( ! checkPackageNameExist(*i) ) {
@@ -493,11 +496,18 @@ void CardsInstall::install(const vector<string>& dependenciesList)
 	addPackagesList();
 	
 }
-void CardsInstall::create()
+void CardsInstall::createBinariesOf(const string& packageName)
+{
+	m_packageName = packageName;
+	createBinaries();
+}
+void CardsInstall::createBinaries()
 {
 	ConfigParser::parseConfig("/etc/cards.conf", m_config);
 	m_configParser = new ConfigParser("/etc/cards.conf");
+	m_configParser->parsePkgRepoCategoryDirectory();
 	m_configParser->parseCategoryDirectory();
+	cout << "create of " << m_packageName << endl;
 	string pkgdir = m_configParser->getPortDir(m_packageName);
 	if (pkgdir == "" ) {
 		m_actualError = PACKAGE_NOT_FOUND;

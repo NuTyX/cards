@@ -172,11 +172,12 @@ Binaries scenario: synchronize local and remote metadatas from the mirror define
 .B /etc/cards.conf.
 
 .TP
-.B level
-Ports scenario: print all the ports available in the order of compilation (per level)
+.B level [-I]
+Ports scenario: print all the ports available in the order of compilation (per level).
+Use -I if you have WARNING about <dependencie> from <port> NOT FOUND ... or fix the prob if you can.
 
 .TP
-.B create <package>
+.B create -r <package>
 Bot scenario: only used in the bot server. It goes back to a base system, install all the dependencies 
 from the founded binaries and then compile and installed the final package.
 

@@ -56,8 +56,9 @@ int main(int argc, char** argv)
 				<< "                             available binaries" << endl
 				<< "                             available ports" << endl;
 			cout << BLUE << "  config" << NORMAL << "                     show the configuration of your " <<  cardsArgPars.appName() << endl;
-			cout << BLUE << "  level" << NORMAL << "                      show all the ports founds. The list is showned by order \
-of compilation" << endl;
+			cout << BLUE << "  level [-I]" << NORMAL << "                 show all the ports founds. The list is showned by order \
+of compilation" << endl
+				<< "                             If -I it will ignore the WARNING about NOT FOUND <dependencies> from <port>" << endl;
 			cout << GREEN << "\nPORTS SPECIFIC SCENARIO" << NORMAL << endl;
 			cout << BLUE << "  depends" << NORMAL << " [i] <port>         show dependencies for the port in compilation order." << endl
 				<< "                             If -i it will shows the installed dependencies as well." << endl;
@@ -65,14 +66,15 @@ of compilation" << endl;
 			cout << BLUE << "  depcreate" << NORMAL << " <port>           compile and install the port and its dependencies." << endl;
 			cout << BLUE << "  create" << NORMAL << " <port>              install all the dependencies from binaries and then compile the port." << endl;
 
-			cout << GREEN << "\nDIFFERENCES / CHECK FOR UPDATES" << NORMAL << endl;
+			cout << GREEN << "\nDIFFERENCES / CHECK FOR UPDATES / CLEANUP" << NORMAL << endl;
 			cout << BLUE << "  diff" << NORMAL << " [-p]                  list outdated packages" << endl
 				<< "                             list outdated ports" << endl;
+			cout << BLUE << "  purge" << NORMAL << "                      cleanup downloaded binaries in cache." << endl;
 			cout << GREEN << "\nSEARCHING" << NORMAL << endl;
 			cout << BLUE << "  search" << NORMAL << " <expr>              show port names or description containing 'expr'" << endl;
 			cout << BLUE << "  query" << NORMAL << "  <file>              list owner of file(s) matching the query" << endl;
 			cout << BLUE << "  files" << NORMAL << "  <package>           list the file(s) owned by the <package>" << endl;
-			cout << "\nSYNCHRONISATION" << NORMAL << endl;
+			cout << GREEN << "\nSYNCHRONISATION" << NORMAL << endl;
 			cout << BLUE << "  sync" << NORMAL << "                       synchronize the local and remote meta datas" << endl;
 			cout << GREEN << "\nINSTALL, UPDATE and REMOVAL" << NORMAL << endl;
 			cout << BLUE << "  install" << NORMAL << " [-u][-f] <package> install the binary found on the mirror." << endl
@@ -137,14 +139,14 @@ of compilation" << endl;
 				CardsBase CB(cardsArgPars);
 				CB.run(argc, argv);
 			}
-			// get the list of the dependencies
+			// get the list of the dependencies"
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			vector<string> listOfDeps = CD.getDependencies();
-			// install all the dependencies
 			CardsInstall CI(cardsArgPars,cardsArgPars.otherArguments()[0]);
-			CI.install(listOfDeps);
-			// compilation of the final port
-			CI.create();
+			if (listOfDeps.size()>1)
+				CI.install(listOfDeps);
+			// compilation of the final port"
+			CI.createBinariesOf(cardsArgPars.otherArguments()[0]);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_BASE) {
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&

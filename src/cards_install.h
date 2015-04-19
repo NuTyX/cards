@@ -45,7 +45,7 @@ public:
 	void update();
 	void install();
 	void install(const vector<string>& dependenciesList);
-	void create();
+	void createBinariesOf(const string& packageName);
 	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;
 	
@@ -62,6 +62,7 @@ private:
 
 	void getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const;
 
+	void createBinaries();
 	void getSignatures();
 	void generateDependencies();
 	bool getPackageFileName();
