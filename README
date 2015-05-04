@@ -1,13 +1,13 @@
 
               cards - Package Management Utilities for NuTyX
-              based on the development of the tool pkgutils
+              a fork of the tool pkgutils and prt-get
 
                http://www.fukt.bth.se/~per/pkgutils/
 
 
 Description
 -----------
-cards is a set of utilities (xxx-add, xxx-rm, xxx-info, xxx-mk and xxx-rejmerge),
+cards is a set of utilities (pkgadd, pkgrm, pkginfo, pkgmk and cards),
 which are used for managing software packages in Linux. It was originally developed for
 and used by the CRUX distribution (http://crux.nu). This is a fork of this work for the 
 NuTyX distribution including the handling of the binaries
@@ -31,18 +31,15 @@ or
 $ make DESTDIR=/some/other/path install
 
 
-Converting the database
------------------------
+ 4. To get a quick overview
 
-To make shure cards find the information about the packages, it's necessary to convert the DB
-
-$ pkginfo -c
+$ cards help
 
 Copyright
 ---------
 pkgutils is Copyright (c) 2000-2005 Per Liden and
 Copyright (c) 2006-2013 CRUX team (http://crux.nu)
-Copyright (c) 2013 NuTyX team (http://nutyx.org).
+Copyright (c) 2013-2015 NuTyX team (http://nutyx.org).
 
 cards is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.
