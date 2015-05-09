@@ -43,11 +43,11 @@ Do not build, only print the version of the package.
 .B "\-utd, \-\-up\-to\-date"
 Do not build, only check if the package is up to date.
 .TP
-.B "\-uc, \-\-update\-category"
-Do not build, only update the .PKGREPO file of the category located in the parent directory.
+.B "\-uc, \-\-update\-collection"
+Do not build, only update the .PKGREPO file of the collection located in the parent directory.
 .TP
-.B "\-ic, \-\-ignore\-category
-Build package without update the .PKGREPO file of the category located in the parent directory.
+.B "\-ic, \-\-ignore\-collection"
+Build package without update the .PKGREPO file of the collection located in the parent directory.
 .TP
 .B "\-ur, \-\-update\-repo"
 Do not build, only update the .PKGREPO file of the port.

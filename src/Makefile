@@ -104,7 +104,7 @@ install: all
 	install -D -m0755 pkgadd $(DESTDIR)$(USRBINDIR)/pkgadd
 	install -D -m0755 cards $(DESTDIR)$(BINDIR)/cards
 	install -D -m0644 pkgadd.conf $(DESTDIR)$(ETCDIR)/pkgadd.conf
-	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf
+	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf.example
 	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkgrm
 	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkginfo
 

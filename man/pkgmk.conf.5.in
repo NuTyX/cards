@@ -68,7 +68,7 @@ Option to disable the generation of the .PKGREPO file. Only set it if you compil
 .br
 Default: 'no'
 .TP
-\fBPKGMK_IGNORE_CATEGORY='STRING'\fP
+\fBPKGMK_IGNORE_COLLECTION='STRING'\fP
 Option to deactivate the generation of the .PKGREPO file located in the parent directory. If set to "no" it will be possible to install via the \fBcards install\fP command your owns packages from your owns ports. You allow then the mix of official binaries and your owns binaries. This method is not recommended.
 .br
 Default: 'yes'

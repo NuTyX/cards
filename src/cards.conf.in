@@ -62,4 +62,3 @@ locale fr
 ## In the following setting, packages from base system and server will not be touch
 
 base /var/lib/pkg/saravane/base
-base /usr/ports/base

@@ -310,6 +310,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 		readFile(contentFile,metaFile.c_str());
 		vf = false;
 		rf = false;
+		info.release = 1;
 		for (unsigned int li=0; li < contentFile->count ; ++li) {
 			if ( contentFile->items[li][0] == 'V' ) {
 				string version = contentFile->items[li];
@@ -318,7 +319,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 			}
 			if ( contentFile->items[li][0] == 'r' ) {
 				string release = contentFile->items[li];
-				info.release = release.substr(1);
+				info.release = atoi(release.substr(1).c_str());
 				rf = true;
 			}
 			if ( vf && rf ) {
@@ -348,6 +349,7 @@ void Pkgdbh::buildDatabaseWithDetailsInfos(bool silent)
 		const string metaFile = m_root + PKG_DB_DIR + *i + '/' + PKG_META;
 		itemList * contentFile = initItemList();
 		readFile(contentFile,metaFile.c_str());
+		info.release = 1;
 		for (unsigned int li=0; li< contentFile->count ; ++li) {
 			if ( contentFile->items[li][0] == 'D' ) {
 				string description = contentFile->items[li];
@@ -375,7 +377,7 @@ void Pkgdbh::buildDatabaseWithDetailsInfos(bool silent)
 			}
 			if ( contentFile->items[li][0] == 'r' ) {
 				string release = contentFile->items[li];
-				info.release = release.substr(1);
+				info.release = atoi(release.substr(1).c_str());
 			}
 			if ( contentFile->items[li][0] == 'a' ) {
 				string arch = contentFile->items[li];

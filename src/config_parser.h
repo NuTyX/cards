@@ -22,6 +22,7 @@
 #ifndef CONFIGPARSER_H
 #define CONFIGPARSER_H
 
+
 #include <string>
 #include <vector>
 #include <list>
@@ -49,7 +50,7 @@ struct BasePackageInfo {
 	std::string basePackageName;
 	std::string extention;
 	std::string version;
-	std::string release;
+	int release;
 	std::string description;
 	std::string URL;
 	std::string maintainer;
@@ -78,7 +79,7 @@ struct FileList {
 	std::string URL;
 	std::string md5SUM;
 	std::string version;
-	std::string release;
+	int release;
 	std::string packager;
 	std::string maintainer;
 	std::string fileDate;

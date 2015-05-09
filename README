@@ -15,16 +15,15 @@ NuTyX distribution including the handling of the binaries
 
 Building and installing
 -----------------------
- 1. To build the libs
+ 1. To build all
 
 $ make all
-$ make libs
 
- 2. To build the binaries
+ 2. To build the pkgadd binary
 
-$ make
+$ make pkgadd
 
- 3. To install the binaries / the libs
+ 3. To install the binaries
 
 $ make install
 or

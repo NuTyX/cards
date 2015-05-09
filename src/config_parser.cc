@@ -31,6 +31,13 @@ using namespace std;
 ConfigParser::ConfigParser(const std::string& fileName)
 	: m_configFileName(fileName)
 {
+	if (!checkFileExist(m_configFileName)) {
+		cerr << WHITE << "Warning: " << NORMAL << "No configuration file: " << YELLOW 
+			<<  "/etc/cards.conf"  << NORMAL
+			<< " found..." << endl
+			<< WHITE << "You should create a new one based on the " << YELLOW
+			<< "/etc/cards.conf.example" << NORMAL << " file" << endl;
+	}
 }
 void ConfigParser::parsePkgRepoCategoryDirectory()
 {
@@ -89,7 +96,7 @@ void ConfigParser::parsePkgRepoCategoryDirectory()
 			}
 			if ( infos.size() > 4 ) {
 				if ( infos[4].size() > 0 ) {
-					basePkgInfo.release = infos[4];
+					basePkgInfo.release = atoi(infos[4].c_str());
 				}
 			}
 			if ( infos.size() > 5 ) {
@@ -391,8 +398,9 @@ void ConfigParser::parsePackagePkgfileList()
 					j->version = getValueBefore( getValue( line, '=' ), '#' );
 					j->version = stripWhiteSpace( j->version );
 				} else if ( line.substr( 0, 8 ) == "release=" ){
-					j->release = getValueBefore( getValue( line, '=' ), '#' );
-					j->release = stripWhiteSpace( j->release );
+					string release = getValueBefore( getValue( line, '=' ), '#' );
+					release = stripWhiteSpace(release );
+					j->release = atoi(release.c_str());
 				} else if ( line[0] == '#' ) {
 					while ( !line.empty() &&
 							( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
@@ -480,7 +488,7 @@ unsigned int ConfigParser::getBinaryPackageList()
 					<< j->extention << endl ;
 #endif
 			numberOfBinaries++;
-			cout << j->basePackageName << " " << j->version << endl;	
+			cout << j->basePackageName << " " << j->version << "-" << j->release << endl;
 		}
 	}
 	return numberOfBinaries;
@@ -503,7 +511,7 @@ unsigned int ConfigParser::getPortsList()
 				<< j->s_buildDate << " "
 				<< j->extention << endl ;
 #endif
-			cout << j->basePackageName << " " << j->version <<  endl;
+			cout << j->basePackageName << " " << j->version << "-" << j->release << endl;
 			numberOfPorts++;
 		}
 	}

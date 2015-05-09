@@ -147,11 +147,7 @@ void Pkginfo::run(int argc, char** argv)
 		if (o_installed_mode) {	// List installed packages
 			buildDatabaseWithNameVersion();
 			for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-				cout << i->first << " " << i->second.version ;
-				if (i->second.release.size()>0 ) {
-					cout << "-" << i->second.release;
-				}
-				cout << endl;
+				cout << i->first << " " << i->second.version << "-" << i->second.release << endl;
 			}
 		} else if (o_list_mode) {	// List package or file contents
 			buildDatabaseWithDetailsInfos(false);

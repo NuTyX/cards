@@ -48,7 +48,6 @@
 #define PKGADD_CONF      "etc/pkgadd.conf"
 #define PKGADD_CONF_MAXLINE	1024
 
-
 #define LDCONFIG         "/sbin/ldconfig"
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
 #define SHELL            "bin/sh"
@@ -84,7 +83,7 @@ struct pkginfo_t {
 	std::string description;
 	time_t build; // date of build
 	std::string version;
-	std::string release;
+	int release;
 	std::string url;
 	std::string packager;
 	std::string maintainer;

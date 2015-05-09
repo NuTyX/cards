@@ -36,11 +36,11 @@ Ne construit pas, affiche uniquement la version du port.
 .B "\-utd, \-\-up\-to\-date"
 Ne construit pas, vérifie uniquement si le paquet est à jour.
 .TP
-.B "\-uc, \-\-update\-category"
-Met à jour le fichier .PKGREPO de la categorie, cad le fichier .PKGREPO qui se trouve dans le dossier parent.
+.B "\-uc, \-\-update\-collection"
+Met à jour le fichier .PKGREPO de la collection, cad le fichier .PKGREPO qui se trouve dans le dossier parent.
 .TP
-.B "\-ic, \-\-ignore\-category"
-Construit le paquet sans mettre à jour le fichier .PKGREPO de la categorie, cad le fichier .PKGREPO qui se trouve dans le dossier parent.
+.B "\-ic, \-\-ignore\-collection"
+Construit le paquet sans mettre à jour le fichier .PKGREPO de la collection, cad le fichier .PKGREPO qui se trouve dans le dossier parent.
 .TP
 .B "\-ur, \-\-update\-repo"
 Met à jour le fichier .PKGREPO du paquet.
