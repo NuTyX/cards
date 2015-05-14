@@ -54,7 +54,6 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APOpt OPT_INSTALLED;
 		static ArgParser::APOpt OPT_BINARIES;
 		static ArgParser::APOpt OPT_PORTS;
-		static ArgParser::APOpt OPT_OUTOFDATE;
 
 		static ArgParser::APOpt OPT_IGNORE;
 

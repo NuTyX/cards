@@ -1133,10 +1133,6 @@ main() {
                 exit $E_GENERAL
         fi
         . $PKGMK_CONFFILE
-	if [ ! -f $CARDS_CONFFILE ]; then
-		error "$CARDS_CONFFILE not found"
-		exit $E_GENERAL
-	fi
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
 		warning "pkginfo NOT FOUND, footprint ignored."
@@ -1379,7 +1375,6 @@ readonly PKGMK_ROOT="$PWD"
 readonly PKGMK_PACKAGE_DIR="$PWD"
 
 PKGMK_BUILDVER=`date +%s`
-CARDS_CONFFILE="/etc/cards.conf"
 
 PKGMK_PACKAGE_EXT="cards.tar"
 

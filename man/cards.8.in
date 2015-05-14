@@ -9,10 +9,8 @@ cards \- the NuTyX package management tool including pkgutils from CRUX (see htt
 .B cards command [options] <arguments>
 .br 
 .SH "DESCRIPTION"
-cards which stand for Create Add Remove and Downloads Systemis a package management tool which provides 
-all the basic functionality for a package management system. It can works with the
-local ports tree AND the available binaries from the mirror. It is fully compatible with ports(8) and
-pkgmk(8)/pkgadd(8). It offers the following features:
+cards which stand for Create Add Remove and Downloads System is a package management system tool which provides all the basic functionality for a package management system. It can works with the
+local ports tree AND the available binaries from the mirror. It is made of two parts, one is for the normal users who just want to have all the basics actions for manage the packages on the NuTyX distribution. Because cards is a fork of pkgutils tool from CRUX distribution, the second part include a script pkgmk(8) for the creation of binaries, they is a set of basic commands for dealing with local binaries. The commands are: pkgadd(8), pkgrm(8) and pkginfo(8). It is fully compatible with the ports(8) command. Cards offers the following features:
 
 .PP
 .TP 

@@ -60,11 +60,11 @@ int main(int argc, char** argv)
 of compilation" << endl
 				<< "                             If -I it will ignore the WARNING about NOT FOUND <dependencies> from <port>" << endl;
 			cout << GREEN << "\nPORTS SPECIFIC SCENARIO" << NORMAL << endl;
-			cout << BLUE << "  depends" << NORMAL << " [i] <port>         show dependencies for the port in compilation order." << endl
+			cout << BLUE << "  depends" << NORMAL << " [-i] <port>        show dependencies for the port in compilation order." << endl
 				<< "                             If -i it will shows the installed dependencies as well." << endl;
-			cout << BLUE << "  deptree" << NORMAL << " <port>             show dependencies in a tree" << endl;
+			cout << BLUE << "  deptree" << NORMAL << "   <port>           show dependencies in a tree" << endl;
 			cout << BLUE << "  depcreate" << NORMAL << " <port>           compile and install the port and its dependencies." << endl;
-			cout << BLUE << "  create" << NORMAL << " <port>              install all the dependencies from binaries and then compile the port." << endl;
+			cout << BLUE << "  create" << NORMAL << "    <port>           install all the dependencies from binaries and then compile the port." << endl;
 
 			cout << GREEN << "\nDIFFERENCES / CHECK FOR UPDATES / CLEANUP" << NORMAL << endl;
 			cout << BLUE << "  diff" << NORMAL << " [-p]                  list outdated packages" << endl
@@ -203,10 +203,6 @@ of compilation" << endl
 			return CD.deptree();
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
 			CardsInfo CList(cardsArgPars);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_OUTOFDATE)) {
-				CList.listOutOfDate();
-				return EXIT_SUCCESS;
-			}
 			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
 				CList.listBinaries();
 				return EXIT_SUCCESS;

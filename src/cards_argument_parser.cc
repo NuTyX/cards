@@ -54,8 +54,6 @@ ArgParser::APOpt CardsArgumentParser::OPT_IGNORE;
 
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
 
-ArgParser::APOpt CardsArgumentParser::OPT_OUTOFDATE;
-
 
 CardsArgumentParser::CardsArgumentParser()
 {
@@ -186,17 +184,12 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		'a',
 		"\t\tRemove the sub package(s) as well, if they exists.");
 
-	OPT_OUTOFDATE.init("old",
-		'o',
-		"\t\tCheck for out of date packages. This option is for the packager.");
-
 	OPT_IGNORE.init("ignore",
 		'I',
 		"\tIgnore errors and list the level anyway.");
 
 	addOption(CMD_LIST, OPT_BINARIES, false);
 	addOption(CMD_LIST, OPT_PORTS, false);
-	addOption(CMD_LIST, OPT_OUTOFDATE, false);
 
 	addOption(CMD_INFO,OPT_BINARIES, false);
 	addOption(CMD_INFO,OPT_PORTS, false);
