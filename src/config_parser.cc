@@ -471,7 +471,8 @@ void ConfigParser::downloadPackageFileName(const std::string& packageName)
 }
 unsigned int ConfigParser::getBinaryPackageList()
 {
-	unsigned int numberOfBinaries = 0;
+	std::string packageNameVersion;
+	std::set<string>  binaryList;
 	// For each defined category
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		// For each directory found in this category
@@ -487,11 +488,14 @@ unsigned int ConfigParser::getBinaryPackageList()
 					<< j->s_buildDate << " "
 					<< j->extention << endl ;
 #endif
-			numberOfBinaries++;
-			cout << j->basePackageName << " " << j->version << "-" << j->release << endl;
+			packageNameVersion= j->basePackageName + " " + j->version;
+			binaryList.insert(packageNameVersion);
 		}
 	}
-	return numberOfBinaries;
+	for ( std::set<string>::iterator i = binaryList.begin(); i != binaryList.end(); ++ i) {
+		cout << *i << endl;
+	}
+	return binaryList.size();
 }
 unsigned int ConfigParser::getPortsList()
 {

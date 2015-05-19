@@ -505,8 +505,8 @@ void CardsInstall::createBinaries()
 {
 	ConfigParser::parseConfig("/etc/cards.conf", m_config);
 	m_configParser = new ConfigParser("/etc/cards.conf");
-	m_configParser->parsePkgRepoCategoryDirectory();
 	m_configParser->parseCategoryDirectory();
+	m_configParser->parsePkgRepoCategoryDirectory();
 	cout << "create of " << m_packageName << endl;
 	string pkgdir = m_configParser->getPortDir(m_packageName);
 	if (pkgdir == "" ) {

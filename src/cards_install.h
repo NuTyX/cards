@@ -69,6 +69,7 @@ private:
 	void addPackagesList();
 	void addPackage();
 
+	const CardsArgumentParser& m_argParser;
 	string m_packageName;
 	string m_packageFileName;
 	vector<string> m_MD5packagesNameVersionList;
@@ -77,7 +78,6 @@ private:
 
 	ConfigParser  * m_configParser;
 	Config m_config;
-	const CardsArgumentParser& m_argParser;
 
 	// TODO make configurable from the command line
 	const string m_root; // absolute path of installation
