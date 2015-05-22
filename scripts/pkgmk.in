@@ -1161,6 +1161,7 @@ main() {
 		if [ ! -z "$group" ];then
 			if [ -f ../$group/$PKGMK_PKGFILE ];then
 				. ../$group/$PKGMK_PKGFILE
+				unset run
 				. $PKGMK_PKGFILE
 			else
 				warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."

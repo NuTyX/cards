@@ -48,6 +48,8 @@ void ConfigParser::parsePkgRepoCategoryDirectory()
 		portsDirectory.Url = i->Url;
 		BasePackageInfo basePkgInfo;
 		string categoryPkgRepoFile = i->Dir + "/.PKGREPO" ;
+		basePkgInfo.release = 1;
+		basePkgInfo.buildDate = 0;
 		if ( ! checkFileExist(categoryPkgRepoFile)) {
 			if ( i->Url.size() > 0 ) {
 				cout << "You should used " << YELLOW << "cards sync" << NORMAL << " for " << i->Dir << endl;
@@ -394,6 +396,7 @@ void ConfigParser::parsePackagePkgfileList()
 			}
 			for (vector<string>::const_iterator p = pkgFileContent.begin();p != pkgFileContent.end();++p) {
 				string line = stripWhiteSpace(*p);
+				j->release = 1;
 				if ( line.substr( 0, 8 ) == "version=" ){
 					j->version = getValueBefore( getValue( line, '=' ), '#' );
 					j->version = stripWhiteSpace( j->version );
