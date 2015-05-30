@@ -639,6 +639,29 @@ string ConfigParser::getPortVersion (const string& portName)
 	}
 	return version;
 }
+int ConfigParser::getPortRelease (const string& portName)
+{
+	string basePortName = portName;
+	string::size_type pos = portName.find('.');
+	if (pos != string::npos) {
+		basePortName=portName.substr(0,pos);
+	}
+
+	int release = 1;
+	bool found = false;
+	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
+			if ( j->basePackageName == basePortName ) {
+				found = true;
+				release = j->release;
+				break;
+			}
+		}
+		if (found)
+			break;
+	}
+	return release;
+}
 bool ConfigParser::checkPortExist(const string& portName)
 {
 	bool found = false;

@@ -38,10 +38,10 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 		return NULL;
 	}
 	depList *dependancesList = initDepsList();
-	char *fullPathfileName = (char*)Malloc (sizeof(char)*255);
-	char *name = (char*)Malloc(sizeof(char)*255);
-	char *depfile1 = (char*)Malloc(sizeof(char)*255);
-	char *depfile2 = (char*)Malloc(sizeof(char)*255);
+	char fullPathfileName[255];
+	char name[255];
+	char depfile1[255];
+	char depfile2[255];
 
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
 	itemList *nameDeps = initItemList();
@@ -64,7 +64,7 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 		} else {
 			for (unsigned int i = 0; i < nameDeps->count;i++) {
 				unsigned j = 0;
-				char *name = (char*)Malloc(sizeof(char)*255);
+				char name[255];
 				for(j = 0; j < filesList->count; j++) {
 					sprintf(name,"%s",basename(filesList->items[j]));
 #ifndef NDEBUG
@@ -138,7 +138,7 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 			if ( deps.size() >0 ) {
 				bool found=false;
 				unsigned j = 0;
-				char *name = (char*)Malloc(sizeof(char)*255);
+				char name[255];
 				for(list<string>::const_iterator i = deps.begin(); i != deps.end(); ++i) {
 					found=false;
 					for(j = 0; j < filesList->count; j++) {
@@ -162,10 +162,6 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 		}
   }
 	freeItemList(nameDeps);
-	free(name);
-	free(depfile1);
-	free(depfile2);
-	free(fullPathfileName);
 	return dependancesList;
 }
 vector<LevelName>& CardsDepends::getLevel()

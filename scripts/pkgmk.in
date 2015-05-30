@@ -73,6 +73,10 @@ check_pkgfile() {
 		error "Variable 'name' contains illegal characters."
 		exit $E_PKGFILE
 	fi
+	if [ ${#name} -gt 50 ];then
+		error "Variable 'name' length higher then 50 characters."
+		exit $E_PKGFILE
+	fi
 }
 get_package_name() {
 	local NAME EXT

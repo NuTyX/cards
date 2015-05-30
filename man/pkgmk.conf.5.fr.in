@@ -63,6 +63,11 @@ Option pour déactiver la génération du fichier .PKGREPO. A ne changer que si 
 .br
 Défaut: 'no'
 .TP
+\fBPKGMK_IGNORE_UNPACK='STRING'\fP
+Option pour déactiver l'extraction des sources du code de votre paquet. Vous devez alors extraire les sources vous-même avant de lancer la commande cd $name-$version (par exemple).
+.br
+Défaut: 'no'
+.TP
 \fBPKGMK_IGNORE_COLLECTION='STRING'\fP
 Option pour déactiver la génération du fichier .PKGREPO se trouvant dans le dossier parent. A changer sur "no" si vous souhaitez installer via la commande \fBcards install\fP vos propres paquets compilés dans vos ports. Vous permettez ainsi le mélange des binaires officiels et de vos propres binaires. Cette méthode n'est pas recommandée.
 .br

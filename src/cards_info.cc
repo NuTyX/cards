@@ -198,18 +198,25 @@ void CardsInfo::diffPorts()
 	result.push_back(pair<string, DiffVers>("", DV));
 	unsigned int widthPackageName = result.begin()->first.length();
 	unsigned int widthInstalled = result.begin()->second.installed.length();
-
+	char sRelease[5]; // release up to 9999 should be enough :)
+	int newRelease = 1;
+	string baseName = "";
+	string newVersion = "";
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-		if (! cp->checkPortExist(i->first)) {
+		if (! cp->checkPortExist(i->first))
 			continue;
-		}
-		string newVersion = cp->getPortVersion(i->first);
+		newVersion = cp->getPortVersion(i->first);
+		newRelease = cp->getPortRelease(i->first);
 #ifndef NDEBUG
 		cerr << i->first << " " << i->second.version << " " << newVersion << endl;	
 #endif
-		if ( i->second.version != newVersion ) {
-			DV.installed = i->second.version;
-			DV.available = newVersion;
+		if ( ( i->second.version == newVersion ) && ( i->second.release == newRelease) ) {
+			continue;
+		} else {
+			sprintf(sRelease,"%d",i->second.release);
+			DV.installed = i->second.version + "-" + sRelease;
+			sprintf(sRelease,"%d",newRelease);
+			DV.available = newVersion + "-" + sRelease;
 			result.push_back(pair<string, DiffVers> (i->first, DV));
 			if (i->first.length() > widthPackageName)
 				widthPackageName = i->first.length();
@@ -244,15 +251,23 @@ void CardsInfo::diffBinaries()
 	result.push_back(pair<string, DiffVers >("", DV));
 	unsigned int widthPackageName = result.begin()->first.length();
 	unsigned int widthInstalled = result.begin()->second.installed.length();
-
+	char sRelease[5]; // release up to 9999 should be enough :)
+	int newRelease = 1;
+	string baseName = "";
+	string newVersion = "";
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
 		if (! cp->checkBinaryExist(i->first))
 			continue;
-		string baseName = cp->getBasePackageName(i->first);
-		string newVersion = cp->getPortVersion(i->first);
-		if ( i->second.version != newVersion ) {
-			DV.installed = i->second.version;
-			DV.available = newVersion;
+		baseName = cp->getBasePackageName(i->first);
+		newVersion = cp->getPortVersion(i->first);
+		newRelease = cp->getPortRelease(i->first);
+		if ( ( i->second.version == newVersion ) && ( i->second.release == newRelease) ) {
+			continue;
+		} else {
+			sprintf(sRelease,"%d",i->second.release);
+			DV.installed = i->second.version + "-" + sRelease;
+			sprintf(sRelease,"%d",newRelease);
+			DV.available = newVersion + "-" + sRelease;
 			result.push_back(pair<string, DiffVers> (i->first, DV));
 			if (i->first.length() > widthPackageName)
 				widthPackageName = i->first.length();
