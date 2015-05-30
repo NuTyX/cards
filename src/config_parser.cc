@@ -65,6 +65,8 @@ void ConfigParser::parsePkgRepoCategoryDirectory()
 
 		for ( vector<string>::iterator i = PkgRepoFileContent.begin();i!=PkgRepoFileContent.end();++i) {
 			string input = *i;
+			basePkgInfo.release = 1;
+			basePkgInfo.buildDate = 0;
 			if ( input.size() <  34 ) {
 				cerr << "missing info" << endl;
 				continue;
