@@ -25,6 +25,8 @@
 
 #include "md5.h"
 #include "string_utils.h"
+#include "system_utils.h"
+
 #include <iostream>
 #include <fstream>
 #include <iterator>
@@ -82,8 +84,22 @@ struct InfoFile
 	FILE *stream;
 };
 
-using namespace std;
+struct DirUrl {
+	std::string Dir;
+	std::string Url;
+};
 
+struct Config {
+	Config() {}
+	std::string arch;
+	std::string logdir;
+	std::vector<std::string> locale;
+	std::vector<DirUrl> dirUrl;
+	std::vector<std::string> baseDir;
+};
+
+using namespace std;
+int getConfig(const string& fileName, Config& config);
 FILE *openFile(const char *fileName);
 void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmemb);
 string trimFileName(const string& filename);

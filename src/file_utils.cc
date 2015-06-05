@@ -21,6 +21,67 @@
 //
 
 #include "file_utils.h"
+int getConfig(const string& fileName, Config& config)
+{
+	FILE* fp = fopen(fileName.c_str(), "r");
+	if (!fp) {
+		return -1;
+	}
+
+	char line[512];
+	string s;
+	while (fgets(line, 512, fp)) {
+		if (line[strlen(line)-1] == '\n' ) {
+			line[strlen(line)-1] = '\0';
+		}
+		s = line;
+
+		// strip comments
+		string::size_type pos = s.find('#');
+		if (pos != string::npos) {
+			s = s.substr(0,pos);
+		}
+
+		// whitespace separates
+		pos = s.find(' ');
+		if (pos == string::npos) {
+			// try with a tab
+			pos = s.find('\t');
+		}
+		if (pos != string::npos) {
+			string key = s.substr(0, pos);
+			string val = stripWhiteSpace(s.substr(pos));
+
+			if (key == "dir") {
+				string::size_type pos = val.find('|');
+				DirUrl DU;
+				if (pos != string::npos) {
+					DU.Dir = stripWhiteSpace(val.substr(0,pos));
+					DU.Url = stripWhiteSpace(val.substr(pos+1));
+				} else {
+					DU.Dir = stripWhiteSpace(val);
+					DU.Url = "";
+				}
+				config.dirUrl.push_back(DU);
+			}
+			if (key == "logdir") {
+				config.logdir = val;
+			}
+			config.arch = getMachineType();
+      if ( config.arch== "" ) {
+        return -1;
+			}
+			if (key == "locale") {
+				config.locale.push_back(val);
+			}
+			if (key == "base") {
+				config.baseDir.push_back(val);
+			}
+		}
+	}
+	fclose(fp);
+	return 0;
+}
 
 FILE *openFile(const char *fileName)
 {

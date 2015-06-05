@@ -91,27 +91,27 @@ void CardsInfo::listInstalled()
 }
 void CardsInfo::listBinaries()
 {
-	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parsePkgRepoCategoryDirectory();
-	cout << endl << "Minimum number of availables binaries: " << cp->getBinaryPackageList() << " (sub packages not included)"<< endl<< endl;
+	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
+	pkgrepo->parsePkgRepoCategoryDirectory();
+	cout << endl << "Minimum number of availables binaries: " << pkgrepo->getBinaryPackageList() << " (sub packages not included)"<< endl<< endl;
 	
 }
 void CardsInfo::listPorts()
 {
-	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
+	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
 	unsigned int  numberOfPorts = 0;
-  cp->parseCategoryDirectory();
-  cp->parsePackagePkgfileList();
-	numberOfPorts = cp->getPortsList();
+	pkgrepo->parseCategoryDirectory();
+	pkgrepo->parsePackagePkgfileList();
+	numberOfPorts = pkgrepo->getPortsList();
 	cout << endl << "Number of available ports: " << numberOfPorts << endl << endl;
 }
 void CardsInfo::listOutOfDate()
 {
 	// FIXME not working anymore, I guess this will change as well in the future
-  ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-  cp->parseCategoryDirectory();
-  cp->parseBasePackageList();
-  set<string> result = cp->getListOutOfDate();
+  Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
+  pkgrepo->parseCategoryDirectory();
+  pkgrepo->parseBasePackageList();
+  set<string> result = pkgrepo->getListOutOfDate();
 	
   if (result.size() > 0) {
 		string packageName = "";
@@ -166,27 +166,27 @@ void CardsInfo::infoInstall()
 }
 void CardsInfo::infoBinary()
 {
-	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parsePkgRepoCategoryDirectory();
-	if ( ! cp->getBinaryPackageInfo(m_argParser.otherArguments()[0]) ) {
+	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
+	pkgrepo->parsePkgRepoCategoryDirectory();
+	if ( ! pkgrepo->getBinaryPackageInfo(m_argParser.otherArguments()[0]) ) {
 		cout << m_argParser.otherArguments()[0] << " not found " << endl;
 	}
 }
 void CardsInfo::infoPort()
 {
-	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parseCategoryDirectory();
-	cp->parsePackagePkgfileList();
-	if ( ! cp->getPortInfo(m_argParser.otherArguments()[0]) ) {
+	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
+	pkgrepo->parseCategoryDirectory();
+	pkgrepo->parsePackagePkgfileList();
+	if ( ! pkgrepo->getPortInfo(m_argParser.otherArguments()[0]) ) {
 		cout << m_argParser.otherArguments()[0] << " not found " << endl;
 	}
 }
 void CardsInfo::diffPorts()
 {
 	buildDatabaseWithNameVersion();
-	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parseCategoryDirectory();
-	cp->parsePackagePkgfileList();
+	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
+	pkgrepo->parseCategoryDirectory();
+	pkgrepo->parsePackagePkgfileList();
 	vector<pair<string, DiffVers > > result;
 	DiffVers DV;
 	DV.installed="Installed";
@@ -203,10 +203,10 @@ void CardsInfo::diffPorts()
 	string baseName = "";
 	string newVersion = "";
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-		if (! cp->checkPortExist(i->first))
+		if (! pkgrepo->checkPortExist(i->first))
 			continue;
-		newVersion = cp->getPortVersion(i->first);
-		newRelease = cp->getPortRelease(i->first);
+		newVersion = pkgrepo->getPortVersion(i->first);
+		newRelease = pkgrepo->getPortRelease(i->first);
 #ifndef NDEBUG
 		cerr << i->first << " " << i->second.version << " " << newVersion << endl;	
 #endif
@@ -238,8 +238,8 @@ void CardsInfo::diffPorts()
 void CardsInfo::diffBinaries()
 {
 	buildDatabaseWithNameVersion();
-	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parsePkgRepoCategoryDirectory();
+	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
+	pkgrepo->parsePkgRepoCategoryDirectory();
 	vector<pair<string, DiffVers > > result;
 	DiffVers DV;
 	DV.installed="Installed";
@@ -256,11 +256,11 @@ void CardsInfo::diffBinaries()
 	string baseName = "";
 	string newVersion = "";
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-		if (! cp->checkBinaryExist(i->first))
+		if (! pkgrepo->checkBinaryExist(i->first))
 			continue;
-		baseName = cp->getBasePackageName(i->first);
-		newVersion = cp->getPortVersion(i->first);
-		newRelease = cp->getPortRelease(i->first);
+		baseName = pkgrepo->getBasePackageName(i->first);
+		newVersion = pkgrepo->getPortVersion(i->first);
+		newRelease = pkgrepo->getPortRelease(i->first);
 		if ( ( i->second.version == newVersion ) && ( i->second.release == newRelease) ) {
 			continue;
 		} else {
@@ -274,7 +274,7 @@ void CardsInfo::diffBinaries()
 		}
 /* FIXME
 		} else {
-			time_t newVersion = cp->getBinaryBuildTime(i->first);
+			time_t newVersion = pkgrepo->getBinaryBuildTime(i->first);
 
 			if ( i->second.build < newVersion ) {
 				char * c_time_s = ctime(&i->second.build);
@@ -303,10 +303,10 @@ void CardsInfo::diffBinaries()
 }
 void CardsInfo::search()
 {
-	ConfigParser  * cp = new ConfigParser("/etc/cards.conf");
-	cp->parsePkgRepoCategoryDirectory();
+	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
+	pkgrepo->parsePkgRepoCategoryDirectory();
 
-	if ( ! cp->search(m_argParser.otherArguments()[0]) ) {
+	if ( ! pkgrepo->search(m_argParser.otherArguments()[0]) ) {
 		cout << "no occurence found" << endl;
 	}
 }

@@ -7,6 +7,9 @@ DIRSCRIPTS = scripts
 
 .PHONY: cards
 
+libs:
+	$(MAKE) -C $(DIRSRC) libs
+
 test:
 	$(MAKE) -C $(DIRSRC) test
 all:

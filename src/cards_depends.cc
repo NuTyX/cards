@@ -28,7 +28,7 @@
 #include "pkginfo.h"
 #include "compile_dependencies_utils.h"
 #include "cards_depends.h"
-#include "config_parser.h"
+#include "pkgrepo.h"
 
 using namespace std;
 
@@ -302,7 +302,7 @@ int CardsDepends::level()
 
 	itemList *filesList = initItemList();
 	Config config;
-	ConfigParser::parseConfig("/etc/cards.conf", config);
+	Pkgrepo::parseConfig("/etc/cards.conf", config);
   for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
 		if ( i->Url.size() > 0)
 			continue;
@@ -370,7 +370,7 @@ int CardsDepends::depends()
 	pkgList *packagesList = initPkgList();
 	itemList *filesList = initItemList();
 	Config config;
-	ConfigParser::parseConfig("/etc/cards.conf", config);
+	Pkgrepo::parseConfig("/etc/cards.conf", config);
   for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
     DirUrl DU = *i;
     string prtDir = DU.Dir;
@@ -453,7 +453,7 @@ int CardsDepends::deptree()
 	dependenciesList = initDepsList();
 
 	Config config;
-	ConfigParser::parseConfig("/etc/cards.conf", config);
+	Pkgrepo::parseConfig("/etc/cards.conf", config);
 	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
 		DirUrl DU  = *i ;
 		string prtDir = DU.Dir;

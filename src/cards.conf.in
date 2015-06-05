@@ -42,13 +42,6 @@ dir /var/lib/pkg/saravane/base|http://downloads.nutyx.org/saravane/#ARCH#/base
 logdir /var/log/pkgbuild
 
 ##
-## Cards need to know for which arch default is 64 bits: x86_64
-## if 32 bits: i686
-##
-
-arch #ARCH#
-
-##
 ## We can specify which locale we want, it's possible to mention as many locale we want
 ## As the following exemple french, belgium, and germans locales
 ## On peut spécifier quelle(s) locale(s) doivent être installées

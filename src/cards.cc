@@ -28,7 +28,7 @@
 #include "cards_remove.h"
 #include "cards_info.h"
 
-#include "config_parser.h"
+#include "pkgrepo.h"
 
 #include "pkginfo.h"
 
@@ -90,7 +90,7 @@ of compilation" << endl
 		}
 		if (cardsArgPars.command() == CardsArgumentParser::CMD_CONFIG) {
 			Config config;
-			ConfigParser::parseConfig("/etc/cards.conf", config);
+			Pkgrepo::parseConfig("/etc/cards.conf", config);
 		
 			unsigned int index = 0;
 			string prtDir, url ;

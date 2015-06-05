@@ -58,13 +58,13 @@ ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
 CardsArgumentParser::CardsArgumentParser()
 {
 	addCommand(CMD_HELP, "help",
-		"\tshows help about cards",
-"You can also check 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.conf'",
+		"\tshows help about cards.",
+"You can also check 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.conf'.",
 	ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_CONFIG, "config",
 		"\tprint info about cards configuration.",
-"It can show the defined Directories where alls the packages are located. The locale which are going to be installed, the architecture of your machine, the base system directory and the logfile directory",
+"It can show the defined Directories where alls the packages are located. The locale which are going to be installed, the architecture of your machine, the base system directory and the logfile directory.",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_BASE, "base",
@@ -85,13 +85,13 @@ It is mainly used for the packager.",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_QUERY, "query",
-		"\tlist owner(s) of file(s) matching the query",
+		"\tlist owner(s) of file(s) matching the query.",
 "",
 		ArgParser::EQ, 1 , "<pattern>");
 
 	addCommand(CMD_INFO, "info",
 		"\tprint info about a package.",
-"If -p or -b are passed as optional arguments, it will be the info of a port or the info of a binary available in the depot",
+"If -p or -b are passed as optional arguments, it will be the info of a port or the info of a binary available in the depot.",
 		ArgParser::EQ, 1 , "<package>");
 
 	addCommand(CMD_LIST, "list",
@@ -119,7 +119,7 @@ If -f is passed as optional argument, it will force the install means overwrite 
 
 	addCommand(CMD_DIFF, "diff",
 		"\tlist outdated packages.",
-"If -p is passed, the list is checked against founds Pkgfile ports",
+"If -p is passed, the list is checked against founds Pkgfile ports.",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_DEPENDS, "depends",

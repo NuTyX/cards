@@ -52,7 +52,7 @@ void CardsInstall::run(int argc, char** argv)
 			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 			treatErrors("");
 	}
-	m_configParser = new ConfigParser("/etc/cards.conf");
+	m_configParser = new Pkgrepo("/etc/cards.conf");
 	// Is it a file (an archive) or a packagename
 	string::size_type pos = m_argParser.otherArguments()[0].find("cards.tar");
 
@@ -66,7 +66,7 @@ void CardsInstall::run(int argc, char** argv)
 		m_archive=false;
 		// Its a packagename
 		m_packageName = m_argParser.otherArguments()[0];
-		ConfigParser::parseConfig("/etc/cards.conf", m_config);
+		Pkgrepo::parseConfig("/etc/cards.conf", m_config);
 		// get following datas
 		// 6467b1da053830c331e1a97458c4f385#1428614644#firefox#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org#.cards.tar.xz
 		m_configParser->parsePkgRepoCategoryDirectory();
@@ -472,7 +472,7 @@ void CardsInstall::install(const vector<string>& dependenciesList)
 
 	// Retrieving info about all the packages
 	buildDatabaseWithDetailsInfos(false);
-	m_configParser = new ConfigParser("/etc/cards.conf");
+	m_configParser = new Pkgrepo("/etc/cards.conf");
 	m_configParser->parsePkgRepoCategoryDirectory();
 	std::set<string> listOfPackages;
 	string packageName;
@@ -503,8 +503,8 @@ void CardsInstall::createBinariesOf(const string& packageName)
 }
 void CardsInstall::createBinaries()
 {
-	ConfigParser::parseConfig("/etc/cards.conf", m_config);
-	m_configParser = new ConfigParser("/etc/cards.conf");
+	Pkgrepo::parseConfig("/etc/cards.conf", m_config);
+	m_configParser = new Pkgrepo("/etc/cards.conf");
 	m_configParser->parseCategoryDirectory();
 	m_configParser->parsePkgRepoCategoryDirectory();
 	cout << "create of " << m_packageName << endl;

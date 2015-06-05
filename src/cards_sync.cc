@@ -31,7 +31,7 @@
 
 #include "file_utils.h"
 #include "file_download.h"
-#include "config_parser.h"
+#include "pkgrepo.h"
 #include "cards_sync.h"
 
 using namespace std;
@@ -138,7 +138,7 @@ void CardsSync::run()
 	}
 
 	Config config;
-	ConfigParser::parseConfig("/etc/cards.conf", config);
+	Pkgrepo::parseConfig("/etc/cards.conf", config);
 	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
 		DirUrl DU = *i ;
 		if (DU.Url.size() == 0 ) {
@@ -162,7 +162,7 @@ void CardsSync::purge()
 			treatErrors("");
 	}
 	Config config;
-	ConfigParser::parseConfig("/etc/cards.conf", config);
+	Pkgrepo::parseConfig("/etc/cards.conf", config);
 
 	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
 		if ( i->Url.size() == 0)

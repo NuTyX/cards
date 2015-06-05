@@ -29,7 +29,7 @@
 
 #include <curl/curl.h>
 
-#include "config_parser.h"
+#include "pkgrepo.h"
 #include "cards_argument_parser.h"
 #include "pkgdbh.h"
 #include "process.h"

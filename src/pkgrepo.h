@@ -1,4 +1,4 @@
-//  config_parser.h
+//  pkgrepo.h
 //
 //  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
 //  Copyright (c) 2014 by NuTyX team (http://nutyx.org)
@@ -28,7 +28,7 @@
 #include <list>
 #include <map>
 #include "file_download.h"
-
+#include "file_utils.h"
 
 struct PortFilesList {
 	std::string md5SUM;
@@ -89,30 +89,16 @@ struct FileList {
 	std::vector<PortFilesList> portFilesList;
 };
 
-struct DirUrl {
-	std::string Dir;
-	std::string Url;
-};
-
 struct PortsDirectory {
 	std::string Dir;
 	std::string Url;
 	std::vector<BasePackageInfo> basePackageList;
-}; 
-struct Config {
-	Config() {}
-	std::string arch;
-	std::string logdir;
-	std::vector<std::string> locale;
-	std::vector<DirUrl> dirUrl;
-	std::vector<std::string> baseDir;
 };
 
-class ConfigParser
+class Pkgrepo
 {
 	public:
-		ConfigParser(const std::string& fileName);
-		int parseConfig(const std::string& fileName);
+		Pkgrepo(const std::string& fileName);
 		static int parseConfig(const std::string& fileName,
 			Config& config);
 /**
@@ -280,6 +266,7 @@ class ConfigParser
 		bool getPortInfo(const std::string& portName);
 
 	private:
+		int parseConfig(const std::string& fileName);
 		std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
 		std::vector<BasePackageInfo>::iterator m_BasePackageInfo_i;
 		std::vector<PortFilesList>::iterator m_PortFilesList_i;

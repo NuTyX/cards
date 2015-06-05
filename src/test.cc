@@ -1,4 +1,4 @@
-#include "config_parser.h"
+#include "pkgrepo.h"
 #include "archive_utils.h"
 #include <set>
 #include <iostream>

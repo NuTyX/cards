@@ -23,7 +23,8 @@
 
 include ../Makefile.inc
 
-TOOLSOBJECTS =	error_treat.o \
+TOOLSOBJECTS =	system_utils.o \
+		error_treat.o \
 		md5.o \
 		string_utils.o \
 		archive_utils.o \
@@ -36,11 +37,12 @@ TOOLSOBJECTS =	error_treat.o \
 		pkginfo.o \
 		tools.o
 
-CARDSOBJECTS =	error_treat.o \
+CARDSOBJECTS =	system_utils.o \
+		error_treat.o \
 		md5.o \
 		string_utils.o \
 		archive_utils.o \
-		config_parser.o \
+		pkgrepo.o \
 		file_download.o \
 		compile_dependencies_utils.o \
 		argument_parser.o \
@@ -59,18 +61,29 @@ CARDSOBJECTS =	error_treat.o \
 		cards.o
 
 
-LIBOBJECTS =  pkgdbh.o pkgadd.o pkgrm.o pkginfo.o
+LIBOBJECTS =  system_utils.o \
+	md5.o \
+	string_utils.o \
+	archive_utils.o \
+	pkgrepo.o \
+	file_download.o \
+	file_utils.o process.o \
+	runtime_dependencies_utils.o \
+	pkgdbh.o \
+	pkgadd.o \
+	pkgrm.o \
+	pkginfo.o
 
 test:
 	$(CXX) -DNDEBUG error_treat.cc md5.cc string_utils.cc \
-	file_utils.cc archive_utils.cc  config_parser.h \
-	config_parser.cc file_download.cc \
+	file_utils.cc archive_utils.cc  pkgrepo.h \
+	pkgrepo.cc file_download.cc \
 	test.cc -o ~/bin/au $(LDFLAGS) $(LIBCURLLIBS)
 
-libs:
+libs:	.libs_depend $(LIBOBJECTS)
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
 
-all: pkgadd cards conf
+all: pkgadd cards conf libs
 
 conf:
 	sed -e "s/#ARCH#/`uname -m`/" cards.conf.in > cards.conf
@@ -80,6 +93,9 @@ pkgadd: .tools_depend $(TOOLSOBJECTS)
 
 cards:  .cards_depend $(CARDSOBJECTS)
 	$(CXX) $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
+
+.libs_depend:
+	$(CXX) $(CXXFLAGS) -MM $(LIBOBJECTS:.o=.cc) > .libs_depend
 
 .tools_depend:
 	$(CXX) $(CXXFLAGS) -MM $(TOOLSOBJECTS:.o=.cc) > .tools_depend
@@ -111,6 +127,7 @@ install: all
 clean:
 	rm -f .tools_depend
 	rm -f .cards_depend
+	rm -f .libs_depend
 	rm -f $(TOOLSOBJECTS)
 	rm -f $(CARDSOBJECTS)
 	rm -f $(MANPAGES)

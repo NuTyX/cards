@@ -30,7 +30,7 @@
 
 #include "file_utils.h"
 #include "file_download.h"
-#include "config_parser.h"
+#include "pkgrepo.h"
 #include "cards_remove.h"
 
 using namespace std;
@@ -53,7 +53,7 @@ void CardsRemove::run(int argc, char** argv)
 	}
 
 	Config config;
-	ConfigParser::parseConfig("/etc/cards.conf", config);
+	Pkgrepo::parseConfig("/etc/cards.conf", config);
 
 	string basePackageName, basePackageNameToRemove, installPackageName, installFullPackageName;
 	set<string> basePackagesList;

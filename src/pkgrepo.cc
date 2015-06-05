@@ -1,4 +1,4 @@
-//  config_parser.cc
+//  pkgrepo.cc
 //
 //  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
 //  Copyright (c) 2014 by NuTyX team (http://nutyx.org)
@@ -24,22 +24,22 @@
 #include <cstring>
 #include <sstream>
 
-#include "config_parser.h"
+#include "pkgrepo.h"
 #include "error_treat.h"
 
 using namespace std;
-ConfigParser::ConfigParser(const std::string& fileName)
+Pkgrepo::Pkgrepo(const std::string& fileName)
 	: m_configFileName(fileName)
 {
 	if (!checkFileExist(m_configFileName)) {
 		cerr << WHITE << "Warning: " << NORMAL << "No configuration file: " << YELLOW 
-			<<  "/etc/cards.conf"  << NORMAL
+			<<  m_configFileName  << NORMAL
 			<< " found..." << endl
 			<< WHITE << "You should create a new one based on the " << YELLOW
 			<< "/etc/cards.conf.example" << NORMAL << " file" << endl;
 	}
 }
-void ConfigParser::parsePkgRepoCategoryDirectory()
+void Pkgrepo::parsePkgRepoCategoryDirectory()
 {
 	parseConfig(m_configFileName);
 	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
@@ -141,7 +141,7 @@ void ConfigParser::parsePkgRepoCategoryDirectory()
 	}
 #endif
 }
-void ConfigParser::parseCategoryDirectory()
+void Pkgrepo::parseCategoryDirectory()
 {
 	parseConfig(m_configFileName);
 	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
@@ -166,7 +166,7 @@ void ConfigParser::parseCategoryDirectory()
 		localPackagesList.clear();
 	}
 }
-void ConfigParser::downloadPortsPkgRepo(const string& packageName)
+void Pkgrepo::downloadPortsPkgRepo(const string& packageName)
 {
 	InfoFile downloadFile;
 	vector<InfoFile> downloadFilesList;
@@ -199,7 +199,7 @@ void ConfigParser::downloadPortsPkgRepo(const string& packageName)
 		FileDownload FD(downloadFilesList,false);
 	}
 }
-set<string> ConfigParser::getListOfPackagesFromDirectory(const string& path)
+set<string> Pkgrepo::getListOfPackagesFromDirectory(const string& path)
 {
 	set<string> listOfPackages; 
 	// For each category activate in cards.conf
@@ -220,7 +220,7 @@ set<string> ConfigParser::getListOfPackagesFromDirectory(const string& path)
 	}
 	return listOfPackages;	
 }
-void ConfigParser::parseBasePackageList()
+void Pkgrepo::parseBasePackageList()
 {
 /*
  From here we can check whats is available in the port directory
@@ -281,7 +281,7 @@ void ConfigParser::parseBasePackageList()
 		m_portFilesList.push_back(portFilesList);
 	}
 }
-void ConfigParser::parseBasePackageList(const std::string& packageName)
+void Pkgrepo::parseBasePackageList(const std::string& packageName)
 {
 	bool found=false;
 	vector<string> infos;
@@ -340,7 +340,7 @@ void ConfigParser::parseBasePackageList(const std::string& packageName)
 			break;
 	}
 }
-set<string> ConfigParser::getListOutOfDate()
+set<string> Pkgrepo::getListOutOfDate()
 {
 	set<string> listOfPackages;
 	// For each category activate in cards.conf
@@ -354,7 +354,7 @@ set<string> ConfigParser::getListOutOfDate()
 	}
 	return listOfPackages;
 }
-void ConfigParser::parsePackagePkgfileList()
+void Pkgrepo::parsePackagePkgfileList()
 {
 	InfoFile downloadFile;
 	vector<InfoFile> downloadFilesList;
@@ -428,7 +428,7 @@ void ConfigParser::parsePackagePkgfileList()
 		} 
 	}
 }
-void ConfigParser::downloadPackageFileName(const std::string& packageName)
+void Pkgrepo::downloadPackageFileName(const std::string& packageName)
 {
 	string basePackageName = packageName;
 	string::size_type pos = packageName.find('.');
@@ -474,7 +474,7 @@ void ConfigParser::downloadPackageFileName(const std::string& packageName)
 		FD.downloadFile();
 	}
 }
-unsigned int ConfigParser::getBinaryPackageList()
+unsigned int Pkgrepo::getBinaryPackageList()
 {
 	std::string packageNameVersion;
 	std::set<string>  binaryList;
@@ -502,7 +502,7 @@ unsigned int ConfigParser::getBinaryPackageList()
 	}
 	return binaryList.size();
 }
-unsigned int ConfigParser::getPortsList()
+unsigned int Pkgrepo::getPortsList()
 {
 	unsigned int numberOfPorts = 0;
 	// For each defined category
@@ -526,7 +526,7 @@ unsigned int ConfigParser::getPortsList()
 	}
 	return numberOfPorts;
 }
-bool ConfigParser::getPortInfo(const string& portName)
+bool Pkgrepo::getPortInfo(const string& portName)
 {
 	bool found = false;
 	// For each defined category
@@ -551,7 +551,7 @@ bool ConfigParser::getPortInfo(const string& portName)
 	}
 	return found;
 }
-bool ConfigParser::getBinaryPackageInfo(const string& packageName)
+bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
 {
 	bool found = false;
 	// For each defined category
@@ -579,7 +579,7 @@ bool ConfigParser::getBinaryPackageInfo(const string& packageName)
 	}
 	return found;
 }
-string ConfigParser::getPortDir (const std::string& portName)
+string Pkgrepo::getPortDir (const std::string& portName)
 {
 	string portDir = "";
 	bool found = false;
@@ -596,7 +596,7 @@ string ConfigParser::getPortDir (const std::string& portName)
 	}
 	return portDir;
 }
-string ConfigParser::getBasePackageName(const string& packageName)
+string Pkgrepo::getBasePackageName(const string& packageName)
 {
 	string basePackageName = "";
 	bool found = false;
@@ -618,7 +618,7 @@ string ConfigParser::getBasePackageName(const string& packageName)
 	return basePackageName;
 }
 
-string ConfigParser::getPortVersion (const string& portName)
+string Pkgrepo::getPortVersion (const string& portName)
 {
   string basePortName = portName;
   string::size_type pos = portName.find('.');
@@ -641,7 +641,7 @@ string ConfigParser::getPortVersion (const string& portName)
 	}
 	return version;
 }
-int ConfigParser::getPortRelease (const string& portName)
+int Pkgrepo::getPortRelease (const string& portName)
 {
 	string basePortName = portName;
 	string::size_type pos = portName.find('.');
@@ -664,7 +664,7 @@ int ConfigParser::getPortRelease (const string& portName)
 	}
 	return release;
 }
-bool ConfigParser::checkPortExist(const string& portName)
+bool Pkgrepo::checkPortExist(const string& portName)
 {
 	bool found = false;
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
@@ -679,7 +679,7 @@ bool ConfigParser::checkPortExist(const string& portName)
 	}
 	return found;
 }
-bool ConfigParser::checkBinaryExist(const string& packageName)
+bool Pkgrepo::checkBinaryExist(const string& packageName)
 {
 
 	string basePackageName = packageName;
@@ -724,13 +724,13 @@ bool ConfigParser::checkBinaryExist(const string& packageName)
 	}
 	return Binaryfound;
 }
-string ConfigParser::getPackageFileName(const string& packageName)
+string Pkgrepo::getPackageFileName(const string& packageName)
 {
 	m_packageFileName = packageName;
 	checkBinaryExist(packageName);
 	return m_packageFileName;
 }
-time_t ConfigParser::getBinaryBuildTime (const string& packageName)
+time_t Pkgrepo::getBinaryBuildTime (const string& packageName)
 {
 	time_t buildTime = 0;
 	bool found = false;
@@ -751,13 +751,13 @@ time_t ConfigParser::getBinaryBuildTime (const string& packageName)
 	}
 	return buildTime;
 }
-bool ConfigParser::search(const string& s)
+bool Pkgrepo::search(const string& s)
 {
-	bool found = false;
 	if (s.size() < 2) {
 		cout << "your string is too short, min 2 characters" << endl;	
 		return false;
 	}
+	bool found = false;
 	set<string> packageList;
 	string packageToInsert;
 	std::string::size_type pos;
@@ -767,21 +767,24 @@ bool ConfigParser::search(const string& s)
 				packageToInsert = j->basePackageName + " " + j->version + " " + j->description;
 				packageList.insert(packageToInsert);
 				found = true;
-				break;
 			}
 			pos = j->basePackageName.find(convertToLowerCase(s));
 			if (pos != std::string::npos) {
 				packageToInsert = j->basePackageName + " " + j->version +" " + j->description;
 				packageList.insert(packageToInsert);
 				found = true;
-				break;
 			}
 			pos = convertToLowerCase(j->description).find(convertToLowerCase(s));
 			if (pos != std::string::npos) {
 				packageToInsert = j->basePackageName + " " + j->version +" " + j->description;
 				packageList.insert(packageToInsert);
 				found = true;
-				break;
+			}
+			pos = convertToLowerCase(j->version).find(convertToLowerCase(s));
+			if (pos != std::string::npos) {
+				packageToInsert = j->basePackageName + " " + j->version +" " + j->description;
+				packageList.insert(packageToInsert);
+				found = true;
 			}
 		}
 	}
@@ -790,132 +793,12 @@ bool ConfigParser::search(const string& s)
 	}
 	return found;
 }
-int ConfigParser::parseConfig(const string& fileName)
+int Pkgrepo::parseConfig(const string& fileName)
 {
-	FILE* fp = fopen(fileName.c_str(), "r");
-	if (!fp) {
-		return -1;
-	}
-
-	char line[512];
-	string s;
-	while (fgets(line, 512, fp)) {
-		if (line[strlen(line)-1] == '\n' ) {
-			line[strlen(line)-1] = '\0';
-		}
-		s = line;
-
-		// strip comments
-		string::size_type pos = s.find('#');
-		if (pos != string::npos) {
-			s = s.substr(0,pos);
-		}
-
-		// whitespace separates
-		pos = s.find(' ');
-		if (pos == string::npos) {
-			// try with a tab
-			pos = s.find('\t');
-		}
-		if (pos != string::npos) {
-			string key = s.substr(0, pos);
-			string val = stripWhiteSpace(s.substr(pos));
-
-			if (key == "dir") {
-				string::size_type pos = val.find('|');
-				DirUrl DU;
-				if (pos != string::npos) {
-					DU.Dir = stripWhiteSpace(val.substr(0,pos));
-					DU.Url = stripWhiteSpace(val.substr(pos+1));
-				} else{
-					DU.Dir = stripWhiteSpace(val);
-					DU.Url = "";
-				}
-				m_config.dirUrl.push_back(DU) ;
-			}
-			if (key == "arch") {
-				if (val != "i686") {
-					m_config.arch="x86_64";
-				} else {
-					m_config.arch="i686";
-				}
-			}
-			if (key == "logdir") {
-				m_config.logdir = val;
-			}
-			if (key == "locale") {
-				m_config.locale.push_back(val);
-			}
-			if (key == "base") {
-				m_config.baseDir.push_back(val);
-			}
-		}
-	}
-	fclose(fp);
-	return 0;
+	return getConfig(fileName,m_config);
 }
-int ConfigParser::parseConfig(const string& fileName, Config& config)
+int Pkgrepo::parseConfig(const string& fileName, Config& config)
 {
-	FILE* fp = fopen(fileName.c_str(), "r");
-	if (!fp) {
-		return -1;
-	}
-
-	char line[512];
-	string s;
-	while (fgets(line, 512, fp)) {
-		if (line[strlen(line)-1] == '\n' ) {
-			line[strlen(line)-1] = '\0';
-		}
-		s = line;
-
-		// strip comments
-		string::size_type pos = s.find('#');
-		if (pos != string::npos) {
-			s = s.substr(0,pos);
-		}
-
-		// whitespace separates
-		pos = s.find(' ');
-		if (pos == string::npos) {
-			// try with a tab
-			pos = s.find('\t');
-		}
-		if (pos != string::npos) {
-			string key = s.substr(0, pos);
-			string val = stripWhiteSpace(s.substr(pos));
-
-			if (key == "dir") {
-					string::size_type pos = val.find('|');
-					DirUrl DU;
-					if (pos != string::npos) {
-							DU.Dir = stripWhiteSpace(val.substr(0,pos));
-							DU.Url = stripWhiteSpace(val.substr(pos+1));
-					} else {
-							DU.Dir = stripWhiteSpace(val);
-							DU.Url = "";
-					}					
-					config.dirUrl.push_back(DU);
-			}
-			if (key == "logdir") {
-					config.logdir = val;
-			}
-			if (key == "arch") {
-				if (val != "i686") {
-					config.arch="x86_64";
-				} else {
-					config.arch="i686";
-				}
-			}
-			if (key == "locale") {
-				config.locale.push_back(val);
-			}
-			if (key == "base") {
-				config.baseDir.push_back(val);
-			}
-		}
-	}
-	fclose(fp);
-	return 0;
+	return getConfig(fileName,config);
 }
 // vim:set ts=2 :
