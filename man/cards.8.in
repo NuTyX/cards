@@ -251,6 +251,10 @@ update the binary package in
 .B cards install
 command.
 
+.TP
+.B -r
+remove all the packages which are not belong to a base system defined in the cards.conf file
+
 .SH "CONFIGURATION"
 .TP 
 See man cards.conf(5) and pkgmk.conf(5)
