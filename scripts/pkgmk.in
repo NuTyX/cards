@@ -658,31 +658,36 @@ add_meta_to_archive() {
 	echo "r$release" >> .META
 	echo "B$PKGMK_BUILDVER" >> .META
 	echo "a$PKGMK_ARCH" >> .META
-
-	for dep in `pkginfo --runtimedepfiles $TAR`; do
-		echo "R$dep" >> .META
-        done
-	if [ ! -z $run ] && [ "$NAME" == "$name" ]; then
-		info "Adding runtime deps to Archive $NAME"
-		for rd in ${run[@]}; do
-			if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
-				error "Runtime dependencie $rd not found, cannot continue"
-				clean
-				exit $E_DEPS;
-			fi
-			echo "R$rd`pkginfo -b $rd`" >> .META
+	# TODO improve the pkginfo --runtimedepfiles functionnality
+	## aaabasicfs is the first package anyway so it can not have
+	## any dependencies. Suggestion: add a variable PKGMK_IGNORE_RUNTIMEDEPS
+	## if not set to "no" do the following code
+	if [ "$name" != "aaabasicfs" ]; then
+		for dep in `pkginfo --runtimedepfiles $TAR`; do
+			echo "R$dep" >> .META
 		done
-	fi
-	if [ -f $PKGMK_ROOT/${NAME}.run ]; then
-		info "Adding runtime deps to Archive $NAME"
-		for rd in `cat $PKGMK_ROOT/${NAME}.run`; do
-			if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
-				error "Runtime dependencie $rd not found, cannot continue"
-				clean
-				exit $E_DEPS;
-			fi
-			echo "R$rd`pkginfo -b $rd`" >> .META
-		done
+		if [ ! -z $run ] && [ "$NAME" == "$name" ]; then
+			info "Adding runtime deps to Archive $NAME"
+			for rd in ${run[@]}; do
+				if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
+					error "Runtime dependencie $rd not found, cannot continue"
+					clean
+					exit $E_DEPS;
+				fi
+				echo "R$rd`pkginfo -b $rd`" >> .META
+			done
+		fi
+		if [ -f $PKGMK_ROOT/${NAME}.run ]; then
+			info "Adding runtime deps to Archive $NAME"
+			for rd in `cat $PKGMK_ROOT/${NAME}.run`; do
+				if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
+					error "Runtime dependencie $rd not found, cannot continue"
+					clean
+					exit $E_DEPS;
+				fi
+				echo "R$rd`pkginfo -b $rd`" >> .META
+			done
+		fi
 	fi
 	bsdtar -tf $PKGMK_PACKAGE_DIR/$1 > .MTREE
 
