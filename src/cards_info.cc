@@ -92,7 +92,6 @@ void CardsInfo::listInstalled()
 void CardsInfo::listBinaries()
 {
 	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
-	pkgrepo->parsePkgRepoCategoryDirectory();
 	cout << endl << "Minimum number of availables binaries: " << pkgrepo->getBinaryPackageList() << " (sub packages not included)"<< endl<< endl;
 	
 }
@@ -100,48 +99,8 @@ void CardsInfo::listPorts()
 {
 	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
 	unsigned int  numberOfPorts = 0;
-	pkgrepo->parseCategoryDirectory();
-	pkgrepo->parsePackagePkgfileList();
 	numberOfPorts = pkgrepo->getPortsList();
 	cout << endl << "Number of available ports: " << numberOfPorts << endl << endl;
-}
-void CardsInfo::listOutOfDate()
-{
-	// FIXME not working anymore, I guess this will change as well in the future
-  Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
-  pkgrepo->parseCategoryDirectory();
-  pkgrepo->parseBasePackageList();
-  set<string> result = pkgrepo->getListOutOfDate();
-	
-  if (result.size() > 0) {
-		string packageName = "";
-		string nameToFind = "";
-		std::string::size_type pos;
-		CardsDepends CD(m_argParser);
-		vector<LevelName> packagesLevelList = CD.getLevel();
-		if (packagesLevelList.size() > 0) {
-			for (vector<LevelName>::iterator i = packagesLevelList.begin();i != packagesLevelList.end();i++) {
-				for (set<string>::const_iterator j = result.begin(); j != result.end(); ++j) {
-					packageName = "/" + *j + "/";
-					
-#ifndef NDEBUG
-					cerr << *j << endl;
-					cerr << packageName << endl;
-					cerr << i->l << " " << i->name << endl;
-#endif
-					nameToFind = i->name + "/";
-					pos = nameToFind.find(packageName);
-					if (pos != std::string::npos) {
-						cout << i->l << ": " << *j << endl;
-						break;
-					}
-				} 
-    	}
-			cout << endl << "Number of ports which need to be updated: " << result.size() << endl << endl;
-		} else {
-			cout << "Check dependencies with cards level command ..." << endl;
-		}
-	}
 }
 void CardsInfo::infoInstall()
 {
@@ -167,7 +126,6 @@ void CardsInfo::infoInstall()
 void CardsInfo::infoBinary()
 {
 	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
-	pkgrepo->parsePkgRepoCategoryDirectory();
 	if ( ! pkgrepo->getBinaryPackageInfo(m_argParser.otherArguments()[0]) ) {
 		cout << m_argParser.otherArguments()[0] << " not found " << endl;
 	}
@@ -175,8 +133,6 @@ void CardsInfo::infoBinary()
 void CardsInfo::infoPort()
 {
 	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
-	pkgrepo->parseCategoryDirectory();
-	pkgrepo->parsePackagePkgfileList();
 	if ( ! pkgrepo->getPortInfo(m_argParser.otherArguments()[0]) ) {
 		cout << m_argParser.otherArguments()[0] << " not found " << endl;
 	}
@@ -185,8 +141,6 @@ void CardsInfo::diffPorts()
 {
 	buildDatabaseWithNameVersion();
 	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
-	pkgrepo->parseCategoryDirectory();
-	pkgrepo->parsePackagePkgfileList();
 	vector<pair<string, DiffVers > > result;
 	DiffVers DV;
 	DV.installed="Installed";
@@ -239,7 +193,6 @@ void CardsInfo::diffBinaries()
 {
 	buildDatabaseWithNameVersion();
 	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
-	pkgrepo->parsePkgRepoCategoryDirectory();
 	vector<pair<string, DiffVers > > result;
 	DiffVers DV;
 	DV.installed="Installed";
@@ -304,7 +257,6 @@ void CardsInfo::diffBinaries()
 void CardsInfo::search()
 {
 	Pkgrepo  * pkgrepo = new Pkgrepo("/etc/cards.conf");
-	pkgrepo->parsePkgRepoCategoryDirectory();
 
 	if ( ! pkgrepo->search(m_argParser.otherArguments()[0]) ) {
 		cout << "no occurence found" << endl;

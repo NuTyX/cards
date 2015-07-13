@@ -19,8 +19,8 @@
 //  USA.
 //
 
-#ifndef CONFIGPARSER_H
-#define CONFIGPARSER_H
+#ifndef PKGREPO_H
+#define PKGREPO_H
 
 
 #include <string>
@@ -37,7 +37,7 @@ struct PortFilesList {
 };
 
 /**
- * \representation of the .PKGREPO file which belong to the category directory
+ * \representation of the .PKGREPO file which belong to the collection directory
  * define in the configuration file cards.conf.
  *************************************************
  * 73193bfc1cb30fe02a880ed088ed7590#1414192958#aalib#1.4rc5##n.a#n.a#n.a#n.a#.cards.tar.xz
@@ -62,7 +62,7 @@ struct BasePackageInfo {
 
 /**
  * \representation of the .PKGREPO file locate in each port directory.
- * The difference with the category .PKGFILE, it contains the list of
+ * The difference with the collection .PKGREPO, it contains the list of
  * possible files (binaries, Pkgfile, README etc)
  * Exemple of firefox/.PKGREPO contents:
  ******************************************************
@@ -101,19 +101,27 @@ class Pkgrepo
 		Pkgrepo(const std::string& fileName);
 		static int parseConfig(const std::string& fileName,
 			Config& config);
+
+	private:
 /**
- * \parse the .PKGREPO file which belong to the category found
+ *
+ * \parse the config file
+ **/
+		int parseConfig(const std::string& fileName);
+
+/**
+ * \parse the .PKGREPO file which belong to the collection found
  * in the configuration file cards.conf. It populate the 
  * the m_packageList.basePackageName part by looking
- * the download .PKGREPO file of each activate category
+ * the downloaded .PKGREPO file of each activate collection
  * 
  * Depends on: m_config.dirUrl
  *
  * populate: m_portsDirectoryList (Dir, Url, BasePackageInfo for each possible port found in Dir)
- * with the contents of the category .PKGREPO file
+ * with the contents of the collection .PKGREPO file
  *
  **/
-		void parsePkgRepoCategoryDirectory();
+		void parsePkgRepoCollectionFile();
 
 /**
  * \parse the directory directly based on what we have locally.
@@ -125,15 +133,35 @@ class Pkgrepo
  * populate:  m_portsDirectoryList  ( Dir, BasePackageInfo->basePackageName only )
  *
  **/
-		void parseCategoryDirectory();
+		void parseCollectionDirectory();
+
+/**
+ * \parse the .PKGREPO of a port directory
+ * if it found a first line with the date of construction
+ * and the extension of the archive then it populate
+ * the list of packages
+ *
+ * Depends on: parsePkgRepoCollectionFile
+ *
+ * Populate: m_portFilesList (md5SUM.name,arch)
+ *
+ */
+		void parsePkgRepoPort();
+
+/**
+ * \parse the Pkgfile for each basePackage
+ * add the version of the port found in the Pkgfile
+ *
+ */
+		void parsePackagePkgfileList();
 
 /**
  * \download the .PKGREPO of packageName
  *
- * Depends on: parsePkgRepoCategoryDirectory
+ * Depends on: parsePkgRepoCollectionFile
  *
  * populate: nothing
- * 
+ *
  * add: the .PKGREPO of the packageName port from the mirror
  *
  */
@@ -142,7 +170,7 @@ class Pkgrepo
 /**
  * \download the packagefileName
  *
- * Depends on: parsePkgRepoCategoryDirectory
+ * Depends on: parsePkgRepoCollectionFile
  *
  * populater: nothing
  *
@@ -150,6 +178,16 @@ class Pkgrepo
  *
  */
 		void downloadPackageFileName(const std::string& packageFileName);
+
+	public:
+
+/**
+ *
+ * \parse the .PKGREPO of all the packageName directory
+ * If we found new one
+ *
+ */
+		void getBasePackageList(const std::string& packageName);
 
 /**
  *
@@ -159,45 +197,18 @@ class Pkgrepo
  */
 	set<string> getListOfPackagesFromDirectory(const std::string& path);
 
-/**
- * \parse the .PKGREPO of a port directory
- * if it found a first line with the date of construction
- * and the extension of the archive then it populate
- * the list of packages
- *
- * Depends on: parsePkgRepoCategoryDirectory
- *
- * Populate: m_portFilesList (md5SUM.name,arch)
- *
- */
-		void parseBasePackageList();
-
-/**
- *
- * \parse the .PKGREPO of all the packageName directory
- * If we found new one
- *
- */
-		void parseBasePackageList(const std::string& packageName);
 
 /**
  *
  * \return a list of ports which has to be compiled OR
  *  has to be updated
  *
- * Depends on: parsePkgRepoCategoryDirectory
+ * Depends on: parsePkgRepoCollectionFile
  *
  * Populate: nothing
  *
  */
 		set<string> getListOutOfDate();
-
-/**
- * \parse the Pkgfile for each basePackage
- * add the version of the port found in the Pkgfile
- *
- */
-		void parsePackagePkgfileList();
 
 /*
  *	\return the folder of the port name
@@ -234,7 +245,7 @@ class Pkgrepo
  *  \return the location and the filename of the package if exist else
  *	return the packageName
  *
- *  Depends on: parsePkgRepoCategoryDirectory
+ *  Depends on: parsePkgRepoCollectionFile
  *
  *  Populate: nothing
  */
@@ -266,7 +277,11 @@ class Pkgrepo
 		bool getPortInfo(const std::string& portName);
 
 	private:
-		int parseConfig(const std::string& fileName);
+		bool m_parsePkgRepoCollectionFile;
+		bool m_parseCollectionDirectory;
+		bool m_parsePkgRepoPort;
+		bool m_parsePackagePkgfileList;
+
 		std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
 		std::vector<BasePackageInfo>::iterator m_BasePackageInfo_i;
 		std::vector<PortFilesList>::iterator m_PortFilesList_i;
@@ -279,5 +294,5 @@ class Pkgrepo
 
 		std::vector<PortsDirectory> m_portsDirectoryList;
 };
-#endif /* CONFIGPARSER_H */
+#endif /* PKGREPO_H */
 // vim:set ts=2 :

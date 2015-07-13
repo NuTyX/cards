@@ -75,7 +75,7 @@ private:
 	vector<string> m_dependenciesList;
 	vector<string> m_packageNameList;
 
-	Pkgrepo  * m_configParser;
+	Pkgrepo  * m_pkgrepo;
 	Config m_config;
 
 	// TODO make configurable from the command line

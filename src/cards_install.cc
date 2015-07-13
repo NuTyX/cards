@@ -52,7 +52,7 @@ void CardsInstall::run(int argc, char** argv)
 			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 			treatErrors("");
 	}
-	m_configParser = new Pkgrepo("/etc/cards.conf");
+	m_pkgrepo = new Pkgrepo("/etc/cards.conf");
 	// Is it a file (an archive) or a packagename
 	string::size_type pos = m_argParser.otherArguments()[0].find("cards.tar");
 
@@ -69,7 +69,6 @@ void CardsInstall::run(int argc, char** argv)
 		Pkgrepo::parseConfig("/etc/cards.conf", m_config);
 		// get following datas
 		// 6467b1da053830c331e1a97458c4f385#1428614644#firefox#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org#.cards.tar.xz
-		m_configParser->parsePkgRepoCategoryDirectory();
 	}
 }
 set<string> CardsInstall::findPackages(const string& path)
@@ -98,10 +97,10 @@ set<string> CardsInstall::getDirectDependencies()
 	}
 	if ( m_listOfDepotPackages.find(m_packageName) != m_listOfDepotPackages.end() )
 		return  m_listOfDepotPackages[m_packageName].dependencies;
-	if ( m_configParser->checkBinaryExist(m_packageName)) {
-		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
+	if ( m_pkgrepo->checkBinaryExist(m_packageName)) {
+		m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
 		if ( ! checkFileExist(m_packageFileName)) {
-			m_configParser->downloadPackageFileName(m_packageName);
+			m_pkgrepo->downloadPackageFileName(m_packageName);
 		}
 
 		set<string> packageNameBuildNDeps;
@@ -263,16 +262,16 @@ void CardsInstall::update()
 			m_actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
 			treatErrors(m_packageName);
 		}
-		if ( m_configParser->checkBinaryExist(m_packageName)) {
-			m_packageFileName = m_configParser->getPackageFileName(m_packageName);
+		if ( m_pkgrepo->checkBinaryExist(m_packageName)) {
+			m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
 			if ( ! checkFileExist(m_packageFileName)) {
-				m_configParser->downloadPackageFileName(m_packageName);
+				m_pkgrepo->downloadPackageFileName(m_packageName);
 			}
 		} else {
 			m_actualError = PACKAGE_NOT_FOUND;
 			treatErrors(m_packageName);
 		}
-		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
+		m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
 	}
 
 	set<string> keep_list;
@@ -367,10 +366,10 @@ void CardsInstall::install()
 #ifndef NDEBUG
 					cout << packageName << endl;
 #endif
-					if ( m_configParser->checkBinaryExist(packageName)) {
-						m_packageFileName = m_configParser->getPackageFileName(packageName);
+					if ( m_pkgrepo->checkBinaryExist(packageName)) {
+						m_packageFileName = m_pkgrepo->getPackageFileName(packageName);
 						if ( ! checkFileExist(m_packageFileName)) {
-							m_configParser->downloadPackageFileName(packageName);
+							m_pkgrepo->downloadPackageFileName(packageName);
 						}
 						tmpList.push_back(packageName);
 					}
@@ -452,13 +451,13 @@ void CardsInstall::addPackagesList()
 #ifndef NDEBUG
 		cerr << m_packageName << endl;
 #endif
-		m_packageFileName = m_configParser->getPackageFileName(m_packageName);
+		m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
 
 		if  ( checkPackageNameExist(m_packageName) ) {
 			continue;
 		}
 
-		if ( ! m_configParser->checkBinaryExist(m_packageName)) {
+		if ( ! m_pkgrepo->checkBinaryExist(m_packageName)) {
 			m_actualError = PACKAGE_NOT_FOUND;
 			treatErrors(m_packageName);
 		}
@@ -472,19 +471,18 @@ void CardsInstall::install(const vector<string>& dependenciesList)
 
 	// Retrieving info about all the packages
 	buildDatabaseWithDetailsInfos(false);
-	m_configParser = new Pkgrepo("/etc/cards.conf");
-	m_configParser->parsePkgRepoCategoryDirectory();
+	m_pkgrepo = new Pkgrepo("/etc/cards.conf");
 	std::set<string> listOfPackages;
 	string packageName;
 	for (std::vector<string>::const_iterator it = dependenciesList.begin(); it != dependenciesList.end();it++) {
 		packageName = basename(const_cast<char*>(it->c_str()));
 		if ( packageName == m_argParser.otherArguments()[0])
 			break;
-		m_configParser->parseBasePackageList(packageName);
-		listOfPackages = m_configParser->getListOfPackagesFromDirectory(*it);
+		m_pkgrepo->getBasePackageList(packageName);
+		listOfPackages = m_pkgrepo->getListOfPackagesFromDirectory(*it);
 		for (std::set<string>::const_iterator i = listOfPackages.begin(); i != listOfPackages.end();i++) {
 			if ( ! checkPackageNameExist(*i) ) {
-				if ( m_configParser->checkBinaryExist(*i)) {
+				if ( m_pkgrepo->checkBinaryExist(*i)) {
 #ifndef NDEBUG
 					cerr << "Add for install: " << *i << endl;
 #endif
@@ -504,11 +502,9 @@ void CardsInstall::createBinariesOf(const string& packageName)
 void CardsInstall::createBinaries()
 {
 	Pkgrepo::parseConfig("/etc/cards.conf", m_config);
-	m_configParser = new Pkgrepo("/etc/cards.conf");
-	m_configParser->parseCategoryDirectory();
-	m_configParser->parsePkgRepoCategoryDirectory();
+	m_pkgrepo = new Pkgrepo("/etc/cards.conf");
 	cout << "create of " << m_packageName << endl;
-	string pkgdir = m_configParser->getPortDir(m_packageName);
+	string pkgdir = m_pkgrepo->getPortDir(m_packageName);
 	if (pkgdir == "" ) {
 		m_actualError = PACKAGE_NOT_FOUND;
 		treatErrors(m_packageName);
@@ -607,14 +603,14 @@ void CardsInstall::createBinaries()
 		treatErrors(pkgdir+ "/.PKGREPO");
 	}
 	// Get the list of files
-	m_configParser->parseBasePackageList(m_packageName);
+//	m_pkgrepo->parseBasePackageList(m_packageName);
 
 	m_dependenciesList.clear();
 	// Let's install the found binaries now
-	std::set<string> listOfPackages = m_configParser->getListOfPackagesFromDirectory(pkgdir);
+	std::set<string> listOfPackages = m_pkgrepo->getListOfPackagesFromDirectory(pkgdir);
 	for (std::set<string>::const_iterator i = listOfPackages.begin(); i != listOfPackages.end();i++) {
 		if ( ! checkPackageNameExist(*i) ) {
-			if ( m_configParser->checkBinaryExist(*i)) {
+			if ( m_pkgrepo->checkBinaryExist(*i)) {
 				message = "ADD FOR INSTALL: " + *i ;
 				cout << message << endl;
 				if ( m_config.logdir != "" ) {
