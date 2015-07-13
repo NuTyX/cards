@@ -659,10 +659,7 @@ add_meta_to_archive() {
 	echo "B$PKGMK_BUILDVER" >> .META
 	echo "a$PKGMK_ARCH" >> .META
 	# TODO improve the pkginfo --runtimedepfiles functionnality
-	## aaabasicfs is the first package anyway so it can not have
-	## any dependencies. Suggestion: add a variable PKGMK_IGNORE_RUNTIMEDEPS
-	## if not set to "no" do the following code
-	if [ "$name" != "aaabasicfs" ]; then
+	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
 		for dep in `pkginfo --runtimedepfiles $TAR`; do
 			echo "R$dep" >> .META
 		done
@@ -1411,6 +1408,7 @@ PKGMK_IGNORE_NEW="yes"
 PKGMK_IGNORE_MD5SUM="yes"
 PKGMK_IGNORE_REPO="no"
 PKGMK_IGNORE_COLLECTION="yes"
+PKGMK_IGNORE_RUNTIMEDEPS="yes"
 
 PKGMK_NO_STRIP="no"
 

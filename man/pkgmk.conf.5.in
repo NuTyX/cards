@@ -78,6 +78,11 @@ Option to deactivate the generation of the .PKGREPO file located in the parent d
 .br
 Default: 'yes'
 .TP
+\fBPKGMK_IGNORE_RUNTIMEDEPS='STRING'\fP
+Option to activate the runtime dependencies. If set to "no" it will add automatically the runtimedeps of the new compile package via the \fBpkginfo --runtimedepfiles\fP command. It's need for the bot and for the people who want to deploy they owns binary packages.
+.br
+Default: 'yes'
+.TP
 \fBPKGMK_COMPRESSION_PACKAGE='STRING'\fP
 Option to activate the compression of the package produced.
 .br

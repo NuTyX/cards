@@ -73,6 +73,11 @@ Option pour déactiver la génération du fichier .PKGREPO se trouvant dans le d
 .br
 Défaut: 'yes'
 .TP
+\fBPKGMK_IGNORE_RUNTIMEDEPS='STRING'\fP
+Option pour activer la rechercher automatique des dépendances de fonctionnement. Si "no", les dépendances de fonctionement seront automatiquement ajoutées dans le nouveau binaire via la commande \fBpkginfo --runtimedepfiles\fP. Cette option est indispensable pour le bot et la personne qui souhaite déployer ses propres paquets produits.
+.br
+Défaut: 'yes'
+.TP
 \fBPKGMK_COMPRESSION_PACKAGE='STRING'\fP
 Option pour activer la compresssion du paquet produit.
 .br
