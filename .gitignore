@@ -1,0 +1,11 @@
+*.[oa]
+*~
+.cards_depend
+.tools_depend
+.libs_depend
+cards
+pkgadd
+pkgrm
+pkginfo
+libcards*
+*.gch
