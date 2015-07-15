@@ -189,5 +189,5 @@ private:
 // Utility functions
 void assertArgument(char** argv, int argc, int index);
 void rotatingCursor();
-#endif /* CARDS_H */
+#endif /* PKGDBH_H */
 // vim:set ts=2 :
