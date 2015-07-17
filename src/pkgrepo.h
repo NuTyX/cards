@@ -155,6 +155,7 @@ class Pkgrepo
  */
 		void parsePackagePkgfileList();
 
+	public:
 /**
  * \download the .PKGREPO of packageName
  *
@@ -178,8 +179,6 @@ class Pkgrepo
  *
  */
 		void downloadPackageFileName(const std::string& packageFileName);
-
-	public:
 
 /**
  *

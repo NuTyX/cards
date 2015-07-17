@@ -894,10 +894,99 @@ bool Pkgrepo::search(const string& s)
 }
 int Pkgrepo::parseConfig(const string& fileName)
 {
-	return getConfig(fileName,m_config);
+	/*
+		TODO This will need to be beter done
+		I guess ones houaphan version  of NuTyX is release we can simply that part
+	*/
+	int result = 0;
+	if (checkFileExist("/var/lib/pkg/nutyx-version") ) {
+		result = getConfig("/var/lib/pkg/nutyx-version", m_config);
+		if ( result != 0 )
+			return result;
+	}
+	if ( m_config.name.size() == 0 ) {
+		m_config.name="saravane";
+	}
+
+	result = getConfig(fileName,m_config);
+	if ( result != 0 )
+		return result;
+
+	std::string::size_type pos;
+
+	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
+		DirUrl DU = *i ;
+		if (DU.Url.size() == 0 )
+			continue;
+
+		string categoryDir, url;
+		categoryDir = DU.Dir;
+
+		string category = basename(const_cast<char*>(categoryDir.c_str()));
+
+		pos = DU.Url.find (m_config.name);
+
+		if (pos != std::string::npos) {
+			url = DU.Url.substr(0,pos-1) + "/" + m_config.name + "/" + getMachineType()+ "/" + category;
+#ifndef NDEBUG
+			cerr << pos << endl;
+#endif
+		} else {
+			 url = DU.Url + "/" + m_config.name + "/" + getMachineType()+ "/" + category;
+		}
+#ifndef NDEBUG
+		cerr << url << endl;
+#endif
+		i->Url = url;
+	}
+	return result;
 }
 int Pkgrepo::parseConfig(const string& fileName, Config& config)
 {
-	return getConfig(fileName,config);
+	/*
+		TODO This will need to be beter done
+		I guess ones houaphan version  of NuTyX is release we can simply that part
+	*/
+	int result = 0;
+	if (checkFileExist("/var/lib/pkg/nutyx-version") ) {
+		result = getConfig( "/var/lib/pkg/nutyx-version" , config);
+		if ( result != 0 )
+			return result;
+	}
+	if ( config.name.size() == 0 ) {
+		config.name="saravane";
+	}
+
+	std::string::size_type pos;
+	result = getConfig(fileName,config);
+	if ( result != 0 )
+		return result;
+
+	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
+		DirUrl DU = *i ;
+		if (DU.Url.size() == 0 )
+			continue;
+
+		string categoryDir, url;
+		categoryDir = DU.Dir;
+
+		string category = basename(const_cast<char*>(categoryDir.c_str()));
+
+		pos = DU.Url.find (config.name);
+		if (pos != std::string::npos) {
+			url = DU.Url.substr(0,pos-1) + "/" + config.name + "/" + getMachineType()+ "/" + category;
+#ifndef NDEBUG
+			cerr << pos << endl;
+#endif
+		} else {
+			url = DU.Url + "/" + config.name + "/" + getMachineType()+ "/" + category;
+		}
+#ifndef NDEBUG
+		cerr << url << endl;
+#endif
+		i->Url = url;
+
+	}
+	return result;
 }
 // vim:set ts=2 :

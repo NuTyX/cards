@@ -251,6 +251,7 @@ void CardsDepends::treatErrors(const string& s) const
 		case CANNOT_COPY_FILE:
 		case CANNOT_RENAME_FILE:
 		case CANNOT_DETERMINE_NAME_BUILDNR:
+		case WRONG_ARCHITECTURE:
 		case EMPTY_PACKAGE:
 		case CANNOT_FORK:
 		case WAIT_PID_FAILED:

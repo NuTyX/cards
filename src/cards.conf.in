@@ -25,21 +25,27 @@
 ##                                         /...
 
 ## Uncomment following lines if you want to compile your own ports
+## Adjust to your wishes
 #
 # dir /usr/ports/desktop
 # dir /usr/ports/console
 # dir /usr/ports/base
 
-dir /var/lib/pkg/saravane/desktop|http://downloads.nutyx.org/saravane/#ARCH#/desktop
-dir /var/lib/pkg/saravane/console|http://downloads.nutyx.org/saravane/#ARCH#/console
-dir /var/lib/pkg/saravane/base|http://downloads.nutyx.org/saravane/#ARCH#/base
+## The name of the NuTyX version is found in /var/lib/pkg/nutyx-version file
+## The Colletion name (graphic,console and base) must exist on the mirror http://downloads.nutyx.org (in this case)
 
-##
-##
-## Cards can log the output of the creation of the final package if 
-## the following variable is set: the compilation will be logged
+dir /var/lib/pkg/remote/graphic|http://downloads.nutyx.org
+dir /var/lib/pkg/remote/console|http://downloads.nutyx.org
+dir /var/lib/pkg/remote/base|http://downloads.nutyx.org
 
-logdir /var/log/pkgbuild
+## Cards needs to know if he's allowed to removing the package you pass to the command argument:
+##   cards remove <packagename>
+## Because yes, we don't want do delete the glibc package for example :)
+## Moreover if need to come back to a base system, following folder(s) should contains packages
+## Si l'on veut revenir à un système de base, les dossiers suivant doivent contenir des paquets
+## In the following setting, packages from base system and server will not be touch
+
+base /var/lib/pkg/saravane/base
 
 ##
 ## We can specify which locale we want, it's possible to mention as many locale we want
@@ -49,9 +55,11 @@ logdir /var/log/pkgbuild
 
 locale fr
 
-##
-## If need to come back to a base system, following folder(s) should contains packages
-## Si l'on veut revenir à un système de base, les dossiers suivant doivent contenir des paquets
-## In the following setting, packages from base system and server will not be touch
 
-base /var/lib/pkg/saravane/base
+## If you plan to build your Package you will like this option otherwise just ignore it
+##
+## Cards can log the output of the creation of the final package if
+## the following variable is set: the compilation will be logged
+
+logdir /var/log/pkgbuild
+
