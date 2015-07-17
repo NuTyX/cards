@@ -68,6 +68,7 @@ CANNOT_READ_ARCHIVE,
 CANNOT_FIND_META_FILE,
 CANNOT_FIND_MTREE_FILE,
 CANNOT_FIND_NAME,
+CANNOT_FIND_ARCH,
 EMPTY_ARCHIVE
 };
 
@@ -91,6 +92,7 @@ class ArchiveUtils
 	unsigned int long size();              	// Numbers of files in the archive
 	std::set<std::string> setofFiles(); 		// return a order set of string
 	std::set<std::string> listofDependencies(); // return an order set of dependencies
+	std::string arch();       // return the arch of the package
 	std::string version();    // return the version of the package
 	std::string release();		// return the release of the package
 	std::string description();// return the description	of the package
@@ -106,6 +108,7 @@ class ArchiveUtils
 	private:
 	
 	std::string getPackageName();
+	std::string getPackageArch();
 	std::vector<std::string>  extractFileContent(const char * fileName);
 	void getRunTimeDependencies();
 
@@ -119,6 +122,7 @@ class ArchiveUtils
 	std::set<std::string> m_rtDependenciesList;
 	std::string m_fileName;
 	std::string m_packageName;
+	std::string m_packageArch;
 	std::set<std::string> m_filesList;
 
 	archive_error m_actualError;

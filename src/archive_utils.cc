@@ -47,6 +47,7 @@ ArchiveUtils::ArchiveUtils(const string& fileName)
 		treatErrors(m_fileName);
 	}
 	m_packageName  = getPackageName();
+	m_packageArch  = getPackageArch();
 	for (vector<string>::const_iterator i = m_contentMtree.begin(); i != m_contentMtree.end(); i++) {
 		string fileName = *i;
 		m_filesList.insert(fileName);
@@ -76,6 +77,8 @@ void ArchiveUtils::treatErrors(const std::string& message) const
 			break;
 		case CANNOT_FIND_NAME:
 			throw runtime_error(message + " is not a CARDS archive");
+		case CANNOT_FIND_ARCH:
+			throw runtime_error("archive " + message + "invalid, cannot architecture");
 			break;
 	}
 }
@@ -188,6 +191,23 @@ string ArchiveUtils::getPackageName()
 	treatErrors(m_fileName);
 	return "";
 }
+string ArchiveUtils::getPackageArch()
+{
+	string arch;
+	if ( m_contentMeta.size() == 0 ) {
+		m_actualError = CANNOT_FIND_ARCH;
+		treatErrors(m_fileName);
+		return "";
+	}
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		arch = *i;
+		if ( arch[0] == 'a' ) {
+			return arch.substr(1);
+			break;
+		}
+	}
+	return "";
+}
 string ArchiveUtils::namebuildn()
 {
 	return getPackageName() + epochBuildDate();
@@ -202,6 +222,10 @@ set<string> ArchiveUtils::listofDependencies()
 string ArchiveUtils::name()
 {
 	return m_packageName;
+}
+string ArchiveUtils::arch()
+{
+	return m_packageArch;
 }
 string ArchiveUtils::version()
 {
