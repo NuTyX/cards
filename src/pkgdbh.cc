@@ -107,6 +107,9 @@ void Pkgdbh::treatErrors(const string& s) const
 		case CANNOT_DETERMINE_NAME_BUILDNR:
 			throw RunTimeErrorWithErrno("could not determine name / build number " + s);
 			break;
+		case WRONG_ARCHITECTURE:
+			throw runtime_error(s + ": wrong architecture" );
+			break;
 		case EMPTY_PACKAGE:
 			throw RunTimeErrorWithErrno("could not synchronize " + s);
 			break;
@@ -761,6 +764,10 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 		treatErrors(basename);
 	}
 	m_packageArchiveName = packageArchive.name();
+	if ( ( packageArchive.arch() != getMachineType() ) && ( packageArchive.arch() != "any" ) ) {
+		m_actualError = WRONG_ARCHITECTURE;
+		treatErrors(basename);
+	}
 	m_packageArchiveVersion = packageArchive.version();
 	if (m_packageArchiveName.empty() ) {
 		m_actualError = CANNOT_DETERMINE_NAME_BUILDNR;

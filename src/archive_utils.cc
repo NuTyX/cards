@@ -78,7 +78,7 @@ void ArchiveUtils::treatErrors(const std::string& message) const
 		case CANNOT_FIND_NAME:
 			throw runtime_error(message + " is not a CARDS archive");
 		case CANNOT_FIND_ARCH:
-			throw runtime_error("archive " + message + "invalid, cannot architecture");
+			throw runtime_error("archive " + message + ": invalid architecture");
 			break;
 	}
 }

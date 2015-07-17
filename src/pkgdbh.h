@@ -24,6 +24,7 @@
 #define PKGDBH_H
 
 #include "archive_utils.h"
+#include "system_utils.h"
 
 #include <string>
 #include <set>
