@@ -91,6 +91,9 @@ struct DirUrl {
 
 struct Config {
 	Config() {}
+	std::string collection;
+	std::string name;
+	std::string version;
 	std::string arch;
 	std::string logdir;
 	std::vector<std::string> locale;

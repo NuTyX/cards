@@ -77,6 +77,12 @@ int getConfig(const string& fileName, Config& config)
 			if (key == "base") {
 				config.baseDir.push_back(val);
 			}
+			if (key == "name") {
+				config.name = val;
+			}
+			if (key == "version") {
+				config.version = val;
+			}
 		}
 	}
 	fclose(fp);
