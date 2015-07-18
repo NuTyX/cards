@@ -312,7 +312,7 @@ void Pkgrepo::getBasePackageList(const std::string& packageName)
 	// For each collection activate in cards.conf
 	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
 #ifndef NDEBUG
-		cerr << m_PortsDirectory_i->Dir << endl;
+		cerr << "m_PortsDirectory_i->Dir: " << m_PortsDirectory_i->Dir << endl;
 #endif
 		for ( m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
 			if ( m_BasePackageInfo_i->basePackageName == packageName ) {
@@ -387,8 +387,6 @@ void Pkgrepo::parsePackagePkgfileList()
 {
 	if (!m_parseCollectionDirectory)
 		parseCollectionDirectory();
-//	if (!m_parsePkgRepoPort)
-//		parsePkgRepoPort();
 
 	InfoFile downloadFile;
 	vector<InfoFile> downloadFilesList;
@@ -745,8 +743,6 @@ bool Pkgrepo::checkPortExist(const string& portName)
 		parseCollectionDirectory();
 	if (!m_parsePackagePkgfileList)
 		parsePackagePkgfileList();
-//	if (!m_parsePkgRepoPort)
-//		parsePkgRepoPort();
 
 	bool found = false;
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
@@ -767,19 +763,27 @@ bool Pkgrepo::checkBinaryExist(const string& packageName)
 		parseCollectionDirectory();
 	if (!m_parsePackagePkgfileList)
 		parsePackagePkgfileList();
-//	if (!m_parsePkgRepoPort)
-//		parsePkgRepoPort();
+	if (!m_parsePkgRepoCollectionFile)
+		parsePkgRepoCollectionFile();
 
 	string basePackageName = packageName;
 	string::size_type pos = packageName.find('.');
 	if (pos != string::npos) {
 		basePackageName=packageName.substr(0,pos);
 	}
-
+#ifndef NDEBUG
+	cerr << "basePackageName: " << basePackageName << endl;
+#endif
 	bool baseBinaryfound = false;
 	bool Binaryfound = false;
 	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
+#ifndef NDEBUG
+		 cerr << "Loop m_portsDirectoryList" << endl;
+#endif
 		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
+#ifndef NDEBUG
+			cerr << "m_BasePackageInfo_i->basePackageName: " << m_BasePackageInfo_i->basePackageName << endl;
+#endif
 			if ( m_BasePackageInfo_i->basePackageName == basePackageName ) {
 				baseBinaryfound = true;
 				break;

@@ -354,6 +354,9 @@ void CardsInstall::install()
 			m_actualError = PACKAGE_ALLREADY_INSTALL;
 			treatErrors (m_packageName);
 		}
+#ifndef NDEBUG
+		cerr << "Check for dependencies" << endl;
+#endif
 		// Generate the dependencies
 		generateDependencies();
 		// Add the locales if any defined
@@ -364,7 +367,7 @@ void CardsInstall::install()
 				for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
 					packageName = *j + "." + *i;
 #ifndef NDEBUG
-					cout << packageName << endl;
+					cerr << packageName << endl;
 #endif
 					if ( m_pkgrepo->checkBinaryExist(packageName)) {
 						m_packageFileName = m_pkgrepo->getPackageFileName(packageName);
