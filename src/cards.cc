@@ -146,7 +146,7 @@ of compilation" << endl
 			if (listOfDeps.size()>1)
 				CI.install(listOfDeps);
 			// compilation of the final port"
-			CI.createBinariesOf(cardsArgPars.otherArguments()[0]);
+			CI.createBinaries(cardsArgPars.otherArguments()[0]);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_BASE) {
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&

@@ -97,11 +97,6 @@ struct PortsDirectory {
 
 class Pkgrepo
 {
-	public:
-		Pkgrepo(const std::string& fileName);
-		static int parseConfig(const std::string& fileName,
-			Config& config);
-
 	private:
 /**
  *
@@ -136,7 +131,7 @@ class Pkgrepo
 		void parseCollectionDirectory();
 
 /**
- * \parse the .PKGREPO of a port directory
+ * \parse the ".PKGREPO" file of a port directory
  * if it found a first line with the date of construction
  * and the extension of the archive then it populate
  * the list of packages
@@ -146,16 +141,20 @@ class Pkgrepo
  * Populate: m_portFilesList (md5SUM.name,arch)
  *
  */
-		void parsePkgRepoPort();
+		void parsePkgRepoPortFile();
 
 /**
- * \parse the Pkgfile for each basePackage
+ * \parse the "Pkgfile" file for each basePackage
  * add the version of the port found in the Pkgfile
  *
  */
-		void parsePackagePkgfileList();
+		void parsePackagePkgfileFile();
 
 	public:
+
+		Pkgrepo(const std::string& fileName);
+		static int parseConfig(const std::string& fileName,
+			Config& config);
 /**
  * \download the .PKGREPO of packageName
  *
@@ -278,8 +277,7 @@ class Pkgrepo
 	private:
 		bool m_parsePkgRepoCollectionFile;
 		bool m_parseCollectionDirectory;
-		bool m_parsePkgRepoPort;
-		bool m_parsePackagePkgfileList;
+		bool m_parsePackagePkgfileFile;
 
 		std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
 		std::vector<BasePackageInfo>::iterator m_BasePackageInfo_i;

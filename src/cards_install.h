@@ -45,7 +45,7 @@ public:
 	void update();
 	void install();
 	void install(const vector<string>& dependenciesList);
-	void createBinariesOf(const string& packageName);
+	void createBinaries(const string& packageName);
 	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;
 	

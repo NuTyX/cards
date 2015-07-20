@@ -389,13 +389,14 @@ void CardsInstall::install()
 }
 void CardsInstall::addPackage()
 {
+	// New LockDatabase pointer
 	Db_lock  * pLock = NULL;
 	// Checking the rules
 	readRulesFile();
 
 	set<string> keep_list;
 	
-	// Reading the archiving to find a list of files
+	// Reading the archive to find a list of files
 	pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
 	set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
 #ifndef NDEBUG
@@ -497,7 +498,7 @@ void CardsInstall::install(const vector<string>& dependenciesList)
 	addPackagesList();
 	
 }
-void CardsInstall::createBinariesOf(const string& packageName)
+void CardsInstall::createBinaries(const string& packageName)
 {
 	m_packageName = packageName;
 	createBinaries();
@@ -601,38 +602,29 @@ void CardsInstall::createBinaries()
 		write( fdlog, timestamp.c_str(), timestamp.length());
 		write( fdlog, "\n", 1 );
 	}
-	if ( ! checkFileExist( pkgdir + "/.PKGREPO")) {
-		m_actualError = CANNOT_FIND_FILE;
-		treatErrors(pkgdir+ "/.PKGREPO");
-	}
-	// Get the list of files
-//	m_pkgrepo->parseBasePackageList(m_packageName);
 
-	m_dependenciesList.clear();
+	std::set<string> listOfPackages = findPackages(pkgdir);
 	// Let's install the found binaries now
-	std::set<string> listOfPackages = m_pkgrepo->getListOfPackagesFromDirectory(pkgdir);
 	for (std::set<string>::const_iterator i = listOfPackages.begin(); i != listOfPackages.end();i++) {
-		if ( ! checkPackageNameExist(*i) ) {
-			if ( m_pkgrepo->checkBinaryExist(*i)) {
-				message = "ADD FOR INSTALL: " + *i ;
-				cout << message << endl;
-				if ( m_config.logdir != "" ) {
-					write( fdlog, message.c_str(), message.length());
-					write( fdlog, "\n", 1 );
-				}
-				m_dependenciesList.push_back(*i);
-			}
+		if (i->find("cards.tar")== string::npos )
+			continue;
+		m_packageFileName = pkgdir + "/" + *i;
+		ArchiveUtils packageArchive(m_packageFileName.c_str());
+		string name = packageArchive.name();
+		string version = packageArchive.version();
+		if ( ! checkPackageNameExist(name) ) {
+				message = "ADD FOR INSTALL: " + name + " " + version;
+				m_packageFileName = pkgdir + "/" + *i;
+				addPackage();
 		} else {
-				message = "WARNING: " + *i + " is ALLREADY installed";
-				cout << message << endl;
-				if ( m_config.logdir != "" ) {
-					write( fdlog, message.c_str(), message.length()); 
-					write( fdlog, "\n", 1 );
-				}
+				message = "WARNING: " + name + " is ALLREADY installed";
+		}
+		cout << message << endl;
+		if ( m_config.logdir != "" ) {
+			write( fdlog, message.c_str(), message.length());
+			write( fdlog, "\n", 1 );
 		}
 	}
-
-	addPackagesList();
 
 	if ( m_config.logdir != "" ) {
 		time_t finishTime;
