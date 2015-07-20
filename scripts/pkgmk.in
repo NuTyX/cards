@@ -616,8 +616,9 @@ add_meta_files() {
 }
 
 add_meta_to_archive() {
-	local NAME TAR SIZE_I DESC URL PACK MAINT
+	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH
 	NAME="`get_package_name $1`"
+	ARCH="`get_package_arch $1`"
 
 	info  "Adding meta data to Archive $NAME"
 
@@ -657,7 +658,7 @@ add_meta_to_archive() {
 	echo "V$version" >> .META
 	echo "r$release" >> .META
 	echo "B$PKGMK_BUILDVER" >> .META
-	echo "a$PKGMK_ARCH" >> .META
+	echo "a$ARCH" >> .META
 	# TODO improve the pkginfo --runtimedepfiles functionnality
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
 		for dep in `pkginfo --runtimedepfiles $TAR`; do
@@ -1406,7 +1407,7 @@ PKGMK_DOWNLOAD="no"
 PKGMK_IGNORE_FOOTPRINT="yes"
 PKGMK_IGNORE_NEW="yes"
 PKGMK_IGNORE_MD5SUM="yes"
-PKGMK_IGNORE_REPO="no"
+PKGMK_IGNORE_REPO="yes"
 PKGMK_IGNORE_COLLECTION="yes"
 PKGMK_IGNORE_RUNTIMEDEPS="yes"
 
