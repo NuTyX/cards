@@ -59,9 +59,9 @@ Si défini comme 'no', pkgmk va supprimé les symboles de test dans les paquets 
 Défaut: 'no'
 .TP
 \fBPKGMK_IGNORE_REPO='STRING'\fP
-Option pour déactiver la génération du fichier .PKGREPO. A ne changer que si vous compilez votre port via la commande \fBpkgmk\fP.
+Option pour déactiver la génération du fichier .PKGREPO se trouvant dans le dossier du port. Si changer à "no", le fichier sera généré. Il sera alors possible d'installer via la commande \fBcards install\fP si la variable \fBPKGMK_IGNORE_COLLECTION\fP est également ajustée à "no". A ne changer que si vous décidez d'installer vos port via la commande \fBcards install\fP.
 .br
-Défaut: 'no'
+Défaut: 'yes'
 .TP
 \fBPKGMK_IGNORE_UNPACK='STRING'\fP
 Option pour déactiver l'extraction des sources du code de votre paquet. Vous devez alors extraire les sources vous-même avant de lancer la commande cd $name-$version (par exemple).

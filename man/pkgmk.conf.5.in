@@ -64,9 +64,9 @@ If set to 'no', pkgmk will strip built binaries.
 Default: 'no'
 .TP
 \fBPKGMK_IGNORE_REPO='STRING'\fP
-Option to disable the generation of the .PKGREPO file. Only set it if you compile your port via the \fBpkgmk\fP command.
+Option to disable the generation of the .PKGREPO file locate in the port directory. If set to "no" it will generate this file. It will be then possible to install via the \fBcards install\fP command if the variable \fBPKGMK_IGNORE_COLLECTION\fP is also set to "no". Only set to "no"  if you plan to use your port via the \fBcards install\fP command.
 .br
-Default: 'no'
+Default: 'yes'
 .TP
 \fBPKGMK_IGNORE_UNPACK='STRING'\fP
 Option to disable the extract of the source codes of the package. You need to extract the source code yourself prior the cd $name-$version (for exemple)
