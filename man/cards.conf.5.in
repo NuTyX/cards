@@ -19,22 +19,21 @@ It might look like this:
 
 # root directories
 dir /usr/ports/lxde
-dir /usr/ports/desktop
+dir /usr/ports/graphic
 dir /usr/ports/console
 dir /usr/ports/base
 
-dir /var/lib/pkg/saravane/desktop|http://downloads.nutyx.org/saravane/x86_64/desktop
-dir /var/lib/pkg/saravane/console|http://downloads.nutyx.org/saravane/x86_64/console
-dir /var/lib/pkg/saravane/base|http://downloads.nutyx.org/saravane/x86_64/base
+dir /var/lib/pkg/remote/graphic-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/remote/graphic|http://downloads.nutyx.org
+dir /var/lib/pkg/remote/console-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/remote/console|http://downloads.nutyx.org
+dir /var/lib/pkg/remote/base-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/remote/base|http://downloads.nutyx.org
 
 
 # write a log file
 
 logdir /var/log/pkgbuild
-
-# arch
-
-arch x86_64
 
 # locales
 
