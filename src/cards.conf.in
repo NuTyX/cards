@@ -31,35 +31,60 @@
 # dir /usr/ports/console
 # dir /usr/ports/base
 
-## The name of the NuTyX version is found in /var/lib/pkg/nutyx-version file
-## The Colletion name (graphic,console and base) must exist on the mirror http://downloads.nutyx.org (in this case)
-
+## The name of the NuTyX version is found in the /var/lib/pkg/nutyx-version file
+## The Colletion name (graphic, graphic-extra,console, console-extra, base et base-extra)
+## must exist on the mirror http://downloads.nutyx.org (in this case)
+##
+## Le nom de la version de NuTyX se trouve dans le fichier /var/lib/pkg/nutyx-version
+## Le nom des collections (graphic, graphic-extra,console, console-extra, base et base-extra)
+## doivent exister sur le mirroir http://downloads.nutyx.org (dans ce cas)
+dir /var/lib/pkg/remote/graphic-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/remote/graphic|http://downloads.nutyx.org
+dir /var/lib/pkg/remote/console-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/remote/console|http://downloads.nutyx.org
+dir /var/lib/pkg/remote/base-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/remote/base|http://downloads.nutyx.org
 
 ## Cards needs to know if he's allowed to removing the package you pass to the command argument:
 ##   cards remove <packagename>
 ## Because yes, we don't want do delete the glibc package for example :)
 ## Moreover if need to come back to a base system, following folder(s) should contains packages
-## Si l'on veut revenir à un système de base, les dossiers suivant doivent contenir des paquets
-## In the following setting, packages from base system and server will not be touch
-
-base /var/lib/pkg/saravane/base
+##
+##
+## Cards doit vérifier si il peut supprimer le paquet passé en argument:
+#    cards remove <packagename>
+#  En effet, nous ne souhaitons pas supprimer le paquet glibc par exemple :)
+#  De plus, si l'on veut revenir à un système de base, les dossiers suivant doivent contenir des paquets
+#
+## In the following setting, packages from base system and base-extra will not be deleted
+## Dans le cas ci-dessous, les paquets des collections base et base-extra ne seront pas supprimés
+base /var/lib/pkg/remote/base
+base /var/lib/pkg/remote/base-extra
 
 ##
 ## We can specify which locale we want, it's possible to mention as many locale we want
 ## As the following exemple french, belgium, and germans locales
 ## On peut spécifier quelle(s) locale(s) doivent être installées
 ##
-
 locale fr
 
 
 ## If you plan to build your Package you will like this option otherwise just ignore it
 ##
-## Cards can log the output of the creation of the final package if
-## the following variable is set: the compilation will be logged
-
+## Cards can log the output of the creation of the final package when a:
+#
+#   cards create -r <nom of package>
+#
+## if following variable is set and is refering a folder: the compilation will be logged
+##
+##
+## Si vous avez l'intention de construire vos propre paquets, cette option va vous plaire
+## Si non, ignorez-la
+##
+## Cards va enrégistrer la sortie de la création du paquet final lors d'un:
+#
+#   cards create -r <nom de paquet >
+#
+##  si la variable ci-dessous est définie et pointe sur un dossier
 logdir /var/log/pkgbuild
 
