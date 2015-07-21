@@ -131,6 +131,7 @@ void Pkginfo::run(int argc, char** argv)
 			<< au->name() << " Packager(s)    : " << au->packager() << endl
 			<< au->name() << " Version        : " << au->version() << endl
 			<< au->name() << " Release        : " << au->release() << endl
+			<< au->name() << " Architecture   : " << au->arch() << endl
 			<< au->name() << " Build date     : " << au->epochBuildDate() << endl;
 		cout << au->name() << " Dependencies   : ";
 		set<string> depList = au->listofDependencies();
