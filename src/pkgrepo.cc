@@ -41,6 +41,7 @@ Pkgrepo::Pkgrepo(const std::string& fileName)
 
 	m_parsePkgRepoCollectionFile = false;
 	m_parseCollectionDirectory = false;
+	m_parsePackagesPkgRepoFile = false;
 	m_parsePackagePkgfileFile = false;
 
 }
@@ -229,7 +230,7 @@ set<string> Pkgrepo::getListOfPackagesFromDirectory(const string& path)
 #endif
 			if ( path == m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName) {
 				found=true;
-				parsePkgRepoPortFile();
+				parseCurrentPackagePkgRepoFile();
 				break;
 			}
 		}
@@ -252,7 +253,7 @@ set<string> Pkgrepo::getListOfPackagesFromDirectory(const string& path)
 
 	return listOfPackages;	
 }
-void Pkgrepo::parsePkgRepoPortFile()
+void Pkgrepo::parseCurrentPackagePkgRepoFile()
 {
 /*
  From here we can check whats is available in the port directory
@@ -320,68 +321,63 @@ void Pkgrepo::parsePkgRepoPortFile()
 		m_portFilesList.push_back(portFilesList);
 	}
 }
-void Pkgrepo::getBasePackageList(const std::string& packageName)
+void Pkgrepo::parsePackagesPkgRepoFile()
 {
 	if (!m_parseCollectionDirectory)
 		parseCollectionDirectory();
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
 
-	bool found=false;
 	vector<string> infos;
 	// For each collection activate in cards.conf
 	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
 #ifndef NDEBUG
 		cerr << "m_PortsDirectory_i->Dir: " << m_PortsDirectory_i->Dir << endl;
 #endif
+		// For each port found in the current collection
 		for ( m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
-			if ( m_BasePackageInfo_i->basePackageName == packageName ) {
-				found=true;
-				vector<string> PkgRepoFileContent;
-				string PkgRepoFile = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName  + "/.PKGREPO";
-				parseFile(PkgRepoFileContent,PkgRepoFile.c_str());
-				PortFilesList portFilesList;
-				for (vector<string>::const_iterator i = PkgRepoFileContent.begin();i != PkgRepoFileContent.end(); ++i) {
-					string input = *i;
-					if (input.size() < 11) {
-						cerr << "[" << input << "]: Wrong format field to small" << endl;
-						continue;
-					}
-					if ( input[10] != '#' ) { // It's not the first line, then it can be one of our files
-#ifndef NDEBUG
-						cerr << "input: " << input << endl;
-#endif
-						infos.clear();
-						split( input, '#', infos, 0, false);
-#ifndef NDEBUG
-						cerr << "Number of fields: " << infos.size()<< endl;
-#endif
-						portFilesList.md5SUM = infos[0];
-						portFilesList.name = infos[1];
-						if ( infos.size() > 2 ) {
-							if ( infos[2].size() > 0 ) {
-								portFilesList.arch = infos[2];
-							}
-						} else {
-								portFilesList.arch = "";
-						}
-#ifndef NDEBUG
-						cerr << m_BasePackageInfo_i->basePackageName << ": "<< portFilesList.md5SUM << " " << portFilesList.name << " " << portFilesList.arch << endl;
-#endif
-					}
-					if (input[10] == '#' ) {
-						vector<string> infos;
-						split( input, '#', infos, 0,true);
-						m_BasePackageInfo_i->s_buildDate = infos[0];
-						m_BasePackageInfo_i->extention = infos[1];
-						m_BasePackageInfo_i->version = infos[2];
-					}
-					m_BasePackageInfo_i->portFilesList.push_back(portFilesList);
+			vector<string> PkgRepoFileContent;
+			string PkgRepoFile = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName  + "/.PKGREPO";
+			parseFile(PkgRepoFileContent,PkgRepoFile.c_str());
+			PortFilesList portFilesList;
+			for (vector<string>::const_iterator i = PkgRepoFileContent.begin();i != PkgRepoFileContent.end(); ++i) {
+				string input = *i;
+				if (input.size() < 11) {
+					cerr << "[" << input << "]: Wrong format field to small" << endl;
+					continue;
 				}
+				if ( input[10] != '#' ) { // It's not the first line, then it can be one of our files
+#ifndef NDEBUG
+					cerr << "input: " << input << endl;
+#endif
+					infos.clear();
+					split( input, '#', infos, 0, false);
+#ifndef NDEBUG
+					cerr << "Number of fields: " << infos.size()<< endl;
+#endif
+					portFilesList.md5SUM = infos[0];
+					portFilesList.name = infos[1];
+					if ( infos.size() > 2 ) {
+						if ( infos[2].size() > 0 ) {
+							portFilesList.arch = infos[2];
+						}
+					} else {
+							portFilesList.arch = "";
+					}
+#ifndef NDEBUG
+					cerr << m_BasePackageInfo_i->basePackageName << ": "<< portFilesList.md5SUM << " " << portFilesList.name << " " << portFilesList.arch << endl;
+#endif
+				}
+				if (input[10] == '#' ) {
+					vector<string> infos;
+					split( input, '#', infos, 0,true);
+					m_BasePackageInfo_i->s_buildDate = infos[0];
+					m_BasePackageInfo_i->extention = infos[1];
+					m_BasePackageInfo_i->version = infos[2];
+				}
+				m_BasePackageInfo_i->portFilesList.push_back(portFilesList);
 			}
 		}
-		if (found)
-			break;
 	}
 }
 set<string> Pkgrepo::getListOutOfDate()
@@ -504,7 +500,7 @@ void Pkgrepo::downloadPackageFileName(const std::string& packageName)
 #endif
 		if ( ! checkFileExist (m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO"))
 			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
-		parsePkgRepoPortFile();
+		parseCurrentPackagePkgRepoFile();
 
 		for ( m_PortFilesList_i = m_portFilesList.begin();m_PortFilesList_i != m_portFilesList.end();++m_PortFilesList_i) {
 			if (m_PortFilesList_i->name == packageName)
@@ -777,10 +773,10 @@ bool Pkgrepo::checkBinaryExist(const string& packageName)
 {
 	if (!m_parseCollectionDirectory)
 		parseCollectionDirectory();
-	if (!m_parsePackagePkgfileFile)
-		parsePackagePkgfileFile();
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
+	if (!m_parsePackagesPkgRepoFile)
+		parsePackagesPkgRepoFile();
 
 	string basePackageName = packageName;
 	string::size_type pos = packageName.find('.');
@@ -817,7 +813,7 @@ bool Pkgrepo::checkBinaryExist(const string& packageName)
 		if ( ! checkMD5sum( pkgRepoFile.c_str(), pkgReporMD5sum.c_str())) {
 			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
 		}
-		parsePkgRepoPortFile();
+		parseCurrentPackagePkgRepoFile();
 		for ( m_PortFilesList_i = m_portFilesList.begin();m_PortFilesList_i != m_portFilesList.end();++m_PortFilesList_i) {
 #ifndef NDEBUG
 			cerr << m_PortFilesList_i->name << endl;

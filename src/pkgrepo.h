@@ -141,7 +141,7 @@ class Pkgrepo
  * Populate: m_portFilesList (md5SUM.name,arch)
  *
  */
-		void parsePkgRepoPortFile();
+		void parseCurrentPackagePkgRepoFile();
 
 /**
  * \parse the "Pkgfile" file for each basePackage
@@ -149,6 +149,14 @@ class Pkgrepo
  *
  */
 		void parsePackagePkgfileFile();
+
+/**
+ *
+ * \parse the .PKGREPO of all the packageName directory
+ * 
+ *
+ */
+		void parsePackagesPkgRepoFile();
 
 	public:
 
@@ -179,13 +187,6 @@ class Pkgrepo
  */
 		void downloadPackageFileName(const std::string& packageFileName);
 
-/**
- *
- * \parse the .PKGREPO of all the packageName directory
- * If we found new one
- *
- */
-		void getBasePackageList(const std::string& packageName);
 
 /**
  *
@@ -277,6 +278,7 @@ class Pkgrepo
 	private:
 		bool m_parsePkgRepoCollectionFile;
 		bool m_parseCollectionDirectory;
+		bool m_parsePackagesPkgRepoFile;
 		bool m_parsePackagePkgfileFile;
 
 		std::vector<PortsDirectory>::iterator m_PortsDirectory_i;

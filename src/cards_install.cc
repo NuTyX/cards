@@ -99,6 +99,9 @@ set<string> CardsInstall::getDirectDependencies()
 		return  m_listOfDepotPackages[m_packageName].dependencies;
 	if ( m_pkgrepo->checkBinaryExist(m_packageName)) {
 		m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
+#ifndef NDEBUG
+		cerr << m_packageFileName  << endl;
+#endif
 		if ( ! checkFileExist(m_packageFileName)) {
 			m_pkgrepo->downloadPackageFileName(m_packageName);
 		}
@@ -456,7 +459,9 @@ void CardsInstall::addPackagesList()
 		cerr << m_packageName << endl;
 #endif
 		m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
-
+#ifndef NDEBUG
+		cerr << m_packageFileName << endl;
+#endif
 		if  ( checkPackageNameExist(m_packageName) ) {
 			continue;
 		}
@@ -475,28 +480,32 @@ void CardsInstall::install(const vector<string>& dependenciesList)
 
 	// Retrieving info about all the packages
 	buildDatabaseWithDetailsInfos(false);
-	m_pkgrepo = new Pkgrepo("/etc/cards.conf");
-	std::set<string> listOfPackages;
 	string packageName;
 	for (std::vector<string>::const_iterator it = dependenciesList.begin(); it != dependenciesList.end();it++) {
+#ifndef NDEBUG
+		cerr << *it << endl;
+#endif
 		packageName = basename(const_cast<char*>(it->c_str()));
 		if ( packageName == m_argParser.otherArguments()[0])
 			break;
-		m_pkgrepo->getBasePackageList(packageName);
-		listOfPackages = m_pkgrepo->getListOfPackagesFromDirectory(*it);
+		std::set<string> listOfPackages = findPackages(*it);
 		for (std::set<string>::const_iterator i = listOfPackages.begin(); i != listOfPackages.end();i++) {
-			if ( ! checkPackageNameExist(*i) ) {
-				if ( m_pkgrepo->checkBinaryExist(*i)) {
+			if (i->find("cards.tar")== string::npos )
+				continue;
 #ifndef NDEBUG
-					cerr << "Add for install: " << *i << endl;
+			cerr << *i << endl;
 #endif
-					m_dependenciesList.push_back(*i);
-				}
+			m_packageFileName = *it + "/" + *i;
+			ArchiveUtils packageArchive(m_packageFileName.c_str());
+			string name = packageArchive.name();
+			if ( ! checkPackageNameExist(name )) {
+#ifndef NDEBUG
+				cerr << "Add for install: " << name << endl;
+#endif
+				addPackage();
 			}
 		}
 	}
-	addPackagesList();
-	
 }
 void CardsInstall::createBinaries(const string& packageName)
 {
