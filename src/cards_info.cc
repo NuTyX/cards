@@ -159,8 +159,11 @@ void CardsInfo::diffPorts()
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
 		if (! pkgrepo->checkPortExist(i->first))
 			continue;
-		newVersion = pkgrepo->getPortVersion(i->first);
-		newRelease = pkgrepo->getPortRelease(i->first);
+		baseName = pkgrepo->getBasePortName(i->first);
+		if ( baseName.size() < 2 )
+			continue;
+		newVersion = pkgrepo->getPortVersion(baseName);
+		newRelease = pkgrepo->getPortRelease(baseName);
 #ifndef NDEBUG
 		cerr << i->first << " " << i->second.version << " " << newVersion << endl;	
 #endif
@@ -212,8 +215,10 @@ void CardsInfo::diffBinaries()
 		if (! pkgrepo->checkBinaryExist(i->first))
 			continue;
 		baseName = pkgrepo->getBasePackageName(i->first);
-		newVersion = pkgrepo->getPortVersion(i->first);
-		newRelease = pkgrepo->getPortRelease(i->first);
+		if ( baseName.size() < 2 )
+			continue;
+		newVersion = pkgrepo->getBasePackageVersion(baseName);
+		newRelease = pkgrepo->getBasePackageRelease(baseName);
 		if ( ( i->second.version == newVersion ) && ( i->second.release == newRelease) ) {
 			continue;
 		} else {
