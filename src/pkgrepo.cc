@@ -143,7 +143,11 @@ if (m_parsePkgRepoCollectionFile == false) {
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		PortsDirectory portsDirectory = *i;
 		for (std::vector<BasePackageInfo>::iterator j = portsDirectory.basePackageList.begin(); j != portsDirectory.basePackageList.end();++j) {
-			cerr << i->Url << " "<< i->Dir << " " << j->basePackageName  << " " << j->version << " "  << j->md5SUM << endl;
+			cerr << i->Url << " "<< i->Dir << " "
+			<< j->basePackageName  << " "
+			<< j->version << " "
+			<< j->md5SUM <<  " "
+			<< j->s_buildDate << endl;
 		}
 	}
 #endif
@@ -800,8 +804,6 @@ bool Pkgrepo::checkPortExist(const string& portName)
 }
 bool Pkgrepo::checkBinaryExist(const string& packageName)
 {
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
 
@@ -817,7 +819,7 @@ bool Pkgrepo::checkBinaryExist(const string& packageName)
 	bool Binaryfound = false;
 	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
 #ifndef NDEBUG
-		 cerr << "Loop m_portsDirectoryList" << endl;
+		 cerr << m_PortsDirectory_i->Url << " " <<  m_PortsDirectory_i->Dir << endl;
 #endif
 		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
 #ifndef NDEBUG

@@ -180,11 +180,7 @@ of compilation" << endl
 				CI.printDependenciesList();
 				return EXIT_SUCCESS;
 			}
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_UPDATE)) {
-				CI.update();
-			}	else {
-				CI.install();
-			}
+			CI.install();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_REMOVE) {
 			CardsRemove CR(cardsArgPars);

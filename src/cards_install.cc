@@ -100,7 +100,7 @@ set<string> CardsInstall::getDirectDependencies()
 	if ( m_pkgrepo->checkBinaryExist(m_packageName)) {
 		m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
 #ifndef NDEBUG
-		cerr << m_packageFileName  << endl;
+		cerr << "m_packageName, m_packageFileName: " << m_packageName << " " << m_packageFileName  << endl;
 #endif
 		if ( ! checkFileExist(m_packageFileName)) {
 			m_pkgrepo->downloadPackageFileName(m_packageName);
@@ -253,7 +253,7 @@ void CardsInstall::generateDependencies()
 			m_dependenciesList.push_back(*vrit);
 	}
 }
-void CardsInstall::update()
+void CardsInstall::updatePackage()
 {
 	// Get the list of installed packages
 	getListOfPackageNames(m_root);
@@ -351,7 +351,13 @@ void CardsInstall::install()
 	buildDatabaseWithDetailsInfos(false);
 
 	if (m_archive) {
-		addPackage();
+	// no need more action just install the archive if it is OK
+		if ( m_argParser.isSet(CardsArgumentParser::OPT_UPDATE)) {
+			updatePackage();
+		} else {
+		// no need more action just install the archive if it is OK
+			addPackage();
+		}
 	} else  {
 		if  ( checkPackageNameExist(m_packageName) ) {
 			m_actualError = PACKAGE_ALLREADY_INSTALL;
