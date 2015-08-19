@@ -109,6 +109,7 @@ string trimFileName(const string& filename);
 string modifyTimeFile(const string& filename);
 bool checkFileExist(const string& filename);
 bool checkFileEmpty(const string& filename);
+bool checkRegularFile(const string& filename);
 bool checkFilesEqual(const string& file1, const string& file2);
 bool checkPermissionsEqual(const string& file1, const string& file2);
 bool createRecursiveDirs(const string& pathname);

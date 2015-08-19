@@ -176,11 +176,6 @@ of compilation" << endl
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 			CardsInstall CI(cardsArgPars);
 			CI.run(argc, argv);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
-				CI.printDependenciesList();
-				return EXIT_SUCCESS;
-			}
-			CI.install();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_REMOVE) {
 			CardsRemove CR(cardsArgPars);

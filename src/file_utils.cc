@@ -171,6 +171,11 @@ bool checkFileEmpty(const string& filename)
 
   return (S_ISREG(buf.st_mode) && buf.st_size == 0);
 }
+bool checkRegularFile(const string& filename)
+{
+	struct stat buf;
+	return (S_ISREG(buf.st_mode));
+}
 bool checkFilesEqual(const string& file1, const string& file2)
 {
   struct stat buf1, buf2;

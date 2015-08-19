@@ -49,8 +49,8 @@ CardsInstall::CardsInstall (const CardsArgumentParser& argParser,
 void CardsInstall::run(int argc, char** argv)
 {
 	if (getuid()) {
-			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-			treatErrors("");
+		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		treatErrors("");
 	}
 	m_pkgrepo = new Pkgrepo("/etc/cards.conf");
 	// Is it a file (an archive) or a packagename
@@ -59,9 +59,11 @@ void CardsInstall::run(int argc, char** argv)
 	if ( pos != std::string::npos) {
 		m_archive=true;
 		m_packageFileName = m_argParser.otherArguments()[0];
-	} else if ( checkFileExist(m_argParser.otherArguments()[0])) {
-		m_archive=true;
-		m_packageFileName = m_argParser.otherArguments()[0];
+	} else if ( (checkFileExist(m_argParser.otherArguments()[0])) &&
+			! (checkFileEmpty(m_argParser.otherArguments()[0])) &&
+			(checkRegularFile(m_argParser.otherArguments()[0])) ) {
+				m_archive=true;
+				m_packageFileName = m_argParser.otherArguments()[0];
 	} else {
 		m_archive=false;
 		// Its a packagename
@@ -69,6 +71,11 @@ void CardsInstall::run(int argc, char** argv)
 		Pkgrepo::parseConfig("/etc/cards.conf", m_config);
 		// get following datas
 		// 6467b1da053830c331e1a97458c4f385#1428614644#firefox#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org#.cards.tar.xz
+	}
+	if ( m_argParser.isSet(CardsArgumentParser::OPT_UPDATE)) {
+		updatePackage();
+	} else {
+		install();
 	}
 }
 set<string> CardsInstall::findPackages(const string& path)
@@ -135,14 +142,6 @@ set<string> CardsInstall::getDirectDependencies()
 	cerr << "----> End of Direct Dependencies" << endl;
 #endif
 	return infoDeps.dependencies;
-}
-void CardsInstall::printDependenciesList()
-{
-	getListOfPackageNames(m_root);
-	generateDependencies();
-	for (std::vector<string>::iterator it = m_dependenciesList.begin(); it != m_dependenciesList.end();it++) {
-		cout << *it << endl;
-	}
 }
 void CardsInstall::generateDependencies()
 {
@@ -352,12 +351,7 @@ void CardsInstall::install()
 
 	if (m_archive) {
 	// no need more action just install the archive if it is OK
-		if ( m_argParser.isSet(CardsArgumentParser::OPT_UPDATE)) {
-			updatePackage();
-		} else {
-		// no need more action just install the archive if it is OK
-			addPackage();
-		}
+		addPackage();
 	} else  {
 		if  ( checkPackageNameExist(m_packageName) ) {
 			m_actualError = PACKAGE_ALLREADY_INSTALL;
