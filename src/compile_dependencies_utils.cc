@@ -191,7 +191,7 @@ int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenci
 /* Generate the all list of package sorted by level where level = 0 No deps , 
 	level = 1 somes deps from level 0 etc
 */
-int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int niveau)
+void generate_level ( itemList *filesList, pkgList *packagesList, unsigned int *niveau)
 {
 
 #ifndef NDEBUG
@@ -205,7 +205,7 @@ int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int ni
 #endif
 	int found = 0;
 #ifndef NDEBUG
-	printf("Loop %d\n",niveau);
+	printf("Loop %d\n",*niveau);
 #endif
 	
 	/* Pour tous les paquets existants */
@@ -214,13 +214,13 @@ int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int ni
 		if ( packagesList->pkgs[nameIndex]->dependences->decount == 0 ) {
 			found = 1;
 #ifndef NDEBUG
-			printf(" %d) Paquet: %s\n",niveau,filesList->items[nameIndex]);
+			printf(" %d) Paquet: %s\n",*niveau,filesList->items[nameIndex]);
 #endif
 			/* Ce paquet ne doit plus faire parti au prochain tour. on met donc son decompte est -1 */
 			packagesList->pkgs[nameIndex]->dependences->decount = -1 ;
 
 			/* Le niveau du paquet nameIndex est mis a la valeur de "niveau" */
-			packagesList->pkgs[nameIndex]->niveau = niveau;
+			packagesList->pkgs[nameIndex]->niveau = *niveau;
 
 			/* Pour tous les paquets existants, on cherche dans la liste des dépendances si elle est + grande que 1 */
 			for (unsigned int nameIndexHaveThisDep = 0; nameIndexHaveThisDep < packagesList->count; nameIndexHaveThisDep++) {
@@ -233,7 +233,7 @@ int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int ni
 							/* On incrémente de UN le nombre de dépendances */
 #ifndef NDEBUG
 							printf("  %d) for %s. Dependencie of %s  %d > ",
-								niveau, filesList->items[nameIndex],filesList->items[nameIndexHaveThisDep],
+								*niveau, filesList->items[nameIndex],filesList->items[nameIndexHaveThisDep],
 								packagesList->pkgs[nameIndexHaveThisDep]->dependences->decount);
 #endif
 							packagesList->pkgs[nameIndexHaveThisDep]->dependences->decrement++;
@@ -255,7 +255,7 @@ int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int ni
 				- packagesList->pkgs[nameIndex]->dependences->decrement;
 #ifndef NDEBUG
 			printf(" niveau %d: for %s, increment: %d new niveau: %d \n",
-				niveau,filesList->items[nameIndex],
+				*niveau,filesList->items[nameIndex],
 				packagesList->pkgs[nameIndex]->dependences->decrement,packagesList->pkgs[nameIndex]->dependences->decount);
 #endif
 			packagesList->pkgs[nameIndex]->dependences->decrement = 0;
@@ -265,12 +265,12 @@ int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int ni
 	printf("\n");
 #endif
 	if ( found != 0) {
-		generate_level (filesList,packagesList,niveau + 1);
+		(*niveau)++;
+		generate_level (filesList,packagesList,niveau);
 	} else {
 #ifndef NDEBUG
 		cerr << "generate_level() FINISH" << endl;
 #endif
-		return niveau;
 	}
 }
 

@@ -81,7 +81,7 @@ void freePkgList(pkgList *packagesList);
 int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList,unsigned int niveau);
 int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList,const char* pkgName, unsigned int niveau);
 
-int generate_level ( itemList *filesList, pkgList *packagesList, unsigned int niveau);
+void generate_level ( itemList *filesList, pkgList *packagesList, unsigned int *niveau);
 
 char *getLongPackageName(itemList *filesList, const char * packageName);
 #endif

@@ -129,7 +129,6 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 							replaceAll( depends, " ", "," );
 							replaceAll( depends, ",,", "," );
  							split( depends, ',', deps, 0,true);
-							break;
 						}
 					}
 				}
@@ -328,13 +327,18 @@ int CardsDepends::level()
 		addPkgToPkgList(packagesList,package);
 		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
 	}
-	int niveau = generate_level (filesList,packagesList,0);
-	if (niveau == 0 ) {
+	unsigned int niveau = 0;
+	static unsigned  int *pNiveau = &niveau;
+	generate_level (filesList,packagesList,pNiveau);
+#ifndef NDEBUG
+	cerr << "Number of level: " << *pNiveau << endl;
+#endif
+	if (*pNiveau == 0 ) {
 		m_actualError = CANNOT_GENERATE_LEVEL;
-		treatErrors("0");
+		treatErrors(" in level()");
 	} else {
 #ifndef NDEBUG
-		cerr << "Number of level: " << niveau << endl;
+		cerr << "Number of level: " << *pNiveau << endl;
 #endif
 	}
 	depList *dependenciesList = initDepsList();
@@ -342,7 +346,7 @@ int CardsDepends::level()
 		return returnVal;
 	}
 	int currentNiveau = 0;
-	while ( currentNiveau <= niveau) {
+	while ( currentNiveau <= *pNiveau) {
 		for ( unsigned int nameIndex = 0; nameIndex < packagesList -> count; nameIndex++ ) {
 #ifndef NDEBUG
 			cerr << "packagesList -> pkgs[nameIndex]->niveau: " << packagesList -> pkgs[nameIndex]->niveau << " " << filesList->items[nameIndex] << endl;
@@ -393,10 +397,16 @@ int CardsDepends::depends()
 		addPkgToPkgList(packagesList,package);
 		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
 	}
-	int niveau = generate_level (filesList,packagesList,0);
-	if (niveau == 0 ) {
+	unsigned int niveau = 0;
+	static unsigned int *pNiveau = &niveau;
+	generate_level (filesList,packagesList,pNiveau);
+	if (*pNiveau == 0 ) {
 		m_actualError = CANNOT_GENERATE_LEVEL;
-		treatErrors("0");
+		treatErrors(" in depends()");
+	} else {
+#ifndef NDEBUG
+		cerr << "Number of level: " << *pNiveau << endl;
+#endif
 	}
 	depList *dependenciesList = initDepsList();
 	if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,longPackageName,1) != 0 ) {
@@ -404,7 +414,7 @@ int CardsDepends::depends()
 	}
 	if (dependenciesList ->count > 0) {
 		int currentNiveau = 0;
-		while ( currentNiveau <= niveau) {
+		while ( currentNiveau <= *pNiveau) {
 #ifndef NDEBUG
 			cerr << "Level: " << currentNiveau << endl;
 #endif
