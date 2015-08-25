@@ -22,10 +22,71 @@
 CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
 	: m_argParser(argParser), m_root("/")
 {
+	if (getuid()) {
+		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		treatErrors("");
+	}
 	if ( m_argParser.isSet(CardsArgumentParser::OPT_FORCE)) {
 		m_force=true;
 	} else {
 		m_force=false;
+	}
+
+	m_pkgrepo = new Pkgrepo("/etc/cards.conf");
+
+	if  ( m_argParser.otherArguments().size() > 1 ) {
+		m_archive=false;
+		Pkgrepo::parseConfig("/etc/cards.conf", m_config);
+		// Get the list of installed packages
+		getListOfPackageNames(m_root);
+
+		// Retrieving info about all the packages
+		buildDatabaseWithDetailsInfos(false);
+
+		for(std::vector<std::string>::const_iterator it = m_argParser.otherArguments().begin(); it != m_argParser.otherArguments().end();it++) {
+			if ( m_argParser.isSet(CardsArgumentParser::OPT_UPDATE)) {
+				updatePackage();
+			} else {
+				if  ( checkPackageNameExist(*it) ) {
+					m_actualError = PACKAGE_ALLREADY_INSTALL;
+					treatErrors (*it);
+				}
+			}
+		}
+		for(std::vector<std::string>::const_iterator it = m_argParser.otherArguments().begin(); it != m_argParser.otherArguments().end();it++) {
+			m_packageName = *it ;
+			// Generate the dependencies
+			generateDependencies();
+		}
+		// Add the locales if any defined
+		getLocalePackagesList();
+		addPackagesList();
+
+	} else if ( ( m_pkgrepo->getListOfPackagesFromCollection(m_argParser.otherArguments()[0]).size() > 0 ) &&
+	( ! m_pkgrepo->checkBinaryExist( m_argParser.otherArguments()[0]  )) ) {
+		// Get the list of installed packages
+		getListOfPackageNames(m_root);
+
+		// Retrieving info about all the packages
+		buildDatabaseWithDetailsInfos(false);
+
+		set<string> ListOfPackage = m_pkgrepo->getListOfPackagesFromCollection(m_argParser.otherArguments()[0]);
+		for(std::set<std::string>::iterator it = ListOfPackage.begin();it != ListOfPackage.end();it++) {
+			m_packageName = *it;
+			// Generate the dependencies
+			generateDependencies();
+		}
+		// Add the locales if any defined
+		getLocalePackagesList();
+#ifndef NDEBUG
+  for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
+    cout << *j << endl;
+  }
+#endif
+		addPackagesList();
+	} else {
+		//TODO get rid of thoses useless arguments
+		run(0, NULL);
 	}
 }
 CardsInstall::CardsInstall(const CardsArgumentParser& argParser,
@@ -48,11 +109,6 @@ CardsInstall::CardsInstall (const CardsArgumentParser& argParser,
 }
 void CardsInstall::run(int argc, char** argv)
 {
-	if (getuid()) {
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		treatErrors("");
-	}
-	m_pkgrepo = new Pkgrepo("/etc/cards.conf");
 	// Is it a file (an archive) or a packagename
 	string::size_type pos = m_argParser.otherArguments()[0].find("cards.tar");
 
@@ -142,6 +198,40 @@ set<string> CardsInstall::getDirectDependencies()
 	cerr << "----> End of Direct Dependencies" << endl;
 #endif
 	return infoDeps.dependencies;
+}
+void CardsInstall::getLocalePackagesList()
+{
+	// Add the locales if any defined
+	if (m_config.locale.size() == 0) {
+		return;
+	}
+	vector<string> tmpList;
+	string packageName = "";
+	for (std::vector<string>::iterator i = m_config.locale.begin();i != m_config.locale.end();++i) {
+		for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
+			packageName = *j + "." + *i;
+#ifndef NDEBUG
+			cerr << packageName << endl;
+#endif
+			if ( m_pkgrepo->checkBinaryExist(packageName)) {
+				m_packageFileName = m_pkgrepo->getPackageFileName(packageName);
+				if ( ! checkFileExist(m_packageFileName)) {
+					m_pkgrepo->downloadPackageFileName(packageName);
+				}
+				tmpList.push_back(packageName);
+			}
+		}
+		if (tmpList.size() > 0 ) {
+			for (std::vector<string>::iterator i = tmpList.begin();i != tmpList.end();++i) {
+				m_dependenciesList.push_back(*i);
+			}
+		}
+	}
+#ifndef NDEBUG
+	for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
+		cout << *j << endl;
+	}
+#endif
 }
 void CardsInstall::generateDependencies()
 {
@@ -341,7 +431,7 @@ void CardsInstall::updatePackage()
 	// Add the info about the files to the DB
 	addPackageFilesRefsToDB(package.first, package.second);
 	runLdConfig();
-}	
+}
 void CardsInstall::install()
 {
 	// Get the list of installed packages
@@ -363,30 +453,12 @@ void CardsInstall::install()
 		// Generate the dependencies
 		generateDependencies();
 		// Add the locales if any defined
-		if (m_config.locale.size() > 0) {
-			vector<string> tmpList;
-			string packageName = "";
-			for (std::vector<string>::iterator i = m_config.locale.begin();i != m_config.locale.end();++i) {
-				for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
-					packageName = *j + "." + *i;
+		getLocalePackagesList();
 #ifndef NDEBUG
-					cerr << packageName << endl;
-#endif
-					if ( m_pkgrepo->checkBinaryExist(packageName)) {
-						m_packageFileName = m_pkgrepo->getPackageFileName(packageName);
-						if ( ! checkFileExist(m_packageFileName)) {
-							m_pkgrepo->downloadPackageFileName(packageName);
-						}
-						tmpList.push_back(packageName);
-					}
-				}
-			}
-			if (tmpList.size() > 0 ) {
-				for (std::vector<string>::iterator i = tmpList.begin();i != tmpList.end();++i) {
-					m_dependenciesList.push_back(*i);
-				}
-			}
+		for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
+			cout << *j << endl;
 		}
+#endif
 		addPackagesList();
 	}
 }
@@ -417,7 +489,7 @@ void CardsInstall::addPackage()
 		} else {
 			copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
 			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
-			treatErrors("listed file(s) already installed, cannot continue... ");
+			treatErrors("'" + m_packageName + "': listed file(s) already installed, cannot continue... ");
 		}
 	}
 

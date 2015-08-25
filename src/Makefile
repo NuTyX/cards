@@ -74,11 +74,17 @@ LIBOBJECTS =  system_utils.o \
 	pkgrm.o \
 	pkginfo.o
 
+CONSOLEKIT_CFLAGS = -I/usr/include/ConsoleKit/ck-connector -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
+CONSOLEKIT_LIBS = -lck-connector -ldbus-1
+GLIB_CFLAGS = -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
+GLIB_LIBS = -lglib-2.0
+
+
 test:
-	$(CXX) -DNDEBUG error_treat.cc md5.cc string_utils.cc \
+	$(CXX) -DNDEBUG $(CONSOLEKIT_CFLAGS) $(GLIB_CFLAGS) system_utils.cc error_treat.cc md5.cc string_utils.cc \
 	file_utils.cc archive_utils.cc  pkgrepo.h \
 	pkgrepo.cc file_download.cc \
-	test.cc -o ~/bin/au $(LDFLAGS) $(LIBCURLLIBS)
+	test.cc -o $@ $(LDFLAGS) $(LIBCURLLIBS) $(CONSOLEKIT_LIBS) $(GLIB_LIBS)
 
 libs:	.libs_depend $(LIBOBJECTS)
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
@@ -133,6 +139,7 @@ clean:
 	rm -f $(MANPAGES)
 	rm -f $(MANPAGES:=.txt)
 	rm -f libcards.so.$(VERSION)
+	rm -f test
 	rm -f pkgadd
 	rm -f pkgcrea
 	rm -f cards

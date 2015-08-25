@@ -42,6 +42,7 @@ public:
 	CardsInstall (const CardsArgumentParser& argParser, const vector<string>& listOfPackages);
 
 	void install();
+	void install(const set<string>& packageList);
 	void install(const vector<string>& dependenciesList);
 	void createBinaries(const string& packageName);
 	virtual void run(int argc, char** argv);
@@ -65,6 +66,7 @@ private:
 	void generateDependencies();
 	bool getPackageFileName();
 	void addPackagesList();
+	void getLocalePackagesList();
 	void addPackage();
 	void updatePackage();
 

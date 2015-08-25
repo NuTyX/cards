@@ -175,7 +175,6 @@ of compilation" << endl
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 			CardsInstall CI(cardsArgPars);
-			CI.run(argc, argv);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_REMOVE) {
 			CardsRemove CR(cardsArgPars);

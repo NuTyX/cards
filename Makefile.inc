@@ -28,13 +28,13 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 1.2.4
+VERSION = 1.3.0
 NAME = cards-$(VERSION)
 
-CXXFLAGS += -DNDEBUG
-CXXFLAGS += -O2 -Wall -pedantic -D_GNU_SOURCE -DVERSION=\"$(VERSION)\" \
+CXXFLAGS += -DNDEBUG -std=c++11
+CXXFLAGS += -O2 -Werror -pedantic -D_GNU_SOURCE -DVERSION=\"$(VERSION)\" \
 	    -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC
-CFLAGS += -DNDEBUG
+CFLAGS += -DNDEBUG -std=gnu11
 CFLAGS += -D_GNU_SOURCE
 
 LIBARCHIVELIBS := $(shell pkg-config --libs --static libarchive)
