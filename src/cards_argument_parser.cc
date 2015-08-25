@@ -100,12 +100,12 @@ It is mainly used for the packager.",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_INSTALL, "install",
-		"\tinstall a <package> or a <file>.",
+		"\tinstall one or more <package>, a <file> or a <collection>.",
 "If the argument is a package name, it will first download the request package, then analyse it and finally download it's dependencies, then analyse them and so on. When all the dependencies are downloaded, they will be installed in the right order then finally the request package will be installed.\n\
 If the argument is a file, it will simply installed it. The file can have any name as long it's a valid package.\n\
 If -u is passed as optional argument, it will upgrade the package.\n\
 If -f is passed as optional argument, it will force the install means overwrite conflicting files.\n",
-		ArgParser::EQ, 1, "<package> | <file>");
+		ArgParser::MIN, 1, "<package> | <file> | <collection>");
 
 	addCommand(CMD_REMOVE, "remove",
 		"\tremove a package.",
