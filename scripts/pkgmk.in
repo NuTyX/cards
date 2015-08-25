@@ -1187,9 +1187,7 @@ main() {
 
 	if [ "$PKGMK_INSTALL" = "no" ]; then
 		PKGMK_CLEAN="no"
-		PKGMK_KEEP_SOURCES="yes"
 		warning "CLEAN IGNORED"
-		warning "KEEP SOURCES"
 	else
 		info "PKGMK_KEEP_SOURCES: $PKGMK_KEEP_SOURCES"
 		info "PKGMK_CLEAN: $PKGMK_CLEAN"
