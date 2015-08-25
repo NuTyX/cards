@@ -194,7 +194,7 @@ class Pkgrepo
  *  return a list of packages found 
  * 
  */
-	set<string> getListOfPackagesFromDirectory(const std::string& path);
+	std::set<std::string> getListOfPackagesFromDirectory(const std::string& path);
 
 
 /**
@@ -207,13 +207,13 @@ class Pkgrepo
  * Populate: nothing
  *
  */
-		set<string> getListOutOfDate();
+		std::set<std::string> getListOutOfDate();
 
 /*
  *	\return the folder of the port name
  *
  */
-		string getPortDir (const std::string& portName);
+		std::string getPortDir (const std::string& portName);
 
 
 /*
@@ -221,29 +221,29 @@ class Pkgrepo
  * 	\return the basename of the portname
  *
  */
-		string getBasePortName (const string& portName);
+		std::string getBasePortName (const std::string& portName);
 /*
  *      \return the basename of the packagename
  *
  */
-		string getBasePackageName(const string& packageName);
+		std::string getBasePackageName(const std::string& packageName);
 /*
  *
  *	\return the version of the packagename
  */
 
-		string getBasePackageVersion(const string& packageName);
+		std::string getBasePackageVersion(const std::string& packageName);
 
 /*
  *  \return the version of the port name
  */
-		string getPortVersion (const std::string& portName);
+		std::string getPortVersion (const std::string& portName);
 
 /*
  *  \return the release of the packagename
  *
  */
-		int getBasePackageRelease (const string& packageName);
+		int getBasePackageRelease (const std::string& packageName);
 
 /*
  *  \return the release of the port name
@@ -258,6 +258,10 @@ class Pkgrepo
  *	\return true if binarie name exist
  */
 		bool checkBinaryExist(const std::string& packageName);
+/*
+ *  \retun list of packages of the collection
+ */
+		std::set<std::string> getListOfPackagesFromCollection(const std::string& collectionName);
 
 /*
  *  \return the location and the filename of the package if exist else
