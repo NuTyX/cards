@@ -152,10 +152,10 @@ void CardsInfo::diffPorts()
 	result.push_back(pair<string, DiffVers>("", DV));
 	unsigned int widthPackageName = result.begin()->first.length();
 	unsigned int widthInstalled = result.begin()->second.installed.length();
-	char sRelease[5]; // release up to 9999 should be enough :)
 	int newRelease = 1;
 	string baseName = "";
 	string newVersion = "";
+	string sRelease = "";
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
 		if (! pkgrepo->checkPortExist(i->first))
 			continue;
@@ -170,9 +170,9 @@ void CardsInfo::diffPorts()
 		if ( ( i->second.version == newVersion ) && ( i->second.release == newRelease) ) {
 			continue;
 		} else {
-			sprintf(sRelease,"%d",i->second.release);
+			sRelease=itos(i->second.release);
 			DV.installed = i->second.version + "-" + sRelease;
-			sprintf(sRelease,"%d",newRelease);
+			sRelease=itos(newRelease);
 			DV.available = newVersion + "-" + sRelease;
 			result.push_back(pair<string, DiffVers> (i->first, DV));
 			if (i->first.length() > widthPackageName)
@@ -207,24 +207,25 @@ void CardsInfo::diffBinaries()
 	result.push_back(pair<string, DiffVers >("", DV));
 	unsigned int widthPackageName = result.begin()->first.length();
 	unsigned int widthInstalled = result.begin()->second.installed.length();
-	char sRelease[5]; // release up to 9999 should be enough :)
 	int newRelease = 1;
 	string baseName = "";
 	string newVersion = "";
+  string sRelease = "";
 	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
 		if (! pkgrepo->checkBinaryExist(i->first))
 			continue;
 		baseName = pkgrepo->getBasePackageName(i->first);
 		if ( baseName.size() < 2 )
 			continue;
+
 		newVersion = pkgrepo->getBasePackageVersion(baseName);
 		newRelease = pkgrepo->getBasePackageRelease(baseName);
 		if ( ( i->second.version == newVersion ) && ( i->second.release == newRelease) ) {
 			continue;
 		} else {
-			sprintf(sRelease,"%d",i->second.release);
+			sRelease = itos(i->second.release);
 			DV.installed = i->second.version + "-" + sRelease;
-			sprintf(sRelease,"%d",newRelease);
+			sRelease = itos(newRelease);
 			DV.available = newVersion + "-" + sRelease;
 			result.push_back(pair<string, DiffVers> (i->first, DV));
 			if (i->first.length() > widthPackageName)

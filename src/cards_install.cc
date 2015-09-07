@@ -54,16 +54,23 @@ CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
 			}
 		}
 		for(std::vector<std::string>::const_iterator it = m_argParser.otherArguments().begin(); it != m_argParser.otherArguments().end();it++) {
-			m_packageName = *it ;
-			// Generate the dependencies
-			generateDependencies();
+			if ( ( m_pkgrepo->getListOfPackagesFromCollection(*it).size() > 0 ) &&
+				( ! m_pkgrepo->checkBinaryExist(*it)) ) {
+				set<string> ListOfPackage = m_pkgrepo->getListOfPackagesFromCollection(*it);
+				for(std::set<std::string>::iterator jt = ListOfPackage.begin();jt != ListOfPackage.end();jt++) {
+					m_packageName = *jt;
+					generateDependencies();
+				}
+			} else {
+				m_packageName = *it ;
+				generateDependencies();
+			}
 		}
-		// Add the locales if any defined
 		getLocalePackagesList();
 		addPackagesList();
-
 	} else if ( ( m_pkgrepo->getListOfPackagesFromCollection(m_argParser.otherArguments()[0]).size() > 0 ) &&
 	( ! m_pkgrepo->checkBinaryExist( m_argParser.otherArguments()[0]  )) ) {
+		Pkgrepo::parseConfig("/etc/cards.conf", m_config);
 		// Get the list of installed packages
 		getListOfPackageNames(m_root);
 
@@ -73,17 +80,15 @@ CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
 		set<string> ListOfPackage = m_pkgrepo->getListOfPackagesFromCollection(m_argParser.otherArguments()[0]);
 		for(std::set<std::string>::iterator it = ListOfPackage.begin();it != ListOfPackage.end();it++) {
 			m_packageName = *it;
-			// Generate the dependencies
 			generateDependencies();
 		}
-		// Add the locales if any defined
 		getLocalePackagesList();
-#ifndef NDEBUG
-  for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
-    cout << *j << endl;
-  }
-#endif
 		addPackagesList();
+#ifndef NDEBUG
+		for (std::vector<string>::iterator j = m_dependenciesList.begin(); j != m_dependenciesList.end();j++) {
+			cerr << *j << endl;
+		}
+#endif
 	} else {
 		//TODO get rid of thoses useless arguments
 		run(0, NULL);
