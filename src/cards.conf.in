@@ -25,25 +25,39 @@
 ##                                         /...
 
 ## Uncomment following lines if you want to compile your own ports
-## Adjust to your wishes
+## This are examples of directories
+## !!!! Read the README for the concerned collection first !!!!
+##
 #
-# dir /usr/ports/desktop
-# dir /usr/ports/console
+# dir /usr/ports/gui-extra
+# dir /usr/ports/gui
+# dir /usr/ports/cli-extra
+# dir /usr/ports/cli
+# dir /usr/ports/base-extra
 # dir /usr/ports/base
 
-## The name of the NuTyX version is found in the /var/lib/pkg/nutyx-version file
-## The Colletion name (graphic, graphic-extra,console, console-extra, base et base-extra)
+## The NuTyX name and version are found in the /var/lib/pkg/nutyx-version file
+## The Colletion name (gui, gui-extra, cli, cli-extra, base et base-extra)
 ## must exist on the mirror http://downloads.nutyx.org (in this case)
-##
-## Le nom de la version de NuTyX se trouve dans le fichier /var/lib/pkg/nutyx-version
+## Checkout for your version what's are the available collections at http://downloads.nutyx.org/<NuTyX-version>
+#
+## Le nom et la version de NuTyX se trouvent dans le fichier /var/lib/pkg/nutyx-version
 ## Le nom des collections (graphic, graphic-extra,console, console-extra, base et base-extra)
 ## doivent exister sur le mirroir http://downloads.nutyx.org (dans ce cas)
-dir /var/lib/pkg/remote/graphic-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/remote/graphic|http://downloads.nutyx.org
-dir /var/lib/pkg/remote/console-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/remote/console|http://downloads.nutyx.org
-dir /var/lib/pkg/remote/base-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/remote/base|http://downloads.nutyx.org
+## Vérifiez quelles sont les collections disponibles sur http://downloads.nutyx.org/<NuTyX-version>
+#
+# dir /var/lib/pkg/depot/kde-extra|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/kde|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/mate-extra|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/mate|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/xfce-extra|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/xfce|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/gui-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/gui|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/cli-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/cli|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/base-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/base|http://downloads.nutyx.org
 
 ## Cards needs to know if he's allowed to removing the package you pass to the command argument:
 ##   cards remove <packagename>
@@ -58,15 +72,17 @@ dir /var/lib/pkg/remote/base|http://downloads.nutyx.org
 #
 ## In the following setting, packages from base system and base-extra will not be deleted
 ## Dans le cas ci-dessous, les paquets des collections base et base-extra ne seront pas supprimés
-base /var/lib/pkg/remote/base
-base /var/lib/pkg/remote/base-extra
+base /var/lib/pkg/depot/base
+base /var/lib/pkg/depot/base-extra
 
 ##
 ## We can specify which locale we want, it's possible to mention as many locale we want
-## As the following exemple french, belgium, and germans locales
+## As the following exemple germans, deutch, and french locales
 ## On peut spécifier quelle(s) locale(s) doivent être installées
 ##
-locale fr
+# locale de
+# locale nl
+# locale fr
 
 
 ## If you plan to build your Package you will like this option otherwise just ignore it
@@ -86,5 +102,5 @@ locale fr
 #   cards create -r <nom de paquet >
 #
 ##  si la variable ci-dessous est définie et pointe sur un dossier
-logdir /var/log/pkgbuild
+# logdir /var/log/pkgbuild
 

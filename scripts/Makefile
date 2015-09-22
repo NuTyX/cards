@@ -36,7 +36,7 @@ pkgmk: pkgmk.in
 
 install: all
 	install -D -m0755 pkgmk $(DESTDIR)$(USRBINDIR)/pkgmk
-	install -D -m0644 pkgmk.conf $(DESTDIR)$(ETCDIR)/pkgmk.conf
+	install -D -m0644 pkgmk.conf $(DESTDIR)$(ETCDIR)/pkgmk.conf.example
 clean:
 	rm -f pkgmk
 

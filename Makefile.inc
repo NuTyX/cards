@@ -28,7 +28,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 1.3.1
+VERSION = 1.3.2
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG -std=c++11

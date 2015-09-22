@@ -972,7 +972,10 @@ int Pkgrepo::parseConfig(const string& fileName)
 			return result;
 	}
 	if ( m_config.name.size() == 0 ) {
-		m_config.name="saravane";
+		m_config.name="current";
+	}
+	if ( m_config.version.size() == 0 ) {
+		m_config.version="current";
 	}
 
 	result = getConfig(fileName,m_config);
@@ -994,7 +997,7 @@ int Pkgrepo::parseConfig(const string& fileName)
 		pos = DU.Url.find (m_config.name);
 
 		if (pos != std::string::npos) {
-			url = DU.Url.substr(0,pos-1) + "/" + m_config.name + "/" + getMachineType()+ "/" + category;
+			url = DU.Url.substr(0,pos-1) + "/" + m_config.version + "/" + getMachineType()+ "/" + category;
 #ifndef NDEBUG
 			cerr << pos << endl;
 #endif
@@ -1021,7 +1024,7 @@ int Pkgrepo::parseConfig(const string& fileName, Config& config)
 			return result;
 	}
 	if ( config.name.size() == 0 ) {
-		config.name="saravane";
+		config.name="current";
 	}
 
 	std::string::size_type pos;
@@ -1041,7 +1044,7 @@ int Pkgrepo::parseConfig(const string& fileName, Config& config)
 
 		pos = DU.Url.find (config.name);
 		if (pos != std::string::npos) {
-			url = DU.Url.substr(0,pos-1) + "/" + config.name + "/" + getMachineType()+ "/" + category;
+			url = DU.Url.substr(0,pos-1) + "/" + config.version + "/" + getMachineType()+ "/" + category;
 #ifndef NDEBUG
 			cerr << pos << endl;
 #endif
