@@ -78,7 +78,9 @@ base /var/lib/pkg/depot/base-extra
 ##
 ## We can specify which locale we want, it's possible to mention as many locale we want
 ## As the following exemple germans, deutch, and french locales
+## The command setup-nutyx -cl add the selected locale into cards.conf file
 ## On peut spécifier quelle(s) locale(s) doivent être installées
+## La commande setup-nutyx -cl ajoute la locale selectionnée dans le fichier cards.conf
 ##
 # locale de
 # locale nl

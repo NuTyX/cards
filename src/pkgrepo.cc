@@ -994,7 +994,7 @@ int Pkgrepo::parseConfig(const string& fileName)
 
 		string category = basename(const_cast<char*>(categoryDir.c_str()));
 
-		pos = DU.Url.find (m_config.name);
+		pos = DU.Url.find (m_config.version);
 
 		if (pos != std::string::npos) {
 			url = DU.Url.substr(0,pos-1) + "/" + m_config.version + "/" + getMachineType()+ "/" + category;
@@ -1002,7 +1002,7 @@ int Pkgrepo::parseConfig(const string& fileName)
 			cerr << pos << endl;
 #endif
 		} else {
-			 url = DU.Url + "/" + m_config.name + "/" + getMachineType()+ "/" + category;
+			 url = DU.Url + "/" + m_config.version + "/" + getMachineType()+ "/" + category;
 		}
 #ifndef NDEBUG
 		cerr << url << endl;
@@ -1023,8 +1023,15 @@ int Pkgrepo::parseConfig(const string& fileName, Config& config)
 		if ( result != 0 )
 			return result;
 	}
+#ifndef NDEBUG
+	cerr << config.name << endl;
+	cerr << config.version << endl;
+#endif
 	if ( config.name.size() == 0 ) {
 		config.name="current";
+	}
+	if ( config.version.size() == 0 ) {
+		config.version="current";
 	}
 
 	std::string::size_type pos;
@@ -1042,14 +1049,14 @@ int Pkgrepo::parseConfig(const string& fileName, Config& config)
 
 		string category = basename(const_cast<char*>(categoryDir.c_str()));
 
-		pos = DU.Url.find (config.name);
+		pos = DU.Url.find (config.version);
 		if (pos != std::string::npos) {
 			url = DU.Url.substr(0,pos-1) + "/" + config.version + "/" + getMachineType()+ "/" + category;
 #ifndef NDEBUG
 			cerr << pos << endl;
 #endif
 		} else {
-			url = DU.Url + "/" + config.name + "/" + getMachineType()+ "/" + category;
+			url = DU.Url + "/" + config.version + "/" + getMachineType()+ "/" + category;
 		}
 #ifndef NDEBUG
 		cerr << url << endl;
