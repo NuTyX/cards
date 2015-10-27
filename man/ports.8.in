@@ -1,0 +1,44 @@
+.TH ports 8 "" "ports #VERSION#" ""
+.SH NAME
+ports \- update/list ports collection
+.SH SYNOPSIS
+\fBports [options] [collection ...]\fP
+.SH DESCRIPTION
+\fBports\fP connects to one or more master repositories and updates the local copy of a
+ports collection. If no collections are specified then all collections will be updated.
+A \fIport\fP is a directory containing all necessary files for building a software package using pkgmk(8).
+.SH OPTIONS
+.TP
+.B "\-u, \-\-update"
+Update ports.
+.TP
+.B "\-l, \-\-list"
+List ports.
+.TP
+.B "\-d, \-\-diff"
+List version differences between local ports and installed packages.
+.TP
+.B "\-v, \-\-version"
+Print version and exit.
+.TP
+.B "\-h, \-\-help"
+Print help and exit.
+.SH FILES
+.TP
+.B "/usr/ports/"  
+Default Root of local ports collection. If not define in the configuration file of the concerned collection and not in cards.conf file
+.TP
+.B "/etc/ports/"
+Directory for port collection configuration.
+.TP
+.B "/var/lib/pkg/drivers/"
+Directory for driver scripts.
+.SH SEE ALSO
+pkgadd(8), pkgrm(8), pkginfo(8), cvsup(1)
+.SH AUTHOR
+.nf
+Per Liden <per@fukt.bth.se>
+http://www.fukt.bth.se/~per/
+Tnierry Nuttens <tnut@nutyx.org>
+http://www.nutyx.org
+.fi
