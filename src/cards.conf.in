@@ -24,17 +24,31 @@
 ##                                         /alsa-utils.post-install
 ##                                         /...
 
+## A COLLECTION CAN BE MADE OF ports only OR MADE OF binaries
+## The only criteria determining this is: with or without '|<url adress' at the end of a line starting with the
+## keyword 'dir'. Followings examples:
+
+## This is a port collection located in '/usr/ports/my_ports'
+# dir /usr/ports/my_ports
+
+## This is a binaries collection located in '/depot/x86_64/gui|http://downloads.nutyx.org'. It will all
+##the binaires from the 'http://downloads.nutyx.org' mirror
+# dir /depot/x86_64/gui|http://downloads.nutyx.org
+
 ## Uncomment following lines if you want to compile your own ports
-## This are examples of directories
-## !!!! Read the README for the concerned collection first !!!!
+## Use then the command 'ports -u' to get all the ports
+## This are examples of directories.
+## IMPORTANT NOTE: They are severall methods to build your own ports.
+## !!!! Read the documentation first  at http://www.nutyx.org !!!!
 ##
-#
-# dir /usr/ports/gui-extra
-# dir /usr/ports/gui
-# dir /usr/ports/cli-extra
-# dir /usr/ports/cli
-# dir /usr/ports/base-extra
-# dir /usr/ports/base
+
+
+# dir /var/lib/pkg/depot/gui-extra
+# dir /var/lib/pkg/depot/gui
+# dir /var/lib/pkg/depot/cli-extra
+# dir /var/lib/pkg/depot/cl
+# dir /var/lib/pkg/depot/base-extra
+# dir /var/lib/pkg/depot/base
 
 ## The NuTyX name and version are found in the /var/lib/pkg/nutyx-version file
 ## The Colletion name (gui, gui-extra, cli, cli-extra, base et base-extra)
@@ -58,6 +72,8 @@ dir /var/lib/pkg/depot/cli-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/cli|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/base-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/base|http://downloads.nutyx.org
+
+# A collection can be
 
 ## Cards needs to know if he's allowed to removing the package you pass to the command argument:
 ##   cards remove <packagename>
