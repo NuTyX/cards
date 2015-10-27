@@ -143,16 +143,17 @@ list_differences() {
 	fi
 }
 get_port_version() {
-	local base_port package
+	local base_port package PORTS_DIR
+	PORTS_DIR=`dirname $port`
 	package=`basename $port`
 	base_port=`echo $package | cut -d "-" -f1`
 	cd $port
-	version=""
-	release=""
+	unset version
+	unset release
 	. Pkgfile
-	if [ "$version" = "" ] && [ "$base_port" != "$package" ] ; then
-		if [ -f $PORTS_DIR/../$base_port/Pkgfile ]; then
-			cd $PORTS_DIR/../$base_port
+	if [ -z $version ] && [ "$base_port" != "$package" ] ; then
+		if [ -f $PORTS_DIR/$base_port/Pkgfile ]; then
+			cd $PORTS_DIR/$base_port
 			. Pkgfile
 		fi
 	fi
