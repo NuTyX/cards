@@ -1,0 +1,229 @@
+#!/bin/bash
+#
+#  ports
+# 
+#  Copyright (c) 2015 Thierry Nuttens
+#  Copyright (c) 2002-2004 Per Liden
+# 
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+#  USA.
+#
+
+VERSION="#VERSION#"
+PORTS_DIR="/var/lib/pkg/depot"
+DRIVERS_DIR="/var/lib/pkg/drivers"
+check_ports_dir() {
+	if [ ! -d "$PORTS_DIR" ]; then
+		echo "$COMMAND: directory '$PORTS_DIR' not found"
+		exit 1
+	fi
+}
+get_ports_dir() {
+	local collection destination
+	collection=`basename $1|cut -d "." -f1`
+	PORTS_DIR="/var/lib/pkg/depot/$collection"
+	if [ -f $1 ];then
+		source $file
+	fi
+	if [ ! -z $destination ];then
+		PORTS_DIR="$destination"
+	else
+	# if destination not set in /etc/ports/xxx.xxx, we try in /etc/cards
+		destination=`cat /etc/cards.conf|grep ^dir|grep /$collection$|cut -d " " -f2`
+		if [ ! -z $destination ];then
+			PORTS_DIR="$destination"
+		fi
+	fi
+}
+update_ports() {
+	if [ "`id -u`" != "0" ]; then
+		echo "$COMMAND: only root can update ports"
+		exit 1
+	fi
+
+	shopt -s nullglob
+	export PORTS_DIR
+
+	if [ "$OPT_COLLECTIONS" ]; then
+		# Update selected collections
+		for collection in $OPT_COLLECTIONS; do
+			collection_exists=no
+			for file in /etc/ports/$collection.*; do
+				collection_exists=yes
+			done
+			if [ "$collection_exists" = "yes" ]; then
+				for driver in $DRIVERS_DIR/*; do
+					if [ -x $driver ]; then
+						suffix=`basename $driver`
+						file=/etc/ports/$collection.$suffix
+						if [ -f $file ]; then
+							$driver $file
+						fi
+					fi
+				done
+			else
+				echo "$COMMAND: collection '$collection' not found"
+			fi
+		done
+	else
+		# Update all collections
+		for driver in $DRIVERS_DIR/*; do
+			if [ -x $driver ]; then
+				suffix=`basename $driver`
+				for file in /etc/ports/*.$suffix; do
+					$driver $file
+				done
+			fi
+		done
+		
+		if [ ! "$driver" ]; then
+			echo "$COMMAND: no driver(s) installed"
+		fi
+	fi
+}
+
+list_ports() {
+	for driver in $DRIVERS_DIR/*; do
+		if [ -x $driver ]; then
+			suffix=`basename $driver`
+			for file in /etc/ports/*.$suffix; do
+				get_ports_dir $file
+				find $PORTS_DIR -name Pkgfile -follow -printf "%h\n" | sed 's|^./||g' | sort
+			done
+		fi
+	done
+}
+
+list_differences_at_exit() {
+	rm $installed_list $ports_list $output $output_sorted &> /dev/null
+}
+
+list_differences() {
+	installed_list=`mktemp` || exit 1
+	ports_list=`mktemp` || exit 1
+	output=`mktemp` || exit 1
+	output_sorted=`mktemp` || exit 1
+	found_diff="no"
+	
+	trap list_differences_at_exit EXIT
+	
+	pkginfo -i >> $installed_list
+	list_ports >> $ports_list
+	
+	for package in `cat $installed_list | gawk '{ print $1 }'`; do
+		installed_version=`cat $installed_list | grep "^$package " | gawk '{ print $2 }'`
+		port_list=`cat $ports_list | grep "/$package\$"`
+		for port in $port_list; do
+			get_port_version			
+			if [ "$installed_version" != "$port_version" ]; then
+				echo "${port%/*} $package $port_version $installed_version" >> $output
+				found_diff="yes"
+			fi
+		done
+	done
+	
+	if [ "$found_diff" = "yes" ]; then
+		echo "Collection Name Port Installed" >> $output_sorted
+		sort $output >> $output_sorted
+		column -t $output_sorted
+	else
+		echo "No differences found"
+	fi
+}
+get_port_version() {
+	local base_port package
+	package=`basename $port`
+	base_port=`echo $package | cut -d "-" -f1`
+	cd $port
+	version=""
+	release=""
+	. Pkgfile
+	if [ "$version" = "" ] && [ "$base_port" != "$package" ] ; then
+		if [ -f $PORTS_DIR/../$base_port/Pkgfile ]; then
+			cd $PORTS_DIR/../$base_port
+			. Pkgfile
+		fi
+	fi
+	[ -z $release ] && release=1
+	port_version="$version-$release"
+}
+print_try_help() {
+	echo "Try '$COMMAND --help' for more information."
+}
+
+print_help() {
+	echo "usage: $COMMAND [options] [collection ...]"
+	echo "options:"
+	echo "   -u, --update    update ports"
+	echo "   -l, --list      list ports"
+	echo "   -d, --diff      list version differences"
+	echo "   -v, --version   print version and exit"
+	echo "   -h, --help      print help and exit"
+}
+
+parse_options() {
+	OPT_MODE=""
+	OPT_COLLECTIONS=""
+	
+	for OPT in "$@"; do
+		case $OPT in
+			-u|--update)
+				OPT_MODE="update" ;;
+			-l|--list)
+				OPT_MODE="list" ;;
+			-d|--diff)
+				OPT_MODE="diff" ;;
+			-v|--version)
+				echo "$COMMAND $VERSION"
+				exit 0 ;;
+			-h|--help)
+				print_help
+				exit 0 ;;
+			-*)
+				echo "$COMMAND: invalid option $OPT"
+				print_try_help
+				exit 1 ;;
+			*)
+				OPT_COLLECTIONS="$OPT_COLLECTIONS $OPT" ;;
+        esac
+    done
+}
+
+main() {
+	parse_options "$@"
+
+	if [ "$OPT_MODE" = "update" ]; then
+		check_ports_dir
+		update_ports
+	elif [ "$OPT_MODE" = "list" ]; then
+		check_ports_dir
+		list_ports
+	elif [ "$OPT_MODE" = "diff" ]; then
+		check_ports_dir
+		list_differences
+	else
+		echo "$COMMAND: option missing"
+		print_try_help
+		exit 1
+	fi
+
+	exit 0
+}
+
+COMMAND=`basename $0`
+
+main "$@"
+
+# End of file

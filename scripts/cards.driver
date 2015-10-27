@@ -1,0 +1,184 @@
+#!/usr/bin/perl
+#
+# /etc/ports/drivers/cards: cards(1) driver script for ports(8)
+#
+
+use warnings;
+use strict;
+use File::Basename;
+use Data::Dumper qw(Dumper);
+
+my $arch ='`uname -m`';
+my $version = '';
+my $host = '';
+my $collection = '';
+my $destination = '';
+my $option = '';
+my %new_checkouts;
+my %old_checkouts;
+
+
+sub error
+{
+	my $message = shift;
+	print "Error: $message ($!)\nUpdating failed\n";
+	exit 1;
+}
+
+sub warning
+{
+	my $message = shift;
+	print "Warning: $message ($!)\n";
+}
+
+if ($#ARGV < 0)
+{
+	print "Usage: $0 <file>\n";
+	exit 1;
+}
+open(FILE, $ARGV[0]) or error("Couldn't open $ARGV[0]");
+while (<FILE>)
+{
+        chomp;
+        if    (/^host=(.*)/)        { $host = $1; }
+        elsif (/^collection=(.*)/)  { $collection = $1; }
+        elsif (/^destination=(.*)/) { $destination = $1; }
+        elsif (/^option=(.*)/)      { $option = $1; }
+	elsif (/^version=(.*)/)      { $version = $1; }
+}
+close(FILE);
+if ($version eq '')
+{
+	open(FILE, "/var/lib/pkg/nutyx-version") or error("Couldn't open /var/lib/pkg/nutyx-version");
+	while (<FILE>)
+	{
+        	chomp;
+        	if    (/^version (.*)/)        { $version = $1; }
+	}
+	close(FILE);
+}
+if ($collection eq '')
+{
+        my @fields = split('\.',$ARGV[0]);
+        $collection = basename $fields[0];
+        warning("collection: field not set in $ARGV[0], will use: $collection");
+}
+
+if ($destination eq '')
+{
+	open(FILE, "/etc/cards.conf") or error("Couldn't open /etc/cards.conf");
+	while (<FILE>)
+	{
+		chomp;
+		if ( (/^dir (.*)/) && (/(.*)\/$collection$/) )
+		{ 
+			my @fields = split(' ',$1);
+			$destination = "$fields[1]/$collection";
+		}
+	}
+	close(FILE);
+}
+
+if ($host eq '')        { error("Host field not set in $ARGV[0]");        }
+
+if ($destination eq '')
+{
+	$destination = "/var/lib/pkg/depot/$collection";
+	warning ("destination field not set in $ARGV[0], will use: $destination");
+}
+
+if (-e "$destination/.checkouts")
+{
+	# read the old .checkouts file into memory
+	open(FILE, "$destination/.checkouts") or error("Couldn't read checkouts from $destination/.checkouts");
+	while (<FILE>)
+	{
+		chomp;
+		$old_checkouts{$_} = 1;
+	}
+	close(FILE);
+}
+
+print "Updating file list from " . $host . "::$collection\n";
+
+# get the remote file list (new .checkouts)
+open(PIPE, 'rsync -crz --no-human-readable --exclude .PKGREPO --exclude *cards.tar* ' . $host . '::nutyx/' . $version . "/" . $arch . "/" . $collection . '/|') or error("Couldn't open pipe to rsync");
+while (<PIPE>)
+{
+	chomp;
+
+	next if /^MOTD:/;	# ignore MOTD lines
+	s/^(.{43})//;		# ignore the first 43 characters (mode, date etc...)
+	next if /^.$/;		# ignore the . directory
+
+	$new_checkouts{$_} = 1;
+}
+close(PIPE);
+error("Running rsync failed") unless $? == 0;
+
+print "Updating collection " . basename($destination) . "\n";
+
+# now really run rsync
+open(PIPE, 'rsync -crz --no-human-readable --exclude .PKGREPO --exclude *cards.tar* --log-format "%o %n" ' . $host . "::nutyx/$version/$arch/$collection/ $destination/|") or error("Couldn't open pipe to rsync");
+while (<PIPE>)
+{
+	chomp;
+
+	if (/^recv (.*)/)
+	{
+		if ($old_checkouts{$1})
+		{
+			s/^recv/ Edit/;
+		}
+		else
+		{
+			s/^recv/ Checkout/;
+		}
+	}
+
+	print $_ . "\n";
+}
+close(PIPE);
+error("Running rsync failed") unless $? == 0;
+
+# save new checkouts into .checkouts
+open(FILE, ">$destination/.checkouts") or error("Couldn't save checkouts to $destination/.checkouts");
+foreach my $checkout (sort keys %new_checkouts)
+{
+	print FILE "$checkout\n";
+}
+close(FILE);
+
+# use chroot as an additional safety measure when removing files
+chroot($destination) or error("Couldn't chroot into $destination");
+chdir('/');
+
+# iterate through old checkouts, remove obsolete files
+foreach my $checkout (sort keys %old_checkouts)
+{
+	if (!$new_checkouts{$checkout})
+	{
+		if (-f $checkout)
+		{
+			print " Delete $checkout\n";
+			unlink($checkout) or warning("Couldn't delete $checkout");
+		}
+	}
+}
+
+# iterate through old checkouts, remove obsolete directories
+foreach my $checkout (sort keys %old_checkouts)
+{
+	if (!$new_checkouts{$checkout})
+	{
+		if (-d $checkout)
+		{
+			print " Delete $checkout\n";
+			rmdir($checkout) or warning("Couldn't delete $checkout");
+		}
+	}
+}
+
+print "Finished successfully\n";
+
+# End of file
