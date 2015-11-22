@@ -60,12 +60,20 @@
 ## doivent exister sur le mirroir http://downloads.nutyx.org (dans ce cas)
 ## Vérifiez quelles sont les collections disponibles sur http://downloads.nutyx.org/<NuTyX-version>
 #
+# dir /var/lib/pkg/depot/enlightenment-extra|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/enlightenment|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/cinnamon-extra|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/cinnamon|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/gnome-extra|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/gnome|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/kde5-extra|http://downloads.nutyx.org
+# dir /var/lib/pkg/depot/kde5|http://downloads.nutyx.org
 # dir /var/lib/pkg/depot/kde-extra|http://downloads.nutyx.org
 # dir /var/lib/pkg/depot/kde|http://downloads.nutyx.org
 # dir /var/lib/pkg/depot/mate-extra|http://downloads.nutyx.org
 # dir /var/lib/pkg/depot/mate|http://downloads.nutyx.org
-# dir /var/lib/pkg/depot/xfce-extra|http://downloads.nutyx.org
-# dir /var/lib/pkg/depot/xfce|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/xfce-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/xfce|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/gui-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/gui|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/cli-extra|http://downloads.nutyx.org
