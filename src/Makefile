@@ -81,10 +81,10 @@ GLIB_LIBS = -lglib-2.0
 
 
 test:
-	$(CXX) -DNDEBUG $(CONSOLEKIT_CFLAGS) $(GLIB_CFLAGS) system_utils.cc error_treat.cc md5.cc string_utils.cc \
+	$(CXX) -DNDEBUG system_utils.cc error_treat.cc md5.cc string_utils.cc \
 	file_utils.cc archive_utils.cc  pkgrepo.h \
 	pkgrepo.cc file_download.cc \
-	test.cc -o $@ $(LDFLAGS) $(LIBCURLLIBS) $(CONSOLEKIT_LIBS) $(GLIB_LIBS)
+	test.cc -o $@ $(LDFLAGS) $(LIBCURLLIBS)
 
 libs:	.libs_depend $(LIBOBJECTS)
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)

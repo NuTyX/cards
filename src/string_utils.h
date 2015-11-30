@@ -41,8 +41,8 @@ void *Malloc(size_t s);
 
 struct keyValue 
 {
-    std::string parameter;
-    std::string value;
+	std::string parameter;
+	std::string value;
 };
 
 /* itemList is a list of *char dynamically allocated */

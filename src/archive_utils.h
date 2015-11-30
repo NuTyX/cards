@@ -92,6 +92,7 @@ class ArchiveUtils
 	unsigned int long size();              	// Numbers of files in the archive
 	std::set<std::string> setofFiles(); 		// return a order set of string
 	std::set<std::string> listofDependencies(); // return an order set of dependencies
+	std::set<std::pair<std::string,time_t> > listofDependenciesBuildDate(); // return an order set of dependencies,BuildDate
 	std::string arch();       // return the arch of the package
 	std::string version();    // return the version of the package
 	std::string release();		// return the release of the package
@@ -111,7 +112,7 @@ class ArchiveUtils
 	std::string getPackageArch();
 	std::vector<std::string>  extractFileContent(const char * fileName);
 	void getRunTimeDependencies();
-
+	void getRunTimeDependenciesEpoch();
 
 	unsigned int long m_size;
 
@@ -120,6 +121,7 @@ class ArchiveUtils
 	std::vector<std::string> m_contentInfo;
 
 	std::set<std::string> m_rtDependenciesList;
+	std::set<std::pair<std::string,time_t> > m_rtDependenciesEpochList;
 	std::string m_fileName;
 	std::string m_packageName;
 	std::string m_packageArch;

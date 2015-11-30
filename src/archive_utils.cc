@@ -141,6 +141,18 @@ vector<string> ArchiveUtils::extractFileContent(const char * fileName)
 	FREE_ARCHIVE(ar);
 	return contentFile;
 }
+void ArchiveUtils::getRunTimeDependenciesEpoch()
+{
+	std::pair<std::string,time_t > NameEpoch;
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		string dependencie = *i;
+		if ( dependencie[0] == 'R' ) {
+			NameEpoch.first=dependencie.substr(1,dependencie.size()-10);
+			NameEpoch.second=strtoul((dependencie.substr(dependencie.size()-10)).c_str(),NULL,0);
+			m_rtDependenciesEpochList.insert(NameEpoch);
+		}
+	}
+}
 void ArchiveUtils::getRunTimeDependencies()
 {
 	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
@@ -218,6 +230,15 @@ set<string> ArchiveUtils::listofDependencies()
 	getRunTimeDependencies();
 
 	return m_rtDependenciesList;
+}
+set< std::pair<std::string,time_t> > ArchiveUtils::listofDependenciesBuildDate()
+{
+	std::pair<std::string,time_t> NameEpoch;
+	NameEpoch.first=getPackageName();
+	NameEpoch.second=buildn();
+	m_rtDependenciesEpochList.insert(NameEpoch);
+	getRunTimeDependenciesEpoch();
+	return m_rtDependenciesEpochList;
 }
 string ArchiveUtils::name()
 {
