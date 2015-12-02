@@ -124,21 +124,24 @@ void Pkginfo::run(int argc, char** argv)
 		treatErrors(o_arg);
 	}
 	if (o_archiveinfo) {
-		ArchiveUtils  * au  = new ArchiveUtils(argv[2]) ;
-		cout	<< au->name() << " Description    : " << au->description() << endl
-			<< au->name() << " URL            : " << au->url() << endl
-			<< au->name() << " Maintainer(s)  : " << au->maintainer() << endl
-			<< au->name() << " Packager(s)    : " << au->packager() << endl
-			<< au->name() << " Version        : " << au->version() << endl
-			<< au->name() << " Release        : " << au->release() << endl
-			<< au->name() << " Architecture   : " << au->arch() << endl
-			<< au->name() << " Build date     : " << au->epochBuildDate() << endl;
-		cout << au->name() << " Dependencies   : ";
-		set<string> depList = au->listofDependencies();
-		for (set<string>::const_iterator i = depList.begin();i != depList.end();i++) {
-			cout << *i << " ";
-		}
-		cout << endl;
+		pair<string, pkginfo_t> packageArchive = openArchivePackage(argv[2]) ;
+		cout	<< packageArchive.first << " Description    : " << packageArchive.second.description << endl
+			<< packageArchive.first << " URL            : " << packageArchive.second.url << endl
+			<< packageArchive.first << " Maintainer(s)  : " << packageArchive.second.maintainer << endl
+			<< packageArchive.first << " Packager(s)    : " << packageArchive.second.packager << endl
+			<< packageArchive.first << " Version        : " << packageArchive.second.version << endl
+			<< packageArchive.first << " Release        : " << packageArchive.second.release << endl
+			<< packageArchive.first << " Architecture   : " << packageArchive.second.arch  << endl
+			<< packageArchive.first << " Build date     : " << packageArchive.second.build << endl;
+		if (packageArchive.second.dependencies.size() > 0 ) {
+			cout << packageArchive.first << " Dependencies   : ";
+			for ( set<pair<string,time_t>>::const_iterator i = packageArchive.second.dependencies.begin();
+				i != packageArchive.second.dependencies.end();
+					++i) {
+					cout << i->first << " ";
+			}
+			cout << endl;
+    }
 	}
 	if (o_footprint_mode) { // Make footprint
 		getFootprintPackage(o_arg);
@@ -286,6 +289,15 @@ void Pkginfo::run(int argc, char** argv)
 				     << "Size           : " << m_listOfInstPackages[o_arg].size << endl
 						 << "Number of Files: " << m_listOfInstPackages[o_arg].files.size()<< endl
 						 << "Arch           : " << m_listOfInstPackages[o_arg].arch << endl;
+				if ( m_listOfInstPackages[o_arg].dependencies.size() > 0 ) {
+					cout << "Dependencies   : ";
+					for ( set<pair<string,time_t>>::const_iterator i = m_listOfInstPackages[o_arg].dependencies.begin();
+							i != m_listOfInstPackages[o_arg].dependencies.end();
+							++i) {
+						cout << i->first << " ";
+					}
+					cout << endl;
+				}
 			}
 		} else if (o_owner_mode) {	// List owner(s) of file or directory
 			buildDatabaseWithDetailsInfos(false);

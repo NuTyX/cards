@@ -95,7 +95,7 @@ class ArchiveUtils
 	std::set<std::pair<std::string,time_t> > listofDependenciesBuildDate(); // return an order set of dependencies,BuildDate
 	std::string arch();       // return the arch of the package
 	std::string version();    // return the version of the package
-	std::string release();		// return the release of the package
+	int  release();		// return the release of the package
 	std::string description();// return the description	of the package
 	std::string url();        // return the url of the package
 	std::string maintainer(); // return the Maintainer(s) of the package

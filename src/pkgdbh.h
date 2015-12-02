@@ -91,7 +91,7 @@ struct pkginfo_t {
 	time_t install; // date of installation
 	std::string arch;
 	std::string size;
-	std::set<std::string> dependencies;
+	std::set< std::pair<std::string,time_t> > dependencies;
 	std::set<std::string> files;
 };
 typedef std::map<std::string, pkginfo_t> packages_t;
@@ -151,6 +151,7 @@ protected:
 	void installArchivePackage(const std::string& filename, const std::set<std::string>& keep_list, const std::set<std::string>& non_install_files);
 	void moveMetaFilesPackage(const std::string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
 	void installArchivePackage_2(const std::string& filename, const std::set<std::string>& keep_list, const std::set<std::string>& non_install_files) const;
+
 
 	void readRulesFile();
 	bool checkRuleAppliesToFile(const rule_t& rule, const std::string& file);

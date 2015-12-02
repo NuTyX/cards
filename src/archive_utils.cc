@@ -147,7 +147,7 @@ void ArchiveUtils::getRunTimeDependenciesEpoch()
 	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
 		string dependencie = *i;
 		if ( dependencie[0] == 'R' ) {
-			NameEpoch.first=dependencie.substr(1,dependencie.size()-10);
+			NameEpoch.first=dependencie.substr(1,dependencie.size()-11);
 			NameEpoch.second=strtoul((dependencie.substr(dependencie.size()-10)).c_str(),NULL,0);
 			m_rtDependenciesEpochList.insert(NameEpoch);
 		}
@@ -260,17 +260,17 @@ string ArchiveUtils::version()
 	}
 	return "";
 }
-string ArchiveUtils::release()
+int ArchiveUtils::release()
 {
 	string release;
 	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
 		release=*i;
 		if ( release[0] == 'r' ) {
-			return release.substr(1);
+			return stoi(release.substr(1));
 			break;
 		}
 	}
-	return "";
+	return 0;
 }
 string ArchiveUtils::url()
 {

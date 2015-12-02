@@ -148,11 +148,12 @@ set<string> CardsInstall::findPackages(const string& path)
 	}
 	return packageList;
 }
-set<string> CardsInstall::getDirectDependencies()
+set< pair<string,time_t> > CardsInstall::getDirectDependencies()
 {
 
-	pkginfo_t infoDeps;
-	set<string> packageNameDeps;
+	pair<string, pkginfo_t> packageArchive;
+	set< pair<string,time_t> > packageNameDepsBuildTime;
+
 #ifndef NDEBUG
 	cerr << "----> Begin of Direct Dependencies" << endl;
 #endif
@@ -161,7 +162,7 @@ set<string> CardsInstall::getDirectDependencies()
 		cerr << m_packageName << " already installed" << endl;
 		cerr << "----> NO Direct Dependencies" << endl;
 #endif
-		return packageNameDeps;
+		return packageNameDepsBuildTime;
 	}
 	if ( m_listOfDepotPackages.find(m_packageName) != m_listOfDepotPackages.end() )
 		return  m_listOfDepotPackages[m_packageName].dependencies;
@@ -170,39 +171,18 @@ set<string> CardsInstall::getDirectDependencies()
 #ifndef NDEBUG
 		cerr << "m_packageName, m_packageFileName: " << m_packageName << " " << m_packageFileName  << endl;
 #endif
-		if ( ! checkFileExist(m_packageFileName)) {
+		if ( ! checkFileExist(m_packageFileName))
 			m_pkgrepo->downloadPackageFileName(m_packageName);
-		}
 
-		set<string> packageNameBuildNDeps;
-		ArchiveUtils packageArchive(m_packageFileName);
-		packageNameBuildNDeps = packageArchive.listofDependencies();
-#ifndef NDEBUG
-		cerr << "Direct Deps of : " << m_packageFileName << endl;
-#endif
-		for (std::set<string>::iterator it = packageNameBuildNDeps.begin();it != packageNameBuildNDeps.end();it++) {
-			string Name = *it;
-#ifndef NDEBUG
-			cerr << Name.substr(0,Name.size()-10)  << " is a direct dep of " << m_packageFileName << endl;
-#endif
-			infoDeps.dependencies.insert(Name.substr(0,Name.size()-10));
-		}
-	} else {
-		/*
-			We consider that this package doens't have any deps 
-			Just add his name
-		*/
-#ifndef NDEBUG
-		cerr << m_packageName << " already installed" << endl;
-#endif
+		packageArchive = openArchivePackage(m_packageFileName);
 	}
 
-	if(!infoDeps.dependencies.empty())
-		m_listOfDepotPackages[m_packageName] = infoDeps;
+	if(! packageArchive.second.dependencies.empty())
+		m_listOfDepotPackages[m_packageName] = packageArchive.second;
 #ifndef NDEBUG
 	cerr << "----> End of Direct Dependencies" << endl;
 #endif
-	return infoDeps.dependencies;
+	return packageArchive.second.dependencies;
 }
 void CardsInstall::getLocalePackagesList()
 {
@@ -245,7 +225,7 @@ void CardsInstall::generateDependencies()
 	// Insert the final package first
 	dependenciesWeMustAdd.push_back(m_packageName);
 	std::vector<string>::iterator vit;
-	std::set<string>::iterator sit;
+	std::set< pair<string,time_t> >::iterator sit;
 	while ( ! dependenciesWeMustAdd.empty() ) {
 		vit = dependenciesWeMustAdd.begin();
 		m_packageName = *vit;
@@ -261,7 +241,7 @@ void CardsInstall::generateDependencies()
 			continue;
 		}
 		dependenciesWeMustAdd.erase(vit); /* Erase the first one in the dependenciesWeMustAdd list */
-		set<string> directDependencies = getDirectDependencies();
+		set< pair<string,time_t> >  directDependencies = getDirectDependencies();
 		/* If m_packageName is already in the depencenciestoSort list  AND ...*/
 		for ( vit = depencenciestoSort.begin(); vit != depencenciestoSort.end();++vit) {
 			if ( m_packageName == *vit ) {
@@ -279,8 +259,8 @@ void CardsInstall::generateDependencies()
 		} */
 		if ( ! checkPackageNameExist(m_packageName)) {
 #ifndef NDEBUG
-			for (std::set<string>::iterator it = directDependencies.begin();it != directDependencies.end();it++) {
-				cerr << "dd: " << *it << " ";
+			for (std::set< pair<string,time_t> >::iterator it = directDependencies.begin();it != directDependencies.end();it++) {
+				cerr << "dd: " << it->first << ",bd: " << it->second;
 			}
 			cerr << endl;
 #endif
@@ -292,14 +272,14 @@ void CardsInstall::generateDependencies()
 			}
 		}
 		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
-			if ( *sit == m_packageName ) {
+			if ( sit->first == m_packageName ) {
 #ifndef NDEBUG
 				cerr << m_packageName << " already found in directDependencies" << endl;
 #endif
 				continue;
 			}
 			for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
-				if ( *sit == *vit) {
+				if ( sit->first == *vit) {
 #ifndef NDEBUG
 					cerr << *vit << " erase from dependenciesWeMustAdd" << endl;
 #endif
@@ -310,13 +290,13 @@ void CardsInstall::generateDependencies()
 		}
 		if (  ! directDependencies.empty() ) {
 			for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
-				if ( m_packageName != *sit ) {
-					if ( ! checkPackageNameExist(*sit)) {
+				if ( m_packageName != sit->first ) {
+					if ( ! checkPackageNameExist(sit->first)) {
 #ifndef NDEBUG
-						cerr << *sit << " not installed, push back in dependenciesWeMustAdd" << endl;
+						cerr << sit->first << " not installed, push back in dependenciesWeMustAdd" << endl;
 #endif
 
-						dependenciesWeMustAdd.push_back(*sit);
+						dependenciesWeMustAdd.push_back(sit->first);
 					}
 				}
 			}

@@ -392,7 +392,10 @@ void Pkgdbh::buildDatabaseWithDetailsInfos(bool silent)
 			}
 			if ( contentFile->items[li][0] == 'R' ) {
 				string run = contentFile->items[li];
-				info.dependencies.insert(run.substr(1));
+				std::pair<std::string,time_t > NameEpoch;
+				NameEpoch.first=run.substr(1,run.size()-11);
+				NameEpoch.second=strtoul((run.substr(run.size()-10)).c_str(),NULL,0);
+				info.dependencies.insert(NameEpoch);
 			}
 		}
 		freeItemList(contentFile);	
@@ -774,10 +777,20 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 		treatErrors(basename);
 	}
 	result.first = m_packageArchiveName;
+	result.second.description = packageArchive.description();
+	result.second.url = packageArchive.url();
+	result.second.maintainer = packageArchive.maintainer();
+	result.second.packager = packageArchive.packager();
+	result.second.version = packageArchive.version();
+	result.second.release = packageArchive.release();
+	result.second.arch = packageArchive.arch();
+	result.second.build = packageArchive.buildn();
+
 	set<string> fileList =  packageArchive.setofFiles();
 	for (set<string>::iterator i = fileList.begin();i != fileList.end();++i) {
 		result.second.files.insert(*i);
 	}
+	result.second.dependencies = packageArchive.listofDependenciesBuildDate();
 	return result;	
 }
 void Pkgdbh::extractAndRunPREfromPackage(const string& filename)
