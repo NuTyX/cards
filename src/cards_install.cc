@@ -157,13 +157,6 @@ set< pair<string,time_t> > CardsInstall::getDirectDependencies()
 #ifndef NDEBUG
 	cerr << "----> Begin of Direct Dependencies" << endl;
 #endif
-	if ( checkPackageNameExist(m_packageName)) {
-#ifndef NDEBUG
-		cerr << m_packageName << " already installed" << endl;
-		cerr << "----> NO Direct Dependencies" << endl;
-#endif
-		return packageNameDepsBuildTime;
-	}
 	if ( m_listOfDepotPackages.find(m_packageName) != m_listOfDepotPackages.end() )
 		return  m_listOfDepotPackages[m_packageName].dependencies;
 	if ( m_pkgrepo->checkBinaryExist(m_packageName)) {
@@ -176,7 +169,13 @@ set< pair<string,time_t> > CardsInstall::getDirectDependencies()
 
 		packageArchive = openArchivePackage(m_packageFileName);
 	}
-
+	if ( checkPackageNameUptodate(packageArchive ) ) {
+#ifndef NDEBUG
+		cerr << m_packageName << " already installed and Up To Dated" << endl;
+		cerr << "----> NO Direct Dependencies" << endl;
+#endif
+		return packageNameDepsBuildTime;
+	}
 	if(! packageArchive.second.dependencies.empty())
 		m_listOfDepotPackages[m_packageName] = packageArchive.second;
 #ifndef NDEBUG
@@ -220,20 +219,24 @@ void CardsInstall::getLocalePackagesList()
 }
 void CardsInstall::generateDependencies()
 {
-	vector<string> dependenciesWeMustAdd,
+	vector< pair<string,time_t> > dependenciesWeMustAdd,
 		depencenciestoSort;
+	pair<string,time_t> PackageTime;
+	PackageTime.first=m_packageName;
+	PackageTime.second=0;
 	// Insert the final package first
-	dependenciesWeMustAdd.push_back(m_packageName);
-	std::vector<string>::iterator vit;
+	dependenciesWeMustAdd.push_back(PackageTime);
+	std::vector< pair<string,time_t> >::iterator vit;
 	std::set< pair<string,time_t> >::iterator sit;
 	while ( ! dependenciesWeMustAdd.empty() ) {
 		vit = dependenciesWeMustAdd.begin();
-		m_packageName = *vit;
+		m_packageName = vit->first;
+		PackageTime = *vit;
 #ifndef NDEBUG
 		cerr << "--> Begin of Main WHILE\n m_packageName = " << m_packageName  << endl;
 #endif
 		/* If m_packageName is already installed no need checkit*/
-		if ( checkPackageNameExist(m_packageName)) {
+		if ( checkPackageNameBuildDateSame(*vit)) {
 #ifndef NDEBUG
 			cerr << m_packageName << " is already installed no need checkit" << endl;
 #endif			
@@ -244,7 +247,10 @@ void CardsInstall::generateDependencies()
 		set< pair<string,time_t> >  directDependencies = getDirectDependencies();
 		/* If m_packageName is already in the depencenciestoSort list  AND ...*/
 		for ( vit = depencenciestoSort.begin(); vit != depencenciestoSort.end();++vit) {
-			if ( m_packageName == *vit ) {
+#ifndef NDEBUG
+			cerr << vit->first << endl;
+#endif
+			if ( m_packageName == vit->first ) {
 				break;
 			}
 		}
@@ -257,31 +263,31 @@ void CardsInstall::generateDependencies()
 //			dependenciesWeMustAdd.erase(vit);
 			continue;
 		} */
-		if ( ! checkPackageNameExist(m_packageName)) {
+		if ( ! checkPackageNameBuildDateSame(PackageTime)) {
 #ifndef NDEBUG
 			for (std::set< pair<string,time_t> >::iterator it = directDependencies.begin();it != directDependencies.end();it++) {
 				cerr << "dd: " << it->first << ",bd: " << it->second;
 			}
 			cerr << endl;
 #endif
-			if ( ! checkPackageNameExist(m_packageName)) {
+			if ( ! checkPackageNameBuildDateSame(PackageTime)) {
 #ifndef NDEBUG
-				cerr << m_packageName << " push back in dependenciestoSort" << endl;
+				cerr << PackageTime.first << " push back in dependenciestoSort" << endl;
 #endif
-				depencenciestoSort.push_back(m_packageName);
+				depencenciestoSort.push_back(PackageTime);
 			}
 		}
 		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
-			if ( sit->first == m_packageName ) {
+			if ( sit->first == PackageTime.first ) {
 #ifndef NDEBUG
-				cerr << m_packageName << " already found in directDependencies" << endl;
+				cerr << PackageTime.first << " already found in directDependencies" << endl;
 #endif
 				continue;
 			}
 			for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
-				if ( sit->first == *vit) {
+				if ( *sit == *vit) {
 #ifndef NDEBUG
-					cerr << *vit << " erase from dependenciesWeMustAdd" << endl;
+					cerr << vit->first << " erase from dependenciesWeMustAdd" << endl;
 #endif
 					dependenciesWeMustAdd.erase(vit);
 					break;
@@ -290,41 +296,44 @@ void CardsInstall::generateDependencies()
 		}
 		if (  ! directDependencies.empty() ) {
 			for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
-				if ( m_packageName != sit->first ) {
-					if ( ! checkPackageNameExist(sit->first)) {
+				if ( PackageTime.first != sit->first ) {
+					if ( ! checkPackageNameBuildDateSame(*sit)) {
 #ifndef NDEBUG
 						cerr << sit->first << " not installed, push back in dependenciesWeMustAdd" << endl;
 #endif
 
-						dependenciesWeMustAdd.push_back(sit->first);
+						dependenciesWeMustAdd.push_back(*sit);
 					}
+#ifndef NDEBUG
+						else cerr << sit->first << " is already installed" << endl;
+#endif
 				}
 			}
 		}
 #ifndef NDEBUG
 		cerr << "dependenciesWeMustAdd: " << endl;
 		for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
-			cerr << *vit << ", ";
+			cerr << vit->first << ", ";
 		}
 		cerr << endl << "depencenciestoSort: " << endl;
 		for ( vit = depencenciestoSort.begin(); vit != depencenciestoSort.end();++vit) {
-			cerr << *vit << ", ";
+			cerr << vit->first << ", ";
 		}
 		
 		cerr << endl << "--> End of Main WHILE" << endl << endl;
 #endif
 	}
 	bool found = false ;
-	for ( std::vector<string>::reverse_iterator vrit = depencenciestoSort.rbegin(); vrit != depencenciestoSort.rend();++vrit) {
+	for ( std::vector<pair <string,time_t> >::reverse_iterator vrit = depencenciestoSort.rbegin(); vrit != depencenciestoSort.rend();++vrit) {
 		found = false ;
-		for ( vit = m_dependenciesList.begin(); vit != m_dependenciesList.end();vit++) {
-			if ( *vrit == *vit ) {
+		for (vector<string>::const_iterator i = m_dependenciesList.begin();i != m_dependenciesList.end();i++) {
+			if (*i == vrit->first) {
 				found = true ;
 				break;
 			}
 		}
 		if (!found)
-			m_dependenciesList.push_back(*vrit);
+			m_dependenciesList.push_back(vrit->first);
 	}
 }
 void CardsInstall::updatePackage()
@@ -520,6 +529,7 @@ void CardsInstall::addPackagesList()
 		cerr << m_packageFileName << endl;
 #endif
 		if  ( checkPackageNameExist(m_packageName) ) {
+			updatePackage();
 			continue;
 		}
 
