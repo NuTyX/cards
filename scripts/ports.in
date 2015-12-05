@@ -46,6 +46,7 @@ get_ports_dir() {
 			PORTS_DIR="$destination"
 		fi
 	fi
+	check_ports_dir
 }
 update_ports() {
 	if [ "`id -u`" != "0" ]; then
@@ -206,13 +207,10 @@ main() {
 	parse_options "$@"
 
 	if [ "$OPT_MODE" = "update" ]; then
-		check_ports_dir
 		update_ports
 	elif [ "$OPT_MODE" = "list" ]; then
-		check_ports_dir
 		list_ports
 	elif [ "$OPT_MODE" = "diff" ]; then
-		check_ports_dir
 		list_differences
 	else
 		echo "$COMMAND: option missing"
