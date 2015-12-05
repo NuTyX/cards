@@ -541,7 +541,28 @@ bool Pkgdbh::checkPackageNameExist(const string& name)
 {
 	return (m_packageNamesList.find(name) != m_packageNamesList.end());
 }
-
+bool Pkgdbh::checkPackageNameUptodate(const pair<string, pkginfo_t>& archiveName)
+{
+	set<string>::iterator it = m_packageNamesList.find(archiveName.first);
+	if (it == m_packageNamesList.end())
+		return false;
+	if (m_listOfInstPackages[archiveName.first].version !=  archiveName.second.version)
+		return false;
+	if (m_listOfInstPackages[archiveName.first].release !=  archiveName.second.release)
+		return false;
+	if (m_listOfInstPackages[archiveName.first].build < archiveName.second.build)
+		return false;
+	return true;
+}
+bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild)
+{
+	set<string>::iterator it = m_packageNamesList.find(dependencieNameBuild.first);
+	if (it == m_packageNamesList.end())
+		return false;
+	if (m_listOfInstPackages[dependencieNameBuild.first].build < dependencieNameBuild.second)
+		return false;
+	return true;
+}
 /* Remove meta data about the removed package */
 void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {

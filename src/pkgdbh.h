@@ -133,6 +133,8 @@ protected:
 	void addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& info);
 	void addPackageFilesRefsToDB_2(const std::string& name, const pkginfo_t& info);
 	bool checkPackageNameExist(const std::string& name);
+	bool checkPackageNameUptodate(const std::pair<std::string, pkginfo_t>& archiveName);
+	bool checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild);
 	bool checkPackageNameExist_2(const std::string& name);	
 	/* Remove the physical files after followings some rules */
 	void removePackageFiles(const std::string& name);
