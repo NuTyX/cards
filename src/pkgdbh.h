@@ -149,6 +149,7 @@ protected:
 
 	// Tar.gz
 	std::pair<std::string, pkginfo_t> openArchivePackage(const std::string& filename);
+	std::set< std::pair<std::string, time_t> > getPackageDependencies(const std::string& filename);
 	void extractAndRunPREfromPackage(const std::string& filename);
 	void installArchivePackage(const std::string& filename, const std::set<std::string>& keep_list, const std::set<std::string>& non_install_files);
 	void moveMetaFilesPackage(const std::string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here

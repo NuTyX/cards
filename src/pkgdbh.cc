@@ -814,6 +814,31 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 	result.second.dependencies = packageArchive.listofDependenciesBuildDate();
 	return result;	
 }
+set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename)
+{
+	pair<string, pkginfo_t> packageArchive;
+	set< pair<string,time_t> > packageNameDepsBuildTime;
+
+#ifndef NDEBUG
+	cerr << "----> Begin of Direct Dependencies" << endl;
+#endif
+
+	packageArchive = openArchivePackage(filename);
+	if ( checkPackageNameUptodate(packageArchive ) ) {
+#ifndef NDEBUG
+		cerr << m_packageName << " already installed and Up To Dated" << endl
+			<< "----> NO Direct Dependencies" << endl
+			<< "----> End of Direct Dependencies" << endl;
+#endif
+		return packageNameDepsBuildTime;
+	}
+	if(! packageArchive.second.dependencies.empty())
+		m_listOfDepotPackages[packageArchive.first] = packageArchive.second;
+#ifndef NDEBUG
+	cerr << "----> End of Direct Dependencies" << endl;
+#endif
+	return packageArchive.second.dependencies;
+}
 void Pkgdbh::extractAndRunPREfromPackage(const string& filename)
 {
 	char buf[PATH_MAX];
