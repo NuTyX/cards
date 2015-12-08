@@ -818,15 +818,13 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 {
 	pair<string, pkginfo_t> packageArchive;
 	set< pair<string,time_t> > packageNameDepsBuildTime;
-
-#ifndef NDEBUG
-	cerr << "----> Begin of Direct Dependencies" << endl;
-#endif
-
 	packageArchive = openArchivePackage(filename);
+#ifndef NDEBUG
+	cerr << "----> Begin of Direct Dependencies of " << packageArchive.first << endl;
+#endif
 	if ( checkPackageNameUptodate(packageArchive ) ) {
 #ifndef NDEBUG
-		cerr << m_packageName << " already installed and Up To Dated" << endl
+		cerr << packageArchive.first << " already installed and Up To Dated" << endl
 			<< "----> NO Direct Dependencies" << endl
 			<< "----> End of Direct Dependencies" << endl;
 #endif
@@ -837,7 +835,20 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 #ifndef NDEBUG
 	cerr << "----> End of Direct Dependencies" << endl;
 #endif
-	return packageArchive.second.dependencies;
+	packageNameDepsBuildTime = packageArchive.second.dependencies;
+	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();
+		it != packageNameDepsBuildTime.end();it++) {
+		if ( checkPackageNameBuildDateSame(*it) ) {// If actual and already present erase the dep
+			packageNameDepsBuildTime.erase(it);
+#ifndef NDEBUG
+			cerr << "----> " << it->first << " deleted" << endl;
+#endif
+		}
+	}
+#ifndef NDEBUG
+	cerr << "----> Number of remains direct deps: " << packageNameDepsBuildTime.size() << "/" << packageArchive.second.dependencies.size() << endl;
+#endif
+	return packageNameDepsBuildTime;
 }
 void Pkgdbh::extractAndRunPREfromPackage(const string& filename)
 {
