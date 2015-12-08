@@ -830,7 +830,7 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 #endif
 		return packageNameDepsBuildTime;
 	}
-	if(! packageArchive.second.dependencies.empty())
+	if (! packageArchive.second.dependencies.empty() )
 		m_listOfDepotPackages[packageArchive.first] = packageArchive.second;
 #ifndef NDEBUG
 	cerr << "----> End of Direct Dependencies" << endl;
@@ -838,7 +838,7 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 	packageNameDepsBuildTime = packageArchive.second.dependencies;
 	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();
 		it != packageNameDepsBuildTime.end();it++) {
-		if ( checkPackageNameBuildDateSame(*it) ) {// If actual and already present erase the dep
+		if ( checkPackageNameBuildDateSame(*it) || ( it->first == packageArchive.first ) ) {// If actual and already present erase the dep
 			packageNameDepsBuildTime.erase(it);
 #ifndef NDEBUG
 			cerr << "----> " << it->first << " deleted" << endl;

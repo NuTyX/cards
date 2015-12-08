@@ -56,8 +56,6 @@ private:
 	*/
 	set<string> findPackages(const string& path);
 
-	//TODO transfer getDirectDependencies into pkgrepo classe
-	set< pair<string,time_t> > getDirectDependencies();
 	set<string> applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
 	set<string> getKeepFileList(const set<string>& files, const vector<rule_t>& rules);
 
@@ -66,7 +64,6 @@ private:
 	void createBinaries();
 	void getSignatures();
 
-	//TODO transfer generateDependencies into pkgrepo class
 	void generateDependencies();
 	bool getPackageFileName();
 	void addPackagesList();

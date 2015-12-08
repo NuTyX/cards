@@ -91,7 +91,7 @@ CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
 #endif
 	} else {
 		//TODO get rid of thoses useless arguments
-		run(0, NULL);
+//		run(0, NULL);
 	}
 }
 CardsInstall::CardsInstall(const CardsArgumentParser& argParser,
@@ -148,41 +148,6 @@ set<string> CardsInstall::findPackages(const string& path)
 	}
 	return packageList;
 }
-set< pair<string,time_t> > CardsInstall::getDirectDependencies()
-{
-
-	pair<string, pkginfo_t> packageArchive;
-	set< pair<string,time_t> > packageNameDepsBuildTime;
-
-#ifndef NDEBUG
-	cerr << "----> Begin of Direct Dependencies" << endl;
-#endif
-	if ( m_listOfDepotPackages.find(m_packageName) != m_listOfDepotPackages.end() )
-		return  m_listOfDepotPackages[m_packageName].dependencies;
-	if ( m_pkgrepo->checkBinaryExist(m_packageName)) {
-		m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
-#ifndef NDEBUG
-		cerr << "m_packageName, m_packageFileName: " << m_packageName << " " << m_packageFileName  << endl;
-#endif
-		if ( ! checkFileExist(m_packageFileName))
-			m_pkgrepo->downloadPackageFileName(m_packageName);
-
-		packageArchive = openArchivePackage(m_packageFileName);
-	}
-	if ( checkPackageNameUptodate(packageArchive ) ) {
-#ifndef NDEBUG
-		cerr << m_packageName << " already installed and Up To Dated" << endl;
-		cerr << "----> NO Direct Dependencies" << endl;
-#endif
-		return packageNameDepsBuildTime;
-	}
-	if(! packageArchive.second.dependencies.empty())
-		m_listOfDepotPackages[m_packageName] = packageArchive.second;
-#ifndef NDEBUG
-	cerr << "----> End of Direct Dependencies" << endl;
-#endif
-	return packageArchive.second.dependencies;
-}
 void CardsInstall::getLocalePackagesList()
 {
 	// Add the locales if any defined
@@ -228,100 +193,34 @@ void CardsInstall::generateDependencies()
 	dependenciesWeMustAdd.push_back(PackageTime);
 	std::vector< pair<string,time_t> >::iterator vit;
 	std::set< pair<string,time_t> >::iterator sit;
-	while ( ! dependenciesWeMustAdd.empty() ) {
+	while ( ! dependenciesWeMustAdd.empty() ) {	// Main WHILE
 		vit = dependenciesWeMustAdd.begin();
 		m_packageName = vit->first;
 		PackageTime = *vit;
-#ifndef NDEBUG
-		cerr << "--> Begin of Main WHILE\n m_packageName = " << m_packageName  << endl;
-#endif
-		/* If m_packageName is already installed no need checkit*/
-		if ( checkPackageNameBuildDateSame(*vit)) {
-#ifndef NDEBUG
-			cerr << m_packageName << " is already installed no need checkit" << endl;
-#endif			
-			dependenciesWeMustAdd.erase(vit);
-			continue;
-		}
-		dependenciesWeMustAdd.erase(vit); /* Erase the first one in the dependenciesWeMustAdd list */
-		set< pair<string,time_t> >  directDependencies = getDirectDependencies();
-		/* If m_packageName is already in the depencenciestoSort list  AND ...*/
-		for ( vit = depencenciestoSort.begin(); vit != depencenciestoSort.end();++vit) {
-#ifndef NDEBUG
-			cerr << vit->first << endl;
-#endif
-			if ( m_packageName == vit->first ) {
-				break;
-			}
-		}
-		/* ... AND m_packageName have dependencies, no need to check it again */
-
-/*		if ( (found) && (! directDependencies.empty() ) ) {  TODO Need to find a beter algo for this. 
-#ifndef NDEBUG
-			cerr << m_packageName << " is already in the depencenciestoSort list and HAVE some dependencies, no need to check it again" << endl;
-#endif
-//			dependenciesWeMustAdd.erase(vit);
-			continue;
-		} */
-		if ( ! checkPackageNameBuildDateSame(PackageTime)) {
-#ifndef NDEBUG
-			for (std::set< pair<string,time_t> >::iterator it = directDependencies.begin();it != directDependencies.end();it++) {
-				cerr << "dd: " << it->first << ",bd: " << it->second;
-			}
-			cerr << endl;
-#endif
-			if ( ! checkPackageNameBuildDateSame(PackageTime)) {
-#ifndef NDEBUG
-				cerr << PackageTime.first << " push back in dependenciestoSort" << endl;
-#endif
-				depencenciestoSort.push_back(PackageTime);
-			}
-		}
+		dependenciesWeMustAdd.erase(vit); 	// Erase the current treated package name
+		if ( m_listOfDepotPackages.find(m_packageName) != m_listOfDepotPackages.end() )
+			continue; // We treat this one already
+		if ( m_pkgrepo->checkBinaryExist(m_packageName)) // directs deps if not yet availables
+			m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
+		if ( ! checkFileExist(m_packageFileName))	// Binary Archive not yet downloaded
+			m_pkgrepo->downloadPackageFileName(m_packageName); // Get it
+		set< pair<string,time_t> > directDependencies = getPackageDependencies(m_packageFileName);
+		if ( ! checkPackageNameBuildDateSame(PackageTime)) // If not yet install or not up to dated
+			depencenciestoSort.push_back(PackageTime); // Add it
 		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
-			if ( sit->first == PackageTime.first ) {
-#ifndef NDEBUG
-				cerr << PackageTime.first << " already found in directDependencies" << endl;
-#endif
+			if ( sit->first == PackageTime.first )
 				continue;
-			}
 			for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
 				if ( *sit == *vit) {
-#ifndef NDEBUG
-					cerr << vit->first << " erase from dependenciesWeMustAdd" << endl;
-#endif
 					dependenciesWeMustAdd.erase(vit);
 					break;
 				}
 			}
 		}
-		if (  ! directDependencies.empty() ) {
-			for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
-				if ( PackageTime.first != sit->first ) {
-					if ( ! checkPackageNameBuildDateSame(*sit)) {
-#ifndef NDEBUG
-						cerr << sit->first << " not installed, push back in dependenciesWeMustAdd" << endl;
-#endif
-
-						dependenciesWeMustAdd.push_back(*sit);
-					}
-#ifndef NDEBUG
-						else cerr << sit->first << " is already installed" << endl;
-#endif
-				}
-			}
+		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
+			if ( PackageTime.first != sit->first )
+				dependenciesWeMustAdd.push_back(*sit);
 		}
-#ifndef NDEBUG
-		cerr << "dependenciesWeMustAdd: " << endl;
-		for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
-			cerr << vit->first << ", ";
-		}
-		cerr << endl << "depencenciestoSort: " << endl;
-		for ( vit = depencenciestoSort.begin(); vit != depencenciestoSort.end();++vit) {
-			cerr << vit->first << ", ";
-		}
-		
-		cerr << endl << "--> End of Main WHILE" << endl << endl;
-#endif
 	}
 	bool found = false ;
 	for ( std::vector<pair <string,time_t> >::reverse_iterator vrit = depencenciestoSort.rbegin(); vrit != depencenciestoSort.rend();++vrit) {
