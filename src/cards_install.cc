@@ -91,7 +91,7 @@ CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
 #endif
 	} else {
 		//TODO get rid of thoses useless arguments
-//		run(0, NULL);
+		run(0, NULL);
 	}
 }
 CardsInstall::CardsInstall(const CardsArgumentParser& argParser,
@@ -198,13 +198,16 @@ void CardsInstall::generateDependencies()
 		m_packageName = vit->first;
 		PackageTime = *vit;
 		dependenciesWeMustAdd.erase(vit); 	// Erase the current treated package name
-		if ( m_listOfDepotPackages.find(m_packageName) != m_listOfDepotPackages.end() )
-			continue; // We treat this one already
-		if ( m_pkgrepo->checkBinaryExist(m_packageName)) // directs deps if not yet availables
-			m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
-		if ( ! checkFileExist(m_packageFileName))	// Binary Archive not yet downloaded
-			m_pkgrepo->downloadPackageFileName(m_packageName); // Get it
-		set< pair<string,time_t> > directDependencies = getPackageDependencies(m_packageFileName);
+		set< pair<string,time_t> > directDependencies;
+		if ( m_listOfDepotPackages.find(m_packageName) != m_listOfDepotPackages.end() ) {
+			directDependencies = m_listOfDepotPackages[m_packageName].dependencies;
+		} else {
+			if ( m_pkgrepo->checkBinaryExist(m_packageName)) // directs deps if not yet availables
+				m_packageFileName = m_pkgrepo->getPackageFileName(m_packageName);
+			if ( ! checkFileExist(m_packageFileName))	// Binary Archive not yet downloaded
+				m_pkgrepo->downloadPackageFileName(m_packageName); // Get it
+			directDependencies = getPackageDependencies(m_packageFileName);
+		}
 		if ( ! checkPackageNameBuildDateSame(PackageTime)) // If not yet install or not up to dated
 			depencenciestoSort.push_back(PackageTime); // Add it
 		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
@@ -218,8 +221,10 @@ void CardsInstall::generateDependencies()
 			}
 		}
 		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
-			if ( PackageTime.first != sit->first )
-				dependenciesWeMustAdd.push_back(*sit);
+			if ( PackageTime.first != sit->first ) {
+				if ( ! checkPackageNameBuildDateSame(*sit))
+					dependenciesWeMustAdd.push_back(*sit);
+			}
 		}
 	}
 	bool found = false ;
