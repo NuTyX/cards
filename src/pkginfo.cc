@@ -138,7 +138,7 @@ void Pkginfo::run(int argc, char** argv)
 			for ( set<pair<string,time_t>>::const_iterator i = packageArchive.second.dependencies.begin();
 				i != packageArchive.second.dependencies.end();
 					++i) {
-					cout << i->first << " ";
+					cout << i->first << i->second<< " ";
 			}
 			cout << endl;
     }

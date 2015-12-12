@@ -72,8 +72,8 @@
 # dir /var/lib/pkg/depot/kde|http://downloads.nutyx.org
 # dir /var/lib/pkg/depot/mate-extra|http://downloads.nutyx.org
 # dir /var/lib/pkg/depot/mate|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/xfce-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/xfce|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/xfce4-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/xfce4|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/gui-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/gui|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/cli-extra|http://downloads.nutyx.org
