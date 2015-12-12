@@ -836,17 +836,42 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 	cerr << "----> End of Direct Dependencies" << endl;
 #endif
 	packageNameDepsBuildTime = packageArchive.second.dependencies;
-	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();
-		it != packageNameDepsBuildTime.end();it++) {
-		if ( checkPackageNameBuildDateSame(*it) || ( it->first == packageArchive.first ) ) {// If actual and already present erase the dep
+#ifndef NDEBUG
+	cerr << "----> Before cleanup: " << packageArchive.first << endl;
+	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();it != packageNameDepsBuildTime.end();it++) {
+			cerr << it->first << it->second<< " ";
+	}
+	cerr << endl;
+	int i=1;
+#endif
+	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();it != packageNameDepsBuildTime.end();it++) {
+#ifndef NDEBUG
+		cerr << it->first << it->second << endl;
+		cerr << "packageArchiveName:" <<packageArchive.first << endl;
+#endif
+		if ( checkPackageNameBuildDateSame(*it) || ( it->first == packageArchive.first ) ) {  // If actual and already present erase the dep
 			packageNameDepsBuildTime.erase(it);
 #ifndef NDEBUG
 			cerr << "----> " << it->first << " deleted" << endl;
 #endif
+		if ( packageNameDepsBuildTime.size()  > 0)
+			it--;
 		}
-	}
 #ifndef NDEBUG
-	cerr << "----> Number of remains direct deps: " << packageNameDepsBuildTime.size() << "/" << packageArchive.second.dependencies.size() << endl;
+		cerr << i << endl;
+		i++;
+#endif
+	}
+	if (! packageNameDepsBuildTime.empty() )
+		m_listOfDepotPackages[packageArchive.first].dependencies = packageNameDepsBuildTime;
+#ifndef NDEBUG
+	cerr << "----> Number of remains direct deps: " << packageArchive.first << ": " << packageNameDepsBuildTime.size() << "/" << packageArchive.second.dependencies.size() << endl;
+	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();
+		it != packageNameDepsBuildTime.end();it++) {
+		cerr << it->first << " " ;
+	}
+	if (packageNameDepsBuildTime.size()>0)
+	cerr << endl;
 #endif
 	return packageNameDepsBuildTime;
 }
