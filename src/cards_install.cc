@@ -681,13 +681,6 @@ set<string> CardsInstall::applyInstallRules(const string& name, pkginfo_t& info,
 #endif
 	return non_install_set;
 }
-void CardsInstall::getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const
-{
-	for (vector<rule_t>::const_iterator i = rules.begin(); i != rules.end(); i++) {
-		if (i->event == event)
-			found.push_back(*i);
-	}
-}
 void CardsInstall::printHelp() const
 {
 	cout << endl
