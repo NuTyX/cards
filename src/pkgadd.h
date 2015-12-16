@@ -37,7 +37,6 @@ public:
 private:
 	set<string> getKeepFileList(const set<string>& files, const vector<rule_t>& rules);
 	set<string> applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
-	void getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const;
 };
 
 #endif /* PKGADD_H */

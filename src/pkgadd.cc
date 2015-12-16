@@ -252,11 +252,4 @@ set<string> Pkgadd::applyInstallRules(const string& name, pkginfo_t& info, const
 
 	return non_install_set;
 }
-
-void Pkgadd::getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const
-{
-	for (vector<rule_t>::const_iterator i = rules.begin(); i != rules.end(); i++)
-		if (i->event == event)
-			found.push_back(*i);
-}
 // vim:set ts=2 :
