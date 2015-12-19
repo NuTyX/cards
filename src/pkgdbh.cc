@@ -1095,9 +1095,9 @@ void Pkgdbh::runLdConfig()
 }
 void Pkgdbh::getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const
 {
-	for (vector<rule_t>::const_iterator i = rules.begin(); i != rules.end(); i++) {
-		if (i->event == event)
-			found.push_back(*i);
+	for (auto i : rules ) {
+	if (i.event == event)
+		found.push_back(i);
 	}
 }
 bool Pkgdbh::checkRuleAppliesToFile(const rule_t& rule, const string& file)
