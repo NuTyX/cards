@@ -648,8 +648,7 @@ void Pkgdbh::removePackageFiles(const string& name, const set<string>& keep_list
 #endif
 
 	// Don't delete files found in the keep list
-	for (set<string>::const_iterator i = keep_list.begin(); i != keep_list.end(); ++i)
-		m_filesList.erase(*i);
+	for (auto i : keep_list) m_filesList.erase(i);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 2 (files that is in the keep list excluded):" << endl;
@@ -838,13 +837,11 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 	packageNameDepsBuildTime = packageArchive.second.dependencies;
 #ifndef NDEBUG
 	cerr << "----> Before cleanup: " << packageArchive.first << endl;
-	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();it != packageNameDepsBuildTime.end();it++) {
-			cerr << it->first << it->second<< " ";
-	}
+	for (auto it : packageNameDepsBuildTime ) cerr << it.first << it.second<< " ";
 	cerr << endl;
 	int i=1;
 #endif
-	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();it != packageNameDepsBuildTime.end();it++) {
+	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();it != packageNameDepsBuildTime.end(); ) {
 #ifndef NDEBUG
 		cerr << it->first << it->second << endl;
 		cerr << "packageArchiveName:" <<packageArchive.first << endl;
@@ -854,8 +851,8 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 #ifndef NDEBUG
 			cerr << "----> " << it->first << " deleted" << endl;
 #endif
-		if ( packageNameDepsBuildTime.size()  > 0)
-			it--;
+		} else {
+			it++;
 		}
 #ifndef NDEBUG
 		cerr << i << endl;
@@ -866,11 +863,7 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 		m_listOfDepotPackages[packageArchive.first].dependencies = packageNameDepsBuildTime;
 #ifndef NDEBUG
 	cerr << "----> Number of remains direct deps: " << packageArchive.first << ": " << packageNameDepsBuildTime.size() << "/" << packageArchive.second.dependencies.size() << endl;
-	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();
-		it != packageNameDepsBuildTime.end();it++) {
-		cerr << it->first << " " ;
-	}
-	if (packageNameDepsBuildTime.size()>0)
+	for ( auto it : packageNameDepsBuildTime ) cerr << it.first << " " ;
 	cerr << endl;
 #endif
 	return packageNameDepsBuildTime;
@@ -1077,9 +1070,7 @@ void Pkgdbh::readRulesFile()
 	}
 #ifndef NDEBUG
 	cerr << "Configuration:" << endl;
-	for (vector<rule_t>::const_iterator j = m_actionRules.begin(); j != m_actionRules.end(); j++) {
-		cerr << "\t" << (*j).pattern << "\t" << (*j).action << endl;
-	}
+	for (auto j : m_actionRules ) cerr << "\t" << j.pattern << "\t" << j.action << endl;
 	cerr << endl;
 #endif
 }
@@ -1114,7 +1105,42 @@ bool Pkgdbh::checkRuleAppliesToFile(const rule_t& rule, const string& file)
 
 	return ret;
 }
+set<string> Pkgdbh::applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules)
+{
+  // TODO: better algo(?)
+  set<string> install_set;
+  set<string> non_install_set;
+  vector<rule_t> found;
 
+  getInstallRulesList(rules, INSTALL, found);
+
+  for (auto i : info.files) {
+    bool install_file = true;
+    for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
+      if (checkRuleAppliesToFile(*j, i)) {
+        install_file = (*j).action;
+        break;
+      }
+    }
+    if (install_file)
+      install_set.insert(install_set.end(), i);
+    else
+      non_install_set.insert(i);
+  }
+  info.files.clear();
+  info.files = install_set;
+
+#ifndef NDEBUG
+  cerr << "Install set:" << endl;
+  for  (auto j : info.files) cerr << "   " << j << endl;
+  cerr << endl;
+  cerr << "Non-Install set:" << endl;
+  for (auto j : non_install_set) cerr << "   " << j << endl;
+  cerr << endl;
+#endif
+
+	return non_install_set;
+}
 void Pkgdbh::getFootprintPackage(string& filename)
 {
 	unsigned int i;

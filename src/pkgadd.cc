@@ -199,12 +199,9 @@ set<string> Pkgadd::getKeepFileList(const set<string>& files, const vector<rule_
 
 #ifndef NDEBUG
 	cerr << "Keep list:" << endl;
-	for (set<string>::const_iterator j = keep_list.begin(); j != keep_list.end(); j++) {
-		cerr << "   " << (*j) << endl;
-	}
+	for (auto j : keep_list) cerr << "   " << j << endl;
 	cerr << endl;
 #endif
-
 	return keep_list;
 }
 
@@ -217,36 +214,28 @@ set<string> Pkgadd::applyInstallRules(const string& name, pkginfo_t& info, const
 
 	getInstallRulesList(rules, INSTALL, found);
 
-	for (set<string>::const_iterator i = info.files.begin(); i != info.files.end(); i++) {
+	for (auto i : info.files) {
 		bool install_file = true;
-
 		for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
-			if (checkRuleAppliesToFile(*j, *i)) {
+			if (checkRuleAppliesToFile(*j, i)) {
 				install_file = (*j).action;
 				break;
 			}
 		}
-
 		if (install_file)
-			install_set.insert(install_set.end(), *i);
+			install_set.insert(install_set.end(), i);
 		else
-			non_install_set.insert(*i);
+			non_install_set.insert(i);
 	}
-
 	info.files.clear();
 	info.files = install_set;
 
 #ifndef NDEBUG
 	cerr << "Install set:" << endl;
-	for (set<string>::iterator j = info.files.begin(); j != info.files.end(); j++) {
-		cerr << "   " << (*j) << endl;
-	}
+	for  (auto j : info.files) cerr << "   " << j << endl;
 	cerr << endl;
-
 	cerr << "Non-Install set:" << endl;
-	for (set<string>::iterator j = non_install_set.begin(); j != non_install_set.end(); j++) {
-		cerr << "   " << (*j) << endl;
-	}
+	for (auto j : non_install_set) cerr << "   " << j << endl;
 	cerr << endl;
 #endif
 

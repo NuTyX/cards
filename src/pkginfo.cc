@@ -135,11 +135,7 @@ void Pkginfo::run(int argc, char** argv)
 			<< packageArchive.first << " Build date     : " << packageArchive.second.build << endl;
 		if (packageArchive.second.dependencies.size() > 0 ) {
 			cout << packageArchive.first << " Dependencies   : ";
-			for ( set<pair<string,time_t>>::const_iterator i = packageArchive.second.dependencies.begin();
-				i != packageArchive.second.dependencies.end();
-					++i) {
-					cout << i->first << i->second<< " ";
-			}
+			for ( auto i : packageArchive.second.dependencies) cout << i.first << i.second << " ";
 			cout << endl;
     }
 	}
@@ -150,9 +146,7 @@ void Pkginfo::run(int argc, char** argv)
 		getListOfPackageNames(o_root);
 		if (o_installed_mode) {	// List installed packages
 			buildDatabaseWithNameVersion();
-			for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-				cout << i->first << " " << i->second.version << "-" << i->second.release << endl;
-			}
+			for (auto i : m_listOfInstPackages) cout << i.first << " " << i.second.version << "-" << i.second.release << endl;
 		} else if (o_list_mode) {	// List package or file contents
 			buildDatabaseWithDetailsInfos(false);
 			if (checkPackageNameExist(o_arg)) {
@@ -173,14 +167,10 @@ void Pkginfo::run(int argc, char** argv)
 			Result = findRecursiveFile (filenameList, const_cast<char*>(o_arg.c_str()), &r, WS_DEFAULT);
 			// get the list of library for all the possible files 
 			set<string> librairiesList;
-			for (set<string>::const_iterator i = filenameList.begin();i != filenameList.end();++i) {
-				Result = getRuntimeLibrairiesList(librairiesList,*i);
-			}
+			for (auto i : filenameList) Result = getRuntimeLibrairiesList(librairiesList,i);
 			// get the own package  for all the elf files dependencies libraries
 #ifndef NDEBUG
-			for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i) {
-				cerr << *i<<endl;
-			}
+			for (auto i : librairiesList) cerr << i <<endl;
 #endif
 			if ( (librairiesList.size() > 0 ) && (Result > -1) ) {
 				set<string> runtimeList;
@@ -206,8 +196,8 @@ void Pkginfo::run(int argc, char** argv)
 					cerr << "Number of librairies founds: " << runtimeList.size() << endl;
 #endif
 					unsigned int s = 1;
-					for (set<string>::const_iterator i = runtimeList.begin();i!=runtimeList.end();++i) {
-						cout << *i << endl;
+					for ( auto i : runtimeList ) {
+						cout << i << endl;
 						s++;
 					}
 					cout << endl;
@@ -325,8 +315,8 @@ void Pkginfo::run(int argc, char** argv)
 			}
 			regfree(&preg);
 			if (result.size() > 1) {
-				for (vector<pair<string, string> >::const_iterator i = result.begin(); i != result.end(); ++i) {
-					cout << left << setw(width + 2) << i->first << i->second << endl;
+				for (auto i : result ) {
+					cout << left << setw(width + 2) << i.first << i.second << endl;
 				}
 			} else {
 				cout << m_utilName << ": no owner(s) found" << endl;

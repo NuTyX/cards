@@ -159,6 +159,7 @@ protected:
 	void readRulesFile();
 	void getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const;
 	bool checkRuleAppliesToFile(const rule_t& rule, const std::string& file);
+	set<string> applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
 
 	void getFootprintPackage(std::string& filename);
 	void runLdConfig();

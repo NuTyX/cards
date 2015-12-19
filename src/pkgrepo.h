@@ -97,7 +97,7 @@ struct PortsDirectory {
 
 class Pkgrepo
 {
-	private:
+	protected:
 /**
  *
  * \parse the config file
@@ -160,6 +160,7 @@ class Pkgrepo
 
 	public:
 
+		Pkgrepo(){};
 		Pkgrepo(const std::string& fileName);
 		static int parseConfig(const std::string& fileName,
 			Config& config);
@@ -298,7 +299,7 @@ class Pkgrepo
 		bool getBinaryPackageInfo(const std::string& packageName);
 		bool getPortInfo(const std::string& portName);
 
-	private:
+	protected:
 		bool m_parsePkgRepoCollectionFile;
 		bool m_parseCollectionDirectory;
 		bool m_parsePackagesPkgRepoFile;
