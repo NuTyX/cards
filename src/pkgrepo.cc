@@ -575,9 +575,7 @@ unsigned int Pkgrepo::getBinaryPackageList()
 			binaryList.insert(packageNameVersion);
 		}
 	}
-	for ( std::set<string>::iterator i = binaryList.begin(); i != binaryList.end(); ++ i) {
-		cout << *i << endl;
-	}
+	for ( auto i : binaryList) cout << i << endl;
 	return binaryList.size();
 }
 unsigned int Pkgrepo::getPortsList()
@@ -889,21 +887,17 @@ string Pkgrepo::getPackageFileName(const string& packageName)
 time_t Pkgrepo::getBinaryBuildTime (const string& packageName)
 {
 
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
-	if (!m_parsePackagePkgfileFile)
-		parsePackagePkgfileFile();
+	if (! m_parsePkgRepoCollectionFile)
+		parsePkgRepoCollectionFile();
 
 	time_t buildTime = 0;
 	bool found = false;
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			for (std::vector<PortFilesList>::iterator p = j->portFilesList.begin(); p != j ->portFilesList.end();++p) {
-				if ( p->name == packageName ) {
-					found = true;
-					buildTime = j->buildDate;
-					break;
-				}
+			if ( j->basePackageName == packageName ) {
+				found = true;
+				buildTime = j->buildDate;
+				break;
 			}
 			if (found)
 				break;
