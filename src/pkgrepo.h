@@ -160,7 +160,6 @@ class Pkgrepo
 
 	public:
 
-		Pkgrepo(){};
 		Pkgrepo(const std::string& fileName);
 		static int parseConfig(const std::string& fileName,
 			Config& config);
