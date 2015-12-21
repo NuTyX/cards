@@ -3,7 +3,7 @@
 ## L'ordre est important
 ## Premier trouvé premier compilé et/ou premier installé
 ##
-## A noter que c'est bien les paquets de "base" en dernier et les paquets "desktop" en premier
+## A noter que c'est bien les paquets de "base" en dernier et les paquets "gui-extra" en premier
 ## et que l'on specifie le dossier parent du jeu de paquets:
 ## Le contenu d'un dossier paquet ressemble donc à ceci dans le cas de:
 ##
@@ -16,13 +16,13 @@
 ## and that we do specify the parent folder of the set of packages category:
 ## The content of a folder package look like this in the case of:
 ##
-## /var/lib/pkg/saravane/console/alsa-utils/.PKGREPO
-##                                         /Pkgfile
-##                                         /alsa-utils123468110i686.cards.tar.xz
-##                                         /alsa-utils123468110x86_64.cards.tar.xz
-##                                         /alsa-utils.doc123468110any.cards.tar.xz
-##                                         /alsa-utils.post-install
-##                                         /...
+## /var/lib/pkg/depot/cli/alsa-utils/.PKGREPO
+##                                  /Pkgfile
+##                                  /alsa-utils123468110i686.cards.tar.xz
+##                                  /alsa-utils123468110x86_64.cards.tar.xz
+##                                  /alsa-utils.doc123468110any.cards.tar.xz
+##                                  /alsa-utils.post-install
+##                                  /...
 
 ## A COLLECTION CAN BE MADE OF ports only OR MADE OF binaries
 ## The only criteria determining this is: with or without '|<url adress' at the end of a line starting with the
@@ -51,12 +51,12 @@
 # dir /var/lib/pkg/depot/base
 
 ## The NuTyX name and version are found in the /var/lib/pkg/nutyx-version file
-## The Colletion name (gui, gui-extra, cli, cli-extra, base et base-extra)
+## The Colletion name (xfce4-extra, xfce4, gui, gui-extra, cli, cli-extra, base, base-extra)
 ## must exist on the mirror http://downloads.nutyx.org (in this case)
 ## Checkout for your version what's are the available collections at http://downloads.nutyx.org/<NuTyX-version>
 #
 ## Le nom et la version de NuTyX se trouvent dans le fichier /var/lib/pkg/nutyx-version
-## Le nom des collections (graphic, graphic-extra,console, console-extra, base et base-extra)
+## Le nom des collections (xfce4-extra, xfce4, gui, gui-extra,cli, cli-extra, base, base-extra)
 ## doivent exister sur le mirroir http://downloads.nutyx.org (dans ce cas)
 ## Vérifiez quelles sont les collections disponibles sur http://downloads.nutyx.org/<NuTyX-version>
 #
