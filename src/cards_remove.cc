@@ -36,7 +36,7 @@
 using namespace std;
 
 CardsRemove::CardsRemove(const CardsArgumentParser& argParser)
-	: m_argParser(argParser)
+	: Pkgdbh("cards remove"),m_argParser(argParser)
 {
 }
 void CardsRemove::run(int argc, char** argv)

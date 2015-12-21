@@ -26,7 +26,7 @@
 using namespace std;
 
 CardsInfo::CardsInfo(const CardsArgumentParser& argParser)
-	:  m_argParser(argParser), m_root("/")
+	:  Pkgdbh("cards info"), m_argParser(argParser), m_root("/")
 {
 }
 void CardsInfo::run(int argc, char** argv)

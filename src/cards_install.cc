@@ -20,7 +20,7 @@
 #include "cards_install.h"
 
 CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
-	: m_argParser(argParser), m_root("/")
+	: Pkgdbh("cards install"),m_argParser(argParser), m_root("/")
 {
 	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
@@ -96,12 +96,12 @@ CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
 }
 CardsInstall::CardsInstall(const CardsArgumentParser& argParser,
 	const string& packageName)
-	: m_argParser(argParser), m_packageName(packageName), m_root("/")
+	: Pkgdbh("cards install"), m_argParser(argParser), m_packageName(packageName), m_root("/")
 {
 }
 CardsInstall::CardsInstall (const CardsArgumentParser& argParser,
 	const vector<string>& listOfPackages)
-	:m_argParser(argParser), m_dependenciesList(listOfPackages), m_root("/")
+	:Pkgdbh("cards install"), m_argParser(argParser), m_dependenciesList(listOfPackages), m_root("/")
 {
 	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;

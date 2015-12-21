@@ -36,7 +36,7 @@ Pkgrepo::Pkgrepo(const std::string& fileName)
 			<<  m_configFileName  << NORMAL
 			<< " found..." << endl
 			<< WHITE << "You should create a new one based on the " << YELLOW
-			<< "/etc/cards.conf.example" << NORMAL << " file" << endl;
+			<< m_configFileName << ".example" << NORMAL << " file" << endl;
 	}
 
 	m_parsePkgRepoCollectionFile = false;

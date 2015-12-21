@@ -36,7 +36,7 @@
 using namespace std;
 
 CardsBase::CardsBase(const CardsArgumentParser& argParser)
-	: m_argParser(argParser)
+	: Pkgdbh("cards base"), m_argParser(argParser)
 {
 }
 void CardsBase::run(int argc, char** argv)

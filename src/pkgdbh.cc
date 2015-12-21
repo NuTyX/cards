@@ -47,14 +47,6 @@ using namespace std;
 
 using __gnu_cxx::stdio_filebuf;
 
-Pkgdbh::Pkgdbh()
-{
-	// TODO fix this some times very ugly
-	if ( m_root.empty() ) {
-		m_root="/";
-	}
-	cleanupMetaFiles(m_root);
-}
 Pkgdbh::Pkgdbh(const string& name)
 	: m_utilName(name)
 {
