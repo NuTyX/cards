@@ -298,6 +298,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 	}
 	bool vf = false;
 	bool rf = false;
+	bool bf = false;
 	for (set<string>::iterator i = m_packageNamesList.begin();i != m_packageNamesList.end();++i) {
 		pkginfo_t info;
 		const string metaFile = m_root + PKG_DB_DIR + *i + '/' + PKG_META;
@@ -305,6 +306,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 		readFile(contentFile,metaFile.c_str());
 		vf = false;
 		rf = false;
+		bf = false;
 		info.release = 1;
 		for (unsigned int li=0; li < contentFile->count ; ++li) {
 			if ( contentFile->items[li][0] == 'V' ) {
@@ -317,7 +319,12 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 				info.release = atoi(release.substr(1).c_str());
 				rf = true;
 			}
-			if ( vf && rf ) {
+			if ( contentFile->items[li][0] == 'B' ) {
+				string build = contentFile->items[li];
+				info.build = strtoul(build.substr(1).c_str(),NULL,0);
+				bf = true;
+			}
+			if ( vf && rf && bf) {
 				m_listOfInstPackages[*i] = info;
 				break;
 			}
