@@ -38,7 +38,10 @@ ArgParser::APCmd CardsArgumentParser::CMD_DEPENDS;
 ArgParser::APCmd CardsArgumentParser::CMD_DEPTREE;
 ArgParser::APCmd CardsArgumentParser::CMD_SEARCH;
 ArgParser::APCmd CardsArgumentParser::CMD_PURGE;
+ArgParser::APCmd CardsArgumentParser::CMD_UPGRADE;
 
+ArgParser::APOpt CardsArgumentParser::OPT_CHECK;
+ArgParser::APOpt CardsArgumentParser::OPT_SIZE;
 
 ArgParser::APOpt CardsArgumentParser::OPT_FORCE;
 ArgParser::APOpt CardsArgumentParser::OPT_UPDATE;
@@ -152,6 +155,11 @@ If -f is passed as optional argument, it will force the install means overwrite 
 "This command can be used if you want to save some space on the harddisk. It will delete all the downloads binaries which are located in the binaries sections directories.",
 		ArgParser::NONE, 0 , "");
 
+	addCommand(CMD_UPGRADE, "upgrade",
+		"\tupgrade you installation with a single command.",
+"This command can upgrade at onces alls your installed packages.",
+		ArgParser::NONE, 0 , "");
+
 	OPT_FORCE.init("force",
 		'f',
 		"\tForce install, overwrite conflicting files.");
@@ -187,6 +195,17 @@ If -f is passed as optional argument, it will force the install means overwrite 
 	OPT_IGNORE.init("ignore",
 		'I',
 		"\tIgnore errors and list the level anyway.");
+
+	OPT_SIZE.init("size",
+		's',
+		"\tJust return the number of updates.");
+
+	OPT_CHECK.init("check",
+		'c',
+		"\tJust check if they are some updates.");
+
+	addOption(CMD_UPGRADE, OPT_SIZE, false);
+	addOption(CMD_UPGRADE, OPT_CHECK, false);
 
 	addOption(CMD_LIST, OPT_BINARIES, false);
 	addOption(CMD_LIST, OPT_PORTS, false);

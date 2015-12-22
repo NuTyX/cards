@@ -47,6 +47,10 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_DEPTREE;
 		static ArgParser::APCmd CMD_SEARCH;
 		static ArgParser::APCmd CMD_PURGE;
+		static ArgParser::APCmd CMD_UPGRADE;
+
+		static ArgParser::APOpt OPT_CHECK;
+		static ArgParser::APOpt OPT_SIZE;
 
 		static ArgParser::APOpt OPT_FORCE;
 		static ArgParser::APOpt OPT_UPDATE;

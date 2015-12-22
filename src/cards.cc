@@ -27,9 +27,9 @@
 #include "cards_install.h"
 #include "cards_remove.h"
 #include "cards_info.h"
+#include "cards_upgrade.h"
 
 #include "pkgrepo.h"
-
 #include "pkginfo.h"
 
 using namespace std;
@@ -106,13 +106,9 @@ of compilation" << endl
 					cout << endl;
 				}
 			}
-			for (vector<string>::iterator i = config.baseDir.begin();i != config.baseDir.end();++i) {
-				cout << "Base System list directory: " << *i << endl;
-			}
+			for ( auto i : config.baseDir ) cout << "Base System list directory: " << i << endl;
 			cout <<   "Binaries : " << config.arch << endl;
-			for (vector<string>::iterator i = config.locale.begin();i != config.locale.end();++i) {
-				cout << "Locale   : " << *i << endl;
-			}
+			for ( auto i : config.locale ) cout << "Locale   : " << i << endl;
 			if ( config.logdir != "") {
 				cout << "log directory: " << config.logdir << endl;
 			}
@@ -172,6 +168,9 @@ of compilation" << endl
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_PURGE) {
 			CardsSync CS(cardsArgPars);
 			CS.purge();
+			return EXIT_SUCCESS;
+		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_UPGRADE) {
+			CardsUpgrade CU(cardsArgPars);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
 			CardsInstall CI(cardsArgPars);

@@ -52,12 +52,14 @@ CARDSOBJECTS =	system_utils.o \
 		pkgdbh.o \
 		pkgadd.o \
 		pkginfo.o \
+		pkginst.o \
 		cards_sync.o \
 		cards_install.o \
 		cards_remove.o \
 		cards_depends.o \
 		cards_base.o \
 		cards_info.o \
+		cards_upgrade.o \
 		cards.o
 
 
