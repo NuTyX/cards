@@ -840,7 +840,7 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 	cerr << endl;
 	int i=1;
 #endif
-	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();it != packageNameDepsBuildTime.end(); ) {
+	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();it != packageNameDepsBuildTime.end();it++ ) {
 #ifndef NDEBUG
 		cerr << it->first << it->second << endl;
 		cerr << "packageArchiveName:" <<packageArchive.first << endl;
@@ -850,8 +850,7 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 #ifndef NDEBUG
 			cerr << "----> " << it->first << " deleted" << endl;
 #endif
-		} else {
-			it++;
+			it--;
 		}
 #ifndef NDEBUG
 		cerr << i << endl;
