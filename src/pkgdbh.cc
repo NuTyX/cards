@@ -275,7 +275,7 @@ int Pkgdbh::getListOfPackageNames (const string& path)
 	const string pathdb =  m_root + PKG_DB_DIR;
 	if ( findFile(m_packageNamesList, pathdb) != 0 ) {
 		m_actualError = CANNOT_READ_FILE;
-    treatErrors(pathdb);
+		treatErrors(pathdb);
 	}
 #ifndef NDEBUG
   cerr << "Number of Packages: " << m_packageNamesList.size() << endl;
@@ -335,7 +335,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 	}
 }
 /* Populate the database with all details infos */
-void Pkgdbh::buildDatabaseWithDetailsInfos(bool silent)
+void Pkgdbh::buildDatabaseWithDetailsInfos(const bool& silent)
 {
 	if (!silent) {
 		m_actualAction = DB_OPEN_START;
@@ -555,6 +555,8 @@ bool Pkgdbh::checkPackageNameUptodate(const pair<string, pkginfo_t>& archiveName
 }
 bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild)
 {
+	if (dependencieNameBuild.second == 0)
+		return false;
 	set<string>::iterator it = m_packageNamesList.find(dependencieNameBuild.first);
 	if (it == m_packageNamesList.end())
 		return false;
@@ -845,7 +847,7 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 		cerr << it->first << it->second << endl;
 		cerr << "packageArchiveName:" <<packageArchive.first << endl;
 #endif
-		if ( checkPackageNameBuildDateSame(*it) || ( it->first == packageArchive.first ) ) {  // If actual and already present erase the dep
+		if ( checkPackageNameBuildDateSame(*it)  ) {  // If actual and already present erase the dep
 			packageNameDepsBuildTime.erase(it);
 #ifndef NDEBUG
 			cerr << "----> " << it->first << " deleted" << endl;
@@ -1138,6 +1140,27 @@ set<string> Pkgdbh::applyInstallRules(const string& name, pkginfo_t& info, const
 #endif
 
 	return non_install_set;
+}
+set<string> Pkgdbh::getKeepFileList(const set<string>& files, const vector<rule_t>& rules)
+{
+	set<string> keep_list;
+	vector<rule_t> found;
+	getInstallRulesList(rules, UPGRADE, found);
+	for (set<string>::const_iterator i = files.begin(); i != files.end(); i++) {
+		for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
+			if (checkRuleAppliesToFile(*j, *i)) {
+				if (!(*j).action)
+					keep_list.insert(keep_list.end(), *i);
+				break;
+			}
+		}
+	}
+#ifndef NDEBUG
+	cerr << "Keep list:" << endl;
+	for (auto i : keep_list) cerr << "   " << i << endl;
+	cerr << endl;
+#endif
+	return keep_list;
 }
 void Pkgdbh::getFootprintPackage(string& filename)
 {

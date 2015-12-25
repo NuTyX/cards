@@ -25,7 +25,7 @@
 ##                                  /...
 
 ## A COLLECTION CAN BE MADE OF ports only OR MADE OF binaries
-## The only criteria determining this is: with or without '|<url adress' at the end of a line starting with the
+## The only criteria determining this is: with or without '|<url adress>' at the end of a line starting with the
 ## keyword 'dir'. Followings examples:
 
 ## This is a port collection located in '/usr/ports/my_ports'
@@ -103,6 +103,7 @@ base /var/lib/pkg/depot/base-extra
 ## We can specify which locale we want, it's possible to mention as many locale we want
 ## As the following exemple germans, deutch, and french locales
 ## The command setup-nutyx -cl add the selected locale into cards.conf file
+##
 ## On peut spécifier quelle(s) locale(s) doivent être installées
 ## La commande setup-nutyx -cl ajoute la locale selectionnée dans le fichier cards.conf
 ##

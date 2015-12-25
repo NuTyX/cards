@@ -206,19 +206,20 @@ If -f is passed as optional argument, it will force the install means overwrite 
 
 	addOption(CMD_UPGRADE, OPT_SIZE, false);
 	addOption(CMD_UPGRADE, OPT_CHECK, false);
+	addOption(CMD_UPGRADE, OPT_FORCE,false);
 
 	addOption(CMD_LIST, OPT_BINARIES, false);
 	addOption(CMD_LIST, OPT_PORTS, false);
 
-	addOption(CMD_INFO,OPT_BINARIES, false);
-	addOption(CMD_INFO,OPT_PORTS, false);
+	addOption(CMD_INFO, OPT_BINARIES, false);
+	addOption(CMD_INFO, OPT_PORTS, false);
 
-	addOption(CMD_DIFF,OPT_PORTS, false);
+	addOption(CMD_DIFF, OPT_PORTS, false);
 
-	addOption(CMD_REMOVE,OPT_ALL, false);
+	addOption(CMD_REMOVE, OPT_ALL, false);
 
-	addOption(CMD_INSTALL,OPT_UPDATE,false);
-	addOption(CMD_INSTALL,OPT_FORCE,false);
+	addOption(CMD_INSTALL, OPT_UPDATE,false);
+	addOption(CMD_INSTALL, OPT_FORCE,false);
 
 	addOption(CMD_BASE, OPT_DRY,false);
 	addOption(CMD_BASE, OPT_REMOVE,false);

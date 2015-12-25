@@ -107,9 +107,7 @@ void Pkgadd::run(int argc, char** argv)
 			// Run pre-install if exist
 			extractAndRunPREfromPackage(o_package);
 		}
-
 		set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
-
 		if (!conflicting_files.empty()) {
 			if (o_force) {
 				pLock = new Db_lock(o_root, true);
@@ -128,9 +126,7 @@ void Pkgadd::run(int argc, char** argv)
 		set<string> keep_list;
 		if (o_upgrade) {
 			pLock = new Db_lock(o_root, true);
-			// Remove metadata about the package removed
-			removePackageFilesRefsFromDB(package.first);
-
+			removePackageFilesRefsFromDB(package.first);	// Remove metadata about the package removed
 			keep_list = getKeepFileList(package.second.files, m_actionRules);
 			removePackageFiles(package.first, keep_list);
 			delete pLock;

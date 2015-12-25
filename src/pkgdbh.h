@@ -122,10 +122,10 @@ public:
 protected:
 	// Database
 
-	int getListOfPackageNames(const std::string& path );
+	int getListOfPackageNames(const std::string& path);
 	std::pair<std::string, pkginfo_t> getInfosPackage(const std::string& packageName);
 	void buildDatabaseWithNameVersion();
-	void buildDatabaseWithDetailsInfos(bool silent);
+	void buildDatabaseWithDetailsInfos(const bool& silent);
 	void buildDatabaseWithDetailsInfos(const std::string& path);
 
 
@@ -159,6 +159,7 @@ protected:
 	void getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const;
 	bool checkRuleAppliesToFile(const rule_t& rule, const std::string& file);
 	set<string> applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
+	set<string> getKeepFileList(const set<string>& files, const vector<rule_t>& rules);
 
 	void getFootprintPackage(std::string& filename);
 	void runLdConfig();

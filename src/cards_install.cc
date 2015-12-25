@@ -362,14 +362,9 @@ void CardsInstall::install()
 }
 void CardsInstall::addPackage()
 {
-	// New LockDatabase pointer
-	Db_lock  * pLock = NULL;
-	// Checking the rules
-	readRulesFile();
-
+	Db_lock  * pLock = NULL;	// New LockDatabase pointer
+	readRulesFile();					// Checking the rules
 	set<string> keep_list;
-	
-	// Reading the archive to find a list of files
 	pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
 	set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
 #ifndef NDEBUG

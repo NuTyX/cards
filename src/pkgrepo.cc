@@ -827,9 +827,8 @@ bool Pkgrepo::checkBinaryExist(const string& packageName)
 
 	string basePackageName = packageName;
 	string::size_type pos = packageName.find('.');
-	if (pos != string::npos) {
+	if (pos != string::npos)
 		basePackageName=packageName.substr(0,pos);
-	}
 #ifndef NDEBUG
 	cerr << "basePackageName: " << basePackageName << endl;
 #endif
@@ -886,15 +885,17 @@ string Pkgrepo::getPackageFileName(const string& packageName)
 }
 time_t Pkgrepo::getBinaryBuildTime (const string& packageName)
 {
-
 	if (! m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
-
+	string basePackageName = packageName;
+	string::size_type pos = packageName.find('.');
+	if (pos != string::npos)
+		basePackageName=packageName.substr(0,pos);
 	time_t buildTime = 0;
 	bool found = false;
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			if ( j->basePackageName == packageName ) {
+			if ( j->basePackageName == basePackageName ) {
 				found = true;
 				buildTime = j->buildDate;
 				break;

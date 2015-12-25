@@ -20,12 +20,9 @@
 
 #include "cards_upgrade.h"
 CardsUpgrade::CardsUpgrade(const CardsArgumentParser& argParser)
-	: Pkginst("cards upgrade","/etc/cards.conf"), m_argParser(argParser)
+	: Pkginst("cards upgrade","/etc/cards.conf",true), m_argParser(argParser)
 {
 	parsePkgRepoCollectionFile();
-	getListOfPackageNames("/");
-
-	buildDatabaseWithNameVersion();
 	for (auto i : m_listOfInstPackages) {
 		if (!checkBinaryExist(i.first)) {
 			cout << i.first << " not exist" << endl;
@@ -37,7 +34,7 @@ CardsUpgrade::CardsUpgrade(const CardsArgumentParser& argParser)
 		if ( checkPackageNameBuildDateSame(packageNameBuildDate)) {
 			continue;
 		}
-		m_ListOfPackages.insert(i.first);
+		m_ListOfPackages.insert(packageNameBuildDate);
 	}
 	if ( m_argParser.isSet(CardsArgumentParser::OPT_CHECK))
 		Isuptodate();
@@ -61,10 +58,13 @@ void CardsUpgrade::Isuptodate()
 void CardsUpgrade::run(int argc, char** argv)
 {
 	for (auto i : m_ListOfPackages) {
-		cout << i << endl;
+#ifndef NDEBUG
+		cerr << i.first << " " << i.second << endl;
+#endif
 		generateDependencies(i);
 	}
-//	addPackagesList();
+	if (!m_dependenciesList.empty())
+		addPackagesList(m_argParser.isSet(CardsArgumentParser::OPT_FORCE)  );
 }
 void CardsUpgrade::printHelp() const
 {

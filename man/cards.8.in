@@ -21,6 +21,10 @@ abstract ports installation/update from file system
 \ \ \ \(bu
 install/update a list of packages with one command
 
+.TP
+\ \ \ \(bu
+upgrade the obslolete installed packages with one command
+
 .TP 
 \ \ \ \(bu
 list dependencies for a list of packages
@@ -92,6 +96,14 @@ check for any dependencies, download the dependencies. Onces all the dependencie
 are download. cards will install all the packages in the right order. If it's a
 <collection name> passed as argument, it will installed all the packages belonging
 to this <collection name>
+
+.TP
+.B upgrade
+Binaries scenario: upgrade the obsolete installed packages on you system. It will not ask for
+confirmation. It will download the binary package, check for any dependencies,
+download the dependencies. Onces all the dependencies are download.
+cards will install all the packages in the right order.
+
 
 .TP 
 .B depcreate [\-\-margs] [\-\-aargs] [\-\-log] <package1> [<package2> ...]
@@ -200,10 +212,20 @@ and
 .SH "OPTIONS"
 
 .TP
+.B -c
+check if they are some update available, will return "yes" or "no"
+
+.TP
+.B -s
+return the number of packages which can be upgrade.
+
+.TP
 .B -f
-Force install of the package in
+Force install of the package(s) in
 .B cards install
-command
+or
+.B cards upgrade
+commands
 
 .TP
 .B -i

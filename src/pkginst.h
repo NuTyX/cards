@@ -19,21 +19,23 @@
 //
 #ifndef PKGINST_H
 #define PKGINST_H
+#include <string>
 
 #include "pkgdbh.h"
 #include "pkgrepo.h"
+#include "process.h"
 
 class Pkginst : public Pkgdbh, public Pkgrepo {
 public:
 //	Pkginst(){}
-	Pkginst(const std::string& commandName,const std::string& configFileName );
-	void generateDependencies(const std::string& packageName);
+	Pkginst(const std::string& commandName,const std::string& configFileName,
+	const bool& silent);
+	void generateDependencies(const pair<std::string,time_t>& packageName);
 	void generateDependencies();
-	void addPackage(const bool& installed);
-	void addPackagesList();
+	void addPackage(const bool& force);
+	void addPackagesList(const bool& force);
 
-private:
-	bool m_force;
+protected:
 	string m_packageName;
 	string m_packageFileName;
 	vector<string> m_dependenciesList;

@@ -24,7 +24,7 @@
 
 class CardsUpgrade : public Pkginst {
 private:
-	set<string> m_ListOfPackages;
+	set<pair<string,time_t>> m_ListOfPackages;
 	const CardsArgumentParser& m_argParser;
 public:
 	CardsUpgrade(const CardsArgumentParser& argParser);
