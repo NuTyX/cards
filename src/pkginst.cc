@@ -19,12 +19,9 @@
 //
 #include "pkginst.h"
 
-Pkginst::Pkginst(const string& commandName, const string& configFileName, const bool& silent)
+Pkginst::Pkginst(const string& commandName, const string& configFileName)
 	: Pkgdbh(commandName), Pkgrepo(configFileName)
 {
-	getListOfPackageNames("/");
-	buildDatabaseWithDetailsInfos(silent);
-	parsePkgRepoCollectionFile();
 }
 void Pkginst::generateDependencies(const pair<string,time_t>& packageName)
 {

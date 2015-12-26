@@ -27,9 +27,7 @@
 
 class Pkginst : public Pkgdbh, public Pkgrepo {
 public:
-//	Pkginst(){}
-	Pkginst(const std::string& commandName,const std::string& configFileName,
-	const bool& silent);
+	Pkginst(const std::string& commandName,const std::string& configFileName);
 	void generateDependencies(const pair<std::string,time_t>& packageName);
 	void generateDependencies();
 	void addPackage(const bool& force);

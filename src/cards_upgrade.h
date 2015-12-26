@@ -29,6 +29,7 @@ private:
 public:
 	CardsUpgrade(const CardsArgumentParser& argParser);
 	void upgradePackages();
+	void dry();		// show the packages that should be update without upgrade them
 	void size(); // number of updates availables
 	void Isuptodate(); // True if some updates availables
 	void run(int argc, char** argv);
