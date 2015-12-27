@@ -21,8 +21,8 @@
 //  USA.
 //
 
-#if (__GNUC__ < 3)
-#error This program requires GCC 3.x to compile.
+#if (__GNUC__ < 4)
+#error This program requires GCC 4.x to compile.
 #endif
 
 #include <iostream>
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 	string name = basename(argv[0]);
 
 	try {
-		auto_ptr<Pkgdbh> util(select_utility(name));
+		unique_ptr<Pkgdbh> util(select_utility(name));
 
 		// Handle common options
 		for (int i = 1; i < argc; i++) {

@@ -80,7 +80,7 @@ int ArgParser::addCommand(APCmd& cmd,
     APCmd apcmd;
     apcmd.id = m_cmdIdCounter;
 
-    PREDEFINED_CMD_HELP.init("help", 'h', "\tPrint this help message");
+    PREDEFINED_CMD_HELP.init("help", 'h', "\t\t    Print this help message");
 
     // add predefined commands
     addOption(cmd, PREDEFINED_CMD_HELP, false);
@@ -416,7 +416,7 @@ string ArgParser::generateOptionString(Option* o) const
 			help += "=" + o->valueName;
 		}
 
-		help += "    ";
+		help += "  ";
 		help += o->description;
 		help += "\n";
 	}

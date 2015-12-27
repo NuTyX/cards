@@ -57,6 +57,7 @@ ArgParser::APOpt CardsArgumentParser::OPT_IGNORE;
 
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
 
+ArgParser::APOpt CardsArgumentParser::OPT_ROOT;
 
 CardsArgumentParser::CardsArgumentParser()
 {
@@ -162,47 +163,53 @@ If -f is passed as optional argument, it will force the install means overwrite 
 
 	OPT_FORCE.init("force",
 		'f',
-		"\tForce install, overwrite conflicting files.");
+		"\t\t    Force install, overwrite conflicting files.");
 
 	OPT_UPDATE.init("upgrade",
 		'u',
-		"\tUpgrade the package with the same name.");
+		  "\t    Upgrade the package with the same name.");
 
 	OPT_INSTALLED.init("installed",
 		'i',
-		"\tIncluded the allready installed packages in the list.");
+		"\t\t    Included the allready installed packages in the list.");
 
 	OPT_BINARIES.init("binaries",
 		'b',
-		"\tAvailable binaries in depot.");
+		"\t    Available binaries in depot.");
 
 	OPT_PORTS.init("ports",
 		'p',
-		"\tAvailable ports.");
+		"\t\t    Available ports.");
 
 	OPT_DRY.init("dry",
 		'n',
-		"\t\tNot doing the action. Only show (if possible) what will be done.");
+		"\t\t    Not doing the action. Only show (if possible) what will be done.");
 
 	OPT_REMOVE.init("remove",
-		'r',
-		"\tRemove the packages founds, use with care.");
+		'R',
+		  "\t    Remove the packages founds, use with care.");
 
 	OPT_ALL.init("all",
 		'a',
-		"\t\tRemove the sub package(s) as well, if they exists.");
+		"\t\t    Remove the sub package(s) as well, if they exists.");
 
 	OPT_IGNORE.init("ignore",
 		'I',
-		"\tIgnore errors and list the level anyway.");
+		  "\t    Ignore errors and list the level anyway.");
 
 	OPT_SIZE.init("size",
 		's',
-		"\tJust return the number of updates.");
+		"\t\tJust return the number of updates.");
 
 	OPT_CHECK.init("check",
 		'c',
-		"\tJust check if they are some updates.");
+		"\t\tJust check if they are some updates.");
+
+	OPT_ROOT.init("root",
+		'r',
+		"Specify alternative installation root",
+		true,
+		"<path>");
 
 	addOption(CMD_UPGRADE, OPT_SIZE, false);
 	addOption(CMD_UPGRADE, OPT_CHECK, false);
@@ -218,12 +225,15 @@ If -f is passed as optional argument, it will force the install means overwrite 
 	addOption(CMD_DIFF, OPT_PORTS, false);
 
 	addOption(CMD_REMOVE, OPT_ALL, false);
+	addOption(CMD_REMOVE, OPT_ROOT,false);
 
 	addOption(CMD_INSTALL, OPT_UPDATE,false);
 	addOption(CMD_INSTALL, OPT_FORCE,false);
+	addOption(CMD_INSTALL, OPT_ROOT,false);
 
 	addOption(CMD_BASE, OPT_DRY,false);
 	addOption(CMD_BASE, OPT_REMOVE,false);
+	addOption(CMD_BASE, OPT_ROOT,false);
 
 	addOption(CMD_CREATE, OPT_DRY,false);
 	addOption(CMD_CREATE, OPT_REMOVE,true);
