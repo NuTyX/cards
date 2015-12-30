@@ -55,6 +55,7 @@ CARDSOBJECTS =	system_utils.o \
 		pkginfo.o \
 		pkginst.o \
 		pkgtest.o \
+		cards_create.o \
 		cards_sync.o \
 		cards_install.o \
 		cards_remove.o \
