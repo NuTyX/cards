@@ -3,7 +3,7 @@
 #
 #  Copyright (c) 2000-2005 by Per Liden <per@fukt.bth.se>
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -51,8 +51,10 @@ CARDSOBJECTS =	system_utils.o \
 		runtime_dependencies_utils.o \
 		pkgdbh.o \
 		pkgadd.o \
+		pkgrm.o \
 		pkginfo.o \
 		pkginst.o \
+		pkgtest.o \
 		cards_sync.o \
 		cards_install.o \
 		cards_remove.o \
@@ -83,10 +85,10 @@ GLIB_LIBS = -lglib-2.0
 
 
 test:
-	$(CXX) -DNDEBUG system_utils.cc error_treat.cc md5.cc string_utils.cc \
-	file_utils.cc archive_utils.cc  pkgrepo.h \
-	pkgrepo.cc file_download.cc \
-	test.cc -o $@ $(LDFLAGS) $(LIBCURLLIBS)
+	$(CXX) -DNDEBUG system_utils.cpp error_treat.cpp md5.cpp string_utils.cpp \
+	file_utils.cpp archive_utils.cpp  pkgrepo.h \
+	pkgrepo.cpp file_download.cpp \
+	test.cpp -o $@ $(LDFLAGS) $(LIBCURLLIBS)
 
 libs:	.libs_depend $(LIBOBJECTS)
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
@@ -103,13 +105,13 @@ cards:  .cards_depend $(CARDSOBJECTS)
 	$(CXX) $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
 
 .libs_depend:
-	$(CXX) $(CXXFLAGS) -MM $(LIBOBJECTS:.o=.cc) > .libs_depend
+	$(CXX) $(CXXFLAGS) -MM $(LIBOBJECTS:.o=.cpp) > .libs_depend
 
 .tools_depend:
-	$(CXX) $(CXXFLAGS) -MM $(TOOLSOBJECTS:.o=.cc) > .tools_depend
+	$(CXX) $(CXXFLAGS) -MM $(TOOLSOBJECTS:.o=.cpp) > .tools_depend
 
 .cards_depend:
-	$(CXX) $(CXXFLAGS) -MM $(CARDSOBJECTS:.o=.cc) > .cards_depend
+	$(CXX) $(CXXFLAGS) -MM $(CARDSOBJECTS:.o=.cpp) > .cards_depend
 
 ifeq (.cards_depend,$(wildcard .cards_depend))
 include .cards_depend

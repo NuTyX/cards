@@ -31,6 +31,7 @@
 
 #include "pkgrepo.h"
 #include "pkginfo.h"
+#include "pkgrm.h"
 
 using namespace std;
 
@@ -176,8 +177,10 @@ of compilation" << endl
 			CardsInstall CI(cardsArgPars);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_REMOVE) {
-			CardsRemove CR(cardsArgPars);
-			CR.run(argc, argv);
+			Cards_remove CR(cardsArgPars);
+			CR.parseArguments(argc,argv);
+			CR.run();
+			CR.finish();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 			CardsDepends CD(cardsArgPars);

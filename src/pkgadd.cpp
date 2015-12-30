@@ -2,7 +2,7 @@
 //
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -31,137 +31,140 @@
 #include <regex.h>
 #include <unistd.h>
 
-void Pkgadd::run(int argc, char** argv)
+Pkgadd::Pkgadd()
+	: Pkgdbh("pkgadd"),
+	m_upgrade(false),
+	m_force(false)
 {
-	//
-	// Check command line options
-	//
-	string o_root;
-	string o_package;
-	bool o_upgrade = false;
-	bool o_force = false;
-	Db_lock  * pLock = NULL;
+}
+void Pkgadd::parseArguments(int argc, char** argv)
+{
 	for (int i = 1; i < argc; i++) {
 		string option(argv[i]);
 		if (option == "-r" || option == "--root") {
 			assertArgument(argv, argc, i);
-			o_root = argv[i + 1];
+			m_root = argv[i + 1];
 			i++;
 		} else if (option == "-u" || option == "--upgrade") {
-			o_upgrade = true;
+			m_upgrade = true;
 		} else if (option == "-f" || option == "--force") {
-			o_force = true;
-		} else if (option[0] == '-' || !o_package.empty()) {
+			m_force = true;
+		} else if (option[0] == '-' || !m_packageArchiveName.empty()) {
 			throw runtime_error("invalid option " + option);
 		} else {
-			o_package = option;
+			m_packageArchiveName = option;
 		}
 	}
-
-	if (o_package.empty())
-	{
+	if (m_packageArchiveName.empty()) {
 		m_actualError = OPTION_MISSING;
 		treatErrors("");
 	}
-	//
+	if (m_root.empty())
+		m_root="/";
+	else
+		m_root=m_root+"/";
+}
+void Pkgadd::preRun()
+{
 	// Check UID
-	//
 	if (getuid())
 	{
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
-	//
-	// Install/upgrade package
-	//
+	extractAndRunPREfromPackage(m_packageArchiveName);
+}
+void Pkgadd::run()
+{
+	// Check UID
+	if (getuid())
 	{
-		// Get the list of installed packages
-		getListOfPackageNames(o_root);
+		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		treatErrors("");
+	}
 
-		// Retrieving info about all the packages
-		buildDatabaseWithDetailsInfos(false);
+	// Get the list of installed packages
+	getListOfPackageNames(m_root);
 
-		// Reading the archiving to find a list of files
-		pair<string, pkginfo_t> package = openArchivePackage(o_package);
+	// Retrieving info about all the packages
+	buildDatabaseWithDetailsInfos(false);
 
-		// Checking the rules
-		readRulesFile();
+	// Reading the archiving to find a list of files
+	pair<string, pkginfo_t> package = openArchivePackage(m_packageArchiveName);
 
-		bool installed = checkPackageNameExist(package.first);
-		if (installed && !o_upgrade)
-		{
-			m_actualError = PACKAGE_ALLREADY_INSTALL;
-			treatErrors (package.first);
-		}
-		else if (!installed && o_upgrade)
-		{
-			m_actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
-			treatErrors(package.first);
-		}
+	// Checking the rules
+	readRulesFile();
 
-		set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
-		if (!o_upgrade) {
+	bool installed = checkPackageNameExist(package.first);
+	if (installed && !m_upgrade)
+	{
+		m_actualError = PACKAGE_ALLREADY_INSTALL;
+		treatErrors (package.first);
+	}
+	else if (!installed && m_upgrade)
+	{
+		m_actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
+		treatErrors(package.first);
+	}
+
+	set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
+	if (!m_upgrade) {
 #ifndef NDEBUG
-			cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
+		cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
 #endif
-			// Run pre-install if exist
-			extractAndRunPREfromPackage(o_package);
+		preRun();
+	}
+	set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
+	if (!conflicting_files.empty()) {
+		if (m_force) {
+			Db_lock lock(m_root, true);
+			set<string> keep_list;
+			if (m_upgrade) // Don't remove files matching the rules in configuration
+				keep_list = getKeepFileList(conflicting_files, m_actionRules);
+			removePackageFilesRefsFromDB(conflicting_files, keep_list); // Remove unwanted conflicts
+		} else {
+			copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
+			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
+			treatErrors("listed file(s) already installed (use -f to ignore and overwrite)");
 		}
-		set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
-		if (!conflicting_files.empty()) {
-			if (o_force) {
-				pLock = new Db_lock(o_root, true);
-				set<string> keep_list;
-				if (o_upgrade) // Don't remove files matching the rules in configuration
-					keep_list = getKeepFileList(conflicting_files, m_actionRules);
-				removePackageFilesRefsFromDB(conflicting_files, keep_list); // Remove unwanted conflicts
-				delete pLock;
-			} else {
-				copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
-				m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
-				treatErrors("listed file(s) already installed (use -f to ignore and overwrite)");
-			}
-		}
+	}
 
-		set<string> keep_list;
-		if (o_upgrade) {
-			pLock = new Db_lock(o_root, true);
-			removePackageFilesRefsFromDB(package.first);	// Remove metadata about the package removed
-			keep_list = getKeepFileList(package.second.files, m_actionRules);
-			removePackageFiles(package.first, keep_list);
-			delete pLock;
+	set<string> keep_list;
+	if (m_upgrade) {
+		Db_lock lock(m_root, true);
+		removePackageFilesRefsFromDB(package.first);	// Remove metadata about the package removed
+		keep_list = getKeepFileList(package.second.files, m_actionRules);
+		removePackageFiles(package.first, keep_list);
+
 #ifndef NDEBUG
-			cerr << "Run extractAndRunPREfromPackage after upgrade" << endl;
+		cerr << "Run extractAndRunPREfromPackage after upgrade" << endl;
 #endif
-			// Run pre-install if exist
-			extractAndRunPREfromPackage(o_package);
+		preRun();
+	}
+
+	Db_lock lock(m_root, true);
+	// Installation progressInfo of the files on the HD
+	installArchivePackage(m_packageArchiveName, keep_list, non_install_files);
+
+	// Add the metadata about the package to the DB
+	moveMetaFilesPackage(package.first,package.second);
+
+	// Add the info about the files to the DB
+	addPackageFilesRefsToDB(package.first, package.second);
+}
+void Pkgadd::postRun()
+{
+	if (checkFileExist(PKG_POST_INSTALL))
+	{
+		m_actualAction = PKG_POSTINSTALL_START;
+		progressInfo();
+		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
+		if (postinstall.executeShell()) {
+			cerr << "WARNING Run post-install FAILED. continue" << endl;
 		}
-
-		pLock = new Db_lock(o_root, true);
-		// Installation progressInfo of the files on the HD
-		installArchivePackage(o_package, keep_list, non_install_files);
-
-		// Add the metadata about the package to the DB
-		moveMetaFilesPackage(package.first,package.second);
-
-		// Add the info about the files to the DB
-		addPackageFilesRefsToDB(package.first, package.second);
-		delete pLock;
-
-		// Post install
-		if (checkFileExist(PKG_POST_INSTALL))
-		{
-			m_actualAction = PKG_POSTINSTALL_START;
-			progressInfo();
-			process postinstall(SHELL,PKG_POST_INSTALL, 0 );
-			if (postinstall.executeShell()) {
-				cerr << "WARNING Run post-install FAILED. continue" << endl;
-			}
-			m_actualAction = PKG_POSTINSTALL_END;
-			progressInfo();
-			removeFile(o_root,PKG_POST_INSTALL);
-		}
-		runLdConfig();
+		m_actualAction = PKG_POSTINSTALL_END;
+		progressInfo();
+		removeFile(m_root,PKG_POST_INSTALL);
 	}
 }
 void Pkgadd::printHelp() const

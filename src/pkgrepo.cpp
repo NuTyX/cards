@@ -651,22 +651,22 @@ bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
 
 	bool found = false;
 	// For each defined collection
-	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
+	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
-		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			if ( j->basePackageName == packageName ) {
-				char * c_time_s = ctime(&j->buildDate);
+		for (auto j : i.basePackageList) {
+			if ( j.basePackageName == packageName ) {
+				char * c_time_s = ctime(&j.buildDate);
 				found = true;
 				cout << "Name           : " << packageName << endl
-					<< "Description    : " << j->description << endl
-					<< "URL            : " << j->URL << endl
-					<< "Version        : " << j->version << endl
-					<< "Release        : " << j->release << endl
-					<< "Maintainer     : " << j->maintainer << endl
-					<< "Packager       : " << j->packager << endl
+					<< "Description    : " << j.description << endl
+					<< "URL            : " << j.URL << endl
+					<< "Version        : " << j.version << endl
+					<< "Release        : " << j.release << endl
+					<< "Maintainer     : " << j.maintainer << endl
+					<< "Packager       : " << j.packager << endl
 					<< "Build date     : " << c_time_s
-					<< "Binary Url     : " << i->Url << endl
-					<< "Local Directory: " << i->Dir << endl;
+					<< "Binary Url     : " << i.Url << endl
+					<< "Local Directory: " << i.Dir << endl;
 				break;
 			}
 		}
@@ -682,10 +682,10 @@ string Pkgrepo::getPortDir (const std::string& portName)
 
 	string portDir = "";
 	bool found = false;
-	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
-		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			if ( j->basePackageName == portName ) {
-				portDir = i->Dir + "/" + j->basePackageName;
+	for (auto i : m_portsDirectoryList) {
+		for (auto j : i.basePackageList) {
+			if ( j.basePackageName == portName ) {
+				portDir = i.Dir + "/" + j.basePackageName;
 				found = true;
 				break;
 			}
@@ -706,10 +706,10 @@ string Pkgrepo::getBasePackageName(const string& packageName)
 	if (pos != string::npos) {
 		basePackageName=packageName.substr(0,pos);
 	}
-	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
-		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			if ( j->basePackageName == basePackageName ) {
-				return j->basePackageName;
+	for (auto i : m_portsDirectoryList) {
+		for (auto j : i.basePackageList) {
+			if ( j.basePackageName == basePackageName ) {
+				return j.basePackageName;
 			}
 		}
 	}

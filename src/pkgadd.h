@@ -2,7 +2,7 @@
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,11 +30,16 @@
 
 class Pkgadd : public Pkgdbh {
 public:
-	Pkgadd() : Pkgdbh("pkgadd") {}
-	virtual void run(int argc, char** argv);
+	Pkgadd();
+	void parseArguments(int argc, char** argv);
+	void preRun();
+	void postRun();
+	virtual void run();
 	virtual void printHelp() const;
 
 private:
+	bool m_upgrade;
+	bool m_force;
 	set<string> getKeepFileList(const set<string>& files, const vector<rule_t>& rules);
 	set<string> applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules);
 };

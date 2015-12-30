@@ -3,7 +3,7 @@
 #
 #  Copyright (c) 2000-2005 by Per Liden <per@fukt.bth.se>
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 1.4.0
+VERSION = 1.91.0
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG -std=c++11

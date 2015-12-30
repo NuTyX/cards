@@ -2,7 +2,7 @@
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -112,12 +112,21 @@ public:
 
 	explicit Pkgdbh(const std::string& name);
 	virtual ~Pkgdbh() {}
-	virtual void run(int argc, char** argv) = 0; // Need to be redefine in derivated class
-	virtual void printHelp() const = 0; // help info is depending of the derivated class
-	virtual void progressInfo() const; // progressInfo info
-	virtual void treatErrors(const std::string& s) const; 
+
+	/* Following methods can be redefined in derivated class */
+	virtual void parseArguments(int argc, char** argv);
+	virtual void run() {};
+	virtual void finish() ;
+
+	virtual void printHelp() const {};
+
+	virtual void progressInfo() const;
+	virtual void treatErrors(const std::string& s) const;
+
+
 	void print_version() const;
 	int getNumberOfPackages();
+	bool checkPackageNameExist(const std::string& name) const;
 
 protected:
 	// Database
@@ -131,7 +140,7 @@ protected:
 
 	void addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& info);
 	void addPackageFilesRefsToDB_2(const std::string& name, const pkginfo_t& info);
-	bool checkPackageNameExist(const std::string& name);
+	
 	bool checkPackageNameUptodate(const std::pair<std::string, pkginfo_t>& archiveName);
 	bool checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild);
 	bool checkPackageNameExist_2(const std::string& name);	
@@ -164,6 +173,7 @@ protected:
 	void getFootprintPackage(std::string& filename);
 	void runLdConfig();
 	std::string m_packageArchiveName;
+	std::string m_packageName;
 	std::string m_packageArchiveVersion;
 	std::string m_utilName;
 	std::string m_root;
@@ -181,6 +191,9 @@ protected:
 	error m_actualError;
 	unsigned int m_filesNumber;
 	unsigned int m_installedFilesNumber;
+private:
+	bool m_DB_Empty;
+	bool m_miniDB_Empty;
 };
 
 class Db_lock {

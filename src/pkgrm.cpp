@@ -3,7 +3,7 @@
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,34 +25,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
-void Pkgrm::run(int argc, char** argv)
+void Pkgrm::run()
 {
-	//
-	// Check command line options
-	//
-	string o_package;
-	string o_root;
-
-	for (int i = 1; i < argc; i++) {
-		string option(argv[i]);
-		if (option == "-r" || option == "--root") {
-			assertArgument(argv, argc, i);
-			o_root = argv[i + 1];
-			i++;
-		} else if (option[0] == '-' || !o_package.empty()) {
-			m_actualError = INVALID_OPTION;
-			treatErrors(option);
-		} else {
-			o_package = option;
-		}
-	}
-
-	if (o_package.empty())
-	{
-		m_actualError = OPTION_MISSING;
-		treatErrors("o_package");
-	}
-	
 	// Check UID
 	if (getuid())
 	{
@@ -60,29 +34,25 @@ void Pkgrm::run(int argc, char** argv)
 		treatErrors("");
 	}
 
-	// Remove package
+	Db_lock lock(m_root, true);
+
+	// Get the list of installed packages
+	getListOfPackageNames(m_root);
+
+	// Retrieve info about all the packages
+	buildDatabaseWithDetailsInfos(false);
+
+	if (!checkPackageNameExist(m_packageName))
 	{
-		Db_lock lock(o_root, true);
-
-		// Get the list of installed packages
-		getListOfPackageNames(o_root);
-
-		// Retrieve info about all the packages
-		buildDatabaseWithDetailsInfos(false);
-
-		if (!checkPackageNameExist(o_package))
-		{
-			m_actualError = PACKAGE_NOT_INSTALL;
-			treatErrors(o_package);
-		}
-
-		// Remove metadata about the package removed 
-		removePackageFilesRefsFromDB(o_package);
-
-		// Remove the files on hd
-		removePackageFiles(o_package);
-		runLdConfig();
+		m_actualError = PACKAGE_NOT_INSTALL;
+		treatErrors(m_packageName);
 	}
+
+	// Remove metadata about the package removed
+	removePackageFilesRefsFromDB(m_packageName);
+
+	// Remove the files on hd
+	removePackageFiles(m_packageName);
 }
 void Pkgrm::printHelp() const
 {

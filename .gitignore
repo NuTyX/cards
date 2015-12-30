@@ -1,12 +1,14 @@
 *.[oa]
 *~
 .cards_depend
+*.geany
 .tools_depend
 .libs_depend
 cards
 pkgadd
 pkgrm
 pkginfo
+pkgtest
 libcards*
 *.gch
 ChangeLog

@@ -1,6 +1,6 @@
 // cards_upgrade.h
 // 
-//  Copyright (c) 2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2015-2016 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,23 +17,27 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
-#ifndef CARDSUPGRADE_H
-#define CARDSUPGRADE_H
+#ifndef CARDS_UPGRADE_H
+#define CARDS_UPGRADE_H
 #include "pkginst.h"
 #include "cards_argument_parser.h"
 
-class CardsUpgrade : public Pkginst {
+class Cards_upgrade : public Pkginst {
 private:
 	set<pair<string,time_t>> m_ListOfPackages;
 	const CardsArgumentParser& m_argParser;
 public:
-	CardsUpgrade(const CardsArgumentParser& argParser);
+	Cards_upgrade(const CardsArgumentParser& argParser,const std::string& configFileName);
 	void upgradePackages();
-	void dry();		// show the packages that should be update without upgrade them
-	void size(); // number of updates availables
-	void Isuptodate(); // True if some updates availables
-	void run(int argc, char** argv);
-	void printHelp() const;
+	// show the packages that should be update without upgrade them
+	void dry();
+	
+	// number of updates availables
+	void size();
+	
+	// True if some updates availables
+	void Isuptodate();
+	void run();
 };
-#endif
+#endif /* CARDS_UPGRADE_H */
 // vim:set ts=2 :

@@ -3,7 +3,7 @@
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,11 +30,26 @@
 
 class Pkginfo : public Pkgdbh {
 public:
-	Pkginfo() : Pkgdbh("pkginfo") {}
-	virtual void run(int argc, char** argv);
+	Pkginfo();
+	virtual void parseArguments(int argc, char** argv);
+	virtual void run();
+	virtual void finish();
 	virtual void printHelp() const;
 	bool isInstalled(const string& packageName);
 //	int getNumberOfPackages();
+protected:
+	std::string m_arg;
+	int m_runtimedependencies_mode;
+	int m_footprint_mode;
+	int m_archiveinfo;
+	int m_installed_mode;
+	int m_list_mode;
+	int m_owner_mode;
+	int m_details_mode;
+	int m_librairies_mode;
+	int m_runtime_mode;
+	int m_epoc;
+
 };
 
 #endif /* PKGINFO_H */

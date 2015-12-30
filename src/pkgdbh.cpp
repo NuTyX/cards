@@ -2,7 +2,7 @@
 //
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -48,13 +48,30 @@ using namespace std;
 using __gnu_cxx::stdio_filebuf;
 
 Pkgdbh::Pkgdbh(const string& name)
-	: m_utilName(name)
+	: m_utilName(name), m_DB_Empty(true), m_miniDB_Empty(true)
 {
 	// TODO fix this some times very ugly
-	if ( m_root.empty() ) {
-		m_root="/";
+/*	cleanupMetaFiles(m_root); */
+}
+void Pkgdbh::parseArguments(int argc, char** argv)
+{
+	for (int i = 1; i < argc; i++) {
+		string option(argv[i]);
+		if (option == "-r" || option == "--root") {
+			assertArgument(argv, argc, i);
+			m_root = argv[i + 1];
+			i++;
+		} else if (option[0] == '-' || !m_packageName.empty()) {
+			m_actualError = INVALID_OPTION;
+			treatErrors(option);
+		} else {
+			m_packageName = option;
+		}
 	}
-	cleanupMetaFiles(m_root);
+	if (m_root.empty())
+		m_root="/";
+	else
+		m_root=m_root+"/";
 }
 void Pkgdbh::treatErrors(const string& s) const
 {
@@ -212,7 +229,7 @@ void Pkgdbh::progressInfo() const
     case PKG_INSTALL_START:
       j = 0;
       cout << "ADD: "
-				<< m_packageArchiveName
+				<< m_packageName
 				<< "-"
 				<< m_packageArchiveVersion
 				<< ", "
@@ -242,7 +259,7 @@ void Pkgdbh::progressInfo() const
 		case RM_PKG_FILES_START:
 			j=0;
 			cout << "REMOVE: "
-				<< m_packageArchiveName
+				<< m_packageName
 				<< " "
 				<< m_filesList.size()
 				<< " files: ";
@@ -271,16 +288,21 @@ int Pkgdbh::getNumberOfPackages()
 /* Append to the "DB" the number of packages founds (directory containg a file named files */
 int Pkgdbh::getListOfPackageNames (const string& path)
 {
-	m_root = trimFileName(path + "/");
+	if (! m_packageNamesList.empty())
+		return m_packageNamesList.size();
+
 	const string pathdb =  m_root + PKG_DB_DIR;
+#ifndef NDEBUG
+	cerr << "pathdb: " << pathdb << endl;
+#endif
 	if ( findFile(m_packageNamesList, pathdb) != 0 ) {
 		m_actualError = CANNOT_READ_FILE;
 		treatErrors(pathdb);
 	}
 #ifndef NDEBUG
-  cerr << "Number of Packages: " << m_packageNamesList.size() << endl;
+	cerr << "Number of Packages: " << m_packageNamesList.size() << endl;
 #endif
-  return m_packageNamesList.size();
+	return m_packageNamesList.size();
 }
 /* get details infos of a package */
 pair<string, pkginfo_t> Pkgdbh::getInfosPackage(const string& packageName)
@@ -293,66 +315,75 @@ pair<string, pkginfo_t> Pkgdbh::getInfosPackage(const string& packageName)
 /* Populate the database with Name and version only */
 void Pkgdbh::buildDatabaseWithNameVersion()
 {
-	if (m_packageNamesList.empty() ) {
-		getListOfPackageNames (m_root);
-	}
-	bool vf = false;
-	bool rf = false;
-	bool bf = false;
-	for (set<string>::iterator i = m_packageNamesList.begin();i != m_packageNamesList.end();++i) {
-		pkginfo_t info;
-		const string metaFile = m_root + PKG_DB_DIR + *i + '/' + PKG_META;
-		itemList * contentFile = initItemList();
-		readFile(contentFile,metaFile.c_str());
-		vf = false;
-		rf = false;
-		bf = false;
-		info.release = 1;
-		for (unsigned int li=0; li < contentFile->count ; ++li) {
-			if ( contentFile->items[li][0] == 'V' ) {
-				string version = contentFile->items[li];
-				info.version = version.substr(1);
-				vf = true;
+	if (m_miniDB_Empty) {
+		if (m_packageNamesList.empty() )
+			getListOfPackageNames (m_root);
+		bool vf = false;
+		bool rf = false;
+		bool bf = false;
+		for ( auto i : m_packageNamesList) {
+			pkginfo_t info;
+			const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
+			itemList * contentFile = initItemList();
+			readFile(contentFile,metaFile.c_str());
+			vf = false;
+			rf = false;
+			bf = false;
+			info.release = 1;
+			for (unsigned int li=0; li < contentFile->count ; ++li) {
+				if ( contentFile->items[li][0] == 'V' ) {
+					string version = contentFile->items[li];
+					info.version = version.substr(1);
+					vf = true;
+				}
+				if ( contentFile->items[li][0] == 'r' ) {
+					string release = contentFile->items[li];
+					info.release = atoi(release.substr(1).c_str());
+					rf = true;
+				}
+				if ( contentFile->items[li][0] == 'B' ) {
+					string build = contentFile->items[li];
+					info.build = strtoul(build.substr(1).c_str(),NULL,0);
+					bf = true;
+				}
+				if ( vf && rf && bf) {
+					m_listOfInstPackages[i] = info;
+					break;
+				}
 			}
-			if ( contentFile->items[li][0] == 'r' ) {
-				string release = contentFile->items[li];
-				info.release = atoi(release.substr(1).c_str());
-				rf = true;
-			}
-			if ( contentFile->items[li][0] == 'B' ) {
-				string build = contentFile->items[li];
-				info.build = strtoul(build.substr(1).c_str(),NULL,0);
-				bf = true;
-			}
-			if ( vf && rf && bf) {
-				m_listOfInstPackages[*i] = info;
-				break;
-			}
+			if ( ! rf )
+				m_listOfInstPackages[i] = info;
+			freeItemList(contentFile);
 		}
-		if ( ! rf )
-			m_listOfInstPackages[*i] = info;
-		freeItemList(contentFile);
+		m_miniDB_Empty=false;
 	}
 }
 /* Populate the database with all details infos */
 void Pkgdbh::buildDatabaseWithDetailsInfos(const bool& silent)
 {
-	if (!silent) {
-		m_actualAction = DB_OPEN_START;
-		progressInfo();
-	}
-	for (set<string>::iterator i = m_packageNamesList.begin();i != m_packageNamesList.end();++i) {
+	if (m_DB_Empty) {
 		if (!silent) {
-			m_actualAction = DB_OPEN_RUN;
-			if ( m_packageNamesList.size() > 100 )
-				progressInfo();
+			m_actualAction = DB_OPEN_START;
+			progressInfo();
 		}
-		pkginfo_t info;
-		const string metaFile = m_root + PKG_DB_DIR + *i + '/' + PKG_META;
-		itemList * contentFile = initItemList();
-		readFile(contentFile,metaFile.c_str());
-		info.release = 1;
-		for (unsigned int li=0; li< contentFile->count ; ++li) {
+#ifndef NDEBUG
+		cerr << "m_root: " << m_root<< endl;
+#endif
+		if (m_packageNamesList.empty() )
+			getListOfPackageNames (m_root);
+
+		for (auto i : m_packageNamesList) {
+			if (!silent) {
+				m_actualAction = DB_OPEN_RUN;
+				if ( m_packageNamesList.size() > 100 )
+					progressInfo();
+			}
+			pkginfo_t info;
+			const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
+			itemList * contentFile = initItemList();
+			readFile(contentFile,metaFile.c_str());
+			info.release = 1;
+			for (unsigned int li=0; li< contentFile->count ; ++li) {
 			if ( contentFile->items[li][0] == 'D' ) {
 				string description = contentFile->items[li];
 				info.description = description.substr(1);
@@ -396,41 +427,43 @@ void Pkgdbh::buildDatabaseWithDetailsInfos(const bool& silent)
 				NameEpoch.second=strtoul((run.substr(run.size()-10)).c_str(),NULL,0);
 				info.dependencies.insert(NameEpoch);
 			}
-		}
-		freeItemList(contentFile);	
-		// list of files
-		const string filelist = m_root + PKG_DB_DIR + *i + PKG_FILES;
-		int fd = open(filelist.c_str(), O_RDONLY);
-		if (fd == -1) {
-			m_actualError = CANNOT_OPEN_FILE;
-			treatErrors(filelist);
-		}
-		stdio_filebuf<char> listbuf(fd, ios::in, getpagesize());
-		istream in(&listbuf);
-		if (!in)
-			throw RunTimeErrorWithErrno("could not read " + filelist);
-
-		while (!in.eof()){
-			// read alls the files for alls the packages founds
-			for (;;) {
-				string file;
-				getline(in, file);
-				if (file.empty())
-					break; // End of record
-				info.files.insert(info.files.end(), file);
 			}
-			if (!info.files.empty())
-				m_listOfInstPackages[*i] = info;
+			freeItemList(contentFile);	
+			// list of files
+			const string filelist = m_root + PKG_DB_DIR + i + PKG_FILES;
+			int fd = open(filelist.c_str(), O_RDONLY);
+			if (fd == -1) {
+				m_actualError = CANNOT_OPEN_FILE;
+				treatErrors(filelist);
+			}
+			stdio_filebuf<char> listbuf(fd, ios::in, getpagesize());
+			istream in(&listbuf);
+			if (!in)
+				throw RunTimeErrorWithErrno("could not read " + filelist);
+
+			while (!in.eof()){
+				// read alls the files for alls the packages founds
+				for (;;) {
+					string file;
+					getline(in, file);
+					if (file.empty())
+						break; // End of record
+					info.files.insert(info.files.end(), file);
+				}
+				if (!info.files.empty())
+					m_listOfInstPackages[i] = info;
+			}
 		}
-	}
 #ifndef NDEBUG
-  cerr << endl;
-  cerr << m_listOfInstPackages.size() << " packages found in database " << endl;
+		cerr << endl;
+		cerr << m_listOfInstPackages.size() << " packages found in database " << endl;
 #endif
-	if (!silent)
-	{
-		m_actualAction = DB_OPEN_END;
-		progressInfo();
+		if (!silent)
+		{
+			m_actualAction = DB_OPEN_END;
+			progressInfo();
+		}
+		m_DB_Empty=false;
 	}
 }
 void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
@@ -536,7 +569,7 @@ void Pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 	}
 }
 
-bool Pkgdbh::checkPackageNameExist(const string& name)
+bool Pkgdbh::checkPackageNameExist(const string& name) const
 {
 	return (m_packageNamesList.find(name) != m_packageNamesList.end());
 }
@@ -602,7 +635,7 @@ void Pkgdbh::removePackageFiles(const string& name)
 {
 	m_filesList = m_listOfInstPackages[name].files;
 	m_listOfInstPackages.erase(name);
-	m_packageArchiveName =  name ;
+	m_packageName =  name ;
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
@@ -641,7 +674,7 @@ void Pkgdbh::removePackageFiles(const string& name, const set<string>& keep_list
 {
 	m_filesList = m_listOfInstPackages[name].files;
 	m_listOfInstPackages.erase(name);
-	m_packageArchiveName =  name ;
+	m_packageName =  name ;
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
 	copy(m_filesList.begin(), m_filesList.end(), ostream_iterator<string>(cerr, "\n"));
@@ -787,7 +820,7 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 		m_actualError = EMPTY_PACKAGE;
 		treatErrors(basename);
 	}
-	m_packageArchiveName = packageArchive.name();
+	m_packageName = packageArchive.name();
 	if ( ( packageArchive.arch() != getMachineType() ) && ( packageArchive.arch() != "any" ) ) {
 		m_actualError = WRONG_ARCHITECTURE;
 		treatErrors(basename);
@@ -797,7 +830,7 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 		m_actualError = CANNOT_DETERMINE_NAME_BUILDNR;
 		treatErrors(basename);
 	}
-	result.first = m_packageArchiveName;
+	result.first = m_packageName;
 	result.second.description = packageArchive.description();
 	result.second.url = packageArchive.url();
 	result.second.maintainer = packageArchive.maintainer();
@@ -1073,6 +1106,10 @@ void Pkgdbh::readRulesFile()
 	for (auto j : m_actionRules ) cerr << "\t" << j.pattern << "\t" << j.action << endl;
 	cerr << endl;
 #endif
+}
+void Pkgdbh::finish()
+{
+		runLdConfig();
 }
 
 void Pkgdbh::runLdConfig()

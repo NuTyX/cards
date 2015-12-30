@@ -2,7 +2,7 @@
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,101 +30,105 @@
 #include <unistd.h>
 #include <sstream>
 
-bool Pkginfo::isInstalled(const string& packageName)
+Pkginfo::Pkginfo()
+	: Pkgdbh("pkginfo"),
+	m_runtimedependencies_mode(0),
+	m_footprint_mode(0),
+	m_archiveinfo(0),
+	m_installed_mode(0),
+	m_list_mode(0),
+	m_owner_mode(0),
+	m_details_mode(0),
+	m_librairies_mode(0),
+	m_runtime_mode(0),
+	m_epoc(0)
 {
-	return checkPackageNameExist(packageName);
 }
-void Pkginfo::run(int argc, char** argv)
+void Pkginfo::parseArguments(int argc, char** argv)
 {
-	//
-	// Check command line options
-	//
-  int o_runtimedependencies_mode = 0;
-	int o_footprint_mode = 0;
-	int o_archiveinfo = 0;
-	int o_installed_mode = 0;
-	int o_list_mode = 0;
-	int o_owner_mode = 0;
-	int o_details_mode = 0;
-	int o_librairies_mode = 0;
-	int o_runtime_mode = 0;
-  int o_epoc = 0;
-
-	string o_root;
-	string o_arg;
-
 	for (int i = 1; i < argc; ++i) {
 		string option(argv[i]);
 		if (option == "-r" || option == "--root") {
 			assertArgument(argv, argc, i);
-			o_root = argv[i + 1];
+			m_root = argv[i + 1];
 			i++;
 		} else if (option == "-i" || option == "--installed") {
-			o_installed_mode += 1;
+			m_installed_mode += 1;
 		} else if (option == "-d" || option == "--details") {
 			assertArgument(argv, argc, i);
-			o_details_mode +=1;
-			o_arg = argv[i + 1];
+			m_details_mode +=1;
+			m_arg = argv[i + 1];
 			i++;
 		} else if (option == "-l" || option == "--list") {
 			assertArgument(argv, argc, i);
-			o_list_mode += 1;
-			o_arg = argv[i + 1];
+			m_list_mode += 1;
+			m_arg = argv[i + 1];
 			i++;
 		} else if (option == "-R" || option == "--runtimedep") {
 			assertArgument(argv, argc, i);
-			o_runtime_mode += 1;
-			o_arg = argv[i + 1];
+			m_runtime_mode += 1;
+			m_arg = argv[i + 1];
 			i++;
 		} else if (option == "-o" || option == "--owner") {
 			assertArgument(argv, argc, i);
-			o_owner_mode += 1;
-			o_arg = argv[i + 1];
+			m_owner_mode += 1;
+			m_arg = argv[i + 1];
 			i++;
 		} else if (option == "-a" || option == "--archive") {
 			assertArgument(argv, argc, i);
-			o_archiveinfo += 1;
-			o_arg = argv[i + 1];
+			m_archiveinfo += 1;
+			m_arg = argv[i + 1];
 			i++;
 		} else if (option == "-f" || option == "--footprint") {
 			assertArgument(argv, argc, i);
-			o_footprint_mode += 1;
-			o_arg = argv[i + 1];
+			m_footprint_mode += 1;
+			m_arg = argv[i + 1];
 			i++;
 		} else if (option == "-L" || option == "--librairies") {
 			assertArgument(argv, argc, i);
-			o_librairies_mode +=1;
-			o_arg =  argv[i + 1];
+			m_librairies_mode +=1;
+			m_arg =  argv[i + 1];
 			i++;
 		} else if (option == "--runtimedepfiles") {
 			assertArgument(argv, argc, i);
-			o_runtimedependencies_mode +=1;
-			o_arg = argv[i + 1];
+			m_runtimedependencies_mode +=1;
+			m_arg = argv[i + 1];
 			i++;
 		} else if (option == "-b" || option == "--buildtime") {
 			assertArgument(argv, argc, i);
-			o_epoc +=1;
-			o_arg = argv[i + 1];
+			m_epoc +=1;
+			m_arg = argv[i + 1];
 			i++; 
 		} else {
 			m_actualError = INVALID_OPTION;
 			treatErrors(option);
 		}
+		if (m_root.empty())
+			m_root="/";
+		else
+			m_root=m_root+"/";
+
 	}
-	if (o_runtimedependencies_mode + o_footprint_mode + o_details_mode + 
-	o_installed_mode + o_list_mode + o_owner_mode + o_epoc + o_archiveinfo +
-	o_footprint_mode + o_librairies_mode + o_runtime_mode == 0)
+
+	m_packageArchiveName = m_arg;
+
+	if (m_runtimedependencies_mode + m_footprint_mode + m_details_mode +
+	m_installed_mode + m_list_mode + m_owner_mode + m_epoc + m_archiveinfo +
+	m_footprint_mode + m_librairies_mode + m_runtime_mode == 0)
 	{
 		m_actualError = OPTION_MISSING;
-		treatErrors(o_arg);
+		treatErrors(m_arg);
 	}
-	if (o_runtimedependencies_mode + o_footprint_mode + o_installed_mode + o_archiveinfo + o_list_mode + o_owner_mode > 1)
+	if (m_runtimedependencies_mode + m_footprint_mode + m_installed_mode + m_archiveinfo + m_list_mode + m_owner_mode > 1)
 	{
 		m_actualError = TOO_MANY_OPTIONS;
-		treatErrors(o_arg);
+		treatErrors(m_arg);
 	}
-	if (o_archiveinfo) {
-		pair<string, pkginfo_t> packageArchive = openArchivePackage(argv[2]) ;
+}
+void Pkginfo::run()
+{
+	if (m_archiveinfo) {
+		pair<string, pkginfo_t> packageArchive = openArchivePackage(m_packageArchiveName) ;
 		cout	<< packageArchive.first << " Description    : " << packageArchive.second.description << endl
 			<< packageArchive.first << " URL            : " << packageArchive.second.url << endl
 			<< packageArchive.first << " Maintainer(s)  : " << packageArchive.second.maintainer << endl
@@ -137,34 +141,42 @@ void Pkginfo::run(int argc, char** argv)
 			cout << packageArchive.first << " Dependencies   : ";
 			for ( auto i : packageArchive.second.dependencies) cout << i.first << i.second << " ";
 			cout << endl;
-    }
+		}
 	}
-	if (o_footprint_mode) { // Make footprint
-		getFootprintPackage(o_arg);
-	} else { // Modes that require the database to be opened
-		Db_lock lock(o_root, false);
-		getListOfPackageNames(o_root);
-		if (o_installed_mode) {	// List installed packages
+	// Make footprint
+	if (m_footprint_mode) {
+		getFootprintPackage(m_arg);
+	} else {
+		// Modes that require the database to be opened
+		Db_lock lock(m_root, false);
+		getListOfPackageNames(m_root);
+		if (m_installed_mode) {
+			// List installed packages
 			buildDatabaseWithNameVersion();
-			for (auto i : m_listOfInstPackages) cout << i.first << " " << i.second.version << "-" << i.second.release << endl;
-		} else if (o_list_mode) {	// List package or file contents
+			for (auto i : m_listOfInstPackages) {
+				cout << i.first << " " << i.second.version << "-" << i.second.release << endl;
+			}
+		} else if (m_list_mode) {
+			// List package or file contents
 			buildDatabaseWithDetailsInfos(false);
-			if (checkPackageNameExist(o_arg)) {
-				copy(m_listOfInstPackages[o_arg].files.begin(), m_listOfInstPackages[o_arg].files.end(), ostream_iterator<string>(cout, "\n"));
-			} else if (checkFileExist(o_arg)) {
-				pair<string, pkginfo_t> package = openArchivePackage(o_arg);
+			if (checkPackageNameExist(m_arg)) {
+				copy(m_listOfInstPackages[m_arg].files.begin(), m_listOfInstPackages[m_arg].files.end(), ostream_iterator<string>(cout, "\n"));
+			} else if (checkFileExist(m_arg)) {
+				pair<string, pkginfo_t> package = openArchivePackage(m_arg);
 				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
 			} else {
 				m_actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
-				treatErrors(o_arg);
+				treatErrors(m_arg);
 			}
-		} else if (o_runtimedependencies_mode) {	// Get runtimedependencies of the file found in the directory path
-			buildDatabaseWithDetailsInfos(true); // get the list of installed package silently
+		} else if (m_runtimedependencies_mode) {
+			/* 	Get runtimedependencies of the file found in the directory path
+				get the list of installed package silently */
+			buildDatabaseWithDetailsInfos(true);
 			regex_t r;
 			int Result;
 			regcomp(&r, ".", REG_EXTENDED | REG_NOSUB);
 			set<string>filenameList;
-			Result = findRecursiveFile (filenameList, const_cast<char*>(o_arg.c_str()), &r, WS_DEFAULT);
+			Result = findRecursiveFile (filenameList, const_cast<char*>(m_arg.c_str()), &r, WS_DEFAULT);
 			// get the list of library for all the possible files 
 			set<string> librairiesList;
 			for (auto i : filenameList) Result = getRuntimeLibrairiesList(librairiesList,i);
@@ -203,19 +215,20 @@ void Pkginfo::run(int argc, char** argv)
 					cout << endl;
 				}
 			}	
-		} else if (o_librairies_mode + o_runtime_mode > 0) {
-			buildDatabaseWithDetailsInfos(true); // get the list of installed package silently
+		} else if (m_librairies_mode + m_runtime_mode > 0) {
+			// get the list of installed package silently
+			buildDatabaseWithDetailsInfos(true);
 			set<string> librairiesList;
 			int Result = -1;
-			if (checkPackageNameExist(o_arg)) {
-				for (set<string>::const_iterator i = m_listOfInstPackages[o_arg].files.begin();
-					i != m_listOfInstPackages[o_arg].files.end();
+			if (checkPackageNameExist(m_arg)) {
+				for (set<string>::const_iterator i = m_listOfInstPackages[m_arg].files.begin();
+					i != m_listOfInstPackages[m_arg].files.end();
 					++i){
 					string filename('/' + *i);
 					Result = getRuntimeLibrairiesList(librairiesList,filename);
 				}
 				if ( (librairiesList.size() > 0 ) && (Result > -1) ) {
-					if (o_runtime_mode) {
+					if (m_runtime_mode) {
 						set<string> runtimeList;
 						for (set<string>::const_iterator i = librairiesList.begin();
 						i != librairiesList.end();
@@ -257,62 +270,62 @@ void Pkginfo::run(int argc, char** argv)
 					}
 				}
 			}	
-		} else if (o_epoc) {	// get the building time of the package return 0 if not found
+		} else if (m_epoc) {
+			// get the building time of the package return 0 if not found
 			buildDatabaseWithDetailsInfos(true);
-			if (checkPackageNameExist(o_arg)) {
-				cout << m_listOfInstPackages[o_arg].build << endl;
+			if (checkPackageNameExist(m_arg)) {
+				cout << m_listOfInstPackages[m_arg].build << endl;
 			} else {
 				cout << "0" << endl;
 			}
-		} else if (o_details_mode) {	// get all the details of a package
+		} else if (m_details_mode) {
+			// get all the details of a package
 			buildDatabaseWithDetailsInfos(false);
-			if (checkPackageNameExist(o_arg)) {
-				char * c_time_s = ctime(&m_listOfInstPackages[o_arg].build);
-				cout << "Name           : " << o_arg << endl
-						 << "Description    : " << m_listOfInstPackages[o_arg].description << endl
-						 << "URL            : " << m_listOfInstPackages[o_arg].url << endl
-						 << "Maintainer(s)  : " << m_listOfInstPackages[o_arg].maintainer << endl
-						 << "Packager(s)    : " << m_listOfInstPackages[o_arg].packager << endl
-						 << "Version        : " << m_listOfInstPackages[o_arg].version << endl
-						 << "Release        : " << m_listOfInstPackages[o_arg].release << endl
-						 << "Build date     : " << c_time_s
-				     << "Size           : " << m_listOfInstPackages[o_arg].size << endl
-						 << "Number of Files: " << m_listOfInstPackages[o_arg].files.size()<< endl
-						 << "Arch           : " << m_listOfInstPackages[o_arg].arch << endl;
-				if ( m_listOfInstPackages[o_arg].dependencies.size() > 0 ) {
+			if (checkPackageNameExist(m_arg)) {
+				char * c_time_s = ctime(&m_listOfInstPackages[m_arg].build);
+				cout << "Name           : " << m_arg << endl
+					<< "Description    : " << m_listOfInstPackages[m_arg].description << endl
+					<< "URL            : " << m_listOfInstPackages[m_arg].url << endl
+					<< "Maintainer(s)  : " << m_listOfInstPackages[m_arg].maintainer << endl
+					<< "Packager(s)    : " << m_listOfInstPackages[m_arg].packager << endl
+					<< "Version        : " << m_listOfInstPackages[m_arg].version << endl
+					<< "Release        : " << m_listOfInstPackages[m_arg].release << endl
+					<< "Build date     : " << c_time_s
+					<< "Size           : " << m_listOfInstPackages[m_arg].size << endl
+					<< "Number of Files: " << m_listOfInstPackages[m_arg].files.size()<< endl
+					<< "Arch           : " << m_listOfInstPackages[m_arg].arch << endl;
+				if ( m_listOfInstPackages[m_arg].dependencies.size() > 0 ) {
 					cout << "Dependencies   : ";
-					for ( set<pair<string,time_t>>::const_iterator i = m_listOfInstPackages[o_arg].dependencies.begin();
-							i != m_listOfInstPackages[o_arg].dependencies.end();
-							++i) {
-						cout << i->first << " ";
-					}
+					for ( auto i : m_listOfInstPackages[m_arg].dependencies) cout << i.first << " ";
 					cout << endl;
 				}
 			}
-		} else if (o_owner_mode) {	// List owner(s) of file or directory
+		} else if (m_owner_mode) {
+			// List owner(s) of file or directory
 			buildDatabaseWithDetailsInfos(false);
 			regex_t preg;
-			if (regcomp(&preg, o_arg.c_str(), REG_EXTENDED | REG_NOSUB)) {
+			if (regcomp(&preg, m_arg.c_str(), REG_EXTENDED | REG_NOSUB)) {
 				m_actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
-				treatErrors(o_arg);
+				treatErrors(m_arg);
 			}
 			vector<pair<string, string> > result;
 			result.push_back(pair<string, string>("Package", "File"));
 			unsigned int width = result.begin()->first.length(); // Width of "Package"
 #ifndef NDEBUG
-			cerr << o_arg << endl;
+			cerr << m_arg << endl;
 #endif
-			for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
-				for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j) {
-					const string file('/' + *j);
+			for (auto i : m_listOfInstPackages) {
+				for (auto j : i.second.files) {
+					const string file('/' + j);
 					if (!regexec(&preg, file.c_str(), 0, 0, 0)) {
-						result.push_back(pair<string, string>(i->first, *j));
-						if (i->first.length() > width) {
-							width = i->first.length();
+						result.push_back(pair<string, string>(i.first, j));
+						if (i.first.length() > width) {
+							width = i.first.length();
 						}
 					}
 				}
 			}
+
 			regfree(&preg);
 			if (result.size() > 1) {
 				for (auto i : result ) {
@@ -324,20 +337,23 @@ void Pkginfo::run(int argc, char** argv)
 		}
 	}
 }
+void Pkginfo::finish()
+{
+}
 void Pkginfo::printHelp() const
 {
 	cout << USAGE << m_utilName << " [options]" << endl
 	     << OPTIONS << endl
 	     << "  -i, --installed             list installed packages" << endl
-       << "  -d, --details               list details about the <package>" << endl
-       << "  -L, --librairies            list all the runtime librairies for the <package>" << endl
+         << "  -d, --details               list details about the <package>" << endl
+         << "  -L, --librairies            list all the runtime librairies for the <package>" << endl
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl
-       << "  -a, --archive <file>        print Name, Version, Release, BuildDate and Deps of the <file>" << endl
+         << "  -a, --archive <file>        print Name, Version, Release, BuildDate and Deps of the <file>" << endl
 	     << "  -b, --buildtime <package>   return the name and the build time of the package" << endl
-       << "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
-       << "  --runtimedepfiles <path>    return on a single line all the runtime dependencies for the files found in the <path>" << endl
+         << "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
+         << "  --runtimedepfiles <path>    return on a single line all the runtime dependencies for the files found in the <path>" << endl
 	     << "  -r, --root <path>           specify alternative installation root" << endl
 	     << "  -v, --version               print version and exit" << endl
 	     << "  -h, --help                  print help and exit" << endl;

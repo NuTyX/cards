@@ -26,16 +26,13 @@
 
 class CardsBase : public Pkgdbh
 {
-public:
-	CardsBase(const CardsArgumentParser& argParser);
-
-	virtual void run(int argc, char** argv);
-	virtual void printHelp() const;
-	
 private:
-	const std::string m_baseDirectory;
 	const CardsArgumentParser& m_argParser;
 
+public:
+	CardsBase(const CardsArgumentParser& argParser);
+	void run(int argc, char** argv);
+	void printHelp() const;
 };
 #endif
 // vim:set ts=2 :

@@ -188,7 +188,7 @@ vector<string>& CardsDepends::getNeededDependencies()
 		} else {
 				name = packageName;
 		}
-		if ( ! packagesInfo.isInstalled(name)) {
+		if ( ! packagesInfo.checkPackageNameExist(name)) {
 			m_neededDependenciesList.push_back(*it);
 		}
 	}

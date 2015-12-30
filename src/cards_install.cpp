@@ -20,8 +20,9 @@
 #include "cards_install.h"
 
 CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
-	: Pkgdbh("cards install"),m_argParser(argParser), m_root("/")
+	: Pkgdbh("cards install"),m_argParser(argParser)
 {
+	m_root="/";
 	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
@@ -90,8 +91,7 @@ CardsInstall::CardsInstall(const CardsArgumentParser& argParser)
 		}
 #endif
 	} else {
-		//TODO get rid of thoses useless arguments
-		run(0, NULL);
+		run();
 	}
 }
 CardsInstall::CardsInstall(const CardsArgumentParser& argParser,
@@ -112,7 +112,7 @@ CardsInstall::CardsInstall (const CardsArgumentParser& argParser,
 		createBinaries();
 	}
 }
-void CardsInstall::run(int argc, char** argv)
+void CardsInstall::run()
 {
 	// Is it a file (an archive) or a packagename
 	string::size_type pos = m_argParser.otherArguments()[0].find("cards.tar");

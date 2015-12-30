@@ -3,7 +3,7 @@
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 
 using namespace std;
 
-static Pkgdbh* select_utility(const string& name)
+Pkgdbh* select_utility(const string& name)
 {
 	if (name == "pkgadd")
 		return new Pkgadd;
@@ -67,8 +67,10 @@ int main(int argc, char** argv)
 				return EXIT_SUCCESS;
 			}
 		}
+		util->parseArguments(argc, argv);
+		util->run();
+		util->finish();
 
-		util->run(argc, argv);
 	} catch (runtime_error& e) {
 		cerr << name <<  " " << VERSION << ": " << e.what() << endl;
 		return EXIT_FAILURE;

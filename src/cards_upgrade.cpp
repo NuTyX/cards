@@ -1,6 +1,6 @@
-// cards_upgrade.cc
+// cards_upgrade.cpp
 //
-//  Copyright (c) 2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2015-2016 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,9 +19,17 @@
 //
 
 #include "cards_upgrade.h"
-CardsUpgrade::CardsUpgrade(const CardsArgumentParser& argParser)
-	: Pkginst("cards upgrade","/etc/cards.conf"), m_argParser(argParser)
+Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,const std::string& configFileName)
+	: Pkginst("cards upgrade",configFileName), m_argParser(argParser)
 {
+	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
+		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
+
+	if (m_root.empty())
+		m_root="/";
+	else
+		m_root=m_root+"/";
+
 	parsePkgRepoCollectionFile();
 	buildDatabaseWithNameVersion();
 	for (auto i : m_listOfInstPackages) {
@@ -37,30 +45,35 @@ CardsUpgrade::CardsUpgrade(const CardsArgumentParser& argParser)
 		}
 		m_ListOfPackages.insert(packageNameBuildDate);
 	}
-	if ( m_argParser.isSet(CardsArgumentParser::OPT_CHECK))
-		Isuptodate();
-	if ( m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
-		size();
-	if ( (! m_argParser.isSet(CardsArgumentParser::OPT_SIZE)) &&
-		(! m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) )
-		run(0,NULL);
+	if ( m_argParser.command() == CardsArgumentParser::CMD_UPGRADE) {
+		if ( m_argParser.isSet(CardsArgumentParser::OPT_CHECK))
+			Isuptodate();
+		if ( m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
+			size();
+		if ( (! m_argParser.isSet(CardsArgumentParser::OPT_SIZE)) &&
+			(! m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) )
+			run();
+	}
+	if ( m_argParser.command() == CardsArgumentParser::CMD_DIFF) {
+		dry();
+	}
 }
-void CardsUpgrade::size()
+void Cards_upgrade::size()
 {
 	cout << m_ListOfPackages.size() << endl;
 }
-void CardsUpgrade::Isuptodate()
+void Cards_upgrade::Isuptodate()
 {
 	if ( m_ListOfPackages.size() == 0)
 		cout << "no" << endl;
 	else
 		cout << "yes" << endl;
 }
-void CardsUpgrade::dry()
+void Cards_upgrade::dry()
 {
-	for (auto i :m_dependenciesList ) cout << i  << endl;
+	for (auto i :m_ListOfPackages ) cout << i.first  << endl;
 }
-void CardsUpgrade::run(int argc, char** argv)
+void Cards_upgrade::run()
 {
 	for (auto i : m_ListOfPackages) generateDependencies(i);
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
@@ -69,8 +82,5 @@ void CardsUpgrade::run(int argc, char** argv)
 		if (!m_dependenciesList.empty())
 			addPackagesList(m_argParser.isSet(CardsArgumentParser::OPT_FORCE)  );
 	}
-}
-void CardsUpgrade::printHelp() const
-{
 }
 // vim:set ts=2 :

@@ -45,8 +45,9 @@ public:
 	void install(const set<string>& packageList);
 	void install(const vector<string>& dependenciesList);
 	void createBinaries(const string& packageName);
-	virtual void run(int argc, char** argv);
-	virtual void printHelp() const;
+	void run(int argc, char** argv){};
+	void run();
+	void printHelp() const;
 	
 private:
 	/* 
@@ -79,7 +80,7 @@ private:
 	Config m_config;
 
 	// TODO make configurable from the command line
-	const string m_root; // absolute path of installation
+	string m_root;
 	bool m_force;
 	bool m_archive;
 };
