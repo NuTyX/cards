@@ -67,6 +67,7 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APOpt OPT_LEVEL_SILENCE;
 
 		static ArgParser::APOpt OPT_ROOT;
+		static ArgParser::APOpt OPT_CONFIG_FILE;
 
 		std::string getAppIdentification() const
 		{

@@ -58,6 +58,7 @@ ArgParser::APOpt CardsArgumentParser::OPT_IGNORE;
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
 
 ArgParser::APOpt CardsArgumentParser::OPT_ROOT;
+ArgParser::APOpt CardsArgumentParser::OPT_CONFIG_FILE;
 
 CardsArgumentParser::CardsArgumentParser()
 {
@@ -114,7 +115,7 @@ If -f is passed as optional argument, it will force the install means overwrite 
 	addCommand(CMD_REMOVE, "remove",
 		"\tremove a package.",
 "",
-		ArgParser::EQ, 1 , "<package>");
+		ArgParser::MIN, 1 , "<package> | <collection>");
 
 	addCommand(CMD_LEVEL, "level",
 		"\tgenerate all the levels.",
@@ -199,11 +200,11 @@ If -f is passed as optional argument, it will force the install means overwrite 
 
 	OPT_SIZE.init("size",
 		's',
-		"\t\tJust return the number of updates.");
+		"\t\t    Just return the number of updates.");
 
 	OPT_CHECK.init("check",
 		'c',
-		"\t\tJust check if they are some updates.");
+		"\t\t    Just check if they are some updates.");
 
 	OPT_ROOT.init("root",
 		'r',
@@ -211,29 +212,47 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		true,
 		"<path>");
 
+	OPT_CONFIG_FILE.init("conf",
+		'C',
+		"Specify alternative \'cards.conf\' configuration file",
+		true,
+		"<file>");
+
+	addOption(CMD_CONFIG, OPT_CONFIG_FILE,false);
+
+
 	addOption(CMD_UPGRADE, OPT_SIZE, false);
 	addOption(CMD_UPGRADE, OPT_CHECK, false);
 	addOption(CMD_UPGRADE, OPT_FORCE,false);
 	addOption(CMD_UPGRADE, OPT_DRY,false);
+	addOption(CMD_UPGRADE, OPT_ROOT,false);
+	addOption(CMD_UPGRADE, OPT_CONFIG_FILE,false);
 
 	addOption(CMD_LIST, OPT_BINARIES, false);
 	addOption(CMD_LIST, OPT_PORTS, false);
+	addOption(CMD_LIST, OPT_ROOT,false);
+	addOption(CMD_LIST, OPT_CONFIG_FILE,false);
 
 	addOption(CMD_INFO, OPT_BINARIES, false);
 	addOption(CMD_INFO, OPT_PORTS, false);
+	addOption(CMD_INFO, OPT_ROOT,false);
+	addOption(CMD_INFO, OPT_CONFIG_FILE,false);
 
 	addOption(CMD_DIFF, OPT_PORTS, false);
 
 	addOption(CMD_REMOVE, OPT_ALL, false);
 	addOption(CMD_REMOVE, OPT_ROOT,false);
+	addOption(CMD_REMOVE, OPT_CONFIG_FILE,false);
 
 	addOption(CMD_INSTALL, OPT_UPDATE,false);
 	addOption(CMD_INSTALL, OPT_FORCE,false);
 	addOption(CMD_INSTALL, OPT_ROOT,false);
+	addOption(CMD_INSTALL, OPT_CONFIG_FILE,false);
 
 	addOption(CMD_BASE, OPT_DRY,false);
 	addOption(CMD_BASE, OPT_REMOVE,false);
 	addOption(CMD_BASE, OPT_ROOT,false);
+	addOption(CMD_BASE, OPT_CONFIG_FILE,false);
 
 	addOption(CMD_CREATE, OPT_DRY,false);
 	addOption(CMD_CREATE, OPT_REMOVE,true);

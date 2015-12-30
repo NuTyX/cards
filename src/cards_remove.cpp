@@ -24,7 +24,6 @@
 
 #include "cards_remove.h"
 
-
 Cards_remove::Cards_remove(const CardsArgumentParser& argParser)
 	: Pkgrm(),m_argParser(argParser)
 {
@@ -35,8 +34,11 @@ Cards_remove::Cards_remove(const CardsArgumentParser& argParser)
 		m_root="/";
 	else
 		m_root=m_root+"/";
-	m_packageName = m_argParser.otherArguments()[0];
-	run();
+
+	for ( auto i : m_argParser.otherArguments() ) {
+		m_packageName = i;
+		run();
+	}
 	finish();
 }
 
