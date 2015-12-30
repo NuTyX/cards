@@ -1,4 +1,4 @@
-// cards.cc
+// cards.cpp
 //
 //  Copyright (c) 2014-2015 by NuTyX team (http://nutyx.org)
 // 
@@ -26,6 +26,7 @@
 #include "cards_depends.h"
 #include "cards_install.h"
 #include "cards_remove.h"
+#include "cards_create.h"
 #include "cards_info.h"
 #include "cards_upgrade.h"
 
@@ -39,9 +40,14 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	string command = basename(argv[1]);
+	string configFile = "/etc/cards.conf";
 	try {
 		CardsArgumentParser cardsArgPars;
 		cardsArgPars.parse(argc, argv);
+
+		if (cardsArgPars.isSet(CardsArgumentParser::OPT_CONFIG_FILE))
+			configFile=cardsArgPars.getOptionValue(CardsArgumentParser::OPT_CONFIG_FILE);
+
 		if (cardsArgPars.command() == CardsArgumentParser::CMD_HELP) {
 			cout << "Usage: " << BLUE << cardsArgPars.appName()  << " command " << NORMAL << "[options]"<< endl;
 
@@ -91,8 +97,7 @@ of compilation" << endl
 		}
 		if (cardsArgPars.command() == CardsArgumentParser::CMD_CONFIG) {
 			Config config;
-			Pkgrepo::parseConfig("/etc/cards.conf", config);
-		
+			Pkgrepo::parseConfig(configFile, config);
 			unsigned int index = 0;
 			string prtDir, url ;
 			for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
@@ -123,7 +128,7 @@ of compilation" << endl
 				return EXIT_SUCCESS;
 			}
 			// create (compile and install) the List of deps (including the final package)
-			CardsInstall CI(cardsArgPars,listOfPackages);
+			Cards_create CC(cardsArgPars,configFile,listOfPackages);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_CREATE) {
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
@@ -139,11 +144,11 @@ of compilation" << endl
 			// get the list of the dependencies"
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			vector<string> listOfDeps = CD.getDependencies();
-			CardsInstall CI(cardsArgPars,cardsArgPars.otherArguments()[0]);
+			Cards_install CI(cardsArgPars,configFile,cardsArgPars.otherArguments()[0]);
 			if (listOfDeps.size()>1)
-				CI.install(listOfDeps);
+				Cards_install CI(cardsArgPars,configFile,listOfDeps);
 			// compilation of the final port"
-			CI.createBinaries(cardsArgPars.otherArguments()[0]);
+			Cards_create CC( cardsArgPars,configFile,cardsArgPars.otherArguments()[0]);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_BASE) {
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
@@ -154,14 +159,6 @@ of compilation" << endl
 			CardsBase CB(cardsArgPars);
 			CB.run(argc, argv);
 			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_QUERY) {
-			CardsInfo Query(cardsArgPars);
-			Query.getOwner();
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_FILES) {
-			CardsInfo CFList(cardsArgPars);
-			CFList.listOfFiles();
-			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
 			CardsSync CS(cardsArgPars);
 			CS.run();
@@ -170,17 +167,15 @@ of compilation" << endl
 			CardsSync CS(cardsArgPars);
 			CS.purge();
 			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_UPGRADE) {
-			CardsUpgrade CU(cardsArgPars);
+		} else if ( (cardsArgPars.command() == CardsArgumentParser::CMD_UPGRADE) ||
+					(cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) ) {
+			Cards_upgrade CU(cardsArgPars,configFile);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
-			CardsInstall CI(cardsArgPars);
+				Cards_install CI(cardsArgPars,configFile);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_REMOVE) {
 			Cards_remove CR(cardsArgPars);
-			CR.parseArguments(argc,argv);
-			CR.run();
-			CR.finish();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 			CardsDepends CD(cardsArgPars);
@@ -193,45 +188,12 @@ of compilation" << endl
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
 			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
 			return CD.deptree();
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LIST) {
-			CardsInfo CList(cardsArgPars);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
-				CList.listBinaries();
-				return EXIT_SUCCESS;
-			}
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
-				CList.listPorts();
-			} else {
-				CList.listInstalled();
-			}
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) {
-			CardsInfo CInfo(cardsArgPars);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_BINARIES)) {
-				CInfo.infoBinary();
-				return EXIT_SUCCESS;	
-			}
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
-				CInfo.infoPort();
-				return EXIT_SUCCESS;
-			} else {
-				CInfo.infoInstall();
-				return EXIT_SUCCESS;
-			}
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) {
-			CardsInfo CInfo(cardsArgPars);
-			if (cardsArgPars.isSet(CardsArgumentParser::OPT_PORTS)) {
-				CInfo.diffPorts();
-				return EXIT_SUCCESS;
-			} else {
-				CInfo.diffBinaries();
-				return EXIT_SUCCESS;
-			}
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) {
-			CardsInfo CInfo(cardsArgPars);
-			CInfo.search();
+		} else if ( (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) ||
+				(cardsArgPars.command() == CardsArgumentParser::CMD_LIST)   ||
+				(cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) ||
+				(cardsArgPars.command() == CardsArgumentParser::CMD_FILES)  ||
+				(cardsArgPars.command() == CardsArgumentParser::CMD_QUERY)) {
+			Cards_info CI(cardsArgPars,configFile);
 			return EXIT_SUCCESS;
 		}
 	} catch (runtime_error& e) {
