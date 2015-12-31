@@ -30,8 +30,8 @@
 #include <unistd.h>
 #include <sstream>
 
-Pkginfo::Pkginfo()
-	: Pkgdbh("pkginfo"),
+Pkginfo::Pkginfo(const string& commandName)
+	: Pkgdbh(commandName),
 	m_runtimedependencies_mode(0),
 	m_footprint_mode(0),
 	m_archiveinfo(0),

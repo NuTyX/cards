@@ -175,7 +175,7 @@ vector<LevelName>& CardsDepends::getLevel()
 }
 vector<string>& CardsDepends::getNeededDependencies()
 {
-	Pkginfo packagesInfo;
+	Pkginfo packagesInfo("");
 	packagesInfo.getNumberOfPackages();
 	depends();
 
@@ -211,7 +211,7 @@ vector<string>& CardsDepends::getDependencies()
 }
 void CardsDepends::showDependencies()
 {
-	Pkginfo packagesInfo;
+	Pkginfo packagesInfo("");
 	packagesInfo.getNumberOfPackages();
 	if (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) {
 		depends();

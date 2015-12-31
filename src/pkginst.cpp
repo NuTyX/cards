@@ -19,8 +19,8 @@
 //
 #include "pkginst.h"
 
-Pkginst::Pkginst(const string& commandName, const string& configFileName)
-	: Pkgdbh(commandName), Pkgrepo(configFileName)
+Pkginst::Pkginst(const string& commandName,const string& configFileName)
+	: Pkgadd(commandName), Pkgrepo(configFileName)
 {
 }
 void Pkginst::generateDependencies(const pair<string,time_t>& packageName)
@@ -70,6 +70,9 @@ void Pkginst::generateDependencies()
 			}
 			if ( ! checkFileExist(m_packageFileName)) // Binary Archive not yet downloaded
 				downloadPackageFileName(m_packageName); // Get it
+#ifndef NDEBUG
+			cerr << "getPackageDependencies(" << m_packageFileName << ")" << endl;
+#endif
 			directDependencies = getPackageDependencies(m_packageFileName);
 #ifndef NDEBUG
 			for (auto i : directDependencies ) cerr << i.first << " ";
@@ -123,87 +126,6 @@ void Pkginst::generateDependencies()
 #ifndef NDEBUG
 		else cerr << "no deps founds" << endl;
 #endif
-	}
-}
-void Pkginst::addPackage(const bool& force)
-{
-	Db_lock  * pLock = NULL;	// New LockDatabase pointer
-	readRulesFile();					// Checking the rules
-	pair<string, pkginfo_t> package = openArchivePackage(m_packageFileName);
-	readRulesFile();  // Checking the rules
-	bool upgrade = checkPackageNameExist(package.first);
-	set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
-
-	if (!upgrade) {
-#ifndef NDEBUG
-		cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
-#endif
-		extractAndRunPREfromPackage(m_packageFileName);	// Run pre-install if exist
-	}
-	set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
-	if (! conflicting_files.empty()) {
-		if (force) {
-			pLock = new Db_lock(m_root, true);
-			set<string> keep_list;
-			if (upgrade)	// Don't remove files matching the rules in configuration
-				keep_list = getKeepFileList(conflicting_files, m_actionRules);
-			removePackageFilesRefsFromDB(conflicting_files, keep_list); // Remove unwanted conflicts
-			delete pLock;
-		} else {
-			copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
-			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
-			treatErrors("'" + m_packageName + "': listed file(s) already installed, cannot continue... ");
-		}
-	}
-	set<string> keep_list;
-	if (upgrade) {
-		pLock = new Db_lock(m_root, true);	// Lock the database, any interruption forbidden
-		removePackageFilesRefsFromDB(package.first);	// Remove metadata about the package removed
-		keep_list = getKeepFileList(package.second.files, m_actionRules);
-		removePackageFiles(package.first, keep_list);
-		delete pLock;
-#ifndef NDEBUG
-		cerr << "Run extractAndRunPREfromPackage after upgrade" << endl;
-#endif
-		extractAndRunPREfromPackage(m_packageFileName);	// Run pre-install if exist
-	}
-	pLock = new Db_lock(m_root, true);
-	installArchivePackage(m_packageFileName, keep_list, non_install_files);	// Installation progressInfo of the files on the HD
-	moveMetaFilesPackage(package.first,package.second);	// Add the metadata about the package to the DB
-	addPackageFilesRefsToDB(package.first, package.second); // Add the info about the files to the DB
-	delete pLock;
-	if (checkFileExist(PKG_POST_INSTALL)) { // Post install
-		m_actualAction = PKG_POSTINSTALL_START;
-		progressInfo();
-		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
-		if (postinstall.executeShell())
-			cerr << "WARNING Run post-install FAILED. continue" << endl;
-		m_actualAction = PKG_POSTINSTALL_END;
-		progressInfo();
-		removeFile(m_root,PKG_POST_INSTALL);
-	}
-	runLdConfig();
-}
-void Pkginst::addPackagesList(const bool& force)
-{
-#ifndef NDEBUG
-	cerr << "Number of Packages : " << m_dependenciesList.size()<< endl;
-#endif
-	buildDatabaseWithDetailsInfos(false);	// Retrieving info about all the packages
-	for (auto i : m_dependenciesList) {
-		m_packageName = i;
-#ifndef NDEBUG
-		cerr << i << endl;
-#endif
-		m_packageFileName = getPackageFileName(m_packageName);
-#ifndef NDEBUG
-		cerr << m_packageFileName << endl;
-#endif
-		if ( ! checkBinaryExist(m_packageName)) {
-			m_actualError = PACKAGE_NOT_FOUND;
-			treatErrors(m_packageName);
-		}
-		addPackage(force);
 	}
 }
 // vim:set ts=2 :

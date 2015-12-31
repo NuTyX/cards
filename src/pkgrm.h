@@ -28,7 +28,7 @@
 
 class Pkgrm : public Pkgdbh {
 public:
-	Pkgrm() : Pkgdbh("pkgrm") {}
+	Pkgrm(const std::string& commandName) : Pkgdbh(commandName) {}
 	void run();
 	void printHelp() const;
 };

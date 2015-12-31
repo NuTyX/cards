@@ -22,20 +22,17 @@
 #include <string>
 
 #include "pkgdbh.h"
+#include "pkgadd.h"
 #include "pkgrepo.h"
 #include "process.h"
 
-class Pkginst : public Pkgdbh, public Pkgrepo {
+class Pkginst : public Pkgadd, public Pkgrepo {
 public:
 	Pkginst(const std::string& commandName,const std::string& configFileName);
 	void generateDependencies(const pair<std::string,time_t>& packageName);
 	void generateDependencies();
-	void addPackage(const bool& force);
-	void addPackagesList(const bool& force);
 
 protected:
-	string m_packageName;
-	string m_packageFileName;
 	vector<string> m_dependenciesList;
 };
 #endif /* PKGINST_H */

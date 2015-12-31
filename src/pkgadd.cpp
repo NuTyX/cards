@@ -31,8 +31,8 @@
 #include <regex.h>
 #include <unistd.h>
 
-Pkgadd::Pkgadd()
-	: Pkgdbh("pkgadd"),
+Pkgadd::Pkgadd(const string& commandName)
+	: Pkgdbh(commandName),
 	m_upgrade(false),
 	m_force(false)
 {
@@ -151,6 +151,8 @@ void Pkgadd::run()
 
 	// Add the info about the files to the DB
 	addPackageFilesRefsToDB(package.first, package.second);
+
+	postRun();
 }
 void Pkgadd::postRun()
 {

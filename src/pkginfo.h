@@ -30,7 +30,7 @@
 
 class Pkginfo : public Pkgdbh {
 public:
-	Pkginfo();
+	Pkginfo(const std::string& commandName);
 	virtual void parseArguments(int argc, char** argv);
 	virtual void run();
 	virtual void finish();

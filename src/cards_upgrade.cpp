@@ -79,8 +79,9 @@ void Cards_upgrade::run()
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
 		dry();
 	else {
-		if (!m_dependenciesList.empty())
-			addPackagesList(m_argParser.isSet(CardsArgumentParser::OPT_FORCE)  );
+		if (!m_dependenciesList.empty()) {
+//			addPackagesList(m_argParser.isSet(CardsArgumentParser::OPT_FORCE)  );
+		}
 	}
 }
 // vim:set ts=2 :

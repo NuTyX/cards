@@ -230,7 +230,7 @@ void Pkgdbh::progressInfo() const
       j = 0;
       cout << "ADD: "
 				<< m_packageName
-				<< "-"
+				<< " "
 				<< m_packageArchiveVersion
 				<< ", "
 				<< m_filesNumber << " files: ";
@@ -261,6 +261,8 @@ void Pkgdbh::progressInfo() const
 			cout << "REMOVE: "
 				<< m_packageName
 				<< " "
+				<< m_packageArchiveVersion
+				<< ", "
 				<< m_filesList.size()
 				<< " files: ";
 			break;
@@ -600,6 +602,9 @@ bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 /* Remove meta data about the removed package */
 void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
+	if ( checkPackageNameExist(m_packageName))
+		m_packageArchiveVersion = m_listOfInstPackages[m_packageName].version;
+
 	set<string> metaFilesList;
 	const string packagedir = m_root + PKG_DB_DIR ;
 	const string arch = m_listOfInstPackages[name].arch;
@@ -721,6 +726,9 @@ void Pkgdbh::removePackageFiles(const string& name, const set<string>& keep_list
 
 void Pkgdbh::removePackageFilesRefsFromDB(set<string> files, const set<string>& keep_list)
 {
+	if ( checkPackageNameExist(m_packageName))
+		m_packageArchiveVersion = m_listOfInstPackages[m_packageName].version;
+	
 	// Remove all references
 	for (packages_t::iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i)
 		for (set<string>::const_iterator j = files.begin(); j != files.end(); ++j)
@@ -809,6 +817,7 @@ set<string> Pkgdbh::getConflictsFilesList(const string& name, const pkginfo_t& i
 }
 pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 {
+	string packageArchiveName;
 	pair<string, pkginfo_t> result;
 	ArchiveUtils packageArchive(filename.c_str());
 #ifndef NDEBUG
@@ -820,17 +829,17 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 		m_actualError = EMPTY_PACKAGE;
 		treatErrors(basename);
 	}
-	m_packageName = packageArchive.name();
+	packageArchiveName = packageArchive.name();
 	if ( ( packageArchive.arch() != getMachineType() ) && ( packageArchive.arch() != "any" ) ) {
 		m_actualError = WRONG_ARCHITECTURE;
 		treatErrors(basename);
 	}
 	m_packageArchiveVersion = packageArchive.version();
-	if (m_packageArchiveName.empty() ) {
+	if (packageArchiveName.empty() ) {
 		m_actualError = CANNOT_DETERMINE_NAME_BUILDNR;
 		treatErrors(basename);
 	}
-	result.first = m_packageName;
+	result.first = packageArchiveName;
 	result.second.description = packageArchive.description();
 	result.second.url = packageArchive.url();
 	result.second.maintainer = packageArchive.maintainer();
@@ -845,6 +854,7 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 		result.second.files.insert(*i);
 	}
 	result.second.dependencies = packageArchive.listofDependenciesBuildDate();
+	m_packageName = packageArchiveName;
 	return result;	
 }
 set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename)

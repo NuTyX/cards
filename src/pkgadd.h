@@ -30,7 +30,7 @@
 
 class Pkgadd : public Pkgdbh {
 public:
-	Pkgadd();
+	Pkgadd(const std::string& commandName);
 	void parseArguments(int argc, char** argv);
 	void preRun();
 	void postRun();

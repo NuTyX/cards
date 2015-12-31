@@ -24,8 +24,8 @@
 
 #include "cards_remove.h"
 
-Cards_remove::Cards_remove(const CardsArgumentParser& argParser)
-	: Pkgrm(),m_argParser(argParser)
+Cards_remove::Cards_remove(const string& commandName, const CardsArgumentParser& argParser)
+	: Pkgrm(commandName),m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);

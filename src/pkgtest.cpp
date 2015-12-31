@@ -24,7 +24,7 @@
 #include "pkgtest.h"
 
 Pkgtest::Pkgtest()
-	:Pkginfo(), Pkgrepo("/etc/cards.conf")
+	:Pkginfo("pkgtest"), Pkgrepo("/etc/cards.conf")
 {
 }
 void Pkgtest::parseArguments(int argc, char** argv)
