@@ -180,7 +180,8 @@ void Pkgadd::printHelp() const
 	     << "  -h, --help          print help and exit" << endl;
 }
 
-set<string> Pkgadd::getKeepFileList(const set<string>& files, const vector<rule_t>& rules)
+set<string> Pkgadd::getKeepFileList(const set<string>& files,
+	const vector<rule_t>& rules)
 {
 	set<string> keep_list;
 	vector<rule_t> found;
@@ -206,7 +207,9 @@ set<string> Pkgadd::getKeepFileList(const set<string>& files, const vector<rule_
 	return keep_list;
 }
 
-set<string> Pkgadd::applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules)
+set<string> Pkgadd::applyInstallRules(const string& name,
+	pkginfo_t& info,
+	const vector<rule_t>& rules)
 {
 	// TODO: better algo(?)
 	set<string> install_set;
@@ -241,5 +244,14 @@ set<string> Pkgadd::applyInstallRules(const string& name, pkginfo_t& info, const
 #endif
 
 	return non_install_set;
+}
+void Pkgadd::getInstallRulesList(const vector<rule_t>& rules,
+	rule_event_t event, 
+	vector<rule_t>& found) const
+{
+	for (auto i : rules ) {
+		if (i.event == event)
+			found.push_back(i);
+	}
 }
 // vim:set ts=2 :

@@ -31,12 +31,21 @@
 class Cards_install: public Pkginst
 {
 	public:
-		Cards_install(const CardsArgumentParser& argParser,const std::string& configFileName);
-		Cards_install(const CardsArgumentParser& argParser, const std::string& configFileName, const std::vector<string>& listOfPackages);
-		Cards_install(const CardsArgumentParser& argParser, const std::string& configFileName, const std::string& packageName);
+		Cards_install(const CardsArgumentParser& argParser,
+			const std::string& configFileName);
+		Cards_install(const CardsArgumentParser& argParser,
+			const std::string& configFileName,
+			const std::vector<string>& listOfPackages);
+		Cards_install(const CardsArgumentParser& argParser,
+			const std::string& configFileName,
+			const std::string& packageName);
 			
 	private:
 		const CardsArgumentParser& m_argParser;
+		void parseArguments();
+		void getLocalePackagesList();
+		Config m_config;
+
 };
 
 #endif /* CARDS_INSTALL_H */ 

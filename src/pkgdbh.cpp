@@ -1131,13 +1131,6 @@ void Pkgdbh::runLdConfig()
 		ldconfig.execute();
 	}
 }
-void Pkgdbh::getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const
-{
-	for (auto i : rules ) {
-	if (i.event == event)
-		found.push_back(i);
-	}
-}
 bool Pkgdbh::checkRuleAppliesToFile(const rule_t& rule, const string& file)
 {
 	regex_t preg;
@@ -1151,63 +1144,6 @@ bool Pkgdbh::checkRuleAppliesToFile(const rule_t& rule, const string& file)
 	regfree(&preg);
 
 	return ret;
-}
-set<string> Pkgdbh::applyInstallRules(const string& name, pkginfo_t& info, const vector<rule_t>& rules)
-{
-  // TODO: better algo(?)
-  set<string> install_set;
-  set<string> non_install_set;
-  vector<rule_t> found;
-
-  getInstallRulesList(rules, INSTALL, found);
-
-  for (auto i : info.files) {
-    bool install_file = true;
-    for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
-      if (checkRuleAppliesToFile(*j, i)) {
-        install_file = (*j).action;
-        break;
-      }
-    }
-    if (install_file)
-      install_set.insert(install_set.end(), i);
-    else
-      non_install_set.insert(i);
-  }
-  info.files.clear();
-  info.files = install_set;
-
-#ifndef NDEBUG
-  cerr << "Install set:" << endl;
-  for  (auto j : info.files) cerr << "   " << j << endl;
-  cerr << endl;
-  cerr << "Non-Install set:" << endl;
-  for (auto j : non_install_set) cerr << "   " << j << endl;
-  cerr << endl;
-#endif
-
-	return non_install_set;
-}
-set<string> Pkgdbh::getKeepFileList(const set<string>& files, const vector<rule_t>& rules)
-{
-	set<string> keep_list;
-	vector<rule_t> found;
-	getInstallRulesList(rules, UPGRADE, found);
-	for (set<string>::const_iterator i = files.begin(); i != files.end(); i++) {
-		for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
-			if (checkRuleAppliesToFile(*j, *i)) {
-				if (!(*j).action)
-					keep_list.insert(keep_list.end(), *i);
-				break;
-			}
-		}
-	}
-#ifndef NDEBUG
-	cerr << "Keep list:" << endl;
-	for (auto i : keep_list) cerr << "   " << i << endl;
-	cerr << endl;
-#endif
-	return keep_list;
 }
 void Pkgdbh::getFootprintPackage(string& filename)
 {
