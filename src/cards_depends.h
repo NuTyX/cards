@@ -36,6 +36,7 @@
 
 #include <dirent.h>
 #include "string_utils.h"
+#include "pkgdbh.h"
 #include "cards_argument_parser.h"
 #include "compile_dependencies_utils.h"
 
@@ -44,16 +45,14 @@ struct LevelName {
 	std::string name;
 };
 
-class CardsDepends
+class CardsDepends: public Pkgdbh
 {
 public:
 
-	CardsDepends (const CardsArgumentParser& argParser, const char * packageName)
-	: m_argParser(argParser),
-		m_packageName(packageName) {}
+	CardsDepends (const CardsArgumentParser& argParser, const char * packageName);
+	CardsDepends (const CardsArgumentParser& argParser);
 
-	CardsDepends (const CardsArgumentParser& argParser)
-	: m_argParser(argParser) {}
+	void parseArguments();
 
 	virtual void treatErrors(const std::string& s) const;
 

@@ -22,7 +22,7 @@
 #
 
 VERSION="#VERSION#"
-PORTS_DIR="/var/lib/pkg/depot"
+PORTS_DIR="/var/lib/pkg/depotrepo"
 DRIVERS_DIR="/var/lib/pkg/drivers"
 check_ports_dir() {
 	if [ ! -d "$PORTS_DIR" ]; then
@@ -33,7 +33,7 @@ check_ports_dir() {
 get_ports_dir() {
 	local collection destination
 	collection=`basename $1|cut -d "." -f1`
-	PORTS_DIR="/var/lib/pkg/depot/$collection"
+	PORTS_DIR="/var/lib/pkg/depotrepo/$collection"
 	if [ -f $1 ];then
 		source $file
 	fi

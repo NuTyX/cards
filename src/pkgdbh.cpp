@@ -228,10 +228,12 @@ void Pkgdbh::progressInfo() const
 			break;
     case PKG_INSTALL_START:
       j = 0;
-      cout << "ADD: "
+      cout << "ADD   : "
 				<< m_packageName
 				<< " "
 				<< m_packageArchiveVersion
+				<< "-"
+				<< m_packageArchiveRelease
 				<< ", "
 				<< m_filesNumber << " files: ";
       break;
@@ -262,6 +264,8 @@ void Pkgdbh::progressInfo() const
 				<< m_packageName
 				<< " "
 				<< m_packageArchiveVersion
+				<< "-"
+				<< m_packageArchiveRelease
 				<< ", "
 				<< m_filesList.size()
 				<< " files: ";
@@ -602,9 +606,10 @@ bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 /* Remove meta data about the removed package */
 void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
-	if ( checkPackageNameExist(m_packageName))
+	if ( checkPackageNameExist(m_packageName)){
 		m_packageArchiveVersion = m_listOfInstPackages[m_packageName].version;
-
+		m_packageArchiveRelease = itos(m_listOfInstPackages[m_packageName].release);
+	}
 	set<string> metaFilesList;
 	const string packagedir = m_root + PKG_DB_DIR ;
 	const string arch = m_listOfInstPackages[name].arch;
@@ -726,9 +731,10 @@ void Pkgdbh::removePackageFiles(const string& name, const set<string>& keep_list
 
 void Pkgdbh::removePackageFilesRefsFromDB(set<string> files, const set<string>& keep_list)
 {
-	if ( checkPackageNameExist(m_packageName))
+	if ( checkPackageNameExist(m_packageName)){
 		m_packageArchiveVersion = m_listOfInstPackages[m_packageName].version;
-	
+		m_packageArchiveRelease = itos(m_listOfInstPackages[m_packageName].release);
+	}
 	// Remove all references
 	for (packages_t::iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i)
 		for (set<string>::const_iterator j = files.begin(); j != files.end(); ++j)
@@ -835,6 +841,7 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 		treatErrors(basename);
 	}
 	m_packageArchiveVersion = packageArchive.version();
+	m_packageArchiveRelease = itos(packageArchive.release());
 	if (packageArchiveName.empty() ) {
 		m_actualError = CANNOT_DETERMINE_NAME_BUILDNR;
 		treatErrors(basename);

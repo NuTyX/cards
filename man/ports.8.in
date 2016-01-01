@@ -25,7 +25,7 @@ Print version and exit.
 Print help and exit.
 .SH FILES
 .TP
-.B "/usr/ports/"  
+.B "/var/lib/pkg/depotrepo"
 Default Root of local ports collection. If not define in the configuration file of the concerned collection and not in cards.conf file
 .TP
 .B "/etc/ports/"

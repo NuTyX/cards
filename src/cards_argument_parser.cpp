@@ -187,7 +187,7 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		"\t\t    Not doing the action. Only show (if possible) what will be done.");
 
 	OPT_REMOVE.init("remove",
-		'R',
+		'r',
 		  "\t    Remove the packages founds, use with care.");
 
 	OPT_ALL.init("all",
@@ -207,13 +207,13 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		"\t\t    Just check if they are some updates.");
 
 	OPT_ROOT.init("root",
-		'r',
+		0,
 		"Specify alternative installation root",
 		true,
 		"<path>");
 
 	OPT_CONFIG_FILE.init("conf",
-		'C',
+		0,
 		"Specify alternative \'cards.conf\' configuration file",
 		true,
 		"<file>");

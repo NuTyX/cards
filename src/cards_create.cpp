@@ -29,13 +29,16 @@ Cards_create::Cards_create(const CardsArgumentParser& argParser,
 	const std::vector<string>& listOfPackages)
 	: Pkginst("cards create",configFileName),m_argParser(argParser)
 {
-	for (auto i : listOfPackages) createBinaries(configFileName, i);
+	parseArguments();
+	for (auto i : listOfPackages) createBinaries(configFileName,
+		basename(const_cast<char*>(i.c_str())) );
 }
 Cards_create::Cards_create(const CardsArgumentParser& argParser,
 	const std::string& configFileName,
 	const std::string& packageName)
 	: Pkginst("cards create",configFileName),m_argParser(argParser)
 {
+	parseArguments();
 	createBinaries(configFileName, packageName);
 }
 void Cards_create::createBinaries(const string& configFileName,
@@ -53,7 +56,7 @@ void Cards_create::createBinaries(const string& configFileName,
 	string commandName = "cards create: ";
 	string message;
 	int fdlog = -1;
-	
+
 	if ( config.logdir != "" ) {
 		if ( ! createRecursiveDirs(config.logdir) ) {
 			m_actualError = CANNOT_CREATE_DIRECTORY;
@@ -61,6 +64,7 @@ void Cards_create::createBinaries(const string& configFileName,
 		}
 		string logFile = config.logdir + "/" + packageName + ".log";
 		unlink( logFile.c_str() );
+		fdlog = open(logFile.c_str(),O_APPEND | O_WRONLY | O_CREAT, 0666 );
 		if ( fdlog == -1 ) {
 			m_actualError = CANNOT_OPEN_FILE;
 			treatErrors(logFile);
@@ -148,13 +152,15 @@ void Cards_create::createBinaries(const string& configFileName,
 		ArchiveUtils packageArchive(m_packageFileName.c_str());
 		string name = packageArchive.name();
 		string version = packageArchive.version();
-		if ( ! checkPackageNameExist(name) ) {
-			message = "ADD FOR INSTALL: " + name + " " + version;
-			m_packageFileName = pkgdir + "/" + i;
-			run();
-		} else {
-			message = "WARNING: " + name + " is ALLREADY installed";
+		message = "CREATED: " + name + " " + version;
+		m_upgrade=0;
+		buildDatabaseWithNameVersion();
+		if ( checkPackageNameExist(name) ) {
+			message = name + ": is ALLREADY installed";
+			m_upgrade=1;
 		}
+		m_packageArchiveName = pkgdir + "/" + i;
+		run();
 		cout << message << endl;
 		if ( config.logdir != "" ) {
 			write( fdlog, message.c_str(), message.length());
@@ -182,4 +188,17 @@ set<string> Cards_create::findPackages(const string& path)
 	}
 	return packageList;
 }
+void Cards_create::parseArguments()
+{
+	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
+		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
+	if (m_root.empty())
+		m_root="/";
+	else
+		m_root=m_root+"/";
 
+	if (getuid()) {
+		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		treatErrors("");
+	}
+}

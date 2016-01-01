@@ -25,13 +25,35 @@
 
 #include "file_download.h"
 #include "file_utils.h"
-#include "pkginfo.h"
 #include "compile_dependencies_utils.h"
 #include "cards_depends.h"
 #include "pkgrepo.h"
 
 using namespace std;
 
+
+CardsDepends::CardsDepends (const CardsArgumentParser& argParser, const char * packageName)
+	: Pkgdbh(""),
+		m_argParser(argParser),
+		m_packageName(packageName)
+{
+	parseArguments();
+}
+CardsDepends::CardsDepends (const CardsArgumentParser& argParser)
+	: Pkgdbh(""),
+		m_argParser(argParser)
+{
+	parseArguments();
+}
+void CardsDepends::parseArguments()
+{
+	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
+		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
+	if (m_root.empty())
+		m_root="/";
+	else
+		m_root=m_root+"/";
+}
 depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int nameIndex)
 {
 	if ( nameIndex > filesList->count  ) {
@@ -175,8 +197,8 @@ vector<LevelName>& CardsDepends::getLevel()
 }
 vector<string>& CardsDepends::getNeededDependencies()
 {
-	Pkginfo packagesInfo("");
-	packagesInfo.getNumberOfPackages();
+	buildDatabaseWithNameVersion();
+
 	depends();
 
 	for (std::vector<string>::iterator it = m_dependenciesList.begin();it != m_dependenciesList.end();it++) {
@@ -188,7 +210,7 @@ vector<string>& CardsDepends::getNeededDependencies()
 		} else {
 				name = packageName;
 		}
-		if ( ! packagesInfo.checkPackageNameExist(name)) {
+		if ( ! checkPackageNameExist(name)) {
 			m_neededDependenciesList.push_back(*it);
 		}
 	}
@@ -211,8 +233,6 @@ vector<string>& CardsDepends::getDependencies()
 }
 void CardsDepends::showDependencies()
 {
-	Pkginfo packagesInfo("");
-	packagesInfo.getNumberOfPackages();
 	if (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) {
 		depends();
 		for (std::vector<string>::iterator it = m_dependenciesList.begin();it != m_dependenciesList.end();it++) {
