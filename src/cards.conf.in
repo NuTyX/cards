@@ -43,12 +43,12 @@
 ##
 
 
-# dir /var/lib/pkg/depot/gui-extra
-# dir /var/lib/pkg/depot/gui
-# dir /var/lib/pkg/depot/cli-extra
-# dir /var/lib/pkg/depot/cl
-# dir /var/lib/pkg/depot/base-extra
-# dir /var/lib/pkg/depot/base
+# dir /usr/ports/gui-extra
+# dir /usr/ports/gui
+# dir /usr/ports/cli-extra
+# dir /usr/ports/cli
+# dir /usr/ports/base-extra
+# dir /usr/ports/base
 
 ## The NuTyX name and version are found in the /var/lib/pkg/nutyx-version file
 ## The Colletion name (xfce4-extra, xfce4, gui, gui-extra, cli, cli-extra, base, base-extra)

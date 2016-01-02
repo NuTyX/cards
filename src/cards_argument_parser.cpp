@@ -114,7 +114,7 @@ If -f is passed as optional argument, it will force the install means overwrite 
 
 	addCommand(CMD_REMOVE, "remove",
 		"\tremove a package.",
-"",
+"It can remove one or more packages. If you want to remove a package from the base list, you should pass the -a argument.",
 		ArgParser::MIN, 1 , "<package> | <collection>");
 
 	addCommand(CMD_LEVEL, "level",
@@ -192,7 +192,7 @@ If -f is passed as optional argument, it will force the install means overwrite 
 
 	OPT_ALL.init("all",
 		'a',
-		"\t\t    Remove the sub package(s) as well, if they exists.");
+		"\t\t    Remove the package(s) even if they are in the base list.");
 
 	OPT_IGNORE.init("ignore",
 		'I',

@@ -52,7 +52,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,const std::str
 			size();
 		if ( (! m_argParser.isSet(CardsArgumentParser::OPT_SIZE)) &&
 			(! m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) )
-			run();
+			upgrade();
 	}
 	if ( m_argParser.command() == CardsArgumentParser::CMD_DIFF) {
 		dry();
@@ -71,16 +71,23 @@ void Cards_upgrade::Isuptodate()
 }
 void Cards_upgrade::dry()
 {
-	for (auto i :m_ListOfPackages ) cout << i.first  << endl;
+	for (auto i : m_ListOfPackages ) cout << i.first  << endl;
 }
-void Cards_upgrade::run()
+void Cards_upgrade::upgrade()
 {
 	for (auto i : m_ListOfPackages) generateDependencies(i);
+
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
 		dry();
 	else {
-		if (!m_dependenciesList.empty()) {
-//			addPackagesList(m_argParser.isSet(CardsArgumentParser::OPT_FORCE)  );
+		for (auto i : m_dependenciesList) {
+			m_packageArchiveName=getPackageFileName(i);
+			if (checkPackageNameExist(i)) {
+				m_upgrade=1;
+			} else {
+				m_upgrade=0;
+			}
+		run();
 		}
 	}
 }

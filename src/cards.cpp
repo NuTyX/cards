@@ -175,7 +175,7 @@ of compilation" << endl
 				Cards_install CI(cardsArgPars,configFile);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_REMOVE) {
-			Cards_remove CR("cards remove",cardsArgPars);
+			Cards_remove CR("cards remove",cardsArgPars, configFile);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 			CardsDepends CD(cardsArgPars);

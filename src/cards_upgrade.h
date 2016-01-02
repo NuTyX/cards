@@ -37,7 +37,7 @@ public:
 	
 	// True if some updates availables
 	void Isuptodate();
-	void run();
+	void upgrade();
 };
 #endif /* CARDS_UPGRADE_H */
 // vim:set ts=2 :
