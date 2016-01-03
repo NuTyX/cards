@@ -142,7 +142,11 @@ void Cards_create::createBinaries(const string& configFileName,
 		write( fdlog, "\n", 1 );
 	}
 
-	std::set<string> listOfPackages = findPackages(pkgdir);
+	std::set<string> listOfPackages;
+	if (findFile(listOfPackages, pkgdir) != 0) {
+		m_actualError = CANNOT_READ_DIRECTORY;
+		treatErrors(pkgdir);
+	}
 
 	// Let's install the found binaries now
 	for (auto i : listOfPackages) {
@@ -178,15 +182,6 @@ void Cards_create::createBinaries(const string& configFileName,
 		write( fdlog, "\n", 1 );
 		close ( fdlog );
 	}	
-}
-set<string> Cards_create::findPackages(const string& path)
-{
-	set<string> packageList;
-	if (findFile(packageList, path) != 0) {
-		m_actualError = CANNOT_READ_DIRECTORY;
-		treatErrors(path);
-	}
-	return packageList;
 }
 void Cards_create::parseArguments()
 {

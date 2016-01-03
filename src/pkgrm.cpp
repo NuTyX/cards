@@ -25,6 +25,16 @@
 #include <unistd.h>
 #include <stdio.h>
 
+Pkgrm::Pkgrm ()
+	: Pkgdbh("pkgrm")
+{
+}
+void Pkgrm::run(int argc, char** argv)
+{
+	parseArguments(argc, argv);
+	run();
+	finish();
+}
 void Pkgrm::run()
 {
 	// Check UID

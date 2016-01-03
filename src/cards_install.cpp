@@ -30,6 +30,13 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	: Pkginst("cards install",configFileName),m_argParser(argParser)
 {
 	parseArguments();
+	for( auto i : m_argParser.otherArguments() ) {
+		if ( getListOfPackagesFromCollection(i).empty() &&
+			(! checkBinaryExist(i) ) ) {
+			m_actualError = PACKAGE_NOT_FOUND;
+			treatErrors(i);
+		}
+	}
 	Pkgrepo::parseConfig(configFileName, m_config);
 	buildDatabaseWithNameVersion();
 
@@ -58,12 +65,30 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	const std::vector<string>& listOfPackages)
 	: Pkginst("cards install",configFileName),m_argParser(argParser)
 {
-}
-Cards_install::Cards_install(const CardsArgumentParser& argParser,
-	const std::string& configFileName,
-	const std::string& packageName)
-	: Pkginst("cards install",configFileName),m_argParser(argParser)
-{
+	parseArguments();
+	buildDatabaseWithDetailsInfos(false);
+	for (auto i : listOfPackages) {
+		string packageName = basename(const_cast<char*>(i.c_str()));
+		if ( packageName == m_argParser.otherArguments()[0])
+			break;
+		std::set<string> listofBinaries;
+		if (findFile(listofBinaries, i) != 0) {
+			m_actualError = CANNOT_READ_DIRECTORY;
+			treatErrors(i);
+		}
+		for (auto j : listofBinaries ) {
+			if (j.find("cards.tar")== string::npos )
+				continue;
+			m_packageArchiveName = i + "/" + j;
+			ArchiveUtils packageArchive(m_packageArchiveName.c_str());
+			string name = packageArchive.name();
+			if ( ! checkPackageNameExist(name )) {
+				m_upgrade=0;
+				m_force=0;
+				run();
+			}
+		}
+	}
 }
 void Cards_install::parseArguments()
 {
@@ -73,13 +98,6 @@ void Cards_install::parseArguments()
 		m_root="/";
 	else
 		m_root=m_root+"/";
-	for( auto i : m_argParser.otherArguments() ) {
-		if ( getListOfPackagesFromCollection(i).empty() &&
-			(! checkBinaryExist(i) ) ) {
-			m_actualError = PACKAGE_NOT_FOUND;
-			treatErrors(i);
-		}
-	}
 	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");

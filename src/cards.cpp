@@ -121,9 +121,9 @@ of compilation" << endl
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPCREATE) {
 			// get the list of the dependencies
-			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
+			CardsDepends CD(cardsArgPars);
 			vector<string> listOfPackages = CD.getNeededDependencies();
-			if ( listOfPackages.size() == 0) {
+			if ( listOfPackages.empty() ) {
 				cout << "The package " << cardsArgPars.otherArguments()[0] << " is already installed" << endl;
 				return EXIT_SUCCESS;
 			}
@@ -131,6 +131,7 @@ of compilation" << endl
 			Cards_create CC(cardsArgPars,configFile,listOfPackages);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_CREATE) {
+
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
 			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
 				cardsArgPars.printHelp("create");
@@ -142,14 +143,16 @@ of compilation" << endl
 				CB.run(argc, argv);
 			}
 			// get the list of the dependencies"
-			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
+			CardsDepends CD(cardsArgPars);
 			vector<string> listOfDeps = CD.getDependencies();
-			Cards_install CI(cardsArgPars,configFile,cardsArgPars.otherArguments()[0]);
-			if (listOfDeps.size()>1)
+
+			if (!listOfDeps.empty())
 				Cards_install CI(cardsArgPars,configFile,listOfDeps);
+
 			// compilation of the final port"
 			Cards_create CC( cardsArgPars,configFile,cardsArgPars.otherArguments()[0]);
 			return EXIT_SUCCESS;
+
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_BASE) {
 			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
 			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
@@ -182,11 +185,11 @@ of compilation" << endl
 			CD.showLevel();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
-			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
+			CardsDepends CD(cardsArgPars);
 			CD.showDependencies();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
-			CardsDepends CD(cardsArgPars,const_cast<char*>(cardsArgPars.otherArguments()[0].c_str()));
+			CardsDepends CD(cardsArgPars);
 			return CD.deptree();
 		} else if ( (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) ||
 				(cardsArgPars.command() == CardsArgumentParser::CMD_LIST)   ||

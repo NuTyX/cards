@@ -49,7 +49,6 @@ class CardsDepends: public Pkgdbh
 {
 public:
 
-	CardsDepends (const CardsArgumentParser& argParser, const char * packageName);
 	CardsDepends (const CardsArgumentParser& argParser);
 
 	void parseArguments();

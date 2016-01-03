@@ -32,13 +32,6 @@
 using namespace std;
 
 
-CardsDepends::CardsDepends (const CardsArgumentParser& argParser, const char * packageName)
-	: Pkgdbh(""),
-		m_argParser(argParser),
-		m_packageName(packageName)
-{
-	parseArguments();
-}
 CardsDepends::CardsDepends (const CardsArgumentParser& argParser)
 	: Pkgdbh(""),
 		m_argParser(argParser)
@@ -189,20 +182,22 @@ vector<LevelName>& CardsDepends::getLevel()
 {
 	level();
 #ifndef NDEBUG
-	for (vector<LevelName>::iterator i = m_levelList.begin();i != m_levelList.end();i++) {
-		cerr << i->name<< endl;
+	for ( auto i : m_levelList ) {
+		cerr << i.name<< endl;
 	} 
 #endif
 	return m_levelList;
 }
 vector<string>& CardsDepends::getNeededDependencies()
 {
+	m_packageName = m_argParser.otherArguments()[0].c_str();
+
 	buildDatabaseWithNameVersion();
 
 	depends();
 
-	for (std::vector<string>::iterator it = m_dependenciesList.begin();it != m_dependenciesList.end();it++) {
-		string packageName = basename(const_cast<char*>(it->c_str()));
+	for ( auto i : m_dependenciesList ) {
+		string packageName = basename(const_cast<char*>(i.c_str()));
 		string::size_type pos = packageName.find('@');
 		string name = "";
 		if ( pos != string::npos) {
@@ -211,37 +206,35 @@ vector<string>& CardsDepends::getNeededDependencies()
 				name = packageName;
 		}
 		if ( ! checkPackageNameExist(name)) {
-			m_neededDependenciesList.push_back(*it);
+			m_neededDependenciesList.push_back(i);
 		}
 	}
 #ifndef NDEBUG
-	for (std::vector<string>::iterator i = m_neededDependenciesList.begin();i !=  m_neededDependenciesList.end();++i) {
-		cerr << *i << endl;
-	}
+	for (auto i : m_neededDependenciesList) cerr << i << endl;
 #endif
 	return m_neededDependenciesList;
 }
 vector<string>& CardsDepends::getDependencies()
 {
+	m_packageName=m_argParser.otherArguments()[0].c_str();
 	depends();
 #ifndef NDEBUG
-	for (std::vector<string>::iterator i = m_dependenciesList.begin();i !=  m_dependenciesList.end();++i) {
-		cerr << *i << endl;
-	}
+	for (auto i : m_dependenciesList) cerr << i << endl;
 #endif
 	return m_dependenciesList;
 }
 void CardsDepends::showDependencies()
 {
+	m_packageName = m_argParser.otherArguments()[0].c_str();
 	if (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) {
 		depends();
-		for (std::vector<string>::iterator it = m_dependenciesList.begin();it != m_dependenciesList.end();it++) {
-			cout << *it << endl;
+		for ( auto i : m_dependenciesList ) {
+			cout << i << endl;
 		}
 	}else {
 		getNeededDependencies();
-		for (std::vector<string>::iterator it = m_neededDependenciesList.begin();it != m_neededDependenciesList.end();it++) {
-				cout << *it << endl;
+		for ( auto i : m_neededDependenciesList ) {
+				cout << i << endl;
 		}
 	}
 }
@@ -250,13 +243,9 @@ void CardsDepends::showLevel()
 	level();
 
 	if ( (m_missingDepsList.size() == 0 ) || ( m_argParser.isSet(CardsArgumentParser::OPT_IGNORE))) {
-		for (std::vector<LevelName>::iterator it = m_levelList.begin();it != m_levelList.end();it++) {
-			cout << it->l << ": " << it->name << endl;
-		}
+		for ( auto i : m_levelList) cout << i.l << ": " << i.name << endl;
 	} else {
-		for (std::set<string>::iterator it = m_missingDepsList.begin();it != m_missingDepsList.end();it++) {
-			cout << *it << endl;
-		}
+		for ( auto i : m_missingDepsList ) cout << i << endl;
 	}
 }
 void CardsDepends::treatErrors(const string& s) const
@@ -396,9 +385,8 @@ int CardsDepends::depends()
 	itemList *filesList = initItemList();
 	Config config;
 	Pkgrepo::parseConfig("/etc/cards.conf", config);
-  for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-    DirUrl DU = *i;
-    string prtDir = DU.Dir;
+	for ( auto DU : config.dirUrl ) {
+		string prtDir = DU.Dir;
 		if ( (findDir(filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(prtDir);
@@ -475,6 +463,8 @@ int CardsDepends::depends()
 }
 int CardsDepends::deptree()
 {
+	m_packageName = m_argParser.otherArguments()[0].c_str();
+
 	itemList *filesList = initItemList();
 
 	pkgInfo *package = NULL;
@@ -485,8 +475,7 @@ int CardsDepends::deptree()
 
 	Config config;
 	Pkgrepo::parseConfig("/etc/cards.conf", config);
-	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-		DirUrl DU  = *i ;
+	for ( auto DU : config.dirUrl ) {
 		string prtDir = DU.Dir;
 		if ( (findDir(filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
@@ -526,11 +515,10 @@ int CardsDepends::deptree()
 	string name = "";
 	set<string> localPackagesList, depsPackagesList;
 
-  for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-    DirUrl DU = *i ;
-		if ( DU.Url == "") {
-			continue;
-		}
+  for (auto DU : config.dirUrl ) {
+	if ( DU.Url == "")
+		continue;
+
     string prtDir, Url ;
     prtDir = DU.Dir;
     Url = DU.Url;

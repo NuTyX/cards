@@ -42,7 +42,6 @@ class Cards_create : public Pkginst
 	private:
 		void createBinaries(const string& configFileName,
 			const string& packageName);
-		set<string> findPackages(const string& path);
 		const CardsArgumentParser& m_argParser;
 };
 

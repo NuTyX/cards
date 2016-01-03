@@ -40,11 +40,11 @@ using namespace std;
 Pkgdbh* select_utility(const string& name)
 {
 	if (name == "pkgadd")
-		return new Pkgadd("pkgadd");
+		return new Pkgadd;
 	else if (name == "pkgrm")
-		return new Pkgrm("pkgrm");
+		return new Pkgrm;
 	else if (name == "pkginfo")
-		return new Pkginfo("pkginfo");
+		return new Pkginfo;
 	else	
 		throw runtime_error("command not supported by cards");
 }
@@ -67,9 +67,7 @@ int main(int argc, char** argv)
 				return EXIT_SUCCESS;
 			}
 		}
-		util->parseArguments(argc, argv);
-		util->run();
-		util->finish();
+		util->run(argc, argv);
 
 	} catch (runtime_error& e) {
 		cerr << name <<  " " << VERSION << ": " << e.what() << endl;

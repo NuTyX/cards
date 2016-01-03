@@ -31,11 +31,23 @@
 #include <regex.h>
 #include <unistd.h>
 
+Pkgadd::Pkgadd()
+	: Pkgdbh("pkgadd"),
+	m_upgrade(false),
+	m_force(false)
+{
+}
 Pkgadd::Pkgadd(const string& commandName)
 	: Pkgdbh(commandName),
 	m_upgrade(false),
 	m_force(false)
 {
+}
+void Pkgadd::run(int argc, char** argv)
+{
+	parseArguments(argc, argv);
+	run();
+	finish();
 }
 void Pkgadd::parseArguments(int argc, char** argv)
 {
@@ -63,6 +75,14 @@ void Pkgadd::parseArguments(int argc, char** argv)
 		m_root="/";
 	else
 		m_root=m_root+"/";
+
+	// Check UID
+	if (getuid())
+	{
+		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		treatErrors("");
+	}
+
 }
 void Pkgadd::preRun()
 {
@@ -76,13 +96,6 @@ void Pkgadd::preRun()
 }
 void Pkgadd::run()
 {
-	// Check UID
-	if (getuid())
-	{
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		treatErrors("");
-	}
-
 	// Get the list of installed packages
 	getListOfPackageNames(m_root);
 
@@ -139,19 +152,21 @@ void Pkgadd::run()
 #ifndef NDEBUG
 		cerr << "Run extractAndRunPREfromPackage after upgrade" << endl;
 #endif
+	}
+	if (m_upgrade) {
 		preRun();
 	}
+	{
+		Db_lock lock(m_root, true);
+		// Installation progressInfo of the files on the HD
+		installArchivePackage(m_packageArchiveName, keep_list, non_install_files);
 
-	Db_lock lock(m_root, true);
-	// Installation progressInfo of the files on the HD
-	installArchivePackage(m_packageArchiveName, keep_list, non_install_files);
+		// Add the metadata about the package to the DB
+		moveMetaFilesPackage(package.first,package.second);
 
-	// Add the metadata about the package to the DB
-	moveMetaFilesPackage(package.first,package.second);
-
-	// Add the info about the files to the DB
-	addPackageFilesRefsToDB(package.first, package.second);
-
+		// Add the info about the files to the DB
+		addPackageFilesRefsToDB(package.first, package.second);
+	}
 	postRun();
 }
 void Pkgadd::postRun()

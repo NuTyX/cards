@@ -115,6 +115,7 @@ public:
 
 	/* Following methods can be redefined in derivated class */
 	virtual void parseArguments(int argc, char** argv);
+	virtual void run(int argc, char** argv) {};
 	virtual void run() {};
 	virtual void finish() ;
 

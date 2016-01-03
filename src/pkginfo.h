@@ -31,6 +31,8 @@
 class Pkginfo : public Pkgdbh {
 public:
 	Pkginfo(const std::string& commandName);
+	Pkginfo();
+	virtual void run(int argc, char** argv);
 	virtual void parseArguments(int argc, char** argv);
 	virtual void run();
 	virtual void finish();

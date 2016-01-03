@@ -44,6 +44,25 @@ Pkginfo::Pkginfo(const string& commandName)
 	m_epoc(0)
 {
 }
+Pkginfo::Pkginfo()
+	:Pkgdbh("pkginfo"),
+	m_runtimedependencies_mode(0),
+	m_footprint_mode(0),
+	m_archiveinfo(0),
+	m_installed_mode(0),
+	m_list_mode(0),
+	m_owner_mode(0),
+	m_details_mode(0),
+	m_librairies_mode(0),
+	m_runtime_mode(0),
+	m_epoc(0)
+{
+}
+void Pkginfo::run(int argc, char** argv)
+{
+	parseArguments(argc,argv);
+	run();
+}
 void Pkginfo::parseArguments(int argc, char** argv)
 {
 	for (int i = 1; i < argc; ++i) {

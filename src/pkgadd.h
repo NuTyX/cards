@@ -30,11 +30,13 @@
 
 class Pkgadd : public Pkgdbh {
 public:
+	Pkgadd();
 	Pkgadd(const std::string& commandName);
 	void parseArguments(int argc, char** argv);
 	void preRun();
 	void postRun();
 	virtual void run();
+	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;
 
 protected:
