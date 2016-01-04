@@ -175,6 +175,8 @@ protected:
 	std::string m_packageName;
 	std::string m_packageArchiveVersion;
 	std::string m_packageArchiveRelease;
+	std::string m_packageVersion;
+	std::string m_packageRelease;
 	std::string m_utilName;
 	std::string m_root;
 	std::string m_build;

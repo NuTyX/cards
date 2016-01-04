@@ -263,9 +263,9 @@ void Pkgdbh::progressInfo() const
 			cout << "REMOVE: "
 				<< m_packageName
 				<< " "
-				<< m_packageArchiveVersion
+				<< m_packageVersion
 				<< "-"
-				<< m_packageArchiveRelease
+				<< m_packageRelease
 				<< ", "
 				<< m_filesList.size()
 				<< " files: ";
@@ -607,8 +607,8 @@ bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
 	if ( checkPackageNameExist(m_packageName)){
-		m_packageArchiveVersion = m_listOfInstPackages[m_packageName].version;
-		m_packageArchiveRelease = itos(m_listOfInstPackages[m_packageName].release);
+		m_packageVersion = m_listOfInstPackages[m_packageName].version;
+		m_packageRelease = itos(m_listOfInstPackages[m_packageName].release);
 	}
 	set<string> metaFilesList;
 	const string packagedir = m_root + PKG_DB_DIR ;
@@ -732,8 +732,8 @@ void Pkgdbh::removePackageFiles(const string& name, const set<string>& keep_list
 void Pkgdbh::removePackageFilesRefsFromDB(set<string> files, const set<string>& keep_list)
 {
 	if ( checkPackageNameExist(m_packageName)){
-		m_packageArchiveVersion = m_listOfInstPackages[m_packageName].version;
-		m_packageArchiveRelease = itos(m_listOfInstPackages[m_packageName].release);
+		m_packageVersion = m_listOfInstPackages[m_packageName].version;
+		m_packageRelease = itos(m_listOfInstPackages[m_packageName].release);
 	}
 	// Remove all references
 	for (packages_t::iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i)

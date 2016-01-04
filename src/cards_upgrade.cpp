@@ -30,6 +30,11 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,const std::str
 	else
 		m_root=m_root+"/";
 
+	if (getuid()) {
+		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		treatErrors("");
+	}
+
 	parsePkgRepoCollectionFile();
 	buildDatabaseWithNameVersion();
 	for (auto i : m_listOfInstPackages) {

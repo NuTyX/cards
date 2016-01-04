@@ -69,23 +69,24 @@ of compilation" << endl
 			cout << GREEN << "\nPORTS SPECIFIC SCENARIO" << NORMAL << endl;
 			cout << BLUE << "  depends" << NORMAL << " [-i] <port>        show dependencies for the port in compilation order." << endl
 				<< "                             If -i it will shows the installed dependencies as well." << endl;
-			cout << BLUE << "  deptree" << NORMAL << "   <port>           show dependencies in a tree" << endl;
+			cout << BLUE << "  deptree" << NORMAL << "   <port>           show dependencies in a tree." << endl;
 			cout << BLUE << "  depcreate" << NORMAL << " <port>           compile and install the port and its dependencies." << endl;
 			cout << BLUE << "  create" << NORMAL << "    <port>           install all the dependencies from binaries and then compile the port." << endl;
 
-			cout << GREEN << "\nDIFFERENCES / CHECK FOR UPDATES / CLEANUP" << NORMAL << endl;
-			cout << BLUE << "  diff" << NORMAL << " [-p]                  list outdated packages" << endl
+			cout << GREEN << "\nDIFFERENCES / UPGRADE / CLEANUP" << NORMAL << endl;
+			cout << BLUE << "  diff" << NORMAL << " [-p]                  list outdated packages." << endl
 				<< "                             list outdated ports" << endl;
+			cout << BLUE << "  upgrade" << NORMAL << "                    upgrade outdated packages." << endl;
 			cout << BLUE << "  purge" << NORMAL << "                      cleanup downloaded binaries in cache." << endl;
 			cout << GREEN << "\nSEARCHING" << NORMAL << endl;
 			cout << BLUE << "  search" << NORMAL << " <expr>              show port names or description containing 'expr'" << endl;
-			cout << BLUE << "  query" << NORMAL << "  <file>              list owner of file(s) matching the query" << endl;
+			cout << BLUE << "  query" << NORMAL << "  <file>              list owner of file(s) matching the query." << endl;
 			cout << BLUE << "  files" << NORMAL << "  <package>           list the file(s) owned by the <package>" << endl;
 			cout << GREEN << "\nSYNCHRONISATION" << NORMAL << endl;
-			cout << BLUE << "  sync" << NORMAL << "                       synchronize the local and remote meta datas" << endl;
+			cout << BLUE << "  sync" << NORMAL << "                       synchronize the local and remote meta datas." << endl;
 			cout << GREEN << "\nINSTALL, UPDATE and REMOVAL" << NORMAL << endl;
 			cout << BLUE << "  install" << NORMAL << " [-u][-f] <package> install the binary found on the mirror." << endl
-				<< "                             If -u it will upgrade the installed package" << endl
+				<< "                             If -u it will upgrade the installed package." << endl
 				<< "                             If -f it will force the installation in case of files conflicts." << endl;
 			cout << BLUE << "  remove" << NORMAL << " [-a] <package>      remove the installed package." << endl
 				<< "                             If -a it will remove the sub-package as well." << endl;
