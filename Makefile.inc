@@ -21,6 +21,7 @@
 #  USA.
 #
 
+
 DESTDIR =
 USRBINDIR = /usr/bin
 BINDIR = /bin
@@ -28,7 +29,11 @@ MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc
 
-VERSION = 1.96.1
+AR?=ar
+RANLIB?=ranlib
+
+VERSION = 1.97.0
+
 NAME = cards-$(VERSION)
 
 CXXFLAGS += -DNDEBUG -std=c++11

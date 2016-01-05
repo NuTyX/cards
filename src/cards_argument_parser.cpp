@@ -256,6 +256,7 @@ If -f is passed as optional argument, it will force the install means overwrite 
 
 	addOption(CMD_CREATE, OPT_DRY,false);
 	addOption(CMD_CREATE, OPT_REMOVE,true);
+	addOption(CMD_CREATE, OPT_ROOT,false);
 
 	addOption(CardsArgumentParser::CMD_DEPENDS, OPT_INSTALLED, false);
 

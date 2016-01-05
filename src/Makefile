@@ -67,6 +67,7 @@ CARDSOBJECTS =	system_utils.o \
 
 
 LIBOBJECTS =  system_utils.o \
+	error_treat.o \
 	md5.o \
 	string_utils.o \
 	archive_utils.o \
@@ -78,6 +79,22 @@ LIBOBJECTS =  system_utils.o \
 	pkgadd.o \
 	pkgrm.o \
 	pkginfo.o
+
+HEADERS = system_utils.h \
+		error_treat.h \
+		md5.h \
+		string_utils.h \
+		archive_utils.h \
+		pkgrepo.h \
+		file_download.h \
+		file_utils.h \
+		process.h \
+		runtime_dependencies_utils.h \
+		pkgdbh.h \
+		pkgadd.h \
+		pkgrm.h \
+		pkginfo.h
+
 
 CONSOLEKIT_CFLAGS = -I/usr/include/ConsoleKit/ck-connector -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
 CONSOLEKIT_LIBS = -lck-connector -ldbus-1
@@ -93,6 +110,22 @@ test:
 
 libs:	.libs_depend $(LIBOBJECTS)
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
+	$(AR) -r libcards.a $(LIBOBJECTS)
+	$(RANLIB) libcards.a
+	-@cat ../COPYING > libcards.h
+	-@echo "#ifndef LIB_CARDS_INCLUDED" >> libcards.h
+	-@echo "#define LIB_CARDS_INCLUDED" >> libcards.h
+	-@cat $(HEADERS)|grep -v '^#define SYSTEM_UTIL' \
+	|grep -v '^#define ERROR'|grep -v '^#define MD5' \
+	|grep -v '^#define STRING'|grep -v '^#define ARCHIVE' \
+	|grep -v '^#define PKG'|grep -v '^#define RUNTIME' \
+	|grep -v '^#define FILE'|grep -v '^#define PROCESS' \
+	|grep -v '^#define DEPENDENCIES' \
+	|grep -v '^#include \"'|grep -v '^#ifndef' \
+	|grep -v '^#endif' |grep -v '^#define TOOL' \
+	|grep -v '^//' >> libcards.h
+	-@echo "#endif" >> libcards.h
+	-@echo "// vim:set ts=2 :" >> libcards.h
 
 all: pkgadd cards conf libs
 
@@ -134,6 +167,13 @@ install: all
 	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf.example
 	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkgrm
 	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkginfo
+	if [ ! -d $(DESTDIR)/usr/include ]; then mkdir -p $(DESTDIR)/usr/include;fi
+	cp -f libcards.h $(DESTDIR)/usr/include/
+	if [ ! -d $(DESTDIR)$(LIBDIR) ]; then mkdir -p $(DESTDIR)$(LIBDIR);fi
+	if [ -L $(DESTDIR)$(LIBDIR)/libcards.so ]; then rm $(DESTDIR)$(LIBDIR)/libcards.so;fi
+	if [ -L $(DESTDIR)$(LIBDIR)/libcards.a ]; then rm $(DESTDIR)$(LIBDIR)/libcards.a;fi
+	cp -f libcards.a libcards.so.$(VERSION) $(DESTDIR)$(LIBDIR)
+	ln -sf libcards.so.$(VERSION) $(DESTDIR)$(LIBDIR)/libcards.so
 
 clean:
 	rm -f .tools_depend
