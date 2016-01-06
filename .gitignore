@@ -13,3 +13,4 @@ libcards*
 *.gch
 ChangeLog
 archives
+tests/test

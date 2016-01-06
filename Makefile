@@ -3,6 +3,8 @@ DIRSRC = src
 
 DIRMAN = man
 
+DIRTEST = tests
+
 DIRSCRIPTS = scripts
 
 .PHONY: cards
@@ -11,7 +13,8 @@ libs:
 	$(MAKE) -C $(DIRSRC) libs
 
 test:
-	$(MAKE) -C $(DIRSRC) test
+	$(MAKE) -C $(DIRTEST) test
+
 all:
 	$(MAKE) -C $(DIRSRC) all
 	$(MAKE) -C $(DIRSCRIPTS) all

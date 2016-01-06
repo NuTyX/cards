@@ -84,10 +84,10 @@ HEADERS = system_utils.h \
 		error_treat.h \
 		md5.h \
 		string_utils.h \
+		file_utils.h \
 		archive_utils.h \
 		pkgrepo.h \
 		file_download.h \
-		file_utils.h \
 		process.h \
 		runtime_dependencies_utils.h \
 		pkgdbh.h \
@@ -101,12 +101,6 @@ CONSOLEKIT_LIBS = -lck-connector -ldbus-1
 GLIB_CFLAGS = -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include
 GLIB_LIBS = -lglib-2.0
 
-
-test:
-	$(CXX) -DNDEBUG system_utils.cpp error_treat.cpp md5.cpp string_utils.cpp \
-	file_utils.cpp archive_utils.cpp  pkgrepo.h \
-	pkgrepo.cpp file_download.cpp \
-	test.cpp -o $@ $(LDFLAGS) $(LIBCURLLIBS)
 
 libs:	.libs_depend $(LIBOBJECTS)
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
@@ -122,8 +116,7 @@ libs:	.libs_depend $(LIBOBJECTS)
 	|grep -v '^#define FILE'|grep -v '^#define PROCESS' \
 	|grep -v '^#define DEPENDENCIES' \
 	|grep -v '^#include \"'|grep -v '^#ifndef' \
-	|grep -v '^#endif' |grep -v '^#define TOOL' \
-	|grep -v '^//' >> libcards.h
+	|grep -v '^#endif /*'|grep -v '^//' >> libcards.h
 	-@echo "#endif" >> libcards.h
 	-@echo "// vim:set ts=2 :" >> libcards.h
 
