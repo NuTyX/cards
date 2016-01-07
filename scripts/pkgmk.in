@@ -70,7 +70,7 @@ check_pkgfile() {
 	fi
 	NAME_TEST=`echo "${name}" | sed 's@[[a-z0-9]*[-_+]*]*@@g'`
 	if [ "$NAME_TEST" != "" ]; then
-		error "Variable 'name' contains illegal characters."
+		error "Variable 'name' contains illegal characters: $NAME_TEST"
 		exit $E_PKGFILE
 	fi
 	if [ ${#name} -gt 50 ];then
@@ -664,6 +664,8 @@ add_meta_to_archive() {
 		for dep in `pkginfo --runtimedepfiles $TAR`; do
 			echo "R$dep" >> .META
 		done
+		# We don't want any .devel dependencies here
+		sed -i '/^R[[a-z0-9]*[-_+]*]*\.devel/d' .META
 		if [ ! -z $run ] && [ "$NAME" == "$name" ]; then
 			info "Adding runtime deps to Archive $NAME"
 			for rd in ${run[@]}; do

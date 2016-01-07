@@ -53,6 +53,7 @@ clean:
 	$(MAKE) -C $(DIRSRC) clean
 	$(MAKE) -C $(DIRSCRIPTS) clean
 	$(MAKE) -C $(DIRMAN) clean
+	$(MAKE) -C $(DIRTEST) clean
 
 dist: distclean
 

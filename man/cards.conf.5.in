@@ -76,4 +76,4 @@ will used the default mirror from nutyx.org.
 .SH "AUTHORS"
 Thierry Nuttens <tnut@nutyx.org>
 .SH "SEE ALSO"
-cards(8), pkgmk(8) pkgadd(8), ports(8)
+cards(8), pkgmk(8) pkgadd(8), ports(8), pkgmk.conf(5)

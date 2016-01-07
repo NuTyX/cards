@@ -28,5 +28,7 @@ test:
 	$(CXX) test.o -o $@ -lcards -lcurl -larchive
 	rm test.o
 
+clean:
+	rm test
 
 # End of file

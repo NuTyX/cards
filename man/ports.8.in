@@ -25,7 +25,7 @@ Print version and exit.
 Print help and exit.
 .SH FILES
 .TP
-.B "/var/lib/pkg/depotrepo"
+.B "/usr/ports"
 Default Root of local ports collection. If not define in the configuration file of the concerned collection and not in cards.conf file
 .TP
 .B "/etc/ports/"
@@ -34,7 +34,7 @@ Directory for port collection configuration.
 .B "/var/lib/pkg/drivers/"
 Directory for driver scripts.
 .SH SEE ALSO
-pkgadd(8), pkgrm(8), pkginfo(8), cvsup(1)
+pkgadd(8), pkgrm(8), pkginfo(8)
 .SH AUTHOR
 .nf
 Per Liden <per@fukt.bth.se>

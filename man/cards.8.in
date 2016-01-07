@@ -10,7 +10,7 @@ cards \- the NuTyX package management tool including pkgutils from CRUX (see htt
 .br 
 .SH "DESCRIPTION"
 cards which stand for Create Add Remove and Downloads System is a package management system tool which provides all the basic functionality for a package management system. It can works with the
-local ports tree AND the available binaries from the mirror. It is made of two parts, one is for the normal users who just want to have all the basics actions for manage the packages on the NuTyX distribution. Because cards is a fork of pkgutils tool from CRUX distribution, the second part include a script pkgmk(8) for the creation of binaries, they is a set of basic commands for dealing with local binaries. The commands are: pkgadd(8), pkgrm(8) and pkginfo(8). It is fully compatible with the ports(8) command. Cards offers the following features:
+local ports tree AND the available binaries from the mirror. It is made of two parts, one is for the normal users who just want to have all the basics actions for manage the packages on the NuTyX distribution. Because cards is a fork of pkgutils tool from CRUX distribution, the second part includes a script pkgmk(8) for the creation of binaries, they is a set of basic commands for dealing with local binaries. The commands are: pkgadd(8), pkgrm(8) and pkginfo(8). The ports(8) command is also part of the cards.devel subpackage. Cards offers followings features:
 
 .PP
 .TP 
@@ -203,11 +203,11 @@ file. If no directory are defined, this command will abort.
 .TP
 .B purge
 All scenarios: Cleanup all the archives of the binaries found in the folders synchronised with any mirror. By default, folders are:
-.B /var/lib/pkg/saravane/base
+.B /var/lib/pkg/depot/base
 ,
-.B /var/lib/pkg/saravane/console
+.B /var/lib/pkg/depot/console
 and
-.B /var/lib/pkg/saravane/desktop
+.B /var/lib/pkg/depot/desktop
 
 .SH "OPTIONS"
 
@@ -319,4 +319,4 @@ show info about kdelibs port.
 .SH "AUTHORS"
 Thierry Nuttens <tnut@nutyx.org>
 .SH "SEE ALSO"
-cards.conf(5), pkgmk(8), pkgadd(8), ports(8)
+cards.conf(5), pkgmk(8), pkgadd(8), pkginfo(8), ports(8), pkgmk.conf(5)
