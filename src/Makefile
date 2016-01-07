@@ -78,7 +78,8 @@ LIBOBJECTS =  system_utils.o \
 	pkgdbh.o \
 	pkgadd.o \
 	pkgrm.o \
-	pkginfo.o
+	pkginfo.o \
+	pkginst.o
 
 HEADERS = system_utils.h \
 		error_treat.h \
@@ -93,7 +94,8 @@ HEADERS = system_utils.h \
 		pkgdbh.h \
 		pkgadd.h \
 		pkgrm.h \
-		pkginfo.h
+		pkginfo.h \
+		pkginst.h
 
 
 CONSOLEKIT_CFLAGS = -I/usr/include/ConsoleKit/ck-connector -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
