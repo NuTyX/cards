@@ -1,0 +1,74 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0302 
+header_name {.h} 
+code_name {.cxx}
+decl {\#include <FL/fl_ask.H>} {public global
+} 
+
+decl {\#include "tableau.ccx"} {public global
+} 
+
+Function {Quitter_CB(Fl_Widget*,void*)} {open return_type {static void}
+} {
+  code {if (fl_ask("Souhaitez-vous quitter l'application Yes/No") )
+	exit(0);} {}
+} 
+
+Function {} {open
+} {
+  Fl_Window {} {open
+    xywh {783 436 600 660} type Double visible
+  } {
+    Fl_Input {} {
+      label {Recherche:}
+      xywh {91 31 499 24} labelfont 2
+    }
+    Fl_Menu_Bar {} {open
+      xywh {0 0 601 20}
+    } {
+      Submenu {} {
+        label Actions open
+        xywh {0 0 70 20}
+      } {
+        MenuItem {} {
+          label Synchroniser
+          xywh {0 0 36 20}
+        }
+        MenuItem {} {
+          label Quitter
+          callback Quitter_CB
+          xywh {0 0 36 20}
+        }
+      }
+      Submenu {} {
+        label Information open
+        xywh {0 0 70 20}
+      } {
+        MenuItem {} {
+          label {Paquets diponibles}
+          xywh {0 0 36 20}
+        }
+        MenuItem {} {
+          label {Paquets installés}
+          xywh {0 0 36 20}
+        }
+      }
+      Submenu {} {
+        label {A propos} open
+        xywh {0 500 70 20}
+      } {}
+    }
+    Fl_Table {} {
+      label {LIste des paquets} open
+      xywh {8 70 581 299}
+    } {}
+    Fl_Text_Display {} {
+      label {Détails du paquet sélectionné:}
+      xywh {8 395 581 232}
+    }
+    Fl_Button {} {
+      label INSTALLER
+      xywh {478 577 100 40}
+    }
+  }
+} 

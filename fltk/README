@@ -1,0 +1,17 @@
+To be able to compile flcards for test, we need:
+
+ get cards.lib \
+ cards.devel \
+ fltk1 fltk1.devel \
+ xorg-libx11.devel \
+ xorg-libxext.devel \
+ xorg-libxfixes.devel \
+ xorg-libxft.devel \
+ xorg-libxinerama.devel \
+ xorg-mesa.devel xorg-proto
+
+NEED to be done:
+
+	- get read of all the deprecated warning
+
+	- replace the externals commands with libcards API :)

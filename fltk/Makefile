@@ -1,9 +1,7 @@
 #
-#  cards
+#  flcards
 #
-#  Copyright (c) 2000-2005 by Per Liden <per@fukt.bth.se>
-#  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2016 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,12 +21,14 @@
 
 include ../Makefile.inc
 
-test:
-	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o test.o test.cpp
-	$(CXX) test.o -o $@ -lcards -lcurl -larchive
-	rm test.o
+LIBFLTK  := $(shell fltk-config --ldflags)
+
+flcards:
+	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o flcards.o flcards.cxx
+	$(CXX) flcards.o -o $@ -lcards -lcurl -larchive $(LIBFLTK)
+	rm flcards.o
 
 clean:
-	rm -f test
+	rm -f flcards
 
 # End of file
