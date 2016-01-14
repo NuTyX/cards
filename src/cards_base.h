@@ -17,22 +17,22 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
-#ifndef CARDSBASE_H
-#define CARDSBASE_H
+#ifndef CARDS_BASE_H
+#define CARDS_BASE_H
 
 
 #include "pkgdbh.h"
 #include "cards_argument_parser.h"
 
-class CardsBase : public Pkgdbh
+class Cards_base : public Pkgdbh
 {
 private:
 	const CardsArgumentParser& m_argParser;
 
 public:
-	CardsBase(const CardsArgumentParser& argParser);
+	Cards_base(const CardsArgumentParser& argParser);
 	void run(int argc, char** argv);
 	void printHelp() const;
 };
-#endif
+#endif /* CARDS_BASE_H */
 // vim:set ts=2 :

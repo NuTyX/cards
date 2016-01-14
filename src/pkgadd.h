@@ -40,6 +40,7 @@ public:
 	virtual void printHelp() const;
 
 protected:
+	bool m_runPrePost;
 	bool m_upgrade;
 	bool m_force;
 private:

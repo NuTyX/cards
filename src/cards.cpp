@@ -140,7 +140,7 @@ of compilation" << endl
 			}
 			if  ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
 				// go back to a base system
-				CardsBase CB(cardsArgPars);
+				Cards_base CB(cardsArgPars);
 				CB.run(argc, argv);
 			}
 			// get the list of the dependencies"
@@ -160,15 +160,15 @@ of compilation" << endl
 				cardsArgPars.printHelp("base");
 				return EXIT_SUCCESS;
 			}
-			CardsBase CB(cardsArgPars);
+			Cards_base CB(cardsArgPars);
 			CB.run(argc, argv);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
-			CardsSync CS(cardsArgPars);
+			Cards_sync CS(cardsArgPars);
 			CS.run();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_PURGE) {
-			CardsSync CS(cardsArgPars);
+			Cards_sync CS(cardsArgPars);
 			CS.purge();
 			return EXIT_SUCCESS;
 		} else if ( (cardsArgPars.command() == CardsArgumentParser::CMD_UPGRADE) ||

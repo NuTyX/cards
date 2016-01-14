@@ -8,6 +8,9 @@ pkgadd \- install software package
 a software package. A \fIpackage\fP is an archive of files (.pkg.tar.xz).
 .SH OPTIONS
 .TP
+.B "\-i, \-\-ignore"
+Ignore the pre and post install of the package. Needed for the install script.
+.TP
 .B "\-u, \-\-upgrade"
 Upgrade/replace package with the same name as <file>.
 .TP

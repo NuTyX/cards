@@ -607,9 +607,9 @@ bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 /* Remove meta data about the removed package */
 void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 {
-	if ( checkPackageNameExist(m_packageName)){
-		m_packageVersion = m_listOfInstPackages[m_packageName].version;
-		m_packageRelease = itos(m_listOfInstPackages[m_packageName].release);
+	if ( checkPackageNameExist(name)){
+		m_packageVersion = m_listOfInstPackages[name].version;
+		m_packageRelease = itos(m_listOfInstPackages[name].release);
 	}
 	set<string> metaFilesList;
 	const string packagedir = m_root + PKG_DB_DIR ;

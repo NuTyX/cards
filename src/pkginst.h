@@ -1,6 +1,6 @@
 //  pkginst.h
 //
-//  Copyright (c) 2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2015-2016 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by

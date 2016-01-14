@@ -35,7 +35,7 @@
 
 using namespace std;
 
-CardsBase::CardsBase(const CardsArgumentParser& argParser)
+Cards_base::Cards_base(const CardsArgumentParser& argParser)
 	: Pkgdbh("cards base"), m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
@@ -45,7 +45,7 @@ CardsBase::CardsBase(const CardsArgumentParser& argParser)
 
 	getListOfPackageNames(m_root); // Get the list of installed packages
 }
-void CardsBase::run(int argc, char** argv)
+void Cards_base::run(int argc, char** argv)
 {
 	Config config;
 	Pkgrepo::parseConfig("/etc/cards.conf", config);
@@ -108,17 +108,20 @@ void CardsBase::run(int argc, char** argv)
 	}
 	if (removePackagesList.size() > 0) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {
+
+			getListOfPackageNames(m_root);
+
 			// Retrieve info about all the packages
 			buildDatabaseWithDetailsInfos(false);
 			// Lock the Database, any interruption forbidden
 			Db_lock lock(m_root, true);
 
-			for (set<string>::const_iterator iR = removePackagesList.begin();iR != removePackagesList.end();iR++) {
+			for (auto i : removePackagesList ) {
 				// Remove metadata about the package removed
-				removePackageFilesRefsFromDB(*iR);
+				removePackageFilesRefsFromDB(i);
 
 				// Remove the files on hd
-				removePackageFiles(*iR);
+				removePackageFiles(i);
 			}
 			runLdConfig();
 		} else {
@@ -126,7 +129,7 @@ void CardsBase::run(int argc, char** argv)
 		}
 	}
 }
-void CardsBase::printHelp() const
+void Cards_base::printHelp() const
 {
 	cout << endl 
 			<< "  You should have one or severall valid directories " << endl

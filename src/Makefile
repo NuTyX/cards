@@ -179,6 +179,8 @@ clean:
 	rm -f $(MANPAGES)
 	rm -f $(MANPAGES:=.txt)
 	rm -f libcards.so.$(VERSION)
+	rm -f libcards.h
+	rm -f libcards.a
 	rm -f test
 	rm -f pkgadd
 	rm -f pkgcrea

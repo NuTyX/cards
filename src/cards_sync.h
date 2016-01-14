@@ -17,8 +17,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
-#ifndef CARDSSYNC_H
-#define CARDSSYNC_H
+#ifndef CARDS_SYNC_H
+#define CARDS_SYNC_H
 
 #include <string>
 #include <list>
@@ -26,11 +26,11 @@
 
 #include <curl/curl.h>
 #include "cards_argument_parser.h"
-class CardsSync
+class Cards_sync
 {
 public:
-	CardsSync (const CardsArgumentParser& argParser);
-	CardsSync (const CardsArgumentParser& argParser,
+	Cards_sync (const CardsArgumentParser& argParser);
+	Cards_sync (const CardsArgumentParser& argParser,
 		const std::string& url,
 		const std::string& directory,
 		const std::string& repoFile);
@@ -58,5 +58,5 @@ private:
 	const CardsArgumentParser& m_argParser;
 	
 };
-#endif
+#endif /* CARDS_SYNC_H */
 // vim:set ts=2 :

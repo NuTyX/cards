@@ -33,12 +33,14 @@
 
 Pkgadd::Pkgadd()
 	: Pkgdbh("pkgadd"),
+	m_runPrePost(true),
 	m_upgrade(false),
 	m_force(false)
 {
 }
 Pkgadd::Pkgadd(const string& commandName)
 	: Pkgdbh(commandName),
+	m_runPrePost(true),
 	m_upgrade(false),
 	m_force(false)
 {
@@ -57,6 +59,8 @@ void Pkgadd::parseArguments(int argc, char** argv)
 			assertArgument(argv, argc, i);
 			m_root = argv[i + 1];
 			i++;
+		} else if (option == "-i" || option == "--ignore") {
+			m_runPrePost = false;
 		} else if (option == "-u" || option == "--upgrade") {
 			m_upgrade = true;
 		} else if (option == "-f" || option == "--force") {
@@ -125,7 +129,7 @@ void Pkgadd::run()
 #ifndef NDEBUG
 		cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
 #endif
-		preRun();
+		if (m_runPrePost) preRun();
 	}
 	set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
 	if (!conflicting_files.empty()) {
@@ -154,7 +158,7 @@ void Pkgadd::run()
 #endif
 	}
 	if (m_upgrade) {
-		preRun();
+		if (m_runPrePost) preRun();
 	}
 	{
 		Db_lock lock(m_root, true);
@@ -167,7 +171,7 @@ void Pkgadd::run()
 		// Add the info about the files to the DB
 		addPackageFilesRefsToDB(package.first, package.second);
 	}
-	postRun();
+	if (m_runPrePost) postRun();
 }
 void Pkgadd::postRun()
 {
@@ -188,6 +192,7 @@ void Pkgadd::printHelp() const
 {
 	cout << USAGE << m_utilName << " [options] <file>" << endl
 	     << OPTIONS << endl
+	     << "  -i, --ignore        do not execute pre/post install scripts" << endl
 	     << "  -u, --upgrade       upgrade package with the same name" << endl
 	     << "  -f, --force         force install, overwrite conflicting files" << endl
 	     << "  -r, --root <path>   specify alternative installation root" << endl
@@ -203,11 +208,11 @@ set<string> Pkgadd::getKeepFileList(const set<string>& files,
 
 	getInstallRulesList(rules, UPGRADE, found);
 
-	for (set<string>::const_iterator i = files.begin(); i != files.end(); i++) {
+	for (auto i : files) {
 		for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
-			if (checkRuleAppliesToFile(*j, *i)) {
+			if (checkRuleAppliesToFile(*j, i)) {
 				if (!(*j).action)
-					keep_list.insert(keep_list.end(), *i);
+					keep_list.insert(keep_list.end(), i);
 
 				break;
 			}

@@ -38,7 +38,7 @@ public:
 	virtual void finish();
 	virtual void printHelp() const;
 	bool isInstalled(const string& packageName);
-//	int getNumberOfPackages();
+
 protected:
 	std::string m_arg;
 	int m_runtimedependencies_mode;

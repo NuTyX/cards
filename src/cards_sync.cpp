@@ -36,14 +36,14 @@
 
 using namespace std;
 
-const string CardsSync::DEFAULT_REPOFILE = ".PKGREPO";
+const string Cards_sync::DEFAULT_REPOFILE = ".PKGREPO";
 
-CardsSync::CardsSync (const CardsArgumentParser& argParser)
+Cards_sync::Cards_sync (const CardsArgumentParser& argParser)
 	: m_argParser(argParser)
 {
 	m_repoFile = DEFAULT_REPOFILE;
 }
-CardsSync::CardsSync ( const CardsArgumentParser& argParser,
+Cards_sync::Cards_sync ( const CardsArgumentParser& argParser,
 		const string& url, const string& baseDirectory,
 		const string& repoFile)
 		: m_baseDirectory(baseDirectory),
@@ -56,7 +56,7 @@ CardsSync::CardsSync ( const CardsArgumentParser& argParser,
 		m_repoFile = DEFAULT_REPOFILE;
 	}
 }
-void CardsSync::treatErrors(const string& s) const
+void Cards_sync::treatErrors(const string& s) const
 {
 	switch ( m_actualError )
 	{
@@ -113,7 +113,7 @@ void CardsSync::treatErrors(const string& s) const
 			break;
 	}
 }
-unsigned int CardsSync::getLocalPackages(const string& path)
+unsigned int Cards_sync::getLocalPackages(const string& path)
 {
 	m_localPackagesList.clear();
 	if ( findFile( m_localPackagesList, path) != 0 ) {
@@ -122,7 +122,7 @@ unsigned int CardsSync::getLocalPackages(const string& path)
 	}
 	return m_localPackagesList.size();
 }
-unsigned int CardsSync::getRemotePackages(const string& pkgrepoFile)
+unsigned int Cards_sync::getRemotePackages(const string& pkgrepoFile)
 {
 	m_remotePackagesList.clear();
 	if ( parseFile(m_remotePackagesList,pkgrepoFile.c_str()) != 0) {
@@ -131,7 +131,7 @@ unsigned int CardsSync::getRemotePackages(const string& pkgrepoFile)
 	}
 	return m_remotePackagesList.size();
 }
-void CardsSync::run()
+void Cards_sync::run()
 {
 	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
@@ -156,7 +156,7 @@ void CardsSync::run()
 		PKGRepo.downloadFile();
 	}
 }
-void CardsSync::purge()
+void Cards_sync::purge()
 {
 	if (getuid()) {
 			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
@@ -175,7 +175,7 @@ void CardsSync::purge()
 		}
 	}
 }
-void CardsSync::deleteFolder(const string& folderName)
+void Cards_sync::deleteFolder(const string& folderName)
 {
 	set<string> filesToDelete;
 	if ( findFile(filesToDelete, folderName) != 0 ){
