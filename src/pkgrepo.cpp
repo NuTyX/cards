@@ -975,7 +975,8 @@ int Pkgrepo::parseConfig(const string& fileName)
 
 	std::string::size_type pos;
 
-	for (auto DU : m_config.dirUrl) {
+	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
+		DirUrl DU = *i ;
 		if (DU.Url.size() == 0 )
 			continue;
 
@@ -997,7 +998,7 @@ int Pkgrepo::parseConfig(const string& fileName)
 #ifndef NDEBUG
 		cerr << url << endl;
 #endif
-		DU.Url = url;
+		i->Url = url;
 	}
 	return result;
 }
@@ -1029,7 +1030,8 @@ int Pkgrepo::parseConfig(const string& fileName, Config& config)
 	if ( result != 0 )
 		return result;
 
-	for (auto DU : config.dirUrl) {
+	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
+		DirUrl DU = *i ;
 		if (DU.Url.size() == 0 )
 			continue;
 
@@ -1050,7 +1052,7 @@ int Pkgrepo::parseConfig(const string& fileName, Config& config)
 #ifndef NDEBUG
 		cerr << url << endl;
 #endif
-		DU.Url = url;
+		i->Url = url;
 
 	}
 	return result;
