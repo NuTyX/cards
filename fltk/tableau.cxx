@@ -59,6 +59,7 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 				}
 			}
 			fl_pop_clip();
+			redraw();
 			return;
 		case CONTEXT_CELL:
 		{
@@ -76,6 +77,7 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 				fl_rect(X,Y,W,H);
 			}
 			fl_pop_clip();
+			redraw();
 			return;
 		}
 		default:
@@ -118,29 +120,35 @@ void Tableau::resize_window()
  * to be done
  * Should not be a big deal, we play with a vector<char*> 
  */
-void Tableau::load_command(const char *cmd) {
-    char s[512];
-    FILE *fp = popen(cmd, "r");
+void Tableau::load_table() {
     cols(0);
-    for ( int r=0; fgets(s, sizeof(s)-1, fp); r++ ) {
-        // Add a new row
-        Row newrow; _rowdata.push_back(newrow);
-        std::vector<char*> &rc = _rowdata[r].cols;
-        // Break line into separate word 'columns'
-        char *ss;
-        const char *delim = "\t";
-        for(int t=0; (t==0)?(ss=strtok(s,delim)):(ss=strtok(NULL,delim)); t++) {
-            rc.push_back(strdup(ss));
-        }
-        // Keep track of max # columns
-        if ( (int)rc.size() > cols() ) {
-            cols((int)rc.size());
-        }
+    Flcards_info flcards_info("/etc/cards.conf");
+    std::vector<string> RowsColumns = flcards_info.getListOfInstalledPackages();
+    int r = 0;
+    for (auto S : RowsColumns ) {
+		char* s = new char[S.size()+1];
+		copy(S.begin(),S.end(),s);
+		s[S.size()]='\0';
+		// Add a new row
+		Row newrow; _rowdata.push_back(newrow);
+		std::vector<char*> &rc = _rowdata[r].cols;
+		// Break line into separate word 'columns'
+		char *ss;
+		const char *delim = "\t";
+		for(int t=0; (t==0)?(ss=strtok(s,delim)):(ss=strtok(NULL,delim)); t++) {
+			rc.push_back(strdup(ss));
+		}
+		// Keep track of max # columns
+		if ( (int)rc.size() > cols() ) {
+			cols((int)rc.size());
+		}
+		delete s;
+		r++;
     } 
-    // How many rows we loaded
-    rows((int)_rowdata.size()); 
-    // Auto-calculate widths, with 20 pixel padding
-    autowidth(20);
+	// How many rows we loaded
+	rows((int)_rowdata.size());
+	// Auto-calculate widths, with 20 pixel padding
+	autowidth(20);
 }
 
 // Callback whenever someone clicks on different parts of the table

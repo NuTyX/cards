@@ -37,7 +37,6 @@ public:
 	virtual void run();
 	virtual void finish();
 	virtual void printHelp() const;
-	bool isInstalled(const string& packageName);
 
 protected:
 	std::string m_arg;

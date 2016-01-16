@@ -12,10 +12,11 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Table_Row.H>
+#include "flcards_info.h"
 
 #define MARGIN 20
-#define COLHEADER { "Nom:", "Version:", "Description:", "", "", "", "", "", ""}
-#define CMD "pkg-get-list"
+#define COLHEADER { "", "", "", "", "", "", "", "", ""}
+
 // A single row of columns
 class Row {
 public:
@@ -74,7 +75,7 @@ public:
 		callback(event_callback, (void*)this);
 	}
 	~Tableau(){}
-	void load_command(const char *packages); // Load the packages list
+	void load_table(); // Load the packages list
 	void autowidth(int pad); // Automatically set the columns widths to the longuest string
 	void resize_window();	// Resize the parent window to size of table
 };

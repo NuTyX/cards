@@ -9,9 +9,3 @@ To be able to compile flcards for test, we need:
  xorg-libxft.devel \
  xorg-libxinerama.devel \
  xorg-mesa.devel xorg-proto
-
-NEED to be done:
-
-	- get read of all the deprecated warning
-
-	- replace the externals commands with libcards API :)
