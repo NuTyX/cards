@@ -142,7 +142,7 @@ void Pkgadd::run()
 		} else {
 			copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
 			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
-			treatErrors("listed file(s) already installed (use -f to ignore and overwrite)");
+			treatErrors("'" + package.first + "'" +": listed file(s) already installed (use -f to ignore and overwrite)");
 		}
 	}
 

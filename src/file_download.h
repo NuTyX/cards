@@ -66,7 +66,7 @@ class FileDownload
 	CURL*       m_curl;
 	CURLcode    m_curlCode;
 	dwlProgress m_downloadProgress;
-	InfoFile	  m_destinationFile;
+	InfoFile    m_destinationFile;
 	string      m_url;
 	string      m_downloadFileName;
 	bool        m_checkMD5;
