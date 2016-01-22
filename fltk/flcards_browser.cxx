@@ -220,7 +220,7 @@ void cb_output1()
 	output1->add(list1->getCellText(ROW,5));
 	output1->add(list1->getCellText(ROW,6));
 	output1->add(list1->getCellText(ROW,7));
-	output1->add("Dépendencies: ");
+	output1->add("Dependencies: ");
 	output1->add(list1->getCellText(ROW,8));
 	if ( ! strcmp (list1->getCellText(ROW,0), "0"))
 	{
