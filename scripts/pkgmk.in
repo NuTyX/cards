@@ -77,6 +77,14 @@ check_pkgfile() {
 		error "Variable 'name' length higher then 50 characters."
 		exit $E_PKGFILE
 	fi
+	if [ "${version}" == "" ]; then
+		error "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+		exit $E_PKGFILE
+	fi
+	if [ "${release}" == "" ]; then
+		error "Variable 'release' not initiated or not found in $PKGMK_PKGFILE."
+		exit $E_PKGFILE
+	fi
 }
 get_package_name() {
 	local NAME EXT
@@ -661,7 +669,7 @@ add_meta_to_archive() {
 	echo "a$ARCH" >> .META
 	# TODO improve the pkginfo --runtimedepfiles functionnality
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
-		for dep in `pkginfo --runtimedepfiles $TAR`; do
+		for dep in `pkginfo --runtimedepfiles $TAR|grep -v ^[A-Z]`; do
 			echo "R$dep" >> .META
 		done
 		# We don't want any .devel dependencies here
