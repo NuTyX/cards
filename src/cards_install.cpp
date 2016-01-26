@@ -57,6 +57,13 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	getLocalePackagesList();
 	for ( auto i : m_dependenciesList ) {
 		m_packageArchiveName = getPackageFileName(i);
+		ArchiveUtils packageArchive(m_packageArchiveName.c_str());
+		string name = packageArchive.name();
+		if ( checkPackageNameExist(name )) {
+			m_upgrade=1;
+		} else {
+			m_upgrade=0;
+		}
 		run();
 	}	
 }
