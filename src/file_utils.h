@@ -27,34 +27,17 @@
 #include "string_utils.h"
 #include "system_utils.h"
 
-#include <iostream>
 #include <fstream>
-#include <iterator>
-#include <stdlib.h>
-
-#include <set>
-#include <map>
-#include <vector>
-#include <iostream>
-#include <stdexcept>
 #include <cstdio>
-#include <cstring>
 #include <ext/stdio_filebuf.h>
-#include <sys/types.h>
-
 #include <utime.h>
-
 #include <sys/stat.h>
 #include <sys/file.h>
 #include <sys/param.h>
 #include <libgen.h>
 #include <unistd.h>
 #include <dirent.h>
-
 #include <regex.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
 #include <err.h>
 
 #define S_CARDS_MODE  0755

@@ -25,12 +25,10 @@
 #include "error_treat.h"
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 
 #include <list>
-#include <string>
 #include <set>
 #include <map>
 #include <vector>

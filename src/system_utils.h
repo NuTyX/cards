@@ -24,6 +24,9 @@
 #include <stdio.h>
 #include <sys/utsname.h>
 #include <string>
+#include <iterator>
+#include <iostream>
+
 
 std::string getMachineType ();
 

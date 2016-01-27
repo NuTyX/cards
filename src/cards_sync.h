@@ -20,10 +20,6 @@
 #ifndef CARDS_SYNC_H
 #define CARDS_SYNC_H
 
-#include <string>
-#include <list>
-#include <map>
-
 #include <curl/curl.h>
 #include "cards_argument_parser.h"
 class Cards_sync

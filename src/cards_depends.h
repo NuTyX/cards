@@ -20,13 +20,6 @@
 #ifndef CARDSDEPENDS_H
 #define CARDSDEPENDS_H
 
-#include <string>
-#include <list>
-#include <map>
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
 #include <locale.h>
 #include <string.h>
 

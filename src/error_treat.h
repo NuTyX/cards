@@ -22,6 +22,8 @@
 #ifndef ERRORTREAT_H
 #define ERRORTREAT_H
 
+#include "system_utils.h"
+
 #define RED "\033[1;31m"
 #define GREEN "\033[1;32m"
 #define YELLOW "\033[1;33m"
@@ -39,7 +41,6 @@
 #define COMMAND "\033[1;34mcommand\033[1;0m"
 
 #include <cstring>
-#include <string>
 #include <stdexcept>
 #include <cerrno>
 

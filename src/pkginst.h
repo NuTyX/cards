@@ -19,7 +19,6 @@
 //
 #ifndef PKGINST_H
 #define PKGINST_H
-#include <string>
 
 #include "pkgdbh.h"
 #include "pkgadd.h"

@@ -242,7 +242,7 @@ void cb_output1()
 int main( int Int, char ** ppc)
 {
 
-	Fl_Window *win = new Fl_Window(100,100,900,680, "Exemple");
+	Fl_Window *win = new Fl_Window(100,100,900,680, "Browser");
 	win->begin();
 		win->add(*input1);
 		input1->callback((Fl_Callback*)*cb_input1);

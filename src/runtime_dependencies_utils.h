@@ -21,15 +21,8 @@
 #ifndef DEPENDENCIES_UTILS_H
 #define DEPENDENCIES_UTILS_H
 
-#include <string>
-#include <set>
-#include <map>
-#include <vector>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/stat.h>
+
+#include "string_utils.h"
 #include "elf_common.h"
 #include "elf.h"
 

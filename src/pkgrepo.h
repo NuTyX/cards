@@ -22,11 +22,6 @@
 #ifndef PKGREPO_H
 #define PKGREPO_H
 
-
-#include <string>
-#include <vector>
-#include <list>
-#include <map>
 #include "file_download.h"
 #include "file_utils.h"
 

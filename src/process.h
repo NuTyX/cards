@@ -22,7 +22,7 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
-#include <string>
+#include "system_utils.h"
   
 /* To execute a process 
 	Arguments:

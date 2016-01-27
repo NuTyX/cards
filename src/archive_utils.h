@@ -30,13 +30,6 @@
 #include "string_utils.h"
 #include "error_treat.h"
 
-#include <iostream>
-#include <iterator>
-#include <stdlib.h>
-
-#include <set>
-#include <vector>
-
 
 #if ARCHIVE_VERSION_NUMBER >= 3000000
 #define INIT_ARCHIVE(ar) \

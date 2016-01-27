@@ -23,6 +23,7 @@
 
 #ifndef PKGINFO_H
 #define PKGINFO_H
+
 #include "file_utils.h"
 #include "pkgdbh.h"
 #include "runtime_dependencies_utils.h"

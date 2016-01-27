@@ -47,7 +47,8 @@ CARDSOBJECTS =	system_utils.o \
 		compile_dependencies_utils.o \
 		argument_parser.o \
 		cards_argument_parser.o \
-		file_utils.o process.o \
+		file_utils.o \
+		process.o \
 		runtime_dependencies_utils.o \
 		pkgdbh.o \
 		pkgadd.o \
@@ -73,7 +74,8 @@ LIBOBJECTS =  system_utils.o \
 	archive_utils.o \
 	pkgrepo.o \
 	file_download.o \
-	file_utils.o process.o \
+	file_utils.o \
+	process.o \
 	runtime_dependencies_utils.o \
 	pkgdbh.o \
 	pkgadd.o \

@@ -25,8 +25,6 @@
 
 #include "string_utils.h"
 #include "pkgdbh.h"
-#include <vector>
-#include <set>
 
 class Pkgadd : public Pkgdbh {
 public:

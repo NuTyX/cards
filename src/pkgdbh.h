@@ -24,18 +24,12 @@
 #define PKGDBH_H
 
 #include "archive_utils.h"
-#include "system_utils.h"
+#include "file_utils.h"
 
-#include <string>
-#include <set>
-#include <map>
-#include <iostream>
 #include <stdexcept>
 #include <csignal>
 #include <cerrno>
-#include <cstring>
 #include <sys/types.h>
-#include <dirent.h>
 
 #define PKG_DB_DIR       "var/lib/pkg/DB/"
 #define PKG_FILES        "/files"

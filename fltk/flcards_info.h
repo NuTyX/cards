@@ -33,7 +33,7 @@
 class Flcards_info : public Pkgdbh, public Pkgrepo {
 public:
 	Flcards_info (const string& configFile);
-	~Flcards_info();
+	~Flcards_info() {}
 	vector<string> getListOfInstalledPackages();
 
 protected:

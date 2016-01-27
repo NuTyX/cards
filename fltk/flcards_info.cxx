@@ -28,24 +28,6 @@ Flcards_info::Flcards_info(const string& configFileName)
 	: Pkgdbh(""),Pkgrepo(configFileName)
 {
 	m_root="/";	
-
-	m_window = new Fl_Window(250,30);
-	m_progressBar = new Fl_Progress(10,10,250,20);
-
-	m_window->add(m_progressBar);
-	m_progressBar->minimum(0);
-	m_progressBar->maximum(100);
-	m_progressBar->labelcolor(FL_BLACK);
-	m_progressBar->color(FL_GRAY);
-	m_progressBar->selection_color(FL_BLUE);
-	m_progressBar->show();
-	m_window->resizable(m_window);
-	m_window->show();
-}
-Flcards_info::~Flcards_info()
-{
-	delete m_progressBar;
-	delete m_window;
 }
 void Flcards_info::progressInfo() const
 {
@@ -72,12 +54,25 @@ void Flcards_info::progressInfo() const
 }
 vector<string> Flcards_info::getListOfInstalledPackages()
 {
+	m_window = new Fl_Window(250,40);
+	m_progressBar = new Fl_Progress(10,10,200,20);
+	m_window->add(m_progressBar);
+	m_progressBar->minimum(0);
+	m_progressBar->maximum(100);
+	m_progressBar->labelcolor(FL_BLACK);
+	m_progressBar->color(FL_GRAY);
+	m_progressBar->selection_color(FL_BLUE);
+	m_progressBar->show();
+	m_window->resizable(m_window);
+	m_window->show();
 	m_progressBar->value(0);
 	m_progressBar->label("Get List of Installed Packages");
 
 	getListOfPackageNames (m_root);
 	buildDatabaseWithDetailsInfos(false);
 
+	delete m_progressBar;
+	delete m_window;
 
 	vector<string> ListOfInstalledPackages;
 	string packageDetails;
@@ -87,11 +82,8 @@ vector<string> Flcards_info::getListOfInstalledPackages()
 #endif
 		packageDetails = i.first + '\t'
 			+ i.second.version + '\t'
-			+ i.second.description + '\t'
-			+ i.second.url +'\t'
-			+ i.second.packager +'\t'
-			+ itos(i.second.files.size()) + '\t'
-			+ i.second.size ;
+			+ i.second.description + '\t';
+
 		ListOfInstalledPackages.push_back(packageDetails);
 	}
 return ListOfInstalledPackages;
