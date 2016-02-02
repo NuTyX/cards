@@ -123,7 +123,7 @@ void Tableau::resize_window()
 void Tableau::load_table() {
     cols(0);
     Flcards_info flcards_info("/etc/cards.conf");
-    std::vector<string> RowsColumns = flcards_info.getListOfInstalledPackages();
+    std::set<string> RowsColumns = flcards_info.getListOfInstalledPackages();
     int r = 0;
     for (auto S : RowsColumns ) {
 		char* s = new char[S.size()+1];

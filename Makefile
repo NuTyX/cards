@@ -31,6 +31,9 @@ install: all
 	$(MAKE) -C $(DIRSCRIPTS) install
 	$(MAKE) -C $(DIRMAN) install
 
+install-libs:
+	$(MAKE) -C $(DIRSRC) install-libs
+
 pkgadd:
 
 	$(MAKE) -C $(DIRSRC) pkgadd

@@ -52,21 +52,21 @@ void Flcards_info::progressInfo() const
 	}
 	Fl::check();
 }
-vector<string> Flcards_info::getListOfInstalledPackages()
+set<string> Flcards_info::getListOfInstalledPackages()
 {
-	m_window = new Fl_Window(250,40);
-	m_progressBar = new Fl_Progress(10,10,200,20);
+	m_window = new Fl_Window(300,40,"Get List of Installed Packages");
+	m_progressBar = new Fl_Progress(10,10,280,20);
 	m_window->add(m_progressBar);
+	m_window->clear_border();
 	m_progressBar->minimum(0);
 	m_progressBar->maximum(100);
 	m_progressBar->labelcolor(FL_BLACK);
 	m_progressBar->color(FL_GRAY);
-	m_progressBar->selection_color(FL_BLUE);
+	m_progressBar->selection_color(FL_GREEN);
 	m_progressBar->show();
 	m_window->resizable(m_window);
 	m_window->show();
 	m_progressBar->value(0);
-	m_progressBar->label("Get List of Installed Packages");
 
 	getListOfPackageNames (m_root);
 	buildDatabaseWithDetailsInfos(false);
@@ -74,7 +74,7 @@ vector<string> Flcards_info::getListOfInstalledPackages()
 	delete m_progressBar;
 	delete m_window;
 
-	vector<string> ListOfInstalledPackages;
+	set<string> ListOfInstalledPackages;
 	string packageDetails;
 	for (auto i : m_listOfInstPackages) {
 #ifndef NDEBUG
@@ -84,7 +84,40 @@ vector<string> Flcards_info::getListOfInstalledPackages()
 			+ i.second.version + '\t'
 			+ i.second.description + '\t';
 
-		ListOfInstalledPackages.push_back(packageDetails);
+		ListOfInstalledPackages.insert(packageDetails);
 	}
 return ListOfInstalledPackages;
+}
+set<string> Flcards_info::getListOfAvailablePackages()
+{
+	m_window = new Fl_Window(300,40,"Get List of Available Packages");
+	m_progressBar = new Fl_Progress(10,10,280,20);
+	m_window->add(m_progressBar);
+	m_window->clear_border();
+	m_progressBar->minimum(0);
+	m_progressBar->maximum(100);
+	m_progressBar->labelcolor(FL_BLACK);
+	m_progressBar->color(FL_GRAY);
+	m_progressBar->selection_color(FL_BLUE);
+	m_progressBar->show();
+	m_window->resizable(m_window);
+	m_window->show();
+	m_progressBar->value(0);
+
+	parsePkgRepoCollectionFile();
+
+	set<string> ListOfAvailablePackages;
+	std::string packageNameVersion;
+	for (auto i : m_portsDirectoryList) {
+		for (auto j : i.basePackageList) {
+			packageNameVersion = j.basePackageName + '\t'
+				+ j.version + '\t'
+				+ j.description + '\t';
+			ListOfAvailablePackages.insert(packageNameVersion);
+		}
+	}
+	delete m_progressBar;
+	delete m_window;
+
+	return ListOfAvailablePackages;
 }

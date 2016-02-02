@@ -124,7 +124,7 @@ libs:	.libs_depend $(LIBOBJECTS)
 	-@echo "#endif" >> libcards.h
 	-@echo "// vim:set ts=2 :" >> libcards.h
 
-all: pkgadd cards conf libs
+all: pkgadd cards conf
 
 conf:
 	sed -e "s/#ARCH#/`uname -m`/" cards.conf.in > cards.conf
@@ -164,6 +164,8 @@ install: all
 	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf.example
 	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkgrm
 	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkginfo
+
+install-libs:
 	if [ ! -d $(DESTDIR)/usr/include ]; then mkdir -p $(DESTDIR)/usr/include;fi
 	cp -f libcards.h $(DESTDIR)/usr/include/
 	if [ ! -d $(DESTDIR)$(LIBDIR) ]; then mkdir -p $(DESTDIR)$(LIBDIR);fi
