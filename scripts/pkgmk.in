@@ -4,7 +4,7 @@
 # 
 #  Copyright (c) 2000-2005 Per Liden
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -59,8 +59,29 @@ get_basename() {
 	local FILE="`echo $1 | sed 's|^.*://.*/||g'`"
 	echo $FILE
 }
+get_variables() {
+	local STRING KEY VALUE
+	while read i;
+	do
+		STRING=`echo $i |grep \# | grep :|sed "s@^[ ,\t,#]*@@" `
+		KEY=`echo $STRING|cut -d ":" -f1|sed "s@^[ ,\t,#]*@@"`
+		VALUE=`echo $STRING|cut -d ":" -f1 --complement|sed "s@^[ ,\t,#]*@@"`
+		if [ -z "$description" ]; then
+			[ ! -z "`echo $KEY|grep -i desc`" ] && description=$VALUE
+		fi
+		if [ -z "$url" ]; then
+			[ ! -z "`echo $KEY|grep -i url`" ] && url=$VALUE
+		fi
+		if [ -z "$packager" ]; then
+			[ ! -z "`echo $KEY|grep -i pack`" ] && packager=$VALUE
+		fi
+		if [ -z "$maintainer" ]; then
+			[ ! -z "`echo $KEY|grep -i main`" ] && maintainer=$VALUE
+		fi
+	done < $PKGMK_ROOT/$PKGMK_PKGFILE
+}
 check_pkgfile() {
-	local NAME_TEST
+	local SIZE NAME_TEST RELEASE_TEST
 	if [ "${name}" == "" ]; then
 		error "Variable 'name' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
@@ -70,7 +91,7 @@ check_pkgfile() {
 	fi
 	NAME_TEST=`echo "${name}" | sed 's@[[a-z0-9]*[-_+]*]*@@g'`
 	if [ "$NAME_TEST" != "" ]; then
-		error "Variable 'name' contains illegal characters: $NAME_TEST"
+		error "Variable 'name' contains following illegal characters: $NAME_TEST"
 		exit $E_PKGFILE
 	fi
 	if [ ${#name} -gt 50 ];then
@@ -83,6 +104,28 @@ check_pkgfile() {
 	fi
 	if [ "${release}" == "" ]; then
 		error "Variable 'release' not initiated or not found in $PKGMK_PKGFILE."
+		exit $E_PKGFILE
+	fi
+	RELEASE_TEST=`echo "${release}" | sed 's@[0-9]*@@g'`
+	if [ "$RELEASE_TEST" != "" ]; then
+		error "Variable 'release' contains following illegal characters: $RELEASE_TEST"
+		exit $E_PKGFILE
+	fi
+	if [ $release -gt  99999999 ]; then
+		error "Variable 'release' outside limit which is '99999999'"
+		exit $E_PKGFILE
+	fi
+	if [ "${description}" == "" ]; then
+		warning "Variable 'description' not initiated or not found in $PKGMK_PKGFILE."
+	fi
+	SIZE=${#description}
+	if [ $SIZE -gt 90 ];then
+		error "Variable 'description' length higher then 90 characters, please resize to 90 char ]"
+		info "$description <== $SIZE characters"
+		exit $E_PKGFILE
+	fi
+	if [ ! -z "`echo $description|grep \#`" ]; then
+		error "Variable 'description' contains the '#' illegal symbol, please remove it."
 		exit $E_PKGFILE
 	fi
 }
@@ -469,7 +512,8 @@ check_footprint() {
 make_work_dir() {
 	export PKG="$PKGMK_WORK_DIR/pkg"
 	export SRC="$PKGMK_WORK_DIR/src"
-
+	export pkgdir=$PKG
+	export srcdir=$SRC
 	umask 022
 	
 	cd $PKGMK_ROOT
@@ -518,7 +562,7 @@ remove_lib() {
 pack_devel() {
 	local DIR SUBDIR
 	for DIR in usr opt/*; do
-		for SUBDIR in include lib/pkgconfig; do
+		for SUBDIR in include lib/pkgconfig lib64/pkgconfig; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
 				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
@@ -533,7 +577,7 @@ pack_devel() {
 remove_devel() {
 	local DIR SUBDIR
 	for DIR in usr opt/*; do
-		for SUBDIR in include lib/pkgconfig; do
+		for SUBDIR in include lib/pkgconfig lib64/pkgconfig; do
 			if [ -d $DIR/$SUBDIR ]; then
 				rm -r $DIR/$SUBDIR
 			fi
@@ -633,30 +677,20 @@ add_meta_to_archive() {
 	TAR="$PKGMK_WORK_DIR/tar"
 	mkdir -p $TAR
 	cd $TAR
+	DESC="n.a"
+	URL="n.a"
+	PACK="n.a"
+	MAINT="n.a"
 
 	bsdtar xf $PKGMK_PACKAGE_DIR/$1
 
-	if [ ! -z "`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^desc|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`" ]; then
-		DESC="`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^desc|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`"
-	else
-		DESC="n.a"
-	fi
-	if [ ! -z "`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^pack|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`" ]; then
-		PACK="`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^pack|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`"
-	else
-		PACK="n.a"
-	fi
-	if [ ! -z "`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^maint|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`" ]; then
-		MAINT="`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^maint|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`"
-	else
-		MAINT="n.a"
-	fi
-	if [ ! -z "`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^url|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`" ]; then
-		URL="`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^url|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`"
-	else
-		URL="n.a"
-	fi
+	[ ! -z "$description" ] && DESC=$description
+	[ ! -z "$packager" ] && PACK=$packager
+	[ ! -z "$maintainer" ] && MAINT=$maintainer
+	[ ! -z "$url" ] && URL=$url
+
 	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
+
 	echo "N$NAME" > .META
 	echo "D$DESC" >> .META
 	echo "U$URL" >> .META
@@ -749,6 +783,7 @@ build_package() {
 		
 	cd $SRC
 	(set -e -x ; build)
+	[ "`type -t package`" = "function" ] && (set -e -x ; package)
 	
 	if [ $? = 0 ]; then
 		if [ "$PKGMK_NO_STRIP" = "no" ]; then
@@ -969,7 +1004,7 @@ update_collection_repo()
 	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION
 	if [ -f $PKGMK_REPO ]; then
 		HEAD=`head -1 $PKGMK_REPO`
-		if [ "${HEAD:10:1}" = "#" ]; then 
+		if [ "${HEAD:10:1}" = "#" ]; then
 			BUILD_DATE="`echo $HEAD|cut -d "#" -f1`"
 			EXTENSION="`echo $HEAD|cut -d "#" -f2`"
 			VERSION="`echo $HEAD|cut -d "#" -f3`"
@@ -993,8 +1028,8 @@ update_repo()
 		EXT="`get_package_extension $TARGETS`"
 		echo -n "`get_package_builddate $TARGETS`#$EXT#$version#$release" > $PKGMK_REPO
 		for string in desc url maint pack; do 
-			if [ ! -z "`cat $PKGMK_ROOT/Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^$string|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`" ]; then 
-				echo -n "#"`cat Pkgfile |sed "s@^[ ,\t,#]*@@"|grep -i ^$string|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`"" \
+			if [ ! -z "`cat $PKGMK_ROOT/$PKGMK_PKGFILE |sed "s@^[ ,\t,#]*@@"|grep -i ^$string|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`" ]; then
+				echo -n "#"`cat $PKGMK_PKGFILE |sed "s@^[ ,\t,#]*@@"|grep -i ^$string|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`"" \
 				>> .PKGREPO
 			else
 				echo -n "#n.a" >> .PKGREPO
@@ -1016,7 +1051,7 @@ update_repo()
 	else
 		rm -f $PKGMK_REPO
 	fi
-	echo "`md5sum Pkgfile|cut -d " " -f1`#Pkgfile" >> $PKGMK_REPO
+	echo "`md5sum $PKGMK_PKGFILE|cut -d " " -f1`#$PKGMK_PKGFILE" >> $PKGMK_REPO
 }
 clean_repo_files()
 {
@@ -1044,25 +1079,26 @@ interrupted() {
 print_help() {
 	echo "usage: `basename $PKGMK_COMMAND` [options]"
 	echo "options:"
-	echo "  -i,   --install             build and install packages"
-	echo "  -u,   --upgrade             build and install packages (as upgrade)"
-	echo "  -r,   --recursive           search for and build packages recursively"
-	echo "  -d,   --download            download missing source file(s)"
+	echo "   -i,  --install             build and install packages"
+	echo "   -u,  --upgrade             build and install packages (as upgrade)"
+	echo "   -r,  --recursive           search for and build packages recursively"
+	echo "   -d,  --download            download missing source file(s)"
+	echo "   -f,  --force               build packages even if it appears to be up to date"
+	echo "  -cs,  --check-syntax        do not build, only check package syntax"
 	echo "  -cv,  --show-version-only   do not build, only show the version of the port and exit"
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
-	echo "  -utd, --up-to-date          do not build, only check if package is up to date"
+	echo " -utd,  --up-to-date          do not build, only check if package is up to date"
 	echo "  -ur,  --update-repo         do not build, only update the $PKGMK_REPO file"
 	echo "  -uc,  --update-collection   do not build, only update the $PKGMK_REPO file of the collection means from the parent directory"
 	echo "  -uf,  --update-footprint    update footprint using result from last build"
-	echo "  -ic,  --ignore-collection     build packages without update the $PKGMK_REPO file of the collection means from the parent directory"
+	echo "  -ic,  --ignore-collection   build packages without update the $PKGMK_REPO file of the collection means from the parent directory"
 	echo "  -if,  --ignore-footprint    build packages without checking footprint"
 	echo "  -in,  --ignore-new          build packages, ignore new files in a footprint missmatch"
 	echo "  -um,  --update-md5sum       update md5sum"
 	echo "  -im,  --ignore-md5sum       build packages without checking md5sum"
 	echo "  -cm,  --check-md5sum        do not build, only check md5sum"
 	echo "  -ns,  --no-strip            do not strip executable binaries or libraries"
-	echo "  -f,   --force               build packages even if it appears to be up to date"
 	echo "  -co,  --clean-only          do not build, only remove packages and downloaded files, update $PKGMK_REPO file"
 	echo "  -kw,  --keep-work           keep temporary working directory"
 	echo "  -cf,  --config-file <file>  use alternative configuration file"
@@ -1080,6 +1116,8 @@ parse_options() {
 				PKGMK_RECURSIVE="yes" ;;
 			-d|--download)
 				PKGMK_DOWNLOAD="yes" ;;
+			-cs|--check-syntax)
+				PKGMK_CHECK_SYNTAX="yes" ;;
 			-do|--download-only)
 				PKGMK_DOWNLOAD="yes"
 				PKGMK_DOWNLOAD_ONLY="yes" ;;
@@ -1163,11 +1201,20 @@ main() {
 		recursive "$@"
 		exit 0
 	fi
+	[ ! -f $PKGMK_PKGFILE  ] && PKGMK_PKGFILE="PKGBUILD"
+
 	if [ ! -f $PKGMK_PKGFILE  ]; then
 		error "File '$PKGMK_PKGFILE' not found."
 		exit $E_PKGFILE
 	fi
+
 	. $PKGMK_PKGFILE
+
+	[ ! -z $pkgname ] && name=$pkgname
+	[ ! -z $pkgver ] && version=$pkgver
+	[ ! -z $pkgrel ] && release=$pkgrel
+	[ ! -z "$pkgdesc" ] && description=$pkgdesc
+
 	if [ -z $group ]; then
 		group="`echo $name | cut -d "-" -f1`"
 	fi
@@ -1239,6 +1286,8 @@ main() {
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "`dirname $PKGMK_WORK_DIR`"
 
+	get_variables
+
 	check_pkgfile
 
 	get_package_list
@@ -1275,6 +1324,13 @@ main() {
 	fi
 	if [ "$PKGMK_UPDATE_FOOTPRINT" = "yes" ]; then
 		update_footprint
+		exit 0
+	fi
+	if [ "$PKGMK_CHECK_SYNTAX" = "yes" ]; then
+		info "description: $description"
+		info "url: $url"
+		info "packager: $packager"
+		info "maintainer: $maintainer"
 		exit 0
 	fi
 	
