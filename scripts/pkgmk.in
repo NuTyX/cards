@@ -783,10 +783,8 @@ build_package() {
 	unpack_source
 		
 	cd $SRC
-	[ "`type -t prepare`" = "function" ] && (set -e -x ; prepare)
+
 	(set -e -x ; build)
-	[ "`type -t check`" = "function" ] && (set -e -x ; check)
-	[ "`type -t package`" = "function" ] && (set -e -x ; package)
 	
 	if [ $? = 0 ]; then
 		if [ "$PKGMK_NO_STRIP" = "no" ]; then
