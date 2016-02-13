@@ -25,7 +25,13 @@ void Selectionner_CB(Fl_Widget *W, void *v)
 	 fl_alert("callback receive!");
 }
 int main(int argc, char **argv) {
+	Fl_Pixmap* p_win;
+	Fl_RGB_Image* p_im;
+	p_win = new Fl_Pixmap(flcards_xpm);
+	p_im = new Fl_RGB_Image(p_win);  
+
 	Fl_Double_Window  win(900, 900, "flcards");
+	win.icon(p_im);
 	Fl_Input* Recherche = new Fl_Input(MARGIN+80, MARGIN, 499, 24, "Search:");
 	Recherche->labelfont(2);
 	Fl_Menu_Bar* BarMenu = new Fl_Menu_Bar(0, 0, 900, 20);

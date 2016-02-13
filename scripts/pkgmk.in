@@ -85,7 +85,8 @@ check_pkgfile() {
 	if [ "${name}" == "" ]; then
 		error "Variable 'name' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
-	elif [ "`type -t build`" != "function" ]; then
+	fi
+	if [ "`type -t build`" != "function" ] && [ "$PKGMK_PKGFILE" == "Pkgfile" ]; then
 		error "Function 'build' not specified in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	fi
@@ -119,8 +120,8 @@ check_pkgfile() {
 		warning "Variable 'description' not initiated or not found in $PKGMK_PKGFILE."
 	fi
 	SIZE=${#description}
-	if [ $SIZE -gt 90 ];then
-		error "Variable 'description' length higher then 90 characters, please resize to 90 char ]"
+	if [ $SIZE -gt 110 ];then
+		error "Variable 'description' length higher then 110 characters, please resize to 110 char ]"
 		info "$description <== $SIZE characters"
 		exit $E_PKGFILE
 	fi
@@ -782,7 +783,9 @@ build_package() {
 	unpack_source
 		
 	cd $SRC
+	[ "`type -t prepare`" = "function" ] && (set -e -x ; prepare)
 	(set -e -x ; build)
+	[ "`type -t check`" = "function" ] && (set -e -x ; check)
 	[ "`type -t package`" = "function" ] && (set -e -x ; package)
 	
 	if [ $? = 0 ]; then
@@ -1201,7 +1204,7 @@ main() {
 		recursive "$@"
 		exit 0
 	fi
-	[ ! -f $PKGMK_PKGFILE  ] && PKGMK_PKGFILE="PKGBUILD"
+	[ ! -f $PKGMK_PKGFILE  ] && PKGMK_PKGFILE="trunk/PKGBUILD"
 
 	if [ ! -f $PKGMK_PKGFILE  ]; then
 		error "File '$PKGMK_PKGFILE' not found."
@@ -1210,7 +1213,14 @@ main() {
 
 	. $PKGMK_PKGFILE
 
-	[ ! -z $pkgname ] && name=$pkgname
+	if [ ! -z $pkgname ];then
+		if (( ${#pkgname[@]} > 1 )); then
+			PKGMK_SPIT="yes"
+		else
+			name=$pkgname
+		fi
+	fi
+	[ "`type -t package_$pkgname`" == "function" ] && PKGMK_SPIT="yes"
 	[ ! -z $pkgver ] && version=$pkgver
 	[ ! -z $pkgrel ] && release=$pkgrel
 	[ ! -z "$pkgdesc" ] && description=$pkgdesc
@@ -1456,6 +1466,7 @@ PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
 PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 PKGMK_NOSTRIP=".nostrip"
+PKGMK_SPIT="no"
 
 PKGMK_KEEP_SOURCES="no"
 PKGMK_CLEAN="yes"

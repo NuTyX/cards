@@ -25,7 +25,7 @@ LIBFLTK  := $(shell fltk-config --ldflags)
 
 flcards:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o flcards_info.o flcards_info.cxx
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o flcards.o flcards.cxx
+	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o flcards.o flcards_browser.cxx
 	$(CXX) flcards_info.o flcards.o -o $@ -lcards -lcurl -larchive $(LIBFLTK)
 	rm flcards.o flcards_info.o
 
@@ -34,6 +34,7 @@ clean:
 
 install:
 	install -D -m0755 flcards $(DESTDIR)$(USRBINDIR)/flcards
-
+	install -D -m0644 pixmaps/flcards.xpm  $(DESTDIR)/usr/share/pixmaps/flcards.xpm
+	install -D -m0644 flcards.desktop $(DESTDIR)/usr/share/applications/flcards.desktop
 
 # End of file

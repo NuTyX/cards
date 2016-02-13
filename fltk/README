@@ -1,7 +1,7 @@
 To be able to compile flcards for test, we need:
 
- get cards.lib \
- cards.devel \
+ get libcards \
+ libcards.devel \
  fltk1 fltk1.devel \
  xorg-libx11.devel \
  xorg-libxext.devel \

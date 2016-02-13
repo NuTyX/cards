@@ -37,6 +37,12 @@
 #include <FL/Fl_Box.H>
 
 #include <FL/fl_draw.H>
+#include "pixmaps/flcards.xpm"
+#include <FL/Fl_Pixmap.H>
+#include <FL/Fl_Image.H>
+
+
+#include "flcards_info.h"
 
 #define MAX_COLS 4
 #define MAX_ROWS 20
@@ -149,13 +155,16 @@ public:
 		end();
 	}
 	~Flcards_browser() { } // Do nothing special
-        void load_list(const char *cmd)
+        void load_table()
         {
-                char s[512];
-                FILE *fp = popen(cmd, "r");
                 cols(0);
-                for ( int r=0; fgets(s, sizeof(s)-1, fp); r++ )
-                {
+		Flcards_info flcards_info("/etc/cards.conf");
+		std::set<string> RowsColumns = flcards_info.getListOfInstalledPackages();
+		int r=0;
+		for (auto S : RowsColumns ) {
+			char* s = new char[S.size()+1];
+			copy(S.begin(),S.end(),s);
+			s[S.size()]='\0';
                         // Add a new row
                         Row newrow; _rowdata.push_back(newrow);
                         std::vector<char*> &rc = _rowdata[r].cols;
@@ -171,11 +180,13 @@ public:
                         {
                                 cols((int)rc.size());
                         }
+			delete s;
+			r++;
                 }
                 // How many rows we loaded
                 rows((int)_rowdata.size());
                 // Auto-calculate widths, with 20 pixel padding
-                autowidth(2);
+                autowidth(20);
         }
 	void clearRows()
 	{
@@ -202,7 +213,7 @@ void cb_input1()
 		char *f=(char*)vf;
 		f=strcat(c,input1->value());
 		printf("%s\n",f);
-		list1->load_list(f);
+		list1->load_table();
 		free(vf);
 	}
 }
@@ -210,7 +221,8 @@ void cb_output1()
 {
 	int ROW = list1->callback_row();
 	output1->clear();
-	box1->hide();
+//TODO Review this code
+/*	box1->hide();
 	button1->hide();
 	button1->deactivate();
 	output1->label(list1->getCellText(ROW,1));
@@ -237,12 +249,17 @@ void cb_output1()
 		button1->activate();
 		button1->show();
 		button1->label("Update");
-	}
+	} */
 }
 int main( int Int, char ** ppc)
 {
+	Fl_Pixmap* p_win;
+	Fl_RGB_Image* p_im;
+	p_win = new Fl_Pixmap(flcards_xpm);
+	p_im = new Fl_RGB_Image(p_win);
 
 	Fl_Window *win = new Fl_Window(100,100,900,680, "Browser");
+	win->icon(p_im);
 	win->begin();
 		win->add(*input1);
 		input1->callback((Fl_Callback*)*cb_input1);

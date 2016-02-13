@@ -12,5 +12,9 @@ void Quitter_CB(Fl_Widget*,void*);
 #include <FL/Fl_Table.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Button.H>
+#include "pixmaps/flcards.xpm"
+#include <FL/Fl_Pixmap.H>
+#include <FL/Fl_Image.H>
+
 extern Fl_Menu_Item menu_[];
 #endif /* FLCARDS_H */
