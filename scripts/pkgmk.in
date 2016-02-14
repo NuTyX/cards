@@ -1025,17 +1025,14 @@ update_repo()
 	local FILE MD5SUM EXT
 	cd $PKGMK_ROOT
 	get_package_list
+	[ -z "$description"  ] && description="n.a."
+	[ -z "$url"  ] && url="n.a."
+	[ -z "$maintainer"  ] && maintainer="n.a."
+	[ -z "$packager"  ] && packager="n.a."
 	if [ ! -z $TARGETS ]; then
 		EXT="`get_package_extension $TARGETS`"
 		echo -n "`get_package_builddate $TARGETS`#$EXT#$version#$release" > $PKGMK_REPO
-		for string in desc url maint pack; do 
-			if [ ! -z "`cat $PKGMK_ROOT/$PKGMK_PKGFILE |sed "s@^[ ,\t,#]*@@"|grep -i ^$string|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`" ]; then
-				echo -n "#"`cat $PKGMK_PKGFILE |sed "s@^[ ,\t,#]*@@"|grep -i ^$string|cut -d : -f1 --complement|sed "s@^[ ,\t]*@@"`"" \
-				>> .PKGREPO
-			else
-				echo -n "#n.a" >> .PKGREPO
-			fi
-		done
+		echo -n "#$description#$url#$maintainer#$packager" >> .PKGREPO
 		printf "\n" >> .PKGREPO
 		for TARGET in ${TARGETS[@]}; do
 			FILE=`basename $TARGET`
