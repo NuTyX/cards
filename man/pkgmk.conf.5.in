@@ -74,7 +74,7 @@ Option to disable the extract of the source codes of the package. You need to ex
 Default: 'no'
 .TP
 \fBPKGMK_IGNORE_COLLECTION='STRING'\fP
-Option to deactivate the generation of the .PKGREPO file located in the parent directory. If set to "no" it will be possible to install via the \fBcards install\fP command your owns packages from your owns ports. You allow then the mix of official binaries and your owns binaries. This method is not recommended.
+Option to deactivate the generation of the .PKGREPO file located in the parent directory. If set to "no" it will be possible to install via the \fBcards install\fP command your own packages from your own ports. You allow mixed content of official binaries and your own binaries. This method is not recommended.
 .br
 Default: 'yes'
 .TP
