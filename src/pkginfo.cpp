@@ -103,7 +103,7 @@ void Pkginfo::parseArguments(int argc, char** argv)
 			m_footprint_mode += 1;
 			m_arg = argv[i + 1];
 			i++;
-		} else if (option == "-L" || option == "--librairies") {
+		} else if (option == "-L" || option == "--libraries") {
 			assertArgument(argv, argc, i);
 			m_librairies_mode +=1;
 			m_arg =  argv[i + 1];
@@ -365,7 +365,7 @@ void Pkginfo::printHelp() const
 	     << OPTIONS << endl
 	     << "  -i, --installed             list installed packages" << endl
          << "  -d, --details               list details about the <package>" << endl
-         << "  -L, --librairies            list all the runtime librairies for the <package>" << endl
+         << "  -L, --libraries            list all the runtime libraries for the <package>" << endl
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl
