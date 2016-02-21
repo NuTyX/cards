@@ -28,7 +28,7 @@
 
 using namespace std;
 
-int getRuntimeLibrairiesList (set<string>& runtimeLibrairiesList, const string& filename);
+int getRuntimeLibrariesList (set<string>& runtimeLibrariesList, const string& filename);
 
 #endif /* DEPENDENCIES_UTILS_H */
 // vim:set ts=2 :

@@ -15,8 +15,8 @@ List installed packages and their version.
 .B "\-d, \-\-details"
 List all available details about the package.
 .TP
-.B "\-L \-\-librairies"
-List all the runtime librairies owned by the specified <package>
+.B "\-L \-\-libraries"
+List all the runtime libraries owned by the specified <package>
 .TP
 .B "\-l, \-\-list <package|file>"
 List files owned by the specified <package> or contained in <file>.

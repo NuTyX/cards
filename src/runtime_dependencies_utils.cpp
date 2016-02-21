@@ -50,7 +50,7 @@ int get_64bit_elf_header_part(FILE *file)
 	elf_header_64bits=*buffer_64bits_part;
 	return 0;
 }
-int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& fileName)
+int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fileName)
 {
 #ifndef NDEBUG
 	printf("sizeof unsigned char: %d\n",sizeof(unsigned char));
@@ -241,7 +241,7 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 				{
 					name = dynamic_strings + edyn->d_un.d_val;
 					if ( name != NULL )
-						runtimeLibrairiesList.insert(name);
+						runtimeLibrariesList.insert(name);
 				}
 			}
 		}
@@ -368,7 +368,7 @@ int getRuntimeLibrairiesList(set<string>& runtimeLibrairiesList, const string& f
 				if ( ( dynamic_strings != NULL ) && ( offset <	dynamic_strings_length) )
 				{
 					name = dynamic_strings + edyn->d_un.d_val;
-					runtimeLibrairiesList.insert(name);
+					runtimeLibrariesList.insert(name);
 				}
 			}
 		}
