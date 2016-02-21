@@ -83,7 +83,7 @@ Option to activate the runtime dependencies. If set to "no" it will add automati
 .br
 Default: 'yes'
 .TP
-\fBPKGMK_COMPRESSION_PACKAGE='STRING'\fP
+\fBPKGMK_COMPRESS_PACKAGE='STRING'\fP
 Option to activate the compression of the package produced.
 .br
 Default: 'no'

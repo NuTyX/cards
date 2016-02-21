@@ -78,7 +78,7 @@ Option pour activer la rechercher automatique des dépendances de fonctionnement
 .br
 Défaut: 'yes'
 .TP
-\fBPKGMK_COMPRESSION_PACKAGE='STRING'\fP
+\fBPKGMK_COMPRESS_PACKAGE='STRING'\fP
 Option pour activer la compresssion du paquet produit.
 .br
 Défaut: 'no'
