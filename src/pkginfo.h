@@ -48,7 +48,7 @@ protected:
 	int m_list_mode;
 	int m_owner_mode;
 	int m_details_mode;
-	int m_librairies_mode;
+	int m_libraries_mode;
 	int m_runtime_mode;
 	int m_epoc;
 

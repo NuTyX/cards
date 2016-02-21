@@ -181,7 +181,7 @@ protected:
 
 	std::set<std::string> m_packageNamesList;
 	std::set<std::string> m_filesList;
-	std::set<std::string> m_runtimeLibrairiesList;
+	std::set<std::string> m_runtimeLibrariesList;
 
 	action m_actualAction;
 	error m_actualError;

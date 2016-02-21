@@ -39,7 +39,7 @@ Pkginfo::Pkginfo(const string& commandName)
 	m_list_mode(0),
 	m_owner_mode(0),
 	m_details_mode(0),
-	m_librairies_mode(0),
+	m_libraries_mode(0),
 	m_runtime_mode(0),
 	m_epoc(0)
 {
@@ -53,7 +53,7 @@ Pkginfo::Pkginfo()
 	m_list_mode(0),
 	m_owner_mode(0),
 	m_details_mode(0),
-	m_librairies_mode(0),
+	m_libraries_mode(0),
 	m_runtime_mode(0),
 	m_epoc(0)
 {
@@ -105,7 +105,7 @@ void Pkginfo::parseArguments(int argc, char** argv)
 			i++;
 		} else if (option == "-L" || option == "--libraries") {
 			assertArgument(argv, argc, i);
-			m_librairies_mode +=1;
+			m_libraries_mode +=1;
 			m_arg =  argv[i + 1];
 			i++;
 		} else if (option == "--runtimedepfiles") {
@@ -133,7 +133,7 @@ void Pkginfo::parseArguments(int argc, char** argv)
 
 	if (m_runtimedependencies_mode + m_footprint_mode + m_details_mode +
 	m_installed_mode + m_list_mode + m_owner_mode + m_epoc + m_archiveinfo +
-	m_footprint_mode + m_librairies_mode + m_runtime_mode == 0)
+	m_footprint_mode + m_libraries_mode + m_runtime_mode == 0)
 	{
 		m_actualError = OPTION_MISSING;
 		treatErrors(m_arg);
@@ -197,15 +197,15 @@ void Pkginfo::run()
 			set<string>filenameList;
 			Result = findRecursiveFile (filenameList, const_cast<char*>(m_arg.c_str()), &r, WS_DEFAULT);
 			// get the list of library for all the possible files 
-			set<string> librairiesList;
-			for (auto i : filenameList) Result = getRuntimeLibrairiesList(librairiesList,i);
+			set<string> librariesList;
+			for (auto i : filenameList) Result = getRuntimeLibrariesList(librariesList,i);
 			// get the own package  for all the elf files dependencies libraries
 #ifndef NDEBUG
-			for (auto i : librairiesList) cerr << i <<endl;
+			for (auto i : librariesList) cerr << i <<endl;
 #endif
-			if ( (librairiesList.size() > 0 ) && (Result > -1) ) {
+			if ( (librariesList.size() > 0 ) && (Result > -1) ) {
 				set<string> runtimeList;
-				for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i) {
+				for (set<string>::const_iterator i = librariesList.begin();i != librariesList.end();++i) {
 					for (packages_t::const_iterator j = m_listOfInstPackages.begin(); j != m_listOfInstPackages.end();++j) {
 						bool found = false;
 						for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k) {
@@ -224,7 +224,7 @@ void Pkginfo::run()
 				}
 				if (runtimeList.size()>0) {
 #ifndef NDEBUG
-					cerr << "Number of librairies founds: " << runtimeList.size() << endl;
+					cerr << "Number of libraries founds: " << runtimeList.size() << endl;
 #endif
 					unsigned int s = 1;
 					for ( auto i : runtimeList ) {
@@ -234,23 +234,23 @@ void Pkginfo::run()
 					cout << endl;
 				}
 			}	
-		} else if (m_librairies_mode + m_runtime_mode > 0) {
+		} else if (m_libraries_mode + m_runtime_mode > 0) {
 			// get the list of installed package silently
 			buildDatabaseWithDetailsInfos(true);
-			set<string> librairiesList;
+			set<string> librariesList;
 			int Result = -1;
 			if (checkPackageNameExist(m_arg)) {
 				for (set<string>::const_iterator i = m_listOfInstPackages[m_arg].files.begin();
 					i != m_listOfInstPackages[m_arg].files.end();
 					++i){
 					string filename('/' + *i);
-					Result = getRuntimeLibrairiesList(librairiesList,filename);
+					Result = getRuntimeLibrariesList(librariesList,filename);
 				}
-				if ( (librairiesList.size() > 0 ) && (Result > -1) ) {
+				if ( (librariesList.size() > 0 ) && (Result > -1) ) {
 					if (m_runtime_mode) {
 						set<string> runtimeList;
-						for (set<string>::const_iterator i = librairiesList.begin();
-						i != librairiesList.end();
+						for (set<string>::const_iterator i = librariesList.begin();
+						i != librariesList.end();
 						++i) {
 							for (packages_t::const_iterator j = m_listOfInstPackages.begin();
 								j != m_listOfInstPackages.end();
@@ -284,7 +284,7 @@ void Pkginfo::run()
 							cout << endl;
 						}
 					} else {
-						for (set<string>::const_iterator i = librairiesList.begin();i != librairiesList.end();++i)
+						for (set<string>::const_iterator i = librariesList.begin();i != librariesList.end();++i)
 							cout << *i << endl;
 					}
 				}
