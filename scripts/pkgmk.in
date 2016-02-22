@@ -258,24 +258,30 @@ download_file() {
 	fi
 }
 download_source() {
-	local FILE LOCAL_FILENAME
+    if [ "$PKGMK_USE_NEW_DOWNLOAD_OPTIONS" = "yes" ]; then
+        # using new download options implemented by peter1000 (Feb 2016)
+        error "PKGMK_USE_NEW_DOWNLOAD_OPTIONS is set to '$PKGMK_USE_NEW_DOWNLOAD_OPTIONS' This is not yet implemted."
+        exit $E_DOWNLOAD
+    else
+        local FILE LOCAL_FILENAME
 
-	for FILE in ${source[@]}; do
-		LOCAL_FILENAME=`get_filename $FILE`
-		if [ ! -e $LOCAL_FILENAME ]; then
-			if [ "$LOCAL_FILENAME" = "$FILE" ]; then
-				error "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
-				exit $E_DOWNLOAD
-			else
-				if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
-					download_file $FILE
-				else
-					error "Source file '$LOCAL_FILENAME' not found (use option -d to download)."
-					exit $E_DOWNLOAD
-				fi
-			fi
-		fi
-	done
+        for FILE in ${source[@]}; do
+            LOCAL_FILENAME=`get_filename $FILE`
+            if [ ! -e $LOCAL_FILENAME ]; then
+                if [ "$LOCAL_FILENAME" = "$FILE" ]; then
+                    error "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
+                    exit $E_DOWNLOAD
+                else
+                    if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
+                        download_file $FILE
+                    else
+                        error "Source file '$LOCAL_FILENAME' not found (use option -d to download)."
+                        exit $E_DOWNLOAD
+                    fi
+                fi
+            fi
+        done
+    fi
 }
 remove_source() {
 	local FILE LOCAL_FILENAME
@@ -1500,6 +1506,9 @@ PKGMK_KEEP_WORK="no"
 
 PKGMK_UPDATE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"
+
+# This variables should be removed once all runs smoothly: peter1000 (Feb. 2016)
+PKGMK_USE_NEW_DOWNLOAD_OPTIONS="no"
 
 main "$@"
 
