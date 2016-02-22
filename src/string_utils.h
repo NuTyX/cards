@@ -103,23 +103,29 @@ void split( const std::string& s, char del,
             T& target,
             int startPos, bool useEmpty )
 {
-    std::string line = s;
+	std::string line = s;
+	std::string ss;
+	std::string::size_type pos;
+	int offset = startPos;
+	while ( ( pos = line.find( del, offset ) ) != std::string::npos ) {
+		offset = 0;
+		if ( line[pos-1] == '\\'  ) {
+			line.erase(pos-1,1);
+			ss = ss + line.substr(0,pos);
+			line.erase(0,pos);
+			continue;
+		}
+		std::string val = line.substr( 0, pos );
+		if ( ( useEmpty || !stripWhiteSpace( val ).empty() ) ||
+			( ss.length() > 0 ) ) {
+			target.push_back( ss + val );
+		}
+		line.erase( 0, pos+1 );
+	}
 
-    std::string::size_type pos;
-    int offset = startPos;
-    while ( ( pos = line.find( del, offset ) ) != std::string::npos ) {
-        offset = 0;
-
-        std::string val = line.substr( 0, pos );
-        if ( useEmpty || !stripWhiteSpace( val ).empty() ) {
-            target.push_back( val );
-        }
-        line.erase( 0, pos+1 );
-    }
-
-    if ( line.length() > 0 ) {
-        target.push_back( line );
-    }
+	if ( ( line.length() > 0 ) || ( ss.length() > 0 ) ) {
+		target.push_back( ss + line );
+	}
 }
 
 #endif /* STRING_UTILS_H */

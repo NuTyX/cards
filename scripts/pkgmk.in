@@ -125,10 +125,6 @@ check_pkgfile() {
 		info "$description <== $SIZE characters"
 		exit $E_PKGFILE
 	fi
-	if [ ! -z "`echo $description|grep \#`" ]; then
-		error "Variable 'description' contains the '#' illegal symbol, please remove it."
-		exit $E_PKGFILE
-	fi
 }
 get_package_name() {
 	local NAME EXT
@@ -258,30 +254,30 @@ download_file() {
 	fi
 }
 download_source() {
-    if [ "$PKGMK_USE_NEW_DOWNLOAD_OPTIONS" = "yes" ]; then
-        # using new download options implemented by peter1000 (Feb 2016)
-        error "PKGMK_USE_NEW_DOWNLOAD_OPTIONS is set to '$PKGMK_USE_NEW_DOWNLOAD_OPTIONS' This is not yet implemted."
-        exit $E_DOWNLOAD
-    else
-        local FILE LOCAL_FILENAME
+	if [ "$PKGMK_USE_NEW_DOWNLOAD_OPTIONS" = "yes" ]; then
+		# using new download options implemented by peter1000 (Feb 2016)
+		error "PKGMK_USE_NEW_DOWNLOAD_OPTIONS is set to '$PKGMK_USE_NEW_DOWNLOAD_OPTIONS' This is not yet implemted."
+		exit $E_DOWNLOAD
+	else
+		local FILE LOCAL_FILENAME
 
-        for FILE in ${source[@]}; do
-            LOCAL_FILENAME=`get_filename $FILE`
-            if [ ! -e $LOCAL_FILENAME ]; then
-                if [ "$LOCAL_FILENAME" = "$FILE" ]; then
-                    error "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
-                    exit $E_DOWNLOAD
-                else
-                    if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
-                        download_file $FILE
-                    else
-                        error "Source file '$LOCAL_FILENAME' not found (use option -d to download)."
-                        exit $E_DOWNLOAD
-                    fi
-                fi
-            fi
-        done
-    fi
+		for FILE in ${source[@]}; do
+			LOCAL_FILENAME=`get_filename $FILE`
+			if [ ! -e $LOCAL_FILENAME ]; then
+				if [ "$LOCAL_FILENAME" = "$FILE" ]; then
+					error "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
+					exit $E_DOWNLOAD
+				else
+					if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
+						download_file $FILE
+					else
+						error "Source file '$LOCAL_FILENAME' not found (use option -d to download)."
+						exit $E_DOWNLOAD
+					fi
+				fi
+			fi
+		done
+	fi
 }
 remove_source() {
 	local FILE LOCAL_FILENAME
@@ -789,9 +785,13 @@ build_package() {
 	unpack_source
 		
 	cd $SRC
-
+	if ( declare -f prepare > /dev/null ); then
+		(set -e -x ; prepare)
+	fi
 	(set -e -x ; build)
-	
+	if ( declare -f package > /dev/null ); then
+		(set -e -x ; package)
+	fi
 	if [ $? = 0 ]; then
 		if [ "$PKGMK_NO_STRIP" = "no" ]; then
 			strip_files
@@ -1031,7 +1031,13 @@ update_repo()
 	local FILE MD5SUM EXT
 	cd $PKGMK_ROOT
 	get_package_list
-	[ -z "$description"  ] && description="n.a."
+	if [ -z "$description"  ]; then
+		 description="n.a."
+	else
+		if [ ! -z "`echo $description|grep \#`" ]; then
+			description=$(echo $description|sed "s@#@\\\#@g")
+		fi
+	fi
 	[ -z "$url"  ] && url="n.a."
 	[ -z "$maintainer"  ] && maintainer="n.a."
 	[ -z "$packager"  ] && packager="n.a."
@@ -1205,7 +1211,7 @@ main() {
 		recursive "$@"
 		exit 0
 	fi
-	[ ! -f $PKGMK_PKGFILE  ] && PKGMK_PKGFILE="trunk/PKGBUILD"
+	[ ! -f $PKGMK_PKGFILE  ] && PKGMK_PKGFILE="PKGBUILD"
 
 	if [ ! -f $PKGMK_PKGFILE  ]; then
 		error "File '$PKGMK_PKGFILE' not found."
@@ -1506,10 +1512,10 @@ PKGMK_KEEP_WORK="no"
 
 PKGMK_UPDATE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"
-
 # This variables should be removed once all runs smoothly: peter1000 (Feb. 2016)
 PKGMK_USE_NEW_DOWNLOAD_OPTIONS="no"
 
 main "$@"
 
 # End of file
+# vim:set ts=3 :
