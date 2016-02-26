@@ -74,7 +74,7 @@ do_abort() {
 }
 
 # extract the original URL from a source entry: strip an eventual filename or VCS directory
-get_origurl() {
+get_orig_url() {
 	printf "%s\n" "${1#*::}"
 }
 
@@ -390,15 +390,31 @@ check_file() {
 		exit $E_GENERAL
 	fi
 }
+#**********************************************************************************************************************
+#
+# file - functions for handling the download and extraction of source files: source entries containing `://` but no VCS
+#
+# If `PKGMK_SOURCE_MIRRORS is set` it will try first to download from these sites and only if not sucessful will is use
+# the original download URL.
+#
+# Examples"
+#
+# source=(ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)
+# source=(https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+#
+# source=(file.tar.gz::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+#
+#**********************************************************************************************************************
 download_file() {
     local DOWNLOAD_OPTS RESUME_OPTS RESUME_CMD
     local FINAL_SRCPATH=$1
     local PROTOCOL=$2
-    local ORIGURL=$3
-    local BASENAME="${ORIGURL##*/}"
+    local ORIG_URL=$3
+    local BASENAME="${ORIG_URL##*/}"
     FINAL_SRCPATH_PARTIAL="$FINAL_SRCPATH.partial"
 
-	info "Downloading '$ORIGURL'."
+	info "Downloading '$ORIG_URL'."
 
 	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then
 		error "Command '${PKGMK_DOWNLOAD_PROG}' not found."
@@ -418,7 +434,7 @@ download_file() {
                     -o $FINAL_SRCPATH_PARTIAL --insecure $PKGMK_DOWNLOAD_PROG_OPTS"
                     ;;
                 *)
-                    do_abort "The protocol  <$PROTOCOL> is not supported. ORIGURL: <$ORIGURL>|E_DOWNLOAD_PROTO"
+                    do_abort "The protocol  <$PROTOCOL> is not supported. ORIG_URL: <$ORIG_URL>|E_DOWNLOAD_PROTO"
                     ;;
             esac
             ;;
@@ -449,7 +465,7 @@ download_file() {
 
     if [ $ret != 0 ]; then
         while true; do
-            $PKGMK_DOWNLOAD_PROG $DOWNLOAD_OPTS $RESUME_OPTS $ORIGURL
+            $PKGMK_DOWNLOAD_PROG $DOWNLOAD_OPTS $RESUME_OPTS $ORIG_URL
             ret=$?
             if [ $ret != 0 ] && [ "$RESUME_OPTS" ]; then
                 info "Partial download failed, restarting"
@@ -462,14 +478,14 @@ download_file() {
     fi
 
     if [ $ret != 0 ]; then
-        do_abort "Failure while downloading <$FINAL_SRCPATH> source entry: <$ORIGURL>.|E_DOWNLOAD"
+        do_abort "Failure while downloading <$FINAL_SRCPATH> source entry: <$ORIG_URL>.|E_DOWNLOAD"
     fi
     mv -f "$FINAL_SRCPATH_PARTIAL" "$FINAL_SRCPATH"
 }
 
 # main download function
 download_source() {
-    local NETSRC PROTOCOL FINAL_SRCNAME FINAL_SRCPATH ORIGURL
+    local NETSRC PROTOCOL FINAL_SRCNAME FINAL_SRCPATH ORIG_URL
 
     for NETSRC in ${source[@]}; do
         PROTOCOL=$(get_protocol "$NETSRC")
@@ -477,7 +493,7 @@ download_source() {
         FINAL_SRCNAME=$(get_final_srcname "$NETSRC")
         check_abort "$FINAL_SRCNAME"
         FINAL_SRCPATH=`get_final_srcpath $NETSRC`
-        ORIGURL=`get_origurl  $NETSRC`
+        ORIG_URL=`get_orig_url  $NETSRC`
 
         if [ "$PROTOCOL" == "local" ]; then
             if [[ ! -f "$FINAL_SRCPATH" ]]; then
@@ -487,8 +503,8 @@ download_source() {
             if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
                 case $PROTOCOL in
                     ftp|http|https)
-                        #download_file  "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$PROTOCOL" "$ORIGURL"
-                        download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIGURL"
+                        #download_file  "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$PROTOCOL" "$ORIG_URL"
+                        download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIG_URL"
                         ;;
                     # currently not supported
                     #git)
