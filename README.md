@@ -43,9 +43,13 @@ $ cards help
 
 Copyright
 ---------
-pkgutils is Copyright (c) 2000-2005 Per Liden and
-Copyright (c) 2006-2013 CRUX team (http://crux.nu)
-Copyright (c) 2013-2015 NuTyX team (http://nutyx.org).
+
+**cards** Copyright (c) 2013-2016 NuTyX team (http://nutyx.org).
+
+Some code based on:
+
+* `pkgutils` Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu)
+* `pacman` (https://projects.archlinux.org/pacman.git/) Copyright (c) 2015-2016 Pacman Development Team
 
 cards is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.
