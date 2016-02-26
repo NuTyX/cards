@@ -42,18 +42,35 @@ E_DEPS=10      # error while searching runtime deps via 'pkginfo -b'
 #   New Functions: by **peter1000** <https://github.com/peter1000> added 2016 most based on `pacman date 2016-02-21`
 #**********************************************************************************************************************
 
-# check if execution of the script should be aborted: if so prints the error message
+E_DOWNLOAD_PROTO=11    # error when a wrong download protocol is encountered
+
+# returns a part of a string: usually used for multiple return values from functions.
+#   Delimiter is |
+#
+#    $1 - return result string: Quoted
+#    $2 - number of part to be returned
+#
+# e.g.: part3=`get_str_part "$str" 3`
+#
+function get_str_part() {
+    IFS="|" read -ra parts_arr <<< "$1"
+    printf "%s\n" "${parts_arr[-1+$2]}"
+}
+
+# $1 must be in the format: "ERR_ABORT|Message|ErrorCode
+#   e.g.:  check_abort "ERR_ABORT|The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
 check_abort() {
-    if [ "$1" == "ERR_ABORT" ]; then
-        echo -e "\n=======> ERROR: Aborting.... $2\n" >&2
-        exit 1
+    if [ "$(get_str_part "$1" 1)" == "ERR_ABORT" ]; then
+        echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 2`\n" >&2
+        exit $((`get_str_part "$1" 3`))
     fi
 }
 
-# called when execution of the script MUST be aborted: prints the error message
+# $1 must be in the format: "Message|ErrorCode
+#   e.g.:  do_abort "The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
 do_abort() {
-	check_abort "ERR_ABORT" "$1"
-    exit 1
+    echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 1`\n" >&2
+    exit $((`get_str_part "$1" 2`))
 }
 
 # extract the original URL from a source entry: strip an eventual filename or VCS directory
@@ -63,16 +80,17 @@ get_origurl() {
 
 # extract the protocol from a source entry - return "local" for local sources
 get_protocol() {
+    local NETSRC=$1
     local PROTOCOL
     local SUPPORTED_PROTOCOLS=('ftp' 'http' 'https' 'git' 'svn' 'hg' 'bzr' 'local' )
-    local PROTO="${1#*::}" # strip leading filename/vcs-directory
+    local PROTO="${NETSRC#*::}" # strip leading filename/vcs-directory
 
-	if [[ $1 = *://* ]]; then
+	if [[ $NETSRC = *://* ]]; then
 		PROTOCOL="${PROTO%%://*}"
         if [[ $PROTOCOL = *+* ]]; then
             PROTOCOL="${PROTO%%+*}"
         fi
-	elif [[ $1 = *lp:* ]]; then
+	elif [[ $NETSRC = *lp:* ]]; then
 		PROTOCOL="${PROTO%%lp:*}"
 	else
 		PROTOCOL="local"
@@ -80,8 +98,7 @@ get_protocol() {
     if [[ " ${SUPPORTED_PROTOCOLS[@]} " =~ " ${PROTOCOL} " ]]; then
         printf "%s\n" "${PROTOCOL}"
     else
-        error "The protocol is not supported: <$PROTOCOL>."
-        printf "%s\n" "ERR_ABORT"
+        echo "ERR_ABORT|The protocol: <$PROTOCOL> is not supported. SOURCE: <$NETSRC>|$E_DOWNLOAD_PROTO"
     fi
 }
 
@@ -93,7 +110,7 @@ get_final_srcname() {
 	if [[ $NETSRC = *::* ]]; then
         # local source files can not change their names
         if [[ "$PROTOCOL" == "local" ]]; then
-            printf "%s\n" "ERR_ABORT"
+            echo "ERR_ABORT|Local source file can not change their names. SOURCE: <$NETSRC>|$E_GENERAL"
         else
             printf "%s\n" ${NETSRC%%::*}
         fi
@@ -105,7 +122,7 @@ get_final_srcname() {
         local)
             # may not start with a slash
             if [[ $NETSRC == /* ]]; then
-                printf "%s\n" "ERR_ABORT"
+                echo "ERR_ABORT|Local source file MUST NOT start with a slash. SOURCE: <$NETSRC>|$E_GENERAL"
                 return
             else
                 # local sources use the whole relative url
@@ -146,7 +163,7 @@ get_final_srcpath() {
 
 # TODO
 #
-# ADD documentation/man for: PKGMK_COMPRESSION_OPTS
+# ADD documentation/man for: PKGMK_COMPRESSION_OPTS, PKGMK_DOWNLOAD_PROG, PKGMK_DOWNLOAD_PROG_OPTS
 #
 # Maybe add Pkgfile syntax check for source=() array
 #
@@ -304,75 +321,81 @@ check_file() {
 		exit $E_GENERAL
 	fi
 }
-downloads_file_with_curl() {
-	if [ ! "`type -p curl`" ]; then
-		error "Command 'curl' not found."
-		exit $E_GENERAL
-	fi
-	DOWNLOAD_OPTS="--ftp-pasv --retry 3 --retry-delay 3 \
-	-R -o $1 --fail -#"
-
-	error=1
-
-	curl $DOWNLOAD_OPTS $2
-	error=$?
-	if [ $error != 0 ]; then
-		error "Downloading '$2' failed."
-		exit $E_DOWNLOAD
-	fi
-}
 download_file() {
-    local WGET_CMD
+    local DOWNLOAD_OPTS RESUME_OPTS RESUME_CMD
     local FINAL_SRCPATH=$1
     local PROTOCOL=$2
     local ORIGURL=$3
     local BASENAME="${ORIGURL##*/}"
-    local RESUME_CMD="-c"
-    
+    FINAL_SRCPATH_PARTIAL="$FINAL_SRCPATH.partial"
+
 	info "Downloading '$ORIGURL'."
 
-	if [ ! "`type -p wget`" ]; then
-		warning "Command 'wget' not found."
-		info "You should install 'wget' as soon as possible, trying with curl ..."
-		downloads_file_with_curl $FINAL_SRCPATH $ORIGURL
-	else
-		FINAL_SRCPATH_PARTIAL="$FINAL_SRCPATH.partial"
-        # CMD Line
-        WGET_CMD="wget --no-directories --tries=3 --waitretry=3 --no-check-certificate \
-        $PKGMK_WGET_OPTS -O $FINAL_SRCPATH_PARTIAL"
-        if [[ $proto = ftp ]]; then
-            WGET_CMD="$WGET_CMD --passive-ftp"
-        fi
-
-		local ret=1
-		for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
-			REPO="`echo $REPO | sed 's|/$||'`"
-			$WGET_CMD $RESUME_CMD $REPO/$BASENAME
-			ret=$?
-			if [ $ret == 0 ]; then
-				break
-			fi
-		done
-
-		if [ $ret != 0 ]; then
-			while true; do
-				$WGET_CMD $RESUME_CMD $ORIGURL
-				ret=$?
-				if [ $ret != 0 ] && [ "$RESUME_CMD" ]; then
-					info "Partial download failed, restarting"
-					rm -f -- "$FINAL_SRCPATH_PARTIAL"
-					RESUME_CMD=""
-				else
-					break
-				fi
-			done
-		fi
-
-		if [ $ret != 0 ]; then
-            do_abort "Failure while downloading <$FINAL_SRCPATH> source entry: <$ORIGURL>." 
-		fi
-		mv -f "$FINAL_SRCPATH_PARTIAL" "$FINAL_SRCPATH"
+	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then
+		error "Command '${PKGMK_DOWNLOAD_PROG}' not found."
+		exit $E_GENERAL
 	fi
+
+	case ${PKGMK_DOWNLOAD_PROG} in
+		curl)
+			RESUME_CMD="-C -"
+            case ${PROTOCOL} in
+                ftp)
+                    DOWNLOAD_OPTS="-qf --ftp-pasv --retry 3 --retry-delay 3 -R -# \
+                    -o $FINAL_SRCPATH_PARTIAL --insecure $PKGMK_DOWNLOAD_PROG_OPTS"
+                    ;;
+                http|https)
+                    DOWNLOAD_OPTS="-qfL --retry 3 --retry-delay 3 -R -# \
+                    -o $FINAL_SRCPATH_PARTIAL --insecure $PKGMK_DOWNLOAD_PROG_OPTS"
+                    ;;
+                *)
+                    do_abort "The protocol  <$PROTOCOL> is not supported. ORIGURL: <$ORIGURL>|E_DOWNLOAD_PROTO"
+                    ;;
+            esac
+            ;;
+		wget)
+			RESUME_CMD="-c"
+            DOWNLOAD_OPTS="--no-directories --tries=3 --waitretry=3 --no-check-certificate \
+            $PKGMK_DOWNLOAD_PROG_OPTS -O $FINAL_SRCPATH_PARTIAL"
+            if [[ $proto = ftp ]]; then
+                DOWNLOAD_OPTS="$DOWNLOAD_OPTS --passive-ftp"
+            fi
+			;;
+	esac
+
+    if [ -f "$FINAL_SRCPATH_PARTIAL" ]; then
+        info "Partial download found, trying to resume"
+        RESUME_OPTS="$RESUME_CMD"
+    fi
+
+    local ret=1
+    for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
+        REPO="`echo $REPO | sed 's|/$||'`"
+        $PKGMK_DOWNLOAD_PROG $DOWNLOAD_OPTS $RESUME_OPTS $REPO/$BASENAME
+        ret=$?
+        if [ $ret == 0 ]; then
+            break
+        fi
+    done
+
+    if [ $ret != 0 ]; then
+        while true; do
+            $PKGMK_DOWNLOAD_PROG $DOWNLOAD_OPTS $RESUME_OPTS $ORIGURL
+            ret=$?
+            if [ $ret != 0 ] && [ "$RESUME_OPTS" ]; then
+                info "Partial download failed, restarting"
+                rm -f -- "$FINAL_SRCPATH_PARTIAL"
+                RESUME_OPTS=""
+            else
+                break
+            fi
+        done
+    fi
+
+    if [ $ret != 0 ]; then
+        do_abort "Failure while downloading <$FINAL_SRCPATH> source entry: <$ORIGURL>.|E_DOWNLOAD"
+    fi
+    mv -f "$FINAL_SRCPATH_PARTIAL" "$FINAL_SRCPATH"
 }
 
 # main download function
@@ -381,53 +404,53 @@ download_source() {
 
     for ENTRY in ${source[@]}; do
         PROTOCOL=$(get_protocol "$ENTRY")
-        check_abort $PROTOCOL "The protocol is not supported. SOURCE: <$ENTRY>"
+        check_abort "$PROTOCOL"
+
         local FINAL_SRCNAME=$(get_final_srcname "$ENTRY")
-        check_abort $FINAL_SRCNAME \
-            "Local source files can not change their names or start with a slash '/'. SOURCE: <$ENTRY>"
+        check_abort $FINAL_SRCNAME
         FINAL_SRCPATH=`get_final_srcpath $ENTRY`
-        ORIGURL=`get_origurl  $ENTRY`        
+        ORIGURL=`get_origurl  $ENTRY`
 
         if [ "$PROTOCOL" == "local" ]; then
             if [[ ! -f "$FINAL_SRCPATH" ]]; then
-                do_abort "Local Source file '$FINAL_SRCPATH' not found (can not be downloaded, URL not specified). \
-                SOURCE: <$ENTRY>"
+                do_abort "Local Source file '$FINAL_SRCPATH' not found. SOURCE: <$ENTRY>|E_DOWNLOAD"
             fi
         else
             if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
                 case $PROTOCOL in
-                    ftp|http|https)     
-                        #download_file  "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$PROTOCOL" "$ORIGURL"  
-                        download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIGURL" 
+                    ftp|http|https)
+                        #download_file  "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$PROTOCOL" "$ORIGURL"
+                        download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIGURL"
                         ;;
                     # currently not supported
-                    #git)                
-                        #download_git                              
+                    #git)
+                        #download_git
                         #;;
-                    #svn)                
-                        #download_svn                                     
+                    #svn)
+                        #download_svn
                         #;;
-                    #hg)                 
-                        #download_hg                                  
+                    #hg)
+                        #download_hg
                         #;;
-                    #bzr)                
-                        #download_bzr                                        
+                    #bzr)
+                        #download_bzr
                         #;;
                     #local) checked above
                 esac
             else
-                do_abort "Source file '$FINAL_SRCPATH' not found (use option -d to download)."
+                do_abort "Source file '$FINAL_SRCPATH' not found (use option -d to download).|E_DOWNLOAD"
             fi
         fi
     done
 }
 remove_source() {
+        echo 'remove_source'
 	local ENTRY FINAL_SRCPATH
 	for ENTRY in ${source[@]}; do
 		FINAL_SRCPATH=`get_final_srcpath $ENTRY`
 		if [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$ENTRY" ]; then
 			info "Removing $FINAL_SRCPATH"
-			rm -f $FINAL_SRCPATH
+			rm -rf $FINAL_SRCPATH
 		fi
 	done
 }
@@ -1657,6 +1680,9 @@ PKGMK_KEEP_WORK="no"
 
 PKGMK_UPDATE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"
+
+PKGMK_DOWNLOAD_PROG="wget"
+PKGMK_DOWNLOAD_PROG_OPTS=""
 
 main "$@"
 
