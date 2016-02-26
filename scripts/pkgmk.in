@@ -43,6 +43,7 @@ E_DEPS=10      # error while searching runtime deps via 'pkginfo -b'
 #**********************************************************************************************************************
 
 E_DOWNLOAD_PROTO=11    # error when a wrong download protocol is encountered
+E_DOWNLOAD_VCS=12      # error wencountered by download (clone/checkout...) of version controlled sources
 
 # returns a part of a string: usually used for multiple return values from functions.
 #   Delimiter is |
@@ -171,6 +172,60 @@ get_final_srcpath() {
 	printf "%s\n" "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 }
 
+#**********************************************************************************************************************
+#
+# git - function for handling the download and "extraction" of Git sources
+#
+# Examples"
+#
+# source=(git://github.com/peter1000/linux-helper-install-scripts.git)
+# source=(git+http://elinks.cz/elinks.git#commit=a3751107033599b835eaafa61177c8d4dda4b7ef)
+# source=(linux_install_scripts::git+http://github.com/peter1000/linux-helper-install-scripts.git)
+# source(test::git+https://cgit.freedesktop.org/poppler/test/#commit=0d2bfd4)
+# source=(git+https://github.com/kaio/ibus-table.git#tag=1.9.11)
+#
+#**********************************************************************************************************************
+download_git() {
+    local url
+	local FINAL_SRCNAME=$1
+	local FINAL_SRCPATH=$2
+    local ORIG_URL=$3
+    local repo=$FINAL_SRCNAME
+	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+
+	info "Downloading $FINAL_SRCNAME..."
+    
+	url=${ORIG_URL#git+}
+	url=${url%%#*}
+
+	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
+		info "Cloning git repo <${repo}>..."
+		if ! git clone --mirror "$url" "$FINAL_SRCPATH"; then
+            if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+                rm -rf $PKGMK_WORK_DIR
+            fi
+            error "Building '$TARGET' failed.. "
+			do_abort "Failure while downloading git repo: <$repo> source entry: <$ORIG_URL>|E_DOWNLOAD_VCS"
+		fi
+	elif (( ! PKGMK_VCS_HOLDVER )); then
+		cd_safe "$FINAL_SRCPATH"
+		# Make sure we are fetching the right repo
+		if [[ "$url" != "$(git config --get remote.origin.url)" ]] ; then
+            if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+                rm -rf $PKGMK_WORK_DIR
+            fi
+            error "Building '$TARGET' failed.. "
+            
+			do_abort "<$FINAL_SRCPATH> is not a clone of <$url> source entry: <$ORIG_URL>|E_DOWNLOAD_VCS"
+        fi
+		info "Updating git repo: <$repo>..."
+		if ! git fetch --all -p; then
+			# only warn on failure to allow offline builds
+			warning "Failure while updating git repo: <$repo>"
+		fi
+	fi
+}
+
 extract_only_copy() {
     local FINAL_SRCPATH=$1
     local NETSRC=$2
@@ -245,6 +300,8 @@ extract_file() {
 		chown -R 0:0 "$SRC"
 	fi
 }
+
+
 # TODO
 #
 # ADD documentation/man for: PKGMK_COMPRESSION_OPTS, PKGMK_DOWNLOAD_PROG, PKGMK_DOWNLOAD_PROG_OPTS
@@ -522,8 +579,8 @@ download_source() {
                         download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIG_URL"
                         ;;
                     # currently not supported
-                    #git)
-                        #download_git
+                    git)
+                        download_git "$FINAL_SRCNAME" "$FINAL_SRCPATH"  "$ORIG_URL"
                         #;;
                     #svn)
                         #download_svn
