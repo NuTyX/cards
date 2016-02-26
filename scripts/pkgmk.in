@@ -25,6 +25,123 @@
 # Some code based on `pacman date 2016-02-21` <https://projects.archlinux.org/pacman.git/> GNU General Public License 2
 #       Copyright (c) 2015-2016 Pacman Development Team <pacman-dev@archlinux.org>
 
+#**********************************************************************************************************************
+#
+#                               Pkgfile: source (array)
+#
+# An array of source files required to build the package. This can also be an empty array `source=()`.
+# To simplify the maintenance of Pkgfiles, use the $name and $version variables when specifying the download location,
+# if possible.
+# Compressed files will be extracted automatically unless `PKGMK_IGNORE_UNPACK="yes"` is set or they are local files
+# specified by relative path to the Pkgfile.
+#
+# It is also possible to change the name of the downloaded file (except for Local source files), which is helpful with
+# weird URLs and for handling multiple source files with the same name.
+#
+# ::1:::::::::::::::::::::::::::: Regular source entries can have two forms:
+#
+#   1) The syntax is: source=(filename::url)
+#
+#       The source URL is divided into two components:
+#
+#           1. `filename` (optional): The new changed name of the downloaded file. `::` is used as separator.
+#           2. `url:` (required):     A fully-qualified URL (supported are: ftp://, http://, https://)
+#
+#
+# ::2:::::::::::::::::::::::::::: There is also support using sources downloaded from version control systems (VCS).
+#
+#   1) The syntax is: source=(directory::url#fragment).
+#
+#       The source URL is divided into three components:
+#
+#           1. `directory` (optional): Specifies an alternate directory name to download the VCS source into.
+#                                      `::` is used as separator.
+#           2. `url` (required):       The URL to the VCS repository. This must include the VCS in the URL protocol.
+#                                      If the protocol does not include the VCS name, it can be added by prefixing
+#                                      the URL with vcs+. For example, using a Git repository over HTTPS would have a
+#                                      source URL in the form: `git+https://....`
+#           3. `fragment` (optional):  Allows specifying a revision number or branch to be checkout from the VCS.
+#                                      For example, to checkout a given revision, the source line would have the
+#                                      format source=(url#revision=123). `#` is used as separator.
+#
+#               The available fragments depends on the VCS being used:
+#
+#                   1. `bzr`: revision (see 'bzr help revisionspec' for details)
+#                   2. `git`: branch, commit, tag
+#                   3. `hg`: branch, revision, tag
+#                   4. `svn`: revision
+#
+#   Currently supported version control systems are Bazaar, Git, Subversion, and Mercurial.
+#   For other version control systems, manual cloning of upstream repositories is usually done in the build() function.
+#
+#
+#
+# ::3:::::::::::::::::::::::::::: Local source files
+#
+#   1) The syntax is: source=(relative_path)
+#
+#       The source URL has one component:
+#
+#           1. `url:` (required): A local file path which is resolved relative to the directory of the `Pkgfile`.
+#                                 A local source file path MUST NOT start with a slash `/`.
+#
+#           * source=(my.patch)
+#           * source=(resources/my.patch)
+#
+#
+#
+# ::4:::::::::::::::::::::::::::: EXAMPLES OK
+#
+#  LOCAL FILES
+#
+# source=(test_file)
+# source=(resources/test_file)
+#
+#
+#  QUALIFIED URI
+#
+#   ftp
+# source=(ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(file::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+#
+#   http
+# source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)
+# source=(xz::http://tukaani.org/xz/xz-5.2.2.tar.xz)
+#
+#   https
+# source=(xmlto::https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+# source=(https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+#
+#  VCS (version control systems)
+#
+#   GIT
+# source=(git://github.com/peter1000/linux-helper-install-scripts.git)
+# source=(git+http://elinks.cz/elinks.git#commit=a3751107033599b835eaafa61177c8d4dda4b7ef)
+# source=(linux_install_scripts::git+http://github.com/peter1000/linux-helper-install-scripts.git)
+# source(test::git+https://cgit.freedesktop.org/poppler/test/#commit=0d2bfd4)
+# source=(git+https://github.com/kaio/ibus-table.git#tag=1.9.11)
+#
+#   SVN
+# source=(svn://svn.code.sf.net/p/splix/code/splix#revision=315)
+# source=(wit::svn+http://opensvn.wiimm.de/wii/trunk/wiimms-iso-tools#revision=6005)
+#
+#   HG
+# source=("hg+https://bitbucket.org/ianb/pastedeploy#tag=1.5.2")
+# source=("pivy::hg+https://bitbucket.org/Coin3D/pivy#tag=pivy-20101207")
+#
+#   BZR
+# source=(bzr+lp:~elementary-os/contractor/elementary-contracts)
+# source=(foomatic_db::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db/#revision=1295)
+#
+#
+# ::5:::::::::::::::::::::::::::: EXAMPLES WRONG / ERROR
+#
+# source=(sftp://home1.cyberciti.biz/~/docs/resume.pdf)
+# source=(ftps://ftp.host.com/ )
+#
+#**********************************************************************************************************************
+
+
 ##
 # error codes
 E_GENERAL=1
