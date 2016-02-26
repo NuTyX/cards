@@ -754,9 +754,9 @@ add_meta_to_archive() {
 compress_archive() {
 	info "compress $1"
 	case $PKGMK_COMPRESSION_MODE in
-		gz) gzip -9 $1;;
-		bz2) bzip2 -9  $1;;
-		xz)  xz -z -9 $1;;
+		gz) gzip $PKGMK_COMPRESSION_OPTS $1;;
+		bz2) bzip2 $PKGMK_COMPRESSION_OPTS $1;;
+		xz)  xz -z $PKGMK_COMPRESSION_OPTS $1;;
 	esac
 }
 build_package() {
@@ -1286,6 +1286,9 @@ main() {
 	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
 	if [ "$PKGMK_COMPRESS_PACKAGE" != "no" ]; then
 		info "PKGMK_COMPRESSION_MODE: $PKGMK_COMPRESSION_MODE"
+        if [ -n "$PKGMK_COMPRESSION_OPTS" ]; then
+            info "PKGMK_COMPRESSION_OPTS: $PKGMK_COMPRESSION_OPTS"
+        fi
 	fi
 
 	info "name: ${name}"
@@ -1495,9 +1498,9 @@ PKGMK_IGNORE_RUNTIMEDEPS="yes"
 
 PKGMK_NO_STRIP="no"
 
-PKGMK_COMPRESSION_MODE="xz"
-
 PKGMK_COMPRESS_PACKAGE="no"
+PKGMK_COMPRESSION_MODE="xz"
+PKGMK_COMPRESSION_OPTS="-9"
 
 PKGMK_INSTALL="no"
 PKGMK_RECURSIVE="no"
