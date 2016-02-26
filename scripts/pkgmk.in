@@ -107,7 +107,7 @@ get_protocol() {
             PROTOCOL="${PROTO%%+*}"
         fi
 	elif [[ $NETSRC = *lp:* ]]; then
-		PROTOCOL="${PROTO%%lp:*}"
+		PROTOCOL="${PROTO%%+lp:*}"
 	else
 		PROTOCOL="local"
 	fi
@@ -333,6 +333,49 @@ download_hg() {
 	fi
 }
 
+#**********************************************************************************************************************
+#
+# bzr - function for handling the download and "extraction" of Bazaar sources
+#
+# Examples"
+#
+# source=(bzr+lp:~elementary-os/contractor/elementary-contracts)
+# source=(foomatic_db::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db/#revision=1295)
+#
+#**********************************************************************************************************************
+
+download_bzr() {
+	local FINAL_SRCNAME=$1
+	local FINAL_SRCPATH=$2
+    local ORIG_URL=$3
+    local repo=$FINAL_SRCNAME
+	local url=$ORIG_URL
+	if [[ $url != bzr+ssh* ]]; then
+		url=${url#bzr+}
+	fi
+	url=${url%%#*}
+	local displaylocation="$url"
+
+	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+
+	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
+        info "Branching bzr displaylocation <${displaylocation}>..."
+		if ! bzr branch "$url" "$FINAL_SRCPATH" --no-tree --use-existing-dir; then
+            if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+                rm -rf $PKGMK_WORK_DIR
+            fi
+            error "Building '$TARGET' failed.. "
+            do_abort "Failure while branching bzr displaylocation: <$displaylocation> Url> <$ORIG_URL>.|E_DOWNLOAD_VCS"
+		fi
+	elif (( ! PKGMK_VCS_HOLDVER )); then
+        info "Pulling bzr displaylocation: <$displaylocation>..."
+		cd_safe "$FINAL_SRCPATH"
+		if ! bzr pull "$url"; then
+			# only warn on failure to allow offline builds
+            warning "Failure while pulling bzr displaylocation: <$displaylocation>"
+		fi
+	fi
+}
 extract_only_copy() {
     local FINAL_SRCPATH=$1
     local NETSRC=$2
@@ -695,9 +738,9 @@ download_source() {
                     hg)
                         download_hg "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
                         ;;
-                    #bzr)
-                        #download_bzr
-                        #;;
+                    bzr)
+                        download_bzr "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
+                        ;;
                     #local) checked above
                 esac
             else
