@@ -290,6 +290,49 @@ download_svn() {
 	fi
 }
 
+#**********************************************************************************************************************
+#
+# hg - function for handling the download and "extraction" of Mercurial sources
+#
+# Examples"
+#
+# source=("hg+https://bitbucket.org/ianb/pastedeploy#tag=1.5.2")
+# source=("pivy::hg+https://bitbucket.org/Coin3D/pivy#tag=pivy-20101207")
+#
+#**********************************************************************************************************************
+
+download_hg() {
+    local url
+	local FINAL_SRCNAME=$1
+	local FINAL_SRCPATH=$2
+    local ORIG_URL=$3
+    local repo=$FINAL_SRCNAME
+	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+
+	info "Downloading $FINAL_SRCNAME..."
+
+	url=${ORIG_URL#hg+}
+	url=${url%%#*}
+
+	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
+		info "Cloning hg repo <${repo}>..."
+		if ! hg clone -U "$url" "$FINAL_SRCPATH"; then
+            if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+                rm -rf $PKGMK_WORK_DIR
+            fi
+            error "Building '$TARGET' failed.. "
+			do_abort "Failure while downloading hg repo: <$repo> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+		fi
+	elif (( ! PKGMK_VCS_HOLDVER )); then
+		info "Updating hg repo: <$repo>..."
+		cd_safe "$FINAL_SRCPATH"
+		if ! hg pull; then
+			# only warn on failure to allow offline builds
+			warning "Failure while updating hg repo: <$repo>"
+		fi
+	fi
+}
+
 extract_only_copy() {
     local FINAL_SRCPATH=$1
     local NETSRC=$2
@@ -649,9 +692,9 @@ download_source() {
                     svn)
                         download_svn "$NETSRC" "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
                         ;;
-                    #hg)
-                        #download_hg
-                        #;;
+                    hg)
+                        download_hg "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
+                        ;;
                     #bzr)
                         #download_bzr
                         #;;
