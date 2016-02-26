@@ -104,6 +104,7 @@ get_protocol() {
 
 # extract the final used source name (filename or VCS directory) from a source entry: this is not a path only the name.
 get_final_srcname() {
+    local FINAL_SRCNAME
 	local NETSRC=$1
     local PROTOCOL=$(get_protocol "$NETSRC")
 	# if a filename/VCS-directory is specified, use it except Local sources
@@ -116,8 +117,7 @@ get_final_srcname() {
         fi
 		return
 	fi
-
-    local FINAL_SRCNAME
+    
 	case $PROTOCOL in
         local)
             # may not start with a slash
@@ -149,18 +149,87 @@ get_final_srcname() {
 }
 
 # Return the absolute expected filename/VCS-dirname of a source entry
+# TODO: decide later if that function should be removed
 get_final_srcpath() {
 	local FINAL_SRCNAME="$(get_final_srcname "$1")"
-	local PROTOCOL="$(get_protocol "$1")"
-    local FINAL_SRCPATH
-
-	case $PROTOCOL in
-		git|svn|hg|bzr)     FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ;;
-		*)                  FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ;;
-	esac
-	printf "%s\n" "$FINAL_SRCPATH"
+    check_abort $FINAL_SRCNAME
+	printf "%s\n" "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 }
 
+extract_only_copy() {
+    local FINAL_SRCPATH=$1
+    local NETSRC=$2
+
+    echo "Copying <$FINAL_SRCPATH> to $SRC"
+
+    cp -f $FINAL_SRCPATH $SRC
+    if [ $? != 0 ]; then
+        if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+            rm -rf $PKGMK_WORK_DIR
+        fi
+        error "Building '$TARGET' failed.. "
+        do_abort "Could not copy FINAL_SRCPATH: <$FINAL_SRCPATH> to SRC: <$SRC>. SOURCE: <$NETSRC>|E_UNPACK"
+    fi
+}
+
+# TODO: clarify if the of: change perms of all source files to root user & root group is OK
+extract_file() {
+    local FINAL_SRCPATH=$1
+    local FINAL_SRCNAME=$2
+    local NETSRC=$3
+     
+	# do not rely on extension for file type
+	local file_type=$(file -bizL "$FINAL_SRCPATH")
+	local ext=${FINAL_SRCPATH##*.}
+	local cmd=''
+	case "$file_type" in
+		*application/x-tar*|*application/zip*|*application/x-zip*|*application/x-cpio*)
+			cmd="bsdtar" ;;
+		*application/x-gzip*)
+			case "$ext" in
+				gz|z|Z) cmd="gzip" ;;
+				*) return;;
+			esac ;;
+		*application/x-bzip*)
+			case "$ext" in
+				bz2|bz) cmd="bzip2" ;;
+				*) return;;
+			esac ;;
+		*application/x-xz*)
+			case "$ext" in
+				xz) cmd="xz" ;;
+				*) return;;
+			esac ;;
+		*)
+			# See if bsdtar can recognize the file
+			if bsdtar -tf "$FINAL_SRCPATH" -q '*' &>/dev/null; then
+				cmd="bsdtar"
+			else
+				return 0
+			fi ;;
+	esac
+
+	local ret=0
+	echo "Extracting <$FINAL_SRCPATH> with <$cmd>"
+	if [[ $cmd = "bsdtar" ]]; then
+		$cmd -p -C $SRC -xf "$FINAL_SRCPATH"  || ret=$?
+	else
+		rm -f -- "$SRC/${FINAL_SRCNAME%.*}"
+		$cmd -dcf "$file" > "$SRC/${FINAL_SRCNAME%.*}" || ret=$?
+	fi
+	if (( ret )); then
+        if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+            rm -rf $PKGMK_WORK_DIR
+        fi
+        error "Building '$TARGET' failed.. "
+        do_abort "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>|E_UNPACK"
+	fi
+
+	if (( EUID == 0 )); then
+		# change perms of all source files to root user & root group
+		chown -R 0:0 "$SRC"
+	fi
+}
 # TODO
 #
 # ADD documentation/man for: PKGMK_COMPRESSION_OPTS, PKGMK_DOWNLOAD_PROG, PKGMK_DOWNLOAD_PROG_OPTS
@@ -400,20 +469,19 @@ download_file() {
 
 # main download function
 download_source() {
-    local ENTRY PROTOCOL FINAL_SRCPATH ORIGURL
+    local NETSRC PROTOCOL FINAL_SRCNAME FINAL_SRCPATH ORIGURL
 
-    for ENTRY in ${source[@]}; do
-        PROTOCOL=$(get_protocol "$ENTRY")
+    for NETSRC in ${source[@]}; do
+        PROTOCOL=$(get_protocol "$NETSRC")
         check_abort "$PROTOCOL"
-
-        local FINAL_SRCNAME=$(get_final_srcname "$ENTRY")
-        check_abort $FINAL_SRCNAME
-        FINAL_SRCPATH=`get_final_srcpath $ENTRY`
-        ORIGURL=`get_origurl  $ENTRY`
+        FINAL_SRCNAME=$(get_final_srcname "$NETSRC")
+        check_abort "$FINAL_SRCNAME"
+        FINAL_SRCPATH=`get_final_srcpath $NETSRC`
+        ORIGURL=`get_origurl  $NETSRC`
 
         if [ "$PROTOCOL" == "local" ]; then
             if [[ ! -f "$FINAL_SRCPATH" ]]; then
-                do_abort "Local Source file '$FINAL_SRCPATH' not found. SOURCE: <$ENTRY>|E_DOWNLOAD"
+                do_abort "Local Source file '$FINAL_SRCPATH' not found. SOURCE: <$NETSRC>|E_DOWNLOAD"
             fi
         else
             if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
@@ -444,43 +512,74 @@ download_source() {
     done
 }
 remove_source() {
-        echo 'remove_source'
-	local ENTRY FINAL_SRCPATH
-	for ENTRY in ${source[@]}; do
-		FINAL_SRCPATH=`get_final_srcpath $ENTRY`
-		if [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$ENTRY" ]; then
+	local NETSRC FINAL_SRCPATH
+	for NETSRC in ${source[@]}; do
+		FINAL_SRCPATH=`get_final_srcpath $NETSRC`
+		if [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$NETSRC" ]; then
 			info "Removing $FINAL_SRCPATH"
 			rm -rf $FINAL_SRCPATH
 		fi
 	done
 }
 unpack_source() {
-	local ENTRY FINAL_SRCPATH COMMAND
+	local NETSRC PROTOCOL FINAL_SRCNAME FINAL_SRCPATH COMMAND
 
-	for ENTRY in ${source[@]}; do
-		FINAL_SRCPATH=`get_final_srcpath $ENTRY`
-		case $FINAL_SRCPATH in
-			*.tar|*.tar.gz|*.tar.Z|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.lzma|*.zip|*.rpm)
-				if [ "$PKGMK_IGNORE_UNPACK" != "yes" ];then
-					COMMAND="bsdtar -p -o -C $SRC -xf $FINAL_SRCPATH"
+    for NETSRC in ${source[@]}; do
+        PROTOCOL=$(get_protocol "$NETSRC")
+        check_abort "$PROTOCOL"
+        FINAL_SRCNAME=$(get_final_srcname "$NETSRC")
+        check_abort "$FINAL_SRCNAME"
+        FINAL_SRCPATH=`get_final_srcpath $NETSRC`
+
+        case $PROTOCOL in
+            ftp|http|https)
+				if [ "$PKGMK_IGNORE_UNPACK" == "yes" ];then
+					extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
 				else
-					COMMAND="cp $FINAL_SRCPATH $SRC"
-				fi ;;
-			*)
-				COMMAND="cp $FINAL_SRCPATH $SRC" ;;
+                    extract_file "$FINAL_SRCPATH" "FINAL_SRCNAME" "$NETSRC"
+				fi 
+                ;;
+            local)
+                extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
+                ;;
+            # currently not supported
+            #git)
+                #download_git
+                #;;
+            #svn)
+                #download_svn
+                #;;
+            #hg)
+                #download_hg
+                #;;
+            #bzr)
+                #download_bzr
+                #;;
 		esac
+        
+        
+		#case $FINAL_SRCPATH in
+			#*.tar|*.tar.gz|*.tar.Z|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.lzma|*.zip|*.rpm)
+				#if [ "$PKGMK_IGNORE_UNPACK" != "yes" ];then
+					#COMMAND="bsdtar -p -o -C $SRC -xf $FINAL_SRCPATH"
+				#else
+					#COMMAND="cp $FINAL_SRCPATH $SRC"
+				#fi ;;
+			#*)
+				#COMMAND="cp $FINAL_SRCPATH $SRC" ;;
+		#esac
 
-		echo "$COMMAND"
+		#echo "$COMMAND"
 
-		$COMMAND
+		#$COMMAND
 
-		if [ $? != 0 ]; then
-			if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-				rm -rf $PKGMK_WORK_DIR
-			fi
-			error "Building '$TARGET' failed."
-			exit $E_UNPACK
-		fi
+		#if [ $? != 0 ]; then
+			#if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+				#rm -rf $PKGMK_WORK_DIR
+			#fi
+			#error "Building '$TARGET' failed."
+			#exit $E_UNPACK
+		#fi
 	done
 }
 get_package_list() {
@@ -494,11 +593,11 @@ get_package_list() {
 	done
 }
 make_md5sum() {
-	local ENTRY FINAL_SRCPATH
+	local NETSRC FINAL_SRCPATH
 
 	if [ "$source" ]; then
-		for ENTRY in ${source[@]}; do
-			FINAL_SRCPATH="$FINAL_SRCPATH `get_final_srcpath $ENTRY`"
+		for NETSRC in ${source[@]}; do
+			FINAL_SRCPATH="$FINAL_SRCPATH `get_final_srcpath $NETSRC`"
 		done
 
 		md5sum $FINAL_SRCPATH | sed -e 's|  .*/|  |' | sort -k 2
