@@ -205,7 +205,7 @@ download_git() {
                 rm -rf $PKGMK_WORK_DIR
             fi
             error "Building '$TARGET' failed.. "
-			do_abort "Failure while downloading git repo: <$repo> source entry: <$ORIG_URL>|E_DOWNLOAD_VCS"
+			do_abort "Failure while downloading git repo: <$repo> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
 		fi
 	elif (( ! PKGMK_VCS_HOLDVER )); then
 		cd_safe "$FINAL_SRCPATH"
@@ -215,13 +215,77 @@ download_git() {
                 rm -rf $PKGMK_WORK_DIR
             fi
             error "Building '$TARGET' failed.. "
-            
-			do_abort "<$FINAL_SRCPATH> is not a clone of <$url> source entry: <$ORIG_URL>|E_DOWNLOAD_VCS"
+			do_abort "<$FINAL_SRCPATH> is not a clone of <$url> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
         fi
 		info "Updating git repo: <$repo>..."
 		if ! git fetch --all -p; then
 			# only warn on failure to allow offline builds
 			warning "Failure while updating git repo: <$repo>"
+		fi
+	fi
+}
+
+#**********************************************************************************************************************
+#
+# svn - function for handling the download and "extraction" of Subversion sources
+#
+# Examples"
+#
+# source=(svn://svn.code.sf.net/p/splix/code/splix#revision=315)
+# source=(wit::svn+http://opensvn.wiimm.de/wii/trunk/wiimms-iso-tools#revision=6005)
+#
+#**********************************************************************************************************************
+
+download_svn() {
+    local url
+	local NETSRC=$1
+	local FINAL_SRCNAME=$2
+	local FINAL_SRCPATH=$3
+    local ORIG_URL=$4
+	local fragment=${NETSRC#*#}
+	local repo=$FINAL_SRCNAME
+	local url=$ORIG_URL
+	if [[ $fragment = "$NETSRC" ]]; then
+		unset fragment
+	fi
+	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+
+	if [[ $url != svn+ssh* ]]; then
+		url=${url#svn+}
+	fi
+	url=${url%%#*}
+
+	local ref=HEAD
+	if [[ -n $fragment ]]; then
+		case ${fragment%%=*} in
+			revision)
+				ref="${fragment##*=}"
+				;;
+			*)
+                if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+                    rm -rf $PKGMK_WORK_DIR
+                fi
+                error "Building '$TARGET' failed.. "
+                do_abort "Unrecognized reference fragment: <${fragment}> source entry: <$ORIG_URL>|E_DOWNLOAD_VCS"
+		esac
+	fi
+
+	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
+		info "Cloning svn repo <${repo}>..."
+		mkdir -p "$FINAL_SRCPATH/.makepkg"
+		if ! svn checkout -r ${ref} --config-dir "$FINAL_SRCPATH/.makepkg" "$url" "$FINAL_SRCPATH"; then
+            if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+                rm -rf $PKGMK_WORK_DIR
+            fi
+            error "Building '$TARGET' failed.. "
+			do_abort "Failure while downloading svn repo: <$repo> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+		fi
+	elif (( ! PKGMK_VCS_HOLDVER )); then
+		info "Updating svn repo: <$repo>..."
+		cd_safe "$FINAL_SRCPATH"
+		if ! svn update -r ${ref}; then
+			# only warn on failure to allow offline builds
+			warning "Failure while updating svn repo: <$repo>"
 		fi
 	fi
 }
@@ -581,10 +645,10 @@ download_source() {
                     # currently not supported
                     git)
                         download_git "$FINAL_SRCNAME" "$FINAL_SRCPATH"  "$ORIG_URL"
-                        #;;
-                    #svn)
-                        #download_svn
-                        #;;
+                        ;;
+                    svn)
+                        download_svn "$NETSRC" "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
+                        ;;
                     #hg)
                         #download_hg
                         #;;
