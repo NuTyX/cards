@@ -78,6 +78,21 @@ get_orig_url() {
 	printf "%s\n" "${1#*::}"
 }
 
+dir_isempty() {
+	(
+		shopt -s dotglob nullglob
+		files=("$1"/*)
+		(( ${#files} == 0 ))
+	)
+}
+
+cd_safe() {
+	if ! cd "$1"; then
+        do_abort "Failed to change to directory $1"
+		exit 1
+	fi
+}
+
 # extract the protocol from a source entry - return "local" for local sources
 get_protocol() {
     local NETSRC=$1
