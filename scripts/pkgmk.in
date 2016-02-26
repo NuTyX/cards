@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #  cards
-# 
+#
 #  Copyright (c) 2000-2005 Per Liden
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
 #  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
@@ -18,9 +18,12 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 #  USA.
 #
+
+# Some code based on `pacman date 2016-02-21` <https://projects.archlinux.org/pacman.git/> GNU General Public License 2
+#       Copyright (c) 2015-2016 Pacman Development Team <pacman-dev@archlinux.org>
 
 ##
 # error codes
@@ -34,6 +37,125 @@ E_FOOTPRINT=7  # footprint check failure
 E_BUILD=8      # error while running 'build()'
 E_INSTALL=9    # error while installing the package via 'pkgadd'
 E_DEPS=10      # error while searching runtime deps via 'pkginfo -b'
+
+#**********************************************************************************************************************
+#   New Functions: by **peter1000** <https://github.com/peter1000> added 2016 most based on `pacman date 2016-02-21`
+#**********************************************************************************************************************
+
+# check if execution of the script should be aborted: if so prints the error message
+check_abort() {
+    if [ "$1" == "ERR_ABORT" ]; then
+        echo -e "\n=======> ERROR: Aborting.... $2\n" >&2
+        exit 1
+    fi
+}
+
+# called when execution of the script MUST be aborted: prints the error message
+do_abort() {
+	check_abort "ERR_ABORT" "$1"
+    exit 1
+}
+
+# extract the original URL from a source entry: strip an eventual filename or VCS directory
+get_origurl() {
+	printf "%s\n" "${1#*::}"
+}
+
+# extract the protocol from a source entry - return "local" for local sources
+get_protocol() {
+    local PROTOCOL
+    local SUPPORTED_PROTOCOLS=('ftp' 'http' 'https' 'git' 'svn' 'hg' 'bzr' 'local' )
+    local PROTO="${1#*::}" # strip leading filename/vcs-directory
+
+	if [[ $1 = *://* ]]; then
+		PROTOCOL="${PROTO%%://*}"
+        if [[ $PROTOCOL = *+* ]]; then
+            PROTOCOL="${PROTO%%+*}"
+        fi
+	elif [[ $1 = *lp:* ]]; then
+		PROTOCOL="${PROTO%%lp:*}"
+	else
+		PROTOCOL="local"
+	fi
+    if [[ " ${SUPPORTED_PROTOCOLS[@]} " =~ " ${PROTOCOL} " ]]; then
+        printf "%s\n" "${PROTOCOL}"
+    else
+        error "The protocol is not supported: <$PROTOCOL>."
+        printf "%s\n" "ERR_ABORT"
+    fi
+}
+
+# extract the final used source name (filename or VCS directory) from a source entry: this is not a path only the name.
+get_final_srcname() {
+	local NETSRC=$1
+    local PROTOCOL=$(get_protocol "$NETSRC")
+	# if a filename/VCS-directory is specified, use it except Local sources
+	if [[ $NETSRC = *::* ]]; then
+        # local source files can not change their names
+        if [[ "$PROTOCOL" == "local" ]]; then
+            printf "%s\n" "ERR_ABORT"
+        else
+            printf "%s\n" ${NETSRC%%::*}
+        fi
+		return
+	fi
+
+    local FINAL_SRCNAME
+	case $PROTOCOL in
+        local)
+            # may not start with a slash
+            if [[ $NETSRC == /* ]]; then
+                printf "%s\n" "ERR_ABORT"
+                return
+            else
+                # local sources use the whole relative url
+                FINAL_SRCNAME="$NETSRC"
+            fi
+            ;;
+		git|svn|hg|bzr)
+			FINAL_SRCNAME=${NETSRC%%#*}
+			FINAL_SRCNAME=${FINAL_SRCNAME%/}
+			FINAL_SRCNAME=${FINAL_SRCNAME##*/}
+			if [[ $PROTOCOL = bzr ]]; then
+				FINAL_SRCNAME=${FINAL_SRCNAME#*lp:}
+			fi
+			if [[ $PROTOCOL = git ]]; then
+				FINAL_SRCNAME=${FINAL_SRCNAME%%.git*}
+			fi
+			;;
+		*)
+			# if it is just an URL, we only keep the last component
+			FINAL_SRCNAME="${NETSRC##*/}"
+			;;
+	esac
+    printf "%s\n" "${FINAL_SRCNAME}"
+}
+
+# Return the absolute expected filename/VCS-dirname of a source entry
+get_final_srcpath() {
+	local FINAL_SRCNAME="$(get_final_srcname "$1")"
+	local PROTOCOL="$(get_protocol "$1")"
+    local FINAL_SRCPATH
+
+	case $PROTOCOL in
+		git|svn|hg|bzr)     FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ;;
+		*)                  FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ;;
+	esac
+	printf "%s\n" "$FINAL_SRCPATH"
+}
+
+# TODO
+#
+# ADD documentation/man for: PKGMK_COMPRESSION_OPTS
+#
+# Maybe add Pkgfile syntax check for source=() array
+#
+# In the future add more file types to `unpack_source` (same as Arch Linux)
+
+#**********************************************************************************************************************
+#   END New Functions by **peter1000**
+#**********************************************************************************************************************
+
 
 info() {
 	echo "=======> $1"
@@ -135,7 +257,7 @@ get_package_name() {
 	fi
 	NAME=`echo $1|sed "s/i686.$EXT//"|sed "s/x86_64.$EXT//"|sed "s/any.$EXT//"`
 
-	echo "${NAME:0:$((${#NAME} - 10 ))}"	
+	echo "${NAME:0:$((${#NAME} - 10 ))}"
 }
 get_package_builddate() {
 	local NAME BUILD_DATE EXT
@@ -200,109 +322,129 @@ downloads_file_with_curl() {
 	fi
 }
 download_file() {
-	info "Downloading '$1'."
-
-	LOCAL_FILENAME=`get_filename $1`
+    local WGET_CMD
+    local FINAL_SRCPATH=$1
+    local PROTOCOL=$2
+    local ORIGURL=$3
+    local BASENAME="${ORIGURL##*/}"
+    local RESUME_CMD="-c"
+    
+	info "Downloading '$ORIGURL'."
 
 	if [ ! "`type -p wget`" ]; then
 		warning "Command 'wget' not found."
 		info "You should install 'wget' as soon as possible, trying with curl ..."
-		downloads_file_with_curl $LOCAL_FILENAME $1
+		downloads_file_with_curl $FINAL_SRCPATH $ORIGURL
 	else
-		LOCAL_FILENAME_PARTIAL="$LOCAL_FILENAME.partial"
-		DOWNLOAD_OPTS="--passive-ftp --no-directories --tries=3 --waitretry=3 \
-		--directory-prefix=$PKGMK_SOURCE_DIR \
-		--output-document=$LOCAL_FILENAME_PARTIAL --no-check-certificate"
+		FINAL_SRCPATH_PARTIAL="$FINAL_SRCPATH.partial"
+        # CMD Line
+        WGET_CMD="wget --no-directories --tries=3 --waitretry=3 --no-check-certificate \
+        $PKGMK_WGET_OPTS -O $FINAL_SRCPATH_PARTIAL"
+        if [[ $proto = ftp ]]; then
+            WGET_CMD="$WGET_CMD --passive-ftp"
+        fi
 
-		if [ -f "$LOCAL_FILENAME_PARTIAL" ]; then
-			info "Partial download found, trying to resume"
-			RESUME_CMD="-c"
-		fi
-
-		error=1
-
-		BASENAME=`get_basename $1`
+		local ret=1
 		for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
 			REPO="`echo $REPO | sed 's|/$||'`"
-			wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $REPO/$BASENAME
-			error=$?
-			if [ $error == 0 ]; then
+			$WGET_CMD $RESUME_CMD $REPO/$BASENAME
+			ret=$?
+			if [ $ret == 0 ]; then
 				break
 			fi
 		done
 
-		if [ $error != 0 ]; then
+		if [ $ret != 0 ]; then
 			while true; do
-				wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $1
-				error=$?
-				if [ $error != 0 ] && [ "$RESUME_CMD" ]; then
+				$WGET_CMD $RESUME_CMD $ORIGURL
+				ret=$?
+				if [ $ret != 0 ] && [ "$RESUME_CMD" ]; then
 					info "Partial download failed, restarting"
-					rm -f "$LOCAL_FILENAME_PARTIAL"
+					rm -f -- "$FINAL_SRCPATH_PARTIAL"
 					RESUME_CMD=""
 				else
 					break
 				fi
 			done
 		fi
-	
-		if [ $error != 0 ]; then
-			error "Downloading '$1' failed."
-			exit $E_DOWNLOAD
+
+		if [ $ret != 0 ]; then
+            do_abort "Failure while downloading <$FINAL_SRCPATH> source entry: <$ORIGURL>." 
 		fi
-	
-		mv -f "$LOCAL_FILENAME_PARTIAL" "$LOCAL_FILENAME"
+		mv -f "$FINAL_SRCPATH_PARTIAL" "$FINAL_SRCPATH"
 	fi
 }
-download_source() {
-	if [ "$PKGMK_USE_NEW_DOWNLOAD_OPTIONS" = "yes" ]; then
-		# using new download options implemented by peter1000 (Feb 2016)
-		error "PKGMK_USE_NEW_DOWNLOAD_OPTIONS is set to '$PKGMK_USE_NEW_DOWNLOAD_OPTIONS' This is not yet implemted."
-		exit $E_DOWNLOAD
-	else
-		local FILE LOCAL_FILENAME
 
-		for FILE in ${source[@]}; do
-			LOCAL_FILENAME=`get_filename $FILE`
-			if [ ! -e $LOCAL_FILENAME ]; then
-				if [ "$LOCAL_FILENAME" = "$FILE" ]; then
-					error "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
-					exit $E_DOWNLOAD
-				else
-					if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
-						download_file $FILE
-					else
-						error "Source file '$LOCAL_FILENAME' not found (use option -d to download)."
-						exit $E_DOWNLOAD
-					fi
-				fi
-			fi
-		done
-	fi
+# main download function
+download_source() {
+    local ENTRY PROTOCOL FINAL_SRCPATH ORIGURL
+
+    for ENTRY in ${source[@]}; do
+        PROTOCOL=$(get_protocol "$ENTRY")
+        check_abort $PROTOCOL "The protocol is not supported. SOURCE: <$ENTRY>"
+        local FINAL_SRCNAME=$(get_final_srcname "$ENTRY")
+        check_abort $FINAL_SRCNAME \
+            "Local source files can not change their names or start with a slash '/'. SOURCE: <$ENTRY>"
+        FINAL_SRCPATH=`get_final_srcpath $ENTRY`
+        ORIGURL=`get_origurl  $ENTRY`        
+
+        if [ "$PROTOCOL" == "local" ]; then
+            if [[ ! -f "$FINAL_SRCPATH" ]]; then
+                do_abort "Local Source file '$FINAL_SRCPATH' not found (can not be downloaded, URL not specified). \
+                SOURCE: <$ENTRY>"
+            fi
+        else
+            if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
+                case $PROTOCOL in
+                    ftp|http|https)     
+                        #download_file  "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$PROTOCOL" "$ORIGURL"  
+                        download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIGURL" 
+                        ;;
+                    # currently not supported
+                    #git)                
+                        #download_git                              
+                        #;;
+                    #svn)                
+                        #download_svn                                     
+                        #;;
+                    #hg)                 
+                        #download_hg                                  
+                        #;;
+                    #bzr)                
+                        #download_bzr                                        
+                        #;;
+                    #local) checked above
+                esac
+            else
+                do_abort "Source file '$FINAL_SRCPATH' not found (use option -d to download)."
+            fi
+        fi
+    done
 }
 remove_source() {
-	local FILE LOCAL_FILENAME
-	for FILE in ${source[@]}; do
-		LOCAL_FILENAME=`get_filename $FILE`
-		if [ -e $LOCAL_FILENAME ] && [ "$LOCAL_FILENAME" != "$FILE" ]; then
-			info "Removing $LOCAL_FILENAME"
-			rm -f $LOCAL_FILENAME
+	local ENTRY FINAL_SRCPATH
+	for ENTRY in ${source[@]}; do
+		FINAL_SRCPATH=`get_final_srcpath $ENTRY`
+		if [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$ENTRY" ]; then
+			info "Removing $FINAL_SRCPATH"
+			rm -f $FINAL_SRCPATH
 		fi
 	done
 }
 unpack_source() {
-	local FILE LOCAL_FILENAME COMMAND
-	
-	for FILE in ${source[@]}; do
-		LOCAL_FILENAME=`get_filename $FILE`
-		case $LOCAL_FILENAME in
+	local ENTRY FINAL_SRCPATH COMMAND
+
+	for ENTRY in ${source[@]}; do
+		FINAL_SRCPATH=`get_final_srcpath $ENTRY`
+		case $FINAL_SRCPATH in
 			*.tar|*.tar.gz|*.tar.Z|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.lzma|*.zip|*.rpm)
 				if [ "$PKGMK_IGNORE_UNPACK" != "yes" ];then
-					COMMAND="bsdtar -p -o -C $SRC -xf $LOCAL_FILENAME"
+					COMMAND="bsdtar -p -o -C $SRC -xf $FINAL_SRCPATH"
 				else
-					COMMAND="cp $LOCAL_FILENAME $SRC"
+					COMMAND="cp $FINAL_SRCPATH $SRC"
 				fi ;;
 			*)
-				COMMAND="cp $LOCAL_FILENAME $SRC" ;;
+				COMMAND="cp $FINAL_SRCPATH $SRC" ;;
 		esac
 
 		echo "$COMMAND"
@@ -329,14 +471,14 @@ get_package_list() {
 	done
 }
 make_md5sum() {
-	local FILE LOCAL_FILENAMES
-	
+	local ENTRY FINAL_SRCPATH
+
 	if [ "$source" ]; then
-		for FILE in ${source[@]}; do
-			LOCAL_FILENAMES="$LOCAL_FILENAMES `get_filename $FILE`"
+		for ENTRY in ${source[@]}; do
+			FINAL_SRCPATH="$FINAL_SRCPATH `get_final_srcpath $ENTRY`"
 		done
-		
-		md5sum $LOCAL_FILENAMES | sed -e 's|  .*/|  |' | sort -k 2
+
+		md5sum $FINAL_SRCPATH | sed -e 's|  .*/|  |' | sort -k 2
 	fi
 }
 
@@ -354,7 +496,7 @@ check_md5sum() {
 	local FILE="$PKGMK_WORK_DIR/.tmp"
 
 	cd $PKGMK_ROOT
-	
+
 	if [ -f $PKGMK_MD5SUM ]; then
 		make_md5sum > $FILE.md5sum
 		sort -k 2 $PKGMK_MD5SUM > $FILE.md5sum.orig
@@ -388,7 +530,7 @@ check_md5sum() {
 			info "Md5sum not found."
 			exit $E_MD5
 		fi
-		
+
 		warning "Md5sum not found, creating new."
 		make_md5sum > $PKGMK_MD5SUM
 	fi
@@ -404,9 +546,9 @@ check_md5sum() {
 
 strip_files() {
 	local FILE FILTER
-	
+
 	cd $PKG
-	
+
 	if [ -f $PKGMK_ROOT/$PKGMK_NOSTRIP ]; then
 		FILTER="grep -v -f $PKGMK_ROOT/$PKGMK_NOSTRIP"
 	else
@@ -431,13 +573,13 @@ compress_manpages() {
 	local FILE DIR TARGET
 
 	cd $PKG
-	
+
 	find . -type f -path "*/share/man*/*" | while read FILE; do
 		if [ "$FILE" = "${FILE%%.gz}" ]; then
 			gzip -9 "$FILE"
 		fi
 	done
-	
+
 	find . -type l -path "*/share/man*/*" | while read FILE; do
 		TARGET=`readlink -n "$FILE"`
 		TARGET="${TARGET##*/}"
@@ -471,7 +613,7 @@ compress_manpages() {
 
 check_footprint() {
 	local TARGET FILE="$PKGMK_WORK_DIR/.tmp"
-	
+
 	cd $PKGMK_PACKAGE_DIR
 	if [ -z $TARGETS ]; then
 		get_package_list
@@ -518,7 +660,7 @@ make_work_dir() {
 	export pkgdir=$PKG
 	export srcdir=$SRC
 	umask 022
-	
+
 	cd $PKGMK_ROOT
 	remove_work_dir
 	mkdir -p $SRC $PKG
@@ -572,7 +714,7 @@ pack_devel() {
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
-				
+
 			fi
 		done
 	done
@@ -775,15 +917,15 @@ build_package() {
 
 	check_file "$TARGET"
 	make_work_dir
-	
+
 	if [ "$UID" != "0" ]; then
 		warning "Packages should be built as root."
 	fi
-	
+
 	info "Building '$TARGET'."
-	
+
 	unpack_source
-		
+
 	cd $SRC
 	if ( declare -f prepare > /dev/null ); then
 		(set -e -x ; prepare)
@@ -796,7 +938,7 @@ build_package() {
 		if [ "$PKGMK_NO_STRIP" = "no" ]; then
 			strip_files
 		fi
-		
+
 		compress_manpages
 
 		cd $PKG
@@ -878,10 +1020,10 @@ build_package() {
 			fi
 		fi
 	fi
-	
+
 	if [ "$BUILD_SUCCESSFUL" = "yes" ]; then
 		if [ "$1" != "$TARGET" ]; then
-			get_package_list		
+			get_package_list
         		if [ -z $TARGETS ]; then
                 		error "Package(s) not found(s)..."
 				exit $E_BUILD
@@ -916,17 +1058,17 @@ install_package() {
 	for TARGET in ${TARGETS[@]}; do
 		if [ "`get_package_arch $TARGET`" = "$PKGMK_ARCH" ] || [ "`get_package_arch $TARGET`" = "any" ]; then
 			info "Installing '$TARGET'."
-	
+
 			if [ "$PKGMK_INSTALL" = "install" ]; then
 				COMMAND="pkgadd $PKGMK_PACKAGE_DIR/$TARGET"
 			else
 				COMMAND="pkgadd -u $PKGMK_PACKAGE_DIR/$TARGET"
 			fi
-	
+
 			cd $PKGMK_ROOT
 			echo "$COMMAND"
 			$COMMAND
-	
+
 			if [ $? = 0 ]; then
 				info "Installing '$TARGET' succeeded."
 			else
@@ -940,7 +1082,7 @@ install_package() {
 recursive() {
 	local ARGS FILE DIR
 	[ -f $PKGMK_REPO ] && rm -v $PKGMK_REPO
-	
+
 	ARGS=`echo "$@" | sed -e "s/--recursive//g" -e "s/-r//g"`
 
 	for FILE in `find $PKGMK_ROOT -name $PKGMK_PKGFILE | sort`; do
@@ -964,7 +1106,7 @@ clean() {
 		done
 	else
 		warning "$TARGETS not found"
-	fi	
+	fi
 	find $PKGMK_ROOT -name "*.md5sum" -exec rm -v {} \; 2> /dev/null
 	find $PKGMK_ROOT -name "*.footprint" -exec rm -v {} \; 2> /dev/null
 	unset TARGETS
@@ -973,7 +1115,7 @@ update_footprint() {
 	cd $PKGMK_PACKAGE_DIR
 	if [ -z $TARGETS ]; then
 		get_package_list
-		if [ -z $TARGETS ]; then		
+		if [ -z $TARGETS ]; then
 			error "Package(s) not found(s), unable to update footprint."
 			exit $E_FOOTPRINT
 		fi
@@ -995,7 +1137,7 @@ update_footprint() {
 build_needed() {
 	local FILE RESULT
 	RESULT="yes"
-	if [ -f $TARGET ]; then 
+	if [ -f $TARGET ]; then
 		RESULT="no"
 		FILE=`get_filename $PKGMK_PKGFILE`
 		if [ ! -e $FILE ] || [ ! $TARGET -nt $FILE ]; then
@@ -1190,7 +1332,6 @@ main() {
 	if [ -f /etc/profile ]; then
 		source /etc/profile
 	fi
-
 	parse_options "$@"
 
         if [ ! -f $PKGMK_CONFFILE ]; then
@@ -1198,12 +1339,13 @@ main() {
                 exit $E_GENERAL
         fi
         . $PKGMK_CONFFILE
+
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
 		warning "pkginfo NOT FOUND, footprint ignored."
 		PKGMK_IGNORE_FOOTPRINT="yes"
 	fi
-	local FILE TARGET 
+	local FILE TARGET
 
 	name=`basename $PKGMK_ROOT`
 
@@ -1277,7 +1419,7 @@ main() {
 			info "PKGMK_UPDATE_REPO: $PKGMK_UPDATE_REPO"
 		fi
 		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
-		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"	
+		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"
 	fi
 	if [ "$PKGMK_IGNORE_REPO"  == "yes" ]; then
 		info "$PKGMK_REPO file will be deleted"
@@ -1353,7 +1495,7 @@ main() {
 		info "maintainer: $maintainer"
 		exit 0
 	fi
-	
+
 	if [ "$PKGMK_UPDATE_MD5SUM" = "yes" ]; then
 		download_source
 		check_file "$PKGMK_MD5SUM"
@@ -1515,8 +1657,6 @@ PKGMK_KEEP_WORK="no"
 
 PKGMK_UPDATE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"
-# This variables should be removed once all runs smoothly: peter1000 (Feb. 2016)
-PKGMK_USE_NEW_DOWNLOAD_OPTIONS="no"
 
 main "$@"
 
