@@ -1,55 +1,74 @@
-
-              cards - Package Management Utilities for NuTyX
-              a fork of the pkgutils and prt-get tools
+## cards - Package Management Utilities for NuTyX-Linux
 
 
+### Description
 
-Description
------------
-cards is a set of utilities (pkgadd, pkgrm, pkginfo, pkgmk and cards),
-which are used for managing software packages in Linux. It was originally developed for
-and used by the CRUX distribution (http://crux.nu). This is a fork of this work for the 
-NuTyX distribution including the handling of the binaries
+**cards** which stands for *Create, Add, Remove and Download System* is a set of utilities 
+(pkgadd, pkgrm, pkginfo, pkgmk and cards), which are used for managing software packages in NuTyX-Linux. 
+ 
+*cards* is based on a fork of the *[CRUX-Linux](http://crux.nu) pkgutils and prt-get tools* and is under active development.
+[NuTyX-Linux Team](http://nutyx.org)
 
 
-Building and installing
------------------------
- 1. To build the lib
+#### The most notable additions and improvements
 
+* Full support for *binary packages*
+* Support for sources from *version control system (VCS)* (Bazaar, Git, Subversion and Mercurial)
+
+
+### Building and installing
+
+
+#### To build the lib
+
+```bash
 $ make libs
+```
 
- 2. To install the lib
+#### To install the lib
 
+```bash
 $ make install-libs
+```
 
- 3. To build all
+#### To build all
 
+```bash
 $ make all
+```
 
- 4. To build the pkgadd binary
+#### To build the pkgadd binary
 
+```bash
 $ make pkgadd
+```
 
- 5. To install the binaries
+#### To install the binaries
 
+```bash
 $ make install
+```
+
 or
+
+```bash
 $ make DESTDIR=/some/other/path install
+```
 
+#### To get a quick overview
 
- 6. To get a quick overview
-
+```bash
 $ cards help
+```
 
-Copyright
----------
 
-**cards** Copyright (c) 2013-2016 NuTyX team (http://nutyx.org).
+### Copyright
+
+**cards** Copyright (c) 2013-2016 [NuTyX-Linux Team](http://nutyx.org).
 
 Some code based on:
 
-* `pkgutils` Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu)
-* `pacman` (https://projects.archlinux.org/pacman.git/) Copyright (c) 2015-2016 Pacman Development Team
+* `pkgutils`: Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 [CRUX team](http://crux.nu)
+* `pacman`:   Copyright (c) 2015-2016 Pacman Development Team [pacman repo](https://projects.archlinux.org/pacman.git/)
 
-cards is licensed through the GNU General Public License.
-Read the COPYING file for the complete license.
+**cards** is licensed through the GNU General Public License. Read the COPYING file for the complete license.
