@@ -346,7 +346,7 @@ download_git() {
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
 		info "Cloning git repo <${REPO}>..."
-		if ! git clone --mirror "$url" "$FINAL_SRCPATH"; then
+		if ! git clone $PKGMK_VCS_GIT_OPTS --mirror "$url" "$FINAL_SRCPATH"; then
             if [ "$PKGMK_KEEP_WORK" = "no" ]; then
                 rm -rf $PKGMK_WORK_DIR
             fi
@@ -364,7 +364,7 @@ download_git() {
 			do_abort "<$FINAL_SRCPATH> is not a clone of <$url> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
         fi
 		info "Updating git repo: <$REPO>..."
-		if ! git fetch --all -p; then
+		if ! git fetch --all -p $PKGMK_VCS_GIT_OPTS; then
 			# only warn on failure to allow offline builds
 			warning "Failure while updating git repo: <$REPO>"
 		fi
@@ -419,7 +419,7 @@ download_svn() {
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
 		info "Cloning svn repo <${REPO}>..."
 		mkdir -p "$FINAL_SRCPATH/.makepkg"
-		if ! svn checkout -r ${ref} --config-dir "$FINAL_SRCPATH/.makepkg" "$url" "$FINAL_SRCPATH"; then
+		if ! svn checkout -r ${ref} $PKGMK_VCS_SVN_OPTS --config-dir "$FINAL_SRCPATH/.makepkg" "$url" "$FINAL_SRCPATH"; then
             if [ "$PKGMK_KEEP_WORK" = "no" ]; then
                 rm -rf $PKGMK_WORK_DIR
             fi
@@ -429,7 +429,7 @@ download_svn() {
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
 		info "Updating svn repo: <$REPO>..."
 		cd_safe "$FINAL_SRCPATH"
-		if ! svn update -r ${ref}; then
+		if ! svn update -r ${ref} $PKGMK_VCS_SVN_OPTS; then
 			# only warn on failure to allow offline builds
 			warning "Failure while updating svn repo: <$REPO>"
 		fi
@@ -462,7 +462,7 @@ download_hg() {
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
 		info "Cloning hg repo <${REPO}>..."
-		if ! hg clone -U "$url" "$FINAL_SRCPATH"; then
+		if ! hg clone $PKGMK_VCS_HG_OPTS -U "$url" "$FINAL_SRCPATH"; then
             if [ "$PKGMK_KEEP_WORK" = "no" ]; then
                 rm -rf $PKGMK_WORK_DIR
             fi
@@ -472,7 +472,7 @@ download_hg() {
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
 		info "Updating hg repo: <$REPO>..."
 		cd_safe "$FINAL_SRCPATH"
-		if ! hg pull; then
+		if ! hg pull $PKGMK_VCS_HG_OPTS; then
 			# only warn on failure to allow offline builds
 			warning "Failure while updating hg repo: <$repo>"
 		fi
@@ -505,7 +505,7 @@ download_bzr() {
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
         info "Branching bzr displaylocation <${displaylocation}>..."
-		if ! bzr branch "$url" "$FINAL_SRCPATH" --no-tree --use-existing-dir; then
+		if ! bzr branch $PKGMK_VCS_BZR_OPTS "$url" "$FINAL_SRCPATH" --no-tree --use-existing-dir; then
             if [ "$PKGMK_KEEP_WORK" = "no" ]; then
                 rm -rf $PKGMK_WORK_DIR
             fi
@@ -515,7 +515,7 @@ download_bzr() {
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
         info "Pulling bzr displaylocation: <$displaylocation>..."
 		cd_safe "$FINAL_SRCPATH"
-		if ! bzr pull "$url"; then
+		if ! bzr pull $PKGMK_VCS_BZR_OPTS "$url"; then
 			# only warn on failure to allow offline builds
             warning "Failure while pulling bzr displaylocation: <$displaylocation>"
 		fi
@@ -2142,14 +2142,14 @@ PKGMK_UPDATE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"
 
 PKGMK_DOWNLOAD_PROG="wget"
-PKGMK_DOWNLOAD_PROG_OPTS=""
+PKGMK_DOWNLOAD_PROG_OPTS=""     
 PKGMK_VCS_HOLDVER="no"         # When using VCS sources any currently checked out source will not be updated to the latest revision.
 
 
 PKGMK_VCS_GIT_OPTS=""
 PKGMK_VCS_SVN_OPTS=""
 PKGMK_VCS_HG_OPTS=""
-PKGMK_VCS_BZR_OPTS="-Ossl.cert_reqs=none"
+PKGMK_VCS_BZR_OPTS=""
 
 
 main "$@"
