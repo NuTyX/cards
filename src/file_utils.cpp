@@ -327,7 +327,7 @@ int findDir(itemList* filesList, const char* path)
 			if ( dir->d_name[0] != '.' ) { // ignore any .directories
 				sprintf(fullPath,"%s/%s",path,dir->d_name);
 				sd = opendir(fullPath);
-				/* want to make shure its not a regular file
+				/* want to make sure its not a regular file
 					maybe a beter way ?
 				*/
 				if (sd) {

@@ -70,7 +70,7 @@ directories, cards will use the one found first (directories listed
 first have precedence)
 
 .LP
-If you specify an url in after a | symbol, it will used binaries from this url. In our exemple, we
+If you specify an url in after a | symbol, it will used binaries from this url. In our example, we
 will used the default mirror from nutyx.org.
 
 .SH "AUTHORS"

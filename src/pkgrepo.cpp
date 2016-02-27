@@ -302,7 +302,7 @@ void Pkgrepo::parseCurrentPackagePkgRepoFile()
 		/*
 		 * Let's check if the first line is something like:
 		 * 1401638336#.cards.tar.xz#4.14.1#..#..#..
-		 * We already have this info let's make shure it's still ok
+		 * We already have this info let's make sure it's still ok
 		*/
 			vector<string> infos;
 			split( input, '#', infos, 0,true);

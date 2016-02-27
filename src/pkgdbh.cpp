@@ -667,7 +667,7 @@ void Pkgdbh::removePackageFiles(const string& name)
 
 	m_actualAction = RM_PKG_FILES_START;
 	progressInfo();
-	// Delete the files from bottom to up to make shure we delete the contents of any folder before
+	// Delete the files from bottom to up to make sure we delete the contents of any folder before
 	for (set<string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
 		m_actualAction = RM_PKG_FILES_RUN;
 		progressInfo();

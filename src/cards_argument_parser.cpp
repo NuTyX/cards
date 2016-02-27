@@ -143,13 +143,13 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		ArgParser::EQ, 1, "<expr>");
 
 	addCommand(CMD_DEPCREATE, "depcreate",
-		"create a package AND it's dependencies from the recept found in the ports.",
+		"create a package AND it's dependencies from the recipe found in the ports.",
 "This command is used for the packager. All the dependencies include the final package will be compiled.",
 		ArgParser::EQ,1 , "<package>");
 
 	addCommand(CMD_CREATE, "create",
-		"\tcreate a package from the recept found in the port.",
-"This command is used for the packager. All the dependencies must be compiled, up to date and available for the creation of the final package. If somes dependencies are missing, the command will abort. A compilation logfile can be define in /etc/cards.conf as: logdir /var/log/pkgbuild for exemple.",
+		"\tcreate a package from the recipe found in the port.",
+"This command is used for the packager. All the dependencies must be compiled, up to date and available for the creation of the final package. If somes dependencies are missing, the command will abort. A compilation logfile can be define in /etc/cards.conf as: logdir /var/log/pkgbuild for example.",
 		ArgParser::EQ, 1, "<package>");
 
 	addCommand(CMD_PURGE, "purge",

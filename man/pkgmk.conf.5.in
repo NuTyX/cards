@@ -69,7 +69,7 @@ Option to disable the generation of the .PKGREPO file locate in the port directo
 Default: 'yes'
 .TP
 \fBPKGMK_IGNORE_UNPACK='STRING'\fP
-Option to disable the extract of the source codes of the package. You need to extract the source code yourself prior the cd $name-$version (for exemple)
+Option to disable the extraction of the source codes of the package. You need to extract the source code yourself prior the cd $name-$version (for example)
 .br
 Default: 'no'
 .TP

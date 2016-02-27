@@ -25,13 +25,133 @@
 # Some code based on `pacman date 2016-02-21` <https://projects.archlinux.org/pacman.git/> GNU General Public License 2
 #       Copyright (c) 2015-2016 Pacman Development Team <pacman-dev@archlinux.org>
 
+#**********************************************************************************************************************
+#
+#                               Pkgfile: source (array)
+#
+# An array of source files required to build the package. This can also be an empty array `source=()`.
+# To simplify the maintenance of Pkgfiles, use the $name and $version variables when specifying the download location,
+# if possible.
+# Compressed files will be extracted automatically unless `PKGMK_IGNORE_UNPACK="yes"` is set or they are local files
+# specified by relative path to the Pkgfile.
+#
+# It is also possible to change the name of the downloaded file (except for Local source files), which is helpful with
+# weird URLs and for handling multiple source files with the same name.
+#
+# ::1:::::::::::::::::::::::::::: Regular source entries can have two forms:
+#
+#   1) The syntax is: source=(filename::url)
+#
+#       The source URL is divided into two components:
+#
+#           1. `filename` (optional): The new changed name of the downloaded file. `::` is used as separator.
+#           2. `url:` (required):     A fully-qualified URL (supported are: ftp://, http://, https://)
+#
+#
+# ::2:::::::::::::::::::::::::::: There is also support using sources downloaded from version control systems (VCS).
+#
+#   1) The syntax is: source=(directory::url#fragment).
+#
+#       The source URL is divided into three components:
+#
+#           1. `directory` (optional): Specifies an alternate directory name to download the VCS source into.
+#                                      `::` is used as separator.
+#           2. `url` (required):       The URL to the VCS repository. This must include the VCS in the URL protocol.
+#                                      If the protocol does not include the VCS name, it can be added by prefixing
+#                                      the URL with vcs+. For example, using a Git repository over HTTPS would have a
+#                                      source URL in the form: `git+https://....`
+#           3. `fragment` (optional):  Allows specifying a revision number or branch to be checkout from the VCS.
+#                                      For example, to checkout a given revision, the source line would have the
+#                                      format source=(url#revision=123). `#` is used as separator.
+#
+#               The available fragments depends on the VCS being used:
+#
+#                   1. `bzr`: revision (see 'bzr help revisionspec' for details)
+#                   2. `git`: branch, commit, tag
+#                   3. `hg`: branch, revision, tag
+#                   4. `svn`: revision
+#
+#   Currently supported version control systems are Bazaar, Git, Subversion, and Mercurial.
+#   For other version control systems, manual cloning of upstream repositories is usually done in the build() function.
+#
+#
+#
+# ::3:::::::::::::::::::::::::::: Local source files
+#
+#   1) The syntax is: source=(relative_path)
+#
+#       The source URL has one component:
+#
+#           1. `url:` (required): A local file path which is resolved relative to the directory of the `Pkgfile`.
+#                                 A local source file path MUST NOT start with a slash `/`.
+#
+#           * source=(my.patch)
+#           * source=(resources/my.patch)
+#
+#
+#
+# ::4:::::::::::::::::::::::::::: EXAMPLES OK
+#
+#  LOCAL FILES
+#
+# source=(test_file)
+# source=(resources/test_file)
+#
+#
+#  QUALIFIED URI
+#
+#   ftp
+# source=(ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(file::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+#
+#   http
+# source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)
+# source=(xz::http://tukaani.org/xz/xz-5.2.2.tar.xz)
+#
+#   https
+# source=(xmlto::https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+# source=(https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+#
+#  VCS (version control systems)
+#
+#   GIT
+# source=(git://github.com/peter1000/linux-helper-install-scripts.git)
+# source=(git+http://elinks.cz/elinks.git#commit=a3751107033599b835eaafa61177c8d4dda4b7ef)
+# source=(linux_install_scripts::git+http://github.com/peter1000/linux-helper-install-scripts.git)
+# source(test::git+https://cgit.freedesktop.org/poppler/test/#commit=0d2bfd4)
+# source=(git+https://github.com/kaio/ibus-table.git#tag=1.9.11)
+#
+#   SVN
+# source=(svn://svn.code.sf.net/p/splix/code/splix#revision=315)
+# source=(wit::svn+http://opensvn.wiimm.de/wii/trunk/wiimms-iso-tools#revision=6005)
+#
+#   HG
+# source=("hg+https://bitbucket.org/ianb/pastedeploy#tag=1.5.2")
+# source=("pivy::hg+https://bitbucket.org/Coin3D/pivy#tag=pivy-20101207")
+#
+#   BZR
+#
+# Useful options: `-Ossl.cert_reqs=none`: to disable certificate verification entirely
+#
+# source=(bzr+lp:~elementary-os/contractor/elementary-contracts)
+# source=(foomatic_db::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db/#revision=1295)
+#
+#
+# ::5:::::::::::::::::::::::::::: EXAMPLES WRONG / ERROR
+#
+# source=(sftp://home1.cyberciti.biz/~/docs/resume.pdf)
+# source=(ftps://ftp.host.com/ )
+#
+#**********************************************************************************************************************
+
+
 ##
 # error codes
 E_GENERAL=1
 E_PKGFILE=2    # invalid Pkgfile
 E_DIR_PERM=3   # (source/build) directory missing or missing read/write permission
 E_DOWNLOAD=4   # error during download
-E_UNPACK=5     # error during unpacking of source file(s)
+E_UNPACK=5     # error during unpacking/extracting of source file(s)
 E_MD5=6        # md5sum verification failed
 E_FOOTPRINT=7  # footprint check failure
 E_BUILD=8      # error while running 'build()'
@@ -42,70 +162,115 @@ E_DEPS=10      # error while searching runtime deps via 'pkginfo -b'
 #   New Functions: by **peter1000** <https://github.com/peter1000> added 2016 most based on `pacman date 2016-02-21`
 #**********************************************************************************************************************
 
-# check if execution of the script should be aborted: if so prints the error message
+E_DOWNLOAD_PROTO=11    # error when a wrong download protocol is encountered
+E_DOWNLOAD_VCS=12      # error during download (clone/checkout...) of version control source
+E_UNPACK_VCS=13        # error during unpacking/extracting ofof version control source
+
+# returns a part of a string: usually used for multiple return values from functions.
+#   Delimiter is |
+#
+#    $1 - return result string: Quoted
+#    $2 - number of part to be returned
+#
+# e.g.: part3=`get_str_part "$str" 3`
+#
+function get_str_part() {
+    IFS="|" read -ra parts_arr <<< "$1"
+    printf "%s\n" "${parts_arr[-1+$2]}"
+}
+
+# $1 must be in the format: "ERR_ABORT|Message|ErrorCode
+#   e.g.:  check_abort "ERR_ABORT|The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
 check_abort() {
-    if [ "$1" == "ERR_ABORT" ]; then
-        echo -e "\n=======> ERROR: Aborting.... $2\n" >&2
-        exit 1
+    if [ "$(get_str_part "$1" 1)" == "ERR_ABORT" ]; then
+        echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 2`\n" >&2
+        exit $((`get_str_part "$1" 3`))
     fi
 }
 
-# called when execution of the script MUST be aborted: prints the error message
+# $1 must be in the format: "Message|ErrorCode
+#   e.g.:  do_abort "The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
 do_abort() {
-	check_abort "ERR_ABORT" "$1"
-    exit 1
+    echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 1`\n" >&2
+    exit $((`get_str_part "$1" 2`))
 }
 
+# Similar to `do_abort` but also checks if we want to remove the workdir
+do_abort_checked() {
+    if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+        rm -rf $PKGMK_WORK_DIR
+    fi
+    error "Building '$TARGET' failed.. "
+    echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 1`\n" >&2
+    exit $((`get_str_part "$1" 2`))
+}
+
+
 # extract the original URL from a source entry: strip an eventual filename or VCS directory
-get_origurl() {
+get_orig_url() {
 	printf "%s\n" "${1#*::}"
+}
+
+dir_isempty() {
+	(
+		shopt -s dotglob nullglob
+		files=("$1"/*)
+		(( ${#files} == 0 ))
+	)
+}
+
+cd_safe() {
+	if ! cd "$1"; then
+        do_abort "Failed to change to directory $1"
+		exit 1
+	fi
 }
 
 # extract the protocol from a source entry - return "local" for local sources
 get_protocol() {
+    local NETSRC=$1
     local PROTOCOL
     local SUPPORTED_PROTOCOLS=('ftp' 'http' 'https' 'git' 'svn' 'hg' 'bzr' 'local' )
-    local PROTO="${1#*::}" # strip leading filename/vcs-directory
+    local PROTO="${NETSRC#*::}" # strip leading filename/vcs-directory
 
-	if [[ $1 = *://* ]]; then
+	if [[ $NETSRC = *://* ]]; then
 		PROTOCOL="${PROTO%%://*}"
         if [[ $PROTOCOL = *+* ]]; then
             PROTOCOL="${PROTO%%+*}"
         fi
-	elif [[ $1 = *lp:* ]]; then
-		PROTOCOL="${PROTO%%lp:*}"
+	elif [[ $NETSRC = *lp:* ]]; then
+		PROTOCOL="${PROTO%%+lp:*}"
 	else
 		PROTOCOL="local"
 	fi
     if [[ " ${SUPPORTED_PROTOCOLS[@]} " =~ " ${PROTOCOL} " ]]; then
         printf "%s\n" "${PROTOCOL}"
     else
-        error "The protocol is not supported: <$PROTOCOL>."
-        printf "%s\n" "ERR_ABORT"
+        echo "ERR_ABORT|The protocol: <$PROTOCOL> is not supported. SOURCE: <$NETSRC>|$E_DOWNLOAD_PROTO"
     fi
 }
 
 # extract the final used source name (filename or VCS directory) from a source entry: this is not a path only the name.
 get_final_srcname() {
+    local FINAL_SRCNAME
 	local NETSRC=$1
     local PROTOCOL=$(get_protocol "$NETSRC")
 	# if a filename/VCS-directory is specified, use it except Local sources
 	if [[ $NETSRC = *::* ]]; then
         # local source files can not change their names
         if [[ "$PROTOCOL" == "local" ]]; then
-            printf "%s\n" "ERR_ABORT"
+            echo "ERR_ABORT|Local source file can not change their names. SOURCE: <$NETSRC>|$E_GENERAL"
         else
             printf "%s\n" ${NETSRC%%::*}
         fi
 		return
 	fi
-
-    local FINAL_SRCNAME
+    
 	case $PROTOCOL in
         local)
             # may not start with a slash
             if [[ $NETSRC == /* ]]; then
-                printf "%s\n" "ERR_ABORT"
+                echo "ERR_ABORT|Local source file MUST NOT start with a slash. SOURCE: <$NETSRC>|$E_GENERAL"
                 return
             else
                 # local sources use the whole relative url
@@ -134,23 +299,485 @@ get_final_srcname() {
 # Return the absolute expected filename/VCS-dirname of a source entry
 get_final_srcpath() {
 	local FINAL_SRCNAME="$(get_final_srcname "$1")"
-	local PROTOCOL="$(get_protocol "$1")"
+    check_abort "$FINAL_SRCNAME"
+	printf "%s\n" "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+}
+# Return the absolute filename/VCS-dirname of a source entry: checks for it's existence
+getchecked_final_srcpath() {
     local FINAL_SRCPATH
-
-	case $PROTOCOL in
-		git|svn|hg|bzr)     FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ;;
-		*)                  FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ;;
+    local NETSRC=$1
+	local FINAL_SRCNAME="$(get_final_srcname "$NETSRC")"
+    check_abort "$FINAL_SRCNAME"
+    local PROTOCOL=$(get_protocol "$NETSRC")
+    check_abort "$PROTOCOL"
+    
+	case $proto in
+		git|svn|hg|bzr)
+			if [[ -d "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ]]; then
+				FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+			else
+				return 1
+			fi
+			;;
+		*)
+			if [[ -f "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ]]; then
+				FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+			else
+				return 1
+			fi
+			;;
 	esac
 	printf "%s\n" "$FINAL_SRCPATH"
 }
+#**********************************************************************************************************************
+#
+# git - function for handling the download and "extraction" of Git sources
+#
+# Examples"
+#
+# source=(git://github.com/peter1000/linux-helper-install-scripts.git)
+# source=(git+http://elinks.cz/elinks.git#commit=a3751107033599b835eaafa61177c8d4dda4b7ef)
+# source=(linux_install_scripts::git+http://github.com/peter1000/linux-helper-install-scripts.git)
+# source(test::git+https://cgit.freedesktop.org/poppler/test/#commit=0d2bfd4)
+# source=(git+https://github.com/kaio/ibus-table.git#tag=1.9.11)
+#
+#**********************************************************************************************************************
+download_git() {
+    local url
+    local NETSRC=$1
+	local FINAL_SRCNAME=$2
+	local FINAL_SRCPATH=$3
+    local ORIG_URL=$4
+    local REPO=$FINAL_SRCNAME
+	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+
+	info "Downloading $FINAL_SRCNAME..."
+    
+	url=${ORIG_URL#git+}
+	url=${url%%#*}
+
+	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
+		info "Cloning git repo <${REPO}>..."
+		if ! git clone $PKGMK_VCS_GIT_OPTS --mirror "$url" "$FINAL_SRCPATH"; then
+			do_abort_checked "Failure while downloading git repo: <$REPO> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
+		fi
+	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
+		cd_safe "$FINAL_SRCPATH"
+		# Make sure we are fetching the right repo
+		if [[ "$url" != "$(git config --get remote.origin.url)" ]] ; then
+			do_abort_checked "<$FINAL_SRCPATH> is not a clone of <$url> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
+        fi
+		info "Updating git repo: <$REPO>..."
+		if ! git fetch --all -p $PKGMK_VCS_GIT_OPTS; then
+			# only warn on failure to allow offline builds
+			warning "Failure while updating git repo: <$REPO>"
+		fi
+	fi
+}
+
+extract_git() {
+	local NETSRC=$1
+
+	local FRAGMENT=${NETSRC#*#}
+	if [[ $FRAGMENT = "$NETSRC" ]]; then
+		unset FRAGMENT
+	fi
+
+	local REPO=${NETSRC##*/}
+	REPO=${REPO%%#*}
+	REPO=${REPO%%.git*}
+
+	local dir=$(getchecked_final_srcpath "$NETSRC")
+	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
+
+	info "Creating working copy of git repo: <$REPO>..."
+	pushd "$SRC" &>/dev/null
+
+	local updating=0
+	if [[ -d "${dir##*/}" ]]; then
+		updating=1
+		cd_safe "${dir##*/}"
+		if ! git fetch; then
+            do_abort_checked "Failure while updating working copy of git repo <$REPO>.|E_UNPACK_VCS"
+		fi
+		cd_safe "$SRC"
+	elif ! git clone "$dir" "${dir##*/}"; then
+        do_abort_checked "Failure while creating working copy of git repo <$REPO>.|E_UNPACK_VCS"
+	fi
+
+	cd_safe "${dir##*/}"
+
+	local ref=origin/HEAD
+	if [[ -n $FRAGMENT ]]; then
+		case ${FRAGMENT%%=*} in
+			commit|tag)
+				ref=${FRAGMENT##*=}
+				;;
+			branch)
+				ref=origin/${FRAGMENT##*=}
+				;;
+			*) do_abort_checked "Unrecognized reference: ${FRAGMENT}.|E_UNPACK_VCS"
+                ;;
+		esac
+	fi
+
+	if [[ $ref != "origin/HEAD" ]] || (( updating )) ; then
+		if ! git checkout --force --no-track -B makepkg $ref; then
+			do_abort_checked "Failure while creating working copy of git repo <$REPO>.|E_UNPACK_VCS"
+		fi
+	fi
+
+	popd &>/dev/null
+}
+
+
+#**********************************************************************************************************************
+#
+# svn - function for handling the download and "extraction" of Subversion sources
+#
+# Examples"
+#
+# source=(svn://svn.code.sf.net/p/splix/code/splix#revision=315)
+# source=(wit::svn+http://opensvn.wiimm.de/wii/trunk/wiimms-iso-tools#revision=6005)
+#
+#**********************************************************************************************************************
+
+download_svn() {
+    local url
+	local NETSRC=$1
+	local FINAL_SRCNAME=$2
+	local FINAL_SRCPATH=$3
+    local ORIG_URL=$4
+	local fragment=${NETSRC#*#}
+	local REPO=$FINAL_SRCNAME
+	local url=$ORIG_URL
+	if [[ $fragment = "$NETSRC" ]]; then
+		unset fragment
+	fi
+	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+
+	if [[ $url != svn+ssh* ]]; then
+		url=${url#svn+}
+	fi
+	url=${url%%#*}
+
+	local ref=HEAD
+	if [[ -n $fragment ]]; then
+		case ${fragment%%=*} in
+			revision)
+				ref="${fragment##*=}"
+				;;
+			*)
+                do_abort_checked "Unrecognized reference fragment: <${fragment}> SOURCE: <$ORIG_URL>|E_DOWNLOAD_VCS"
+		esac
+	fi
+
+	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
+		info "Cloning svn repo <${REPO}>..."
+		mkdir -p "$FINAL_SRCPATH/.makepkg"
+		if ! svn checkout -r ${ref} $PKGMK_VCS_SVN_OPTS --config-dir "$FINAL_SRCPATH/.makepkg" "$url" "$FINAL_SRCPATH"; 
+            then
+			do_abort_checked "Failure while downloading svn repo: <$REPO> SOURCE: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+		fi
+	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
+		info "Updating svn repo: <$REPO>..."
+		cd_safe "$FINAL_SRCPATH"
+		if ! svn update -r ${ref} $PKGMK_VCS_SVN_OPTS; then
+			# only warn on failure to allow offline builds
+			warning "Failure while updating svn repo: <$REPO>"
+		fi
+	fi
+}
+
+extract_svn() {
+	local NETSRC=$1
+
+	local dir=$(getchecked_final_srcpath "$NETSRC")
+	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
+
+	local repo=${NETSRC##*/}
+	REPO=${repo%%#*}
+
+    info "Creating working copy of svc repo: <$REPO>..."
+
+    local ret=1
+	cp -au "$dir" "$SRC"
+    ret=$?
+	if [ $ret != 0 ]; then
+        do_abort_checked "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>|E_UNPACK"
+	fi
+}
+
+#**********************************************************************************************************************
+#
+# hg - function for handling the download and "extraction" of Mercurial sources
+#
+# Examples"
+#
+# source=("hg+https://bitbucket.org/ianb/pastedeploy#tag=1.5.2")
+# source=("pivy::hg+https://bitbucket.org/Coin3D/pivy#tag=pivy-20101207")
+#
+#**********************************************************************************************************************
+
+download_hg() {
+    local url
+    local $NETSRC=$1
+	local FINAL_SRCNAME=$2
+	local FINAL_SRCPATH=$3
+    local ORIG_URL=$4
+    local REPO=$FINAL_SRCNAME
+	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+
+	info "Downloading $FINAL_SRCNAME..."
+
+	url=${ORIG_URL#hg+}
+	url=${url%%#*}
+
+	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
+		info "Cloning hg repo <${REPO}>..."
+		if ! hg clone $PKGMK_VCS_HG_OPTS -U "$url" "$FINAL_SRCPATH"; then
+			do_abort_checked "Failure while downloading hg repo: <$REPO> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
+		fi
+	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
+		info "Updating hg repo: <$REPO>..."
+		cd_safe "$FINAL_SRCPATH"
+		if ! hg pull $PKGMK_VCS_HG_OPTS; then
+			# only warn on failure to allow offline builds
+			warning "Failure while updating hg repo: <$repo>"
+		fi
+	fi
+}
+
+extract_hg() {
+	local NETSRC=$1
+
+	local FRAGMENT=${NETSRC#*#}
+	if [[ $FRAGMENT = "$NETSRC" ]]; then
+		unset FRAGMENT
+	fi
+
+	local dir=$(getchecked_final_srcpath "$NETSRC")
+	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
+
+	local REPO=${NETSRC##*/}
+	REPO=${REPO%%#*}
+
+	info "Creating working copy of hg repo: <$REPO>..."
+	pushd "$SRC" &>/dev/null
+
+	local ref=tip
+	if [[ -n $FRAGMENT ]]; then
+		case ${FRAGMENT%%=*} in
+			branch|revision|tag)
+				ref="${FRAGMENT##*=}"
+				;;
+            *) do_abort_checked "Unrecognized reference: ${FRAGMENT}.|E_UNPACK_VCS"
+                ;;
+		esac
+	fi
+
+	if [[ -d "${dir##*/}" ]]; then
+		cd_safe "${dir##*/}"
+		if ! (hg pull && hg update -C -r "$ref"); then
+			do_abort_checked "Failure while updating working copy of hg repo <$REPO>.|E_UNPACK_VCS"
+		fi
+	elif ! hg clone -u "$ref" "$dir" "${dir##*/}"; then
+		do_abort_checked "Failure while creating working copy of hg repo <$REPO>.|E_UNPACK_VCS"
+	fi
+
+	popd &>/dev/null
+}
+
+#**********************************************************************************************************************
+#
+# bzr - function for handling the download and "extraction" of Bazaar sources
+#
+# Examples
+#
+# source=(bzr+lp:~elementary-os/contractor/elementary-contracts)
+# source=(foomatic-db-engine::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db-engine/#revision=371)
+# source=(foomatic-db::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db/)
+# source=(foomatic-db-nonfree::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db-nonfree/)
+#
+#
+#**********************************************************************************************************************
+
+download_bzr() {
+    local NETSRC=$1
+	local FINAL_SRCNAME=$2
+	local FINAL_SRCPATH=$3
+    local ORIG_URL=$4
+	local url=$ORIG_URL
+	if [[ $url != bzr+ssh* ]]; then
+		url=${url#bzr+}
+	fi
+	url=${url%%#*}
+
+	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+
+	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
+        info "Branching bzr displaylocation <${url}>..."
+		if ! bzr branch $PKGMK_VCS_BZR_OPTS "$url" "$FINAL_SRCPATH" --no-tree --use-existing-dir; then
+            do_abort_checked "Failure while branching bzr displaylocation: <$url> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
+		fi
+	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
+        info "Pulling bzr displaylocation: <$displaylocation>..."
+		cd_safe "$FINAL_SRCPATH"
+		if ! bzr pull $PKGMK_VCS_BZR_OPTS "$url"; then
+			# only warn on failure to allow offline builds
+            warning "Failure while pulling bzr displaylocation: <$url>"
+		fi
+	fi
+}
+
+extract_bzr() {
+	local NETSRC=$1
+	local REPO=$(get_final_srcname "$NETSRC")
+	local FRAGMENT=${NETSRC#*#}
+	if [[ $FRAGMENT = "$NETSRC" ]]; then
+		unset FRAGMENT
+	fi
+
+	rev="last:1"
+	if [[ -n $FRAGMENT ]]; then
+		case ${FRAGMENT%%=*} in
+			revision)
+				rev="${FRAGMENT#*=}"
+				displaylocation="$url -r ${FRAGMENT#*=}"
+				;;
+            *) do_abort_checked "Unrecognized reference: ${FRAGMENT}.|E_UNPACK_VCS"
+                ;;
+		esac
+	fi
+
+	local dir=$(getchecked_final_srcpath "$NETSRC")
+	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
+
+	info "Creating working copy of bzr repo: <$REPO>..."
+	pushd "$SRC" &>/dev/null
+
+	if [[ -d "${dir##*/}" ]]; then
+		cd_safe "${dir##*/}"
+		if ! (bzr pull "$dir" -q --overwrite -r "$rev" && bzr clean-tree -q --detritus --force); then
+            do_abort_checked "Failure while updating working copy of bzr repo <$REPO>.|E_UNPACK_VCS"
+		fi
+	elif ! bzr checkout "$dir" -r "$rev"; then
+		do_abort_checked "Failure while creating working copy of bzr repo <$REPO>.|E_UNPACK_VCS"
+	fi
+
+	popd &>/dev/null
+}
+
+
+#**********************************************************************************************************************
+#
+# local file - function for handling the download and "extraction" of local sources
+#
+# Examples
+#
+# source=(test_file)
+# source=(resources/test_file)
+#
+#**********************************************************************************************************************
+
+extract_only_copy() {
+    local FINAL_SRCPATH=$1
+    local NETSRC=$2
+
+    echo "Copying <$FINAL_SRCPATH> to $SRC"
+
+    cp -f $FINAL_SRCPATH $SRC
+    if [ $? != 0 ]; then
+        do_abort_checked "Could not copy FINAL_SRCPATH: <$FINAL_SRCPATH> to SRC: <$SRC>. SOURCE: <$NETSRC>|E_UNPACK"
+    fi
+}
+
+#**********************************************************************************************************************
+#
+# qualified uri - function for handling the download and "extraction" of qualified uri sources
+#
+# Examples
+#
+#  QUALIFIED URI
+#
+#   ftp
+# source=(ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(file::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+#
+#   http
+# source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)
+# source=(xz::http://tukaani.org/xz/xz-5.2.2.tar.xz)
+#
+#   https
+# source=(xmlto::https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+# source=(https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+#
+#**********************************************************************************************************************
+
+# TODO: clarify permissions: see issue #34: https://github.com/NuTyX/cards/issues/34
+extract_file() {
+    local FINAL_SRCPATH=$1
+    local FINAL_SRCNAME=$2
+    local NETSRC=$3
+     
+	# do not rely on extension for file type
+	local file_type=$(file -bizL "$FINAL_SRCPATH")
+	local ext=${FINAL_SRCPATH##*.}
+	local cmd=''
+	case "$file_type" in
+		*application/x-tar*|*application/zip*|*application/x-zip*|*application/x-cpio*)
+			cmd="bsdtar" ;;
+		*application/x-gzip*)
+			case "$ext" in
+				gz|z|Z) cmd="gzip" ;;
+				*) return;;
+			esac ;;
+		*application/x-bzip*)
+			case "$ext" in
+				bz2|bz) cmd="bzip2" ;;
+				*) return;;
+			esac ;;
+		*application/x-xz*)
+			case "$ext" in
+				xz) cmd="xz" ;;
+				*) return;;
+			esac ;;
+		*)
+			# See if bsdtar can recognize the file
+			if bsdtar -tf "$FINAL_SRCPATH" -q '*' &>/dev/null; then
+				cmd="bsdtar"
+			else
+				return 0
+			fi ;;
+	esac
+
+	local ret=0
+	echo "Extracting <$FINAL_SRCPATH> with <$cmd>"
+	if [[ $cmd = "bsdtar" ]]; then
+		$cmd -p -C $SRC -xf "$FINAL_SRCPATH"  || ret=$?
+	else
+		rm -f -- "$SRC/${FINAL_SRCNAME%.*}"
+		$cmd -dcf "$file" > "$SRC/${FINAL_SRCNAME%.*}" || ret=$?
+	fi
+	if (( ret )); then
+        do_abort_checked "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>|E_UNPACK"
+	fi
+
+	if (( EUID == 0 )); then
+		# change perms of all source files to root user & root group
+		chown -R 0:0 "$SRC"
+	fi
+}
+
 
 # TODO
 #
-# ADD documentation/man for: PKGMK_COMPRESSION_OPTS
+# ADD documentation/man for: PKGMK_COMPRESSION_OPTS, PKGMK_DOWNLOAD_PROG, PKGMK_DOWNLOAD_PROG_OPTS, PKGMK_VCS_HOLDVER
+#                            PKGMK_VCS_GIT_OPTS, PKGMK_VCS_SVN_OPTS, PKGMK_VCS_HG_OPTS, PKGMK_VCS_BZR_OPTS
 #
 # Maybe add Pkgfile syntax check for source=() array
 #
-# In the future add more file types to `unpack_source` (same as Arch Linux)
+#    Unify the style: e.g. quoting variables etc..
 
 #**********************************************************************************************************************
 #   END New Functions by **peter1000**
@@ -304,160 +931,187 @@ check_file() {
 		exit $E_GENERAL
 	fi
 }
-downloads_file_with_curl() {
-	if [ ! "`type -p curl`" ]; then
-		error "Command 'curl' not found."
-		exit $E_GENERAL
-	fi
-	DOWNLOAD_OPTS="--ftp-pasv --retry 3 --retry-delay 3 \
-	-R -o $1 --fail -#"
-
-	error=1
-
-	curl $DOWNLOAD_OPTS $2
-	error=$?
-	if [ $error != 0 ]; then
-		error "Downloading '$2' failed."
-		exit $E_DOWNLOAD
-	fi
-}
+#**********************************************************************************************************************
+#
+# file - functions for handling the download and extraction of source files: source entries containing `://` but no VCS
+#
+# If `PKGMK_SOURCE_MIRRORS is set` it will try first to download from these sites and only if not sucessful will is use
+# the original download URL.
+#
+# Examples"
+#
+# source=(ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)
+# source=(https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+#
+# source=(file.tar.gz::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+#
+#**********************************************************************************************************************
 download_file() {
-    local WGET_CMD
+    local DOWNLOAD_OPTS RESUME_OPTS RESUME_CMD
     local FINAL_SRCPATH=$1
     local PROTOCOL=$2
-    local ORIGURL=$3
-    local BASENAME="${ORIGURL##*/}"
-    local RESUME_CMD="-c"
-    
-	info "Downloading '$ORIGURL'."
+    local ORIG_URL=$3
+    local BASENAME="${ORIG_URL##*/}"
+    FINAL_SRCPATH_PARTIAL="$FINAL_SRCPATH.partial"
 
-	if [ ! "`type -p wget`" ]; then
-		warning "Command 'wget' not found."
-		info "You should install 'wget' as soon as possible, trying with curl ..."
-		downloads_file_with_curl $FINAL_SRCPATH $ORIGURL
-	else
-		FINAL_SRCPATH_PARTIAL="$FINAL_SRCPATH.partial"
-        # CMD Line
-        WGET_CMD="wget --no-directories --tries=3 --waitretry=3 --no-check-certificate \
-        $PKGMK_WGET_OPTS -O $FINAL_SRCPATH_PARTIAL"
-        if [[ $proto = ftp ]]; then
-            WGET_CMD="$WGET_CMD --passive-ftp"
-        fi
+	info "Downloading '$ORIG_URL'."
 
-		local ret=1
-		for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
-			REPO="`echo $REPO | sed 's|/$||'`"
-			$WGET_CMD $RESUME_CMD $REPO/$BASENAME
-			ret=$?
-			if [ $ret == 0 ]; then
-				break
-			fi
-		done
-
-		if [ $ret != 0 ]; then
-			while true; do
-				$WGET_CMD $RESUME_CMD $ORIGURL
-				ret=$?
-				if [ $ret != 0 ] && [ "$RESUME_CMD" ]; then
-					info "Partial download failed, restarting"
-					rm -f -- "$FINAL_SRCPATH_PARTIAL"
-					RESUME_CMD=""
-				else
-					break
-				fi
-			done
-		fi
-
-		if [ $ret != 0 ]; then
-            do_abort "Failure while downloading <$FINAL_SRCPATH> source entry: <$ORIGURL>." 
-		fi
-		mv -f "$FINAL_SRCPATH_PARTIAL" "$FINAL_SRCPATH"
+	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then
+		error "Command '${PKGMK_DOWNLOAD_PROG}' not found."
+		exit $E_GENERAL
 	fi
+
+	case ${PKGMK_DOWNLOAD_PROG} in
+		curl)
+			RESUME_CMD="-C -"
+            case ${PROTOCOL} in
+                ftp)
+                    DOWNLOAD_OPTS="-qf --ftp-pasv --retry 3 --retry-delay 3 -R -# \
+                    -o $FINAL_SRCPATH_PARTIAL --insecure $PKGMK_DOWNLOAD_PROG_OPTS"
+                    ;;
+                http|https)
+                    DOWNLOAD_OPTS="-qfL --retry 3 --retry-delay 3 -R -# \
+                    -o $FINAL_SRCPATH_PARTIAL --insecure $PKGMK_DOWNLOAD_PROG_OPTS"
+                    ;;
+                *)
+                    do_abort "The protocol  <$PROTOCOL> is not supported. ORIG_URL: <$ORIG_URL>|E_DOWNLOAD_PROTO"
+                    ;;
+            esac
+            ;;
+		wget)
+			RESUME_CMD="-c"
+            DOWNLOAD_OPTS="--no-directories --tries=3 --waitretry=3 --no-check-certificate \
+            $PKGMK_DOWNLOAD_PROG_OPTS -O $FINAL_SRCPATH_PARTIAL"
+            if [[ $proto = ftp ]]; then
+                DOWNLOAD_OPTS="$DOWNLOAD_OPTS --passive-ftp"
+            fi
+			;;
+	esac
+
+    if [ -f "$FINAL_SRCPATH_PARTIAL" ]; then
+        info "Partial download found, trying to resume"
+        RESUME_OPTS="$RESUME_CMD"
+    fi
+
+    local ret=1
+    for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
+        REPO="`echo $REPO | sed 's|/$||'`"
+        $PKGMK_DOWNLOAD_PROG $DOWNLOAD_OPTS $RESUME_OPTS $REPO/$BASENAME
+        ret=$?
+        if [ $ret == 0 ]; then
+            break
+        fi
+    done
+
+    if [ $ret != 0 ]; then
+        while true; do
+            $PKGMK_DOWNLOAD_PROG $DOWNLOAD_OPTS $RESUME_OPTS $ORIG_URL
+            ret=$?
+            if [ $ret != 0 ] && [ "$RESUME_OPTS" ]; then
+                info "Partial download failed, restarting"
+                rm -f -- "$FINAL_SRCPATH_PARTIAL"
+                RESUME_OPTS=""
+            else
+                break
+            fi
+        done
+    fi
+
+    if [ $ret != 0 ]; then
+        do_abort "Failure while downloading <$FINAL_SRCPATH> SOURCE: <$ORIG_URL>.|E_DOWNLOAD"
+    fi
+    mv -f "$FINAL_SRCPATH_PARTIAL" "$FINAL_SRCPATH"
 }
 
 # main download function
 download_source() {
-    local ENTRY PROTOCOL FINAL_SRCPATH ORIGURL
+    local NETSRC PROTOCOL FINAL_SRCNAME FINAL_SRCPATH ORIG_URL
 
-    for ENTRY in ${source[@]}; do
-        PROTOCOL=$(get_protocol "$ENTRY")
-        check_abort $PROTOCOL "The protocol is not supported. SOURCE: <$ENTRY>"
-        local FINAL_SRCNAME=$(get_final_srcname "$ENTRY")
-        check_abort $FINAL_SRCNAME \
-            "Local source files can not change their names or start with a slash '/'. SOURCE: <$ENTRY>"
-        FINAL_SRCPATH=`get_final_srcpath $ENTRY`
-        ORIGURL=`get_origurl  $ENTRY`        
+    for NETSRC in ${source[@]}; do
+        PROTOCOL=$(get_protocol "$NETSRC")
+        check_abort "$PROTOCOL"
+        FINAL_SRCNAME=$(get_final_srcname "$NETSRC")
+        check_abort "$FINAL_SRCNAME"
+        FINAL_SRCPATH=`get_final_srcpath $NETSRC`
+        ORIG_URL=`get_orig_url  $NETSRC`
 
         if [ "$PROTOCOL" == "local" ]; then
             if [[ ! -f "$FINAL_SRCPATH" ]]; then
-                do_abort "Local Source file '$FINAL_SRCPATH' not found (can not be downloaded, URL not specified). \
-                SOURCE: <$ENTRY>"
+                do_abort "Local Source file '$FINAL_SRCPATH' not found. SOURCE: <$NETSRC>|E_DOWNLOAD"
             fi
         else
             if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
                 case $PROTOCOL in
-                    ftp|http|https)     
-                        #download_file  "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$PROTOCOL" "$ORIGURL"  
-                        download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIGURL" 
+                    ftp|http|https)
+                        download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIG_URL"
                         ;;
-                    # currently not supported
-                    #git)                
-                        #download_git                              
-                        #;;
-                    #svn)                
-                        #download_svn                                     
-                        #;;
-                    #hg)                 
-                        #download_hg                                  
-                        #;;
-                    #bzr)                
-                        #download_bzr                                        
-                        #;;
+                    # TODO: remove currently not supported
+                    git)
+                        download_git "$NETSRC" "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
+                        ;;
+                    svn)
+                        download_svn "$NETSRC" "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
+                        ;;
+                    hg)
+                        download_hg  "$NETSRC" "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
+                        ;;
+                    bzr)
+                        download_bzr "$NETSRC" "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
+                        ;;
                     #local) checked above
                 esac
             else
-                do_abort "Source file '$FINAL_SRCPATH' not found (use option -d to download)."
+                do_abort "Source file '$FINAL_SRCPATH' not found (use option -d to download).|E_DOWNLOAD"
             fi
         fi
     done
 }
 remove_source() {
-	local ENTRY FINAL_SRCPATH
-	for ENTRY in ${source[@]}; do
-		FINAL_SRCPATH=`get_final_srcpath $ENTRY`
-		if [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$ENTRY" ]; then
+	local NETSRC FINAL_SRCPATH
+	for NETSRC in ${source[@]}; do
+		FINAL_SRCPATH=`get_final_srcpath $NETSRC`
+		if [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$NETSRC" ]; then
 			info "Removing $FINAL_SRCPATH"
-			rm -f $FINAL_SRCPATH
+			rm -rf $FINAL_SRCPATH
 		fi
 	done
 }
 unpack_source() {
-	local ENTRY FINAL_SRCPATH COMMAND
+	local NETSRC PROTOCOL FINAL_SRCNAME FINAL_SRCPATH COMMAND
 
-	for ENTRY in ${source[@]}; do
-		FINAL_SRCPATH=`get_final_srcpath $ENTRY`
-		case $FINAL_SRCPATH in
-			*.tar|*.tar.gz|*.tar.Z|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.lzma|*.zip|*.rpm)
-				if [ "$PKGMK_IGNORE_UNPACK" != "yes" ];then
-					COMMAND="bsdtar -p -o -C $SRC -xf $FINAL_SRCPATH"
+    for NETSRC in ${source[@]}; do
+        PROTOCOL=$(get_protocol "$NETSRC")
+        check_abort "$PROTOCOL"
+        FINAL_SRCNAME=$(get_final_srcname "$NETSRC")
+        check_abort "$FINAL_SRCNAME"
+        FINAL_SRCPATH=`get_final_srcpath $NETSRC`
+
+        case $PROTOCOL in
+            ftp|http|https)
+				if [ "$PKGMK_IGNORE_UNPACK" == "yes" ];then
+					extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
 				else
-					COMMAND="cp $FINAL_SRCPATH $SRC"
-				fi ;;
-			*)
-				COMMAND="cp $FINAL_SRCPATH $SRC" ;;
+                    extract_file "$FINAL_SRCPATH" "FINAL_SRCNAME" "$NETSRC"
+				fi 
+                ;;
+            local)
+                extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
+                ;;
+            # TODO: remove currently not supported
+            git)
+                extract_git "$NETSRC"
+                ;;
+            svn)
+                extract_svn "$NETSRC"
+                ;;
+            hg)
+                extract_hg "$NETSRC"
+                ;;
+            bzr)
+                extract_bzr "$NETSRC"
+                ;;
 		esac
-
-		echo "$COMMAND"
-
-		$COMMAND
-
-		if [ $? != 0 ]; then
-			if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-				rm -rf $PKGMK_WORK_DIR
-			fi
-			error "Building '$TARGET' failed."
-			exit $E_UNPACK
-		fi
 	done
 }
 get_package_list() {
@@ -471,17 +1125,18 @@ get_package_list() {
 	done
 }
 make_md5sum() {
-	local ENTRY FINAL_SRCPATH
-
-	if [ "$source" ]; then
-		for ENTRY in ${source[@]}; do
-			FINAL_SRCPATH="$FINAL_SRCPATH `get_final_srcpath $ENTRY`"
-		done
-
-		md5sum $FINAL_SRCPATH | sed -e 's|  .*/|  |' | sort -k 2
+	local NETSRC PROTOCOL MD5SUM_PATHS
+    for NETSRC in ${source[@]}; do
+        PROTOCOL=$(get_protocol "$NETSRC")
+        check_abort "$PROTOCOL"
+        case $PROTOCOL in
+            ftp|http|https|local) MD5SUM_PATHS="$MD5SUM_PATHS `get_final_srcpath $NETSRC`" ;;
+        esac
+    done
+    if [ "$MD5SUM_PATHS" ]; then
+		md5sum $MD5SUM_PATHS | sed -e 's|  .*/|  |' | sort -k 2
 	fi
 }
-
 make_footprint() {
 if ! (echo $TARGET| grep "kernel" >/dev/null); then
 	pkginfo --footprint $TARGET | \
@@ -983,7 +1638,7 @@ build_package() {
 			for DIR in usr/share/locale opt/*/share/locale; do
 				if [ -d $DIR ]; then
 					for LOC in `cd $DIR && ls`; do
-						# Need to double check because glibc for exemple create a file in this directory
+						# Need to double check because glibc for example create a file in this directory
 						if [ -d $DIR/$LOC ];then
 							for PKGMK_LOCALE in ${PKGMK_LOCALES[@]}; do
 								if [ "$PKGMK_LOCALE" == "$LOC" ]; then
@@ -1657,6 +2312,18 @@ PKGMK_KEEP_WORK="no"
 
 PKGMK_UPDATE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"
+
+PKGMK_DOWNLOAD_PROG="wget"
+PKGMK_DOWNLOAD_PROG_OPTS=""  
+# When using VCS sources any currently checked out source will not be updated to the latest revision.   
+PKGMK_VCS_HOLDVER="no"         
+
+
+PKGMK_VCS_GIT_OPTS=""
+PKGMK_VCS_SVN_OPTS=""
+PKGMK_VCS_HG_OPTS=""
+PKGMK_VCS_BZR_OPTS=""
+
 
 main "$@"
 
