@@ -130,6 +130,9 @@
 # source=("pivy::hg+https://bitbucket.org/Coin3D/pivy#tag=pivy-20101207")
 #
 #   BZR
+#
+# Useful options: `-Ossl.cert_reqs=none`: to disable certificate verification entirely
+#
 # source=(bzr+lp:~elementary-os/contractor/elementary-contracts)
 # source=(foomatic_db::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db/#revision=1295)
 #
@@ -148,7 +151,7 @@ E_GENERAL=1
 E_PKGFILE=2    # invalid Pkgfile
 E_DIR_PERM=3   # (source/build) directory missing or missing read/write permission
 E_DOWNLOAD=4   # error during download
-E_UNPACK=5     # error during unpacking of source file(s)
+E_UNPACK=5     # error during unpacking/extracting of source file(s)
 E_MD5=6        # md5sum verification failed
 E_FOOTPRINT=7  # footprint check failure
 E_BUILD=8      # error while running 'build()'
@@ -160,7 +163,8 @@ E_DEPS=10      # error while searching runtime deps via 'pkginfo -b'
 #**********************************************************************************************************************
 
 E_DOWNLOAD_PROTO=11    # error when a wrong download protocol is encountered
-E_DOWNLOAD_VCS=12      # error wencountered by download (clone/checkout...) of version controlled sources
+E_DOWNLOAD_VCS=12      # error during download (clone/checkout...) of version control source
+E_UNPACK_VCS=13        # error during unpacking/extracting ofof version control source
 
 # returns a part of a string: usually used for multiple return values from functions.
 #   Delimiter is |
@@ -284,10 +288,36 @@ get_final_srcname() {
 # Return the absolute expected filename/VCS-dirname of a source entry
 get_final_srcpath() {
 	local FINAL_SRCNAME="$(get_final_srcname "$1")"
-    check_abort $FINAL_SRCNAME
+    check_abort "$FINAL_SRCNAME"
 	printf "%s\n" "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 }
-
+# Return the absolute filename/VCS-dirname of a source entry: checks for it's existence
+getchecked_final_srcpath() {
+    local FINAL_SRCPATH
+    local NETSRC=$1
+	local FINAL_SRCNAME="$(get_final_srcname "$NETSRC")"
+    check_abort "$FINAL_SRCNAME"
+    local PROTOCOL=$(get_protocol "$NETSRC")
+    check_abort "$PROTOCOL"
+    
+	case $proto in
+		git|svn|hg|bzr)
+			if [[ -d "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ]]; then
+				FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+			else
+				return 1
+			fi
+			;;
+		*)
+			if [[ -f "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ]]; then
+				FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+			else
+				return 1
+			fi
+			;;
+	esac
+	printf "%s\n" "$FINAL_SRCPATH"
+}
 #**********************************************************************************************************************
 #
 # git - function for handling the download and "extraction" of Git sources
@@ -306,7 +336,7 @@ download_git() {
 	local FINAL_SRCNAME=$1
 	local FINAL_SRCPATH=$2
     local ORIG_URL=$3
-    local repo=$FINAL_SRCNAME
+    local REPO=$FINAL_SRCNAME
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
 	info "Downloading $FINAL_SRCNAME..."
@@ -315,13 +345,13 @@ download_git() {
 	url=${url%%#*}
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-		info "Cloning git repo <${repo}>..."
+		info "Cloning git repo <${REPO}>..."
 		if ! git clone --mirror "$url" "$FINAL_SRCPATH"; then
             if [ "$PKGMK_KEEP_WORK" = "no" ]; then
                 rm -rf $PKGMK_WORK_DIR
             fi
             error "Building '$TARGET' failed.. "
-			do_abort "Failure while downloading git repo: <$repo> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+			do_abort "Failure while downloading git repo: <$REPO> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
 		cd_safe "$FINAL_SRCPATH"
@@ -333,10 +363,10 @@ download_git() {
             error "Building '$TARGET' failed.. "
 			do_abort "<$FINAL_SRCPATH> is not a clone of <$url> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
         fi
-		info "Updating git repo: <$repo>..."
+		info "Updating git repo: <$REPO>..."
 		if ! git fetch --all -p; then
 			# only warn on failure to allow offline builds
-			warning "Failure while updating git repo: <$repo>"
+			warning "Failure while updating git repo: <$REPO>"
 		fi
 	fi
 }
@@ -359,7 +389,7 @@ download_svn() {
 	local FINAL_SRCPATH=$3
     local ORIG_URL=$4
 	local fragment=${NETSRC#*#}
-	local repo=$FINAL_SRCNAME
+	local REPO=$FINAL_SRCNAME
 	local url=$ORIG_URL
 	if [[ $fragment = "$NETSRC" ]]; then
 		unset fragment
@@ -387,21 +417,21 @@ download_svn() {
 	fi
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-		info "Cloning svn repo <${repo}>..."
+		info "Cloning svn repo <${REPO}>..."
 		mkdir -p "$FINAL_SRCPATH/.makepkg"
 		if ! svn checkout -r ${ref} --config-dir "$FINAL_SRCPATH/.makepkg" "$url" "$FINAL_SRCPATH"; then
             if [ "$PKGMK_KEEP_WORK" = "no" ]; then
                 rm -rf $PKGMK_WORK_DIR
             fi
             error "Building '$TARGET' failed.. "
-			do_abort "Failure while downloading svn repo: <$repo> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+			do_abort "Failure while downloading svn repo: <$REPO> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
-		info "Updating svn repo: <$repo>..."
+		info "Updating svn repo: <$REPO>..."
 		cd_safe "$FINAL_SRCPATH"
 		if ! svn update -r ${ref}; then
 			# only warn on failure to allow offline builds
-			warning "Failure while updating svn repo: <$repo>"
+			warning "Failure while updating svn repo: <$REPO>"
 		fi
 	fi
 }
@@ -422,7 +452,7 @@ download_hg() {
 	local FINAL_SRCNAME=$1
 	local FINAL_SRCPATH=$2
     local ORIG_URL=$3
-    local repo=$FINAL_SRCNAME
+    local REPO=$FINAL_SRCNAME
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
 	info "Downloading $FINAL_SRCNAME..."
@@ -431,16 +461,16 @@ download_hg() {
 	url=${url%%#*}
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-		info "Cloning hg repo <${repo}>..."
+		info "Cloning hg repo <${REPO}>..."
 		if ! hg clone -U "$url" "$FINAL_SRCPATH"; then
             if [ "$PKGMK_KEEP_WORK" = "no" ]; then
                 rm -rf $PKGMK_WORK_DIR
             fi
             error "Building '$TARGET' failed.. "
-			do_abort "Failure while downloading hg repo: <$repo> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+			do_abort "Failure while downloading hg repo: <$REPO> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
-		info "Updating hg repo: <$repo>..."
+		info "Updating hg repo: <$REPO>..."
 		cd_safe "$FINAL_SRCPATH"
 		if ! hg pull; then
 			# only warn on failure to allow offline builds
@@ -453,7 +483,7 @@ download_hg() {
 #
 # bzr - function for handling the download and "extraction" of Bazaar sources
 #
-# Examples"
+# Examples
 #
 # source=(bzr+lp:~elementary-os/contractor/elementary-contracts)
 # source=(foomatic_db::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db/#revision=1295)
@@ -464,7 +494,6 @@ download_bzr() {
 	local FINAL_SRCNAME=$1
 	local FINAL_SRCPATH=$2
     local ORIG_URL=$3
-    local repo=$FINAL_SRCNAME
 	local url=$ORIG_URL
 	if [[ $url != bzr+ssh* ]]; then
 		url=${url#bzr+}
@@ -571,9 +600,11 @@ extract_file() {
 # TODO
 #
 # ADD documentation/man for: PKGMK_COMPRESSION_OPTS, PKGMK_DOWNLOAD_PROG, PKGMK_DOWNLOAD_PROG_OPTS, PKGMK_VCS_HOLDVER
+#                            PKGMK_VCS_GIT_OPTS, PKGMK_VCS_SVN_OPTS, PKGMK_VCS_HG_OPTS, PKGMK_VCS_BZR_OPTS
 #
 # Maybe add Pkgfile syntax check for source=() array
 #
+#    Unify the style: e.g. quoting variables etc..
 
 #**********************************************************************************************************************
 #   END New Functions by **peter1000**
@@ -2113,6 +2144,13 @@ PKGMK_CHECK_MD5SUM="no"
 PKGMK_DOWNLOAD_PROG="wget"
 PKGMK_DOWNLOAD_PROG_OPTS=""
 PKGMK_VCS_HOLDVER="no"         # When using VCS sources any currently checked out source will not be updated to the latest revision.
+
+
+PKGMK_VCS_GIT_OPTS=""
+PKGMK_VCS_SVN_OPTS=""
+PKGMK_VCS_HG_OPTS=""
+PKGMK_VCS_BZR_OPTS="-Ossl.cert_reqs=none"
+
 
 main "$@"
 
