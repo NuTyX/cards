@@ -489,6 +489,25 @@ download_svn() {
 	fi
 }
 
+extract_svn() {
+	local NETSRC=$1
+
+	local dir=$(getchecked_final_srcpath "$NETSRC")
+	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
+
+	local repo=${NETSRC##*/}
+	REPO=${repo%%#*}
+
+    info "Creating working copy of svc repo: <$REPO>..."
+
+    local ret=1
+	cp -au "$dir" "$SRC"
+    ret=$?
+	if [ $ret != 0 ]; then
+        do_abort_checked "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>|E_UNPACK"
+	fi
+}
+
 #**********************************************************************************************************************
 #
 # hg - function for handling the download and "extraction" of Mercurial sources
@@ -966,10 +985,10 @@ unpack_source() {
             # TODO: remove currently not supported
             git)
                 extract_git "$NETSRC"
-                #;;
-            #svn)
-                #extract_svn
-                #;;
+                ;;
+            svn)
+                extract_svn "$NETSRC"
+                ;;
             #hg)
                 #extract_hg
                 #;;
