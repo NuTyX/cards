@@ -923,17 +923,18 @@ get_package_list() {
 	done
 }
 make_md5sum() {
-	local NETSRC FINAL_SRCPATH
-
-	if [ "$source" ]; then
-		for NETSRC in ${source[@]}; do
-			FINAL_SRCPATH="$FINAL_SRCPATH `get_final_srcpath $NETSRC`"
-		done
-
-		md5sum $FINAL_SRCPATH | sed -e 's|  .*/|  |' | sort -k 2
+	local NETSRC PROTOCOL MD5SUM_PATHS
+    for NETSRC in ${source[@]}; do
+        PROTOCOL=$(get_protocol "$NETSRC")
+        check_abort "$PROTOCOL"
+        case $PROTOCOL in
+            ftp|http|https|local) MD5SUM_PATHS="$MD5SUM_PATHS `get_final_srcpath $NETSRC`" ;;
+        esac
+    done
+    if [ "$MD5SUM_PATHS" ]; then
+		md5sum $MD5SUM_PATHS | sed -e 's|  .*/|  |' | sort -k 2
 	fi
 }
-
 make_footprint() {
 if ! (echo $TARGET| grep "kernel" >/dev/null); then
 	pkginfo --footprint $TARGET | \
