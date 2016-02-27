@@ -324,7 +324,7 @@ download_git() {
             error "Building '$TARGET' failed.. "
 			do_abort "Failure while downloading git repo: <$repo> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
 		fi
-	elif (( ! PKGMK_VCS_HOLDVER )); then
+	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
 		cd_safe "$FINAL_SRCPATH"
 		# Make sure we are fetching the right repo
 		if [[ "$url" != "$(git config --get remote.origin.url)" ]] ; then
@@ -397,7 +397,7 @@ download_svn() {
             error "Building '$TARGET' failed.. "
 			do_abort "Failure while downloading svn repo: <$repo> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
 		fi
-	elif (( ! PKGMK_VCS_HOLDVER )); then
+	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
 		info "Updating svn repo: <$repo>..."
 		cd_safe "$FINAL_SRCPATH"
 		if ! svn update -r ${ref}; then
@@ -440,7 +440,7 @@ download_hg() {
             error "Building '$TARGET' failed.. "
 			do_abort "Failure while downloading hg repo: <$repo> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
 		fi
-	elif (( ! PKGMK_VCS_HOLDVER )); then
+	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
 		info "Updating hg repo: <$repo>..."
 		cd_safe "$FINAL_SRCPATH"
 		if ! hg pull; then
@@ -484,7 +484,7 @@ download_bzr() {
             error "Building '$TARGET' failed.. "
             do_abort "Failure while branching bzr displaylocation: <$displaylocation> Url> <$ORIG_URL>.|E_DOWNLOAD_VCS"
 		fi
-	elif (( ! PKGMK_VCS_HOLDVER )); then
+	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
         info "Pulling bzr displaylocation: <$displaylocation>..."
 		cd_safe "$FINAL_SRCPATH"
 		if ! bzr pull "$url"; then
@@ -571,7 +571,7 @@ extract_file() {
 
 # TODO
 #
-# ADD documentation/man for: PKGMK_COMPRESSION_OPTS, PKGMK_DOWNLOAD_PROG, PKGMK_DOWNLOAD_PROG_OPTS
+# ADD documentation/man for: PKGMK_COMPRESSION_OPTS, PKGMK_DOWNLOAD_PROG, PKGMK_DOWNLOAD_PROG_OPTS, PKGMK_VCS_HOLDVER
 #
 # Maybe add Pkgfile syntax check for source=() array
 #
@@ -2112,6 +2112,7 @@ PKGMK_CHECK_MD5SUM="no"
 
 PKGMK_DOWNLOAD_PROG="wget"
 PKGMK_DOWNLOAD_PROG_OPTS=""
+PKGMK_VCS_HOLDVER="no"         # When using VCS sources any currently checked out source will not be updated to the latest revision.
 
 main "$@"
 
