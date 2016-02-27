@@ -282,7 +282,6 @@ get_final_srcname() {
 }
 
 # Return the absolute expected filename/VCS-dirname of a source entry
-# TODO: decide later if that function should be removed
 get_final_srcpath() {
 	local FINAL_SRCNAME="$(get_final_srcname "$1")"
     check_abort $FINAL_SRCNAME
@@ -509,7 +508,7 @@ extract_only_copy() {
     fi
 }
 
-# TODO: clarify if the of: change perms of all source files to root user & root group is OK
+# TODO: clarify permissions: see issue #34: https://github.com/NuTyX/cards/issues/34
 extract_file() {
     local FINAL_SRCPATH=$1
     local FINAL_SRCNAME=$2
