@@ -548,6 +548,46 @@ download_hg() {
 	fi
 }
 
+extract_hg() {
+	local NETSRC=$1
+
+	local FRAGMENT=${NETSRC#*#}
+	if [[ $FRAGMENT = "$NETSRC" ]]; then
+		unset FRAGMENT
+	fi
+
+	local dir=$(getchecked_final_srcpath "$NETSRC")
+	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
+
+	local REPO=${NETSRC##*/}
+	REPO=${REPO%%#*}
+
+	info "Creating working copy of hg repo: <$REPO>..."
+	pushd "$SRC" &>/dev/null
+
+	local ref=tip
+	if [[ -n $FRAGMENT ]]; then
+		case ${FRAGMENT%%=*} in
+			branch|revision|tag)
+				ref="${FRAGMENT##*=}"
+				;;
+            *) do_abort_checked "Unrecognized reference: ${FRAGMENT}.|E_UNPACK_VCS"
+                ;;
+		esac
+	fi
+
+	if [[ -d "${dir##*/}" ]]; then
+		cd_safe "${dir##*/}"
+		if ! (hg pull && hg update -C -r "$ref"); then
+			do_abort_checked "Failure while updating working copy of hg repo <$REPO>.|E_UNPACK_VCS"
+		fi
+	elif ! hg clone -u "$ref" "$dir" "${dir##*/}"; then
+		do_abort_checked "Failure while creating working copy of hg repo <$REPO>.|E_UNPACK_VCS"
+	fi
+
+	popd &>/dev/null
+}
+
 #**********************************************************************************************************************
 #
 # bzr - function for handling the download and "extraction" of Bazaar sources
@@ -989,9 +1029,9 @@ unpack_source() {
             svn)
                 extract_svn "$NETSRC"
                 ;;
-            #hg)
-                #extract_hg
-                #;;
+            hg)
+                extract_hg "$NETSRC"
+                ;;
             #bzr)
                 #extract_bzr
                 #;;
