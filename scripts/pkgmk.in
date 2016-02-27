@@ -575,7 +575,6 @@ extract_file() {
 #
 # Maybe add Pkgfile syntax check for source=() array
 #
-# In the future add more file types to `unpack_source` (same as Arch Linux)
 
 #**********************************************************************************************************************
 #   END New Functions by **peter1000**
@@ -911,30 +910,6 @@ unpack_source() {
                 #download_bzr
                 #;;
 		esac
-        
-        
-		#case $FINAL_SRCPATH in
-			#*.tar|*.tar.gz|*.tar.Z|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.lzma|*.zip|*.rpm)
-				#if [ "$PKGMK_IGNORE_UNPACK" != "yes" ];then
-					#COMMAND="bsdtar -p -o -C $SRC -xf $FINAL_SRCPATH"
-				#else
-					#COMMAND="cp $FINAL_SRCPATH $SRC"
-				#fi ;;
-			#*)
-				#COMMAND="cp $FINAL_SRCPATH $SRC" ;;
-		#esac
-
-		#echo "$COMMAND"
-
-		#$COMMAND
-
-		#if [ $? != 0 ]; then
-			#if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-				#rm -rf $PKGMK_WORK_DIR
-			#fi
-			#error "Building '$TARGET' failed."
-			#exit $E_UNPACK
-		#fi
 	done
 }
 get_package_list() {
