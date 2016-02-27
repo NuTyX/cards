@@ -195,6 +195,17 @@ do_abort() {
     exit $((`get_str_part "$1" 2`))
 }
 
+# Similar to `do_abort` but also checks if we want to remove the workdir
+do_abort_checked() {
+    if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+        rm -rf $PKGMK_WORK_DIR
+    fi
+    error "Building '$TARGET' failed.. "
+    echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 1`\n" >&2
+    exit $((`get_str_part "$1" 2`))
+}
+
+
 # extract the original URL from a source entry: strip an eventual filename or VCS directory
 get_orig_url() {
 	printf "%s\n" "${1#*::}"
@@ -333,9 +344,10 @@ getchecked_final_srcpath() {
 #**********************************************************************************************************************
 download_git() {
     local url
-	local FINAL_SRCNAME=$1
-	local FINAL_SRCPATH=$2
-    local ORIG_URL=$3
+    local NETSRC=$1
+	local FINAL_SRCNAME=$2
+	local FINAL_SRCPATH=$3
+    local ORIG_URL=$4
     local REPO=$FINAL_SRCNAME
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
@@ -347,21 +359,13 @@ download_git() {
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
 		info "Cloning git repo <${REPO}>..."
 		if ! git clone $PKGMK_VCS_GIT_OPTS --mirror "$url" "$FINAL_SRCPATH"; then
-            if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-                rm -rf $PKGMK_WORK_DIR
-            fi
-            error "Building '$TARGET' failed.. "
-			do_abort "Failure while downloading git repo: <$REPO> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+			do_abort_checked "Failure while downloading git repo: <$REPO> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
 		cd_safe "$FINAL_SRCPATH"
 		# Make sure we are fetching the right repo
 		if [[ "$url" != "$(git config --get remote.origin.url)" ]] ; then
-            if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-                rm -rf $PKGMK_WORK_DIR
-            fi
-            error "Building '$TARGET' failed.. "
-			do_abort "<$FINAL_SRCPATH> is not a clone of <$url> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+			do_abort_checked "<$FINAL_SRCPATH> is not a clone of <$url> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
         fi
 		info "Updating git repo: <$REPO>..."
 		if ! git fetch --all -p $PKGMK_VCS_GIT_OPTS; then
@@ -408,23 +412,16 @@ download_svn() {
 				ref="${fragment##*=}"
 				;;
 			*)
-                if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-                    rm -rf $PKGMK_WORK_DIR
-                fi
-                error "Building '$TARGET' failed.. "
-                do_abort "Unrecognized reference fragment: <${fragment}> source entry: <$ORIG_URL>|E_DOWNLOAD_VCS"
+                do_abort_checked "Unrecognized reference fragment: <${fragment}> SOURCE: <$ORIG_URL>|E_DOWNLOAD_VCS"
 		esac
 	fi
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
 		info "Cloning svn repo <${REPO}>..."
 		mkdir -p "$FINAL_SRCPATH/.makepkg"
-		if ! svn checkout -r ${ref} $PKGMK_VCS_SVN_OPTS --config-dir "$FINAL_SRCPATH/.makepkg" "$url" "$FINAL_SRCPATH"; then
-            if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-                rm -rf $PKGMK_WORK_DIR
-            fi
-            error "Building '$TARGET' failed.. "
-			do_abort "Failure while downloading svn repo: <$REPO> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+		if ! svn checkout -r ${ref} $PKGMK_VCS_SVN_OPTS --config-dir "$FINAL_SRCPATH/.makepkg" "$url" "$FINAL_SRCPATH"; 
+            then
+			do_abort_checked "Failure while downloading svn repo: <$REPO> SOURCE: <$ORIG_URL>.|E_DOWNLOAD_VCS"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
 		info "Updating svn repo: <$REPO>..."
@@ -449,9 +446,10 @@ download_svn() {
 
 download_hg() {
     local url
-	local FINAL_SRCNAME=$1
-	local FINAL_SRCPATH=$2
-    local ORIG_URL=$3
+    local $NETSRC=$1
+	local FINAL_SRCNAME=$2
+	local FINAL_SRCPATH=$3
+    local ORIG_URL=$4
     local REPO=$FINAL_SRCNAME
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
@@ -463,11 +461,7 @@ download_hg() {
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
 		info "Cloning hg repo <${REPO}>..."
 		if ! hg clone $PKGMK_VCS_HG_OPTS -U "$url" "$FINAL_SRCPATH"; then
-            if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-                rm -rf $PKGMK_WORK_DIR
-            fi
-            error "Building '$TARGET' failed.. "
-			do_abort "Failure while downloading hg repo: <$REPO> source entry: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+			do_abort_checked "Failure while downloading hg repo: <$REPO> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
 		info "Updating hg repo: <$REPO>..."
@@ -491,33 +485,29 @@ download_hg() {
 #**********************************************************************************************************************
 
 download_bzr() {
-	local FINAL_SRCNAME=$1
-	local FINAL_SRCPATH=$2
-    local ORIG_URL=$3
+    local NETSRC=$1
+	local FINAL_SRCNAME=$2
+	local FINAL_SRCPATH=$3
+    local ORIG_URL=$4
 	local url=$ORIG_URL
 	if [[ $url != bzr+ssh* ]]; then
 		url=${url#bzr+}
 	fi
 	url=${url%%#*}
-	local displaylocation="$url"
 
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-        info "Branching bzr displaylocation <${displaylocation}>..."
+        info "Branching bzr displaylocation <${url}>..."
 		if ! bzr branch $PKGMK_VCS_BZR_OPTS "$url" "$FINAL_SRCPATH" --no-tree --use-existing-dir; then
-            if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-                rm -rf $PKGMK_WORK_DIR
-            fi
-            error "Building '$TARGET' failed.. "
-            do_abort "Failure while branching bzr displaylocation: <$displaylocation> Url> <$ORIG_URL>.|E_DOWNLOAD_VCS"
+            do_abort_checked "Failure while branching bzr displaylocation: <$url> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
         info "Pulling bzr displaylocation: <$displaylocation>..."
 		cd_safe "$FINAL_SRCPATH"
 		if ! bzr pull $PKGMK_VCS_BZR_OPTS "$url"; then
 			# only warn on failure to allow offline builds
-            warning "Failure while pulling bzr displaylocation: <$displaylocation>"
+            warning "Failure while pulling bzr displaylocation: <$url>"
 		fi
 	fi
 }
@@ -529,11 +519,7 @@ extract_only_copy() {
 
     cp -f $FINAL_SRCPATH $SRC
     if [ $? != 0 ]; then
-        if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-            rm -rf $PKGMK_WORK_DIR
-        fi
-        error "Building '$TARGET' failed.. "
-        do_abort "Could not copy FINAL_SRCPATH: <$FINAL_SRCPATH> to SRC: <$SRC>. SOURCE: <$NETSRC>|E_UNPACK"
+        do_abort_checked "Could not copy FINAL_SRCPATH: <$FINAL_SRCPATH> to SRC: <$SRC>. SOURCE: <$NETSRC>|E_UNPACK"
     fi
 }
 
@@ -583,11 +569,7 @@ extract_file() {
 		$cmd -dcf "$file" > "$SRC/${FINAL_SRCNAME%.*}" || ret=$?
 	fi
 	if (( ret )); then
-        if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-            rm -rf $PKGMK_WORK_DIR
-        fi
-        error "Building '$TARGET' failed.. "
-        do_abort "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>|E_UNPACK"
+        do_abort_checked "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>|E_UNPACK"
 	fi
 
 	if (( EUID == 0 )); then
@@ -846,7 +828,7 @@ download_file() {
     fi
 
     if [ $ret != 0 ]; then
-        do_abort "Failure while downloading <$FINAL_SRCPATH> source entry: <$ORIG_URL>.|E_DOWNLOAD"
+        do_abort "Failure while downloading <$FINAL_SRCPATH> SOURCE: <$ORIG_URL>.|E_DOWNLOAD"
     fi
     mv -f "$FINAL_SRCPATH_PARTIAL" "$FINAL_SRCPATH"
 }
@@ -871,21 +853,20 @@ download_source() {
             if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
                 case $PROTOCOL in
                     ftp|http|https)
-                        #download_file  "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$PROTOCOL" "$ORIG_URL"
                         download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIG_URL"
                         ;;
-                    # currently not supported
+                    # TODO: remove currently not supported
                     git)
-                        download_git "$FINAL_SRCNAME" "$FINAL_SRCPATH"  "$ORIG_URL"
+                        download_git "$NETSRC" "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
                         ;;
                     svn)
                         download_svn "$NETSRC" "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
                         ;;
                     hg)
-                        download_hg "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
+                        download_hg  "$NETSRC" "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
                         ;;
                     bzr)
-                        download_bzr "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
+                        download_bzr "$NETSRC" "$FINAL_SRCNAME" "$FINAL_SRCPATH" "$ORIG_URL"
                         ;;
                     #local) checked above
                 esac
@@ -926,7 +907,7 @@ unpack_source() {
             local)
                 extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
                 ;;
-            # currently not supported
+            # TODO: remove currently not supported
             #git)
                 #download_git
                 #;;
@@ -2142,8 +2123,9 @@ PKGMK_UPDATE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"
 
 PKGMK_DOWNLOAD_PROG="wget"
-PKGMK_DOWNLOAD_PROG_OPTS=""     
-PKGMK_VCS_HOLDVER="no"         # When using VCS sources any currently checked out source will not be updated to the latest revision.
+PKGMK_DOWNLOAD_PROG_OPTS=""  
+# When using VCS sources any currently checked out source will not be updated to the latest revision.   
+PKGMK_VCS_HOLDVER="no"         
 
 
 PKGMK_VCS_GIT_OPTS=""
