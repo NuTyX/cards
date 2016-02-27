@@ -595,7 +595,10 @@ extract_hg() {
 # Examples
 #
 # source=(bzr+lp:~elementary-os/contractor/elementary-contracts)
-# source=(foomatic_db::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db/#revision=1295)
+# source=(foomatic-db-engine::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db-engine/#revision=371)
+# source=(foomatic-db::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db/)
+# source=(foomatic-db-nonfree::bzr+http://bzr.linuxfoundation.org/openprinting/foomatic/foomatic-db-nonfree/)
+#
 #
 #**********************************************************************************************************************
 
@@ -626,6 +629,57 @@ download_bzr() {
 		fi
 	fi
 }
+
+extract_bzr() {
+	local NETSRC=$1
+	local REPO=$(get_final_srcname "$NETSRC")
+	local FRAGMENT=${NETSRC#*#}
+	if [[ $FRAGMENT = "$NETSRC" ]]; then
+		unset FRAGMENT
+	fi
+
+	rev="last:1"
+	if [[ -n $FRAGMENT ]]; then
+		case ${FRAGMENT%%=*} in
+			revision)
+				rev="${FRAGMENT#*=}"
+				displaylocation="$url -r ${FRAGMENT#*=}"
+				;;
+            *) do_abort_checked "Unrecognized reference: ${FRAGMENT}.|E_UNPACK_VCS"
+                ;;
+		esac
+	fi
+
+	local dir=$(getchecked_final_srcpath "$NETSRC")
+	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
+
+	info "Creating working copy of bzr repo: <$REPO>..."
+	pushd "$SRC" &>/dev/null
+
+	if [[ -d "${dir##*/}" ]]; then
+		cd_safe "${dir##*/}"
+		if ! (bzr pull "$dir" -q --overwrite -r "$rev" && bzr clean-tree -q --detritus --force); then
+            do_abort_checked "Failure while updating working copy of bzr repo <$REPO>.|E_UNPACK_VCS"
+		fi
+	elif ! bzr checkout "$dir" -r "$rev"; then
+		do_abort_checked "Failure while creating working copy of bzr repo <$REPO>.|E_UNPACK_VCS"
+	fi
+
+	popd &>/dev/null
+}
+
+
+#**********************************************************************************************************************
+#
+# local file - function for handling the download and "extraction" of local sources
+#
+# Examples
+#
+# source=(test_file)
+# source=(resources/test_file)
+#
+#**********************************************************************************************************************
+
 extract_only_copy() {
     local FINAL_SRCPATH=$1
     local NETSRC=$2
@@ -637,6 +691,28 @@ extract_only_copy() {
         do_abort_checked "Could not copy FINAL_SRCPATH: <$FINAL_SRCPATH> to SRC: <$SRC>. SOURCE: <$NETSRC>|E_UNPACK"
     fi
 }
+
+#**********************************************************************************************************************
+#
+# qualified uri - function for handling the download and "extraction" of qualified uri sources
+#
+# Examples
+#
+#  QUALIFIED URI
+#
+#   ftp
+# source=(ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(file::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+#
+#   http
+# source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)
+# source=(xz::http://tukaani.org/xz/xz-5.2.2.tar.xz)
+#
+#   https
+# source=(xmlto::https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+# source=(https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+#
+#**********************************************************************************************************************
 
 # TODO: clarify permissions: see issue #34: https://github.com/NuTyX/cards/issues/34
 extract_file() {
@@ -1032,9 +1108,9 @@ unpack_source() {
             hg)
                 extract_hg "$NETSRC"
                 ;;
-            #bzr)
-                #extract_bzr
-                #;;
+            bzr)
+                extract_bzr "$NETSRC"
+                ;;
 		esac
 	done
 }
