@@ -1460,7 +1460,7 @@ build_package() {
 			for DIR in usr/share/locale opt/*/share/locale; do
 				if [ -d $DIR ]; then
 					for LOC in `cd $DIR && ls`; do
-						# Need to double check because glibc for exemple create a file in this directory
+						# Need to double check because glibc for example create a file in this directory
 						if [ -d $DIR/$LOC ];then
 							for PKGMK_LOCALE in ${PKGMK_LOCALES[@]}; do
 								if [ "$PKGMK_LOCALE" == "$LOC" ]; then

@@ -8,12 +8,12 @@
 ## Le contenu d'un dossier paquet ressemble donc à ceci dans le cas de:
 ##
 ##
-## Folders where should be located the recepts
-## The order is important 
+## Folders where the recipes should be located.
+## The order is important
 ## First found first compiled and/or first installed
 ##
-## Note that it's the "base" packages which will be the last and the "desktop" one the first
-## and that we do specify the parent folder of the set of packages category:
+## Note that it's the "base" packages which will be the last and the "desktop" packages
+## the first and that we do specify the parent folder of the set of packages category:
 ## The content of a folder package look like this in the case of:
 ##
 ## /var/lib/pkg/depot/cli/alsa-utils/.PKGREPO
@@ -25,20 +25,20 @@
 ##                                  /...
 
 ## A COLLECTION CAN BE MADE OF ports only OR MADE OF binaries
-## The only criteria determining this is: with or without '|<url adress>' at the end of a line starting with the
-## keyword 'dir'. Followings examples:
+## The only criteria for determining this is: with or without '|<url adress>' at the end of a line starting with the
+## keyword 'dir'. Following examples:
 
 ## This is a port collection located in '/usr/ports/my_ports'
 # dir /usr/ports/my_ports
 
-## This is a binaries collection located in '/depot/x86_64/gui|http://downloads.nutyx.org'. It will all
-##the binaires from the 'http://downloads.nutyx.org' mirror
+## This is a binaries collection located in '/depot/x86_64/gui|http://downloads.nutyx.org'.
+## It will contain all the binaires from the 'http://downloads.nutyx.org' mirror
 # dir /depot/x86_64/gui|http://downloads.nutyx.org
 
 ## Uncomment following lines if you want to compile your own ports
-## Use then the command 'ports -u' to get all the ports
-## This are examples of directories.
-## IMPORTANT NOTE: They are severall methods to build your own ports.
+## Afterwards use the command 'ports -u' to update all the ports
+## These are examples of directories.
+## IMPORTANT NOTE: There are severall methods to build your own ports.
 ## !!!! Read the documentation first  at http://www.nutyx.org !!!!
 ##
 
@@ -53,7 +53,7 @@
 ## The NuTyX name and version are found in the /var/lib/pkg/nutyx-version file
 ## The Colletion name (xfce4-extra, xfce4, gui, gui-extra, cli, cli-extra, base, base-extra)
 ## must exist on the mirror http://downloads.nutyx.org (in this case)
-## Checkout for your version what's are the available collections at http://downloads.nutyx.org/<NuTyX-version>
+## Check for your version what are the available collections at http://downloads.nutyx.org/<NuTyX-version>
 #
 ## Le nom et la version de NuTyX se trouvent dans le fichier /var/lib/pkg/nutyx-version
 ## Le nom des collections (xfce4-extra, xfce4, gui, gui-extra,cli, cli-extra, base, base-extra)
@@ -83,10 +83,10 @@ dir /var/lib/pkg/depot/base|http://downloads.nutyx.org
 
 # A collection can be
 
-## Cards needs to know if he's allowed to removing the package you pass to the command argument:
+## Cards needs to know if it is allowed to remove the package you pass to the command argument:
 ##   cards remove <packagename>
-## Because yes, we don't want do delete the glibc package for example :)
-## Moreover if need to come back to a base system, following folder(s) should contains packages
+## We don't want do delete the 'glibc package' for example :)
+## Moreover if there is a need to come back to a base system, following folder(s) should contain packages
 ##
 ##
 ## Cards doit vérifier si il peut supprimer le paquet passé en argument:
@@ -100,25 +100,25 @@ base /var/lib/pkg/depot/base
 base /var/lib/pkg/depot/base-extra
 
 ##
-## We can specify which locale we want, it's possible to mention as many locale we want
-## As the following exemple germans, deutch, and french locales
-## The command setup-nutyx -cl add the selected locale into cards.conf file
+## We can specify which locale should be installed (more than one are allowed)
+## Following example sets: german, dutch, and french locales
+## The command 'setup-nutyx -cl' add the selected locale into cards.conf file
 ##
 ## On peut spécifier quelle(s) locale(s) doivent être installées
-## La commande setup-nutyx -cl ajoute la locale selectionnée dans le fichier cards.conf
+## La commande 'setup-nutyx -cl' ajoute la locale selectionnée dans le fichier cards.conf
 ##
 # locale de
 # locale nl
 # locale fr
 
 
-## If you plan to build your Package you will like this option otherwise just ignore it
+## If you plan to build packages you will like this option otherwise just ignore it
 ##
 ## Cards can log the output of the creation of the final package when a:
 #
 #   cards create -r <nom of package>
 #
-## if following variable is set and is refering a folder: the compilation will be logged
+## if following variable is set and is refering to a folder: the compilation will be logged
 ##
 ##
 ## Si vous avez l'intention de construire vos propre paquets, cette option va vous plaire
