@@ -68,3 +68,11 @@ but decide also on others.
 * improve the pkginfo --runtimedepfiles functionnality
 
 * Update Copyright to include: Johannes Winkelmann  man pages etc..
+
+* PKGMK_VCS_HOLDVER: Decide maybe change it to hold the last set version
+
+    Currently: When using VCS sources any currently checked out source will not be updated to the latest revision.  
+
+* `pkgmk.in` rewrite info *Pkgfile: source (array)* in the documentation and remove it from the `pkgmk.in` file
+
+* Adjust the `pkgmk.conf` file to reflect recent changes
