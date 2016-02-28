@@ -807,10 +807,6 @@ get_filename() {
 		echo $1
 	fi
 }
-get_basename() {
-	local FILE="`echo $1 | sed 's|^.*://.*/||g'`"
-	echo $FILE
-}
 get_variables() {
 	local STRING KEY VALUE
 	while read i;
