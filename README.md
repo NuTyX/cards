@@ -3,11 +3,11 @@
 
 ### Description
 
-**cards** which stands for *Create, Add, Remove and Download System* is a set of utilities 
-(pkgadd, pkgrm, pkginfo, pkgmk and cards), which are used for managing software packages in NuTyX-Linux. 
- 
-*cards* is based on a fork of the *[CRUX-Linux](http://crux.nu) pkgutils and prt-get tools* and is under active development.
-[NuTyX-Linux Team](http://nutyx.org)
+**cards** which stands for *Create, Add, Remove and Download System* is a set of utilities
+(pkgadd, pkgrm, pkginfo, pkgmk and cards), which are used for managing software packages in NuTyX-Linux.
+
+*cards* is based on a fork of the *[CRUX-Linux](http://crux.nu) pkgutils and prt-get tools and is under active
+development. [NuTyX-Linux Team](http://nutyx.org)
 
 
 #### The most notable additions and improvements
@@ -64,11 +64,15 @@ $ cards help
 
 ### Copyright
 
-**cards** Copyright (c) 2013-2016 [NuTyX-Linux Team](http://nutyx.org).
+**cards** Copyright (c) 2013-2016 [NuTyX-Linux Team](http://nutyx.org) licensed under the GNU General Public License 2
+or later.
 
-Some code based on:
+Read the COPYING file for the complete license.
 
-* `pkgutils`: Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 [CRUX team](http://crux.nu)
-* `pacman`:   Copyright (c) 2015-2016 Pacman Development Team [pacman repo](https://projects.archlinux.org/pacman.git/)
 
-**cards** is licensed through the GNU General Public License. Read the COPYING file for the complete license.
+#### Licenses for incorporated software
+
+* `pkgutils`: Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team <http://crux.nu> [GPL2/later]
+* `prt-get`:  Copyright (c) 20002, 2004, 2005 Johannes Winkelmann (jw@tks6.net) [GPL2/later]
+* `pacman`:   Copyright (c) 2015-2016 Pacman Development Team <https://projects.archlinux.org/pacman.git/> [GPL2/later]
+
