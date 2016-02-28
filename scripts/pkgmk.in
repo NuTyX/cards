@@ -2101,7 +2101,6 @@ main() {
 	if [ ! -z "$group" ]; then
 		info "group: $group"
 	fi
-	PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "`dirname $PKGMK_WORK_DIR`"
@@ -2266,16 +2265,17 @@ readonly PKGMK_COMMAND="$0"
 readonly PKGMK_ROOT="$PWD"
 readonly PKGMK_PACKAGE_DIR="$PWD"
 
-PKGMK_BUILDVER=`date +%s`
+readonly PKGMK_BUILDVER=`date +%s`
 
-PKGMK_PACKAGE_EXT="cards.tar"
+readonly PKGMK_PACKAGE_EXT="cards.tar"
 
-PKGMK_REPO=".PKGREPO"
+readonly PKGMK_REPO=".PKGREPO"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
-PKGMK_MD5SUM="$name.`uname -m`.md5sum"
-PKGMK_NOSTRIP=".nostrip"
+readonly PKGMK_MD5SUM="$name.`uname -m`.md5sum"
+
+readonly PKGMK_NOSTRIP=".nostrip"
 PKGMK_SPIT="no"
 
 PKGMK_KEEP_SOURCES="no"
