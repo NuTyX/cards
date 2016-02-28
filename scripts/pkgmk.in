@@ -1481,10 +1481,12 @@ check_footprint() {
 }
 
 make_work_dir() {
+	# TODO findout why we have to export thoses 2 variables
+	# I really think it's pointless in cards building process	
 	export PKG="$PKGMK_WORK_DIR/pkg"
 	export SRC="$PKGMK_WORK_DIR/src"
-	export pkgdir=$PKG
-	export srcdir=$SRC
+	pkgdir=$PKG
+	srcdir=$SRC
 	umask 022
 
 	cd $PKGMK_ROOT
