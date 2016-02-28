@@ -63,7 +63,7 @@ but decide also on others.
 
 * improve the pkginfo --runtimedepfiles functionnality
 
-* Update Copyright to include: Johannes Winkelmann  man pages etc..
+* Update Copyright to include: Johannes Winkelmann and Judd Vinet  man pages etc..
 
 * PKGMK_VCS_HOLDVER: Decide maybe change it to hold the last set version
 
