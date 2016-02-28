@@ -28,13 +28,14 @@
 # `pacman`:   Copyright (c) 2015-2016 Pacman Development Team <https://projects.archlinux.org/pacman.git/> [GPL2/later]
 
 
-
 #**********************************************************************************************************************
 #           CODE INDEX: TIP: use search to jump there
 #
 #   GENERAL INFO
 #   ERROR CODES
 #   GENERAL FUNCTIONS - HELPERS
+#       FUNCTION RELATED: helpers to check, run other functions
+#       GENERAL - helper functions
 #   DOWNLOAD SOURCE FUNCTIONS
 #       FILES - function for handling the *download* of `File` sources
 #       GIT - function for handling the *download* of `Git` sources
@@ -50,7 +51,7 @@
 #   PACKAGE FUNCTIONS
 #       COMPRESSION  - package functions
 #       PACKAGE PACK/REMOVE functions: lib, devel, doc, man, service
-#       GENERAL  - package functions
+#       GENERAL - package functions
 #   REPO FUNCTIONS
 #   MAIN FUNCTIONS
 #   DIVERSES
@@ -209,6 +210,18 @@ E_UNPACK_VCS=13         # error during unpacking/extracting ofof version control
 #
 #   GENERAL FUNCTIONS - HELPERS
 #
+#**********************************************************************************************************************
+
+#**********************************************************************************************************************
+#   FUNCTION RELATED: helpers to check, run other functions
+#**********************************************************************************************************************
+
+have_function() {
+	declare -f "$1" >/dev/null
+}
+
+#**********************************************************************************************************************
+#   GENERAL - helper functions
 #**********************************************************************************************************************
 
 info() {
@@ -1197,7 +1210,7 @@ remove_service() {
 
 
 #**********************************************************************************************************************
-#   GENERAL  - package functions
+#   GENERAL - package functions
 #**********************************************************************************************************************
 
 get_pkgfile_variables() {
@@ -1228,7 +1241,7 @@ check_pkgfile() {
 		error "Variable 'name' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	fi
-	if [ "`type -t build`" != "function" ] && [ "$PKGMK_PKGFILE" == "Pkgfile" ]; then
+	if ! have_function 'build' && [ "$PKGMK_PKGFILE" == "Pkgfile" ]; then
 		error "Function 'build' not specified in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	fi
@@ -1617,11 +1630,11 @@ build_package() {
 	extract_source
 
 	cd $SRC
-	if ( declare -f prepare > /dev/null ); then
+    if have_function 'prepare'; then
 		(set -e -x ; prepare)
 	fi
 	(set -e -x ; build)
-	if ( declare -f package > /dev/null ); then
+    if have_function 'package'; then
 		(set -e -x ; package)
 	fi
 	if [ $? = 0 ]; then
@@ -1636,7 +1649,7 @@ build_package() {
 		j=0
 		for group in ${PKGMK_GROUPS[@]}; do
 			BUILD_SUCCESSFUL="yes"
-			if [ "`type -t ${group}`" == "function" ]; then
+            if have_function "${group}"; then
 				(set -e -x ;${group})
 				j=1
 				if [ $? = 0 ]; then
@@ -2076,7 +2089,7 @@ main() {
 			name=$pkgname
 		fi
 	fi
-	[ "`type -t package_$pkgname`" == "function" ] && PKGMK_SPIT="yes"
+    have_function "package_$pkgname" && PKGMK_SPIT="yes"
 	[ ! -z $pkgver ] && version=$pkgver
 	[ ! -z $pkgrel ] && release=$pkgrel
 	[ ! -z "$pkgdesc" ] && description=$pkgdesc
