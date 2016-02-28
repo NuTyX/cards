@@ -50,6 +50,11 @@ e.g. pkgmk -cm, --check-md5sum [see issue](https://github.com/NuTyX/cards/issues
 but decide also on others.
 
 
+### Adjust documentation to include: ARCH i686
+
+[see issue](https://github.com/NuTyX/cards/issues/35)
+
+
 ### Re-write Documentation
 
 
@@ -59,3 +64,4 @@ but decide also on others.
 
 * improve the pkginfo --runtimedepfiles functionnality
 
+* Update Copyright to include: Johannes Winkelmann  man pages etc..
