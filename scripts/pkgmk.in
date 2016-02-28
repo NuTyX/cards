@@ -1080,7 +1080,7 @@ remove_source() {
 		fi
 	done
 }
-unpack_source() {
+extract_source() {
 	local NETSRC PROTOCOL FINAL_SRCNAME FINAL_SRCPATH COMMAND
 
     for NETSRC in ${source[@]}; do
@@ -1582,7 +1582,7 @@ build_package() {
 
 	info "Building '$TARGET'."
 
-	unpack_source
+	extract_source
 
 	cd $SRC
 	if ( declare -f prepare > /dev/null ); then
@@ -2170,7 +2170,7 @@ main() {
 		download_source
 		make_work_dir
 		info "Extracting sources of package '${name}-$version'."
-		unpack_source
+		extract_source
 		exit 0
 	fi
 
