@@ -807,7 +807,7 @@ get_filename() {
 		echo $1
 	fi
 }
-get_variables() {
+get_pkgfile_variables() {
 	local STRING KEY VALUE
 	while read i;
 	do
@@ -2101,7 +2101,7 @@ main() {
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "`dirname $PKGMK_WORK_DIR`"
 
-	get_variables
+	get_pkgfile_variables
 
 	check_pkgfile
 
