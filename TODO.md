@@ -58,6 +58,9 @@ but decide also on others.
 ### Re-write Documentation
 
 
+### CHECK: PKGMK.CONF VARIABLES: which can be set in the `pkgmk.conf`
+
+
 ### DIVERSE TODO
 
 * Maybe: add Pkgfile syntax check for source=() array
