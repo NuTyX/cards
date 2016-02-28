@@ -9,7 +9,7 @@ Clarify permissions set for extract_file(): [see issue](https://github.com/NuTyX
 
 Add documentation / man page info for ALL PKGMK options.
 
-Split them into 2 categories: 
+Split them into 2 categories:
 
 * PKGMK.CONF VARIABLES: which can be set in the `pkgmk.conf`
 * PKGMK INTERNAL VARIABLES: which should not be set in the `pkgmk.conf` but might be useful for developers.
@@ -26,21 +26,17 @@ build_package(): find a better solution for the hardcoded folders [see issue](ht
 
 ### Unify code style in `pkgmk.in`: backticks to parentheses style
 
-Change all backticks to parentheses style [see](http://mywiki.wooledge.org/BashFAQ/082) 
-
-
-### Unify code style in `pkgmk.in`: quotation
-
-Prefer quoted ariables over unquoted.
+Change all backticks to parentheses style [see](http://mywiki.wooledge.org/BashFAQ/082)
 
 
 ### Unify code style in `pkgmk.in`: Quoting Variables
 
-[see Quoting Variables](http://www.tldp.org/LDP/abs/html/quotingvar.html)
+Prefer quoted variables over unquoted. [see Quoting Variables](http://www.tldp.org/LDP/abs/html/quotingvar.html)
 
 ```
-When referencing a variable, it is generally advisable to enclose its name in double quotes. This prevents 
-reinterpretation of all special characters within the quoted string -- except $, ` (backquote), and \ (escape). 
+When referencing a variable, it is generally advisable to enclose its name in double quotes.
+This prevents  reinterpretation of all special characters within the
+quoted string -- except $, ` (backquote), and \ (escape).
 ```
 
 ### Remove unneeded or brocken options
@@ -71,8 +67,6 @@ but decide also on others.
 
 * PKGMK_VCS_HOLDVER: Decide maybe change it to hold the last set version
 
-    Currently: When using VCS sources any currently checked out source will not be updated to the latest revision.  
+    Currently: When using VCS sources any currently checked out source will not be updated to the latest revision.
 
 * `pkgmk.in` rewrite info *Pkgfile: source (array)* in the documentation and remove it from the `pkgmk.in` file
-
-* Adjust the `pkgmk.conf` file to reflect recent changes
