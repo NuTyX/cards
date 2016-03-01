@@ -2108,13 +2108,12 @@ main() {
 	fi
 	parse_options "$@"
 
-        if [ ! -f $PKGMK_CONFFILE ]; then
-            error "$(gettext "File <%s> not found.")" "$PKGMK_CONFFILE"
-            exit $E_GENERAL
-        fi
-        . $PKGMK_CONFFILE
+    if [ ! -f $PKGMK_CONFFILE ]; then
+        error "$(gettext "File <%s> not found.")" "$PKGMK_CONFFILE"
+        exit $E_GENERAL
+    fi
+    . $PKGMK_CONFFILE
 
-	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
         warning "$(gettext "Command <pkginfo> NOT FOUND, footprint ignored.")"
 		PKGMK_IGNORE_FOOTPRINT="yes"
@@ -2404,6 +2403,7 @@ readonly PKGMK_PACKAGE_EXT="cards.tar"
 readonly PKGMK_REPO=".PKGREPO"
 readonly PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 readonly PKGMK_NOSTRIP=".nostrip"
+readonly PKGMK_ARCH="$(uname -m)"
 
 #**********************************************************************************************************************
 #   PKGMK.CONF VARIABLES: which can be set in the `pkgmk.conf`
