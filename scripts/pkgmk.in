@@ -213,7 +213,7 @@ E_UNPACK_VCS=13         # error during unpacking/extracting ofof version control
 # USAGE EXAMPLE: ALL messages should be in the format:
 #
 #   plain "$(gettext "Some Info...")"
-#   plain "$(gettext "The files path is: <%s>")"  "$FILEPATH"
+#   plain "$(gettext "The files path is: %s")"  "$FILEPATH"
 #   plain "$(gettext "Source file <%s>.")" "$(get_filename "$1")"
 #
 #**********************************************************************************************************************
@@ -235,7 +235,7 @@ colorize() {
 		RED_MSG="${BOLD_MSG}\e[31m"
 		YELLOW_MSG="${BOLD_MSG}\e[33m"
 	fi
-	readonly ALL_OFF_MSG BOLD_MSG BLUE_MSG GREEN_MSG RED_MSG YELLOW_MSG
+	readonly ALL_OFF_MSG BOLD_MSG BLUE_MSG GREEN_MSG RED_MSG YELLOW_MSG  
 }
 
 plain() {
@@ -2171,17 +2171,17 @@ main() {
 		echo "$version"
 		exit 0
 	fi
-    msg "$(gettext "Configuration settings")"
-    plain "$(gettext "PKGMK_INSTALL:          %s")" "$PKGMK_INSTALL"
-    plain "$(gettext "PKGMK_WORK_DIR:         %s")" "$PKGMK_WORK_DIR"
-    plain "$(gettext "PKGMK_SOURCE_DIR:       %s")" "$PKGMK_SOURCE_DIR"
-
-	if [ "$PKGMK_INSTALL" = "yes" ]; then  TODO set it to no
+    msg "$(gettext "Configuration settings...")"
+    msg2 "$(gettext "PKGMK_INSTALL:          %s")" "$PKGMK_INSTALL"
+    msg2 "$(gettext "PKGMK_WORK_DIR:         %s")" "$PKGMK_WORK_DIR"
+    msg2 "$(gettext "PKGMK_SOURCE_DIR:       %s")" "$PKGMK_SOURCE_DIR"
+    
+	if [ "$PKGMK_INSTALL" = "no" ]; then
 		PKGMK_CLEAN="no"
         warning "$(gettext "CLEAN IGNORED.")"
 	else
-        plain "$(gettext "PKGMK_KEEP_SOURCES:     %s")" "$PKGMK_KEEP_SOURCES"
-        plain "$(gettext "PKGMK_CLEAN:            %s")" "$PKGMK_CLEAN"
+        msg2 "$(gettext "PKGMK_KEEP_SOURCES:     %s")" "$PKGMK_KEEP_SOURCES"
+        msg2 "$(gettext "PKGMK_CLEAN:            %s")" "$PKGMK_CLEAN"
 	fi
 	if [ "$PKGMK_CLEAN" != "no" ]; then
 		PKGMK_IGNORE_FOOTPRINT="yes"
@@ -2189,34 +2189,35 @@ main() {
         warning "$(gettext "FOOTPRINT AND MD5SUM IGNORED.")"
 	else
 		if [ "$PKGMK_UPDATE_REPO" != "yes" ]; then
-            plain "$(gettext "PKGMK_IGNORE_REPO:      %s")" "$PKGMK_IGNORE_REPO"
+            msg2 "$(gettext "PKGMK_IGNORE_REPO:      %s")" "$PKGMK_IGNORE_REPO"
 		else
-            plain "$(gettext "PKGMK_UPDATE_REPO:      %s")" "$PKGMK_UPDATE_REPO"
+            msg2 "$(gettext "PKGMK_UPDATE_REPO:      %s")" "$PKGMK_UPDATE_REPO"
 		fi
-        plain "$(gettext "PKGMK_IGNORE_FOOTPRINT: %s")" "$PKGMK_IGNORE_FOOTPRINT"
-        plain "$(gettext "PKGMK_IGNORE_MD5SUM:    %s")" "$PKGMK_IGNORE_MD5SUM"
+        msg2 "$(gettext "PKGMK_IGNORE_FOOTPRINT: %s")" "$PKGMK_IGNORE_FOOTPRINT"
+        msg2 "$(gettext "PKGMK_IGNORE_MD5SUM:    %s")" "$PKGMK_IGNORE_MD5SUM"
 	fi
 	if [ "$PKGMK_IGNORE_REPO" == "yes" ]; then
         plain "$(gettext "<%s> file will be deleted.")" "$PKGMK_REPO"
 	fi
 
-    plain "$(gettext "PKGMK_COMPRESS_PACKAGE: %s")" "$PKGMK_COMPRESS_PACKAGE"
+    msg2 "$(gettext "PKGMK_COMPRESS_PACKAGE: %s")" "$PKGMK_COMPRESS_PACKAGE"
 	if [ "$PKGMK_COMPRESS_PACKAGE" != "no" ]; then
-        plain "$(gettext "PKGMK_COMPRESSION_MODE: %s")" "$PKGMK_COMPRESSION_MODE"
+        msg2 "$(gettext "PKGMK_COMPRESSION_MODE: %s")" "$PKGMK_COMPRESSION_MODE"
         if [ -n "$PKGMK_COMPRESSION_OPTS" ]; then
-            plain "$(gettext "PKGMK_COMPRESSION_OPTS: %s")" "$PKGMK_COMPRESSION_OPTS"
+            msg2 "$(gettext "PKGMK_COMPRESSION_OPTS: %s")" "$PKGMK_COMPRESSION_OPTS"
         fi
 	fi
 
-    plain "$(gettext "name: <%s>.")" "$name"
+    msg "$(gettext "Package info...")"
+    msg2 "$(gettext "name:    %s")" "$name"
 	if [ ! -z "$version" ]; then
-        plain "$(gettext "version: <%s>.")" "$version"
+        msg2 "$(gettext "version: %s")" "$version"
 	fi
 	if [ ! -z "$release" ]; then
-        plain "$(gettext "release: <%s>.")" "$release"
+        msg2 "$(gettext "release: %s")" "$release"
 	fi
 	if [ ! -z "$group" ]; then
-        plain "$(gettext "group: <%s>.")" "$group"
+        msg2 "$(gettext "group:   %s")" "$group"
 	fi
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
