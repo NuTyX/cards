@@ -28,9 +28,6 @@ Split them into 2 categories:
     * add info that PKGMK_ARCH variable exists: **currently I found 85 occurencies of `uname -m` in the official Pkgfiles.
 
 
-### Add for VCS (version control source) code to auomaticaly update the Pkgfile version.
-
-
 ### Unify code style in `pkgmk.in`: backticks to parentheses style
 
 Change all backticks to parentheses style [see](http://mywiki.wooledge.org/BashFAQ/082)
@@ -70,4 +67,6 @@ quoted string -- except $, ` (backquote), and \ (escape).
 
     Currently: When using VCS sources any currently checked out source will not be updated to the latest revision.
 
-* `pkgmk.in` rewrite info *Pkgfile: source (array)* in the documentation and remove it from the `pkgmk.in` file
+* `pkgmk.in` rewrite info *Pkgfile: source (array)* (the big block at the top of the file)
+    in the documentation and remove it from the `pkgmk.in` file
+    
