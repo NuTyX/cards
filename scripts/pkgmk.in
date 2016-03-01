@@ -213,59 +213,59 @@ E_UNPACK_VCS=13         # error during unpacking/extracting ofof version control
 # USAGE EXAMPLE: ALL messages should be in the format:
 #
 #   plain "$(gettext "Some Info...")"
-#   plain "$(gettext "The files path is: %s")"  "$FILEPATH"
-#   plain "$(gettext "Source file %s.")" "$(get_filename "$1")"
+#   plain "$(gettext "The files path is: <%s>")"  "$FILEPATH"
+#   plain "$(gettext "Source file <%s>.")" "$(get_filename "$1")"
 #
 #**********************************************************************************************************************
 
 colorize() {
 	# prefer terminal safe colored and bold text when tput is supported
 	if tput setaf 0 &>/dev/null; then
-		ALL_OFF="$(tput sgr0)"
-		BOLD="$(tput bold)"
-		BLUE="${BOLD}$(tput setaf 4)"
-		GREEN="${BOLD}$(tput setaf 2)"
-		RED="${BOLD}$(tput setaf 1)"
-		YELLOW="${BOLD}$(tput setaf 3)"
+		ALL_OFF_MSG="$(tput sgr0)"
+		BOLD_MSG="$(tput bold)"
+		BLUE_MSG="${BOLD_MSG}$(tput setaf 4)"
+		GREEN_MSG="${BOLD_MSG}$(tput setaf 2)"
+		RED_MSG="${BOLD_MSG}$(tput setaf 1)"
+		YELLOW_MSG="${BOLD_MSG}$(tput setaf 3)"
 	else
-		ALL_OFF="\e[0m"
-		BOLD="\e[1m"
-		BLUE="${BOLD}\e[34m"
-		GREEN="${BOLD}\e[32m"
-		RED="${BOLD}\e[31m"
-		YELLOW="${BOLD}\e[33m"
+		ALL_OFF_MSG="\e[0m"
+		BOLD_MSG="\e[1m"
+		BLUE_MSG="${BOLD_MSG}\e[34m"
+		GREEN_MSG="${BOLD_MSG}\e[32m"
+		RED_MSG="${BOLD_MSG}\e[31m"
+		YELLOW_MSG="${BOLD_MSG}\e[33m"
 	fi
-	readonly ALL_OFF BOLD BLUE GREEN RED YELLOW
+	readonly ALL_OFF_MSG BOLD_MSG BLUE_MSG GREEN_MSG RED_MSG YELLOW_MSG
 }
 
 plain() {
 	local mesg=$1; shift
-	printf "${BOLD}==> ${mesg}${ALL_OFF}\n" "$@" >&1
+	printf "${BOLD_MSG}==> ${mesg}${ALL_OFF_MSG}\n" "$@" >&1
 }
 
 plain2() {
 	local mesg=$1; shift
-	printf "${BOLD}    ${mesg}${ALL_OFF}\n" "$@" >&1
+	printf "${BOLD_MSG}    ${mesg}${ALL_OFF_MSG}\n" "$@" >&1
 }
 
 msg() {
 	local mesg=$1; shift
-	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&1
+	printf "${GREEN_MSG}==>${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&1
 }
 
 msg2() {
 	local mesg=$1; shift
-	printf "${BLUE}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&1
+	printf "${BLUE_MSG}  ->${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&1
 }
 
 warning() {
 	local mesg=$1; shift
-	printf "${YELLOW}==> $(gettext "WARNING:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${YELLOW_MSG}==> $(gettext "WARNING:")${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&2
 }
 
 error() {
 	local mesg=$1; shift
-	printf "${RED}==> $(gettext "ERROR:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
+	printf "${RED_MSG}==> $(gettext "ERROR:")${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&2
 }
 
 # ==================  THESE BELOW SHOULD BE REPLACED
@@ -486,7 +486,7 @@ remove_source() {
 	for NETSRC in ${source[@]}; do
 		FINAL_SRCPATH=`get_final_srcpath $NETSRC`
 		if [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$NETSRC" ]; then
-            plain "$(gettext "Removing <%s>.")" "$FINAL_SRCPATH"
+            plain "$(gettext "Removing <%s>...")" "$FINAL_SRCPATH"
 			rm -rf $FINAL_SRCPATH
 		fi
 	done
@@ -1720,14 +1720,14 @@ build_package() {
 					pack_${group}
 				fi
 				remove_${group}
-				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
+				if [ "$BUILD_SUCCESSFUL" == "no" ]; then
 					error "$(gettext "Building <%s> failed.")" "$TARGET"
                 			exit $E_BUILD
 				fi
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
-				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
+				if [ "$BUILD_SUCCESSFUL" == "no" ]; then
 					error "$(gettext "Building <%s> failed.")" "$TARGET"
 					exit $E_BUILD
 				fi
@@ -2171,16 +2171,17 @@ main() {
 		echo "$version"
 		exit 0
 	fi
-    plain "$(gettext "PKGMK_INSTALL: <%s>.")" "$PKGMK_INSTALL"
-    plain "$(gettext "PKGMK_WORK_DIR: <%s>.")" "$PKGMK_WORK_DIR"
-    plain "$(gettext "PKGMK_SOURCE_DIR: <%s>.")" "$PKGMK_SOURCE_DIR"
+    msg "$(gettext "Configuration settings")"
+    plain "$(gettext "PKGMK_INSTALL:          %s")" "$PKGMK_INSTALL"
+    plain "$(gettext "PKGMK_WORK_DIR:         %s")" "$PKGMK_WORK_DIR"
+    plain "$(gettext "PKGMK_SOURCE_DIR:       %s")" "$PKGMK_SOURCE_DIR"
 
-	if [ "$PKGMK_INSTALL" = "no" ]; then
+	if [ "$PKGMK_INSTALL" = "yes" ]; then  TODO set it to no
 		PKGMK_CLEAN="no"
         warning "$(gettext "CLEAN IGNORED.")"
 	else
-        plain "$(gettext "PKGMK_KEEP_SOURCES: <%s>.")" "$PKGMK_KEEP_SOURCES"
-        plain "$(gettext "PKGMK_CLEAN: <%s>.")" "$PKGMK_CLEAN"
+        plain "$(gettext "PKGMK_KEEP_SOURCES:     %s")" "$PKGMK_KEEP_SOURCES"
+        plain "$(gettext "PKGMK_CLEAN:            %s")" "$PKGMK_CLEAN"
 	fi
 	if [ "$PKGMK_CLEAN" != "no" ]; then
 		PKGMK_IGNORE_FOOTPRINT="yes"
@@ -2188,22 +2189,22 @@ main() {
         warning "$(gettext "FOOTPRINT AND MD5SUM IGNORED.")"
 	else
 		if [ "$PKGMK_UPDATE_REPO" != "yes" ]; then
-            plain "$(gettext "PKGMK_IGNORE_REPO: <%s>.")" "$PKGMK_IGNORE_REPO"
+            plain "$(gettext "PKGMK_IGNORE_REPO:      %s")" "$PKGMK_IGNORE_REPO"
 		else
-            plain "$(gettext "PKGMK_UPDATE_REPO: <%s>.")" "$PKGMK_UPDATE_REPO"
+            plain "$(gettext "PKGMK_UPDATE_REPO:      %s")" "$PKGMK_UPDATE_REPO"
 		fi
-        plain "$(gettext "PKGMK_IGNORE_FOOTPRINT: <%s>.")" "$PKGMK_IGNORE_FOOTPRINT"
-        plain "$(gettext "PKGMK_IGNORE_MD5SUM: <%s>.")" "$PKGMK_IGNORE_MD5SUM"
+        plain "$(gettext "PKGMK_IGNORE_FOOTPRINT: %s")" "$PKGMK_IGNORE_FOOTPRINT"
+        plain "$(gettext "PKGMK_IGNORE_MD5SUM:    %s")" "$PKGMK_IGNORE_MD5SUM"
 	fi
-	if [ "$PKGMK_IGNORE_REPO"  == "yes" ]; then
+	if [ "$PKGMK_IGNORE_REPO" == "yes" ]; then
         plain "$(gettext "<%s> file will be deleted.")" "$PKGMK_REPO"
 	fi
 
-    plain "$(gettext "PKGMK_COMPRESS_PACKAGE: <%s>.")" "$PKGMK_COMPRESS_PACKAGE"
+    plain "$(gettext "PKGMK_COMPRESS_PACKAGE: %s")" "$PKGMK_COMPRESS_PACKAGE"
 	if [ "$PKGMK_COMPRESS_PACKAGE" != "no" ]; then
-        plain "$(gettext "PKGMK_COMPRESSION_MODE: <%s>.")" "$PKGMK_COMPRESSION_MODE"
+        plain "$(gettext "PKGMK_COMPRESSION_MODE: %s")" "$PKGMK_COMPRESSION_MODE"
         if [ -n "$PKGMK_COMPRESSION_OPTS" ]; then
-            plain "$(gettext "PKGMK_COMPRESSION_OPTS: <%s>.")" "$PKGMK_COMPRESSION_OPTS"
+            plain "$(gettext "PKGMK_COMPRESSION_OPTS: %s")" "$PKGMK_COMPRESSION_OPTS"
         fi
 	fi
 
