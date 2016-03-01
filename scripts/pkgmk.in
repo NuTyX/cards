@@ -49,6 +49,7 @@
 #       SVN - function for handling the *extraction* of `Subversion` sources
 #       HG - function for handling the *extraction* of `Mercurial` sources
 #       BZR - function for handling the *extraction* of `Bazaar` sources
+#   PKGFILE VERSION FUNCTIONS
 #   PACKAGE FUNCTIONS
 #       COMPRESSION  - package functions
 #       PACKAGE PACK/REMOVE functions: lib, devel, doc, man, service
@@ -305,6 +306,58 @@ interrupted() {
 have_function() {
 	declare -f "$1" >/dev/null
 }
+
+# first exit all subshells, then print the error
+error_function() {
+	if (( ! BASH_SUBSHELL )); then
+		error "$(gettext "A failure occurred in %s().")" "$1"
+		plain "$(gettext "Aborting...")"
+	fi
+	exit 1
+}
+
+source_safe() {
+	shopt -u extglob
+	if ! source "$@"; then
+		error "$(gettext "Failed to source %s")" "$1"
+		exit 1
+	fi
+	shopt -s extglob
+}
+
+run_function_safe() {
+	local restoretrap
+
+	set -e
+	set -E
+
+	restoretrap=$(trap -p ERR)
+	trap 'error_function $pkgfunc' ERR
+
+	run_function "$1"
+
+	eval $restoretrap
+
+	set +E
+	set +e
+}
+
+run_function() {
+	if [[ -z $1 ]]; then
+		return 1
+	fi
+	local pkgfunc="$1"
+
+	#msg "$(gettext "Starting %s()...")" "$pkgfunc"
+	cd_safe "$SRC"
+
+	# save our shell options so pkgfunc() can't override what we need
+	local shellopts=$(shopt -p)
+    "$pkgfunc"
+	# reset our shell options
+	eval "$shellopts"
+}
+
 
 #**********************************************************************************************************************
 #   GENERAL - helper functions
@@ -1059,10 +1112,57 @@ extract_bzr() {
 
 #**********************************************************************************************************************
 #
-#   PACKAGE FUNCTIONS
+#   PKGFILE VERSION FUNCTIONS
 #
 #**********************************************************************************************************************
 
+# return: full version spec, including version, version
+get_full_version() {
+	printf "%s\n" "$version-$release"
+}
+
+check_version() {
+    local PKG_VERSION="$1"
+	if [[ -z "$PKG_VERSION" ]]; then
+		abort "$(gettext "Package 'version' is not allowed to be empty.")"
+	fi
+	if [[ "$PKG_VERSION" = *[[:space:]:-]:\|]* ]]; then
+		abort "$(gettext "Package 'version': <%s> is not allowed to contain pipe, colons, hyphens or whitespace.")" "$PKG_VERSION"
+	fi
+}
+
+# Automatically update Pkgfile version variable if a setversion() function is provided
+# Re-sources the PKGBUILD afterwards to allow for other variables that use $version
+update_pkgver() {
+    msg "$(gettext "Updating Pkgfile version variable...")"
+    BUILDFILE="$PKGMK_ROOT/$PKGMK_PKGFILE"
+	NEW_VERSION=$(run_function_safe setversion)
+	if ! check_version "$NEW_VERSION"; then
+		abort "$(gettext "setversion() generated an invalid version: %s")" "$NEW_VERSION"
+	fi
+	if [[ -n $NEW_VERSION && $NEW_VERSION != "$version" ]]; then
+		if [[ -f $BUILDFILE && -w $BUILDFILE ]]; then
+			if ! sed -i "s|^version=[^ ]*|version=$NEW_VERSION     # previous: $version|" "$BUILDFILE"; then
+				abort "$(gettext "Failed to update 'Pkgfile version' from: <%s> to <%s>")" "$version" "$NEW_VERSION"
+			fi
+			sed -i "s:|^pkgrel=[^ ]*|pkgrel=1|" "$BUILDFILE"
+            
+            # TODO: Decide if we should keep that or just update the version variable with the new one.
+			source_safe "$BUILDFILE"
+			msg2 "$(gettext "Updated 'Pkgfile version' from: <%s> to <%s>")" "$version" "$NEW_VERSION"
+            msg2 "$(gettext "Full version is now: <%s>")" "$(get_full_version)"
+		else
+			warning "$(gettext "<%s> is not writeable -- version will not be updated")" "$BUILDFILE"
+		fi
+	fi
+}
+
+
+#**********************************************************************************************************************
+#
+#   PACKAGE FUNCTIONS
+#
+#**********************************************************************************************************************
 
 #**********************************************************************************************************************
 #   COMPRESSION  - package functions
@@ -1295,7 +1395,9 @@ check_pkgfile() {
 	fi
 	if [ "${version}" == "" ]; then
         abort "$(gettext "Variable 'version' not initiated or not found in <%s>")" "$PKGMK_PKGFILE"
-	fi
+    else
+        check_version "$version"
+    fi
 	if [ "${release}" == "" ]; then
         abort "$(gettext "Variable 'release' not initiated or not found in<%s>")" "$PKGMK_PKGFILE"
 	fi
@@ -1655,7 +1757,13 @@ build_package() {
 
 	extract_source
 
-	cd $SRC
+	cd "$SRC"
+    
+    if have_function 'setversion'; then
+        # Update Pkgfile with new version variable
+        update_pkgver
+	fi
+    
     if have_function 'prepare'; then
 		(set -e -x ; prepare)
 	fi
@@ -2402,7 +2510,7 @@ PKGMK_PKGFILE="Pkgfile"
 PKGMK_INSTALL="no"
 PKGMK_RECURSIVE="no"
 PKGMK_UPDATE_MD5SUM="no"
-PKGMK_CHECK_MD5SUM="no"  # TODO: Remove this later
+PKGMK_CHECK_MD5SUM="no"
 PKGMK_SPIT="no"
 
 
