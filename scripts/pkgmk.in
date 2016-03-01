@@ -656,7 +656,7 @@ download_git() {
 		info "Updating git repo: <$REPO>..."
 		if ! git fetch --all -p $PKGMK_VCS_GIT_OPTS; then
 			# only warn on failure to allow offline builds
-			warning "Failure while updating git repo: <$REPO>"
+            warning "$(gettext "Failure while updating git repo: <%s>")" "$REPO"
 		fi
 	fi
 }
@@ -708,7 +708,7 @@ download_svn() {
 		cd_safe "$FINAL_SRCPATH"
 		if ! svn update -r ${ref} $PKGMK_VCS_SVN_OPTS; then
 			# only warn on failure to allow offline builds
-			warning "Failure while updating svn repo: <$REPO>"
+            warning "$(gettext "Failure while updating svn repo: <%s>")" "$REPO"
 		fi
 	fi
 }
@@ -742,7 +742,7 @@ download_hg() {
 		cd_safe "$FINAL_SRCPATH"
 		if ! hg pull $PKGMK_VCS_HG_OPTS; then
 			# only warn on failure to allow offline builds
-			warning "Failure while updating hg repo: <$repo>"
+            warning "$(gettext "Failure while updating hg repo: <%s>")" "$REPO"
 		fi
 	fi
 }
@@ -775,7 +775,7 @@ download_bzr() {
 		cd_safe "$FINAL_SRCPATH"
 		if ! bzr pull $PKGMK_VCS_BZR_OPTS "$url"; then
 			# only warn on failure to allow offline builds
-            warning "Failure while pulling bzr displaylocation: <$url>"
+            warning "$(gettext "Failure while pulling bzr displaylocation: <%s>")" "$url"
 		fi
 	fi
 }
@@ -1453,7 +1453,7 @@ check_md5sum() {
 			exit $E_MD5
 		fi
 
-		warning "Md5sum not found, creating new."
+        warning "$(gettext "Md5sum not found, creating new.")"
 		make_md5sum > $PKGMK_MD5SUM
 	fi
 
@@ -1865,7 +1865,7 @@ clean() {
 			fi
 		done
 	else
-		warning "$TARGETS not found"
+        warning "$(gettext "<%s> not found.")" "$TARGETS"
 	fi
 	find $PKGMK_ROOT -name "*.md5sum" -exec rm -v {} \; 2> /dev/null
 	find $PKGMK_ROOT -name "*.footprint" -exec rm -v {} \; 2> /dev/null
@@ -2163,10 +2163,10 @@ main() {
 				unset run
 				. $PKGMK_PKGFILE
 			else
-				warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+                warning "$(gettext "Variable 'version' not initiated or not found in <%s>.")" "$PKGMK_PKGFILE"
 			fi
 		else
-			warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+            warning "$(gettext "Variable 'version' not initiated or not found in <%s>.")" "$PKGMK_PKGFILE"
 		fi
 	fi
 	if [ "$PKGMK_SHOW_VERSION" == "yes" ]; then
@@ -2179,7 +2179,7 @@ main() {
 
 	if [ "$PKGMK_INSTALL" = "no" ]; then
 		PKGMK_CLEAN="no"
-		warning "CLEAN IGNORED"
+        warning "$(gettext "CLEAN IGNORED.")"
 	else
 		info "PKGMK_KEEP_SOURCES: $PKGMK_KEEP_SOURCES"
 		info "PKGMK_CLEAN: $PKGMK_CLEAN"
@@ -2187,7 +2187,7 @@ main() {
 	if [ "$PKGMK_CLEAN" != "no" ]; then
 		PKGMK_IGNORE_FOOTPRINT="yes"
 		PKGMK_IGNORE_MD5SUM="yes"
-		warning "FOOTPRINT AND MD5SUM IGNORED"
+        warning "$(gettext "FOOTPRINT AND MD5SUM IGNORED.")"
 	else
 		if [ "$PKGMK_UPDATE_REPO" != "yes" ]; then
 			info "PKGMK_IGNORE_REPO: $PKGMK_IGNORE_REPO"
