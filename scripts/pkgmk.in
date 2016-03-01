@@ -486,7 +486,7 @@ remove_source() {
 	for NETSRC in ${source[@]}; do
 		FINAL_SRCPATH=`get_final_srcpath $NETSRC`
 		if [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$NETSRC" ]; then
-            plain "$(gettext "Removing <%s>...")" "$FINAL_SRCPATH"
+            msg "$(gettext "Removing source <%s>")" "$FINAL_SRCPATH"
 			rm -rf $FINAL_SRCPATH
 		fi
 	done
@@ -554,8 +554,8 @@ download_file() {
     local BASENAME="${ORIG_URL##*/}"
     FINAL_SRCPATH_PARTIAL="$FINAL_SRCPATH.partial"
 
-    plain "$(gettext "Downloading <%s>...")" "$ORIG_URL"
-
+    msg "$(gettext "Downloading file URL: <%s>")" "$ORIG_URL"
+    
 	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then
         error "$(gettext "Command <%s> not found.")" "$PKGMK_DOWNLOAD_PROG"
 		exit $E_GENERAL
@@ -589,7 +589,7 @@ download_file() {
 	esac
 
     if [ -f "$FINAL_SRCPATH_PARTIAL" ]; then
-        plain "$(gettext "Partial download found, trying to resume...")"
+        plain2 "$(gettext "Partial download found, trying to resume...")"
         RESUME_OPTS="$RESUME_CMD"
     fi
 
@@ -608,7 +608,7 @@ download_file() {
             $PKGMK_DOWNLOAD_PROG $DOWNLOAD_OPTS $RESUME_OPTS $ORIG_URL
             ret=$?
             if [ $ret != 0 ] && [ "$RESUME_OPTS" ]; then
-                plain "$(gettext "Partial download failed, restarting download...")"
+                plain2 "$(gettext "Partial download failed, restarting download...")"
                 rm -f -- "$FINAL_SRCPATH_PARTIAL"
                 RESUME_OPTS=""
             else
@@ -637,13 +637,13 @@ download_git() {
     local REPO=$FINAL_SRCNAME
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
-    plain "$(gettext "Downloading <%s>...")" "$FINAL_SRCNAME"
+    msg "$(gettext "Downloading git into: <%s>")" "$FINAL_SRCNAME"
 
 	url=${ORIG_URL#git+}
 	url=${url%%#*}
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-        plain "$(gettext "Cloning git repo <%s>...")" "$REPO"
+        plain2 "$(gettext "Cloning git repo <%s>")" "$REPO"
 		if ! git clone $PKGMK_VCS_GIT_OPTS --mirror "$url" "$FINAL_SRCPATH"; then
 			do_abort_checked "Failure while downloading git repo: <$REPO> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
 		fi
@@ -653,7 +653,7 @@ download_git() {
 		if [[ "$url" != "$(git config --get remote.origin.url)" ]] ; then
 			do_abort_checked "<$FINAL_SRCPATH> is not a clone of <$url> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
         fi
-		plain "$(gettext "Updating git repo <%s>...")" "$REPO"
+		plain2 "$(gettext "Updating git repo <%s>")" "$REPO"
 		if ! git fetch --all -p $PKGMK_VCS_GIT_OPTS; then
 			# only warn on failure to allow offline builds
             warning "$(gettext "Failure while updating git repo <%s>.")" "$REPO"
@@ -680,6 +680,8 @@ download_svn() {
 	fi
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
+    msg "$(gettext "Downloading svn into: <%s>")" "$FINAL_SRCNAME"
+
 	if [[ $url != svn+ssh* ]]; then
 		url=${url#svn+}
 	fi
@@ -697,14 +699,14 @@ download_svn() {
 	fi
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-        plain "$(gettext "Cloning svn repo <%s>...")" "$REPO"
+        plain2 "$(gettext "Cloning svn repo <%s>")" "$REPO"
 		mkdir -p "$FINAL_SRCPATH/.makepkg"
 		if ! svn checkout -r ${ref} $PKGMK_VCS_SVN_OPTS --config-dir "$FINAL_SRCPATH/.makepkg" "$url" "$FINAL_SRCPATH";
             then
 			do_abort_checked "Failure while downloading svn repo: <$REPO> SOURCE: <$ORIG_URL>.|E_DOWNLOAD_VCS"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
-        plain "$(gettext "Updating svn repo <%s>...")" "$REPO"
+        plain2 "$(gettext "Updating svn repo <%s>")" "$REPO"
 		cd_safe "$FINAL_SRCPATH"
 		if ! svn update -r ${ref} $PKGMK_VCS_SVN_OPTS; then
 			# only warn on failure to allow offline builds
@@ -727,17 +729,18 @@ download_hg() {
     local REPO=$FINAL_SRCNAME
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
-    plain "$(gettext "Downloading <%s>...")" "$FINAL_SRCNAME"
+    msg "$(gettext "Downloading hg into: <%s>")" "$FINAL_SRCNAME"
+    
 	url=${ORIG_URL#hg+}
 	url=${url%%#*}
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-        plain "$(gettext "Cloning hg repo <%s>...")" "$REPO"
+        plain2 "$(gettext "Cloning hg repo <%s>")" "$REPO"
 		if ! hg clone $PKGMK_VCS_HG_OPTS -U "$url" "$FINAL_SRCPATH"; then
 			do_abort_checked "Failure while downloading hg repo: <$REPO> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
-		plain "$(gettext "Updating hg repo <%s>...")" "$REPO"
+		plain2 "$(gettext "Updating hg repo <%s>")" "$REPO"
 		cd_safe "$FINAL_SRCPATH"
 		if ! hg pull $PKGMK_VCS_HG_OPTS; then
 			# only warn on failure to allow offline builds
@@ -764,13 +767,15 @@ download_bzr() {
 
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
+    msg "$(gettext "Downloading bzr into: <%s>")" "$FINAL_SRCNAME"
+
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-        plain "$(gettext "Branching bzr displaylocation <%s>...")" "$url"
+        plain2 "$(gettext "Branching bzr displaylocation <%s>")" "$url"
 		if ! bzr branch $PKGMK_VCS_BZR_OPTS "$url" "$FINAL_SRCPATH" --no-tree --use-existing-dir; then
             do_abort_checked "Failure while branching bzr displaylocation: <$url> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
-        plain "$(gettext "Pulling bzr displaylocation <%s>...")" "$displaylocation"
+        plain2 "$(gettext "Pulling bzr displaylocation <%s>")" "$displaylocation"
 		cd_safe "$FINAL_SRCPATH"
 		if ! bzr pull $PKGMK_VCS_BZR_OPTS "$url"; then
 			# only warn on failure to allow offline builds
@@ -878,7 +883,7 @@ extract_file() {
 	esac
 
 	local ret=0
-	echo "Extracting <$FINAL_SRCPATH> with <$cmd>"
+    msg2 "$(gettext "Extracting file with (%s): <%s>")" "$cmd" "$FINAL_SRCPATH"
 	if [[ $cmd = "bsdtar" ]]; then
 		$cmd -p -C $SRC -xf "$FINAL_SRCPATH"  || ret=$?
 	else
@@ -915,7 +920,7 @@ extract_git() {
 	local dir=$(getchecked_final_srcpath "$NETSRC")
 	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
 
-    plain "$(gettext "Creating working copy of git repo <%s>...")" "$REPO"
+    msg2 "$(gettext "Creating working copy of git repo <%s>")" "$REPO"
 	pushd "$SRC" &>/dev/null
 
 	local updating=0
@@ -969,7 +974,7 @@ extract_svn() {
 	local repo=${NETSRC##*/}
 	REPO=${repo%%#*}
 
-    plain "$(gettext "Creating working copy of svn repo <%s>...")" "$REPO"
+    msg2 "$(gettext "Creating working copy of svn repo <%s>")" "$REPO"
     local ret=1
 	cp -au "$dir" "$SRC"
     ret=$?
@@ -997,7 +1002,7 @@ extract_hg() {
 	local REPO=${NETSRC##*/}
 	REPO=${REPO%%#*}
 
-    plain "$(gettext "Creating working copy of hg repo <%s>...")" "$REPO"
+    msg2 "$(gettext "Creating working copy of hg repo <%s>")" "$REPO"
 	pushd "$SRC" &>/dev/null
 
 	local ref=tip
@@ -1051,7 +1056,7 @@ extract_bzr() {
 	local dir=$(getchecked_final_srcpath "$NETSRC")
 	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
 
-    plain "$(gettext "Creating working copy of bzr repo <%s>...")" "$REPO"
+    msg2 "$(gettext "Creating working copy of bzr repo <%s>")" "$REPO"
 	pushd "$SRC" &>/dev/null
 
 	if [[ -d "${dir##*/}" ]]; then
@@ -1079,7 +1084,7 @@ extract_bzr() {
 #**********************************************************************************************************************
 
 compress_archive() {
-    plain "$(gettext "Using <%s> to compress <%s>...")" "$PKGMK_COMPRESSION_MODE" "$1"
+    plain "$(gettext "Using (%s) to compress <%s>")" "$PKGMK_COMPRESSION_MODE" "$1"
 	case $PKGMK_COMPRESSION_MODE in
 		gz) gzip $PKGMK_COMPRESSION_OPTS $1;;
 		bz2) bzip2 $PKGMK_COMPRESSION_OPTS $1;;
@@ -1659,7 +1664,6 @@ add_meta_to_archive() {
 
 
 build_package() {
-	# TODO find a better solution for the hardcoded folders
 	local BUILD_SUCCESSFUL="no"
 
 	if [ "$1" != "$TARGET" ]; then
@@ -1679,7 +1683,7 @@ build_package() {
         warning "$(gettext "Packages should be built as root.")"
 	fi
 
-    plain "$(gettext "Building <%s>.")" "$TARGET"
+    msg "$(gettext "Building package: <%s>")" "$TARGET"
 
 	extract_source
 
@@ -1765,7 +1769,7 @@ build_package() {
 		if [ "`ls|wc -l`" != "0" ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} *
 		else
-            error "$(gettext "No files found in <%s>...")" "$PKG"
+            error "$(gettext "No files found in package <%s>.")" "$PKG"
 			exit $E_BUILD
 		fi
 		if [ $? = 0 ]; then
