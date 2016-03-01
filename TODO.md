@@ -15,10 +15,7 @@ Split them into 2 categories:
 * PKGMK INTERNAL VARIABLES: which should not be set in the `pkgmk.conf` but might be useful for developers.
     e.g. Pkgfiles
 
-
-###  build_package(): find a better solution for the hardcoded folders
-
-build_package(): find a better solution for the hardcoded folders [see issue](https://github.com/NuTyX/cards/issues/36)
+    * add info that PKGMK_ARCH variable exists: **currently I found 85 occurencies of `uname -m` in the official Pkgfiles.
 
 
 ### Add for VCS (version control source) code to auomaticaly update the Pkgfile version.
