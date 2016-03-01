@@ -1627,7 +1627,7 @@ add_meta_to_archive() {
 			info "Adding runtime deps to Archive $NAME"
 			for rd in ${run[@]}; do
 				if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
-					error "Runtime dependencie $rd not found, cannot continue"
+					error "Runtime dependency $rd not found, cannot continue"
 					clean
 					exit $E_DEPS;
 				fi
@@ -1638,7 +1638,7 @@ add_meta_to_archive() {
 			info "Adding runtime deps to Archive $NAME"
 			for rd in `cat $PKGMK_ROOT/${NAME}.run`; do
 				if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
-					error "Runtime dependencie $rd not found, cannot continue"
+					error "Runtime dependency $rd not found, cannot continue"
 					clean
 					exit $E_DEPS;
 				fi
@@ -1671,7 +1671,7 @@ build_package() {
 	if [ "$1" != "$TARGET" ]; then
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
-				error "$TARGET should be remove"
+				error "$TARGET should be removed."
 			done
 			error "Remove the binaries first..."
 			exit $E_BUILD
