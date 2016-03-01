@@ -63,65 +63,6 @@
 #
 #**********************************************************************************************************************
 
-#**********************************************************************************************************************
-#
-#   MESSAGES FUNCTIONS - functions for outputting messages
-#
-# USAGE EXAMPLE: ALL messages should be in the format:
-#
-#   plain "$(gettext "Some Info...")"
-#   plain "$(gettext "The files path is: %s")"  "$FILEPATH"
-#   plain "$(gettext "The files path is: %s")"  "$FILEPATH"
-#   plain "$(gettext "Source file %s.")" "$(get_filename "$1")"
-#
-#**********************************************************************************************************************
-
-colorize() {
-	# prefer terminal safe colored and bold text when tput is supported
-	if tput setaf 0 &>/dev/null; then
-		ALL_OFF="$(tput sgr0)"
-		BOLD="$(tput bold)"
-		BLUE="${BOLD}$(tput setaf 4)"
-		GREEN="${BOLD}$(tput setaf 2)"
-		RED="${BOLD}$(tput setaf 1)"
-		YELLOW="${BOLD}$(tput setaf 3)"
-	else
-		ALL_OFF="\e[0m"
-		BOLD="\e[1m"
-		BLUE="${BOLD}\e[34m"
-		GREEN="${BOLD}\e[32m"
-		RED="${BOLD}\e[31m"
-		YELLOW="${BOLD}\e[33m"
-	fi
-	readonly ALL_OFF BOLD BLUE GREEN RED YELLOW
-}
-
-plain() {
-	local mesg=$1; shift
-	printf "${BOLD}    ${mesg}${ALL_OFF}\n" "$@" >&1
-}
-
-msg() {
-	local mesg=$1; shift
-	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&1
-}
-
-msg2() {
-	local mesg=$1; shift
-	printf "${BLUE}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&1
-}
-
-warning1() {
-	local mesg=$1; shift
-	printf "${YELLOW}==> $(gettext "WARNING:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
-}
-
-error1() {
-	local mesg=$1; shift
-	printf "${RED}==> $(gettext "ERROR:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
-}
-
-
 
 #**********************************************************************************************************************
 #
@@ -266,6 +207,109 @@ E_UNPACK_VCS=13         # error during unpacking/extracting ofof version control
 
 #**********************************************************************************************************************
 #
+#   MESSAGES FUNCTIONS - functions for outputting messages
+#
+# USAGE EXAMPLE: ALL messages should be in the format:
+#
+#   plain "$(gettext "Some Info...")"
+#   plain "$(gettext "The files path is: %s")"  "$FILEPATH"
+#   plain "$(gettext "Source file %s.")" "$(get_filename "$1")"
+#
+#**********************************************************************************************************************
+
+colorize() {
+	# prefer terminal safe colored and bold text when tput is supported
+	if tput setaf 0 &>/dev/null; then
+		ALL_OFF="$(tput sgr0)"
+		BOLD="$(tput bold)"
+		BLUE="${BOLD}$(tput setaf 4)"
+		GREEN="${BOLD}$(tput setaf 2)"
+		RED="${BOLD}$(tput setaf 1)"
+		YELLOW="${BOLD}$(tput setaf 3)"
+	else
+		ALL_OFF="\e[0m"
+		BOLD="\e[1m"
+		BLUE="${BOLD}\e[34m"
+		GREEN="${BOLD}\e[32m"
+		RED="${BOLD}\e[31m"
+		YELLOW="${BOLD}\e[33m"
+	fi
+	readonly ALL_OFF BOLD BLUE GREEN RED YELLOW
+}
+
+plain() {
+	local mesg=$1; shift
+	printf "${BOLD}    ${mesg}${ALL_OFF}\n" "$@" >&1
+}
+
+msg() {
+	local mesg=$1; shift
+	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&1
+}
+
+msg2() {
+	local mesg=$1; shift
+	printf "${BLUE}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&1
+}
+
+warning() {
+	local mesg=$1; shift
+	printf "${YELLOW}==> $(gettext "WARNING:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
+}
+
+error() {
+	local mesg=$1; shift
+	printf "${RED}==> $(gettext "ERROR:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
+}
+
+# ==================  THESE BELOW SHOULD BE REPLACED 
+
+
+info() {
+	echo "=======> $1"
+}
+
+abort_on_build() {
+    error "$(gettext "%s")" "$1"
+    exit $E_BUILD
+}
+
+# returns a part of a string: usually used for multiple return values from functions.
+#   Delimiter is |    $1 - return result string: Quoted  $2 - number of part to be returned
+# e.g.: part3=`get_str_part "$str" 3`
+function get_str_part() {
+    IFS="|" read -ra parts_arr <<< "$1"
+    printf "%s\n" "${parts_arr[-1+$2]}"
+}
+
+# $1 must be in the format: "PART_TO_BE_CHECKED|Message|ErrorCode
+#   e.g.:  check_abort "ERR_ABORT|The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
+check_abort() {
+    if [ "$(get_str_part "$1" 1)" == "ERR_ABORT" ]; then
+        plain "$(gettext "\n=======> ERROR: Aborting....\n")" "$(get_str_part "$1" 2)"
+        exit $((`get_str_part "$1" 3`))
+    fi
+}
+
+# $1 must be in the format: "Message|ErrorCode
+#   e.g.:  do_abort "The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
+do_abort() {
+    plain "$(gettext "\n=======> ERROR: Aborting....\n")" "$(get_str_part "$1" 1)"
+    exit $((`get_str_part "$1" 2`))
+}
+
+# Similar to `do_abort` but also checks if we want to remove the workdir
+do_abort_checked() {
+    if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+        rm -rf $PKGMK_WORK_DIR
+    fi
+    error "$(gettext "Building <%s> failed.. ")" "$TARGET"
+    plain "$(gettext "\n=======> ERROR: Aborting....\n")" "$(get_str_part "$1" 1)"
+    exit $((`get_str_part "$1" 2`))
+}
+
+#**********************************************************************************************************************
+#
 #   GENERAL FUNCTIONS - HELPERS
 #
 #**********************************************************************************************************************
@@ -282,53 +326,6 @@ have_function() {
 #   GENERAL - helper functions
 #**********************************************************************************************************************
 
-info() {
-	echo "=======> $1"
-}
-warning() {
-	info "WARNING: $1" >&2
-}
-error() {
-	info "ERROR: $1" >&2
-}
-abort_on_build() {
-    error $1
-    exit $E_BUILD
-}
-
-# returns a part of a string: usually used for multiple return values from functions.
-#   Delimiter is |    $1 - return result string: Quoted  $2 - number of part to be returned
-# e.g.: part3=`get_str_part "$str" 3`
-function get_str_part() {
-    IFS="|" read -ra parts_arr <<< "$1"
-    printf "%s\n" "${parts_arr[-1+$2]}"
-}
-
-# $1 must be in the format: "PART_TO_BE_CHECKED|Message|ErrorCode
-#   e.g.:  check_abort "ERR_ABORT|The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
-check_abort() {
-    if [ "$(get_str_part "$1" 1)" == "ERR_ABORT" ]; then
-        echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 2`\n" >&2
-        exit $((`get_str_part "$1" 3`))
-    fi
-}
-
-# $1 must be in the format: "Message|ErrorCode
-#   e.g.:  do_abort "The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
-do_abort() {
-    echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 1`\n" >&2
-    exit $((`get_str_part "$1" 2`))
-}
-
-# Similar to `do_abort` but also checks if we want to remove the workdir
-do_abort_checked() {
-    if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-        rm -rf $PKGMK_WORK_DIR
-    fi
-    error "Building '$TARGET' failed.. "
-    echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 1`\n" >&2
-    exit $((`get_str_part "$1" 2`))
-}
 
 # extract the original URL from a source entry: strip an eventual filename or VCS directory
 get_orig_url() {
@@ -361,20 +358,20 @@ get_filename() {
 
 check_directory() {
 	if [ ! -d $1 ]; then
-		error "Directory '$1' does not exist."
+        error "$(gettext "Directory <%s> does not exist.")" "$1"
 		exit $E_DIR_PERM
 	elif [ ! -w $1 ]; then
-		error "Directory '$1' not writable."
+        error "$(gettext "Directory <%s> is not writable.")" "$1"
 		exit $E_DIR_PERM
 	elif [ ! -x $1 ] || [ ! -r $1 ]; then
-		error "Directory '$1' not readable."
+        error "$(gettext "Directory <%s> is not readable.")" "$1"
 		exit $E_DIR_PERM
 	fi
 }
 
 check_file() {
 	if [ -e $1 ] && [ ! -w $1 ]; then
-		error "File '$1' is not writable."
+        error "$(gettext "File <%s> is not writable.")" "$1"
 		exit $E_GENERAL
 	fi
 }
@@ -559,8 +556,8 @@ download_file() {
 
 	info "Downloading '$ORIG_URL'."
 
-	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then
-		error "Command '${PKGMK_DOWNLOAD_PROG}' not found."
+	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then        
+        error "$(gettext "Command <%s> not found.")" "$PKGMK_DOWNLOAD_PROG"
 		exit $E_GENERAL
 	fi
 
@@ -1296,46 +1293,46 @@ get_pkgfile_variables() {
 check_pkgfile() {
 	local SIZE NAME_TEST RELEASE_TEST
 	if [ "${name}" == "" ]; then
-		error "Variable 'name' not initiated or not found in $PKGMK_PKGFILE."
+        error "$(gettext "Variable 'name' not initiated or not found in <%s>.")" "$PKGMK_PKGFILE"
 		exit $E_PKGFILE
 	fi
 	if ! have_function 'build' && [ "$PKGMK_PKGFILE" == "Pkgfile" ]; then
-		error "Function 'build' not specified in $PKGMK_PKGFILE."
+        error "$(gettext "Function 'build' not specified in <%s>.")" "$PKGMK_PKGFILE"
 		exit $E_PKGFILE
 	fi
 	NAME_TEST=`echo "${name}" | sed 's@[[a-z0-9]*[-_+]*]*@@g'`
 	if [ "$NAME_TEST" != "" ]; then
-		error "Variable 'name' contains following illegal characters: $NAME_TEST"
+        error "$(gettext "Variable 'name' contains following illegal characters: <%s>.")" "$NAME_TEST"
 		exit $E_PKGFILE
 	fi
 	if [ ${#name} -gt 50 ];then
-		error "Variable 'name' length higher then 50 characters."
+        error "$(gettext "Variable 'name' length higher then 50 characters.")"
 		exit $E_PKGFILE
 	fi
 	if [ "${version}" == "" ]; then
-		error "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+        error "$(gettext "Variable 'version' not initiated or not found in <%s>.")" "$PKGMK_PKGFILE"
 		exit $E_PKGFILE
 	fi
 	if [ "${release}" == "" ]; then
-		error "Variable 'release' not initiated or not found in $PKGMK_PKGFILE."
+        error "$(gettext "Variable 'release' not initiated or not found in<%s>.")" "$PKGMK_PKGFILE"
 		exit $E_PKGFILE
 	fi
 	RELEASE_TEST=`echo "${release}" | sed 's@[0-9]*@@g'`
 	if [ "$RELEASE_TEST" != "" ]; then
-		error "Variable 'release' contains following illegal characters: $RELEASE_TEST"
+        error "$(gettext "Variable 'release' contains following illegal characters:<%s>.")" "$RELEASE_TEST"
 		exit $E_PKGFILE
 	fi
 	if [ $release -gt  99999999 ]; then
-		error "Variable 'release' outside limit which is '99999999'"
+        error "$(gettext "Variable 'release' outside limit which is '99999999'.")"
 		exit $E_PKGFILE
 	fi
 	if [ "${description}" == "" ]; then
-		warning "Variable 'description' not initiated or not found in $PKGMK_PKGFILE."
+		warning "$(gettext "Variable 'description' not initiated or not found in <%s>.")" "$PKGMK_PKGFILE"
 	fi
 	SIZE=${#description}
 	if [ $SIZE -gt 110 ];then
-		error "Variable 'description' length higher then 110 characters, please resize to 110 char ]"
-		info "$description <== $SIZE characters"
+		error "$(gettext "Variable 'description' length higher then 110 characters, please resize to 110 char ]")"
+		plain "$(gettext "%s <== <%s> characters")" "$description" "$SIZE"
 		exit $E_PKGFILE
 	fi
 }
@@ -1433,7 +1430,7 @@ check_md5sum() {
 			sed 's/^+/NEW       /g' | \
 			sed 's/^-/MISSING   /g' > $FILE.md5sum.diff
 		if [ -s $FILE.md5sum.diff ]; then
-			error "Md5sum mismatch found:"
+            error "$(gettext "Md5sum mismatch found:")"
 			cat $FILE.md5sum.diff >&2
 
 			if [ "$PKGMK_KEEP_WORK" = "no" ]; then
@@ -1441,11 +1438,10 @@ check_md5sum() {
 			fi
 
 			if [ "$PKGMK_CHECK_MD5SUM" = "yes" ]; then
-				error "Md5sum not ok."
+				error "$(gettext "Md5sum not ok.")"
 				exit $E_MD5
 			fi
-
-			error "Building '$TARGET' failed."
+            error "$(gettext "Building <%s> failed.")" "$TARGET"
 			exit $E_MD5
 		fi
 	else
@@ -1502,7 +1498,7 @@ check_footprint() {
 	if [ -z $TARGETS ]; then
 		get_package_list
 		if [ -z $TARGETS ]; then
-			error "Unable to update footprint"
+            error "$(gettext "Unable to update footprint")"
 		fi
 	fi
 	for TARGET in ${TARGETS[@]}; do
@@ -1520,19 +1516,19 @@ check_footprint() {
 			if [ -s $FILE.footprint.diff ]; then
 				if [ "$PKGMK_IGNORE_NEW" = "yes" ]; then
 					mv $FILE.footprint $PKGMK_FOOTPRINT
-					warning "Footprint mismatch found:"
+                    warning "$(gettext "Footprint mismatch found:")"
 				else
-					error "Footprint mismatch found:"
+					error "$(gettext "Footprint mismatch found:")"
 					BUILD_SUCCESSFUL="no"
 				fi
 				cat $FILE.footprint.diff >&2
 			fi
 		else
-			warning "Footprint not found, creating new."
+			warning "$(gettext "Footprint not found, creating new.")"
 			mv $FILE.footprint $PKGMK_FOOTPRINT
 		fi
 		else
-			error "Package '$TARGET' was not found."
+            error "$(gettext "Package <%s> was not found.")" "$TARGET"
 			BUILD_SUCCESSFUL="no"
 		fi
 	done
@@ -1627,7 +1623,7 @@ add_meta_to_archive() {
 			info "Adding runtime deps to Archive $NAME"
 			for rd in ${run[@]}; do
 				if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
-					error "Runtime dependency $rd not found, cannot continue"
+                    error "$(gettext "Runtime dependencie <%s> not found, cannot continue.")" "$rd"
 					clean
 					exit $E_DEPS;
 				fi
@@ -1638,7 +1634,7 @@ add_meta_to_archive() {
 			info "Adding runtime deps to Archive $NAME"
 			for rd in `cat $PKGMK_ROOT/${NAME}.run`; do
 				if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
-					error "Runtime dependency $rd not found, cannot continue"
+                    error "$(gettext "Runtime dependency <%s> not found, cannot continue.")" "$rd"
 					clean
 					exit $E_DEPS;
 				fi
@@ -1671,9 +1667,9 @@ build_package() {
 	if [ "$1" != "$TARGET" ]; then
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
-				error "$TARGET should be removed."
+                error "$(gettext "<%s> should be removed.")" "$TARGET"
 			done
-			error "Remove the binaries first..."
+            error "$(gettext "Remove the binaries first...")"
 			exit $E_BUILD
 		fi
 	fi
@@ -1682,7 +1678,7 @@ build_package() {
 	make_work_dir
 
 	if [ "$UID" != "0" ]; then
-		warning "Packages should be built as root."
+        warning "$(gettext "Packages should be built as root.")"
 	fi
 
 	info "Building '$TARGET'."
@@ -1715,7 +1711,7 @@ build_package() {
 				if [ $? = 0 ]; then
 					BUILD_SUCCESSFUL="yes"
 				else
-					error "Building '$TARGET' failed."
+                    error "$(gettext "Building <%s> failed.")" "$TARGET"
 					exit $E_BUILD
 				fi
 			else
@@ -1727,14 +1723,14 @@ build_package() {
 				fi
 				remove_${group}
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
-					error "Building '$TARGET' failed."
+					error "$(gettext "Building <%s> failed.")" "$TARGET"
                 			exit $E_BUILD
 				fi
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
-					error "Building '$TARGET' failed."
+					error "$(gettext "Building <%s> failed.")" "$TARGET"
 					exit $E_BUILD
 				fi
 				j=0
@@ -1771,13 +1767,13 @@ build_package() {
 		if [ "`ls|wc -l`" != "0" ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} *
 		else
-			error "No files found in $PKG..."
+            error "$(gettext "No files found in <%s>...")" "$PKG"
 			exit $E_BUILD
 		fi
 		if [ $? = 0 ]; then
 			BUILD_SUCCESSFUL="yes"
 			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
-				warning "Footprint ignored."
+				warning "$(gettext "Footprint ignored.")" 
 			else
 				check_footprint
 			fi
@@ -1788,8 +1784,8 @@ build_package() {
 		if [ "$1" != "$TARGET" ]; then
 			get_package_list
         		if [ -z $TARGETS ]; then
-                		error "Package(s) not found(s)..."
-				exit $E_BUILD
+                    error "$(gettext "Package(s) not found(s)...")" "$PKG"
+                    exit $E_BUILD
         		fi
 			for TARGET in ${TARGETS[@]}; do
 				add_meta_files $TARGET
@@ -1806,7 +1802,7 @@ build_package() {
 		if [ -f $TARGET ]; then
 			touch -r $PKGMK_ROOT/$PKGMK_PKGFILE $TARGET &> /dev/null
 		fi
-		error "Building '$TARGET' failed."
+		error "$(gettext "Building <%s> failed.")" "$TARGET"
 		exit $E_BUILD
 	fi
 }
@@ -1815,7 +1811,7 @@ install_package() {
 	local COMMAND
 	get_package_list
 	if [ -z $TARGETS ]; then
-		error "Package(s) not found(s) nothing to install..."
+        error "$(gettext "Package(s) not found(s) nothing to install...")"
 		exit $E_INSTALL
 	fi
 	for TARGET in ${TARGETS[@]}; do
@@ -1833,9 +1829,9 @@ install_package() {
 			$COMMAND
 
 			if [ $? = 0 ]; then
-				info "Installing '$TARGET' succeeded."
+                plain "$(gettext "Installing <%s> succeeded.")" "$TARGET"
 			else
-				error "Installing '$TARGET' failed."
+				error "$(gettext "Installing <%s> failed.")" "$TARGET"
 				exit $E_INSTALL
 			fi
 		fi
@@ -1881,13 +1877,13 @@ update_footprint() {
 	if [ -z $TARGETS ]; then
 		get_package_list
 		if [ -z $TARGETS ]; then
-			error "Package(s) not found(s), unable to update footprint."
+            error "$(gettext "Package(s) not found(s), unable to update footprint.")"
 			exit $E_FOOTPRINT
 		fi
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ ! -f $TARGET ]; then
-			error "Unable to update footprint. File '$TARGET' not found."
+            error "$(gettext "Unable to update footprint. File <%s> not found.")" "$TARGET"
 			exit $E_FOOTPRINT
 		fi
 		PKGMK_FOOTPRINT="`get_package_name $TARGET`".footprint
@@ -1895,7 +1891,7 @@ update_footprint() {
 		make_footprint > $PKGMK_FOOTPRINT
 		touch $TARGET
 
-		info "Footprint updated for $TARGET"
+        plain "$(gettext "Footprint updated for <%s>.")" "$TARGET"
 	done
 }
 
@@ -1991,7 +1987,7 @@ clean_repo_files() {
 
 interrupted() {
 	echo ""
-	error "Interrupted."
+	error "$(gettext "Interrupted")"
 
 	if [ "$PKGMK_KEEP_WORK" = "no" ]; then
 		rm -rf $PKGMK_WORK_DIR
@@ -2115,14 +2111,14 @@ main() {
 	parse_options "$@"
 
         if [ ! -f $PKGMK_CONFFILE ]; then
-                error "File '$PKGMK_CONFFILE' not found."
-                exit $E_GENERAL
+            error "$(gettext "File <%s> not found.")" "$PKGMK_CONFFILE"
+            exit $E_GENERAL
         fi
         . $PKGMK_CONFFILE
 
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
-		warning "pkginfo NOT FOUND, footprint ignored."
+        warning "$(gettext "Command <pkginfo> NOT FOUND, footprint ignored.")"
 		PKGMK_IGNORE_FOOTPRINT="yes"
 	fi
 	local FILE TARGET
@@ -2136,7 +2132,7 @@ main() {
 	[ ! -f $PKGMK_PKGFILE  ] && PKGMK_PKGFILE="PKGBUILD"
 
 	if [ ! -f $PKGMK_PKGFILE  ]; then
-		error "File '$PKGMK_PKGFILE' not found."
+        error "$(gettext "File <%s> not found.")" "$PKGMK_PKGFILE"
 		exit $E_PKGFILE
 	fi
 
@@ -2239,7 +2235,7 @@ main() {
 				TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
 			fi;;
 		*)
-			error "Compression mode '$PKGMK_COMPRESSION_MODE' not supported"
+            error "$(gettext "Compression mode <%s> not supported.")" "$PKGMK_COMPRESSION_MODE"
 			exit $E_GENERAL
 			;;
 	esac
@@ -2299,17 +2295,17 @@ main() {
 	if [ "$PKGMK_UP_TO_DATE" = "yes" ]; then
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
-				if [ "`build_needed`" = "yes" ]; then
-					info "Package '$TARGET' is not up to date."
+				if [ "`build_needed`" = "yes" ]; then                    
+                    plain "$(gettext "Package <%s> is not up to date.")" "$TARGET"
 				else
-					info "Package '$TARGET' is up to date."
+                    plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
 				fi
 			done
 		else
 			if [ "`build_needed`" = "yes" ]; then
-				info "Package '$TARGET' is not up to date."
+				plain "$(gettext "Package <%s> is not up to date.")" "$TARGET"
 			else
-				info "Package '$TARGET' is up to date."
+				plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
 			fi
 		fi
 		exit 0
@@ -2319,7 +2315,7 @@ main() {
 	if [ -z $TARGETS ]; then
 		TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 		if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
-			info "Package '$TARGET' is up to date."
+			plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
 		else
 			download_source
 			build_package
@@ -2331,7 +2327,7 @@ main() {
 				if [ "`get_package_arch $TARGET`" = "$PKGMK_ARCH" ]; then
 					FOUND=true
 				fi
-				info "Package '$TARGET' is up to date."
+				plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
 			else
 				download_source
 				build_package
@@ -2467,6 +2463,7 @@ PKGMK_SPIT="no"
 
 #**********************************************************************************************************************
 
+colorize
 main "$@"
 
 # End of file
