@@ -1538,12 +1538,8 @@ check_footprint() {
 }
 
 make_work_dir() {
-	# TODO findout why we have to export thoses 2 variables
-	# I really think it's pointless in cards building process
-	export PKG="$PKGMK_WORK_DIR/pkg"
-	export SRC="$PKGMK_WORK_DIR/src"
-	pkgdir=$PKG
-	srcdir=$SRC
+	PKG="$PKGMK_WORK_DIR/pkg"
+	SRC="$PKGMK_WORK_DIR/src"
 	umask 022
 
 	cd $PKGMK_ROOT
@@ -2245,8 +2241,8 @@ main() {
 	esac
 	case $PKGMK_COMPRESSION_MODE in
 		gz)  COMPRESSION="-z" ;;
-		bz2) export COMPRESSION="-j" ;;
-		xz)  export COMPRESSION="-J" ;;
+		bz2) COMPRESSION="-j" ;;
+		xz)  COMPRESSION="-J" ;;
 	esac
 
 	if [ "$PKGMK_CLEAN_ONLY" = "yes" ]; then
