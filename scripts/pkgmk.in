@@ -1973,7 +1973,6 @@ print_help() {
 	echo "  -in,  --ignore-new          build packages, ignore new files in a footprint missmatch"
 	echo "  -um,  --update-md5sum       update md5sum"
 	echo "  -im,  --ignore-md5sum       build packages without checking md5sum"
-	echo "  -cm,  --check-md5sum        do not build, only check md5sum"
 	echo "  -ns,  --no-strip            do not strip executable binaries or libraries"
 	echo "  -co,  --clean-only          do not build, only remove packages and downloaded files, update $PKGMK_REPO file"
 	echo "  -kw,  --keep-work           keep temporary working directory"
@@ -2022,8 +2021,6 @@ parse_options() {
 				PKGMK_IGNORE_COLLECTION="yes" ;;
 			-ir|--ignore-repo)
 				PKGMK_IGNORE_REPO="yes" ;;
-			-cm|--check-md5sum)
-				PKGMK_CHECK_MD5SUM="yes" ;;
 			-ns|--no-strip)
 				PKGMK_NO_STRIP="yes" ;;
 			-f|--force)
