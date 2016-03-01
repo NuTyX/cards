@@ -28,11 +28,11 @@
 # `pacman`:   Copyright (c) 2006-2016 Pacman Development Team <pacman-dev@archlinux.org> [GPL2/later]
 # `pacman`:   Copyright (c) 2002-2006 by Judd Vinet <jvinet@zeroflux.org> [GPL2/later]
 
+
 #**********************************************************************************************************************
 #           CODE INDEX: TIP: use search to jump there
 #
 #   GENERAL INFO
-#   ERROR CODES
 #   MESSAGES FUNCTIONS - functions for outputting messages
 #   GENERAL FUNCTIONS - HELPERS
 #       FUNCTION RELATED - helpers to check, run other functions
@@ -56,71 +56,12 @@
 #   REPO FUNCTIONS
 #   MAIN FUNCTIONS
 #   DIVERSES
-#   VARIABLES 
+#   VARIABLES
 #       READ-ONLY VARIABLES
 #       PKGMK.CONF VARIABLES: which can be set in the `pkgmk.conf`
 #       PKGMK INTERNAL VARIABLES: which should not be set in the `pkgmk.conf`
 #
 #**********************************************************************************************************************
-
-#**********************************************************************************************************************
-#
-#   MESSAGES FUNCTIONS - functions for outputting messages
-#
-# USAGE EXAMPLE: ALL messages should be in the format:
-#
-#   plain "$(gettext "Some Info...")"
-#   plain "$(gettext "The files path is: %s")"  "$FILEPATH"
-#   plain "$(gettext "The files path is: %s")"  "$FILEPATH"
-#   plain "$(gettext "Source file %s.")" "$(get_filename "$1")"
-#
-#**********************************************************************************************************************
-
-colorize() {
-	# prefer terminal safe colored and bold text when tput is supported
-	if tput setaf 0 &>/dev/null; then
-		ALL_OFF="$(tput sgr0)"
-		BOLD="$(tput bold)"
-		BLUE="${BOLD}$(tput setaf 4)"
-		GREEN="${BOLD}$(tput setaf 2)"
-		RED="${BOLD}$(tput setaf 1)"
-		YELLOW="${BOLD}$(tput setaf 3)"
-	else
-		ALL_OFF="\e[0m"
-		BOLD="\e[1m"
-		BLUE="${BOLD}\e[34m"
-		GREEN="${BOLD}\e[32m"
-		RED="${BOLD}\e[31m"
-		YELLOW="${BOLD}\e[33m"
-	fi
-	readonly ALL_OFF BOLD BLUE GREEN RED YELLOW
-}
-
-plain() {
-	local mesg=$1; shift
-	printf "${BOLD}    ${mesg}${ALL_OFF}\n" "$@" >&1
-}
-
-msg() {
-	local mesg=$1; shift
-	printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&1
-}
-
-msg2() {
-	local mesg=$1; shift
-	printf "${BLUE}  ->${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&1
-}
-
-warning1() {
-	local mesg=$1; shift
-	printf "${YELLOW}==> $(gettext "WARNING:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
-}
-
-error1() {
-	local mesg=$1; shift
-	printf "${RED}==> $(gettext "ERROR:")${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
-}
-
 
 
 #**********************************************************************************************************************
@@ -242,26 +183,113 @@ error1() {
 #
 #**********************************************************************************************************************
 
-
 #**********************************************************************************************************************
 #
-#   ERROR CODES
+#   MESSAGES FUNCTIONS - functions for outputting messages
+#
+# USAGE EXAMPLE: ALL messages should be in the format:
+#
+#   plain "$(gettext "Some Info...")"
+#   plain "$(gettext "The files path is: %s")"  "$FILEPATH"
+#   plain "$(gettext "Source file <%s>.")" "$(get_filename "$1")"
 #
 #**********************************************************************************************************************
 
-E_GENERAL=1
-E_PKGFILE=2             # invalid Pkgfile
-E_DIR_PERM=3            # (source/build) directory missing or missing read/write permission
-E_DOWNLOAD=4            # error during download
-E_UNPACK=5              # error during unpacking/extracting of source file(s)
-E_MD5=6                 # md5sum verification failed
-E_FOOTPRINT=7           # footprint check failure
-E_BUILD=8               # error while running 'build()'
-E_INSTALL=9             # error while installing the package via 'pkgadd'
-E_DEPS=10               # error while searching runtime deps via 'pkginfo -b'
-E_DOWNLOAD_PROTO=11     # error when a wrong download protocol is encountered
-E_DOWNLOAD_VCS=12       # error during download (clone/checkout...) of version control source
-E_UNPACK_VCS=13         # error during unpacking/extracting ofof version control source
+colorize() {
+	# prefer terminal safe colored and bold text when tput is supported
+	if tput setaf 0 &>/dev/null; then
+		ALL_OFF_MSG="$(tput sgr0)"
+		BOLD_MSG="$(tput bold)"
+		RED_MSG="${BOLD_MSG}$(tput setaf 1)"
+		GREEN_MSG="${BOLD_MSG}$(tput setaf 2)"
+		YELLOW_MSG="${BOLD_MSG}$(tput setaf 3)"
+		BLUE_MSG="${BOLD_MSG}$(tput setaf 4)"
+		MAGENTA_MSG="${BOLD_MSG}$(tput setaf 5)"
+	else
+		ALL_OFF_MSG="\e[0m"
+		BOLD_MSG="\e[1m"
+        RED_MSG="${BOLD_MSG}\e[31m"
+		GREEN_MSG="${BOLD_MSG}\e[32m"
+		YELLOW_MSG="${BOLD_MSG}\e[33m"
+		BLUE_MSG="${BOLD_MSG}\e[34m"
+		MAGENTA_MSG="${BOLD_MSG}\e[35m"
+	fi
+	readonly ALL_OFF_MSG BOLD_MSG BLUE_MSG GREEN_MSG RED_MSG YELLOW_MSG MAGENTA_MSG
+}
+
+plain() {
+	local mesg=$1; shift
+	printf "${BOLD_MSG}==> ${mesg}${ALL_OFF_MSG}\n" "$@" >&1
+}
+
+plain2() {
+	local mesg=$1; shift
+	printf "${BOLD_MSG}    ${mesg}${ALL_OFF_MSG}\n" "$@" >&1
+}
+
+msg() {
+	local mesg=$1; shift
+	printf "${GREEN_MSG}==>${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&1
+}
+
+msg2() {
+	local mesg=$1; shift
+	printf "${BLUE_MSG}  ->${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&1
+}
+
+warning() {
+	local mesg=$1; shift
+	printf "${YELLOW_MSG}==> $(gettext "WARNING:")${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&2
+}
+
+error() {
+	local mesg=$1; shift
+	printf "${RED_MSG}==> $(gettext "ERROR:")${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&2
+}
+
+# ==================  THESE BELOW SHOULD BE REPLACED
+
+
+# $1 must be in the format: "PART_TO_BE_CHECKED|Message|ErrorCode
+#   e.g.:  check_abort "ERR_ABORT|The protocol: <$PROTOCOL> is not supported."
+check_abort() {
+	local delimstr=$1; shift
+    local PART_TO_BE_CHECKED="$(get_str_part "$delimstr" 1)";
+    local mesg="$(get_str_part "$delimstr" 2)";
+    if [ "$PART_TO_BE_CHECKED" == "ERR_ABORT" ]; then
+        printf "${MAGENTA_MSG}\n====> $(gettext "ABORTING....\n")${ALL_OFF_MSG}" >&2
+        printf "${BLUE_MSG}    ->${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n\n" "$@" >&2
+        exit 1
+    fi
+}
+
+abort() {
+	local mesg=$1; shift   
+    printf "${MAGENTA_MSG}\n====> $(gettext "ABORTING....\n")${ALL_OFF_MSG}" >&2
+    printf "${BLUE_MSG}    ->${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n\n" "$@" >&2
+    exit 1
+}
+
+# also checks if we keep `PKGMK_WORK_DIR`
+abort_check_keepwork() {
+    local mesg=$1; shift
+    if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+        rm -rf $PKGMK_WORK_DIR
+    fi
+    local mesg2="$(gettext "Building failed: <%s>")" "$TARGET"
+    printf "${RED_MSG}==> $(gettext "ERROR:")${ALL_OFF_MSG}${BOLD_MSG} ${mesg2}${ALL_OFF_MSG}\n" "$@" >&2
+    printf "${MAGENTA_MSG}\n====> $(gettext "ABORTING....\n")${ALL_OFF_MSG}" >&2
+    printf "${BLUE_MSG}    ->${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&2
+    exit 1
+}
+
+interrupted() {
+	if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+		rm -rf $PKGMK_WORK_DIR
+	fi
+    printf "${RED_MSG}\n==> $(gettext "ERROR:")${ALL_OFF_MSG}${BOLD_MSG} Interrupted${ALL_OFF_MSG}\n" >&2
+	exit 1
+}
 
 
 #**********************************************************************************************************************
@@ -282,52 +310,12 @@ have_function() {
 #   GENERAL - helper functions
 #**********************************************************************************************************************
 
-info() {
-	echo "=======> $1"
-}
-warning() {
-	info "WARNING: $1" >&2
-}
-error() {
-	info "ERROR: $1" >&2
-}
-abort_on_build() {
-    error $1
-    exit $E_BUILD
-}
-
 # returns a part of a string: usually used for multiple return values from functions.
 #   Delimiter is |    $1 - return result string: Quoted  $2 - number of part to be returned
 # e.g.: part3=`get_str_part "$str" 3`
 function get_str_part() {
     IFS="|" read -ra parts_arr <<< "$1"
     printf "%s\n" "${parts_arr[-1+$2]}"
-}
-
-# $1 must be in the format: "PART_TO_BE_CHECKED|Message|ErrorCode
-#   e.g.:  check_abort "ERR_ABORT|The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
-check_abort() {
-    if [ "$(get_str_part "$1" 1)" == "ERR_ABORT" ]; then
-        echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 2`\n" >&2
-        exit $((`get_str_part "$1" 3`))
-    fi
-}
-
-# $1 must be in the format: "Message|ErrorCode
-#   e.g.:  do_abort "The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
-do_abort() {
-    echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 1`\n" >&2
-    exit $((`get_str_part "$1" 2`))
-}
-
-# Similar to `do_abort` but also checks if we want to remove the workdir
-do_abort_checked() {
-    if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-        rm -rf $PKGMK_WORK_DIR
-    fi
-    error "Building '$TARGET' failed.. "
-    echo -e "\n=======> ERROR: Aborting.... `get_str_part "$1" 1`\n" >&2
-    exit $((`get_str_part "$1" 2`))
 }
 
 # extract the original URL from a source entry: strip an eventual filename or VCS directory
@@ -345,8 +333,7 @@ dir_isempty() {
 
 cd_safe() {
 	if ! cd "$1"; then
-        do_abort "Failed to change to directory $1"
-		exit 1
+        abort "Failed to change to directory $1"
 	fi
 }
 
@@ -361,21 +348,17 @@ get_filename() {
 
 check_directory() {
 	if [ ! -d $1 ]; then
-		error "Directory '$1' does not exist."
-		exit $E_DIR_PERM
+        abort "$(gettext "Directory <%s> does not exist.")" "$1"
 	elif [ ! -w $1 ]; then
-		error "Directory '$1' not writable."
-		exit $E_DIR_PERM
+        abort "$(gettext "Directory <%s> is not writable.")" "$1"
 	elif [ ! -x $1 ] || [ ! -r $1 ]; then
-		error "Directory '$1' not readable."
-		exit $E_DIR_PERM
+        abort "$(gettext "Directory <%s> is not readable.")" "$1"
 	fi
 }
 
 check_file() {
 	if [ -e $1 ] && [ ! -w $1 ]; then
-		error "File '$1' is not writable."
-		exit $E_GENERAL
+        abort "$(gettext "File <%s> is not writable.")" "$1"
 	fi
 }
 
@@ -418,7 +401,7 @@ get_final_srcname() {
         fi
 		return
 	fi
-    
+
 	case $PROTOCOL in
         local)
             # may not start with a slash
@@ -464,7 +447,7 @@ getchecked_final_srcpath() {
     check_abort "$FINAL_SRCNAME"
     local PROTOCOL=$(get_protocol "$NETSRC")
     check_abort "$PROTOCOL"
-    
+
 	case $proto in
 		git|svn|hg|bzr)
 			if [[ -d "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ]]; then
@@ -489,7 +472,7 @@ remove_source() {
 	for NETSRC in ${source[@]}; do
 		FINAL_SRCPATH=`get_final_srcpath $NETSRC`
 		if [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$NETSRC" ]; then
-			info "Removing $FINAL_SRCPATH"
+            msg "$(gettext "Removing source <%s>")" "$FINAL_SRCPATH"
 			rm -rf $FINAL_SRCPATH
 		fi
 	done
@@ -515,7 +498,7 @@ download_source() {
 
         if [ "$PROTOCOL" == "local" ]; then
             if [[ ! -f "$FINAL_SRCPATH" ]]; then
-                do_abort "Local Source file '$FINAL_SRCPATH' not found. SOURCE: <$NETSRC>|E_DOWNLOAD"
+                abort "Local Source file '$FINAL_SRCPATH' not found. SOURCE: <$NETSRC>"
             fi
         else
             if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
@@ -538,7 +521,7 @@ download_source() {
                     #local) checked above
                 esac
             else
-                do_abort "Source file '$FINAL_SRCPATH' not found (use option -d to download).|E_DOWNLOAD"
+                abort "Source file '$FINAL_SRCPATH' not found (use option -d to download)."
             fi
         fi
     done
@@ -557,11 +540,10 @@ download_file() {
     local BASENAME="${ORIG_URL##*/}"
     FINAL_SRCPATH_PARTIAL="$FINAL_SRCPATH.partial"
 
-	info "Downloading '$ORIG_URL'."
+    msg "$(gettext "Downloading file URL: <%s>")" "$ORIG_URL"
 
 	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then
-		error "Command '${PKGMK_DOWNLOAD_PROG}' not found."
-		exit $E_GENERAL
+        abort "$(gettext "Command <%s> not found.")" "$PKGMK_DOWNLOAD_PROG"
 	fi
 
 	case ${PKGMK_DOWNLOAD_PROG} in
@@ -577,7 +559,7 @@ download_file() {
                     -o $FINAL_SRCPATH_PARTIAL --insecure $PKGMK_DOWNLOAD_PROG_OPTS"
                     ;;
                 *)
-                    do_abort "The protocol  <$PROTOCOL> is not supported. ORIG_URL: <$ORIG_URL>|E_DOWNLOAD_PROTO"
+                    abort "The protocol  <$PROTOCOL> is not supported. ORIG_URL: <$ORIG_URL>"
                     ;;
             esac
             ;;
@@ -592,7 +574,7 @@ download_file() {
 	esac
 
     if [ -f "$FINAL_SRCPATH_PARTIAL" ]; then
-        info "Partial download found, trying to resume"
+        plain2 "$(gettext "Partial download found, trying to resume...")"
         RESUME_OPTS="$RESUME_CMD"
     fi
 
@@ -611,7 +593,7 @@ download_file() {
             $PKGMK_DOWNLOAD_PROG $DOWNLOAD_OPTS $RESUME_OPTS $ORIG_URL
             ret=$?
             if [ $ret != 0 ] && [ "$RESUME_OPTS" ]; then
-                info "Partial download failed, restarting"
+                plain2 "$(gettext "Partial download failed, restarting download...")"
                 rm -f -- "$FINAL_SRCPATH_PARTIAL"
                 RESUME_OPTS=""
             else
@@ -621,7 +603,7 @@ download_file() {
     fi
 
     if [ $ret != 0 ]; then
-        do_abort "Failure while downloading <$FINAL_SRCPATH> SOURCE: <$ORIG_URL>.|E_DOWNLOAD"
+        abort "Failure while downloading <$FINAL_SRCPATH> SOURCE: <$ORIG_URL>"
     fi
     mv -f "$FINAL_SRCPATH_PARTIAL" "$FINAL_SRCPATH"
 }
@@ -640,26 +622,26 @@ download_git() {
     local REPO=$FINAL_SRCNAME
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
-	info "Downloading $FINAL_SRCNAME..."
-    
+    msg "$(gettext "Downloading git into: <%s>")" "$FINAL_SRCNAME"
+
 	url=${ORIG_URL#git+}
 	url=${url%%#*}
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-		info "Cloning git repo <${REPO}>..."
+        plain2 "$(gettext "Cloning git repo <%s>")" "$REPO"
 		if ! git clone $PKGMK_VCS_GIT_OPTS --mirror "$url" "$FINAL_SRCPATH"; then
-			do_abort_checked "Failure while downloading git repo: <$REPO> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
+			abort_check_keepwork "Failure while downloading git repo: <$REPO> SOURCE: <$NETSRC>"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
 		cd_safe "$FINAL_SRCPATH"
 		# Make sure we are fetching the right repo
 		if [[ "$url" != "$(git config --get remote.origin.url)" ]] ; then
-			do_abort_checked "<$FINAL_SRCPATH> is not a clone of <$url> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
+			abort_check_keepwork "<$FINAL_SRCPATH> is not a clone of <$url> SOURCE: <$NETSRC>"
         fi
-		info "Updating git repo: <$REPO>..."
+		plain2 "$(gettext "Updating git repo <%s>")" "$REPO"
 		if ! git fetch --all -p $PKGMK_VCS_GIT_OPTS; then
 			# only warn on failure to allow offline builds
-			warning "Failure while updating git repo: <$REPO>"
+            warning "$(gettext "Failure while updating git repo <%s>")" "$REPO"
 		fi
 	fi
 }
@@ -683,6 +665,8 @@ download_svn() {
 	fi
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
+    msg "$(gettext "Downloading svn into: <%s>")" "$FINAL_SRCNAME"
+
 	if [[ $url != svn+ssh* ]]; then
 		url=${url#svn+}
 	fi
@@ -695,23 +679,23 @@ download_svn() {
 				ref="${fragment##*=}"
 				;;
 			*)
-                do_abort_checked "Unrecognized reference fragment: <${fragment}> SOURCE: <$ORIG_URL>|E_DOWNLOAD_VCS"
+                abort_check_keepwork "Unrecognized reference fragment: <${fragment}> SOURCE: <$ORIG_URL>"
 		esac
 	fi
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-		info "Cloning svn repo <${REPO}>..."
+        plain2 "$(gettext "Cloning svn repo <%s>")" "$REPO"
 		mkdir -p "$FINAL_SRCPATH/.makepkg"
-		if ! svn checkout -r ${ref} $PKGMK_VCS_SVN_OPTS --config-dir "$FINAL_SRCPATH/.makepkg" "$url" "$FINAL_SRCPATH"; 
+		if ! svn checkout -r ${ref} $PKGMK_VCS_SVN_OPTS --config-dir "$FINAL_SRCPATH/.makepkg" "$url" "$FINAL_SRCPATH";
             then
-			do_abort_checked "Failure while downloading svn repo: <$REPO> SOURCE: <$ORIG_URL>.|E_DOWNLOAD_VCS"
+			abort_check_keepwork "Failure while downloading svn repo: <$REPO> SOURCE: <$ORIG_URL>"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
-		info "Updating svn repo: <$REPO>..."
+        plain2 "$(gettext "Updating svn repo <%s>")" "$REPO"
 		cd_safe "$FINAL_SRCPATH"
 		if ! svn update -r ${ref} $PKGMK_VCS_SVN_OPTS; then
 			# only warn on failure to allow offline builds
-			warning "Failure while updating svn repo: <$REPO>"
+            warning "$(gettext "Failure while updating svn repo <%s>")" "$REPO"
 		fi
 	fi
 }
@@ -730,22 +714,22 @@ download_hg() {
     local REPO=$FINAL_SRCNAME
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
-	info "Downloading $FINAL_SRCNAME..."
+    msg "$(gettext "Downloading hg into: <%s>")" "$FINAL_SRCNAME"
 
 	url=${ORIG_URL#hg+}
 	url=${url%%#*}
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-		info "Cloning hg repo <${REPO}>..."
+        plain2 "$(gettext "Cloning hg repo <%s>")" "$REPO"
 		if ! hg clone $PKGMK_VCS_HG_OPTS -U "$url" "$FINAL_SRCPATH"; then
-			do_abort_checked "Failure while downloading hg repo: <$REPO> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
+			abort_check_keepwork "Failure while downloading hg repo: <$REPO> SOURCE: <$NETSRC>"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
-		info "Updating hg repo: <$REPO>..."
+		plain2 "$(gettext "Updating hg repo <%s>")" "$REPO"
 		cd_safe "$FINAL_SRCPATH"
 		if ! hg pull $PKGMK_VCS_HG_OPTS; then
 			# only warn on failure to allow offline builds
-			warning "Failure while updating hg repo: <$repo>"
+            warning "$(gettext "Failure while updating hg repo <%s>")" "$REPO"
 		fi
 	fi
 }
@@ -768,17 +752,19 @@ download_bzr() {
 
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
+    msg "$(gettext "Downloading bzr into: <%s>")" "$FINAL_SRCNAME"
+
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
-        info "Branching bzr displaylocation <${url}>..."
+        plain2 "$(gettext "Branching bzr displaylocation <%s>")" "$url"
 		if ! bzr branch $PKGMK_VCS_BZR_OPTS "$url" "$FINAL_SRCPATH" --no-tree --use-existing-dir; then
-            do_abort_checked "Failure while branching bzr displaylocation: <$url> SOURCE: <$NETSRC>.|E_DOWNLOAD_VCS"
+            abort_check_keepwork "Failure while branching bzr displaylocation: <$url> SOURCE: <$NETSRC>"
 		fi
 	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
-        info "Pulling bzr displaylocation: <$displaylocation>..."
+        plain2 "$(gettext "Pulling bzr displaylocation <%s>")" "$displaylocation"
 		cd_safe "$FINAL_SRCPATH"
 		if ! bzr pull $PKGMK_VCS_BZR_OPTS "$url"; then
 			# only warn on failure to allow offline builds
-            warning "Failure while pulling bzr displaylocation: <$url>"
+            warning "$(gettext "Failure while pulling bzr displaylocation <%s>")" "$url"
 		fi
 	fi
 }
@@ -806,7 +792,7 @@ extract_source() {
 					extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
 				else
                     extract_file "$FINAL_SRCPATH" "FINAL_SRCNAME" "$NETSRC"
-				fi 
+				fi
                 ;;
             local)
                 extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
@@ -840,7 +826,7 @@ extract_only_copy() {
 
     cp -f $FINAL_SRCPATH $SRC
     if [ $? != 0 ]; then
-        do_abort_checked "Could not copy FINAL_SRCPATH: <$FINAL_SRCPATH> to SRC: <$SRC>. SOURCE: <$NETSRC>|E_UNPACK"
+        abort_check_keepwork "Could not copy FINAL_SRCPATH: <$FINAL_SRCPATH> to SRC: <$SRC>. SOURCE: <$NETSRC>"
     fi
 }
 
@@ -849,7 +835,7 @@ extract_file() {
     local FINAL_SRCPATH=$1
     local FINAL_SRCNAME=$2
     local NETSRC=$3
-     
+
 	# do not rely on extension for file type
 	local file_type=$(file -bizL "$FINAL_SRCPATH")
 	local ext=${FINAL_SRCPATH##*.}
@@ -882,7 +868,7 @@ extract_file() {
 	esac
 
 	local ret=0
-	echo "Extracting <$FINAL_SRCPATH> with <$cmd>"
+    msg2 "$(gettext "Extracting file with (%s): <%s>")" "$cmd" "$FINAL_SRCPATH"
 	if [[ $cmd = "bsdtar" ]]; then
 		$cmd -p -C $SRC -xf "$FINAL_SRCPATH"  || ret=$?
 	else
@@ -890,7 +876,7 @@ extract_file() {
 		$cmd -dcf "$file" > "$SRC/${FINAL_SRCNAME%.*}" || ret=$?
 	fi
 	if (( ret )); then
-        do_abort_checked "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>|E_UNPACK"
+        abort_check_keepwork "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>"
 	fi
 
 	if (( EUID == 0 )); then
@@ -919,7 +905,7 @@ extract_git() {
 	local dir=$(getchecked_final_srcpath "$NETSRC")
 	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
 
-	info "Creating working copy of git repo: <$REPO>..."
+    msg2 "$(gettext "Creating working copy of git repo <%s>")" "$REPO"
 	pushd "$SRC" &>/dev/null
 
 	local updating=0
@@ -927,11 +913,11 @@ extract_git() {
 		updating=1
 		cd_safe "${dir##*/}"
 		if ! git fetch; then
-            do_abort_checked "Failure while updating working copy of git repo <$REPO>.|E_UNPACK_VCS"
+            abort_check_keepwork "Failure while updating working copy of git repo <$REPO>"
 		fi
 		cd_safe "$SRC"
 	elif ! git clone "$dir" "${dir##*/}"; then
-        do_abort_checked "Failure while creating working copy of git repo <$REPO>.|E_UNPACK_VCS"
+        abort_check_keepwork "Failure while creating working copy of git repo <$REPO>"
 	fi
 
 	cd_safe "${dir##*/}"
@@ -945,14 +931,14 @@ extract_git() {
 			branch)
 				ref=origin/${FRAGMENT##*=}
 				;;
-			*) do_abort_checked "Unrecognized reference: ${FRAGMENT}.|E_UNPACK_VCS"
+			*) abort_check_keepwork "Unrecognized reference: ${FRAGMENT}"
                 ;;
 		esac
 	fi
 
 	if [[ $ref != "origin/HEAD" ]] || (( updating )) ; then
 		if ! git checkout --force --no-track -B makepkg $ref; then
-			do_abort_checked "Failure while creating working copy of git repo <$REPO>.|E_UNPACK_VCS"
+			abort_check_keepwork "Failure while creating working copy of git repo <$REPO>"
 		fi
 	fi
 
@@ -973,13 +959,12 @@ extract_svn() {
 	local repo=${NETSRC##*/}
 	REPO=${repo%%#*}
 
-    info "Creating working copy of svc repo: <$REPO>..."
-
+    msg2 "$(gettext "Creating working copy of svn repo <%s>")" "$REPO"
     local ret=1
 	cp -au "$dir" "$SRC"
     ret=$?
 	if [ $ret != 0 ]; then
-        do_abort_checked "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>|E_UNPACK"
+        abort_check_keepwork "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>"
 	fi
 }
 
@@ -1002,7 +987,7 @@ extract_hg() {
 	local REPO=${NETSRC##*/}
 	REPO=${REPO%%#*}
 
-	info "Creating working copy of hg repo: <$REPO>..."
+    msg2 "$(gettext "Creating working copy of hg repo <%s>")" "$REPO"
 	pushd "$SRC" &>/dev/null
 
 	local ref=tip
@@ -1011,7 +996,7 @@ extract_hg() {
 			branch|revision|tag)
 				ref="${FRAGMENT##*=}"
 				;;
-            *) do_abort_checked "Unrecognized reference: ${FRAGMENT}.|E_UNPACK_VCS"
+            *) abort_check_keepwork "Unrecognized reference: ${FRAGMENT}"
                 ;;
 		esac
 	fi
@@ -1019,10 +1004,10 @@ extract_hg() {
 	if [[ -d "${dir##*/}" ]]; then
 		cd_safe "${dir##*/}"
 		if ! (hg pull && hg update -C -r "$ref"); then
-			do_abort_checked "Failure while updating working copy of hg repo <$REPO>.|E_UNPACK_VCS"
+			abort_check_keepwork "Failure while updating working copy of hg repo <$REPO>"
 		fi
 	elif ! hg clone -u "$ref" "$dir" "${dir##*/}"; then
-		do_abort_checked "Failure while creating working copy of hg repo <$REPO>.|E_UNPACK_VCS"
+		abort_check_keepwork "Failure while creating working copy of hg repo <$REPO>"
 	fi
 
 	popd &>/dev/null
@@ -1048,7 +1033,7 @@ extract_bzr() {
 				rev="${FRAGMENT#*=}"
 				displaylocation="$url -r ${FRAGMENT#*=}"
 				;;
-            *) do_abort_checked "Unrecognized reference: ${FRAGMENT}.|E_UNPACK_VCS"
+            *) abort_check_keepwork "Unrecognized reference: ${FRAGMENT}"
                 ;;
 		esac
 	fi
@@ -1056,16 +1041,16 @@ extract_bzr() {
 	local dir=$(getchecked_final_srcpath "$NETSRC")
 	[[ -z "$dir" ]] && dir="$PKGMK_SOURCE_DIR/$(get_final_srcname "$NETSRC")"
 
-	info "Creating working copy of bzr repo: <$REPO>..."
+    msg2 "$(gettext "Creating working copy of bzr repo <%s>")" "$REPO"
 	pushd "$SRC" &>/dev/null
 
 	if [[ -d "${dir##*/}" ]]; then
 		cd_safe "${dir##*/}"
 		if ! (bzr pull "$dir" -q --overwrite -r "$rev" && bzr clean-tree -q --detritus --force); then
-            do_abort_checked "Failure while updating working copy of bzr repo <$REPO>.|E_UNPACK_VCS"
+            abort_check_keepwork "Failure while updating working copy of bzr repo <$REPO>"
 		fi
 	elif ! bzr checkout "$dir" -r "$rev"; then
-		do_abort_checked "Failure while creating working copy of bzr repo <$REPO>.|E_UNPACK_VCS"
+		abort_check_keepwork "Failure while creating working copy of bzr repo <$REPO>"
 	fi
 
 	popd &>/dev/null
@@ -1084,7 +1069,7 @@ extract_bzr() {
 #**********************************************************************************************************************
 
 compress_archive() {
-	info "compress $1"
+    plain "$(gettext "Using (%s) to compress <%s>")" "$PKGMK_COMPRESSION_MODE" "$1"
 	case $PKGMK_COMPRESSION_MODE in
 		gz) gzip $PKGMK_COMPRESSION_OPTS $1;;
 		bz2) bzip2 $PKGMK_COMPRESSION_OPTS $1;;
@@ -1296,47 +1281,38 @@ get_pkgfile_variables() {
 check_pkgfile() {
 	local SIZE NAME_TEST RELEASE_TEST
 	if [ "${name}" == "" ]; then
-		error "Variable 'name' not initiated or not found in $PKGMK_PKGFILE."
-		exit $E_PKGFILE
+        abort "$(gettext "Variable 'name' not initiated or not found in <%s>")" "$PKGMK_PKGFILE"
 	fi
 	if ! have_function 'build' && [ "$PKGMK_PKGFILE" == "Pkgfile" ]; then
-		error "Function 'build' not specified in $PKGMK_PKGFILE."
-		exit $E_PKGFILE
+        abort "$(gettext "Function 'build' not specified in <%s>")" "$PKGMK_PKGFILE"
 	fi
 	NAME_TEST=`echo "${name}" | sed 's@[[a-z0-9]*[-_+]*]*@@g'`
 	if [ "$NAME_TEST" != "" ]; then
-		error "Variable 'name' contains following illegal characters: $NAME_TEST"
-		exit $E_PKGFILE
+        abort "$(gettext "Variable 'name' contains following illegal characters: <%s>")" "$NAME_TEST"
 	fi
 	if [ ${#name} -gt 50 ];then
-		error "Variable 'name' length higher then 50 characters."
-		exit $E_PKGFILE
+        abort "$(gettext "Variable 'name' length higher then 50 characters.")"
 	fi
 	if [ "${version}" == "" ]; then
-		error "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
-		exit $E_PKGFILE
+        abort "$(gettext "Variable 'version' not initiated or not found in <%s>")" "$PKGMK_PKGFILE"
 	fi
 	if [ "${release}" == "" ]; then
-		error "Variable 'release' not initiated or not found in $PKGMK_PKGFILE."
-		exit $E_PKGFILE
+        abort "$(gettext "Variable 'release' not initiated or not found in<%s>")" "$PKGMK_PKGFILE"
 	fi
 	RELEASE_TEST=`echo "${release}" | sed 's@[0-9]*@@g'`
 	if [ "$RELEASE_TEST" != "" ]; then
-		error "Variable 'release' contains following illegal characters: $RELEASE_TEST"
-		exit $E_PKGFILE
+        abort "$(gettext "Variable 'release' contains following illegal characters:<%s>")" "$RELEASE_TEST"
 	fi
 	if [ $release -gt  99999999 ]; then
-		error "Variable 'release' outside limit which is '99999999'"
-		exit $E_PKGFILE
+        abort "$(gettext "Variable 'release' outside limit which is '99999999'.")"
 	fi
 	if [ "${description}" == "" ]; then
-		warning "Variable 'description' not initiated or not found in $PKGMK_PKGFILE."
+		warning "$(gettext "Variable 'description' not initiated or not found in <%s>")" "$PKGMK_PKGFILE"
 	fi
 	SIZE=${#description}
 	if [ $SIZE -gt 110 ];then
-		error "Variable 'description' length higher then 110 characters, please resize to 110 char ]"
-		info "$description <== $SIZE characters"
-		exit $E_PKGFILE
+		error "$(gettext "Variable 'description' length higher then 110 characters, please resize to 110 char ]")"
+		abort "$(gettext "%s <== <%s> characters")" "$description" "$SIZE"
 	fi
 }
 
@@ -1433,7 +1409,7 @@ check_md5sum() {
 			sed 's/^+/NEW       /g' | \
 			sed 's/^-/MISSING   /g' > $FILE.md5sum.diff
 		if [ -s $FILE.md5sum.diff ]; then
-			error "Md5sum mismatch found:"
+            error "$(gettext "Md5sum mismatch found:")"
 			cat $FILE.md5sum.diff >&2
 
 			if [ "$PKGMK_KEEP_WORK" = "no" ]; then
@@ -1441,23 +1417,19 @@ check_md5sum() {
 			fi
 
 			if [ "$PKGMK_CHECK_MD5SUM" = "yes" ]; then
-				error "Md5sum not ok."
-				exit $E_MD5
+				abort "$(gettext "Md5sum not ok.")"
 			fi
-
-			error "Building '$TARGET' failed."
-			exit $E_MD5
+            abort "$(gettext "Building <%s> failed.")" "$TARGET"
 		fi
 	else
 		if [ "$PKGMK_CHECK_MD5SUM" = "yes" ]; then
 			if [ "$PKGMK_KEEP_WORK" = "no" ]; then
 				rm -rf $PKGMK_WORK_DIR
 			fi
-			info "Md5sum not found."
-			exit $E_MD5
+            abort "$(gettext "Md5sum not found.")"
 		fi
 
-		warning "Md5sum not found, creating new."
+        warning "$(gettext "Md5sum not found, creating new.")"
 		make_md5sum > $PKGMK_MD5SUM
 	fi
 
@@ -1465,7 +1437,7 @@ check_md5sum() {
 		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
 			rm -rf $PKGMK_WORK_DIR
 		fi
-		info "Md5sum ok."
+        plain "$(gettext "Md5sum ok.")"
 		exit 0
 	fi
 }
@@ -1502,7 +1474,7 @@ check_footprint() {
 	if [ -z $TARGETS ]; then
 		get_package_list
 		if [ -z $TARGETS ]; then
-			error "Unable to update footprint"
+            error "$(gettext "Unable to update footprint")"
 		fi
 	fi
 	for TARGET in ${TARGETS[@]}; do
@@ -1520,31 +1492,27 @@ check_footprint() {
 			if [ -s $FILE.footprint.diff ]; then
 				if [ "$PKGMK_IGNORE_NEW" = "yes" ]; then
 					mv $FILE.footprint $PKGMK_FOOTPRINT
-					warning "Footprint mismatch found:"
+                    warning "$(gettext "Footprint mismatch found:")"
 				else
-					error "Footprint mismatch found:"
+					error "$(gettext "Footprint mismatch found:")"
 					BUILD_SUCCESSFUL="no"
 				fi
 				cat $FILE.footprint.diff >&2
 			fi
 		else
-			warning "Footprint not found, creating new."
+			warning "$(gettext "Footprint not found, creating new.")"
 			mv $FILE.footprint $PKGMK_FOOTPRINT
 		fi
 		else
-			error "Package '$TARGET' was not found."
+            error "$(gettext "Package <%s> was not found.")" "$TARGET"
 			BUILD_SUCCESSFUL="no"
 		fi
 	done
 }
 
 make_work_dir() {
-	# TODO findout why we have to export thoses 2 variables
-	# I really think it's pointless in cards building process	
-	export PKG="$PKGMK_WORK_DIR/pkg"
-	export SRC="$PKGMK_WORK_DIR/src"
-	pkgdir=$PKG
-	srcdir=$SRC
+	PKG="$PKGMK_WORK_DIR/pkg"
+	SRC="$PKGMK_WORK_DIR/src"
 	umask 022
 
 	cd $PKGMK_ROOT
@@ -1587,7 +1555,7 @@ add_meta_to_archive() {
 	NAME="`get_package_name $1`"
 	ARCH="`get_package_arch $1`"
 
-	info  "Adding meta data to Archive $NAME"
+    plain "$(gettext "Adding meta data to Archive <%s>")" "$NAME"
 
 	TAR="$PKGMK_WORK_DIR/tar"
 	mkdir -p $TAR
@@ -1624,23 +1592,23 @@ add_meta_to_archive() {
 		# We don't want any .devel dependencies here
 		sed -i '/^R[[a-z0-9]*[-_+]*]*\.devel/d' .META
 		if [ ! -z $run ] && [ "$NAME" == "$name" ]; then
-			info "Adding runtime deps to Archive $NAME"
+            plain "$(gettext "Adding runtime deps to Archive <%s>")" "$NAME"
 			for rd in ${run[@]}; do
 				if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
-					error "Runtime dependencie $rd not found, cannot continue"
+                    error "$(gettext "Runtime dependency <%s> not found, cannot continue.")" "$rd"
 					clean
-					exit $E_DEPS;
+					exit 1;
 				fi
 				echo "R$rd`pkginfo -b $rd`" >> .META
 			done
 		fi
 		if [ -f $PKGMK_ROOT/${NAME}.run ]; then
-			info "Adding runtime deps to Archive $NAME"
+            plain "$(gettext "Adding runtime deps to Archive <%s>")" "$NAME"
 			for rd in `cat $PKGMK_ROOT/${NAME}.run`; do
 				if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
-					error "Runtime dependencie $rd not found, cannot continue"
+                    error "$(gettext "Runtime dependency <%s> not found, cannot continue.")" "$rd"
 					clean
-					exit $E_DEPS;
+					exit 1;
 				fi
 				echo "R$rd`pkginfo -b $rd`" >> .META
 			done
@@ -1665,16 +1633,14 @@ add_meta_to_archive() {
 
 
 build_package() {
-	# TODO find a better solution for the hardcoded folders
 	local BUILD_SUCCESSFUL="no"
 
 	if [ "$1" != "$TARGET" ]; then
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
-				error "$TARGET should be remove"
+                error "$(gettext "<%s> should be removed.")" "$TARGET"
 			done
-			error "Remove the binaries first..."
-			exit $E_BUILD
+            abort "$(gettext "Remove the binaries first...")"
 		fi
 	fi
 
@@ -1682,10 +1648,10 @@ build_package() {
 	make_work_dir
 
 	if [ "$UID" != "0" ]; then
-		warning "Packages should be built as root."
+        warning "$(gettext "Packages should be built as root.")"
 	fi
 
-	info "Building '$TARGET'."
+    msg "$(gettext "Building package: <%s>")" "$TARGET"
 
 	extract_source
 
@@ -1715,8 +1681,7 @@ build_package() {
 				if [ $? = 0 ]; then
 					BUILD_SUCCESSFUL="yes"
 				else
-					error "Building '$TARGET' failed."
-					exit $E_BUILD
+                    abort "$(gettext "Building <%s> failed.")" "$TARGET"
 				fi
 			else
 				if [ "$1" != "$TARGET" ]; then
@@ -1726,16 +1691,14 @@ build_package() {
 					pack_${group}
 				fi
 				remove_${group}
-				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
-					error "Building '$TARGET' failed."
-                			exit $E_BUILD
+				if [ "$BUILD_SUCCESSFUL" == "no" ]; then
+					abort "$(gettext "Building <%s> failed.")" "$TARGET"
 				fi
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
-				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
-					error "Building '$TARGET' failed."
-					exit $E_BUILD
+				if [ "$BUILD_SUCCESSFUL" == "no" ]; then
+					abort "$(gettext "Building <%s> failed.")" "$TARGET"
 				fi
 				j=0
 			fi
@@ -1752,7 +1715,7 @@ build_package() {
 								if [ "$PKGMK_LOCALE" == "$LOC" ]; then
 									if [ "$1" != "$TARGET" ]; then
 										bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${LOC}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
-										$DIR/$LOC || abort_on_build "${name}.${LOC}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT}"
+										$DIR/$LOC || abort "${name}.${LOC}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT}"
 									fi
 									rm -rf $DIR/$LOC
 									break
@@ -1771,13 +1734,12 @@ build_package() {
 		if [ "`ls|wc -l`" != "0" ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} *
 		else
-			error "No files found in $PKG..."
-			exit $E_BUILD
+            abort "$(gettext "No files found in package <%s>")" "$PKG"
 		fi
 		if [ $? = 0 ]; then
 			BUILD_SUCCESSFUL="yes"
 			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
-				warning "Footprint ignored."
+				warning "$(gettext "Footprint ignored.")"
 			else
 				check_footprint
 			fi
@@ -1788,8 +1750,7 @@ build_package() {
 		if [ "$1" != "$TARGET" ]; then
 			get_package_list
         		if [ -z $TARGETS ]; then
-                		error "Package(s) not found(s)..."
-				exit $E_BUILD
+                    abort "$(gettext "Package(s) not found(s)...")" "$PKG"
         		fi
 			for TARGET in ${TARGETS[@]}; do
 				add_meta_files $TARGET
@@ -1806,8 +1767,7 @@ build_package() {
 		if [ -f $TARGET ]; then
 			touch -r $PKGMK_ROOT/$PKGMK_PKGFILE $TARGET &> /dev/null
 		fi
-		error "Building '$TARGET' failed."
-		exit $E_BUILD
+		abort "$(gettext "Building <%s> failed.")" "$TARGET"
 	fi
 }
 
@@ -1815,12 +1775,11 @@ install_package() {
 	local COMMAND
 	get_package_list
 	if [ -z $TARGETS ]; then
-		error "Package(s) not found(s) nothing to install..."
-		exit $E_INSTALL
+        abort "$(gettext "Package(s) not found(s) nothing to install...")"
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ "`get_package_arch $TARGET`" = "$PKGMK_ARCH" ] || [ "`get_package_arch $TARGET`" = "any" ]; then
-			info "Installing '$TARGET'."
+            plain "$(gettext "Installing <%s>")" "$TARGET"
 
 			if [ "$PKGMK_INSTALL" = "install" ]; then
 				COMMAND="pkgadd $PKGMK_PACKAGE_DIR/$TARGET"
@@ -1833,10 +1792,9 @@ install_package() {
 			$COMMAND
 
 			if [ $? = 0 ]; then
-				info "Installing '$TARGET' succeeded."
+                plain "$(gettext "Installing <%s> succeeded.")" "$TARGET"
 			else
-				error "Installing '$TARGET' failed."
-				exit $E_INSTALL
+				abort "$(gettext "Installing <%s> failed.")" "$TARGET"
 			fi
 		fi
 	done
@@ -1851,9 +1809,9 @@ recursive() {
 	for FILE in `find $PKGMK_ROOT -name $PKGMK_PKGFILE | sort`; do
 		DIR="`dirname $FILE`/"
 		if [ -d $DIR ]; then
-			info "Entering directory '$DIR'."
+            plain "$(gettext "Entering directory  <%s>")" "$DIR"
 			(cd $DIR && $PKGMK_COMMAND $ARGS)
-			info "Leaving directory '$DIR'."
+            plain "$(gettext "Leaving directory <%s>")" "$DIR"
 		fi
 	done
 }
@@ -1864,12 +1822,12 @@ clean() {
 	if [ ! -z $TARGETS ]; then
 		for TARGET in ${TARGETS[@]}; do
 			if [ -f $PKGMK_PACKAGE_DIR/$TARGET ]; then
-				info "Removing $TARGET"
+                plain "$(gettext "Removing <%s>")" "$TARGET"
 				rm -f $PKGMK_PACKAGE_DIR/$TARGET
 			fi
 		done
 	else
-		warning "$TARGETS not found"
+        warning "$(gettext "<%s> not found.")" "$TARGETS"
 	fi
 	find $PKGMK_ROOT -name "*.md5sum" -exec rm -v {} \; 2> /dev/null
 	find $PKGMK_ROOT -name "*.footprint" -exec rm -v {} \; 2> /dev/null
@@ -1881,21 +1839,19 @@ update_footprint() {
 	if [ -z $TARGETS ]; then
 		get_package_list
 		if [ -z $TARGETS ]; then
-			error "Package(s) not found(s), unable to update footprint."
-			exit $E_FOOTPRINT
+            abort "$(gettext "Package(s) not found(s), unable to update footprint.")"
 		fi
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ ! -f $TARGET ]; then
-			error "Unable to update footprint. File '$TARGET' not found."
-			exit $E_FOOTPRINT
+            abort "$(gettext "Unable to update footprint. File <%s> not found.")" "$TARGET"
 		fi
 		PKGMK_FOOTPRINT="`get_package_name $TARGET`".footprint
 		check_file "$PKGMK_FOOTPRINT"
 		make_footprint > $PKGMK_FOOTPRINT
 		touch $TARGET
 
-		info "Footprint updated for $TARGET"
+        plain "$(gettext "Footprint updated for <%s>")" "$TARGET"
 	done
 }
 
@@ -1981,23 +1937,12 @@ clean_repo_files() {
 	cd $PKGMK_ROOT
 	if [ -f $PKGMK_REPO ]; then
 		rm $PKGMK_REPO
-		info "Removing $PKGMK_REPO"
+        plain "$(gettext "Removing <%s>")" "$PKGMK_REPO"
 	fi
 	if [ -f MD5SUM ]; then
 		rm MD5SUM
-		info "Removing MD5SUM"
+        plain "$(gettext "Removing MD5SUM.")"
 	fi
-}
-
-interrupted() {
-	echo ""
-	error "Interrupted."
-
-	if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-		rm -rf $PKGMK_WORK_DIR
-	fi
-
-	exit $E_GENERAL
 }
 
 
@@ -2028,7 +1973,6 @@ print_help() {
 	echo "  -in,  --ignore-new          build packages, ignore new files in a footprint missmatch"
 	echo "  -um,  --update-md5sum       update md5sum"
 	echo "  -im,  --ignore-md5sum       build packages without checking md5sum"
-	echo "  -cm,  --check-md5sum        do not build, only check md5sum"
 	echo "  -ns,  --no-strip            do not strip executable binaries or libraries"
 	echo "  -co,  --clean-only          do not build, only remove packages and downloaded files, update $PKGMK_REPO file"
 	echo "  -kw,  --keep-work           keep temporary working directory"
@@ -2077,8 +2021,6 @@ parse_options() {
 				PKGMK_IGNORE_COLLECTION="yes" ;;
 			-ir|--ignore-repo)
 				PKGMK_IGNORE_REPO="yes" ;;
-			-cm|--check-md5sum)
-				PKGMK_CHECK_MD5SUM="yes" ;;
 			-ns|--no-strip)
 				PKGMK_NO_STRIP="yes" ;;
 			-f|--force)
@@ -2089,8 +2031,7 @@ parse_options() {
 				PKGMK_KEEP_WORK="yes" ;;
 			-cf|--config-file)
 				if [ ! "$2" ]; then
-					echo "`basename $PKGMK_COMMAND`: option $1 requires an argument"
-					exit 1
+					abort "`basename $PKGMK_COMMAND`: option $1 requires an argument"
 				fi
 				PKGMK_CONFFILE="$2"
 				shift ;;
@@ -2101,8 +2042,8 @@ parse_options() {
 				print_help
 				exit 0 ;;
 			*)
-				echo "`basename $PKGMK_COMMAND`: invalid option $1"
-				exit 1 ;;
+				abort "`basename $PKGMK_COMMAND`: invalid option $1"
+				;;
 		esac
 		shift
 	done
@@ -2114,15 +2055,13 @@ main() {
 	fi
 	parse_options "$@"
 
-        if [ ! -f $PKGMK_CONFFILE ]; then
-                error "File '$PKGMK_CONFFILE' not found."
-                exit $E_GENERAL
-        fi
-        . $PKGMK_CONFFILE
+    if [ ! -f $PKGMK_CONFFILE ]; then
+        abort "$(gettext "File <%s> not found.")" "$PKGMK_CONFFILE"
+    fi
+    . $PKGMK_CONFFILE
 
-	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
-		warning "pkginfo NOT FOUND, footprint ignored."
+        warning "$(gettext "Command <pkginfo> NOT FOUND, footprint ignored.")"
 		PKGMK_IGNORE_FOOTPRINT="yes"
 	fi
 	local FILE TARGET
@@ -2136,8 +2075,7 @@ main() {
 	[ ! -f $PKGMK_PKGFILE  ] && PKGMK_PKGFILE="PKGBUILD"
 
 	if [ ! -f $PKGMK_PKGFILE  ]; then
-		error "File '$PKGMK_PKGFILE' not found."
-		exit $E_PKGFILE
+        abort "$(gettext "File <%s> not found.")" "$PKGMK_PKGFILE"
 	fi
 
 	. $PKGMK_PKGFILE
@@ -2167,61 +2105,63 @@ main() {
 				unset run
 				. $PKGMK_PKGFILE
 			else
-				warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+                warning "$(gettext "Variable 'version' not initiated or not found in <%s>")" "$PKGMK_PKGFILE"
 			fi
 		else
-			warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+            warning "$(gettext "Variable 'version' not initiated or not found in <%s>")" "$PKGMK_PKGFILE"
 		fi
 	fi
 	if [ "$PKGMK_SHOW_VERSION" == "yes" ]; then
 		echo "$version"
 		exit 0
 	fi
-	info "PKGMK_INSTALL: $PKGMK_INSTALL"
-	info "PKGMK_WORK_DIR: $PKGMK_WORK_DIR"
-	info "PKGMK_SOURCE_DIR: $PKGMK_SOURCE_DIR"
+    msg "$(gettext "Configuration settings...")"
+    msg2 "$(gettext "PKGMK_INSTALL:          %s")" "$PKGMK_INSTALL"
+    msg2 "$(gettext "PKGMK_WORK_DIR:         %s")" "$PKGMK_WORK_DIR"
+    msg2 "$(gettext "PKGMK_SOURCE_DIR:       %s")" "$PKGMK_SOURCE_DIR"
 
 	if [ "$PKGMK_INSTALL" = "no" ]; then
 		PKGMK_CLEAN="no"
-		warning "CLEAN IGNORED"
+        warning "$(gettext "CLEAN IGNORED.")"
 	else
-		info "PKGMK_KEEP_SOURCES: $PKGMK_KEEP_SOURCES"
-		info "PKGMK_CLEAN: $PKGMK_CLEAN"
+        msg2 "$(gettext "PKGMK_KEEP_SOURCES:     %s")" "$PKGMK_KEEP_SOURCES"
+        msg2 "$(gettext "PKGMK_CLEAN:            %s")" "$PKGMK_CLEAN"
 	fi
 	if [ "$PKGMK_CLEAN" != "no" ]; then
 		PKGMK_IGNORE_FOOTPRINT="yes"
 		PKGMK_IGNORE_MD5SUM="yes"
-		warning "FOOTPRINT AND MD5SUM IGNORED"
+        warning "$(gettext "FOOTPRINT AND MD5SUM IGNORED.")"
 	else
 		if [ "$PKGMK_UPDATE_REPO" != "yes" ]; then
-			info "PKGMK_IGNORE_REPO: $PKGMK_IGNORE_REPO"
+            msg2 "$(gettext "PKGMK_IGNORE_REPO:      %s")" "$PKGMK_IGNORE_REPO"
 		else
-			info "PKGMK_UPDATE_REPO: $PKGMK_UPDATE_REPO"
+            msg2 "$(gettext "PKGMK_UPDATE_REPO:      %s")" "$PKGMK_UPDATE_REPO"
 		fi
-		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
-		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"
+        msg2 "$(gettext "PKGMK_IGNORE_FOOTPRINT: %s")" "$PKGMK_IGNORE_FOOTPRINT"
+        msg2 "$(gettext "PKGMK_IGNORE_MD5SUM:    %s")" "$PKGMK_IGNORE_MD5SUM"
 	fi
-	if [ "$PKGMK_IGNORE_REPO"  == "yes" ]; then
-		info "$PKGMK_REPO file will be deleted"
+	if [ "$PKGMK_IGNORE_REPO" == "yes" ]; then
+        plain "$(gettext "<%s> file will be deleted.")" "$PKGMK_REPO"
 	fi
 
-	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
+    msg2 "$(gettext "PKGMK_COMPRESS_PACKAGE: %s")" "$PKGMK_COMPRESS_PACKAGE"
 	if [ "$PKGMK_COMPRESS_PACKAGE" != "no" ]; then
-		info "PKGMK_COMPRESSION_MODE: $PKGMK_COMPRESSION_MODE"
+        msg2 "$(gettext "PKGMK_COMPRESSION_MODE: %s")" "$PKGMK_COMPRESSION_MODE"
         if [ -n "$PKGMK_COMPRESSION_OPTS" ]; then
-            info "PKGMK_COMPRESSION_OPTS: $PKGMK_COMPRESSION_OPTS"
+            msg2 "$(gettext "PKGMK_COMPRESSION_OPTS: %s")" "$PKGMK_COMPRESSION_OPTS"
         fi
 	fi
 
-	info "name: ${name}"
+    msg "$(gettext "Package info...")"
+    msg2 "$(gettext "name:    %s")" "$name"
 	if [ ! -z "$version" ]; then
-		info "version: $version"
+        msg2 "$(gettext "version: %s")" "$version"
 	fi
 	if [ ! -z "$release" ]; then
-		info "release: $release"
+        msg2 "$(gettext "release: %s")" "$release"
 	fi
 	if [ ! -z "$group" ]; then
-		info "group: $group"
+        msg2 "$(gettext "group:   %s")" "$group"
 	fi
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
@@ -2239,14 +2179,13 @@ main() {
 				TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
 			fi;;
 		*)
-			error "Compression mode '$PKGMK_COMPRESSION_MODE' not supported"
-			exit $E_GENERAL
+            abort "$(gettext "Compression mode <%s> not supported.")" "$PKGMK_COMPRESSION_MODE"
 			;;
 	esac
 	case $PKGMK_COMPRESSION_MODE in
 		gz)  COMPRESSION="-z" ;;
-		bz2) export COMPRESSION="-j" ;;
-		xz)  export COMPRESSION="-J" ;;
+		bz2) COMPRESSION="-j" ;;
+		xz)  COMPRESSION="-J" ;;
 	esac
 
 	if [ "$PKGMK_CLEAN_ONLY" = "yes" ]; then
@@ -2268,10 +2207,10 @@ main() {
 		exit 0
 	fi
 	if [ "$PKGMK_CHECK_SYNTAX" = "yes" ]; then
-		info "description: $description"
-		info "url: $url"
-		info "packager: $packager"
-		info "maintainer: $maintainer"
+        plain "$(gettext "description: <%s>")" "$description"
+        plain "$(gettext "url: <%s>")" "$url"
+        plain "$(gettext "packager: <%s>")" "$packager"
+        plain "$(gettext "maintainer: <%s>")" "$maintainer"
 		exit 0
 	fi
 
@@ -2279,7 +2218,7 @@ main() {
 		download_source
 		check_file "$PKGMK_MD5SUM"
 		make_md5sum > $PKGMK_MD5SUM
-		info "Md5sum updated."
+        plain "$(gettext "Md5sum updated.")"
 		exit 0
 	fi
 
@@ -2291,7 +2230,8 @@ main() {
 	if [ "$PKGMK_EXTRACT_ONLY" = "yes" ]; then
 		download_source
 		make_work_dir
-		info "Extracting sources of package '${name}-$version'."
+        plain "$(gettext "Extracting sources of package <%s>")" "${name}-${version}"
+
 		extract_source
 		exit 0
 	fi
@@ -2300,16 +2240,16 @@ main() {
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
 				if [ "`build_needed`" = "yes" ]; then
-					info "Package '$TARGET' is not up to date."
+                    plain "$(gettext "Package <%s> is not up to date.")" "$TARGET"
 				else
-					info "Package '$TARGET' is up to date."
+                    plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
 				fi
 			done
 		else
 			if [ "`build_needed`" = "yes" ]; then
-				info "Package '$TARGET' is not up to date."
+				plain "$(gettext "Package <%s> is not up to date.")" "$TARGET"
 			else
-				info "Package '$TARGET' is up to date."
+				plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
 			fi
 		fi
 		exit 0
@@ -2319,7 +2259,7 @@ main() {
 	if [ -z $TARGETS ]; then
 		TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 		if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
-			info "Package '$TARGET' is up to date."
+			plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
 		else
 			download_source
 			build_package
@@ -2331,7 +2271,7 @@ main() {
 				if [ "`get_package_arch $TARGET`" = "$PKGMK_ARCH" ]; then
 					FOUND=true
 				fi
-				info "Package '$TARGET' is up to date."
+				plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
 			else
 				download_source
 				build_package
@@ -2407,6 +2347,7 @@ readonly PKGMK_PACKAGE_EXT="cards.tar"
 readonly PKGMK_REPO=".PKGREPO"
 readonly PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 readonly PKGMK_NOSTRIP=".nostrip"
+readonly PKGMK_ARCH="$(uname -m)"
 
 #**********************************************************************************************************************
 #   PKGMK.CONF VARIABLES: which can be set in the `pkgmk.conf`
@@ -2467,6 +2408,7 @@ PKGMK_SPIT="no"
 
 #**********************************************************************************************************************
 
+colorize
 main "$@"
 
 # End of file

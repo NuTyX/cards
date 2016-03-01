@@ -3,456 +3,456 @@
 # This file is distributed under the same license as the cards package.
 # NuTyX Team <https://github.com/NuTyX/cards>, 2016.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: cards\n"
 "Report-Msgid-Bugs-To: https://github.com/NuTyX/cards/issues\n"
 "POT-Creation-Date: 2016-03-01 13:16-0500\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2016-03-01 13:16-0500\n"
+"Last-Translator: NuTyX Team <https://github.com/NuTyX/cards>\n"
 "Language-Team: LANGUAGE <https://github.com/NuTyX/cards>\n"
-"Language: \n"
+"Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: pkgmk.in:242
 msgid "WARNING:"
-msgstr ""
+msgstr "WARNING:"
 
 #: pkgmk.in:247 pkgmk.in:280 pkgmk.in:290
 msgid "ERROR:"
-msgstr ""
+msgstr "ERROR:"
 
 #: pkgmk.in:260 pkgmk.in:268 pkgmk.in:281
 msgid "ABORTING....\\n"
-msgstr ""
+msgstr "ABORTING....\\n"
 
 #: pkgmk.in:279
 msgid "Building failed: <%s>"
-msgstr ""
+msgstr "Building failed: <%s>"
 
 #: pkgmk.in:351
 msgid "Directory <%s> does not exist."
-msgstr ""
+msgstr "Directory <%s> does not exist."
 
 #: pkgmk.in:353
 msgid "Directory <%s> is not writable."
-msgstr ""
+msgstr "Directory <%s> is not writable."
 
 #: pkgmk.in:355
 msgid "Directory <%s> is not readable."
-msgstr ""
+msgstr "Directory <%s> is not readable."
 
 #: pkgmk.in:361
 msgid "File <%s> is not writable."
-msgstr ""
+msgstr "File <%s> is not writable."
 
 #: pkgmk.in:475
 msgid "Removing source <%s>"
-msgstr ""
+msgstr "Removing source <%s>"
 
 #: pkgmk.in:543
 msgid "Downloading file URL: <%s>"
-msgstr ""
+msgstr "Downloading file URL: <%s>"
 
 #: pkgmk.in:546
 msgid "Command <%s> not found."
-msgstr ""
+msgstr "Command <%s> not found."
 
 #: pkgmk.in:577
 msgid "Partial download found, trying to resume..."
-msgstr ""
+msgstr "Partial download found, trying to resume..."
 
 #: pkgmk.in:596
 msgid "Partial download failed, restarting download..."
-msgstr ""
+msgstr "Partial download failed, restarting download..."
 
 #: pkgmk.in:625
 msgid "Downloading git into: <%s>"
-msgstr ""
+msgstr "Downloading git into: <%s>"
 
 #: pkgmk.in:631
 msgid "Cloning git repo <%s>"
-msgstr ""
+msgstr "Cloning git repo <%s>"
 
 #: pkgmk.in:641
 msgid "Updating git repo <%s>"
-msgstr ""
+msgstr "Updating git repo <%s>"
 
 #: pkgmk.in:644
 msgid "Failure while updating git repo <%s>"
-msgstr ""
+msgstr "Failure while updating git repo <%s>"
 
 #: pkgmk.in:668
 msgid "Downloading svn into: <%s>"
-msgstr ""
+msgstr "Downloading svn into: <%s>"
 
 #: pkgmk.in:687
 msgid "Cloning svn repo <%s>"
-msgstr ""
+msgstr "Cloning svn repo <%s>"
 
 #: pkgmk.in:694
 msgid "Updating svn repo <%s>"
-msgstr ""
+msgstr "Updating svn repo <%s>"
 
 #: pkgmk.in:698
 msgid "Failure while updating svn repo <%s>"
-msgstr ""
+msgstr "Failure while updating svn repo <%s>"
 
 #: pkgmk.in:717
 msgid "Downloading hg into: <%s>"
-msgstr ""
+msgstr "Downloading hg into: <%s>"
 
 #: pkgmk.in:723
 msgid "Cloning hg repo <%s>"
-msgstr ""
+msgstr "Cloning hg repo <%s>"
 
 #: pkgmk.in:728
 msgid "Updating hg repo <%s>"
-msgstr ""
+msgstr "Updating hg repo <%s>"
 
 #: pkgmk.in:732
 msgid "Failure while updating hg repo <%s>"
-msgstr ""
+msgstr "Failure while updating hg repo <%s>"
 
 #: pkgmk.in:755
 msgid "Downloading bzr into: <%s>"
-msgstr ""
+msgstr "Downloading bzr into: <%s>"
 
 #: pkgmk.in:758
 msgid "Branching bzr displaylocation <%s>"
-msgstr ""
+msgstr "Branching bzr displaylocation <%s>"
 
 #: pkgmk.in:763
 msgid "Pulling bzr displaylocation <%s>"
-msgstr ""
+msgstr "Pulling bzr displaylocation <%s>"
 
 #: pkgmk.in:767
 msgid "Failure while pulling bzr displaylocation <%s>"
-msgstr ""
+msgstr "Failure while pulling bzr displaylocation <%s>"
 
 #: pkgmk.in:871
 msgid "Extracting file with (%s): <%s>"
-msgstr ""
+msgstr "Extracting file with (%s): <%s>"
 
 #: pkgmk.in:908
 msgid "Creating working copy of git repo <%s>"
-msgstr ""
+msgstr "Creating working copy of git repo <%s>"
 
 #: pkgmk.in:962
 msgid "Creating working copy of svn repo <%s>"
-msgstr ""
+msgstr "Creating working copy of svn repo <%s>"
 
 #: pkgmk.in:990
 msgid "Creating working copy of hg repo <%s>"
-msgstr ""
+msgstr "Creating working copy of hg repo <%s>"
 
 #: pkgmk.in:1044
 msgid "Creating working copy of bzr repo <%s>"
-msgstr ""
+msgstr "Creating working copy of bzr repo <%s>"
 
 #: pkgmk.in:1072
 msgid "Using (%s) to compress <%s>"
-msgstr ""
+msgstr "Using (%s) to compress <%s>"
 
 #: pkgmk.in:1284
 msgid "Variable 'name' not initiated or not found in <%s>"
-msgstr ""
+msgstr "Variable 'name' not initiated or not found in <%s>"
 
 #: pkgmk.in:1287
 msgid "Function 'build' not specified in <%s>"
-msgstr ""
+msgstr "Function 'build' not specified in <%s>"
 
 #: pkgmk.in:1291
 msgid "Variable 'name' contains following illegal characters: <%s>"
-msgstr ""
+msgstr "Variable 'name' contains following illegal characters: <%s>"
 
 #: pkgmk.in:1294
 msgid "Variable 'name' length higher then 50 characters."
-msgstr ""
+msgstr "Variable 'name' length higher then 50 characters."
 
 #: pkgmk.in:1297 pkgmk.in:2108 pkgmk.in:2111
 msgid "Variable 'version' not initiated or not found in <%s>"
-msgstr ""
+msgstr "Variable 'version' not initiated or not found in <%s>"
 
 #: pkgmk.in:1300
 msgid "Variable 'release' not initiated or not found in<%s>"
-msgstr ""
+msgstr "Variable 'release' not initiated or not found in<%s>"
 
 #: pkgmk.in:1304
 msgid "Variable 'release' contains following illegal characters:<%s>"
-msgstr ""
+msgstr "Variable 'release' contains following illegal characters:<%s>"
 
 #: pkgmk.in:1307
 msgid "Variable 'release' outside limit which is '99999999'."
-msgstr ""
+msgstr "Variable 'release' outside limit which is '99999999'."
 
 #: pkgmk.in:1310
 msgid "Variable 'description' not initiated or not found in <%s>"
-msgstr ""
+msgstr "Variable 'description' not initiated or not found in <%s>"
 
 #: pkgmk.in:1314
 msgid "Variable 'description' length higher then 110 characters, please resize to 110 char ]"
-msgstr ""
+msgstr "Variable 'description' length higher then 110 characters, please resize to 110 char ]"
 
 #: pkgmk.in:1315
 msgid "%s <== <%s> characters"
-msgstr ""
+msgstr "%s <== <%s> characters"
 
 #: pkgmk.in:1412
 msgid "Md5sum mismatch found:"
-msgstr ""
+msgstr "Md5sum mismatch found:"
 
 #: pkgmk.in:1420
 msgid "Md5sum not ok."
-msgstr ""
+msgstr "Md5sum not ok."
 
 #: pkgmk.in:1422 pkgmk.in:1684 pkgmk.in:1695 pkgmk.in:1701 pkgmk.in:1770
 msgid "Building <%s> failed."
-msgstr ""
+msgstr "Building <%s> failed."
 
 #: pkgmk.in:1429
 msgid "Md5sum not found."
-msgstr ""
+msgstr "Md5sum not found."
 
 #: pkgmk.in:1432
 msgid "Md5sum not found, creating new."
-msgstr ""
+msgstr "Md5sum not found, creating new."
 
 #: pkgmk.in:1440
 msgid "Md5sum ok."
-msgstr ""
+msgstr "Md5sum ok."
 
 #: pkgmk.in:1477
 msgid "Unable to update footprint"
-msgstr ""
+msgstr "Unable to update footprint"
 
 #: pkgmk.in:1495 pkgmk.in:1497
 msgid "Footprint mismatch found:"
-msgstr ""
+msgstr "Footprint mismatch found:"
 
 #: pkgmk.in:1503
 msgid "Footprint not found, creating new."
-msgstr ""
+msgstr "Footprint not found, creating new."
 
 #: pkgmk.in:1507
 msgid "Package <%s> was not found."
-msgstr ""
+msgstr "Package <%s> was not found."
 
 #: pkgmk.in:1558
 msgid "Adding meta data to Archive <%s>"
-msgstr ""
+msgstr "Adding meta data to Archive <%s>"
 
 #: pkgmk.in:1595 pkgmk.in:1606
 msgid "Adding runtime deps to Archive <%s>"
-msgstr ""
+msgstr "Adding runtime deps to Archive <%s>"
 
 #: pkgmk.in:1598 pkgmk.in:1609
 msgid "Runtime dependency <%s> not found, cannot continue."
-msgstr ""
+msgstr "Runtime dependency <%s> not found, cannot continue."
 
 #: pkgmk.in:1641
 msgid "<%s> should be removed."
-msgstr ""
+msgstr "<%s> should be removed."
 
 #: pkgmk.in:1643
 msgid "Remove the binaries first..."
-msgstr ""
+msgstr "Remove the binaries first..."
 
 #: pkgmk.in:1651
 msgid "Packages should be built as root."
-msgstr ""
+msgstr "Packages should be built as root."
 
 #: pkgmk.in:1654
 msgid "Building package: <%s>"
-msgstr ""
+msgstr "Building package: <%s>"
 
 #: pkgmk.in:1737
 msgid "No files found in package <%s>"
-msgstr ""
+msgstr "No files found in package <%s>"
 
 #: pkgmk.in:1742
 msgid "Footprint ignored."
-msgstr ""
+msgstr "Footprint ignored."
 
 #: pkgmk.in:1753
 msgid "Package(s) not found(s)..."
-msgstr ""
+msgstr "Package(s) not found(s)..."
 
 #: pkgmk.in:1778
 msgid "Package(s) not found(s) nothing to install..."
-msgstr ""
+msgstr "Package(s) not found(s) nothing to install..."
 
 #: pkgmk.in:1782
 msgid "Installing <%s>"
-msgstr ""
+msgstr "Installing <%s>"
 
 #: pkgmk.in:1795
 msgid "Installing <%s> succeeded."
-msgstr ""
+msgstr "Installing <%s> succeeded."
 
 #: pkgmk.in:1797
 msgid "Installing <%s> failed."
-msgstr ""
+msgstr "Installing <%s> failed."
 
 #: pkgmk.in:1812
 msgid "Entering directory  <%s>"
-msgstr ""
+msgstr "Entering directory  <%s>"
 
 #: pkgmk.in:1814
 msgid "Leaving directory <%s>"
-msgstr ""
+msgstr "Leaving directory <%s>"
 
 #: pkgmk.in:1825 pkgmk.in:1940
 msgid "Removing <%s>"
-msgstr ""
+msgstr "Removing <%s>"
 
 #: pkgmk.in:1830
 msgid "<%s> not found."
-msgstr ""
+msgstr "<%s> not found."
 
 #: pkgmk.in:1842
 msgid "Package(s) not found(s), unable to update footprint."
-msgstr ""
+msgstr "Package(s) not found(s), unable to update footprint."
 
 #: pkgmk.in:1847
 msgid "Unable to update footprint. File <%s> not found."
-msgstr ""
+msgstr "Unable to update footprint. File <%s> not found."
 
 #: pkgmk.in:1854
 msgid "Footprint updated for <%s>"
-msgstr ""
+msgstr "Footprint updated for <%s>"
 
 #: pkgmk.in:1944
 msgid "Removing MD5SUM."
-msgstr ""
+msgstr "Removing MD5SUM."
 
 #: pkgmk.in:2059 pkgmk.in:2078
 msgid "File <%s> not found."
-msgstr ""
+msgstr "File <%s> not found."
 
 #: pkgmk.in:2064
 msgid "Command <pkginfo> NOT FOUND, footprint ignored."
-msgstr ""
+msgstr "Command <pkginfo> NOT FOUND, footprint ignored."
 
 #: pkgmk.in:2118
 msgid "Configuration settings..."
-msgstr ""
+msgstr "Configuration settings..."
 
 #: pkgmk.in:2119
 msgid "PKGMK_INSTALL:          %s"
-msgstr ""
+msgstr "PKGMK_INSTALL:          %s"
 
 #: pkgmk.in:2120
 msgid "PKGMK_WORK_DIR:         %s"
-msgstr ""
+msgstr "PKGMK_WORK_DIR:         %s"
 
 #: pkgmk.in:2121
 msgid "PKGMK_SOURCE_DIR:       %s"
-msgstr ""
+msgstr "PKGMK_SOURCE_DIR:       %s"
 
 #: pkgmk.in:2125
 msgid "CLEAN IGNORED."
-msgstr ""
+msgstr "CLEAN IGNORED."
 
 #: pkgmk.in:2127
 msgid "PKGMK_KEEP_SOURCES:     %s"
-msgstr ""
+msgstr "PKGMK_KEEP_SOURCES:     %s"
 
 #: pkgmk.in:2128
 msgid "PKGMK_CLEAN:            %s"
-msgstr ""
+msgstr "PKGMK_CLEAN:            %s"
 
 #: pkgmk.in:2133
 msgid "FOOTPRINT AND MD5SUM IGNORED."
-msgstr ""
+msgstr "FOOTPRINT AND MD5SUM IGNORED."
 
 #: pkgmk.in:2136
 msgid "PKGMK_IGNORE_REPO:      %s"
-msgstr ""
+msgstr "PKGMK_IGNORE_REPO:      %s"
 
 #: pkgmk.in:2138
 msgid "PKGMK_UPDATE_REPO:      %s"
-msgstr ""
+msgstr "PKGMK_UPDATE_REPO:      %s"
 
 #: pkgmk.in:2140
 msgid "PKGMK_IGNORE_FOOTPRINT: %s"
-msgstr ""
+msgstr "PKGMK_IGNORE_FOOTPRINT: %s"
 
 #: pkgmk.in:2141
 msgid "PKGMK_IGNORE_MD5SUM:    %s"
-msgstr ""
+msgstr "PKGMK_IGNORE_MD5SUM:    %s"
 
 #: pkgmk.in:2144
 msgid "<%s> file will be deleted."
-msgstr ""
+msgstr "<%s> file will be deleted."
 
 #: pkgmk.in:2147
 msgid "PKGMK_COMPRESS_PACKAGE: %s"
-msgstr ""
+msgstr "PKGMK_COMPRESS_PACKAGE: %s"
 
 #: pkgmk.in:2149
 msgid "PKGMK_COMPRESSION_MODE: %s"
-msgstr ""
+msgstr "PKGMK_COMPRESSION_MODE: %s"
 
 #: pkgmk.in:2151
 msgid "PKGMK_COMPRESSION_OPTS: %s"
-msgstr ""
+msgstr "PKGMK_COMPRESSION_OPTS: %s"
 
 #: pkgmk.in:2155
 msgid "Package info..."
-msgstr ""
+msgstr "Package info..."
 
 #: pkgmk.in:2156
 msgid "name:    %s"
-msgstr ""
+msgstr "name:    %s"
 
 #: pkgmk.in:2158
 msgid "version: %s"
-msgstr ""
+msgstr "version: %s"
 
 #: pkgmk.in:2161
 msgid "release: %s"
-msgstr ""
+msgstr "release: %s"
 
 #: pkgmk.in:2164
 msgid "group:   %s"
-msgstr ""
+msgstr "group:   %s"
 
 #: pkgmk.in:2182
 msgid "Compression mode <%s> not supported."
-msgstr ""
+msgstr "Compression mode <%s> not supported."
 
 #: pkgmk.in:2210
 msgid "description: <%s>"
-msgstr ""
+msgstr "description: <%s>"
 
 #: pkgmk.in:2211
 msgid "url: <%s>"
-msgstr ""
+msgstr "url: <%s>"
 
 #: pkgmk.in:2212
 msgid "packager: <%s>"
-msgstr ""
+msgstr "packager: <%s>"
 
 #: pkgmk.in:2213
 msgid "maintainer: <%s>"
-msgstr ""
+msgstr "maintainer: <%s>"
 
 #: pkgmk.in:2221
 msgid "Md5sum updated."
-msgstr ""
+msgstr "Md5sum updated."
 
 #: pkgmk.in:2233
 msgid "Extracting sources of package <%s>"
-msgstr ""
+msgstr "Extracting sources of package <%s>"
 
 #: pkgmk.in:2243 pkgmk.in:2250
 msgid "Package <%s> is not up to date."
-msgstr ""
+msgstr "Package <%s> is not up to date."
 
 #: pkgmk.in:2245 pkgmk.in:2252 pkgmk.in:2262 pkgmk.in:2274
 msgid "Package <%s> is up to date."
-msgstr ""
+msgstr "Package <%s> is up to date."

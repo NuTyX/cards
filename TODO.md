@@ -5,6 +5,16 @@
 Clarify permissions set for extract_file(): [see issue](https://github.com/NuTyX/cards/issues/34)
 
 
+### pkgmk.in supports now gettext translation files
+
+* Need to translate them
+* Decide where final PO files should be installed and add: `TEXTDOMAIN`, `TEXTDOMAINDIR`
+
+Maybe suggestion:
+
+    * export TEXTDOMAIN='pkgmk'
+    * export TEXTDOMAINDIR='/etc/cards/pkgmk/locale'
+
 ### Add documentation / man page info for PKGMK variables
 
 Add documentation / man page info for ALL PKGMK options.
@@ -15,10 +25,7 @@ Split them into 2 categories:
 * PKGMK INTERNAL VARIABLES: which should not be set in the `pkgmk.conf` but might be useful for developers.
     e.g. Pkgfiles
 
-
-###  build_package(): find a better solution for the hardcoded folders
-
-build_package(): find a better solution for the hardcoded folders [see issue](https://github.com/NuTyX/cards/issues/36)
+    * add info that PKGMK_ARCH variable exists: **currently I found 85 occurencies of `uname -m` in the official Pkgfiles.
 
 
 ### Add for VCS (version control source) code to auomaticaly update the Pkgfile version.
@@ -38,12 +45,6 @@ When referencing a variable, it is generally advisable to enclose its name in do
 This prevents  reinterpretation of all special characters within the
 quoted string -- except $, ` (backquote), and \ (escape).
 ```
-
-### Remove unneeded or brocken options
-
-e.g. pkgmk -cm, --check-md5sum [see issue](https://github.com/NuTyX/cards/issues/33)
-
-but decide also on others.
 
 
 ### Adjust documentation to include: ARCH i686
