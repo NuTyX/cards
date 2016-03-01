@@ -279,7 +279,7 @@ abort_on_build() {
 #   e.g.:  check_abort "ERR_ABORT|The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
 check_abort() {
     if [ "$(get_str_part "$1" 1)" == "ERR_ABORT" ]; then
-        error "$(gettext "\n=======> ERROR: Aborting....\n")" "$(get_str_part "$1" 2)"
+        error "$(gettext "Aborting.... %s\n")" "$(get_str_part "$1" 2)"
         exit $((`get_str_part "$1" 3`))
     fi
 }
@@ -287,7 +287,7 @@ check_abort() {
 # $1 must be in the format: "Message|ErrorCode
 #   e.g.:  do_abort "The protocol: <$PROTOCOL> is not supported.|$E_DOWNLOAD_PROTO"
 do_abort() {
-    error "$(gettext "\n=======> ERROR: Aborting....\n")" "$(get_str_part "$1" 1)"
+    error "$(gettext "Aborting....%s\n")" "$(get_str_part "$1" 1)"
     exit $((`get_str_part "$1" 2`))
 }
 
@@ -297,7 +297,7 @@ do_abort_checked() {
         rm -rf $PKGMK_WORK_DIR
     fi
     error "$(gettext "Building <%s> failed.. ")" "$TARGET"
-    error "$(gettext "\n=======> ERROR: Aborting....\n")" "$(get_str_part "$1" 1)"
+    error "$(gettext "Aborting....%s\n")" "$(get_str_part "$1" 1)"
     exit $((`get_str_part "$1" 2`))
 }
 
