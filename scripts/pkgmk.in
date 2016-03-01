@@ -276,7 +276,7 @@ abort_check_keepwork() {
     if [ "$PKGMK_KEEP_WORK" = "no" ]; then
         rm -rf $PKGMK_WORK_DIR
     fi
-    local mesg2="$(gettext "Building <%s> failed.. ")" "$TARGET"
+    local mesg2="$(gettext "Building failed: <%s>")" "$TARGET"
     printf "${RED_MSG}==> $(gettext "ERROR:")${ALL_OFF_MSG}${BOLD_MSG} ${mesg2}${ALL_OFF_MSG}\n" "$@" >&2
     printf "${MAGENTA_MSG}\n====> $(gettext "ABORTING....\n")${ALL_OFF_MSG}" >&2
     printf "${BLUE_MSG}    ->${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&2
