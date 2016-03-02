@@ -1,9 +1,8 @@
 ## TODO
 
-### extract_file() - clarify permissions
+### Add Option to define: no_unpack per source entry
 
-Clarify permissions set for extract_file(): [see issue](https://github.com/NuTyX/cards/issues/34)
-
+[comment](https://github.com/NuTyX/cards/issues/48#issuecomment-191182092)
 
 ### pkgmk.in supports now gettext translation files
 
