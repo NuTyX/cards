@@ -614,7 +614,7 @@ download_file() {
     FINAL_SRCPATH_PARTIAL="$FINAL_SRCPATH.partial"
 
     msg "$(gettext "Downloading file URL: <%s>")" "$ORIG_URL"
-
+    msg2 "$(gettext "FINAL_SRCPATH: <%s>")" "$FINAL_SRCPATH"
 	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then
         abort "$(gettext "Command <%s> not found.")" "$PKGMK_DOWNLOAD_PROG"
 	fi
@@ -696,6 +696,7 @@ download_git() {
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
     msg "$(gettext "Downloading git into: <%s>")" "$FINAL_SRCNAME"
+    msg2 "$(gettext "FINAL_SRCPATH: <%s>")" "$FINAL_SRCPATH"
 
 	url=${ORIG_URL#git+}
 	url=${url%%#*}
@@ -739,6 +740,7 @@ download_svn() {
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
     msg "$(gettext "Downloading svn into: <%s>")" "$FINAL_SRCNAME"
+    msg2 "$(gettext "FINAL_SRCPATH: <%s>")" "$FINAL_SRCPATH"
 
 	if [[ $url != svn+ssh* ]]; then
 		url=${url#svn+}
@@ -788,6 +790,7 @@ download_hg() {
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
     msg "$(gettext "Downloading hg into: <%s>")" "$FINAL_SRCNAME"
+    msg2 "$(gettext "FINAL_SRCPATH: <%s>")" "$FINAL_SRCPATH"
 
 	url=${ORIG_URL#hg+}
 	url=${url%%#*}
@@ -826,6 +829,7 @@ download_bzr() {
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
 
     msg "$(gettext "Downloading bzr into: <%s>")" "$FINAL_SRCNAME"
+    msg2 "$(gettext "FINAL_SRCPATH: <%s>")" "$FINAL_SRCPATH"
 
 	if [[ ! -d "$FINAL_SRCPATH" ]] || dir_isempty "$FINAL_SRCPATH" ; then
         plain2 "$(gettext "Branching bzr displaylocation <%s>")" "$url"
