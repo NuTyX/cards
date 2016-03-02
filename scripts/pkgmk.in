@@ -541,8 +541,10 @@ getchecked_final_srcpath() {
 remove_source() {
 	local NETSRC FINAL_SRCPATH
 	for NETSRC in ${source[@]}; do
+        PROTOCOL=$(get_protocol "$NETSRC")
+        check_abort "$PROTOCOL"
 		FINAL_SRCPATH=`get_final_srcpath $NETSRC`
-		if [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$NETSRC" ]; then
+        if [[ "$PROTOCOL" != "local" ]] && [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$NETSRC" ]; then
             msg "$(gettext "Removing source <%s>")" "$FINAL_SRCPATH"
 			rm -rf $FINAL_SRCPATH
 		fi
