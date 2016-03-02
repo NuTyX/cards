@@ -65,27 +65,46 @@
 #**********************************************************************************************************************
 
 
-#**********************************************************************************************************************
+##**********************************************************************************************************************
 #
 #                               Pkgfile: source (array): TODO rewrite this in the documentation and remove it here
 #
 # An array of source files required to build the package. This can also be an empty array `source=()`.
 # To simplify the maintenance of Pkgfiles, use the $name and $version variables when specifying the download location,
 # if possible.
-# Compressed files will be extracted automatically unless `PKGMK_IGNORE_UNPACK="yes"` is set or they are local files
-# specified by relative path to the Pkgfile.
+#
+# COMPRESSED Source Archives
+#
+#   Compressed files will be extracted automatically unless they are local files specified by relative path to the
+#   Pkgfile.
+#
+#       * To avoid unpacking of ALL archive source files set: `PKGMK_IGNORE_UNPACK="yes"`
+#
+#       * Extraction of individual source files can be skipped by prefixing the entry with `NOEXTRACT::`
 #
 # It is also possible to change the name of the downloaded file (except for Local source files), which is helpful with
 # weird URLs and for handling multiple source files with the same name.
 #
-# ::1:::::::::::::::::::::::::::: Regular source entries can have two forms:
+# ::1:::::::::::::::::::::::::::: Regular source entries.
 #
 #   1) The syntax is: source=(filename::url)
 #
-#       The source URL is divided into two components:
+#       The source URL is divided into three components:
 #
-#           1. `filename` (optional): The new changed name of the downloaded file. `::` is used as separator.
-#           2. `url:` (required):     A fully-qualified URL (supported are: ftp://, http://, https://)
+#           1. `NOEXTRACT` (optional): If a source is prefixed with `NOEXTRACT` it will not be extracted  `::` is used
+#                                      as separator.
+#           2. `filename` (optional):  The new changed name of the downloaded file. Can NOT be called `NOEXTRACT`
+#                                      `::` is used as separator.
+#           3. `url` (required):       A fully-qualified URL (supported are: ftp://, http://, https://)
+#
+#
+#     POSSIBLE OPTIONS
+#
+#       source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)                    # BASIC FORM
+#       source=(renamed.tar.xz::http://tukaani.org/xz/xz-5.2.2.tar.xz)    # RENAME downloaded file to: `renamed.tar.xz`
+#       source=(NOEXTRACT::http://tukaani.org/xz/xz-5.2.2.tar.xz)         # SKIP Automatic extraction
+#       source=(NOEXTRACT::renamed.tar.xz::http://tukaani.org/xz/xz-5.2.2.tar.xz) # RENAME & SKIP Automatic extraction
+#
 #
 #
 # ::2:::::::::::::::::::::::::::: There is also support using sources downloaded from version control systems (VCS).
@@ -142,14 +161,18 @@
 #
 #   ftp
 # source=(ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
-# source=(file::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(NOEXTRACT::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(file.tar.gz::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(NOEXTRACT::file.tar.gz::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
 #
 #   http
-# source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)
-# source=(xz::http://tukaani.org/xz/xz-5.2.2.tar.xz)
+# source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)                            # BASIC FORM
+# source=(renamed.tar.xz::http://tukaani.org/xz/xz-5.2.2.tar.xz)            # RENAME downloaded file to: renamed.tar.xz
+# source=(NOEXTRACT::http://tukaani.org/xz/xz-5.2.2.tar.xz)                 # SKIP Automatic extraction
+# source=(NOEXTRACT::renamed.tar.xz::http://tukaani.org/xz/xz-5.2.2.tar.xz) # RENAME & SKIP Automatic extraction
 #
 #   https
-# source=(xmlto::https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+# source=(xmlto.tar.bz2::https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
 # source=(https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
 #
 #  VCS (version control systems)
@@ -183,6 +206,7 @@
 # source=(ftps://ftp.host.com/ )
 #
 #**********************************************************************************************************************
+
 
 #**********************************************************************************************************************
 #
@@ -368,11 +392,6 @@ function get_str_part() {
     printf "%s\n" "${parts_arr[-1+$2]}"
 }
 
-# extract the original URL from a source entry: strip an eventual filename/VCS directory/other prefix
-get_orig_url() {
-	printf "%s\n" "${1##*::}"
-}
-
 dir_isempty() {
 	(
 		shopt -s dotglob nullglob
@@ -412,6 +431,20 @@ check_file() {
 	fi
 }
 
+# extract the original URL from a source entry: strip an eventual filename/VCS directory/other prefix
+get_orig_url() {
+	printf "%s\n" "${1##*::}"
+}
+
+# Checks if the Source entry has a Prefix called: NOEXTRACT
+has_source_noextract() {
+    local NETSRC=$1
+    if [[ "$NETSRC" == *::* ]] && [[ "${NETSRC%%::*}" == "NOEXTRACT" ]]; then
+        return 0
+    fi
+    return 1
+}
+
 # extract the protocol from a source entry - return "local" for local sources
 get_protocol() {
     local NETSRC=$1
@@ -437,20 +470,35 @@ get_protocol() {
 
 # extract the final used source name (filename or VCS directory) from a source entry: this is not a path only the name.
 get_final_srcname() {
-    local FINAL_SRCNAME
+    local TOTAL_PREFIXT
 	local NETSRC=$1
     local PROTOCOL=$(get_protocol "$NETSRC")
     check_abort "$PROTOCOL"
-	# if a filename/VCS-directory is specified, use it except Local sources
-	if [[ "$NETSRC" == *::* ]]; then
-        # local source files can not change their names
-        if [[ "$PROTOCOL" == "local" ]]; then
-            echo "ERR_ABORT|Local source file can not change their names. SOURCE: <$NETSRC>|$E_GENERAL"
+    local FINAL_SRCNAME=""
+
+    # Check PREFIX:
+    if [[ "$NETSRC" == *::* ]]; then
+        # check NOEXTRACT
+        TOTAL_PREFIXT="${NETSRC%::*}"
+        if [[ "$TOTAL_PREFIXT" == *::* ]]; then
+            # filename to rename/VCS-directory is specified
+            FINAL_SRCNAME="${TOTAL_PREFIXT#*::}"
+        elif [[ "$TOTAL_PREFIXT" != "NOEXTRACT" ]]; then
+            FINAL_SRCNAME="$TOTAL_PREFIXT"
         else
-            printf "%s\n" ${NETSRC%%::*}
+            # only NOEXTRACT prefix
+            FINAL_SRCNAME=""
         fi
-		return
-	fi
+        if [[ -n "$FINAL_SRCNAME" ]]; then
+            # local source files can not change their names
+            if [[ "$PROTOCOL" == "local" ]]; then
+                echo "ERR_ABORT|Local source file can not change their names. SOURCE: <$NETSRC>"
+            else
+                printf "%s\n" "$FINAL_SRCNAME"
+            fi
+            return
+        fi
+    fi
 
 	case "$PROTOCOL" in
         local)
@@ -464,14 +512,14 @@ get_final_srcname() {
             fi
             ;;
 		git|svn|hg|bzr)
-			FINAL_SRCNAME=${NETSRC%%#*}
-			FINAL_SRCNAME=${FINAL_SRCNAME%/}
-			FINAL_SRCNAME=${FINAL_SRCNAME##*/}
+			FINAL_SRCNAME="${NETSRC%%#*}"
+			FINAL_SRCNAME="${FINAL_SRCNAME%/}"
+			FINAL_SRCNAME="${FINAL_SRCNAME##*/}"
 			if [[ "$PROTOCOL" == "bzr" ]]; then
-				FINAL_SRCNAME=${FINAL_SRCNAME#*lp:}
+				FINAL_SRCNAME="${FINAL_SRCNAME#*lp:}"
 			fi
 			if [[ "$PROTOCOL" == "git" ]]; then
-				FINAL_SRCNAME=${FINAL_SRCNAME%%.git*}
+				FINAL_SRCNAME="${FINAL_SRCNAME%%.git*}"
 			fi
 			;;
 		*)
@@ -866,9 +914,17 @@ extract_source() {
         FINAL_SRCNAME=$(get_final_srcname "$NETSRC")
         check_abort "$FINAL_SRCNAME"
         FINAL_SRCPATH=$(get_final_srcpath $NETSRC)
+        # local|git|svn|hg|bzr MUST NOT use NOEXTRACT in the source array
+        case "$PROTOCOL" in
+            local|git|svn|hg|bzr)
+                if has_source_noextract "$NETSRC"; then
+                    abort_check_keepwork "local git svn hg bzr sources MUST NOT specify 'NOEXTRACT'. SOURCE: <$NETSRC>"
+                fi
+        esac
+
         case "$PROTOCOL" in
             ftp|http|https)
-				if [ "$PKGMK_IGNORE_UNPACK" == "yes" ];then
+				if [ "$PKGMK_IGNORE_UNPACK" == "yes" ] || has_source_noextract "$NETSRC"; then
 					extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
 				else
                     extract_file "$FINAL_SRCPATH" "$FINAL_SRCNAME" "$NETSRC"
