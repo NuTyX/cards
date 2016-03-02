@@ -869,13 +869,12 @@ extract_source() {
         FINAL_SRCNAME=$(get_final_srcname "$NETSRC")
         check_abort "$FINAL_SRCNAME"
         FINAL_SRCPATH=$(get_final_srcpath $NETSRC)
-
         case "$PROTOCOL" in
             ftp|http|https)
 				if [ "$PKGMK_IGNORE_UNPACK" == "yes" ];then
 					extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
 				else
-                    extract_file "$FINAL_SRCPATH" "FINAL_SRCNAME" "$NETSRC"
+                    extract_file "$FINAL_SRCPATH" "$FINAL_SRCNAME" "$NETSRC"
 				fi
                 ;;
             local)
@@ -956,7 +955,7 @@ extract_file() {
 		$cmd -p -C $SRC -xf "$FINAL_SRCPATH"  || ret=$?
 	else
 		rm -f -- "$SRC/${FINAL_SRCNAME%.*}"
-		$cmd -dcf "$file" > "$SRC/${FINAL_SRCNAME%.*}" || ret=$?
+		$cmd -dcf "$FINAL_SRCPATH" > "$SRC/${FINAL_SRCNAME%.*}" || ret=$?
 	fi
 	if (( ret )); then
         abort_check_keepwork "Failed to extract file: <$FINAL_SRCPATH>. SOURCE: <$NETSRC>"
