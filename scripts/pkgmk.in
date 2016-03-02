@@ -1142,7 +1142,7 @@ update_pkgver() {
 	fi
 	if [[ -n $NEW_VERSION && $NEW_VERSION != "$version" ]]; then
 		if [[ -f $BUILDFILE && -w $BUILDFILE ]]; then
-			if ! sed -i "s|^version=[^ ]*|version=$NEW_VERSION     # previous: $version|" "$BUILDFILE"; then
+			if ! sed -i "s|^version=.*$|version=$NEW_VERSION      # previous: $version|" "$BUILDFILE"; then
 				abort "$(gettext "Failed to update 'Pkgfile version' from: <%s> to <%s>")" "$version" "$NEW_VERSION"
 			fi
 			sed -i "s:|^pkgrel=[^ ]*|pkgrel=1|" "$BUILDFILE"
