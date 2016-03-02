@@ -1,5 +1,9 @@
 ## TODO
 
+### Add Option to define: no_unpack per source entry
+
+[comment](https://github.com/NuTyX/cards/issues/48#issuecomment-191182092)
+
 ### pkgmk.in supports now gettext translation files
 
 * Need to translate them
