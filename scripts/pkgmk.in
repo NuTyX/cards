@@ -274,7 +274,7 @@ abort() {
 # also checks if we keep `PKGMK_WORK_DIR`
 abort_check_keepwork() {
     local mesg=$1; shift
-    if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+    if [ "$PKGMK_KEEP_WORK" == "no" ]; then
         rm -rf $PKGMK_WORK_DIR
     fi
     local mesg2="$(gettext "Building failed: <%s>")" "$TARGET"
@@ -285,7 +285,7 @@ abort_check_keepwork() {
 }
 
 interrupted() {
-	if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+	if [ "$PKGMK_KEEP_WORK" == "no" ]; then
 		rm -rf $PKGMK_WORK_DIR
 	fi
     printf "${RED_MSG}\n==> $(gettext "ERROR:")${ALL_OFF_MSG}${BOLD_MSG} Interrupted${ALL_OFF_MSG}\n" >&2
@@ -371,9 +371,9 @@ function get_str_part() {
     printf "%s\n" "${parts_arr[-1+$2]}"
 }
 
-# extract the original URL from a source entry: strip an eventual filename or VCS directory
+# extract the original URL from a source entry: strip an eventual filename/VCS directory/other prefix
 get_orig_url() {
-	printf "%s\n" "${1#*::}"
+	printf "%s\n" "${1##*::}"
 }
 
 dir_isempty() {
@@ -415,20 +415,42 @@ check_file() {
 	fi
 }
 
+## extract the protocol from a source entry - return "local" for local sources
+#get_protocol() {
+    #local NETSRC=$1
+    #local PROTOCOL
+    #local SUPPORTED_PROTOCOLS=('ftp' 'http' 'https' 'git' 'svn' 'hg' 'bzr' 'local' )
+    #local PROTO="${NETSRC#*::}" # strip leading filename/vcs-directory
+	#if [[ $NETSRC = *://* ]]; then
+		#PROTOCOL="${PROTO%%://*}"
+        #if [[ $PROTOCOL = *+* ]]; then
+            #PROTOCOL="${PROTO%%+*}"
+        #fi
+	#elif [[ $NETSRC = *lp:* ]]; then
+		#PROTOCOL="${PROTO%%+lp:*}"
+	#else
+		#PROTOCOL="local"
+	#fi
+    #if [[ " ${SUPPORTED_PROTOCOLS[@]} " =~ " ${PROTOCOL} " ]]; then
+        #printf "%s\n" "${PROTOCOL}"
+    #else
+        #echo "ERR_ABORT|The protocol: <$PROTOCOL> is not supported. SOURCE: <$NETSRC>|$E_DOWNLOAD_PROTO"
+    #fi
+#}
+
 # extract the protocol from a source entry - return "local" for local sources
 get_protocol() {
     local NETSRC=$1
     local PROTOCOL
     local SUPPORTED_PROTOCOLS=('ftp' 'http' 'https' 'git' 'svn' 'hg' 'bzr' 'local' )
-    local PROTO="${NETSRC#*::}" # strip leading filename/vcs-directory
-
-	if [[ $NETSRC = *://* ]]; then
-		PROTOCOL="${PROTO%%://*}"
-        if [[ $PROTOCOL = *+* ]]; then
-            PROTOCOL="${PROTO%%+*}"
+    local ORIG_URL=$(get_orig_url  "$NETSRC")
+	if [[ "$NETSRC" == *://* ]]; then
+		PROTOCOL="${ORIG_URL%%://*}"
+        if [[ "$PROTOCO"L = *+* ]]; then
+            PROTOCOL="${ORIG_URL%%+*}"
         fi
-	elif [[ $NETSRC = *lp:* ]]; then
-		PROTOCOL="${PROTO%%+lp:*}"
+	elif [[ "$NETSRC" == *lp:* ]]; then
+		PROTOCOL="${ORIG_URL%%+lp:*}"
 	else
 		PROTOCOL="local"
 	fi
@@ -1104,7 +1126,7 @@ extract_bzr() {
 	local NETSRC=$1
 	local REPO=$(get_final_srcname "$NETSRC")
 	local FRAGMENT=${NETSRC#*#}
-	if [[ $FRAGMENT = "$NETSRC" ]]; then
+	if [[ $FRAGMENT == "$NETSRC" ]]; then
 		unset FRAGMENT
 	fi
 
@@ -1155,7 +1177,7 @@ check_version() {
 	if [[ -z "$PKG_VERSION" ]]; then
 		abort "$(gettext "Package 'version' is not allowed to be empty.")"
 	fi
-	if [[ "$PKG_VERSION" = *[[:space:]:-]:\|]* ]]; then
+	if [[ "$PKG_VERSION" == *[[:space:]:-]:\|]* ]]; then
 		abort "$(gettext "Package 'version': <%s> is not allowed to contain pipe, colons, hyphens or whitespace.")" "$PKG_VERSION"
 	fi
 }
@@ -1212,7 +1234,7 @@ compress_manpages() {
 	cd $PKG
 
 	find . -type f -path "*/share/man*/*" | while read FILE; do
-		if [ "$FILE" = "${FILE%%.gz}" ]; then
+		if [ "$FILE" == "${FILE%%.gz}" ]; then
 			gzip -9 "$FILE"
 		fi
 	done
@@ -1231,7 +1253,7 @@ compress_manpages() {
 		fi
 	done
 	find . -type f -path "*/share/info/*" | while read FILE; do
-		if [ "$FILE" = "${FILE%%.gz}" ]; then
+		if [ "$FILE" == "${FILE%%.gz}" ]; then
 			gzip -9 "$FILE"
 		fi
 	done
@@ -1543,18 +1565,18 @@ check_md5sum() {
             error "$(gettext "Md5sum mismatch found:")"
 			cat $FILE.md5sum.diff >&2
 
-			if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+			if [ "$PKGMK_KEEP_WORK" == "no" ]; then
 				rm -rf $PKGMK_WORK_DIR
 			fi
 
-			if [ "$PKGMK_CHECK_MD5SUM" = "yes" ]; then
+			if [ "$PKGMK_CHECK_MD5SUM" == "yes" ]; then
 				abort "$(gettext "Md5sum not ok.")"
 			fi
             abort "$(gettext "Building <%s> failed.")" "$TARGET"
 		fi
 	else
-		if [ "$PKGMK_CHECK_MD5SUM" = "yes" ]; then
-			if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+		if [ "$PKGMK_CHECK_MD5SUM" == "yes" ]; then
+			if [ "$PKGMK_KEEP_WORK" == "no" ]; then
 				rm -rf $PKGMK_WORK_DIR
 			fi
             abort "$(gettext "Md5sum not found.")"
@@ -1564,8 +1586,8 @@ check_md5sum() {
 		make_md5sum > $PKGMK_MD5SUM
 	fi
 
-	if [ "$PKGMK_CHECK_MD5SUM" = "yes" ]; then
-		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+	if [ "$PKGMK_CHECK_MD5SUM" == "yes" ]; then
+		if [ "$PKGMK_KEEP_WORK" == "no" ]; then
 			rm -rf $PKGMK_WORK_DIR
 		fi
         plain "$(gettext "Md5sum ok.")"
@@ -1621,7 +1643,7 @@ check_footprint() {
 					sed 's/^+/NEW       /g' | \
 					sed 's/^-/MISSING   /g' > $FILE.footprint.diff
 			if [ -s $FILE.footprint.diff ]; then
-				if [ "$PKGMK_IGNORE_NEW" = "yes" ]; then
+				if [ "$PKGMK_IGNORE_NEW" == "yes" ]; then
 					mv $FILE.footprint $PKGMK_FOOTPRINT
                     warning "$(gettext "Footprint mismatch found:")"
 				else
@@ -1650,7 +1672,7 @@ make_work_dir() {
 	remove_work_dir
 	mkdir -p $SRC $PKG
 
-	if [ "$PKGMK_IGNORE_MD5SUM" = "no" ]; then
+	if [ "$PKGMK_IGNORE_MD5SUM" == "no" ]; then
 		check_md5sum
 	fi
 }
@@ -1801,7 +1823,7 @@ build_package() {
 		(set -e -x ; package)
 	fi
 	if [ $? = 0 ]; then
-		if [ "$PKGMK_NO_STRIP" = "no" ]; then
+		if [ "$PKGMK_NO_STRIP" == "no" ]; then
 			strip_files
 		fi
 
@@ -1883,7 +1905,7 @@ build_package() {
 		fi
 	fi
 
-	if [ "$BUILD_SUCCESSFUL" = "yes" ]; then
+	if [ "$BUILD_SUCCESSFUL" == "yes" ]; then
 		if [ "$1" != "$TARGET" ]; then
 			get_package_list
         		if [ -z $TARGETS ]; then
@@ -1897,7 +1919,7 @@ build_package() {
 			add_meta_files `basename $TARGET`
 			add_meta_to_archive `basename $TARGET`
 		fi
-		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
+		if [ "$PKGMK_KEEP_WORK" == "no" ]; then
 			remove_work_dir
 		fi
 	else
@@ -1915,10 +1937,10 @@ install_package() {
         abort "$(gettext "Package(s) not found(s) nothing to install...")"
 	fi
 	for TARGET in ${TARGETS[@]}; do
-		if [ "`get_package_arch $TARGET`" = "$PKGMK_ARCH" ] || [ "`get_package_arch $TARGET`" = "any" ]; then
+		if [ "`get_package_arch $TARGET`" == "$PKGMK_ARCH" ] || [ "`get_package_arch $TARGET`" == "any" ]; then
             plain "$(gettext "Installing <%s>")" "$TARGET"
 
-			if [ "$PKGMK_INSTALL" = "install" ]; then
+			if [ "$PKGMK_INSTALL" == "install" ]; then
 				COMMAND="pkgadd $PKGMK_PACKAGE_DIR/$TARGET"
 			else
 				COMMAND="pkgadd -u $PKGMK_PACKAGE_DIR/$TARGET"
@@ -1928,7 +1950,7 @@ install_package() {
 			echo "$COMMAND"
 			$COMMAND
 
-			if [ $? = 0 ]; then
+			if [ $? == 0 ]; then
                 plain "$(gettext "Installing <%s> succeeded.")" "$TARGET"
 			else
 				abort "$(gettext "Installing <%s> failed.")" "$TARGET"
@@ -2017,7 +2039,7 @@ update_collection_repo() {
 	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION
 	if [ -f $PKGMK_REPO ]; then
 		HEAD=`head -1 $PKGMK_REPO`
-		if [ "${HEAD:10:1}" = "#" ]; then
+		if [ "${HEAD:10:1}" == "#" ]; then
 			BUILD_DATE="`echo $HEAD|cut -d "#" -f1`"
 			EXTENSION="`echo $HEAD|cut -d "#" -f2`"
 			VERSION="`echo $HEAD|cut -d "#" -f3`"
@@ -2205,7 +2227,7 @@ main() {
 
 	name=$(basename $PKGMK_ROOT)
 
-	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
+	if [ "$PKGMK_RECURSIVE" == "yes" ]; then
 		recursive "$@"
 		exit 0
 	fi
@@ -2257,7 +2279,7 @@ main() {
     msg2 "$(gettext "PKGMK_WORK_DIR:         %s")" "$PKGMK_WORK_DIR"
     msg2 "$(gettext "PKGMK_SOURCE_DIR:       %s")" "$PKGMK_SOURCE_DIR"
 
-	if [ "$PKGMK_INSTALL" = "no" ]; then
+	if [ "$PKGMK_INSTALL" == "no" ]; then
 		PKGMK_CLEAN="no"
         warning "$(gettext "CLEAN IGNORED.")"
 	else
@@ -2325,25 +2347,25 @@ main() {
 		xz)  COMPRESSION="-J" ;;
 	esac
 
-	if [ "$PKGMK_CLEAN_ONLY" = "yes" ]; then
+	if [ "$PKGMK_CLEAN_ONLY" == "yes" ]; then
 		clean
 		remove_source
 		update_repo
 		exit 0
 	fi
-	if [ "$PKGMK_UPDATE_COLLECTION" = "yes" ]; then
+	if [ "$PKGMK_UPDATE_COLLECTION" == "yes" ]; then
 		update_collection_repo
 		exit 0
 	fi
-	if [ "$PKGMK_UPDATE_REPO" = "yes" ]; then
+	if [ "$PKGMK_UPDATE_REPO" == "yes" ]; then
 		update_repo
 		exit 0
 	fi
-	if [ "$PKGMK_UPDATE_FOOTPRINT" = "yes" ]; then
+	if [ "$PKGMK_UPDATE_FOOTPRINT" == "yes" ]; then
 		update_footprint
 		exit 0
 	fi
-	if [ "$PKGMK_CHECK_SYNTAX" = "yes" ]; then
+	if [ "$PKGMK_CHECK_SYNTAX" == "yes" ]; then
         plain "$(gettext "description: <%s>")" "$description"
         plain "$(gettext "url: <%s>")" "$url"
         plain "$(gettext "packager: <%s>")" "$packager"
@@ -2351,7 +2373,7 @@ main() {
 		exit 0
 	fi
 
-	if [ "$PKGMK_UPDATE_MD5SUM" = "yes" ]; then
+	if [ "$PKGMK_UPDATE_MD5SUM" == "yes" ]; then
 		download_source
 		check_file "$PKGMK_MD5SUM"
 		make_md5sum > $PKGMK_MD5SUM
@@ -2359,12 +2381,12 @@ main() {
 		exit 0
 	fi
 
-	if [ "$PKGMK_DOWNLOAD_ONLY" = "yes" ]; then
+	if [ "$PKGMK_DOWNLOAD_ONLY" == "yes" ]; then
 		download_source
 		exit 0
 	fi
 
-	if [ "$PKGMK_EXTRACT_ONLY" = "yes" ]; then
+	if [ "$PKGMK_EXTRACT_ONLY" == "yes" ]; then
 		download_source
 		make_work_dir
         plain "$(gettext "Extracting sources of package <%s>")" "${name}-${version}"
@@ -2373,17 +2395,17 @@ main() {
 		exit 0
 	fi
 
-	if [ "$PKGMK_UP_TO_DATE" = "yes" ]; then
+	if [ "$PKGMK_UP_TO_DATE" == "yes" ]; then
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
-				if [ "`build_needed`" = "yes" ]; then
+				if [ "`build_needed`" == "yes" ]; then
                     plain "$(gettext "Package <%s> is not up to date.")" "$TARGET"
 				else
                     plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
 				fi
 			done
 		else
-			if [ "`build_needed`" = "yes" ]; then
+			if [ "`build_needed`" == "yes" ]; then
 				plain "$(gettext "Package <%s> is not up to date.")" "$TARGET"
 			else
 				plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
@@ -2395,7 +2417,7 @@ main() {
 	# From here on it's need to check the base package not any group which means
 	if [ -z $TARGETS ]; then
 		TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
-		if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
+		if [ "`build_needed`" == "no" ] && [ "$PKGMK_FORCE" == "no" ] && [ "$PKGMK_CHECK_MD5SUM" == "no" ]; then
 			plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
 		else
 			download_source
@@ -2404,8 +2426,8 @@ main() {
 	else
 		FOUND=false
 		for TARGET in ${TARGETS[@]}; do
-			if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
-				if [ "`get_package_arch $TARGET`" = "$PKGMK_ARCH" ]; then
+			if [ "`build_needed`" == "no" ] && [ "$PKGMK_FORCE" == "no" ] && [ "$PKGMK_CHECK_MD5SUM" == "no" ]; then
+				if [ "`get_package_arch $TARGET`" == "$PKGMK_ARCH" ]; then
 					FOUND=true
 				fi
 				plain "$(gettext "Package <%s> is up to date.")" "$TARGET"
@@ -2427,7 +2449,7 @@ main() {
 	if [ "$PKGMK_INSTALL" != "no" ]; then
 		install_package
 	fi
-	if [ "$PKGMK_COMPRESS_PACKAGE" = "yes" ]; then
+	if [ "$PKGMK_COMPRESS_PACKAGE" == "yes" ]; then
 		cd $PKGMK_PACKAGE_DIR
 		get_package_list
 		for TARGET in ${TARGETS[@]}; do
