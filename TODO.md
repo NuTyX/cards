@@ -1,10 +1,5 @@
 ## TODO
 
-### extract_file() - clarify permissions
-
-Clarify permissions set for extract_file(): [see issue](https://github.com/NuTyX/cards/issues/34)
-
-
 ### pkgmk.in supports now gettext translation files
 
 * Need to translate them

@@ -455,11 +455,11 @@ get_final_srcname() {
 		return
 	fi
 
-	case $PROTOCOL in
+	case "$PROTOCOL" in
         local)
             # may not start with a slash
             if [[ $NETSRC == /* ]]; then
-                echo "ERR_ABORT|Local source file MUST NOT start with a slash. SOURCE: <$NETSRC>|$E_GENERAL"
+                echo "ERR_ABORT|Local source file MUST NOT start with a slash. SOURCE: <$NETSRC>"
                 return
             else
                 # local sources use the whole relative url
@@ -487,10 +487,21 @@ get_final_srcname() {
 
 # Return the absolute expected filename/VCS-dirname of a source entry
 get_final_srcpath() {
-	local FINAL_SRCNAME="$(get_final_srcname "$1")"
+    local FINAL_SRCPATH
+    local NETSRC=$1
+	local FINAL_SRCNAME="$(get_final_srcname "$NETSRC")"
     check_abort "$FINAL_SRCNAME"
-	printf "%s\n" "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+    local PROTOCOL=$(get_protocol "$NETSRC")
+    check_abort "$PROTOCOL"
+
+	case "$PROTOCOL" in
+		git|svn|hg|bzr) FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ;;
+		ftp|http|https) FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ;;
+		local)          FINAL_SRCPATH="$PKGMK_ROOT/$FINAL_SRCNAME"       ;;
+	esac
+	printf "%s\n" "$FINAL_SRCPATH"
 }
+
 
 # Return the absolute filename/VCS-dirname of a source entry: checks for it's existence
 getchecked_final_srcpath() {
@@ -501,7 +512,7 @@ getchecked_final_srcpath() {
     local PROTOCOL=$(get_protocol "$NETSRC")
     check_abort "$PROTOCOL"
 
-	case $proto in
+	case "$PROTOCOL" in
 		git|svn|hg|bzr)
 			if [[ -d "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ]]; then
 				FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
@@ -509,9 +520,16 @@ getchecked_final_srcpath() {
 				return 1
 			fi
 			;;
-		*)
+		ftp|http|https)
 			if [[ -f "$PKGMK_SOURCE_DIR/$FINAL_SRCNAME" ]]; then
 				FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
+			else
+				return 1
+			fi
+			;;
+		local)
+			if [[ -f "$PKGMK_ROOT/$FINAL_SRCNAME" ]]; then
+				FINAL_SRCPATH="$PKGMK_ROOT/$FINAL_SRCNAME"
 			else
 				return 1
 			fi
@@ -555,7 +573,7 @@ download_source() {
             fi
         else
             if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
-                case $PROTOCOL in
+                case "$PROTOCOL" in
                     ftp|http|https)
                         download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIG_URL"
                         ;;
@@ -602,7 +620,7 @@ download_file() {
 	case ${PKGMK_DOWNLOAD_PROG} in
 		curl)
 			RESUME_CMD="-C -"
-            case ${PROTOCOL} in
+            case "$PROTOCOL" in
                 ftp)
                     DOWNLOAD_OPTS="-qf --ftp-pasv --retry 3 --retry-delay 3 -R -# \
                     -o $FINAL_SRCPATH_PARTIAL --insecure $PKGMK_DOWNLOAD_PROG_OPTS"
@@ -620,7 +638,7 @@ download_file() {
 			RESUME_CMD="-c"
             DOWNLOAD_OPTS="--no-directories --tries=3 --waitretry=3 --no-check-certificate \
             $PKGMK_DOWNLOAD_PROG_OPTS -O $FINAL_SRCPATH_PARTIAL"
-            if [[ $proto = ftp ]]; then
+            if [[ $PROTOCOL = ftp ]]; then
                 DOWNLOAD_OPTS="$DOWNLOAD_OPTS --passive-ftp"
             fi
 			;;
@@ -839,7 +857,7 @@ extract_source() {
         check_abort "$FINAL_SRCNAME"
         FINAL_SRCPATH=`get_final_srcpath $NETSRC`
 
-        case $PROTOCOL in
+        case "$PROTOCOL" in
             ftp|http|https)
 				if [ "$PKGMK_IGNORE_UNPACK" == "yes" ];then
 					extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
@@ -883,7 +901,6 @@ extract_only_copy() {
     fi
 }
 
-# TODO: clarify permissions: see issue #34: https://github.com/NuTyX/cards/issues/34
 extract_file() {
     local FINAL_SRCPATH=$1
     local FINAL_SRCNAME=$2
@@ -1476,7 +1493,7 @@ make_md5sum() {
     for NETSRC in ${source[@]}; do
         PROTOCOL=$(get_protocol "$NETSRC")
         check_abort "$PROTOCOL"
-        case $PROTOCOL in
+        case "$PROTOCOL" in
             ftp|http|https|local) MD5SUM_PATHS="$MD5SUM_PATHS `get_final_srcpath $NETSRC`" ;;
         esac
     done
@@ -1495,7 +1512,6 @@ else
 fi
 }
 
-# TODO: remove this options issue https://github.com/NuTyX/cards/issues/33
 check_md5sum() {
 	local FILE="$PKGMK_WORK_DIR/.tmp"
 
@@ -2470,12 +2486,11 @@ PKGMK_VCS_SVN_OPTS=""
 PKGMK_VCS_HG_OPTS=""
 PKGMK_VCS_BZR_OPTS=""
 # When using VCS sources any currently checked out source will not be updated to the latest revision.
-# TODO: Decide: PKGMK_VCS_HOLDVER: Decide maybe change it to hold the last set version
 PKGMK_VCS_HOLDVER="no"
 
 # PACKACKE COMPRESSION
 PKGMK_COMPRESS_PACKAGE="no"
-PKGMK_COMPRESSION_MODE="xz"     # TODO: Remove this and set fix xz compression if PKGMK_COMPRESS_PACKAGE=yes
+PKGMK_COMPRESSION_MODE="xz"
 PKGMK_COMPRESSION_OPTS="-9"
 
 # DIVERSE
