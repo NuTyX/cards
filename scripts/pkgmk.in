@@ -543,8 +543,8 @@ remove_source() {
 	for NETSRC in ${source[@]}; do
         PROTOCOL=$(get_protocol "$NETSRC")
         check_abort "$PROTOCOL"
-		FINAL_SRCPATH=`get_final_srcpath $NETSRC`
-        if [[ "$PROTOCOL" != "local" ]] && [ -e $FINAL_SRCPATH ] && [ "$FINAL_SRCPATH" != "$NETSRC" ]; then
+		FINAL_SRCPATH=$(get_final_srcpath $NETSRC)
+        if [[ "$PROTOCOL" != "local" ]] && [ -e "$FINAL_SRCPATH" ] && [ "$FINAL_SRCPATH" != "$NETSRC" ]; then
             msg "$(gettext "Removing source <%s>")" "$FINAL_SRCPATH"
 			rm -rf $FINAL_SRCPATH
 		fi
@@ -566,8 +566,8 @@ download_source() {
         check_abort "$PROTOCOL"
         FINAL_SRCNAME=$(get_final_srcname "$NETSRC")
         check_abort "$FINAL_SRCNAME"
-        FINAL_SRCPATH=`get_final_srcpath $NETSRC`
-        ORIG_URL=`get_orig_url  $NETSRC`
+        FINAL_SRCPATH=$(get_final_srcpath $NETSRC)
+        ORIG_URL=$(get_orig_url  $NETSRC)
 
         if [ "$PROTOCOL" == "local" ]; then
             if [[ ! -f "$FINAL_SRCPATH" ]]; then
@@ -608,6 +608,11 @@ download_source() {
 download_file() {
     local DOWNLOAD_OPTS RESUME_OPTS RESUME_CMD
     local FINAL_SRCPATH=$1
+	if [[ -e "$FINAL_SRCPATH" ]]; then
+		plain "$(gettext "Found Source File: <%s>")" "$FINAL_SRCPATH"
+		return
+	fi
+    
     local PROTOCOL=$2
     local ORIG_URL=$3
     local BASENAME="${ORIG_URL##*/}"
@@ -861,7 +866,7 @@ extract_source() {
         check_abort "$PROTOCOL"
         FINAL_SRCNAME=$(get_final_srcname "$NETSRC")
         check_abort "$FINAL_SRCNAME"
-        FINAL_SRCPATH=`get_final_srcpath $NETSRC`
+        FINAL_SRCPATH=$(get_final_srcpath $NETSRC)
 
         case "$PROTOCOL" in
             ftp|http|https)
@@ -1211,13 +1216,14 @@ compress_manpages() {
 		fi
 	done
 
+
 	find . -type l -path "*/share/man*/*" | while read FILE; do
-		TARGET=`readlink -n "$FILE"`
+		TARGET="$(readlink -n "$FILE")"
 		TARGET="${TARGET##*/}"
 		TARGET="${TARGET%%.gz}.gz"
 		rm -f "$FILE"
 		FILE="${FILE%%.gz}.gz"
-		DIR=`dirname "$FILE"`
+		DIR="$(dirname "$FILE")"
 
 		if [ -e "$DIR/$TARGET" ]; then
 			ln -sf "$TARGET" "$FILE"
@@ -1229,12 +1235,12 @@ compress_manpages() {
 		fi
 	done
 	find . -type l -path "*/share/info/*" | while read FILE; do
-		TARGET=`readlink -n "$FILE"`
+		TARGET="$(readlink -n "$FILE")"
 		TARGET="${TARGET##*/}"
 		TARGET="${TARGET%%.gz}.gz"
 		rm -f "$FILE"
 		FILE="${FILE%%.gz}.gz"
-		DIR=`dirname "$FILE"`
+		DIR="$(dirname "$FILE")"
 
 		if [ -e "$DIR/$TARGET" ]; then
 			ln -sf "$TARGET" "$FILE"
@@ -1409,7 +1415,7 @@ check_pkgfile() {
 	if ! have_function 'build' && [ "$PKGMK_PKGFILE" == "Pkgfile" ]; then
         abort "$(gettext "Function 'build' not specified in <%s>")" "$PKGMK_PKGFILE"
 	fi
-	NAME_TEST=`echo "${name}" | sed 's@[[a-z0-9]*[-_+]*]*@@g'`
+	NAME_TEST="$(echo "${name}" | sed 's@[[a-z0-9]*[-_+]*]*@@g')"
 	if [ "$NAME_TEST" != "" ]; then
         abort "$(gettext "Variable 'name' contains following illegal characters: <%s>")" "$NAME_TEST"
 	fi
@@ -1424,7 +1430,7 @@ check_pkgfile() {
 	if [ "${release}" == "" ]; then
         abort "$(gettext "Variable 'release' not initiated or not found in<%s>")" "$PKGMK_PKGFILE"
 	fi
-	RELEASE_TEST=`echo "${release}" | sed 's@[0-9]*@@g'`
+	RELEASE_TEST="$(echo "${release}" | sed 's@[0-9]*@@g')"
 	if [ "$RELEASE_TEST" != "" ]; then
         abort "$(gettext "Variable 'release' contains following illegal characters:<%s>")" "$RELEASE_TEST"
 	fi
@@ -2046,8 +2052,8 @@ update_repo() {
 		echo -n "#$description#$url#$maintainer#$packager" >> .PKGREPO
 		printf "\n" >> .PKGREPO
 		for TARGET in ${TARGETS[@]}; do
-			FILE=`basename $TARGET`
-			MD5SUM=`md5sum $TARGET|cut -d " " -f1`
+			FILE=$(basename $TARGET)
+			MD5SUM=$(md5sum $TARGET|cut -d " " -f1)
 			echo "$MD5SUM#`get_package_name $TARGET`#`get_package_arch $TARGET|sed "s/-//"`" >> $PKGMK_REPO
 		done
 		for FILE in  ${name}*
@@ -2196,7 +2202,7 @@ main() {
 	fi
 	local FILE TARGET
 
-	name=`basename $PKGMK_ROOT`
+	name=$(basename $PKGMK_ROOT)
 
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
 		recursive "$@"
@@ -2472,7 +2478,7 @@ readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
 readonly PKGMK_ROOT="$PWD"
 readonly PKGMK_PACKAGE_DIR="$PWD"
-readonly PKGMK_BUILDVER=`date +%s`
+readonly PKGMK_BUILDVER="$(date +%s)"
 readonly PKGMK_PACKAGE_EXT="cards.tar"
 readonly PKGMK_REPO=".PKGREPO"
 readonly PKGMK_MD5SUM="$name.`uname -m`.md5sum"
