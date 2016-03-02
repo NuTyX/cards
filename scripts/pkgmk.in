@@ -265,7 +265,7 @@ check_abort() {
 }
 
 abort() {
-	local mesg=$1; shift   
+	local mesg=$1; shift
     printf "${MAGENTA_MSG}\n====> $(gettext "ABORTING....\n")${ALL_OFF_MSG}" >&2
     printf "${BLUE_MSG}    ->${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n\n" "$@" >&2
     exit 1
@@ -573,6 +573,7 @@ download_source() {
             if [[ ! -f "$FINAL_SRCPATH" ]]; then
                 abort "Local Source file '$FINAL_SRCPATH' not found. SOURCE: <$NETSRC>"
             fi
+            plain "$(gettext "Found Local-Source file: <%s>")" "$FINAL_SRCPATH"
         else
             if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
                 case "$PROTOCOL" in
@@ -609,10 +610,11 @@ download_file() {
     local DOWNLOAD_OPTS RESUME_OPTS RESUME_CMD
     local FINAL_SRCPATH=$1
 	if [[ -e "$FINAL_SRCPATH" ]]; then
-		plain "$(gettext "Found Source File: <%s>")" "$FINAL_SRCPATH"
+        # line up space with the Local-Source msg.
+		plain "$(gettext "Found  Source file     : <%s>")" "$FINAL_SRCPATH"
 		return
 	fi
-    
+
     local PROTOCOL=$2
     local ORIG_URL=$3
     local BASENAME="${ORIG_URL##*/}"
@@ -904,7 +906,7 @@ extract_only_copy() {
     local FINAL_SRCPATH=$1
     local NETSRC=$2
 
-    echo "Copying <$FINAL_SRCPATH> to $SRC"
+    msg2 "$(gettext "Copying <%s> to <%s>")" "$FINAL_SRCPATH" "$SRC"
 
     cp -f $FINAL_SRCPATH $SRC
     if [ $? != 0 ]; then
@@ -1174,7 +1176,7 @@ update_pkgver() {
 				abort "$(gettext "Failed to update 'Pkgfile version' from: <%s> to <%s>")" "$version" "$NEW_VERSION"
 			fi
 			sed -i "s:|^pkgrel=[^ ]*|pkgrel=1|" "$BUILDFILE"
-            
+
             # TODO: Decide if we should keep that or just update the version variable with the new one.
 			source_safe "$BUILDFILE"
 			msg2 "$(gettext "Updated 'Pkgfile version' from: <%s> to <%s>")" "$version" "$NEW_VERSION"
@@ -1786,12 +1788,12 @@ build_package() {
 	extract_source
 
 	cd "$SRC"
-    
+
     if have_function 'setversion'; then
         # Update Pkgfile with new version variable
         update_pkgver
 	fi
-    
+
     if have_function 'prepare'; then
 		(set -e -x ; prepare)
 	fi
