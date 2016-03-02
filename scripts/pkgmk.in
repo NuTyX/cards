@@ -91,11 +91,11 @@
 #
 #       The source URL is divided into three components:
 #
-#           1. `NOEXTRACT` (optional): If a source is prefixed with `NOEXTRACT` it will not be extracted  `::` is used
-#                                      as separator.
-#           2. `filename` (optional):  The new changed name of the downloaded file. Can NOT be called `NOEXTRACT`
-#                                      `::` is used as separator.
-#           3. `url` (required):       A fully-qualified URL (supported are: ftp://, http://, https://)
+#           1.  `NOEXTRACT` (optional): If a source is prefixed with `NOEXTRACT` it will not be extracted  `::` is used
+#                                       as separator.
+#           2. `filename` (optional):   The new changed name of the downloaded file. Can NOT be called `NOEXTRACT`
+#                                       `::` is used as separator.
+#           3. `url` (required):        A fully-qualified URL (supported are: ftp://, http://, https://)
 #
 #
 #     POSSIBLE OPTIONS
@@ -436,7 +436,7 @@ get_orig_url() {
 	printf "%s\n" "${1##*::}"
 }
 
-# Checks if the Source entry has a Prefix called: NOEXTRACT
+# Checks if the Source entry has a Prefix called: NOEXTRACT::
 has_source_noextract() {
     local NETSRC=$1
     if [[ "$NETSRC" == *::* ]] && [[ "${NETSRC%%::*}" == "NOEXTRACT" ]]; then
@@ -1227,7 +1227,7 @@ update_pkgver() {
 			if ! sed -i "s|^version=.*$|version=$NEW_VERSION      # previous: $version|" "$BUILDFILE"; then
 				abort "$(gettext "Failed to update 'Pkgfile version' from: <%s> to <%s>")" "$version" "$NEW_VERSION"
 			fi
-			sed -i "s:|^pkgrel=[^ ]*|pkgrel=1|" "$BUILDFILE"
+			sed -i "s|^pkgrel=[^ ]*|pkgrel=1|" "$BUILDFILE"
 
             # TODO: Decide if we should keep that or just update the version variable with the new one.
 			source_safe "$BUILDFILE"
