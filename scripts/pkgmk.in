@@ -65,27 +65,46 @@
 #**********************************************************************************************************************
 
 
-#**********************************************************************************************************************
+##**********************************************************************************************************************
 #
 #                               Pkgfile: source (array): TODO rewrite this in the documentation and remove it here
 #
 # An array of source files required to build the package. This can also be an empty array `source=()`.
 # To simplify the maintenance of Pkgfiles, use the $name and $version variables when specifying the download location,
 # if possible.
-# Compressed files will be extracted automatically unless `PKGMK_IGNORE_UNPACK="yes"` is set or they are local files
-# specified by relative path to the Pkgfile.
+#
+# COMPRESSED Source Archives
+#
+#   Compressed files will be extracted automatically unless they are local files specified by relative path to the
+#   Pkgfile.
+#
+#       * To avoid unpacking of ALL archive source files set: `PKGMK_IGNORE_UNPACK="yes"`
+#
+#       * Extraction of individual source files can be skipped by prefixing the entry with `NOEXTRACT::`
 #
 # It is also possible to change the name of the downloaded file (except for Local source files), which is helpful with
 # weird URLs and for handling multiple source files with the same name.
 #
-# ::1:::::::::::::::::::::::::::: Regular source entries can have two forms:
+# ::1:::::::::::::::::::::::::::: Regular source entries.
 #
 #   1) The syntax is: source=(filename::url)
 #
-#       The source URL is divided into two components:
+#       The source URL is divided into three components:
 #
-#           1. `filename` (optional): The new changed name of the downloaded file. `::` is used as separator.
-#           2. `url:` (required):     A fully-qualified URL (supported are: ftp://, http://, https://)
+#           1.  `NOEXTRACT` (optional): If a source is prefixed with `NOEXTRACT` it will not be extracted  `::` is used
+#                                       as separator.
+#           2. `filename` (optional):   The new changed name of the downloaded file. Can NOT be called `NOEXTRACT`
+#                                       `::` is used as separator.
+#           3. `url` (required):        A fully-qualified URL (supported are: ftp://, http://, https://)
+#
+#
+#     POSSIBLE OPTIONS
+#
+#       source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)                    # BASIC FORM
+#       source=(renamed.tar.xz::http://tukaani.org/xz/xz-5.2.2.tar.xz)    # RENAME downloaded file to: `renamed.tar.xz`
+#       source=(NOEXTRACT::http://tukaani.org/xz/xz-5.2.2.tar.xz)         # SKIP Automatic extraction
+#       source=(NOEXTRACT::renamed.tar.xz::http://tukaani.org/xz/xz-5.2.2.tar.xz) # RENAME & SKIP Automatic extraction
+#
 #
 #
 # ::2:::::::::::::::::::::::::::: There is also support using sources downloaded from version control systems (VCS).
@@ -142,14 +161,18 @@
 #
 #   ftp
 # source=(ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
-# source=(file::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(NOEXTRACT::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(file.tar.gz::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
+# source=(NOEXTRACT::file.tar.gz::ftp://ftp.astron.com/pub/file/file-5.25.tar.gz)
 #
 #   http
-# source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)
-# source=(xz::http://tukaani.org/xz/xz-5.2.2.tar.xz)
+# source=(http://tukaani.org/xz/xz-5.2.2.tar.xz)                            # BASIC FORM
+# source=(renamed.tar.xz::http://tukaani.org/xz/xz-5.2.2.tar.xz)            # RENAME downloaded file to: renamed.tar.xz
+# source=(NOEXTRACT::http://tukaani.org/xz/xz-5.2.2.tar.xz)                 # SKIP Automatic extraction
+# source=(NOEXTRACT::renamed.tar.xz::http://tukaani.org/xz/xz-5.2.2.tar.xz) # RENAME & SKIP Automatic extraction
 #
 #   https
-# source=(xmlto::https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
+# source=(xmlto.tar.bz2::https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
 # source=(https://fedorahosted.org/releases/x/m/xmlto/xmlto-0.0.26.tar.bz2)
 #
 #  VCS (version control systems)
@@ -183,6 +206,7 @@
 # source=(ftps://ftp.host.com/ )
 #
 #**********************************************************************************************************************
+
 
 #**********************************************************************************************************************
 #
@@ -247,8 +271,6 @@ error() {
 	local mesg=$1; shift
 	printf "${RED_MSG}==> $(gettext "ERROR:")${ALL_OFF_MSG}${BOLD_MSG} ${mesg}${ALL_OFF_MSG}\n" "$@" >&2
 }
-
-# ==================  THESE BELOW SHOULD BE REPLACED
 
 
 # $1 must be in the format: "PART_TO_BE_CHECKED|Message|ErrorCode
@@ -348,7 +370,6 @@ run_function() {
 	fi
 	local pkgfunc="$1"
 
-	#msg "$(gettext "Starting %s()...")" "$pkgfunc"
 	cd_safe "$SRC"
 
 	# save our shell options so pkgfunc() can't override what we need
@@ -371,11 +392,6 @@ function get_str_part() {
     printf "%s\n" "${parts_arr[-1+$2]}"
 }
 
-# extract the original URL from a source entry: strip an eventual filename/VCS directory/other prefix
-get_orig_url() {
-	printf "%s\n" "${1##*::}"
-}
-
 dir_isempty() {
 	(
 		shopt -s dotglob nullglob
@@ -390,7 +406,7 @@ cd_safe() {
 	fi
 }
 
-# TODO: maybe replace that with one of the other similar functions
+# TODO: this is only use 1 time - maybe move it directly to where it is used and remove the function
 get_filename() {
 	if [[ $1 =~ ^(http|https|ftp|file)://.*/(.+) ]]; then
 		echo "$PKGMK_SOURCE_DIR/${BASH_REMATCH[2]}"
@@ -415,28 +431,19 @@ check_file() {
 	fi
 }
 
-## extract the protocol from a source entry - return "local" for local sources
-#get_protocol() {
-    #local NETSRC=$1
-    #local PROTOCOL
-    #local SUPPORTED_PROTOCOLS=('ftp' 'http' 'https' 'git' 'svn' 'hg' 'bzr' 'local' )
-    #local PROTO="${NETSRC#*::}" # strip leading filename/vcs-directory
-	#if [[ $NETSRC = *://* ]]; then
-		#PROTOCOL="${PROTO%%://*}"
-        #if [[ $PROTOCOL = *+* ]]; then
-            #PROTOCOL="${PROTO%%+*}"
-        #fi
-	#elif [[ $NETSRC = *lp:* ]]; then
-		#PROTOCOL="${PROTO%%+lp:*}"
-	#else
-		#PROTOCOL="local"
-	#fi
-    #if [[ " ${SUPPORTED_PROTOCOLS[@]} " =~ " ${PROTOCOL} " ]]; then
-        #printf "%s\n" "${PROTOCOL}"
-    #else
-        #echo "ERR_ABORT|The protocol: <$PROTOCOL> is not supported. SOURCE: <$NETSRC>|$E_DOWNLOAD_PROTO"
-    #fi
-#}
+# extract the original URL from a source entry: strip an eventual filename/VCS directory/other prefix
+get_orig_url() {
+	printf "%s\n" "${1##*::}"
+}
+
+# Checks if the Source entry has a Prefix called: NOEXTRACT::
+has_source_noextract() {
+    local NETSRC=$1
+    if [[ "$NETSRC" == *::* ]] && [[ "${NETSRC%%::*}" == "NOEXTRACT" ]]; then
+        return 0
+    fi
+    return 1
+}
 
 # extract the protocol from a source entry - return "local" for local sources
 get_protocol() {
@@ -446,7 +453,7 @@ get_protocol() {
     local ORIG_URL=$(get_orig_url  "$NETSRC")
 	if [[ "$NETSRC" == *://* ]]; then
 		PROTOCOL="${ORIG_URL%%://*}"
-        if [[ "$PROTOCO"L = *+* ]]; then
+        if [[ "$PROTOCOL" == *+* ]]; then
             PROTOCOL="${ORIG_URL%%+*}"
         fi
 	elif [[ "$NETSRC" == *lp:* ]]; then
@@ -454,33 +461,49 @@ get_protocol() {
 	else
 		PROTOCOL="local"
 	fi
-    if [[ " ${SUPPORTED_PROTOCOLS[@]} " =~ " ${PROTOCOL} " ]]; then
-        printf "%s\n" "${PROTOCOL}"
+    if [[ " ${SUPPORTED_PROTOCOLS[@]} " =~ " $PROTOCOL " ]]; then
+        printf "%s\n" "$PROTOCOL"
     else
-        echo "ERR_ABORT|The protocol: <$PROTOCOL> is not supported. SOURCE: <$NETSRC>|$E_DOWNLOAD_PROTO"
+        echo "ERR_ABORT|The protocol: <$PROTOCOL> is not supported. SOURCE: <$NETSRC>"
     fi
 }
 
 # extract the final used source name (filename or VCS directory) from a source entry: this is not a path only the name.
 get_final_srcname() {
-    local FINAL_SRCNAME
+    local TOTAL_PREFIXT
 	local NETSRC=$1
     local PROTOCOL=$(get_protocol "$NETSRC")
-	# if a filename/VCS-directory is specified, use it except Local sources
-	if [[ $NETSRC = *::* ]]; then
-        # local source files can not change their names
-        if [[ "$PROTOCOL" == "local" ]]; then
-            echo "ERR_ABORT|Local source file can not change their names. SOURCE: <$NETSRC>|$E_GENERAL"
+    check_abort "$PROTOCOL"
+    local FINAL_SRCNAME=""
+
+    # Check PREFIX:
+    if [[ "$NETSRC" == *::* ]]; then
+        # check NOEXTRACT
+        TOTAL_PREFIXT="${NETSRC%::*}"
+        if [[ "$TOTAL_PREFIXT" == *::* ]]; then
+            # filename to rename/VCS-directory is specified
+            FINAL_SRCNAME="${TOTAL_PREFIXT#*::}"
+        elif [[ "$TOTAL_PREFIXT" != "NOEXTRACT" ]]; then
+            FINAL_SRCNAME="$TOTAL_PREFIXT"
         else
-            printf "%s\n" ${NETSRC%%::*}
+            # only NOEXTRACT prefix
+            FINAL_SRCNAME=""
         fi
-		return
-	fi
+        if [[ -n "$FINAL_SRCNAME" ]]; then
+            # local source files can not change their names
+            if [[ "$PROTOCOL" == "local" ]]; then
+                echo "ERR_ABORT|Local source file can not change their names. SOURCE: <$NETSRC>"
+            else
+                printf "%s\n" "$FINAL_SRCNAME"
+            fi
+            return
+        fi
+    fi
 
 	case "$PROTOCOL" in
         local)
             # may not start with a slash
-            if [[ $NETSRC == /* ]]; then
+            if [[ "$NETSRC" == /* ]]; then
                 echo "ERR_ABORT|Local source file MUST NOT start with a slash. SOURCE: <$NETSRC>"
                 return
             else
@@ -489,14 +512,14 @@ get_final_srcname() {
             fi
             ;;
 		git|svn|hg|bzr)
-			FINAL_SRCNAME=${NETSRC%%#*}
-			FINAL_SRCNAME=${FINAL_SRCNAME%/}
-			FINAL_SRCNAME=${FINAL_SRCNAME##*/}
-			if [[ $PROTOCOL = bzr ]]; then
-				FINAL_SRCNAME=${FINAL_SRCNAME#*lp:}
+			FINAL_SRCNAME="${NETSRC%%#*}"
+			FINAL_SRCNAME="${FINAL_SRCNAME%/}"
+			FINAL_SRCNAME="${FINAL_SRCNAME##*/}"
+			if [[ "$PROTOCOL" == "bzr" ]]; then
+				FINAL_SRCNAME="${FINAL_SRCNAME#*lp:}"
 			fi
-			if [[ $PROTOCOL = git ]]; then
-				FINAL_SRCNAME=${FINAL_SRCNAME%%.git*}
+			if [[ "$PROTOCOL" == "git" ]]; then
+				FINAL_SRCNAME="${FINAL_SRCNAME%%.git*}"
 			fi
 			;;
 		*)
@@ -597,7 +620,7 @@ download_source() {
             fi
             plain "$(gettext "Found Local-Source file: <%s>")" "$FINAL_SRCPATH"
         else
-            if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
+            if [ "$PKGMK_DOWNLOAD" == "yes" ]; then
                 case "$PROTOCOL" in
                     ftp|http|https)
                         download_file "$FINAL_SRCPATH" "$PROTOCOL" "$ORIG_URL"
@@ -669,7 +692,7 @@ download_file() {
 			RESUME_CMD="-c"
             DOWNLOAD_OPTS="--no-directories --tries=3 --waitretry=3 --no-check-certificate \
             $PKGMK_DOWNLOAD_PROG_OPTS -O $FINAL_SRCPATH_PARTIAL"
-            if [[ $PROTOCOL = ftp ]]; then
+            if [[ "$PROTOCOL" == "ftp" ]]; then
                 DOWNLOAD_OPTS="$DOWNLOAD_OPTS --passive-ftp"
             fi
 			;;
@@ -735,7 +758,7 @@ download_git() {
 		if ! git clone $PKGMK_VCS_GIT_OPTS --mirror "$url" "$FINAL_SRCPATH"; then
 			abort_check_keepwork "Failure while downloading git repo: <$REPO> SOURCE: <$NETSRC>"
 		fi
-	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
+	elif [ "$PKGMK_VCS_HOLDVER" == "no" ]; then
 		cd_safe "$FINAL_SRCPATH"
 		# Make sure we are fetching the right repo
 		if [[ "$url" != "$(git config --get remote.origin.url)" ]] ; then
@@ -763,7 +786,7 @@ download_svn() {
 	local fragment=${NETSRC#*#}
 	local REPO=$FINAL_SRCNAME
 	local url=$ORIG_URL
-	if [[ $fragment = "$NETSRC" ]]; then
+	if [[ "$fragment" == "$NETSRC" ]]; then
 		unset fragment
 	fi
 	[[ -z "$FINAL_SRCPATH" ]] && FINAL_SRCPATH="$PKGMK_SOURCE_DIR/$FINAL_SRCNAME"
@@ -771,13 +794,13 @@ download_svn() {
     msg "$(gettext "Downloading svn into: <%s>")" "$FINAL_SRCNAME"
     msg2 "$(gettext "FINAL_SRCPATH: <%s>")" "$FINAL_SRCPATH"
 
-	if [[ $url != svn+ssh* ]]; then
+	if [[ "$url" != svn+ssh* ]]; then
 		url=${url#svn+}
 	fi
 	url=${url%%#*}
 
 	local ref=HEAD
-	if [[ -n $fragment ]]; then
+	if [[ -n "$fragment" ]]; then
 		case ${fragment%%=*} in
 			revision)
 				ref="${fragment##*=}"
@@ -794,7 +817,7 @@ download_svn() {
             then
 			abort_check_keepwork "Failure while downloading svn repo: <$REPO> SOURCE: <$ORIG_URL>"
 		fi
-	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
+	elif [ "$PKGMK_VCS_HOLDVER" == "no" ]; then
         plain2 "$(gettext "Updating svn repo <%s>")" "$REPO"
 		cd_safe "$FINAL_SRCPATH"
 		if ! svn update -r ${ref} $PKGMK_VCS_SVN_OPTS; then
@@ -829,7 +852,7 @@ download_hg() {
 		if ! hg clone $PKGMK_VCS_HG_OPTS -U "$url" "$FINAL_SRCPATH"; then
 			abort_check_keepwork "Failure while downloading hg repo: <$REPO> SOURCE: <$NETSRC>"
 		fi
-	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
+	elif [ "$PKGMK_VCS_HOLDVER" == "no" ]; then
 		plain2 "$(gettext "Updating hg repo <%s>")" "$REPO"
 		cd_safe "$FINAL_SRCPATH"
 		if ! hg pull $PKGMK_VCS_HG_OPTS; then
@@ -865,7 +888,7 @@ download_bzr() {
 		if ! bzr branch $PKGMK_VCS_BZR_OPTS "$url" "$FINAL_SRCPATH" --no-tree --use-existing-dir; then
             abort_check_keepwork "Failure while branching bzr displaylocation: <$url> SOURCE: <$NETSRC>"
 		fi
-	elif [ "$PKGMK_VCS_HOLDVER" = "no" ]; then
+	elif [ "$PKGMK_VCS_HOLDVER" == "no" ]; then
         plain2 "$(gettext "Pulling bzr displaylocation <%s>")" "$displaylocation"
 		cd_safe "$FINAL_SRCPATH"
 		if ! bzr pull $PKGMK_VCS_BZR_OPTS "$url"; then
@@ -891,9 +914,17 @@ extract_source() {
         FINAL_SRCNAME=$(get_final_srcname "$NETSRC")
         check_abort "$FINAL_SRCNAME"
         FINAL_SRCPATH=$(get_final_srcpath $NETSRC)
+        # local|git|svn|hg|bzr MUST NOT use NOEXTRACT in the source array
+        case "$PROTOCOL" in
+            local|git|svn|hg|bzr)
+                if has_source_noextract "$NETSRC"; then
+                    abort_check_keepwork "local git svn hg bzr sources MUST NOT specify 'NOEXTRACT'. SOURCE: <$NETSRC>"
+                fi
+        esac
+
         case "$PROTOCOL" in
             ftp|http|https)
-				if [ "$PKGMK_IGNORE_UNPACK" == "yes" ];then
+				if [ "$PKGMK_IGNORE_UNPACK" == "yes" ] || has_source_noextract "$NETSRC"; then
 					extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
 				else
                     extract_file "$FINAL_SRCPATH" "$FINAL_SRCNAME" "$NETSRC"
@@ -973,7 +1004,7 @@ extract_file() {
 
 	local ret=0
     msg2 "$(gettext "Extracting file with (%s): <%s>")" "$cmd" "$FINAL_SRCPATH"
-	if [[ $cmd = "bsdtar" ]]; then
+	if [[ $cmd == "bsdtar" ]]; then
 		$cmd -p -C $SRC -xf "$FINAL_SRCPATH"  || ret=$?
 	else
 		rm -f -- "$SRC/${FINAL_SRCNAME%.*}"
@@ -998,7 +1029,7 @@ extract_git() {
 	local NETSRC=$1
 
 	local FRAGMENT=${NETSRC#*#}
-	if [[ $FRAGMENT = "$NETSRC" ]]; then
+	if [[ "$FRAGMENT" == "$NETSRC" ]]; then
 		unset FRAGMENT
 	fi
 
@@ -1027,7 +1058,7 @@ extract_git() {
 	cd_safe "${dir##*/}"
 
 	local ref=origin/HEAD
-	if [[ -n $FRAGMENT ]]; then
+	if [[ -n "$FRAGMENT" ]]; then
 		case ${FRAGMENT%%=*} in
 			commit|tag)
 				ref=${FRAGMENT##*=}
@@ -1081,7 +1112,7 @@ extract_hg() {
 	local NETSRC=$1
 
 	local FRAGMENT=${NETSRC#*#}
-	if [[ $FRAGMENT = "$NETSRC" ]]; then
+	if [[ "$FRAGMENT" == "$NETSRC" ]]; then
 		unset FRAGMENT
 	fi
 
@@ -1095,7 +1126,7 @@ extract_hg() {
 	pushd "$SRC" &>/dev/null
 
 	local ref=tip
-	if [[ -n $FRAGMENT ]]; then
+	if [[ -n "$FRAGMENT" ]]; then
 		case ${FRAGMENT%%=*} in
 			branch|revision|tag)
 				ref="${FRAGMENT##*=}"
@@ -1126,12 +1157,12 @@ extract_bzr() {
 	local NETSRC=$1
 	local REPO=$(get_final_srcname "$NETSRC")
 	local FRAGMENT=${NETSRC#*#}
-	if [[ $FRAGMENT == "$NETSRC" ]]; then
+	if [[ "$FRAGMENT" == "$NETSRC" ]]; then
 		unset FRAGMENT
 	fi
 
 	rev="last:1"
-	if [[ -n $FRAGMENT ]]; then
+	if [[ -n "$FRAGMENT" ]]; then
 		case ${FRAGMENT%%=*} in
 			revision)
 				rev="${FRAGMENT#*=}"
@@ -1196,7 +1227,7 @@ update_pkgver() {
 			if ! sed -i "s|^version=.*$|version=$NEW_VERSION      # previous: $version|" "$BUILDFILE"; then
 				abort "$(gettext "Failed to update 'Pkgfile version' from: <%s> to <%s>")" "$version" "$NEW_VERSION"
 			fi
-			sed -i "s:|^pkgrel=[^ ]*|pkgrel=1|" "$BUILDFILE"
+			sed -i "s|^pkgrel=[^ ]*|pkgrel=1|" "$BUILDFILE"
 
             # TODO: Decide if we should keep that or just update the version variable with the new one.
 			source_safe "$BUILDFILE"
@@ -1432,35 +1463,35 @@ get_pkgfile_variables() {
 
 check_pkgfile() {
 	local SIZE NAME_TEST RELEASE_TEST
-	if [ "${name}" == "" ]; then
+	if [ "$name" == "" ]; then
         abort "$(gettext "Variable 'name' not initiated or not found in <%s>")" "$PKGMK_PKGFILE"
 	fi
 	if ! have_function 'build' && [ "$PKGMK_PKGFILE" == "Pkgfile" ]; then
         abort "$(gettext "Function 'build' not specified in <%s>")" "$PKGMK_PKGFILE"
 	fi
-	NAME_TEST="$(echo "${name}" | sed 's@[[a-z0-9]*[-_+]*]*@@g')"
+	NAME_TEST="$(echo "$name" | sed 's@[[a-z0-9]*[-_+]*]*@@g')"
 	if [ "$NAME_TEST" != "" ]; then
         abort "$(gettext "Variable 'name' contains following illegal characters: <%s>")" "$NAME_TEST"
 	fi
 	if [ ${#name} -gt 50 ];then
         abort "$(gettext "Variable 'name' length higher then 50 characters.")"
 	fi
-	if [ "${version}" == "" ]; then
+	if [ "$version" == "" ]; then
         abort "$(gettext "Variable 'version' not initiated or not found in <%s>")" "$PKGMK_PKGFILE"
     else
         check_version "$version"
     fi
-	if [ "${release}" == "" ]; then
-        abort "$(gettext "Variable 'release' not initiated or not found in<%s>")" "$PKGMK_PKGFILE"
+	if [ "$release" == "" ]; then
+        abort "$(gettext "Variable 'release' not initiated or not found in <%s>")" "$PKGMK_PKGFILE"
 	fi
-	RELEASE_TEST="$(echo "${release}" | sed 's@[0-9]*@@g')"
+	RELEASE_TEST="$(echo "$release" | sed 's@[0-9]*@@g')"
 	if [ "$RELEASE_TEST" != "" ]; then
         abort "$(gettext "Variable 'release' contains following illegal characters:<%s>")" "$RELEASE_TEST"
 	fi
 	if [ $release -gt  99999999 ]; then
         abort "$(gettext "Variable 'release' outside limit which is '99999999'.")"
 	fi
-	if [ "${description}" == "" ]; then
+	if [ "$description" == "" ]; then
 		warning "$(gettext "Variable 'description' not initiated or not found in <%s>")" "$PKGMK_PKGFILE"
 	fi
 	SIZE=${#description}
@@ -1477,7 +1508,7 @@ get_package_name() {
 	else
 		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 	fi
-	NAME=`echo $1|sed "s/i686.$EXT//"|sed "s/x86_64.$EXT//"|sed "s/any.$EXT//"`
+	NAME=$(echo $1|sed "s/i686.$EXT//"|sed "s/x86_64.$EXT//"|sed "s/any.$EXT//")
 
 	echo "${NAME:0:$((${#NAME} - 10 ))}"
 }
@@ -1490,7 +1521,7 @@ get_package_builddate() {
 		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 	fi
 	NAME="`get_package_name $1`"
-	BUILD_DATE=`echo $1|sed "s/i686.$EXT//"|sed "s/x86_64.$EXT//"|sed "s/any.$EXT//"`
+	BUILD_DATE=$(echo $1|sed "s/i686.$EXT//"|sed "s/x86_64.$EXT//"|sed "s/any.$EXT//")
 	echo "${BUILD_DATE:$((${#NAME}))}"
 }
 
@@ -1834,7 +1865,7 @@ build_package() {
 		j=0
 		for group in ${PKGMK_GROUPS[@]}; do
 			BUILD_SUCCESSFUL="yes"
-            if have_function "${group}"; then
+            if have_function "$group"; then
 				(set -e -x ;${group})
 				j=1
 				if [ $? = 0 ]; then
