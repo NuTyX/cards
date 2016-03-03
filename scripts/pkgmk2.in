@@ -998,7 +998,8 @@ extract_file() {
 			if bsdtar -tf "$FINAL_SRCPATH" -q '*' &>/dev/null; then
 				cmd="bsdtar"
 			else
-				return 0
+				extract_only_copy "$FINAL_SRCPATH" "$NETSRC"
+                return 0
 			fi ;;
 	esac
 
