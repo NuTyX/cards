@@ -119,7 +119,7 @@ If -f is passed as optional argument, it will force the install means overwrite 
 
 	addCommand(CMD_LEVEL, "level",
 		"\tgenerate all the levels.",
-"This command is used for the packager. It allow to see which package depends on which dependencie. It is used for the compilation of a port.",
+"This command is used by the packager. It allows to see which package depends on which dependency. It is used for the compilation of a port.",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_DIFF, "diff",

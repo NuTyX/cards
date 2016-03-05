@@ -186,7 +186,7 @@ Binaries scenario: synchronize local and remote metadatas from the mirror define
 .TP
 .B level [-I]
 Ports scenario: print all the ports available in the order of compilation (per level).
-Use -I if you have WARNING about <dependencie> from <port> NOT FOUND ... or fix the prob if you can.
+Use -I if you have WARNING about <dependencies> from <port> NOT FOUND ... or fix the prob if you can.
 
 .TP
 .B create -r <package>
