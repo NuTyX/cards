@@ -210,8 +210,8 @@ void Pkginfo::run()
 						bool found = false;
 						for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k) {
 							if ( k->find('/' + *i) != string::npos) {
-								string dependencie = j->first + static_cast<ostringstream*>( &(ostringstream() <<  j->second.build ))->str();
-								runtimeList.insert(dependencie);
+								string dependency = j->first + static_cast<ostringstream*>( &(ostringstream() <<  j->second.build ))->str();
+								runtimeList.insert(dependency);
 								break;
 								found = true;
 							}

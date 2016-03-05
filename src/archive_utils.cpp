@@ -145,10 +145,10 @@ void ArchiveUtils::getRunTimeDependenciesEpoch()
 {
 	std::pair<std::string,time_t > NameEpoch;
 	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		string dependencie = *i;
-		if ( dependencie[0] == 'R' ) {
-			NameEpoch.first=dependencie.substr(1,dependencie.size()-11);
-			NameEpoch.second=strtoul((dependencie.substr(dependencie.size()-10)).c_str(),NULL,0);
+		string dependency = *i;
+		if ( dependency[0] == 'R' ) {
+			NameEpoch.first=dependency.substr(1,dependency.size()-11);
+			NameEpoch.second=strtoul((dependency.substr(dependency.size()-10)).c_str(),NULL,0);
 			m_rtDependenciesEpochList.insert(NameEpoch);
 		}
 	}
@@ -156,9 +156,9 @@ void ArchiveUtils::getRunTimeDependenciesEpoch()
 void ArchiveUtils::getRunTimeDependencies()
 {
 	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		string dependencie = *i;
-		if ( dependencie[0] == 'R' ) {
-			m_rtDependenciesList.insert(dependencie.substr(1));
+		string dependency = *i;
+		if ( dependency[0] == 'R' ) {
+			m_rtDependenciesList.insert(dependency.substr(1));
 		}
 	}
 }
