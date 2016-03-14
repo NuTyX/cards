@@ -133,7 +133,7 @@ get_package_name() {
 	else
 		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 	fi
-	NAME=`echo $1|sed "s/i686.$EXT//"|sed "s/x86_64.$EXT//"|sed "s/any.$EXT//"`
+	NAME=`echo $1|sed "s/$PKGMK_ARCH.$EXT//"|sed "s/any.$EXT//"`
 
 	echo "${NAME:0:$((${#NAME} - 10 ))}"	
 }
@@ -145,7 +145,7 @@ get_package_builddate() {
 		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 	fi
 	NAME="`get_package_name $1`"
-	BUILD_DATE=`echo $1|sed "s/i686.$EXT//"|sed "s/x86_64.$EXT//"|sed "s/any.$EXT//"`
+	BUILD_DATE=`echo $1|sed "s/$PKGMK_ARCH.$EXT//"|sed "s/any.$EXT//"`
 	echo "${BUILD_DATE:$((${#NAME}))}"
 }
 get_package_extension() {
@@ -315,7 +315,7 @@ unpack_source() {
 get_package_list() {
 	local ARCHFILE i
 	i=0
-	for ARCH in x86_64 i686 any; do
+	for ARCH in $PKGMK_ARCH any; do
 		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*$ARCH.$PKGMK_PACKAGE_EXT*"`; do
 			TARGETS[i]=`basename $FILE`
 			i=$((i+1))
