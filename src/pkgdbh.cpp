@@ -838,8 +838,16 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 	}
 	packageArchiveName = packageArchive.name();
 	if ( ( packageArchive.arch() != getMachineType() ) && ( packageArchive.arch() != "any" ) ) {
-		m_actualError = WRONG_ARCHITECTURE;
-		treatErrors(basename);
+		if ( m_root.size() > 1 ) { // means it's in a chroot environment ... probably
+			cerr << basename << ": Architecture is different. If "
+				<<  m_root << " filesystem is a "
+				<< getMachineType()
+				<< " architecture, everything is OK..."
+				<< endl;
+		} else {
+			m_actualError = WRONG_ARCHITECTURE;
+			treatErrors(basename);
+		}
 	}
 	m_packageArchiveVersion = packageArchive.version();
 	m_packageArchiveRelease = itos(packageArchive.release());

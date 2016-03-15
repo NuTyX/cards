@@ -119,7 +119,7 @@ All scenarios: remove the <package>
 All scenarios: print the actual configuration of cards. It shows the order of ports and binaries directories,
 the base directory containing all the package which should be keep when a
 .B cards base -r
-command is given. It shows also the arch defined (i686 or x86_64), the locale which going to be installed with the
+command is given. It shows also the arch defined (i686, x86_64, etc), the locale which going to be installed with the
 .B cards install
 command, and the defined log directory which will be used by the
 .B cards depcreate
