@@ -46,7 +46,6 @@
 #define LDCONFIG         "/sbin/ldconfig"
 #define LDCONFIG_CONF    "/etc/ld.so.conf"
 #define SHELL            "bin/sh"
-using namespace std;
 
 enum action 
 { 
@@ -160,7 +159,7 @@ protected:
 
 
 	void readRulesFile();
-	void getInstallRulesList(const vector<rule_t>& rules, rule_event_t event, vector<rule_t>& found) const;
+	void getInstallRulesList(const std::vector<rule_t>& rules, rule_event_t event, std::vector<rule_t>& found) const;
 	bool checkRuleAppliesToFile(const rule_t& rule, const std::string& file);
 
 	void getFootprintPackage(std::string& filename);
@@ -194,7 +193,7 @@ private:
 
 class Db_lock {
 public:
-	Db_lock(const string& m_root, bool exclusive);
+	Db_lock(const std::string& m_root, bool exclusive);
 	~Db_lock();
 
 private:

@@ -84,35 +84,35 @@ struct Config {
 	std::vector<std::string> baseDir;
 };
 
-using namespace std;
-int getConfig(const string& fileName, Config& config);
+int getConfig(const std::string& fileName, Config& config);
 FILE *openFile(const char *fileName);
 void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmemb);
-string trimFileName(const string& filename);
-string modifyTimeFile(const string& filename);
-bool checkFileExist(const string& filename);
-bool checkFileEmpty(const string& filename);
-bool checkRegularFile(const string& filename);
-bool checkFilesEqual(const string& file1, const string& file2);
-bool checkPermissionsEqual(const string& file1, const string& file2);
-bool createRecursiveDirs(const string& pathname);
-void cleanupMetaFiles(const string& basedir);
-void removeFile(const string& basedir, const string& filename);
+std::string trimFileName(const std::string& filename);
+std::string modifyTimeFile(const std::string& filename);
+bool checkFileExist(const std::string& filename);
+bool checkFileEmpty(const std::string& filename);
+bool checkRegularFile(const std::string& filename);
+bool checkFilesEqual(const std::string& file1, const std::string& file2);
+bool checkPermissionsEqual(const std::string& file1, const std::string& file2);
+bool createRecursiveDirs(const std::string& pathname);
+void cleanupMetaFiles(const std::string& basedir);
+void removeFile(const std::string& basedir, const std::string& filename);
 int copyFile(const char *  destFile, const char *  origFile);
-int findFile(set<string>& filesList, const string& basedir);
+int findFile(std::set<std::string>& filesList, const std::string& basedir);
 int findDir(itemList *filenameList, const char *path);
-int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, int spec);
+int findRecursiveFile(std::set<std::string>& filenameList, char *filename, regex_t *reg, int spec);
 int readFileStripSpace(itemList *fileContent, const char *fileName);
 int readFile(itemList *fileContent, const char *fileName);
-int parseFile(set<string>& fileContent, const char* fileName);
-int parseFile(vector<string>& fileContent, const char* fileName);
-bool findMD5sum(const string& fileName, unsigned char* result);
+int parseFile(std::set<std::string>& fileContent, const char* fileName);
+int parseFile(std::vector<std::string>& fileContent, const char* fileName);
+bool findMD5sum(const std::string& fileName, unsigned char* result);
 bool checkMD5sum(const char * fileName, const char * MD5Sum);
 /* read a file
    return it into a template container */
 template <class T>
 int parseFile( T& target, const char* fileName)
 {
+  using namespace std;
 	FILE *fp = NULL;
 	if (( fp = openFile (fileName)) == NULL ) {
 		return -1;

@@ -25,6 +25,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
+using namespace std;
+
 Pkgrm::Pkgrm ()
 	: Pkgdbh("pkgrm")
 {

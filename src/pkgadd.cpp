@@ -31,6 +31,8 @@
 #include <regex.h>
 #include <unistd.h>
 
+using namespace std;
+
 Pkgadd::Pkgadd()
 	: Pkgdbh("pkgadd"),
 	m_runPrePost(true),

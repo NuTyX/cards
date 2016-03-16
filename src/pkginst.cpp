@@ -19,6 +19,8 @@
 //
 #include "pkginst.h"
 
+using namespace std;
+
 Pkginst::Pkginst(const string& commandName,const string& configFileName)
 	: Pkgadd(commandName), Pkgrepo(configFileName)
 {

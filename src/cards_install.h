@@ -39,7 +39,7 @@ class Cards_install: public Pkginst
 		 */
 		Cards_install(const CardsArgumentParser& argParser,
 			const std::string& configFileName,
-			const std::vector<string>& listOfPackages);
+			const std::vector<std::string>& listOfPackages);
 			
 	private:
 		const CardsArgumentParser& m_argParser;

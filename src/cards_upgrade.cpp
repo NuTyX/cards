@@ -22,6 +22,7 @@
 Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,const std::string& configFileName)
 	: Pkginst("cards upgrade",configFileName), m_argParser(argParser)
 {
+	using namespace std;
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
 
@@ -65,18 +66,18 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,const std::str
 }
 void Cards_upgrade::size()
 {
-	cout << m_ListOfPackages.size() << endl;
+	std::cout << m_ListOfPackages.size() << std::endl;
 }
 void Cards_upgrade::Isuptodate()
 {
 	if ( m_ListOfPackages.size() == 0)
-		cout << "no" << endl;
+		std::cout << "no" << std::endl;
 	else
-		cout << "yes" << endl;
+		std::cout << "yes" << std::endl;
 }
 void Cards_upgrade::dry()
 {
-	for (auto i : m_ListOfPackages ) cout << i.first  << endl;
+	for (auto i : m_ListOfPackages ) std::cout << i.first  << std::endl;
 }
 void Cards_upgrade::upgrade()
 {

@@ -50,8 +50,8 @@ private:
 	int execShell(const char* shell);
 	int execShellLog(const char* shell);
 
-	string application;
-	string arguments;
+	std::string application;
+	std::string arguments;
 	int fileDescriptorLog;
 };
 

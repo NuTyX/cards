@@ -21,6 +21,9 @@
 //
 
 #include "file_utils.h"
+
+using namespace std;
+
 int getConfig(const string& fileName, Config& config)
 {
 	FILE* fp = fopen(fileName.c_str(), "r");

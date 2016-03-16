@@ -26,7 +26,7 @@
 
 Cards_create::Cards_create(const CardsArgumentParser& argParser,
 	const std::string& configFileName,
-	const std::vector<string>& listOfPackages)
+	const std::vector<std::string>& listOfPackages)
 	: Pkginst("cards create",configFileName),m_argParser(argParser)
 {
 	parseArguments();
@@ -41,9 +41,10 @@ Cards_create::Cards_create(const CardsArgumentParser& argParser,
 	parseArguments();
 	createBinaries(configFileName, packageName);
 }
-void Cards_create::createBinaries(const string& configFileName,
-	const string& packageName)
+void Cards_create::createBinaries(const std::string& configFileName,
+	const std::string& packageName)
 {
+	using namespace std;
 	Config config;
 	Pkgrepo::parseConfig(configFileName, config);
 	cout << "create of " << packageName << endl;
@@ -142,7 +143,7 @@ void Cards_create::createBinaries(const string& configFileName,
 		write( fdlog, "\n", 1 );
 	}
 
-	std::set<string> listOfPackages;
+	set<string> listOfPackages;
 	if (findFile(listOfPackages, pkgdir) != 0) {
 		m_actualError = CANNOT_READ_DIRECTORY;
 		treatErrors(pkgdir);
@@ -150,7 +151,7 @@ void Cards_create::createBinaries(const string& configFileName,
 
 	// Let's install the found binaries now
 	for (auto i : listOfPackages) {
-		if (i.find("cards.tar")== string::npos )
+		if (i.find("cards.tar")== std::string::npos )
 			continue;
 		m_packageFileName = pkgdir + "/" + i;
 		ArchiveUtils packageArchive(m_packageFileName.c_str());

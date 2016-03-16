@@ -24,7 +24,7 @@
 
 class Cards_upgrade : public Pkginst {
 private:
-	set<pair<string,time_t>> m_ListOfPackages;
+	std::set<std::pair<std::string,time_t>> m_ListOfPackages;
 	const CardsArgumentParser& m_argParser;
 public:
 	Cards_upgrade(const CardsArgumentParser& argParser,const std::string& configFileName);

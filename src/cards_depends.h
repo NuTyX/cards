@@ -51,8 +51,8 @@ public:
 	void showDependencies();
 	void showLevel();
 	
-	std::vector<string>& getDependencies();
-	std::vector<string>& getNeededDependencies();
+	std::vector<std::string>& getDependencies();
+	std::vector<std::string>& getNeededDependencies();
 	std::vector<LevelName>& getLevel();
 
 	int deptree();
@@ -73,10 +73,10 @@ private:
 	int depends();
 	int level();
 
-	std::vector<string> m_dependenciesList;
-	std::vector<string> m_neededDependenciesList;
+	std::vector<std::string> m_dependenciesList;
+	std::vector<std::string> m_neededDependenciesList;
 	std::vector<LevelName> m_levelList;
-	std::set<string> m_missingDepsList;
+	std::set<std::string> m_missingDepsList;
 	
 	const CardsArgumentParser& m_argParser;
 	const char* m_packageName;

@@ -33,15 +33,15 @@ class Cards_create : public Pkginst
 	public:
 		Cards_create(const CardsArgumentParser& argParser,
 			const std::string& configFileName,
-			const std::vector<string>& listOfPackages);
+			const std::vector<std::string>& listOfPackages);
 		Cards_create(const CardsArgumentParser& argParser,
 			const std::string& configFileName,
 			const std::string& packageName);
 		void parseArguments();
 			
 	private:
-		void createBinaries(const string& configFileName,
-			const string& packageName);
+		void createBinaries(const std::string& configFileName,
+			const std::string& packageName);
 		const CardsArgumentParser& m_argParser;
 };
 

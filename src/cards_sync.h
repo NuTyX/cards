@@ -30,7 +30,7 @@ public:
 		const std::string& url,
 		const std::string& directory,
 		const std::string& repoFile);
-	virtual void treatErrors(const string& s) const;
+	virtual void treatErrors(const std::string& s) const;
 
 	void run();
 	void purge();
@@ -39,13 +39,13 @@ public:
 	
 private:
 
-	unsigned int getLocalPackages(const string& path);
-	unsigned int getRemotePackages(const string& pkgrepoFile);
+	unsigned int getLocalPackages(const std::string& path);
+	unsigned int getRemotePackages(const std::string& pkgrepoFile);
 
-	void deleteFolder(const string& folderName);
+	void deleteFolder(const std::string& folderName);
 
-	set<string> m_localPackagesList;
-	set<string> m_remotePackagesList;
+	std::set<std::string> m_localPackagesList;
+	std::set<std::string> m_remotePackagesList;
 	const std::string m_baseDirectory;
 	const std::string m_remoteUrl;
 	std::string m_repoFile;

@@ -23,6 +23,8 @@
 #include <fstream>
 #include <iterator>
 
+using namespace std;
+
 FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 	: m_progress(progress)
 {

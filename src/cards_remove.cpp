@@ -25,9 +25,11 @@
 #include "cards_remove.h"
 #include "pkgrepo.h"
 
+using namespace std;
+
 Cards_remove::Cards_remove(const string& commandName,
 	const CardsArgumentParser& argParser,
-	const std::string& configFileName)
+	const string& configFileName)
 	: Pkgrm(commandName),m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))

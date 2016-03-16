@@ -62,11 +62,11 @@ class FileDownload
 	CURLcode    m_curlCode;
 	dwlProgress m_downloadProgress;
 	InfoFile    m_destinationFile;
-	string      m_url;
-	string      m_downloadFileName;
+	std::string      m_url;
+	std::string      m_downloadFileName;
 	bool        m_checkMD5;
 	bool        m_progress;
-	string      m_MD5Sum;
+	std::string      m_MD5Sum;
 };
 
 #endif /* FILEDOWNLOAD_H */

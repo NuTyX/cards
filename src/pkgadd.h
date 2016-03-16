@@ -42,14 +42,14 @@ protected:
 	bool m_upgrade;
 	bool m_force;
 private:
-	set<string> getKeepFileList(const set<string>& files,
-		const vector<rule_t>& rules);
-	set<string> applyInstallRules(const string& name,
+	std::set<std::string> getKeepFileList(const std::set<std::string>& files,
+		const std::vector<rule_t>& rules);
+	std::set<std::string> applyInstallRules(const std::string& name,
 		pkginfo_t& info,
-		const vector<rule_t>& rules);
-	void getInstallRulesList(const vector<rule_t>& rules,
+		const std::vector<rule_t>& rules);
+	void getInstallRulesList(const std::vector<rule_t>& rules,
 		rule_event_t event,
-		vector<rule_t>& found) const;
+		std::vector<rule_t>& found) const;
 };
 
 #endif /* PKGADD_H */

@@ -44,8 +44,8 @@ Cards_sync::Cards_sync (const CardsArgumentParser& argParser)
 	m_repoFile = DEFAULT_REPOFILE;
 }
 Cards_sync::Cards_sync ( const CardsArgumentParser& argParser,
-		const string& url, const string& baseDirectory,
-		const string& repoFile)
+		const std::string& url, const std::string& baseDirectory,
+		const std::string& repoFile)
 		: m_baseDirectory(baseDirectory),
 		m_remoteUrl(url),
 		m_argParser(argParser)
@@ -56,7 +56,7 @@ Cards_sync::Cards_sync ( const CardsArgumentParser& argParser,
 		m_repoFile = DEFAULT_REPOFILE;
 	}
 }
-void Cards_sync::treatErrors(const string& s) const
+void Cards_sync::treatErrors(const std::string& s) const
 {
 	switch ( m_actualError )
 	{
@@ -122,7 +122,7 @@ unsigned int Cards_sync::getLocalPackages(const string& path)
 	}
 	return m_localPackagesList.size();
 }
-unsigned int Cards_sync::getRemotePackages(const string& pkgrepoFile)
+unsigned int Cards_sync::getRemotePackages(const std::string& pkgrepoFile)
 {
 	m_remotePackagesList.clear();
 	if ( parseFile(m_remotePackagesList,pkgrepoFile.c_str()) != 0) {
@@ -133,6 +133,7 @@ unsigned int Cards_sync::getRemotePackages(const string& pkgrepoFile)
 }
 void Cards_sync::run()
 {
+	using namespace std;
 	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
