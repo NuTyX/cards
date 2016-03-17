@@ -34,9 +34,7 @@
 #include "pkgrepo.h"
 #include "cards_sync.h"
 
-using namespace std;
-
-const string Cards_sync::DEFAULT_REPOFILE = ".PKGREPO";
+const std::string Cards_sync::DEFAULT_REPOFILE = ".PKGREPO";
 
 Cards_sync::Cards_sync (const CardsArgumentParser& argParser)
 	: m_argParser(argParser)
@@ -58,6 +56,7 @@ Cards_sync::Cards_sync ( const CardsArgumentParser& argParser,
 }
 void Cards_sync::treatErrors(const std::string& s) const
 {
+	using namespace std;
 	switch ( m_actualError )
 	{
 		case CANNOT_FIND_FILE:
@@ -113,7 +112,7 @@ void Cards_sync::treatErrors(const std::string& s) const
 			break;
 	}
 }
-unsigned int Cards_sync::getLocalPackages(const string& path)
+unsigned int Cards_sync::getLocalPackages(const std::string& path)
 {
 	m_localPackagesList.clear();
 	if ( findFile( m_localPackagesList, path) != 0 ) {
@@ -159,6 +158,7 @@ void Cards_sync::run()
 }
 void Cards_sync::purge()
 {
+	using namespace std;
 	if (getuid()) {
 			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 			treatErrors("");
@@ -176,8 +176,9 @@ void Cards_sync::purge()
 		}
 	}
 }
-void Cards_sync::deleteFolder(const string& folderName)
+void Cards_sync::deleteFolder(const std::string& folderName)
 {
+	using namespace std;
 	set<string> filesToDelete;
 	if ( findFile(filesToDelete, folderName) != 0 ){
 			m_actualError = CANNOT_READ_FILE;
