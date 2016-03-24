@@ -80,7 +80,7 @@ int ArgParser::addCommand(APCmd& cmd,
     APCmd apcmd;
     apcmd.id = m_cmdIdCounter;
 
-    PREDEFINED_CMD_HELP.init("help", 'h', "\t\t    Print this help message");
+    PREDEFINED_CMD_HELP.init("help", 'h', "\t   Print this help message");
 
     // add predefined commands
     addOption(cmd, PREDEFINED_CMD_HELP, false);
@@ -358,17 +358,17 @@ std::string ArgParser::generateHelpForCommand(const std::string& command) const
 	}
 
 	const Command * const  cmd = cit->second;
-	string help = "\n";
+	string help = "";
 	help += ACTION;
-	help += "\t\t" + cmd->shortInfo;
+	help += "\n  " + cmd->shortInfo;
 	help += "\n\n";
 	help += USAGE;
-	help += "\t\t\t" ;
+	help += "\n  " ;
 	help += BLUE + m_appName + " " + cmd->name + " ";
 	help += OPTIONS;
 	help += " " + cmd->otherArguments + "\n\n";
 	help += DESCRIPTION;
-	help += "\t\t" + cmd->description;
+	help += "\n  " + cmd->description;
 	help += "\n\n";
 
 
@@ -440,7 +440,7 @@ std::string ArgParser::generateUsage() const
 	std::map<std::string, Command*>::const_iterator it;
 	it = m_commands.begin();
 	for (; it != m_commands.end(); ++it) {
-        usage += BLUE + it->first + WHITE + "\t" +
+        usage += BLUE + it->first + WHITE + "    \t" +
             it->second->shortInfo + "\n" + NORMAL;
 	}
 
