@@ -124,30 +124,93 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 			const int length = BUFSIZ;
 			char input[length];
 			string line;
+			string depends;
+			string::size_type pos;
+			bool find_end = false;
+			// pkgdeps=() array search
 			while ( fgets( input, length, fp ) ) {
 				line = stripWhiteSpace( input );
-        if ( line[0] == '#' ) {
-					while ( !line.empty() &&
-						( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
-							line = line.substr( 1 );
-						}
-					string::size_type pos = line.find( ':' );
+				if ( find_end ) {
+					pos = line.find( ')' );
 					if ( pos != string::npos ) {
-						if ( startsWithNoCase( line, "dep" ) ) {
 #ifndef NDEBUG
 							cerr << line << endl;
 #endif
-							string depends = stripWhiteSpace( getValue( line, ':' ) );
+							depends += line.substr(0, pos);
 #ifndef NDEBUG
 							cerr << depends << endl;
 #endif
-							replaceAll( depends, " ", "," );
-							replaceAll( depends, ",,", "," );
- 							split( depends, ',', deps, 0,true);
+ 							break;
+ 					} else {
+						// Check for comment lines and inline comments
+						pos = line.find( '#' );
+						if ( pos != string::npos ) {
+							depends += line.substr(0, pos) + " ";
+						} else {
+							depends += line + " ";
+						}
+					}
+				}
+				if ( line.substr( 0, 9 ) == "pkgdeps=(" ){
+					pos = line.find( ')' );
+					if ( pos != string::npos ) {
+#ifndef NDEBUG
+							cerr << line << endl;
+#endif
+							depends = line.substr(9, pos-9);
+#ifndef NDEBUG
+							cerr << depends << endl;
+#endif
+ 							break;
+					} else {
+						// Check for comments lines and inline comments
+						pos = line.find( '#' );
+						if ( pos != string::npos ) {
+							depends += line.substr(9, pos-9) + " ";
+						} else {
+							depends += line.substr(9) + " ";
+						}
+						find_end=true;
+					}
+				}
+			}
+			if ( ! depends.empty() ) {
+				replaceAll( depends, "'", " " );
+				replaceAll( depends, "\"", " " );
+				depends = stripWhiteSpace( depends );
+				replaceAll( depends, " ", "," );
+				replaceAll( depends, ",,", "," );
+				split( depends, ',', deps, 0,true);
+ 			} else {
+				// Depends on comment line search
+				rewind (fp);
+				while ( fgets( input, length, fp ) ) {
+					line = stripWhiteSpace( input );
+					if ( line[0] == '#' ) {
+						while ( !line.empty() &&
+							( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
+								line = line.substr( 1 );
+							}
+						string::size_type pos = line.find( ':' );
+						if ( pos != string::npos ) {
+							if ( startsWithNoCase( line, "dep" ) ) {
+#ifndef NDEBUG
+								cerr << line << endl;
+#endif
+								string depends = stripWhiteSpace( getValue( line, ':' ) );
+#ifndef NDEBUG
+								cerr << depends << endl;
+#endif
+								replaceAll( depends, " ", "," );
+								replaceAll( depends, ",,", "," );
+								split( depends, ',', deps, 0,true);
+								break;
+							}
 						}
 					}
 				}
 			}
+
 			fclose( fp );
 			if ( deps.size() >0 ) {
 				bool found=false;
@@ -184,7 +247,7 @@ vector<LevelName>& CardsDepends::getLevel()
 #ifndef NDEBUG
 	for ( auto i : m_levelList ) {
 		cerr << i.name<< endl;
-	} 
+	}
 #endif
 	return m_levelList;
 }
@@ -370,7 +433,7 @@ int CardsDepends::level()
 		currentNiveau++;
 	}
 	freeItemList(filesList);
-// TODO findout why segmentfault	
+// TODO findout why segmentfault
 //freePkgInfo(package);
 	freePkgList(packagesList);
 #ifndef NDEBUG
@@ -428,8 +491,8 @@ int CardsDepends::depends()
 #endif
 			for ( unsigned int dInd=0; dInd < dependenciesList->count; dInd++ ) {
 #ifndef NDEBUG
-				cerr << "packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau: " 
-						<< packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau 
+				cerr << "packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau: "
+						<< packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau
 						<< " " << filesList->items[dependenciesList->depsIndex[dInd]] << endl;
 #endif
 				if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == currentNiveau ) {
@@ -510,7 +573,7 @@ int CardsDepends::deptree()
 			printf("%d) %s\n",dependenciesList->niveau[dInd],basename(filesList->items[dependenciesList->depsIndex[dInd]]));
 		}
 	}
-	
+
 	bool found=false;
 	string name = "";
 	set<string> localPackagesList, depsPackagesList;
@@ -519,9 +582,9 @@ int CardsDepends::deptree()
 	if ( DU.Url == "")
 		continue;
 
-    string prtDir, Url ;
-    prtDir = DU.Dir;
-    Url = DU.Url;
+	string prtDir, Url ;
+	prtDir = DU.Dir;
+	Url = DU.Url;
 		string category = basename(const_cast<char*>(prtDir.c_str()));
 		string remoteUrl = Url + "/" + category;
 		DIR *d;
@@ -548,9 +611,9 @@ int CardsDepends::deptree()
 								}
 						} else {
 							FileDownload DepsPort(remoteUrl + "/" + dirName  + "/" + name + ".deps",
-                    prtDir + "/" + dirName  ,
-                    name + ".deps",
-                    false);	
+					prtDir + "/" + dirName  ,
+					name + ".deps",
+					false);
 							DepsPort.downloadFile();
 							if (parseFile(depsPackagesList,depFile.c_str()) != 0 ) {
 								m_actualError = CANNOT_READ_FILE;
