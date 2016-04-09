@@ -127,7 +127,7 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 			string depends;
 			string::size_type pos;
 			bool find_end = false;
-			// pkgdeps=() array search
+			// makedepends=() array search
 			while ( fgets( input, length, fp ) ) {
 				line = stripWhiteSpace( input );
 				if ( find_end ) {
@@ -151,13 +151,13 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 						}
 					}
 				}
-				if ( line.substr( 0, 9 ) == "pkgdeps=(" ){
+				if ( line.substr( 0, 12 ) == "makedepends=(" ){
 					pos = line.find( ')' );
 					if ( pos != string::npos ) {
 #ifndef NDEBUG
 							cerr << line << endl;
 #endif
-							depends = line.substr(9, pos-9);
+							depends = line.substr(12, pos-12);
 #ifndef NDEBUG
 							cerr << depends << endl;
 #endif
@@ -166,9 +166,9 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 						// Check for comments lines and inline comments
 						pos = line.find( '#' );
 						if ( pos != string::npos ) {
-							depends += line.substr(9, pos-9) + " ";
+							depends += line.substr(12, pos-12) + " ";
 						} else {
-							depends += line.substr(9) + " ";
+							depends += line.substr(12) + " ";
 						}
 						find_end=true;
 					}
