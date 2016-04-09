@@ -99,7 +99,7 @@ Si défini comme 'yes', pkgmk supprime le(s) paquet(s) produit(s) après une con
 Défaut: 'yes'
 .TP
 \fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
-Si défini, pkgmk fera une tentative de séparation du paquet produit en sous groupes. Chaque groupe étant défini dans cette variable. Une fonction par défaut est exécutée si cette même fonction n'est pas trouvée dans le Pkgfile. (EXPERIMENTAL)
+Si défini, pkgmk fera une tentative de séparation du paquet produit en sous groupes. Chaque groupe étant défini dans cette variable. Une fonction par défaut est exécutée si cette même fonction n'est pas trouvée dans le Pkgfile. Les groupes de fonction suivantes sont disponibles: lib() devel()  doc()  man()  service()
 .br
 Défaut: '()' Aucun sous paquet ne sera produit, sauf si défini dans le Pkgfile
 Valeurs possibles: '(lib devel man doc service)'

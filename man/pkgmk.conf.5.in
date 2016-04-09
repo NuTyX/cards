@@ -104,7 +104,7 @@ If set to 'yes', pkgmk will delete the package(s) after a successfull build and 
 Default: 'yes'
 .TP
 \fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
-If set, pkgmk will try to split the produced package into groups. Each group is define in this variable. A default function is executed if this same function is not found in the Pkgfile.
+If set, pkgmk will try to split the produced package into groups. Each group is define in this variable. A default function is executed if this same function is not found in the Pkgfile. Supported default group functions are: lib() devel()  doc()  man()  service()
 .br
 Default: '()' No sub package will be produced except if define in the Pkgfile
 Possible values: '(lib devel man doc service)'
