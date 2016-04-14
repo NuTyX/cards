@@ -1091,7 +1091,7 @@ print_help() {
 	echo " -utd,  --up-to-date          do not build, only check if package is up to date"
 	echo "  -ur,  --update-repo         do not build, only update the $PKGMK_REPO file"
 	echo "  -uc,  --update-collection   do not build, only update the $PKGMK_REPO file of the collection means from the parent directory"
-	echo "  -uf,  --update-footprint    update footprint using result from last build"
+	echo "  -uf,  --update-footprint    update footprint using the result of the last build"
 	echo "  -ic,  --ignore-collection   build packages without update the $PKGMK_REPO file of the collection means from the parent directory"
 	echo "  -if,  --ignore-footprint    build packages without checking footprint"
 	echo "  -in,  --ignore-new          build packages, ignore new files in a footprint missmatch"
