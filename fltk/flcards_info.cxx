@@ -69,7 +69,7 @@ set<string> Flcards_info::getListOfInstalledPackages()
 	m_progressBar->value(0);
 
 	getListOfPackageNames (m_root);
-	buildDatabaseWithDetailsInfos(false);
+	buildDatabaseWithDetailInfos(false);
 
 	delete m_progressBar;
 	delete m_window;

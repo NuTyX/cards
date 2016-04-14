@@ -73,7 +73,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	: Pkginst("cards install",configFileName),m_argParser(argParser)
 {
 	parseArguments();
-	buildDatabaseWithDetailsInfos(false);
+	buildDatabaseWithDetailInfos(false);
 	for (auto i : listOfPackages) {
 		std::string packageName = basename(const_cast<char*>(i.c_str()));
 		if ( packageName == m_argParser.otherArguments()[0])
