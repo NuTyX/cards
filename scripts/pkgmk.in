@@ -1083,7 +1083,7 @@ print_help() {
 	echo "   -u,  --upgrade             build and install packages (as upgrade)"
 	echo "   -r,  --recursive           search for and build packages recursively"
 	echo "   -d,  --download            download missing source file(s)"
-	echo "   -f,  --force               build packages even if it appears to be up to date"
+	echo "   -f,  --force               build packages even if they appear to be up-to-date"
 	echo "  -cs,  --check-syntax        do not build, only check package syntax"
 	echo "  -cv,  --show-version-only   do not build, only show the version of the port and exit"
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
