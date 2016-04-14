@@ -1,7 +1,7 @@
 //  file_download.cc
-// 
+//
 //  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
-// 
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -14,7 +14,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
 
@@ -48,7 +48,7 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 		m_MD5Sum = i->md5sum;
 		createRecursiveDirs(i->dirname);
 		initFileToDownload(m_url,m_downloadFileName);
-		downloadFile();	
+		downloadFile();
 		if ( ! checkMD5sum() )
 			throw runtime_error (m_downloadFileName + " " + m_MD5Sum +": checksum error");
 	}
@@ -111,10 +111,10 @@ void FileDownload::downloadFile()
 	m_downloadProgress.lastruntime = 0;
 	m_downloadProgress.curl = m_curl;
 	/*
-	TODO May be they is a more efficient way to do that but
+	TODO Maybe there is a more efficient way to do this, but
 	for the moment we never want to use server side cache
 	*/
-	curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, m_slist);	
+	curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, m_slist);
 	curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, &FileDownload::writeToStreamHandle);
 	curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &m_destinationFile);
 	curl_easy_setopt(m_curl, CURLOPT_PROGRESSFUNCTION, &FileDownload::updateProgressHandle);
@@ -130,11 +130,11 @@ void FileDownload::downloadFile()
 	if (m_progress)
 		cout << endl;
 	if ( m_curlCode != CURLE_OK) {
-		cerr << curl_easy_strerror(m_curlCode) << endl;		
-		throw runtime_error ( "\n\nURL   : " + 
-		m_url + "\nFILE  : " + 
-		m_downloadFileName + "\nMD5SUM: " + 
-		m_MD5Sum +"\n\n !!! download failed !!! \n");	
+		cerr << curl_easy_strerror(m_curlCode) << endl;
+		throw runtime_error ( "\n\nURL   : " +
+		m_url + "\nFILE  : " +
+		m_downloadFileName + "\nMD5SUM: " +
+		m_MD5Sum +"\n\n !!! download failed !!! \n");
 	}
 	if (m_destinationFile.stream) {
 		fclose(m_destinationFile.stream);
@@ -179,7 +179,7 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 	curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &TotalTime);
 	fprintf(stderr,"\r%d Bytes - %d Bytes/Sec - %d%% - %d Sec remain ",
 	(int)dlnow, (int)SpeedDownload, (int)((dlnow/dltotal) * 100 ), (int)((dltotal - dlnow)/SpeedDownload) );
-	
+
 	return 0;
 }
 int FileDownload::updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
