@@ -128,8 +128,8 @@ protected:
 	int getListOfPackageNames(const std::string& path);
 	std::pair<std::string, pkginfo_t> getInfosPackage(const std::string& packageName);
 	void buildDatabaseWithNameVersion();
-	void buildDatabaseWithDetailsInfos(const bool& silent);
-	void buildDatabaseWithDetailsInfos(const std::string& path);
+	void buildDatabaseWithDetailInfos(const bool& silent);
+	void buildDatabaseWithDetailInfos(const std::string& path);
 
 
 	void addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& info);

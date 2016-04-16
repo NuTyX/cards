@@ -365,7 +365,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 	}
 }
 /* Populate the database with all details infos */
-void Pkgdbh::buildDatabaseWithDetailsInfos(const bool& silent)
+void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
 {
 	cleanupMetaFiles(m_root);
 	if (m_DB_Empty) {

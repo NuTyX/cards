@@ -59,7 +59,7 @@ struct BasePackageInfo {
  * \representation of the .PKGREPO file locate in each port directory.
  * The difference with the collection .PKGREPO, it contains the list of
  * possible files (binaries, Pkgfile, README etc)
- * Exemple of firefox/.PKGREPO contents:
+ * Example of firefox/.PKGREPO contents:
  ******************************************************
  * 1428615787#.cards.tar.xz#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org
  * ada2187e655daaec9195802b955cce4b#firefox#i686

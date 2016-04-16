@@ -106,7 +106,7 @@ void Pkgadd::run()
 	getListOfPackageNames(m_root);
 
 	// Retrieving info about all the packages
-	buildDatabaseWithDetailsInfos(false);
+	buildDatabaseWithDetailInfos(false);
 
 	// Reading the archiving to find a list of files
 	pair<string, pkginfo_t> package = openArchivePackage(m_packageArchiveName);

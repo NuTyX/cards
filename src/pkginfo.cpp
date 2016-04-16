@@ -177,7 +177,7 @@ void Pkginfo::run()
 			}
 		} else if (m_list_mode) {
 			// List package or file contents
-			buildDatabaseWithDetailsInfos(false);
+			buildDatabaseWithDetailInfos(false);
 			if (checkPackageNameExist(m_arg)) {
 				copy(m_listOfInstPackages[m_arg].files.begin(), m_listOfInstPackages[m_arg].files.end(), ostream_iterator<string>(cout, "\n"));
 			} else if (checkFileExist(m_arg)) {
@@ -189,17 +189,17 @@ void Pkginfo::run()
 			}
 		} else if (m_runtimedependencies_mode) {
 			/* 	Get runtimedependencies of the file found in the directory path
-				get the list of installed package silently */
-			buildDatabaseWithDetailsInfos(true);
+				get the list of installed packages silently */
+			buildDatabaseWithDetailInfos(true);
 			regex_t r;
 			int Result;
 			regcomp(&r, ".", REG_EXTENDED | REG_NOSUB);
 			set<string>filenameList;
 			Result = findRecursiveFile (filenameList, const_cast<char*>(m_arg.c_str()), &r, WS_DEFAULT);
-			// get the list of library for all the possible files 
+			// get the list of libraries for all the possible files 
 			set<string> librariesList;
 			for (auto i : filenameList) Result = getRuntimeLibrariesList(librariesList,i);
-			// get the own package  for all the elf files dependencies libraries
+			// get the own package for all the elf files dependencies libraries
 #ifndef NDEBUG
 			for (auto i : librariesList) cerr << i <<endl;
 #endif
@@ -224,7 +224,7 @@ void Pkginfo::run()
 				}
 				if (runtimeList.size()>0) {
 #ifndef NDEBUG
-					cerr << "Number of libraries founds: " << runtimeList.size() << endl;
+					cerr << "Number of libraries found: " << runtimeList.size() << endl;
 #endif
 					unsigned int s = 1;
 					for ( auto i : runtimeList ) {
@@ -235,8 +235,8 @@ void Pkginfo::run()
 				}
 			}	
 		} else if (m_libraries_mode + m_runtime_mode > 0) {
-			// get the list of installed package silently
-			buildDatabaseWithDetailsInfos(true);
+			// get the list of installed packages silently
+			buildDatabaseWithDetailInfos(true);
 			set<string> librariesList;
 			int Result = -1;
 			if (checkPackageNameExist(m_arg)) {
@@ -290,16 +290,16 @@ void Pkginfo::run()
 				}
 			}	
 		} else if (m_epoc) {
-			// get the building time of the package return 0 if not found
-			buildDatabaseWithDetailsInfos(true);
+			// get the buildtime of the package: return 0 if not found
+			buildDatabaseWithDetailInfos(true);
 			if (checkPackageNameExist(m_arg)) {
 				cout << m_listOfInstPackages[m_arg].build << endl;
 			} else {
 				cout << "0" << endl;
 			}
 		} else if (m_details_mode) {
-			// get all the details of a package
-			buildDatabaseWithDetailsInfos(false);
+			// get all details of a package
+			buildDatabaseWithDetailInfos(false);
 			if (checkPackageNameExist(m_arg)) {
 				char * c_time_s = ctime(&m_listOfInstPackages[m_arg].build);
 				cout << "Name           : " << m_arg << endl
@@ -321,7 +321,7 @@ void Pkginfo::run()
 			}
 		} else if (m_owner_mode) {
 			// List owner(s) of file or directory
-			buildDatabaseWithDetailsInfos(false);
+			buildDatabaseWithDetailInfos(false);
 			regex_t preg;
 			if (regcomp(&preg, m_arg.c_str(), REG_EXTENDED | REG_NOSUB)) {
 				m_actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
@@ -365,7 +365,7 @@ void Pkginfo::printHelp() const
 	     << OPTIONS << endl
 	     << "  -i, --installed             list installed packages" << endl
          << "  -d, --details               list details about the <package>" << endl
-         << "  -L, --libraries            list all the runtime libraries for the <package>" << endl
+         << "  -L, --libraries             list all the runtime libraries for the <package>" << endl
 	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl

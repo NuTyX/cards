@@ -59,7 +59,7 @@ if (m_parsePkgRepoCollectionFile == false) {
 		basePkgInfo.buildDate = 0;
 		if ( ! checkFileExist(collectionPkgRepoFile)) {
 			if ( i->Url.size() > 0 ) {
-				cout << "You should used " << YELLOW << "cards sync" << NORMAL << " for " << i->Dir << endl;
+				cout << "You should use " << YELLOW << "cards sync" << NORMAL << " for " << i->Dir << endl;
 			}
 			continue;
 		}
