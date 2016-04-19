@@ -990,7 +990,6 @@ build_needed() {
 		FILE=`get_filename $PKGMK_PKGFILE`
 		if [ ! -e $FILE ] || [ ! $TARGET -nt $FILE ]; then
 			RESULT="yes"
-			break
 		fi
 	fi
 	echo $RESULT
