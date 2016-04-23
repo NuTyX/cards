@@ -48,6 +48,9 @@ abort_on_build() {
         error $1
         exit $E_BUILD
 }
+have_function() {
+	declare -f "$1" >/dev/null
+}
 get_filename() {
 	if [[ $1 =~ ^(http|https|ftp|file)://.*/(.+) ]]; then
 		echo "$PKGMK_SOURCE_DIR/${BASH_REMATCH[2]}"
@@ -780,7 +783,13 @@ build_package() {
 		
 	cd $SRC
 
+    if have_function 'prepare'; then
+		(set -e -x ; prepare)
+	fi
 	(set -e -x ; build)
+    if have_function 'package'; then
+		(set -e -x ; package)
+	fi
 	
 	if [ $? = 0 ]; then
 		if [ "$PKGMK_NO_STRIP" = "no" ]; then
