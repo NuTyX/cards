@@ -150,17 +150,14 @@ void Pkgadd::run()
 
 	set<string> keep_list;
 	if (m_upgrade) {
+#ifndef NDEBUG
+		cerr << "Run extractAndRunPREfromPackage with upgrade" << endl;
+#endif
+		if (m_runPrePost) preRun();
 		Db_lock lock(m_root, true);
 		removePackageFilesRefsFromDB(package.first);	// Remove metadata about the package removed
 		keep_list = getKeepFileList(package.second.files, m_actionRules);
 		removePackageFiles(package.first, keep_list);
-
-#ifndef NDEBUG
-		cerr << "Run extractAndRunPREfromPackage after upgrade" << endl;
-#endif
-	}
-	if (m_upgrade) {
-		if (m_runPrePost) preRun();
 	}
 	{
 		Db_lock lock(m_root, true);
