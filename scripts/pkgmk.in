@@ -316,7 +316,7 @@ unpack_source() {
 	done
 }
 get_package_list() {
-	local ARCHFILE i
+	local i
 	i=0
 	for ARCH in $PKGMK_ARCH any; do
 		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*$ARCH.$PKGMK_PACKAGE_EXT*"`; do
