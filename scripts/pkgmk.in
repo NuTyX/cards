@@ -1389,7 +1389,7 @@ main() {
 		exit 0
 
 	fi
-	# From here on it's need to check the base package not any group which means
+	# From here on check the base package not any group
 	if [ -z $TARGETS ]; then
 		TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 		if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
