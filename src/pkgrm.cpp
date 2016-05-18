@@ -54,17 +54,33 @@ void Pkgrm::run()
 	// Retrieve info about all the packages
 	buildDatabaseWithDetailInfos(false);
 
-	if (!checkPackageNameExist(m_packageName))
-	{
-		m_actualError = PACKAGE_NOT_INSTALL;
-		treatErrors(m_packageName);
+	set<string> listOfPackagesToRemove;
+	for (auto i : m_listOfInstPackages) {
+		if ( i.second.collection == m_packageName) {
+			listOfPackagesToRemove.insert(i.first);
+		}
 	}
+	if ( listOfPackagesToRemove.empty() ) {
+		if (!checkPackageNameExist(m_packageName))
+		{
+			m_actualError = PACKAGE_NOT_INSTALL;
+			treatErrors(m_packageName);
+		}
 
-	// Remove metadata about the package removed
-	removePackageFilesRefsFromDB(m_packageName);
+		// Remove metadata about the package removed
+		removePackageFilesRefsFromDB(m_packageName);
 
-	// Remove the files on hd
-	removePackageFiles(m_packageName);
+		// Remove the files on hd
+		removePackageFiles(m_packageName);
+	} else {
+		for (auto i : listOfPackagesToRemove) {
+			// Remove metadata about the package removed
+			removePackageFilesRefsFromDB(i);
+
+			// Remove the files on hd
+			removePackageFiles(i);
+		}
+	}
 }
 void Pkgrm::printHelp() const
 {

@@ -423,6 +423,10 @@ void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
 				string arch = contentFile->items[li];
 				info.arch = arch.substr(1);
 			}
+			if ( contentFile->items[li][0] == 'c' ) {
+				string collection = contentFile->items[li];
+				info.collection = collection.substr(1);
+			}
 			if ( contentFile->items[li][0] == 'S' ) {
 				string size = contentFile->items[li];
 				info.size = size.substr(1);
@@ -575,7 +579,6 @@ void Pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 		treatErrors(fileslist_new + " to " + fileslist);
 	}
 }
-
 bool Pkgdbh::checkPackageNameExist(const string& name) const
 {
 	return (m_packageNamesList.find(name) != m_packageNamesList.end());

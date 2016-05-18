@@ -113,8 +113,10 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		ArgParser::MIN, 1, "<package> | <file> | <collection>");
 
 	addCommand(CMD_REMOVE, "remove",
-		"remove a package.",
-"It can remove one or more packages. If you want to remove a package from the base list, you should pass the -a argument.",
+		"remove one or more packages or a complete collection.",
+"It can remove one or more packages. If you want to remove a package from the base list, \n\
+you should pass the -a argument. If you specify an existing collection, all packages  \n\
+that belong to this collection will be deleted.",
 		ArgParser::MIN, 1 , "<package> | <collection>");
 
 	addCommand(CMD_LEVEL, "level",

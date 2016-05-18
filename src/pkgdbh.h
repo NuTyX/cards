@@ -74,6 +74,7 @@ RM_PKG_FILES_END
 };
 
 struct pkginfo_t {
+	std::string collection;
 	std::string description;
 	time_t build; // date of build
 	std::string version;

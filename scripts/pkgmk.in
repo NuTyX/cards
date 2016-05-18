@@ -668,7 +668,7 @@ add_meta_files() {
 }
 
 add_meta_to_archive() {
-	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH
+	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH COLLECTION
 	NAME="`get_package_name $1`"
 	ARCH="`get_package_arch $1`"
 
@@ -681,6 +681,7 @@ add_meta_to_archive() {
 	URL="n.a"
 	PACK="n.a"
 	MAINT="n.a"
+	COLLECTION=""
 
 	bsdtar xf $PKGMK_PACKAGE_DIR/$1
 
@@ -688,6 +689,7 @@ add_meta_to_archive() {
 	[ ! -z "$packager" ] && PACK=$packager
 	[ ! -z "$maintainer" ] && MAINT=$maintainer
 	[ ! -z "$url" ] && URL=$url
+	[ ! -z "$collection" ] && COLLECTION=$collection
 
 	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
 
@@ -701,6 +703,8 @@ add_meta_to_archive() {
 	echo "r$release" >> .META
 	echo "B$PKGMK_BUILDVER" >> .META
 	echo "a$ARCH" >> .META
+	echo "c$COLLECTION" >> .META
+
 	# TODO improve the pkginfo --runtimedepfiles functionnality
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
 		for dep in `pkginfo --runtimedepfiles $TAR|grep -v ^[A-Z]`; do
@@ -1201,9 +1205,12 @@ main() {
 		warning "pkginfo NOT FOUND, footprint ignored."
 		PKGMK_IGNORE_FOOTPRINT="yes"
 	fi
-	local FILE TARGET 
+	local FILE TARGET DIR
 
 	name=`basename $PKGMK_ROOT`
+
+	DIR=`dirname $PKGM_ROOT`
+	collection=`basename $DIR`
 
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
 		recursive "$@"
