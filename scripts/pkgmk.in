@@ -1209,7 +1209,7 @@ main() {
 
 	name=`basename $PKGMK_ROOT`
 
-	DIR=`dirname $PKGM_ROOT`
+	DIR=`dirname $PKGMK_ROOT`
 	collection=`basename $DIR`
 
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
