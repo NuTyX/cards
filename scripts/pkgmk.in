@@ -668,7 +668,7 @@ add_meta_files() {
 }
 
 add_meta_to_archive() {
-	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH COLLECTION
+	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH COLLECTION GROUP
 	NAME="`get_package_name $1`"
 	ARCH="`get_package_arch $1`"
 
@@ -677,11 +677,12 @@ add_meta_to_archive() {
 	TAR="$PKGMK_WORK_DIR/tar"
 	mkdir -p $TAR
 	cd $TAR
-	DESC="n.a"
-	URL="n.a"
-	PACK="n.a"
-	MAINT="n.a"
-	COLLECTION=""
+	DESC="none"
+	URL="none"
+	PACK="none"
+	MAINT="none"
+	COLLECTION="none"
+	GROUP="none"
 
 	bsdtar xf $PKGMK_PACKAGE_DIR/$1
 
@@ -690,7 +691,8 @@ add_meta_to_archive() {
 	[ ! -z "$maintainer" ] && MAINT=$maintainer
 	[ ! -z "$url" ] && URL=$url
 	[ ! -z "$collection" ] && COLLECTION=$collection
-
+        [ ! -z "$group" ] && GROUP=$group
+        
 	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
 
 	echo "N$NAME" > .META
@@ -704,6 +706,8 @@ add_meta_to_archive() {
 	echo "B$PKGMK_BUILDVER" >> .META
 	echo "a$ARCH" >> .META
 	echo "c$COLLECTION" >> .META
+	echo "g$GROUP" >> .META
+
 
 	# TODO improve the pkginfo --runtimedepfiles functionnality
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
