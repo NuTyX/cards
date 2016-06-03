@@ -371,7 +371,7 @@ void Pkginfo::printHelp() const
 	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
 	     << "  -f, --footprint <file>      print footprint for <file>" << endl
          << "  -a, --archive <file>        print Name, Version, Release, BuildDate and Deps of the <file>" << endl
-	     << "  -b, --buildtime <package>   return the name and the build time of the package" << endl
+	     << "  -b, --buildtime <package>   return the build time of the package" << endl
          << "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
          << "  --runtimedepfiles <path>    return on a single line all the runtime dependencies for the files found in the <path>" << endl
 	     << "  -r, --root <path>           specify alternative installation root" << endl
