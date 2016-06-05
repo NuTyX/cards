@@ -427,6 +427,14 @@ void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
 				string collection = contentFile->items[li];
 				info.collection = collection.substr(1);
 			}
+			if ( contentFile->items[li][0] == 'g' ) {
+				string group = contentFile->items[li];
+				info.group = group.substr(1);
+			}
+			if ( contentFile->items[li][0] == 'f' ) {
+				string family = contentFile->items[li];
+				info.family = family.substr(1);
+			}
 			if ( contentFile->items[li][0] == 'S' ) {
 				string size = contentFile->items[li];
 				info.size = size.substr(1);

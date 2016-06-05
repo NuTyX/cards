@@ -952,62 +952,10 @@ bool Pkgrepo::search(const string& s)
 }
 int Pkgrepo::parseConfig(const string& fileName)
 {
-	/*
-		TODO This will need to be beter done
-		I guess ones houaphan version  of NuTyX is release we can simply that part
-	*/
-	int result = 0;
-	if (checkFileExist("/var/lib/pkg/nutyx-version") ) {
-		result = getConfig("/var/lib/pkg/nutyx-version", m_config);
-		if ( result != 0 )
-			return result;
-	}
-	if ( m_config.name.size() == 0 ) {
-		m_config.name="current";
-	}
-	if ( m_config.version.size() == 0 ) {
-		m_config.version="current";
-	}
-
-	result = getConfig(fileName,m_config);
-	if ( result != 0 )
-		return result;
-
-	std::string::size_type pos;
-
-	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
-		DirUrl DU = *i ;
-		if (DU.Url.size() == 0 )
-			continue;
-
-		string categoryDir, url;
-		categoryDir = DU.Dir;
-
-		string category = basename(const_cast<char*>(categoryDir.c_str()));
-
-		pos = DU.Url.find (m_config.version);
-
-		if (pos != std::string::npos) {
-			url = DU.Url.substr(0,pos-1) + "/" + m_config.version + "/" + getMachineType()+ "/" + category;
-#ifndef NDEBUG
-			cerr << pos << endl;
-#endif
-		} else {
-			 url = DU.Url + "/" + m_config.version + "/" + getMachineType()+ "/" + category;
-		}
-#ifndef NDEBUG
-		cerr << url << endl;
-#endif
-		i->Url = url;
-	}
-	return result;
+	return parseConfig(fileName,m_config);
 }
 int Pkgrepo::parseConfig(const string& fileName, Config& config)
 {
-	/*
-		TODO This will need to be beter done
-		I guess ones houaphan version  of NuTyX is release we can simply that part
-	*/
 	int result = 0;
 	if (checkFileExist("/var/lib/pkg/nutyx-version") ) {
 		result = getConfig( "/var/lib/pkg/nutyx-version" , config);
@@ -1041,13 +989,18 @@ int Pkgrepo::parseConfig(const string& fileName, Config& config)
 		string category = basename(const_cast<char*>(categoryDir.c_str()));
 
 		pos = DU.Url.find (config.version);
+		/*
+		This give the chance to use TWO formats of url
+		1. http://downloads.nutyx.org/
+		2. http://downloads.nutyx/folder1/folder2/../folderN/<version>/
+		*/
 		if (pos != std::string::npos) {
-			url = DU.Url.substr(0,pos-1) + "/" + config.version + "/" + getMachineType()+ "/" + category;
+			url = DU.Url.substr(0,pos-1) + "/" + getMachineType() + "/" + config.version + "/" + category;
 #ifndef NDEBUG
 			cerr << pos << endl;
 #endif
 		} else {
-			url = DU.Url + "/" + config.version + "/" + getMachineType()+ "/" + category;
+			url = DU.Url + "/" + getMachineType() + "/" + config.version + "/"  + category;
 		}
 #ifndef NDEBUG
 		cerr << url << endl;

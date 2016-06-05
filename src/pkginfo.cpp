@@ -304,6 +304,8 @@ void Pkginfo::run()
 				char * c_time_s = ctime(&m_listOfInstPackages[m_arg].build);
 				cout << "Name           : " << m_arg << endl
 					<< "Description    : " << m_listOfInstPackages[m_arg].description << endl
+					<< "Family         : " << m_listOfInstPackages[m_arg].family << endl
+					<< "Group          : " << m_listOfInstPackages[m_arg].group << endl
 					<< "Collection     : " << m_listOfInstPackages[m_arg].collection << endl
 					<< "URL            : " << m_listOfInstPackages[m_arg].url << endl
 					<< "Maintainer(s)  : " << m_listOfInstPackages[m_arg].maintainer << endl

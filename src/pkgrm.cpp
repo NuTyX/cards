@@ -56,7 +56,9 @@ void Pkgrm::run()
 
 	set<string> listOfPackagesToRemove;
 	for (auto i : m_listOfInstPackages) {
-		if ( i.second.collection == m_packageName) {
+		if  (( i.second.collection == m_packageName) ||
+		( i.second.group == m_packageName) ||
+		( i.second.family == m_packageName) ) {
 			listOfPackagesToRemove.insert(i.first);
 		}
 	}

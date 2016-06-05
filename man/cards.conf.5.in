@@ -25,7 +25,8 @@ dir /usr/ports/gui
 dir /usr/ports/cli
 dir /usr/ports/base
 
-
+dir /var/lib/pkg/repo/kde5|http://downloads.nutyx.org/x86_64/development/
+dir /var/lib/pkg/repo/kde5|http://downloads.nutyx.org/folder1/folder2/development/
 dir /var/lib/pkg/repo/xfce4-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/repo/xfce4|http://downloads.nutyx.org
 dir /var/lib/pkg/repo/gui-extra|http://downloads.nutyx.org
@@ -76,7 +77,8 @@ first have precedence)
 
 .LP
 If you specify an url in after a | symbol, it will used binaries from this url. In our example, we
-will used the default mirror from nutyx.org.
+will used the default mirror from nutyx.org.As you can see on this example above they are two syntaxes possible:
+The default URL which is normaly the URL of the root server or a specific URL include specific version
 
 .SH "AUTHORS"
 Thierry Nuttens <tnut@nutyx.org>

@@ -537,7 +537,7 @@ pack_lib() {
 			fi
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -565,7 +565,7 @@ pack_devel() {
 		for SUBDIR in include lib/pkgconfig lib64/pkgconfig; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -590,7 +590,7 @@ pack_doc() {
 		for SUBDIR in doc gtk-doc; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				j=1
 			fi
@@ -613,7 +613,7 @@ pack_man() {
 		for SUBDIR in info man; do
 			if [ -d $DIR/$SUBDIR  ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				j=1
 			fi
@@ -634,7 +634,7 @@ pack_service() {
 	local DIR="etc/rc.d"
 	if [ -d $DIR ]; then
 		bsdtar -r -f \
-		$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+		$PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 		$DIR || BUILD_SUCCESSFUL="no"
 		j=1
 	fi
@@ -668,10 +668,11 @@ add_meta_files() {
 }
 
 add_meta_to_archive() {
-	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH COLLECTION GROUP
+	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH FAMILY
 	NAME="`get_package_name $1`"
 	ARCH="`get_package_arch $1`"
-
+	FAMILY="`echo $NAME|cut -d "." -f2`"
+	[ "$FAMILY" == "$NAME" ] && unset FAMILY
 	info  "Adding meta data to Archive $NAME"
 
 	TAR="$PKGMK_WORK_DIR/tar"
@@ -681,8 +682,6 @@ add_meta_to_archive() {
 	URL="none"
 	PACK="none"
 	MAINT="none"
-	COLLECTION="none"
-	GROUP="none"
 
 	bsdtar xf $PKGMK_PACKAGE_DIR/$1
 
@@ -690,9 +689,7 @@ add_meta_to_archive() {
 	[ ! -z "$packager" ] && PACK=$packager
 	[ ! -z "$maintainer" ] && MAINT=$maintainer
 	[ ! -z "$url" ] && URL=$url
-	[ ! -z "$collection" ] && COLLECTION=$collection
-        [ ! -z "$group" ] && GROUP=$group
-        
+
 	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
 
 	echo "N$NAME" > .META
@@ -705,8 +702,9 @@ add_meta_to_archive() {
 	echo "r$release" >> .META
 	echo "B$PKGMK_BUILDVER" >> .META
 	echo "a$ARCH" >> .META
-	echo "c$COLLECTION" >> .META
-	echo "g$GROUP" >> .META
+	[ ! -z "$collection" ] && echo "c$collection" >> .META
+	[ ! -z "$group" ] && echo "g$group" >> .META
+	[ ! -z "$FAMILY" ] && echo "f$FAMILY" >> .META
 
 
 	# TODO improve the pkginfo --runtimedepfiles functionnality
@@ -809,10 +807,10 @@ build_package() {
 		cd $PKG
 		i=0
 		j=0
-		for group in ${PKGMK_GROUPS[@]}; do
+		for subgroup in ${PKGMK_GROUPS[@]}; do
 			BUILD_SUCCESSFUL="yes"
-			if [ "`type -t ${group}`" == "function" ]; then
-				(set -e -x ;${group})
+			if [ "`type -t ${subgroup}`" == "function" ]; then
+				(set -e -x ;${subgroup})
 				j=1
 				if [ $? = 0 ]; then
 					BUILD_SUCCESSFUL="yes"
@@ -822,12 +820,12 @@ build_package() {
 				fi
 			else
 				if [ "$1" != "$TARGET" ]; then
-					if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}* ]; then
-						rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}*
+					if [ -f $PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}* ]; then
+						rm $PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}*
 					fi
-					pack_${group}
+					pack_${subgroup}
 				fi
-				remove_${group}
+				remove_${subgroup}
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
                 			exit $E_BUILD

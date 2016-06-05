@@ -102,7 +102,7 @@ if (-e "$destination/.checkouts")
 print "Updating file list from " . $host . "::$collection\n";
 
 # get the remote file list (new .checkouts)
-open(PIPE, 'rsync -crz --no-human-readable --exclude .PKGREPO --exclude *cards.tar* ' . $host . '::nutyx/' . $version . "/" . $arch . "/" . $collection . '/|') or error("Couldn't open pipe to rsync");
+open(PIPE, 'rsync -crz --no-human-readable --exclude .PKGREPO --exclude *cards.tar* ' . $host . '::nutyx/' . $arch . "/" . $version . "/" . $collection . '/|') or error("Couldn't open pipe to rsync");
 while (<PIPE>)
 {
 	chomp;
@@ -119,7 +119,7 @@ error("Running rsync failed") unless $? == 0;
 print "Updating collection " . basename($destination) . "\n";
 
 # now really run rsync
-open(PIPE, 'rsync -crz --no-human-readable --exclude .PKGREPO --exclude *cards.tar* --log-format "%o %n" ' . $host . "::nutyx/$version/$arch/$collection/ $destination/|") or error("Couldn't open pipe to rsync");
+open(PIPE, 'rsync -crz --no-human-readable --exclude .PKGREPO --exclude *cards.tar* --log-format "%o %n" ' . $host . "::nutyx/$arch/$version/$collection/ $destination/|") or error("Couldn't open pipe to rsync");
 while (<PIPE>)
 {
 	chomp;
