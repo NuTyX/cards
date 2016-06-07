@@ -431,9 +431,9 @@ void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
 				string group = contentFile->items[li];
 				info.group = group.substr(1);
 			}
-			if ( contentFile->items[li][0] == 'f' ) {
-				string family = contentFile->items[li];
-				info.family = family.substr(1);
+			if ( contentFile->items[li][0] == 'b' ) {
+				string base = contentFile->items[li];
+				info.base = base.substr(1);
 			}
 			if ( contentFile->items[li][0] == 'S' ) {
 				string size = contentFile->items[li];

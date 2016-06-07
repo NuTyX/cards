@@ -74,7 +74,7 @@ RM_PKG_FILES_END
 };
 
 struct pkginfo_t {
-	std::string family;
+	std::string base;
 	std::string group;
 	std::string collection;
 	std::string description;

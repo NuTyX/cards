@@ -537,7 +537,7 @@ pack_lib() {
 			fi
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -565,7 +565,7 @@ pack_devel() {
 		for SUBDIR in include lib/pkgconfig lib64/pkgconfig; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -590,7 +590,7 @@ pack_doc() {
 		for SUBDIR in doc gtk-doc; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				j=1
 			fi
@@ -613,7 +613,7 @@ pack_man() {
 		for SUBDIR in info man; do
 			if [ -d $DIR/$SUBDIR  ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				j=1
 			fi
@@ -634,7 +634,7 @@ pack_service() {
 	local DIR="etc/rc.d"
 	if [ -d $DIR ]; then
 		bsdtar -r -f \
-		$PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+		$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
 		$DIR || BUILD_SUCCESSFUL="no"
 		j=1
 	fi
@@ -668,11 +668,11 @@ add_meta_files() {
 }
 
 add_meta_to_archive() {
-	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH FAMILY
+	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH GROUP
 	NAME="`get_package_name $1`"
 	ARCH="`get_package_arch $1`"
-	FAMILY="`echo $NAME|cut -d "." -f2`"
-	[ "$FAMILY" == "$NAME" ] && unset FAMILY
+	GROUP="`echo $NAME|cut -d "." -f2`"
+	[ "$GROUP" == "$NAME" ] && unset GROUP
 	info  "Adding meta data to Archive $NAME"
 
 	TAR="$PKGMK_WORK_DIR/tar"
@@ -703,8 +703,8 @@ add_meta_to_archive() {
 	echo "B$PKGMK_BUILDVER" >> .META
 	echo "a$ARCH" >> .META
 	[ ! -z "$collection" ] && echo "c$collection" >> .META
-	[ ! -z "$group" ] && echo "g$group" >> .META
-	[ ! -z "$FAMILY" ] && echo "f$FAMILY" >> .META
+	[ ! -z "$GROUP" ] && echo "g$GROUP" >> .META
+	[ ! -z "$basename" ] && echo "b$basename" >> .META
 
 
 	# TODO improve the pkginfo --runtimedepfiles functionnality
@@ -807,10 +807,10 @@ build_package() {
 		cd $PKG
 		i=0
 		j=0
-		for subgroup in ${PKGMK_GROUPS[@]}; do
+		for group in ${PKGMK_GROUPS[@]}; do
 			BUILD_SUCCESSFUL="yes"
-			if [ "`type -t ${subgroup}`" == "function" ]; then
-				(set -e -x ;${subgroup})
+			if [ "`type -t ${group}`" == "function" ]; then
+				(set -e -x ;${group})
 				j=1
 				if [ $? = 0 ]; then
 					BUILD_SUCCESSFUL="yes"
@@ -820,12 +820,12 @@ build_package() {
 				fi
 			else
 				if [ "$1" != "$TARGET" ]; then
-					if [ -f $PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}* ]; then
-						rm $PKGMK_PACKAGE_DIR/${name}.${subgroup}${PKGMK_BUILDVER}*
+					if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}* ]; then
+						rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}*
 					fi
-					pack_${subgroup}
+					pack_${group}
 				fi
-				remove_${subgroup}
+				remove_${group}
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					error "Building '$TARGET' failed."
                 			exit $E_BUILD
@@ -1239,16 +1239,16 @@ main() {
 	[ ! -z $pkgrel ] && release=$pkgrel
 	[ ! -z "$pkgdesc" ] && description=$pkgdesc
 
-	if [ -z $group ]; then
-		group="`echo $name | cut -d "-" -f1`"
+	if [ -z $basename ]; then
+		basename="`echo $name | cut -d "-" -f1`"
 	fi
-	if [ "$group" == "$name" ]; then
-		unset group
+	if [ "$basename" == "$name" ]; then
+		unset basename
 	fi
 	if [ -z "$version" ]; then
-		if [ ! -z "$group" ];then
-			if [ -f ../$group/$PKGMK_PKGFILE ];then
-				. ../$group/$PKGMK_PKGFILE
+		if [ ! -z "$gbasename" ];then
+			if [ -f ../$basename/$PKGMK_PKGFILE ];then
+				. ../$basename/$PKGMK_PKGFILE
 				unset run
 				. $PKGMK_PKGFILE
 			else
@@ -1302,8 +1302,8 @@ main() {
 	if [ ! -z "$release" ]; then
 		info "release: $release"
 	fi
-	if [ ! -z "$group" ]; then
-		info "group: $group"
+	if [ ! -z "$basename" ]; then
+		info "basename: $basename"
 	fi
 	PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 	check_directory "$PKGMK_SOURCE_DIR"
