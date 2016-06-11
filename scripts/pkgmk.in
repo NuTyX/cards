@@ -789,15 +789,33 @@ build_package() {
 		
 	cd $SRC
 
-    if have_function 'prepare'; then
+	if have_function 'prepare'; then
 		(set -e -x ; prepare)
+		if [ $? = 0 ]; then
+			BUILD_SUCCESSFUL="yes"
+		fi
+	else
+		BUILD_SUCCESSFUL="yes"
 	fi
-	(set -e -x ; build)
-    if have_function 'package'; then
-		(set -e -x ; package)
+
+	if [ "$BUILD_SUCCESSFUL" == "yes" ]; then
+		BUILD_SUCCESSFUL="no"
+		(set -e -x ; build)
+		if [ $? = 0 ]; then
+			BUILD_SUCCESSFUL="yes"
+		fi
 	fi
-	
-	if [ $? = 0 ]; then
+	if [ "$BUILD_SUCCESSFUL" == "yes" ]; then
+		if have_function 'package'; then
+			BUILD_SUCCESSFUL="no"
+			(set -e -x ; package)
+			if [ $? = 0 ]; then
+				BUILD_SUCCESSFUL="yes"
+			fi
+		fi
+	fi
+
+	if [ "$BUILD_SUCCESSFUL" == "yes" ]; then
 		if [ "$PKGMK_NO_STRIP" = "no" ]; then
 			strip_files
 		fi
@@ -808,8 +826,8 @@ build_package() {
 		i=0
 		j=0
 		for group in ${PKGMK_GROUPS[@]}; do
-			BUILD_SUCCESSFUL="yes"
 			if [ "`type -t ${group}`" == "function" ]; then
+				BUILD_SUCCESSFUL="no"
 				(set -e -x ;${group})
 				j=1
 				if [ $? = 0 ]; then
@@ -1246,7 +1264,7 @@ main() {
 		unset basename
 	fi
 	if [ -z "$version" ]; then
-		if [ ! -z "$gbasename" ];then
+		if [ ! -z "$basename" ];then
 			if [ -f ../$basename/$PKGMK_PKGFILE ];then
 				. ../$basename/$PKGMK_PKGFILE
 				unset run

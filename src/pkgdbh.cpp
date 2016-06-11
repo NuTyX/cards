@@ -324,6 +324,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 	if (m_miniDB_Empty) {
 		if (m_packageNamesList.empty() )
 			getListOfPackageNames (m_root);
+		bool cf = false;
 		bool vf = false;
 		bool rf = false;
 		bool bf = false;
@@ -332,11 +333,17 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 			const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
 			itemList * contentFile = initItemList();
 			readFile(contentFile,metaFile.c_str());
+			cf = false;
 			vf = false;
 			rf = false;
 			bf = false;
 			info.release = 1;
 			for (unsigned int li=0; li < contentFile->count ; ++li) {
+				if ( contentFile->items[li][0] == 'c' ) {
+					string collection = contentFile->items[li];
+					info.collection = collection.substr(1);
+					cf = true;
+				}
 				if ( contentFile->items[li][0] == 'V' ) {
 					string version = contentFile->items[li];
 					info.version = version.substr(1);
@@ -352,7 +359,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 					info.build = strtoul(build.substr(1).c_str(),NULL,0);
 					bf = true;
 				}
-				if ( vf && rf && bf) {
+				if ( cf && vf && rf && bf) {
 					m_listOfInstPackages[i] = info;
 					break;
 				}

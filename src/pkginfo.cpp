@@ -173,7 +173,7 @@ void Pkginfo::run()
 			// List installed packages
 			buildDatabaseWithNameVersion();
 			for (auto i : m_listOfInstPackages) {
-				cout << i.first << " " << i.second.version << "-" << i.second.release << endl;
+				cout << "(" << i.second.collection << ")" << " " << i.first << " " << i.second.version << "-" << i.second.release << endl;
 			}
 		} else if (m_list_mode) {
 			// List package or file contents
