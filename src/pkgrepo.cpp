@@ -140,7 +140,6 @@ if (m_parsePkgRepoCollectionFile == false) {
 	}
 #ifndef NDEBUG
 	for (auto i : m_portsDirectoryList) {
-		PortsDirectory portsDirectory = *i;
 		for (auto j : i.basePackageList) {
 			cerr << i.Url << " "<< i.Dir << " "
 			<< j.basePackageName  << " "

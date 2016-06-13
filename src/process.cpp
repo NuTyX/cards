@@ -99,7 +99,8 @@ int process::execLog(const int argc, char** argv)
 	else if ( pid < 0 )
 	{
 		// fork failed
-		status = -1;
+		if (status == 0)
+			status = -1;
 	}
 	else
 	{
@@ -124,10 +125,11 @@ int process::execLog(const int argc, char** argv)
 
 		if ( wpval != pid )
 		{
-			status = -1;
+			if (status == 0)
+				status = -1;
   	}
   }
-	return status;
+	return status / 256;
 }
 
 int process::exec(const int argc, char** argv)
@@ -143,17 +145,19 @@ int process::exec(const int argc, char** argv)
 	else if ( pid < 0 )
 	{
 		// fork failed
-		status = -1;
+		if (status == 0)
+			status = -1;
 	}
 	else
 	{
 		// parent process
 		if ( waitpid ( pid, &status, 0 ) != pid )
 		{
-			status = -1;
+			if (status == 0)
+				status = -1;
 		}
 	}
-	return status;
+	return status / 256;
 }
 
 int process::executeShell()
@@ -193,7 +197,8 @@ int process::execShellLog(const char* SHELL)
 	else if ( pid < 0 )
 	{
 		// fork failed
-		status = -1;
+		if (status == 0)
+			status = -1;
 	}
 	else
 	{
@@ -218,10 +223,11 @@ int process::execShellLog(const char* SHELL)
 
 		if ( wpval != pid )
 		{
-			status = -1;
+			if (status == 0)
+				status = -1;
 		}
   }
-	return status;
+	return status / 256;
 }
 
 int process::execShell(const char* SHELL)
@@ -237,16 +243,18 @@ int process::execShell(const char* SHELL)
 	else if ( pid < 0 )
 	{
 		// fork failed
-		status = -1;
+		if (status == 0)
+			status = -1;
 	}
 	else
 	{
 		// parent process
 		if ( waitpid ( pid, &status, 0 ) != pid )
 		{
-			status = -1;
+			if (status == 0)
+				status = -1;
 		}
 	}
-	return status;
+	return status / 256;
 }
 // vim:set ts=2 :

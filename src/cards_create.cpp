@@ -93,44 +93,43 @@ void Cards_create::createBinaries(const std::string& configFileName,
 	int result = 0 ;
 	result = makeprocess.executeShell();
 #ifndef NDEBUG
-	cerr << result << endl;
+	cerr << "result:" << result << endl;
 #endif
+	string s = RED;
 	switch ( result )
 	{
 		case 1:
-			throw runtime_error("General error");
+			s += "General error";
 			break;
 		case 2:
-			throw runtime_error("Error Invalid Pkgfile");
+			s += "Invalid Pkgfile";
 			break;
 		case 3:
-			throw runtime_error("Error Sources /build directory missing or missing read/write permission");
+			s += "Sources / build directory missing or missing read/write permission";
 			break;
 		case 4:
-			throw runtime_error("Error during download of sources file(s)");
+			s += "Download of sources file(s)";
 			break;
 		case 5:
-			throw runtime_error("Error during unpacking of sources file(s)");
+			s += "Unpacking of sources file(s)";
 			break;
 		case 6:
-			throw runtime_error("Error md5sum from sources Checking");
+			s += "Checking md5sum from sources";
 			break;
 		case 7:
-			throw runtime_error("Error footprint Checking");
+			s += "Checking footprint";
 			break;
 		case 8:
-			throw runtime_error("Error while running 'build()'");
+			s += "While running 'build()'";
 			break;
 		case 10:
-			throw runtime_error("Error searching runtime dependancies");
-			break;
-		case 11:
-			throw runtime_error(pkgdir + "/" + m_packageName +".info not found");
+			s += "Searching runtime dependancies";
 			break;
 	}
-	if (result > 0) { //TODO find out why return code is wrong
+	if (result > 0) {
+		s += NORMAL;
 		m_actualError = CANNOT_PARSE_FILE;
-		treatErrors(pkgdir+ "/Pkgfile");
+		treatErrors("Pkgfile: " + s);
 	} 
 	if ( config.logdir != "" ) {
 		time_t endTime;
