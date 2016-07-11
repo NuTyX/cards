@@ -124,8 +124,10 @@ libs:	.libs_depend $(LIBOBJECTS)
 	-@echo "#endif" >> libcards.h
 	-@echo "// vim:set ts=2 :" >> libcards.h
 
-all: pkgadd cards conf
+all: setup-nutyx-log pkgadd cards conf
 
+setup-nutyx-log:
+	${CC} system_log.c -o $@
 conf:
 	sed -e "s/#ARCH#/`uname -m`/" cards.conf.in > cards.conf
 
@@ -160,6 +162,7 @@ endif
 install: all
 	install -D -m0755 pkgadd $(DESTDIR)$(USRBINDIR)/pkgadd
 	install -D -m0755 cards $(DESTDIR)$(BINDIR)/cards
+	install -D -m0755 setup-nutyx-log $(DESTDIR)$(BINDIR)/setup-nutyx-log
 	install -D -m0644 pkgadd.conf $(DESTDIR)$(ETCDIR)/pkgadd.conf
 	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf.example
 	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkgrm
@@ -185,6 +188,7 @@ clean:
 	rm -f libcards.so.$(VERSION)
 	rm -f libcards.h
 	rm -f libcards.a
+	rm -f setup-nutyx-log
 	rm -f test
 	rm -f pkgadd
 	rm -f pkgcrea
