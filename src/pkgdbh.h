@@ -107,7 +107,12 @@ class Pkgdbh {
 public:
 
 	explicit Pkgdbh(const std::string& name);
-	virtual ~Pkgdbh() {}
+	virtual ~Pkgdbh() {
+#ifndef NDEBUG
+		syslog(LOG_INFO,"Closing log...");
+#endif
+		void closelog(void);
+	}
 
 	/* Following methods can be redefined in derivated class */
 	virtual void parseArguments(int argc, char** argv);

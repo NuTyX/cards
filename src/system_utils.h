@@ -21,6 +21,7 @@
 
 #ifndef SYSTEM_UTILS_H
 #define SYSTEM_UTILS_H
+#include <syslog.h>
 #include <stdio.h>
 #include <sys/utsname.h>
 #include <string>

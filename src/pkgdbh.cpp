@@ -50,8 +50,8 @@ using __gnu_cxx::stdio_filebuf;
 Pkgdbh::Pkgdbh(const string& name)
 	: m_utilName(name), m_DB_Empty(true), m_miniDB_Empty(true)
 {
-	// TODO fix this some times very ugly
-/*	cleanupMetaFiles(m_root); */
+	// const_cast<char*>(m_arg.c_str()), &r, WS_DEFAULT);
+	openlog(m_utilName.c_str(),LOG_CONS,LOG_LOCAL7);
 }
 void Pkgdbh::parseArguments(int argc, char** argv)
 {
@@ -207,14 +207,13 @@ void Pkgdbh::progressInfo() const
 		case PKG_MOVE_META_END:
 			break;
     case DB_OPEN_START:
-      cout << "Retrieve info about the " << m_packageNamesList.size() << " packages: ";
-      break;
+			cout << "Retrieve info about the " << m_packageNamesList.size() << " packages: ";
+			break;
     case DB_OPEN_RUN:
-      if ( m_packageNamesList.size()>100)
-      {
-        i = j / ( m_packageNamesList.size() / 100);
-        printf("%3d%%\b\b\b\b",i);
-      }
+			if ( m_packageNamesList.size()>100) {
+				i = j / ( m_packageNamesList.size() / 100);
+				printf("%3d%%\b\b\b\b",i);
+			}
       j++;
       break;
     case DB_OPEN_END:
