@@ -28,8 +28,6 @@
 # - gui-extra
 # - gnome
 # - xfce4
-# - lxde
-# - cinnamon
 # - kde5
 # - mate
 # - enlightenment
@@ -38,7 +36,7 @@
 # a. We make a difference only for base, cli and gui and their -extra counterparts
 #    Example: to compile the all cli-extra collection on the stable version, the syntax will be:
 #
-#    bash bin/enter-nutyx /stable/cli-extra
+#    build-collection /stable/cli-extra
 #    As simple as that :)
 #
 # b. Some services are going to be activated (http (port 80), rpcbind (port 111), nfs (port 2049)
@@ -49,11 +47,10 @@
 #    (temporary) installed NuTyX. Also be aware that /srv/local/sources will continuously grow
 #    until you delete some sources / package files
 #
-# d. You need to have the install-nutyx script and enter-nutyx in the /root/bin directory, use a link to
+# d. You need to have the install-nutyx script in the /root/bin directory, use a link to
 #    your 'core' git
 #
 #       mkdir /root/bin
-#       ln -sv /home/thierry/git/core/scripts/enter-nutyx /root/bin/enter-nutyx
 #       ln -sv /home/thierry/git/core/scripts/install-nutyx /root/bin/install-nutyx
 #
 #    Adapt '/home/thierry/git/core' to the path to your 'core' git
@@ -93,7 +90,7 @@
 #  - umount the depot, the ports, the sources and logs folders 
 #  - IF NO ERROR OCCUR at umount process will delete the current or stable NuTyX folder
 #
-# 3. ARGUMENTS to the enter-nutyx script.
+# 3. ARGUMENTS:
 #
 # You can pass 1 or 2 arguments:
 #
@@ -101,15 +98,15 @@
 #  It's specify the version we are going to use (currently it can be "stable" or "current"
 #  and it's specify the collection which is one of following possible collection:
 #
-#  base, base-extra, cli, cli-extra, gui, gui-extra, cinnamon, enlightenment, gnome, lxde, kde5, mate, xfce4
-#  You note that even under cinnamon (for example) we have two collection cinnamon and cinnamon-extra, even
+#  base, base-extra, cli, cli-extra, gui, gui-extra, enlightenment, gnome, kde5, mate, xfce4
+#  You note that even under kde5 (for example) we have two collection kde5 and kde5-extra, even
 #  then the script will automatically build both
 #
 # Parameter 2 (optionnal):
 #  This parameter specify the port you want to build only. Currently this option works
 #  only with base, base-extra, cli, cli-extra, gui, gui-extra collections.
 #  Example:
-#   bash bin/enter-nutyx /current/base-extra kernel
+#   build-collection /current/base-extra kernel
 #
 #  This example will build (or rebuild) the kernel binaries only
 #
@@ -242,32 +239,6 @@ setup_collection() {
 	if [ "$CHROOT" == "enlightenment" ]; then
 		echo "dir /DEPOT/enlightenment-extra
 dir /DEPOT/enlightenment
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base
-dir /DEPOT/base-extra
-base /DEPOT/base
-base /DEPOT/cli
-base /DEPOT/gui
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-	fi
-	if [ "$CHROOT" == "cinnamon" ]; then
-		echo "dir /DEPOT/cinnamon-extra
-dir /DEPOT/cinnamon
-dir /DEPOT/gnome-extra
-dir /DEPOT/gnome
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base
-dir /DEPOT/base-extra
-base /DEPOT/base
-base /DEPOT/cli
-base /DEPOT/gui
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-	fi
-	if [ "$CHROOT" == "lxde" ]; then
-		echo "dir /DEPOT/lxde-extra
-dir /DEPOT/lxde
 dir /DEPOT/gui
 dir /DEPOT/cli
 dir /DEPOT/base
