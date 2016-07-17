@@ -4,7 +4,12 @@
 *.geany
 .tools_depend
 .libs_depend
+build-collection
+build-port
+ports
 cards
+pkgmk
+pkgmk2
 pkgadd
 pkgrm
 pkginfo

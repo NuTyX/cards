@@ -162,7 +162,7 @@ endif
 install: all
 	install -D -m0755 pkgadd $(DESTDIR)$(USRBINDIR)/pkgadd
 	install -D -m0755 cards $(DESTDIR)$(BINDIR)/cards
-	install -D -m0755 setup-nutyx-log $(DESTDIR)$(BINDIR)/setup-nutyx-log
+	install -D -m0755 setup-nutyx-log $(DESTDIR)$(SBINDIR)/setup-nutyx-log
 	install -D -m0644 pkgadd.conf $(DESTDIR)$(ETCDIR)/pkgadd.conf
 	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf.example
 	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkgrm
@@ -191,7 +191,6 @@ clean:
 	rm -f setup-nutyx-log
 	rm -f test
 	rm -f pkgadd
-	rm -f pkgcrea
 	rm -f cards
 	rm -f cards.conf
 

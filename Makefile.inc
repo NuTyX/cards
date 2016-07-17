@@ -25,6 +25,7 @@
 DESTDIR =
 USRBINDIR = /usr/bin
 BINDIR = /bin
+SBINDIR = /sbin
 MANDIR = /usr/share/man
 LIBDIR = /usr/lib
 ETCDIR = /etc

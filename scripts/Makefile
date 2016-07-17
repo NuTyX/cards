@@ -23,11 +23,8 @@
 
 include ../Makefile.inc
 
-all: pkgmk pkgmk2 ports
+all: pkgmk pkgmk2 ports build-port build-collection
 
-pkgmk: pkgmk.in
-
-ports: ports.in
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
 
@@ -35,6 +32,8 @@ ports: ports.in
 .PHONY:	install clean distclean dist
 
 install: all
+	install -D -m0755 build-port $(DESTDIR)$(USRBINDIR)/build-port
+	install -D -m0755 build-collection $(DESTDIR)$(USRBINDIR)/build-collection
 	install -D -m0755 pkgmk $(DESTDIR)$(USRBINDIR)/pkgmk
 	install -D -m0755 pkgmk2 $(DESTDIR)$(USRBINDIR)/pkgmk2
 	install -D -m0644 pkgmk.conf $(DESTDIR)$(ETCDIR)/pkgmk.conf.example
@@ -46,9 +45,9 @@ clean:
 	rm -f pkgmk
 	rm -f pkgmk2
 	rm -f ports
+	rm -f build-port
+	rm -f build-collection
 
 distclean: clean
-	rm -f pkgmk
-	rm -f ports
 
 # End of file
