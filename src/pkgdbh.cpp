@@ -363,8 +363,9 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 					break;
 				}
 			}
-			if ( ! rf )
+			if ( (  rf ) && (  bf ) && (  vf ) && (  cf ) ) {
 				m_listOfInstPackages[i] = info;
+			}
 			freeItemList(contentFile);
 		}
 		m_miniDB_Empty=false;

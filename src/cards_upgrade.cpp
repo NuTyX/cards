@@ -40,7 +40,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,const std::str
 	buildDatabaseWithNameVersion();
 	for (auto i : m_listOfInstPackages) {
 		if (!checkBinaryExist(i.first)) {
-			cout << i.first << " not exist" << endl;
+			cerr << i.first << " not exist" << endl;
 			continue;
 		}
 		pair<string,time_t> packageNameBuildDate;

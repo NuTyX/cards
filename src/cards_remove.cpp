@@ -52,8 +52,33 @@ Cards_remove::Cards_remove(const string& commandName,
 		}	
 		if (basePackagesList.empty())
 			throw runtime_error("No package found for the base System" );
-		
+
+		// Retrieve info about all the packages
+		buildDatabaseWithNameVersion();
+
+		set<string> listOfPackagesToRemove;
+
 		for ( auto i : m_argParser.otherArguments() ) {
+			bool found = false;
+			for (auto j : m_listOfInstPackages) {
+				if  (( j.second.collection == i) ||
+				( j.second.group == i) ) {
+				listOfPackagesToRemove.insert(j.first);
+				}
+			}
+			if ( listOfPackagesToRemove.empty()) {
+				for (auto j : m_listOfInstPackages) {
+					if  (( j.second.base == i) ) {
+						listOfPackagesToRemove.insert(j.first);
+					}
+				}
+			}
+
+			if ( listOfPackagesToRemove.empty()) {
+				listOfPackagesToRemove.insert(i);
+			}
+		}
+		for ( auto i : listOfPackagesToRemove ) {
 			bool found = false;
 			for (auto j : basePackagesList) {
 				if ( i == j) {
@@ -79,3 +104,4 @@ Cards_remove::Cards_remove(const string& commandName,
 	}
 	finish();
 }
+// vim:set ts=2 :
