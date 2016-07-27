@@ -95,11 +95,13 @@ Cards_remove::Cards_remove(const string& commandName,
 			
 			m_packageName = i;
 			run();
+			syslog(LOG_INFO,m_packageName.c_str());
 		}
 	} else {
 		for ( auto i : m_argParser.otherArguments() ) {
 			m_packageName = i;
 			run();
+			syslog(LOG_INFO,m_packageName.c_str());
 		}
 	}
 	finish();

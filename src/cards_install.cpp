@@ -65,6 +65,8 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			m_upgrade=0;
 		}
 		run();
+		syslog(LOG_INFO,name.c_str());
+
 	}	
 }
 Cards_install::Cards_install(const CardsArgumentParser& argParser,
@@ -93,6 +95,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 				m_upgrade=0;
 				m_force=0;
 				run();
+				syslog(LOG_INFO,packageName.c_str());
 			}
 		}
 	}
