@@ -32,7 +32,7 @@ all: pkgmk pkgmk2 ports build-port build-collection
 .PHONY:	install clean distclean dist
 
 install: all
-	install -D -m0755 build-port $(DESTDIR)$(BINDIR)/build-port
+	install -D -m0755 build-port $(DESTDIR)$(USRBINDIR)/build-port
 	install -D -m0755 build-collection $(DESTDIR)$(BINDIR)/build-collection
 	install -D -m0755 pkgmk $(DESTDIR)$(USRBINDIR)/pkgmk
 	install -D -m0755 pkgmk2 $(DESTDIR)$(USRBINDIR)/pkgmk2
