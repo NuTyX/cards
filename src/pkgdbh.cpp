@@ -227,7 +227,9 @@ void Pkgdbh::progressInfo() const
 			break;
     case PKG_INSTALL_START:
       j = 0;
-      cout << "ADD    : "
+      cout << "   ADD: ("
+				<< m_packageArchiveCollection
+				<< ") "
 				<< m_packageName
 				<< " "
 				<< m_packageArchiveVersion
@@ -259,7 +261,9 @@ void Pkgdbh::progressInfo() const
 			break;
 		case RM_PKG_FILES_START:
 			j=0;
-			cout << "REMOVE: "
+			cout << "REMOVE: ("
+				<< m_packageCollection
+				<< ") "
 				<< m_packageName
 				<< " "
 				<< m_packageVersion
@@ -609,6 +613,12 @@ bool Pkgdbh::checkPackageNameUptodate(const pair<string, pkginfo_t>& archiveName
 		return false;
 	if (m_listOfInstPackages[archiveName.first].build < archiveName.second.build)
 		return false;
+	if (m_listOfInstPackages[archiveName.first].collection == "")
+		return true;
+	if (archiveName.second.collection == "" )
+		return true;
+	if (m_listOfInstPackages[archiveName.first].collection != archiveName.second.collection)
+		return false;
 	return true;
 }
 bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild)
@@ -628,6 +638,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 	if ( checkPackageNameExist(name)){
 		m_packageVersion = m_listOfInstPackages[name].version;
 		m_packageRelease = itos(m_listOfInstPackages[name].release);
+		m_packageCollection = m_listOfInstPackages[name].collection;
 	}
 	set<string> metaFilesList;
 	const string packagedir = m_root + PKG_DB_DIR ;
@@ -753,6 +764,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(set<string> files, const set<string>& 
 	if ( checkPackageNameExist(m_packageName)){
 		m_packageVersion = m_listOfInstPackages[m_packageName].version;
 		m_packageRelease = itos(m_listOfInstPackages[m_packageName].release);
+		m_packageCollection = m_listOfInstPackages[m_packageName].collection;
 	}
 	// Remove all references
 	for (packages_t::iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i)
@@ -867,6 +879,7 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 			treatErrors(basename);
 		}
 	}
+	m_packageArchiveCollection = packageArchive.collection();
 	m_packageArchiveVersion = packageArchive.version();
 	m_packageArchiveRelease = itos(packageArchive.release());
 	if (packageArchiveName.empty() ) {
@@ -985,7 +998,7 @@ void Pkgdbh::extractAndRunPREfromPackage(const string& filename)
 	if (checkFileExist(PKG_PRE_INSTALL))
 	{
 		m_actualAction = PKG_PREINSTALL_START;
-  	progressInfo();	
+		progressInfo();
 		process preinstall(SHELL,PKG_PRE_INSTALL, 0 );
 		if (preinstall.executeShell()) {
 			exit(EXIT_FAILURE);

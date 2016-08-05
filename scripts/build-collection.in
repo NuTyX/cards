@@ -321,6 +321,19 @@ base /DEPOT/base
 base /DEPOT/base-extra
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 	fi
+	if [ "$CHROOT" == "systemd" ]; then
+		COLLECTION="core"
+		echo "dir /DEPOT/systemd
+dir /DEPOT/gui
+dir /DEPOT/cli
+dir /DEPOT/base
+dir /DEPOT/base-extra
+base /DEPOT/base
+base /DEPOT/cli
+base /DEPOT/gui
+base /DEPOT/systemd
+logdir /LOGS" > $DIR/etc/cards.conf || exit 1
+	fi
 	if [ "$CHROOT" == "base-extra" ]; then
 		COLLECTION="extra"
 		echo "dir /DEPOT/base-extra
@@ -373,7 +386,11 @@ if [ "$CHROOT" == "base" ] || [ "$CHROOT" == "cli"  ] || [ "$CHROOT" == "gui"  ]
 	setup_collection
 	DEVEL="cards.devel && cd /root/$COLLECTION && bash scripts/$CHROOT"
 fi
-
+if [ "$CHROOT" == "systemd"  ]; then
+	setup_collection
+	DEVEL="cards.devel && pkgrm eudev && pkgrm eudev.devel && cards install systemd && cards install systemd.devel \
+	&& cd /root/$COLLECTION && bash scripts/$CHROOT"
+fi
 if [ "$CHROOT" == "base-extra" ] || [ "$CHROOT" == "cli-extra"  ] || [ "$CHROOT" == "gui-extra"  ]; then
 	setup_collection
 	DEVEL="cards.devel && cd /root/$COLLECTION && bash scripts/$CHROOT"

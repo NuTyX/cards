@@ -56,52 +56,61 @@ Cards_remove::Cards_remove(const string& commandName,
 		// Retrieve info about all the packages
 		buildDatabaseWithNameVersion();
 
-		set<string> listOfPackagesToRemove;
+		set< pair<string,string> > listOfPackagesToRemove;
+		pair<string,string> PackageToRemove;
 
 		for ( auto i : m_argParser.otherArguments() ) {
 			bool found = false;
 			for (auto j : m_listOfInstPackages) {
 				if  (( j.second.collection == i) ||
 				( j.second.group == i) ) {
-				listOfPackagesToRemove.insert(j.first);
+				PackageToRemove.first=j.first;
+				PackageToRemove.second=j.second.collection;
+				listOfPackagesToRemove.insert(PackageToRemove);
 				}
 			}
 			if ( listOfPackagesToRemove.empty()) {
 				for (auto j : m_listOfInstPackages) {
 					if  (( j.second.base == i) ) {
-						listOfPackagesToRemove.insert(j.first);
+						PackageToRemove.first=j.first;
+						listOfPackagesToRemove.insert(PackageToRemove);
 					}
 				}
 			}
 
 			if ( listOfPackagesToRemove.empty()) {
-				listOfPackagesToRemove.insert(i);
+				PackageToRemove.first = i ;
+				listOfPackagesToRemove.insert(PackageToRemove);
 			}
 		}
 		for ( auto i : listOfPackagesToRemove ) {
 			bool found = false;
 			for (auto j : basePackagesList) {
-				if ( i == j) {
+				if ( i.first == j) {
 					found = true;
 					break;
 				}
 			}
 			if (found){	
-				cout << "The package '" << i 
+				cout << "The package '" << i.first
 					<< "' is in the base list" << endl;
 				cout << "   specify -a to remove it anyway" << endl;  
 				continue;
 			}
 			
-			m_packageName = i;
+			m_packageName = i.first;
 			run();
-			syslog(LOG_INFO,m_packageName.c_str());
+			string name = "(" +  m_packageCollection + ") ";
+			name += i.first;
+			syslog(LOG_INFO,name.c_str());
 		}
 	} else {
 		for ( auto i : m_argParser.otherArguments() ) {
 			m_packageName = i;
 			run();
-			syslog(LOG_INFO,m_packageName.c_str());
+			string name = "(" + m_packageCollection + ") ";
+			name += m_packageName;
+			syslog(LOG_INFO,name.c_str());
 		}
 	}
 	finish();

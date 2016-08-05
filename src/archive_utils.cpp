@@ -320,6 +320,18 @@ string ArchiveUtils::packager()
   }
   return "";
 }
+string ArchiveUtils::collection()
+{
+	string collection;
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		collection = *i;
+		if ( collection[0] == 'c' ) {
+			return collection.substr(1);
+			break;
+		}
+	}
+	return "";
+}
 string ArchiveUtils::builddate()
 {
 	char * c_time_s;
