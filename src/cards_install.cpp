@@ -60,12 +60,12 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 		ArchiveUtils packageArchive(m_packageArchiveName.c_str());
 		std::string name = "(" + packageArchive.collection()+") ";
 		name += packageArchive.name();
-		if ( checkPackageNameExist(name )) {
+/*		if ( checkPackageNameExist(name )) {
 			m_upgrade=1;
 		} else {
 			m_upgrade=0;
 		}
-		run();
+*/		run();
 		syslog(LOG_INFO,name.c_str());
 
 	}	
@@ -95,10 +95,12 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			name += packageArchive.name();
 			if ( ! checkPackageNameExist(name )) {
 				m_upgrade=0;
-				m_force=0;
-				run();
-				syslog(LOG_INFO,name.c_str());
+			} else {
+				m_upgrade=1;
 			}
+			m_force=0;
+			run();
+			syslog(LOG_INFO,name.c_str());
 		}
 	}
 }
