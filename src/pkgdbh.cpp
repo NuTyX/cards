@@ -341,6 +341,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 			rf = false;
 			bf = false;
 			info.release = 1;
+			m_listOfAlias[i] = i;
 			for (unsigned int li=0; li < contentFile->count ; ++li) {
 				if ( contentFile->items[li][0] == 'c' ) {
 					string collection = contentFile->items[li];
@@ -362,10 +363,14 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 					info.build = strtoul(build.substr(1).c_str(),NULL,0);
 					bf = true;
 				}
-				if ( cf && vf && rf && bf) {
+				if ( contentFile->items[li][0] == 'A' ) {
+					string alias = contentFile->items[li];
+					m_listOfAlias[alias.substr(1)] = i;
+				}
+/*				if ( cf && vf && rf && bf) {
 					m_listOfInstPackages[i] = info;
 					break;
-				}
+				} */
 			}
 			if ( (  rf ) && (  bf ) && (  vf ) && (  cf ) ) {
 				m_listOfInstPackages[i] = info;
@@ -374,6 +379,10 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 		}
 		m_miniDB_Empty=false;
 	}
+#ifndef NDEBUG
+	for (auto i : m_listOfAlias)
+		cerr << "Alias: " << i.first << ", Package: " << i.second << endl;
+#endif
 }
 /* Populate the database with all details infos */
 void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
@@ -401,6 +410,7 @@ void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
 			itemList * contentFile = initItemList();
 			readFile(contentFile,metaFile.c_str());
 			info.release = 1;
+			m_listOfAlias[i] = i;
 			for (unsigned int li=0; li< contentFile->count ; ++li) {
 			if ( contentFile->items[li][0] == 'D' ) {
 				string description = contentFile->items[li];
@@ -449,6 +459,11 @@ void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
 			if ( contentFile->items[li][0] == 'S' ) {
 				string size = contentFile->items[li];
 				info.size = size.substr(1);
+			}
+			if ( contentFile->items[li][0] == 'A' ) {
+				string alias = contentFile->items[li];
+				info.alias.insert(alias.substr(1));
+				m_listOfAlias[alias.substr(1)] = i;
 			}
 			if ( contentFile->items[li][0] == 'R' ) {
 				string run = contentFile->items[li];
@@ -600,7 +615,7 @@ void Pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 }
 bool Pkgdbh::checkPackageNameExist(const string& name) const
 {
-	return (m_packageNamesList.find(name) != m_packageNamesList.end());
+	return (m_listOfAlias.find(name) != m_listOfAlias.end());
 }
 bool Pkgdbh::checkPackageNameUptodate(const pair<string, pkginfo_t>& archiveName)
 {

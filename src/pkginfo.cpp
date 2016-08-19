@@ -179,7 +179,8 @@ void Pkginfo::run()
 			// List package or file contents
 			buildDatabaseWithDetailInfos(false);
 			if (checkPackageNameExist(m_arg)) {
-				copy(m_listOfInstPackages[m_arg].files.begin(), m_listOfInstPackages[m_arg].files.end(), ostream_iterator<string>(cout, "\n"));
+				string arg = m_listOfAlias[m_arg];
+				copy(m_listOfInstPackages[arg].files.begin(), m_listOfInstPackages[arg].files.end(), ostream_iterator<string>(cout, "\n"));
 			} else if (checkFileExist(m_arg)) {
 				pair<string, pkginfo_t> package = openArchivePackage(m_arg);
 				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
@@ -301,24 +302,30 @@ void Pkginfo::run()
 			// get all details of a package
 			buildDatabaseWithDetailInfos(false);
 			if (checkPackageNameExist(m_arg)) {
-				char * c_time_s = ctime(&m_listOfInstPackages[m_arg].build);
-				cout << "Name           : " << m_arg << endl
-					<< "Description    : " << m_listOfInstPackages[m_arg].description << endl
-					<< "Series(base)   : " << m_listOfInstPackages[m_arg].base << endl
-					<< "Group          : " << m_listOfInstPackages[m_arg].group << endl
-					<< "Collection     : " << m_listOfInstPackages[m_arg].collection << endl
-					<< "URL            : " << m_listOfInstPackages[m_arg].url << endl
-					<< "Maintainer(s)  : " << m_listOfInstPackages[m_arg].maintainer << endl
-					<< "Packager(s)    : " << m_listOfInstPackages[m_arg].packager << endl
-					<< "Version        : " << m_listOfInstPackages[m_arg].version << endl
-					<< "Release        : " << m_listOfInstPackages[m_arg].release << endl
+				string arg = m_listOfAlias[m_arg];
+				char * c_time_s = ctime(&m_listOfInstPackages[arg].build);
+				cout << "Name           : " << arg << endl;
+				if (m_listOfInstPackages[arg].alias.size() > 0 ) {
+					cout << "Alias          : ";
+					for ( auto i : m_listOfInstPackages[arg].alias) cout << i << " ";
+						cout << endl;
+				}
+				cout	<< "Description    : " << m_listOfInstPackages[arg].description << endl
+					<< "Series(base)   : " << m_listOfInstPackages[arg].base << endl
+					<< "Group          : " << m_listOfInstPackages[arg].group << endl
+					<< "Collection     : " << m_listOfInstPackages[arg].collection << endl
+					<< "URL            : " << m_listOfInstPackages[arg].url << endl
+					<< "Maintainer(s)  : " << m_listOfInstPackages[arg].maintainer << endl
+					<< "Packager(s)    : " << m_listOfInstPackages[arg].packager << endl
+					<< "Version        : " << m_listOfInstPackages[arg].version << endl
+					<< "Release        : " << m_listOfInstPackages[arg].release << endl
 					<< "Build date     : " << c_time_s
-					<< "Size           : " << m_listOfInstPackages[m_arg].size << endl
-					<< "Number of Files: " << m_listOfInstPackages[m_arg].files.size()<< endl
-					<< "Arch           : " << m_listOfInstPackages[m_arg].arch << endl;
+					<< "Size           : " << m_listOfInstPackages[arg].size << endl
+					<< "Number of Files: " << m_listOfInstPackages[arg].files.size()<< endl
+					<< "Arch           : " << m_listOfInstPackages[arg].arch << endl;
 				if ( m_listOfInstPackages[m_arg].dependencies.size() > 0 ) {
 					cout << "Dependencies   : ";
-					for ( auto i : m_listOfInstPackages[m_arg].dependencies) cout << i.first << " ";
+					for ( auto i : m_listOfInstPackages[arg].dependencies) cout << i.first << " ";
 					cout << endl;
 				}
 			}

@@ -88,9 +88,11 @@ struct pkginfo_t {
 	std::string arch;
 	std::string size;
 	std::set< std::pair<std::string,time_t> > dependencies;
+	std::set<std::string> alias;
 	std::set<std::string> files;
 };
 typedef std::map<std::string, pkginfo_t> packages_t;
+typedef std::map<std::string, std::string> alias_t;
 
 enum rule_event_t {
 	UPGRADE,
@@ -187,6 +189,7 @@ protected:
 
 	packages_t m_listOfInstPackages;
 	packages_t m_listOfDepotPackages;
+	alias_t	m_listOfAlias;
 
 	std::set<std::string> m_packageNamesList;
 	std::set<std::string> m_filesList;

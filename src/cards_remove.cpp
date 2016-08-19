@@ -79,7 +79,9 @@ Cards_remove::Cards_remove(const string& commandName,
 			}
 
 			if ( listOfPackagesToRemove.empty()) {
-				PackageToRemove.first = i ;
+				// if it's an alias get the real name
+				string a = m_listOfAlias [i];
+				PackageToRemove.first = a ;
 				listOfPackagesToRemove.insert(PackageToRemove);
 			}
 		}

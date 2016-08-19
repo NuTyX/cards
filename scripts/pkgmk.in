@@ -737,6 +737,16 @@ add_meta_to_archive() {
 			done
 		fi
 	fi
+	if [ ! -z $alias ]; then
+		info "Adding Alias to Archive $NAME"
+		for al in ${alias[@]}; do
+			if [ -z "$GROUP" ];then
+				echo "A$al" >> .META
+			else
+				echo "A$al.$GROUP" >> .META
+			fi
+		done
+	fi
 	bsdtar -tf $PKGMK_PACKAGE_DIR/$1 > .MTREE
 
 	rm $PKGMK_PACKAGE_DIR/$1

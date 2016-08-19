@@ -162,6 +162,14 @@ void ArchiveUtils::getRunTimeDependencies()
 		}
 	}
 }
+void ArchiveUtils::getAliasList()
+{
+	for (auto i : m_contentMeta) {
+		if ( i[0] == 'A' ) {
+			m_aliasList.insert(i.substr(1));
+		}
+	}
+}
 void ArchiveUtils::printDeps()
 {
 	getRunTimeDependencies();
@@ -230,6 +238,11 @@ set<string> ArchiveUtils::listofDependencies()
 	getRunTimeDependencies();
 
 	return m_rtDependenciesList;
+}
+set<string> ArchiveUtils::listofAlias()
+{
+	getAliasList();
+	return m_aliasList;
 }
 set< std::pair<std::string,time_t> > ArchiveUtils::listofDependenciesBuildDate()
 {
