@@ -134,6 +134,16 @@ if (m_parsePkgRepoCollectionFile == false) {
 					basePkgInfo.extention = infos[9];
 				}
 			}
+			if ( infos.size() > 10 ) {
+				if ( infos[10].size() > 0 ) {
+					basePkgInfo.alias = infos[10];
+				}
+			}
+			if ( infos.size() > 11 ) {
+				if ( infos[11].size() > 0 ) {
+					basePkgInfo.group = infos[11];
+				}
+			}
 			portsDirectory.basePackageList.push_back(basePkgInfo);
 		}
 		m_portsDirectoryList.push_back(portsDirectory);
@@ -655,7 +665,9 @@ bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
 				char * c_time_s = ctime(&j.buildDate);
 				found = true;
 				cout << "Name           : " << packageName << endl
+					<< "ALias          : " << j.alias << endl
 					<< "Description    : " << j.description << endl
+					<< "Group          : " << j.group << endl
 					<< "URL            : " << j.URL << endl
 					<< "Version        : " << j.version << endl
 					<< "Release        : " << j.release << endl

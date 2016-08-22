@@ -51,6 +51,8 @@ struct BasePackageInfo {
 	std::string maintainer;
 	std::string packager;
 	std::string fileDate;
+	std::string alias;
+	std::string group;
 	time_t buildDate;
 	std::vector<PortFilesList> portFilesList;
 };

@@ -33,7 +33,7 @@ ETCDIR = /etc
 AR?=ar
 RANLIB?=ranlib
 
-VERSION = 2.1.88
+VERSION = 2.1.89
 
 NAME = cards-$(VERSION)
 
