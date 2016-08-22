@@ -336,7 +336,6 @@ make_md5sum() {
 		md5sum $LOCAL_FILENAMES | sed -e 's|  .*/|  |' | sort -k 2
 	fi
 }
-
 make_footprint() {
 if ! (echo $TARGET| grep "kernel" >/dev/null); then
 	pkginfo --footprint $TARGET | \
@@ -346,7 +345,6 @@ else
 	pkginfo --footprint $TARGET | sort -k 3
 fi
 }
-
 check_md5sum() {
 	local FILE="$PKGMK_WORK_DIR/.tmp"
 
@@ -398,7 +396,6 @@ check_md5sum() {
 		exit 0
 	fi
 }
-
 strip_files() {
 	local FILE FILTER
 	
@@ -423,7 +420,6 @@ strip_files() {
 		esac
 	done
 }
-
 compress_manpages() {
 	local FILE DIR TARGET
 
@@ -465,7 +461,6 @@ compress_manpages() {
 		fi
 	done
 }
-
 check_footprint() {
 	local TARGET FILE="$PKGMK_WORK_DIR/.tmp"
 	
@@ -508,7 +503,6 @@ check_footprint() {
 		fi
 	done
 }
-
 make_work_dir() {
 	export PKG="$PKGMK_WORK_DIR/pkg"
 	export SRC="$PKGMK_WORK_DIR/src"
@@ -524,7 +518,6 @@ make_work_dir() {
 		check_md5sum
 	fi
 }
-
 remove_work_dir() {
 	rm -rf $PKGMK_WORK_DIR
 }
@@ -666,7 +659,6 @@ add_meta_files() {
 		fi
 	done
 }
-
 add_meta_to_archive() {
 	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH GROUP
 	NAME="`get_package_name $1`"
@@ -763,7 +755,6 @@ add_meta_to_archive() {
 	cd ..
 	rm -rf $TAR
 }
-
 compress_archive() {
 	info "compress $1"
 	case $PKGMK_COMPRESSION_MODE in
@@ -927,7 +918,7 @@ build_package() {
 			add_meta_to_archive `basename $TARGET`
 		fi
 		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-			[ PKGMK_PACK_ONLY=="no" ] && remove_work_dir
+			remove_work_dir
 		fi
 	else
 		if [ -f $TARGET ]; then
@@ -937,7 +928,6 @@ build_package() {
 		exit $E_BUILD
 	fi
 }
-
 install_package() {
 	local COMMAND
 	get_package_list
@@ -968,7 +958,6 @@ install_package() {
 		fi
 	done
 }
-
 recursive() {
 	local ARGS FILE DIR
 	[ -f $PKGMK_REPO ] && rm -v $PKGMK_REPO
@@ -1023,7 +1012,6 @@ update_footprint() {
 		info "Footprint updated for $TARGET"
 	done
 }
-
 build_needed() {
 	local FILE RESULT
 	RESULT="yes"
@@ -1036,11 +1024,15 @@ build_needed() {
 	fi
 	echo $RESULT
 }
-
-update_collection_repo()
-{
-	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION
+update_collection_repo() {
+	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION ALIAS GROUP
 	if [ -f $PKGMK_REPO ]; then
+		for i in `tail -n +3  $PKGMK_REPO`
+		do
+			if [ "`echo $i|cut -d "#" -f3`" != "" ];then
+				GROUP="`echo $i|cut -d "#" -f2|cut -d "." -f2` $GROUP"
+			fi
+		done
 		HEAD=`head -1 $PKGMK_REPO`
 		if [ "${HEAD:10:1}" = "#" ]; then
 			BUILD_DATE="`echo $HEAD|cut -d "#" -f1`"
@@ -1051,14 +1043,21 @@ update_collection_repo()
 			URL="`echo $HEAD|cut -d "#" -f6`"
 			MAINTAINER="`echo $HEAD|cut -d "#" -f7`"
 			PACKAGER="`echo $HEAD|cut -d "#" -f8`"
+			if [ ! -z $alias ]; then
+				for i in ${alias[@]}
+				do
+					ALIAS="$i $ALIAS"
+				done
+			else
+				ALIAS=""
+			fi
 			[ -f ../$PKGMK_REPO ] && sed -i "/#$name#/d" ../$PKGMK_REPO
-			echo "`md5sum $PKGMK_REPO|cut -d " " -f1`#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION" \
+			echo "`md5sum $PKGMK_REPO|cut -d " " -f1`#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP" \
 			>> ../$PKGMK_REPO
 		fi
 	fi
 }
-update_repo()
-{
+update_repo() {
 	local FILE MD5SUM EXT
 	cd $PKGMK_ROOT
 	get_package_list
@@ -1094,8 +1093,7 @@ update_repo()
 	fi
 	echo "`md5sum $PKGMK_PKGFILE|cut -d " " -f1`#$PKGMK_PKGFILE" >> $PKGMK_REPO
 }
-clean_repo_files()
-{
+clean_repo_files() {
 	cd $PKGMK_ROOT
 	if [ -f $PKGMK_REPO ]; then
 		rm $PKGMK_REPO
@@ -1116,7 +1114,6 @@ interrupted() {
 
 	exit $E_GENERAL
 }
-
 print_help() {
 	echo "usage: `basename $PKGMK_COMMAND` [options]"
 	echo "options:"
@@ -1220,7 +1217,6 @@ parse_options() {
 		shift
 	done
 }
-
 main() {
 	if [ -f /etc/profile ]; then
 		source /etc/profile
