@@ -232,7 +232,32 @@
 # Enjoy NuTyX :)
 #
 #*********************************************************************************************************************************
-
+trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
+umount_all() {
+for FOLDER in $MOUNT_POINTS
+do
+	umount -v $FOLDER || exit 1
+done
+}
+remove_all() {
+for FOLDER in $MOUNT_POINTS
+do
+	rm -d $FOLDER || exit 1
+done
+[ -z ${1} ] && exit 1
+umount ${1}/{run,sys,proc,dev/pts,dev}
+for FOLDER in ${1}/*
+do
+	rm -r $FOLDER || exit 1
+	echo "Folder $FOLDER deleted"
+done
+rm -d $1 || exit 1
+}
+error() {
+	umount_all
+	remove_all ${1}
+	exit 1
+}
 setup_collection() {
 	local DIR
 	DIR="/$VERSION/$CHROOT"
@@ -422,24 +447,26 @@ if [ "$a" != "y" ]; then
 	exit 1
 fi
 
-mkdir -p $1/DEPOT || exit 1
-mount $1/DEPOT || exit 1
+mkdir -p $1/DEPOT || error $1
+mount $1/DEPOT || error $1
+MOUNT_POINTS="$1/DEPOT"
 
-mkdir -p $1/LOGS || exit 1
-mount $1/LOGS || exit 1
+mkdir -p $1/LOGS || error $1
+mount $1/LOGS || error $1
+MOUNT_POINTS="$MOUNT_POINTS $1/LOGS"
 
-mkdir -p $1/sources || exit 1
-mount $1/sources || exit 1
+mkdir -p $1/sources || error $1
+mount $1/sources || error $1
+MOUNT_POINTS="$MOUNT_POINTS $1/sources"
 
-mkdir -p $1/root/$COLLECTION || exit 1
-mount $1/root/$COLLECTION || exit 1
+mkdir -p $1/root/$COLLECTION || error $1
+mount $1/root/$COLLECTION || error $1
+MOUNT_POINTS="$MOUNT_POINTS $1/root/$COLLECTION"
 
+KERNEL="NONE" LFS="$1" bash /root/bin/install-nutyx || error $1
 
-KERNEL="NONE" LFS="$1" bash /root/bin/install-nutyx
+umount_all
+remove_all "$1"
 
-umount $1/LOGS || exit 1
-umount $1/sources || exit 1
-umount $1/DEPOT || exit 1
-umount $1/root/$COLLECTION || exit 1
-rm -r $1
 unset VERSION DEVEL
+exit 0
