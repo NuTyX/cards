@@ -92,6 +92,25 @@ keyValue splitKeyValue(string s, char delimiter)
   return pv;
 }
 
+string sizeHumanRead(int value)
+{
+	char buffer[255];
+	if ( value < KILO ) {
+		snprintf(buffer,255,"%d",value);
+		return buffer;
+	}
+	if ( value < MEGA ) {
+		snprintf(buffer,255,"%g K",value / KILO);
+		return buffer;
+	}
+	if ( value < GIGA ) {
+		snprintf(buffer,255,"%g M",value / MEGA);
+		return buffer;
+	}
+	snprintf(buffer,255,"%g G",value / GIGA);
+	return buffer;
+		
+}
 set<string> getKeysList(string file, string delimiter)
 {
   set<string> parameter_list;

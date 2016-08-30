@@ -320,8 +320,10 @@ void Pkginfo::run()
 					<< "Version        : " << m_listOfInstPackages[arg].version << endl
 					<< "Release        : " << m_listOfInstPackages[arg].release << endl
 					<< "Build date     : " << c_time_s
-					<< "Size           : " << m_listOfInstPackages[arg].size << endl
-					<< "Number of Files: " << m_listOfInstPackages[arg].files.size()<< endl
+					<< "Installed Size : " << sizeHumanRead(m_listOfInstPackages[arg].size)
+					<< "bytes" << endl
+					<< "Number of Files: " << m_listOfInstPackages[arg].files.size()
+					<< " file(s)" << endl
 					<< "Arch           : " << m_listOfInstPackages[arg].arch << endl;
 				if ( m_listOfInstPackages[m_arg].dependencies.size() > 0 ) {
 					cout << "Dependencies   : ";

@@ -22,6 +22,10 @@
 #ifndef STRING_UTILS_H
 #define STRING_UTILS_H
 
+#define GIGA 1e9
+#define MEGA 1e6
+#define KILO 1e3
+
 #include "error_treat.h"
 
 #include <stdlib.h>
@@ -66,6 +70,7 @@ std::string ultos(unsigned long int value);
 
 std::string mtos(mode_t mode);
 std::string trimFileName(const std::string& filename);
+std::string sizeHumanRead(int value);
 
 /*param s the string to be searched, param delimiter the delimiter char 
 return the value after the first occurance of a delimiter */

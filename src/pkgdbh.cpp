@@ -458,7 +458,7 @@ void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
 			}
 			if ( contentFile->items[li][0] == 'S' ) {
 				string size = contentFile->items[li];
-				info.size = size.substr(1);
+				info.size = atoi(size.substr(1).c_str());
 			}
 			if ( contentFile->items[li][0] == 'A' ) {
 				string alias = contentFile->items[li];
