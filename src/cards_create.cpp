@@ -125,6 +125,9 @@ void Cards_create::createBinaries(const std::string& configFileName,
 		case 10:
 			s += "Searching runtime dependancies";
 			break;
+		case 11:
+			s += "Duplicate alias";
+			break;
 	}
 	if (result > 0) {
 		s += NORMAL;
