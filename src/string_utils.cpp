@@ -100,14 +100,14 @@ string sizeHumanRead(int value)
 		return buffer;
 	}
 	if ( value < MEGA ) {
-		snprintf(buffer,255,"%g K",value / KILO);
+		snprintf(buffer,255,"%5.2f K",value / KILO);
 		return buffer;
 	}
 	if ( value < GIGA ) {
-		snprintf(buffer,255,"%g M",value / MEGA);
+		snprintf(buffer,255,"%5.2f M",value / MEGA);
 		return buffer;
 	}
-	snprintf(buffer,255,"%g G",value / GIGA);
+	snprintf(buffer,255,"%5.2f G",value / GIGA);
 	return buffer;
 		
 }
