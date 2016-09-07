@@ -303,7 +303,6 @@ void Pkginfo::run()
 			buildDatabaseWithDetailInfos(false);
 			if (checkPackageNameExist(m_arg)) {
 				string arg = m_listOfAlias[m_arg];
-				char * c_time_s = ctime(&m_listOfInstPackages[arg].build);
 				cout << "Name           : " << arg << endl;
 				if (m_listOfInstPackages[arg].alias.size() > 0 ) {
 					cout << "Alias          : ";
@@ -319,7 +318,8 @@ void Pkginfo::run()
 					<< "Packager(s)    : " << m_listOfInstPackages[arg].packager << endl
 					<< "Version        : " << m_listOfInstPackages[arg].version << endl
 					<< "Release        : " << m_listOfInstPackages[arg].release << endl
-					<< "Build date     : " << c_time_s
+					<< "Build date     : " << getDateFromEpoch(m_listOfInstPackages[arg].build)
+					<< "Installed date : " << getDateFromEpoch(m_listOfInstPackages[arg].install)
 					<< "Installed Size : " << sizeHumanRead(m_listOfInstPackages[arg].size)
 					<< "bytes" << endl
 					<< "Number of Files: " << m_listOfInstPackages[arg].files.size()

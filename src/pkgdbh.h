@@ -84,7 +84,7 @@ struct pkginfo_t {
 	std::string url;
 	std::string packager;
 	std::string maintainer;
-	time_t install; // date of installation
+	time_t install; // date of last installation
 	std::string arch;
 	int size;
 	std::set< std::pair<std::string,time_t> > dependencies;

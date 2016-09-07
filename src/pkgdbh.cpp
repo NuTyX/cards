@@ -406,7 +406,9 @@ void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
 					progressInfo();
 			}
 			pkginfo_t info;
-			const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
+			const string metaFileDir = m_root + PKG_DB_DIR + i;
+			const string metaFile = metaFileDir + '/' + PKG_META;
+			info.install = getEpochModifyTimeFile(metaFileDir);
 			itemList * contentFile = initItemList();
 			readFile(contentFile,metaFile.c_str());
 			info.release = 1;

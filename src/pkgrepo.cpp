@@ -450,7 +450,7 @@ void Pkgrepo::parsePackagePkgfileFile()
 				j->basePackageName = "";
 				continue;
 			}
-			j->fileDate = modifyTimeFile(pkgFile);
+			j->fileDate = getModifyTimeFile(pkgFile);
 			vector<string> pkgFileContent;
 			if ( parseFile(pkgFileContent,pkgFile.c_str()) != 0) {
 				cerr << "Cannot read the file: " << pkgFile << endl;
@@ -662,10 +662,9 @@ bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
 		// For each directory found in this collection
 		for (auto j : i.basePackageList) {
 			if ( j.basePackageName == packageName ) {
-				char * c_time_s = ctime(&j.buildDate);
 				found = true;
 				cout << "Name           : " << packageName << endl
-					<< "ALias          : " << j.alias << endl
+					<< "Alias          : " << j.alias << endl
 					<< "Description    : " << j.description << endl
 					<< "Group          : " << j.group << endl
 					<< "URL            : " << j.URL << endl
@@ -673,7 +672,7 @@ bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
 					<< "Release        : " << j.release << endl
 					<< "Maintainer     : " << j.maintainer << endl
 					<< "Packager       : " << j.packager << endl
-					<< "Build date     : " << c_time_s
+					<< "Build date     : " << getDateFromEpoch(j.buildDate)
 					<< "Binary Url     : " << i.Url << endl
 					<< "Local Directory: " << i.Dir << endl;
 				break;

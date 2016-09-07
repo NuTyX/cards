@@ -27,7 +27,6 @@
 #include "file_utils.h"
 #include "pkgdbh.h"
 #include "runtime_dependencies_utils.h"
-#include "file_utils.h"
 
 class Pkginfo : public Pkgdbh {
 public:

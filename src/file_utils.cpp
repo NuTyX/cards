@@ -147,12 +147,28 @@ string trimFileName(const string& filename)
 
   return result;
 }
-string modifyTimeFile(const string& filename)
+time_t getEpochModifyTimeFile(const string& filename)
+{
+	struct stat buf;
+	if (stat(filename.c_str(), &buf) != 0) {
+		return 0;
+	}
+	return buf.st_mtime;
+}
+string getDateFromEpoch(const time_t& epoch)
+{
+	string sTimeFile = "";
+	char * c_time_s;
+	c_time_s = ctime(&epoch);
+	sTimeFile = c_time_s;
+	return sTimeFile;
+}
+string getModifyTimeFile(const string& filename)
 {
 	string sTimeFile = "";
 	char * c_time_s;
 	struct stat buf;
-	if (lstat(filename.c_str(), &buf) == -1) {
+	if (stat(filename.c_str(), &buf) != 0) {
 		return sTimeFile;
 	}
 	c_time_s = ctime(&buf.st_mtime);
