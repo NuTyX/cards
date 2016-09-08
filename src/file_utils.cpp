@@ -157,11 +157,12 @@ time_t getEpochModifyTimeFile(const string& filename)
 }
 string getDateFromEpoch(const time_t& epoch)
 {
-	string sTimeFile = "";
-	char * c_time_s;
-	c_time_s = ctime(&epoch);
-	sTimeFile = c_time_s;
-	return sTimeFile;
+	const struct tm* time = localtime(&epoch);
+	char datetime[100] = {0};
+	if ( strftime(datetime, 100, "%c", time) > 0 )
+		return datetime;
+	else
+		return "";
 }
 string getModifyTimeFile(const string& filename)
 {
@@ -171,9 +172,7 @@ string getModifyTimeFile(const string& filename)
 	if (stat(filename.c_str(), &buf) != 0) {
 		return sTimeFile;
 	}
-	c_time_s = ctime(&buf.st_mtime);
-	sTimeFile = c_time_s;
-	return sTimeFile;
+	return getDateFromEpoch(buf.st_mtime);
 }
 bool checkFileExist(const string& filename)
 {

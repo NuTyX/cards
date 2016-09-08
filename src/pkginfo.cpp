@@ -318,8 +318,8 @@ void Pkginfo::run()
 					<< "Packager(s)    : " << m_listOfInstPackages[arg].packager << endl
 					<< "Version        : " << m_listOfInstPackages[arg].version << endl
 					<< "Release        : " << m_listOfInstPackages[arg].release << endl
-					<< "Build date     : " << getDateFromEpoch(m_listOfInstPackages[arg].build)
-					<< "Installed date : " << getDateFromEpoch(m_listOfInstPackages[arg].install)
+					<< "Build date     : " << getDateFromEpoch(m_listOfInstPackages[arg].build) << endl
+					<< "Installed date : " << getDateFromEpoch(m_listOfInstPackages[arg].install) << endl
 					<< "Installed Size : " << sizeHumanRead(m_listOfInstPackages[arg].size)
 					<< "bytes" << endl
 					<< "Number of Files: " << m_listOfInstPackages[arg].files.size()

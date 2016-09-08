@@ -644,7 +644,7 @@ bool Pkgrepo::getPortInfo(const string& portName)
 					<< "Release        : " << j.release << endl
 					<< "Maintainer     : " << j.maintainer << endl
 					<< "Packager       : " << j.packager << endl
-					<< "Date of Pkgfile: " << j.fileDate
+					<< "Date of Pkgfile: " << j.fileDate << endl
 					<< "Local Directory: " << i.Dir << endl;
 			}
 		}
@@ -672,7 +672,7 @@ bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
 					<< "Release        : " << j.release << endl
 					<< "Maintainer     : " << j.maintainer << endl
 					<< "Packager       : " << j.packager << endl
-					<< "Build date     : " << getDateFromEpoch(j.buildDate)
+					<< "Build date     : " << getDateFromEpoch(j.buildDate) << endl
 					<< "Binary Url     : " << i.Url << endl
 					<< "Local Directory: " << i.Dir << endl;
 				break;
