@@ -160,13 +160,13 @@ endif
 .PHONY:	install clean distclean dist
 
 install: all
-	install -D -m0755 pkgadd $(DESTDIR)$(USRBINDIR)/pkgadd
+	install -D -m0755 pkgadd $(DESTDIR)$(BINDIR)/pkgadd
 	install -D -m0755 cards $(DESTDIR)$(BINDIR)/cards
 	install -D -m0755 setup-nutyx-log $(DESTDIR)$(SBINDIR)/setup-nutyx-log
 	install -D -m0644 pkgadd.conf $(DESTDIR)$(ETCDIR)/pkgadd.conf
 	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf.example
-	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkgrm
-	ln -sf pkgadd $(DESTDIR)$(USRBINDIR)/pkginfo
+	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkgrm
+	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkginfo
 
 install-libs:
 	if [ ! -d $(DESTDIR)/usr/include ]; then mkdir -p $(DESTDIR)/usr/include;fi

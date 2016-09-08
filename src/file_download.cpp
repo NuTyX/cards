@@ -177,8 +177,11 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 	double SpeedDownload = 0;
 	curl_easy_getinfo(curl,CURLINFO_SPEED_DOWNLOAD,&SpeedDownload);
 	curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &TotalTime);
-	fprintf(stderr,"\r%d Bytes - %d Bytes/Sec - %d%% - %d Sec remain ",
-	(int)dlnow, (int)SpeedDownload, (int)((dlnow/dltotal) * 100 ), (int)((dltotal - dlnow)/SpeedDownload) );
+	if ( ( dltotal == 0 ) ||
+		( SpeedDownload == 0 ) || ( dlnow == 0 ) )
+			return 0;
+	fprintf(stderr,"\r    %sB  (%sB/s) %d %% - %d s   ",
+	(sizeHumanRead((int)dlnow)).c_str(), (sizeHumanRead((int)SpeedDownload)).c_str(), (int)((dlnow/dltotal) * 100 ), (int)((dltotal - dlnow)/SpeedDownload) );
 
 	return 0;
 }
