@@ -49,38 +49,38 @@ echo '**************************************************************************
     Also be aware that /srv/local/sources will continuously grow
     until you delete some sources / package files
 
- c. The installed NuTyX should ALWAYS be installed under /development or
-    /stable.
+ c. The installed NuTyX should ALWAYS be under /development or /stable.
     It means if you have to use another (bigger) partition for example
-    ou you should use a link to it:
+    then you should use a link to it:
     Example:
 
        ln -sv /home/thierry/chroot-64/stable /stable
 
-    Replaces stable with current if you plan to build against the development
-    version of the NuTyX binaries.
+    Replaces 'stable' with 'development' if you plan to build
+    against the development version of the NuTyX binaries.
     In this example the installed NuTyX will always ends up in
-    /home/thierry/chroot-64/current/xxx which is fine because
+    /home/thierry/chroot-64/development/xxx which is fine because
     its another bigger partition (about 740 Gb in this case).
  
  d. They should be TWO copies of the binaries depots packages.
-    One is the original set and is located in
-    '/srv/remote' folder. Its a copy of the official availables packages.
-    This set can be resync
-    (to receive any updates from upstream) automaticaly every hour for example.
+    One is the original set and is located in '/srv/remote' folder.
+    Its a copy of the official availables packages.
+    This set can be resync (to receive any updates from upstream)
+    automaticaly every hour for example.
 
     The second set is located in '/srv/local' folder.
-    This set is your working copy. Means as soon you start some compilations,
+    This set is your working copy.
+    Means as soon you start some compilations,
     this set will be out of sync with the official one.
 
 
  2. HOW DOES THIS WORK ?
 
-  The script will:
+  The script will do following steps:
 
-  - install a NuTyX development or stable 
+  - install a development or stable NuTyX
     (define by the first part of the first argument)
-    into a folder (define by the first argument)
+    into a folder (define by the first argument as well)
   - install the devel packages
   - mount the depot needed for the specific collection
     (define by the first argument)
@@ -92,9 +92,8 @@ echo '**************************************************************************
   - will compile what has to be compile with or without success
     but in both cases will...
   - exit the installed NuTyX
-  - umount the depot, the ports, the sources and logs folders 
-  - IF NO ERROR OCCUR at umount process will delete the development
-    or stable NuTyX folder
+  - umount the depot, the ports, the sources and logs folders.
+
  3. ARGUMENTS:
 
  You can pass 1 or 2 arguments:
@@ -104,15 +103,15 @@ echo '**************************************************************************
   (currently it can be 'development' or 'stable' and its specify
   the collection which is one of following possible collection:
   base, base-extra, cli, cli-extra, gui, gui-extra, enlightenment,
-  gnome, kde5, mate, xfce4.
+  gnome, kde5, mate or xfce4.
   You note that even under kde5 (for example)
   we have two collection kde5 and kde5-extra, even then the script
   will automatically build both
 
  Parameter 2 (optionnal):
   This parameter specify the port you want to build only.
-  Currently this option works only with base, base-extra, cli, cli-extra,
-  gui or gui-extra collections.
+  Currently this option works only with base, base-extra, cli,
+  cli-extra, gui or gui-extra collections.
   Example:
 
    build-collection /development/base-extra kernel
@@ -131,19 +130,20 @@ echo '**************************************************************************
  As explained above, we mount a lot of folders,
  means they HAVE TO BE specified in the /etc/fstab
  As we used predefined folders (/DEPOT, /sources, /LOGS)
- we specify them in /etc/fstab:
+ we specify all of them in /etc/fstab file:
 
  Example for the cli-extra collection of the development version
- you should specify following lines
+ you should specify following lines:
 
- /srv/local/sources /development/cli-extra/sources none bind
- /srv/local/stable/x86_64 /development/cli-extra/DEPOT none bind
- /home/thierry/git/extra /development/cli-extra/root/extra none bind
- /srv/local/logs/development/x86_64/cli-extra /development/cli-extra/LOGS none bind
+/srv/local/sources /development/cli-extra/sources none bind
+/srv/local/x86_64/development /development/cli-extra/DEPOT none bind
+/home/thierry/git/extra /development/cli-extra/root/extra none bind
+/srv/local/logs/x86_64/development/cli-extra /development/cli-extra/LOGS none bind
 
   Copy and adapt thoses four lines for every collection you planned to build.
   Adapt '/home/thierry/git/extra' to your 'extra' git.
-  Replace (or add) stable version in case you plan to build on the stable version.
+  Replace (or add) stable version in case you plan to build
+  on the 'stable' version.
   Replace 'x86_64' with 'i686' if you plan to build on a 32 bits platform.
   
 
@@ -153,10 +153,10 @@ echo '**************************************************************************
   We create all the necessary folders (for our cli-extra collection example):
 
     mkdir -p /srv/local/sources
-    mkdir -p /srv/local/logs/stable/x86_64/cli-extra
+    mkdir -p /srv/local/logs/x86_64/development/cli-extra
 
-  Replace 'stable' with 'development' if you plan to build on the
-  development version.
+  Replace 'development' with 'stable' if you plan to build on the
+  'stable' version.
   Replace 'cli-extra' collection with the one you plan to build
 
   To get all the binaries locally and used them (highly recommended)
@@ -190,7 +190,7 @@ echo '**************************************************************************
  Enjoy NuTyX :)
 
 ******************************************************************************
-'
+'|more
 }
 trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
 umount_all() {
@@ -224,7 +224,7 @@ export CFLAGS="-O2 -pipe"
 export CXXFLAGS="${CFLAGS}"
 export MAKEFLAGS="-j8"
 PKGMK_GROUPS=(devel man doc service)
-PKGMK_LOCALES=(fr de it es nl pt da nn sv fi tr)
+PKGMK_LOCALES=(fr de it es nl pt da nn sv fi tr ru)
 PKGMK_CLEAN="no"
 PKGMK_KEEP_SOURCES="yes"
 PKGMK_SOURCE_DIR="/sources"
@@ -367,7 +367,7 @@ logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 	fi
 }
 
-if [ "${1}" == "-u" ] || [ "${1}" == "--usage" ];then
+if [ "${1}" == "-h" ] || [ "${1}" == "--help" ];then
 	usage
 	exit 0
 fi
@@ -382,7 +382,11 @@ if [ $# -lt 1 ]; then
 fi
 
 if [ -d $1 ]; then
-	echo "$1 exist ..."
+	usage
+	mount | grep $1
+	echo "
+>>>	$1 exist ...
+"
 	exit 1
 fi
 
@@ -393,9 +397,13 @@ COLLECTION="$CHROOT"
 
 mkdir -p $1/etc || exit 1
 
-if [ "$CHROOT" == "base" ] || [ "$CHROOT" == "cli"  ] || [ "$CHROOT" == "gui"  ]; then
+if [ "$CHROOT" == "base" ] \
+|| [ "$CHROOT" == "cli"  ] \
+|| [ "$CHROOT" == "gui"  ]; then
 	setup_collection
-	DEVEL="cards.devel && cd /root/$COLLECTION && bash scripts/$CHROOT"
+	DEVEL="cards.devel \
+	&& cd /root/$COLLECTION \
+	&& bash scripts/$CHROOT"
 fi
 if [ "$CHROOT" == "systemd"  ]; then
 	setup_collection
@@ -403,13 +411,21 @@ if [ "$CHROOT" == "systemd"  ]; then
 	&& cards install systemd && cards install systemd.devel \
 	&& cd /root/$COLLECTION && bash scripts/$CHROOT"
 fi
-if [ "$CHROOT" == "base-extra" ] || [ "$CHROOT" == "cli-extra"  ] || [ "$CHROOT" == "gui-extra"  ]; then
+if [ "$CHROOT" == "base-extra" ] \
+|| [ "$CHROOT" == "cli-extra"  ] \
+|| [ "$CHROOT" == "gui-extra"  ]; then
 	setup_collection
-	DEVEL="cards.devel && cd /root/$COLLECTION && bash scripts/$CHROOT"
+	DEVEL="cards.devel \
+	&& cd /root/$COLLECTION \
+	&& bash scripts/$CHROOT"
 fi
-if [ "$COLLECTION" != "core" ] && [ "$COLLECTION" != "extra"  ]; then
+if [ "$COLLECTION" != "core" ] \
+&& [ "$COLLECTION" != "extra"  ]; then
 	setup_collection
-	DEVEL="cards.devel && cd /root/$CHROOT && bash scripts/$COLLECTION -a && bash scripts/$COLLECTION-extra"
+	DEVEL="cards.devel \
+	&& cd /root/$CHROOT \
+	&& bash scripts/$COLLECTION -a \
+	&& bash scripts/$COLLECTION-extra"
 fi
 
 setup_pkgmk_conf
