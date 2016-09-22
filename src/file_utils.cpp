@@ -30,10 +30,10 @@ int getConfig(const string& fileName, Config& config)
 	if (!fp) {
 		return -1;
 	}
-
-	char line[512];
+	const int length = BUFSIZ;
+	char line[length];
 	string s;
-	while (fgets(line, 512, fp)) {
+	while (fgets(line, length, fp)) {
 		if (line[strlen(line)-1] == '\n' ) {
 			line[strlen(line)-1] = '\0';
 		}
@@ -197,6 +197,7 @@ bool checkRegularFile(const string& filename)
 bool checkFilesEqual(const string& file1, const string& file2)
 {
   struct stat buf1, buf2;
+	const int length = BUFSIZ;
 
   if (lstat(file1.c_str(), &buf1) == -1)
     return false;
@@ -213,10 +214,10 @@ bool checkFilesEqual(const string& file1, const string& file2)
       return false;
 
     while (!f1.eof()) {
-      char buffer1[4096];
-      char buffer2[4096];
-      f1.read(buffer1, 4096);
-      f2.read(buffer2, 4096);
+      char buffer1[length];
+      char buffer2[length];
+      f1.read(buffer1, length);
+      f2.read(buffer2, length);
       if (f1.gcount() != f2.gcount() ||
           memcmp(buffer1, buffer2, f1.gcount()) ||
           f1.eof() != f2.eof())
@@ -319,11 +320,11 @@ int copyFile( const char *  destFile, const char *  origFile)
 	FILE * infile  = fopen(origFile,  "rb");
 	FILE * outfile = fopen(destFile, "wb");
 
-	const int size = 16384;
-	char buffer[size];
+	const int length = BUFSIZ;
+	char buffer[length];
 
 	while (!feof(infile)) {
-		int n = fread(buffer, 1, size, infile);
+		int n = fread(buffer, 1, length, infile);
 		fwrite(buffer, 1, n, outfile);
 	}
 
@@ -478,8 +479,9 @@ int readFileStripSpace(itemList* fileContent, const char* fileName)
 	if ((fp = openFile (fileName)) == NULL ) {
 		return -1;
 	}
-	char input[1024];
-	while (fgets(input, 1024, fp)) {
+	const int lenght = BUFSIZ;
+	char input[lenght];
+	while (fgets(input, lenght, fp)) {
 		input[strlen(input)-1] = '\0';
 		string inputS = input;
 		string stripString = stripWhiteSpace(inputS);
@@ -495,8 +497,9 @@ int readFile(itemList* fileContent, const char* fileName)
 	if ((fp = openFile (fileName)) == NULL ) {
 		return -1;
 	}
-	char input[1024];
-	while (fgets(input, 1024, fp)) {
+	const int length = BUFSIZ;
+	char input[length];
+	while (fgets(input, length, fp)) {
 		input[strlen(input)-1] = '\0';
 		addItemToItemList(fileContent,input);
 	}

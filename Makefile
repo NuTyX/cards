@@ -11,6 +11,9 @@ DIRFLTK = fltk
 
 .PHONY: cards
 
+webcards:
+	$(MAKE) -C $(DIRSRC) webcards
+
 flcards:
 	$(MAKE) -C $(DIRFLTK) flcards
 

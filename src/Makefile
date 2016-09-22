@@ -83,6 +83,12 @@ LIBOBJECTS =  system_utils.o \
 	pkginfo.o \
 	pkginst.o
 
+WEBOBJECTS =  system_utils.o \
+	md5.o \
+	file_utils.o \
+	string_utils.o \
+	webcards.o
+
 HEADERS = system_utils.h \
 		error_treat.h \
 		md5.h \
@@ -124,7 +130,10 @@ libs:	.libs_depend $(LIBOBJECTS)
 	-@echo "#endif" >> libcards.h
 	-@echo "// vim:set ts=2 :" >> libcards.h
 
-all: setup-nutyx-log pkgadd cards conf
+all: setup-nutyx-log pkgadd cards webcards conf
+
+webcards: .web_depend $(WEBOBJECTS)
+	$(CXX) $(WEBOBJECTS) -o index.cgi
 
 setup-nutyx-log:
 	${CC} system_log.c -o $@
@@ -146,12 +155,19 @@ cards:  .cards_depend $(CARDSOBJECTS)
 .cards_depend:
 	$(CXX) $(CXXFLAGS) -MM $(CARDSOBJECTS:.o=.cpp) > .cards_depend
 
+.web_depend:
+	$(CXX) $(CXXFLAGS) -MM $(WEBOBJECTS:.o=.cpp) > .web_depend
+
 ifeq (.cards_depend,$(wildcard .cards_depend))
 include .cards_depend
 endif
 
 ifeq (.tools_depend,$(wildcard .tools_depend))
 include .tools_depend
+endif
+
+ifeq (.web_depend,$(wildcard .web_depend))
+include .web_depend
 endif
 
 %: %.conf.in
@@ -181,8 +197,10 @@ clean:
 	rm -f .tools_depend
 	rm -f .cards_depend
 	rm -f .libs_depend
+	rm -f .web_depend
 	rm -f $(TOOLSOBJECTS)
 	rm -f $(CARDSOBJECTS)
+	rm -f $(WEBOBJECTS)
 	rm -f $(MANPAGES)
 	rm -f $(MANPAGES:=.txt)
 	rm -f libcards.so.$(VERSION)
@@ -193,6 +211,7 @@ clean:
 	rm -f pkgadd
 	rm -f cards
 	rm -f cards.conf
+	rm -f index.cgi
 
 distclean: clean
 	rm -f pkgadd pkginfo pkgrm cards

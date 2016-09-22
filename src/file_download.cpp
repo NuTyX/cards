@@ -175,19 +175,16 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 	CURL *curl = CurrentProgress->curl;
 	double TotalTime = 0;
 	double SpeedDownload = 0;
-	static int timeRemain = 0;
+
 	curl_easy_getinfo(curl,CURLINFO_SPEED_DOWNLOAD,&SpeedDownload);
 	curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &TotalTime);
 
 	if ( ( dltotal == 0 ) ||
 		( SpeedDownload == 0 ) || ( dlnow == 0 ) )
 			return 0;
-	if  ( ( timeRemain <= (int)(dltotal - dlnow)/SpeedDownload ) &&
-		( timeRemain != 0 ) )
-		return 0;
+
 	fprintf(stderr,"\r    %sB  (%sB/s) %d %% - %d s   ",
 	(sizeHumanRead((int)dlnow)).c_str(), (sizeHumanRead((int)SpeedDownload)).c_str(), (int)((dlnow/dltotal) * 100 ), (int)((dltotal - dlnow)/SpeedDownload) );
-	timeRemain = (dltotal - dlnow)/SpeedDownload;
 	return 0;
 }
 int FileDownload::updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
