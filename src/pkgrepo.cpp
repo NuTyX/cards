@@ -53,10 +53,7 @@ if (m_parsePkgRepoCollectionFile == false) {
 		PortsDirectory portsDirectory;
 		portsDirectory.Dir = i->Dir;
 		portsDirectory.Url = i->Url;
-		BasePackageInfo basePkgInfo;
 		string collectionPkgRepoFile = i->Dir + "/.PKGREPO" ;
-		basePkgInfo.release = 1;
-		basePkgInfo.buildDate = 0;
 		if ( ! checkFileExist(collectionPkgRepoFile)) {
 			if ( i->Url.size() > 0 ) {
 				cout << "You should use " << YELLOW << "cards sync" << NORMAL << " for " << i->Dir << endl;
@@ -71,6 +68,7 @@ if (m_parsePkgRepoCollectionFile == false) {
 		}
 
 		for ( auto input : PkgRepoFileContent) {
+			BasePackageInfo basePkgInfo;
 			basePkgInfo.release = 1;
 			basePkgInfo.buildDate = 0;
 			if ( input.size() <  34 ) {
