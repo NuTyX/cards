@@ -101,17 +101,13 @@ of compilation" << endl
 			Pkgrepo::parseConfig(configFile, config);
 			unsigned int index = 0;
 			string prtDir, url ;
-			for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+
+			for ( auto i : config.dirUrl ) {
 				index++;
-				DirUrl DU = *i ;
-				prtDir = DU.Dir;
-				url = DU.Url;
-				cout << index << " Directory: " << prtDir ;
-				if ( url != "" ) {
-					cout << " from " << url  << endl;
-				} else {
-					cout << endl;
-				}
+				cout << index << " Directory: " << i.Dir ;
+				if ( i.Url != "" )
+					cout << " from " << i.Url ;
+				cout << endl;
 			}
 			for ( auto i : config.baseDir ) cout << "Base System list directory: " << i << endl;
 			cout <<   "Binaries : " << config.arch << endl;

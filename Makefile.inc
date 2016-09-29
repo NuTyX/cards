@@ -23,17 +23,18 @@
 
 
 DESTDIR =
-USRBINDIR = /usr/bin
-BINDIR = /bin
-SBINDIR = /sbin
-MANDIR = /usr/share/man
-LIBDIR = /usr/lib
-ETCDIR = /etc
+USRBINDIR = ${DESTDIR}/usr/bin
+BINDIR = ${DESTDIR}/bin
+SBINDIR = ${DESTDIR}/sbin
+MANDIR = ${DESTDIR}/usr/share/man
+LIBDIR = ${DESTDIR}/usr/lib
+ETCDIR = ${DESTDIR}/etc
+VARDIR = ${DESTDIR}/var
 
 AR?=ar
 RANLIB?=ranlib
 
-VERSION = 2.1.93
+VERSION = 2.1.94
 
 NAME = cards-$(VERSION)
 

@@ -125,7 +125,7 @@ void Cards_install::getLocalePackagesList()
 		for ( auto j :m_dependenciesList ) {
 			std::string packageName  = j + "." + i;
 #ifndef NDEBUG
-			std::cerr << packageName << endl;
+			std::cerr << packageName << std::endl;
 #endif
 			if (checkBinaryExist(packageName)) {
 				m_packageFileName = getPackageFileName(packageName);
@@ -138,6 +138,6 @@ void Cards_install::getLocalePackagesList()
 			for (auto i : tmpList) m_dependenciesList.push_back(i);
 	}
 #ifndef NDEBUG
-	for (auto i : m_dependenciesList ) std::cerr << i << endl;
+	for (auto i : m_dependenciesList ) std::cerr << i << std::endl;
 #endif
 }

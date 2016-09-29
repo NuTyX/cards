@@ -32,13 +32,13 @@ all: pkgmk pkgmk2 ports build-port build-collection
 .PHONY:	install clean distclean dist
 
 install: all
-	install -D -m0755 build-port $(DESTDIR)$(USRBINDIR)/build-port
-	install -D -m0755 build-collection $(DESTDIR)$(BINDIR)/build-collection
-	install -D -m0755 pkgmk $(DESTDIR)$(USRBINDIR)/pkgmk
-	install -D -m0755 pkgmk2 $(DESTDIR)$(USRBINDIR)/pkgmk2
-	install -D -m0644 pkgmk.conf $(DESTDIR)$(ETCDIR)/pkgmk.conf.example
-	install -D -m0755 ports $(DESTDIR)$(USRBINDIR)/ports
-	install -D -m0755 cards.driver $(DESTDIR)/var/lib/pkg/drivers/cards
+	install -D -m0755 build-port $(USRBINDIR)/build-port
+	install -D -m0755 build-collection $(BINDIR)/build-collection
+	install -D -m0755 pkgmk $(USRBINDIR)/pkgmk
+	install -D -m0755 pkgmk2 $(USRBINDIR)/pkgmk2
+	install -D -m0644 pkgmk.conf $(ETCDIR)/pkgmk.conf.example
+	install -D -m0755 ports $(USRBINDIR)/ports
+	install -D -m0755 cards.driver $(VARDIR)/lib/pkg/drivers/cards
 
 
 clean:

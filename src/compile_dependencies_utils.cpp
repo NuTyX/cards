@@ -25,7 +25,6 @@
 
 #include "file_utils.h"
 #include "compile_dependencies_utils.h"
-
 depList *initDepsList(void)
 {
 	depList *list;
@@ -205,7 +204,7 @@ void generate_level ( itemList *filesList, pkgList *packagesList, unsigned int *
 #endif
 	int found = 0;
 #ifndef NDEBUG
-	printf("Loop %d\n",*niveau);
+	std::cerr << "Loop: " << *niveau << std::endl;
 #endif
 	
 	/* Pour tous les paquets existants */
@@ -214,7 +213,9 @@ void generate_level ( itemList *filesList, pkgList *packagesList, unsigned int *
 		if ( packagesList->pkgs[nameIndex]->dependences->decount == 0 ) {
 			found = 1;
 #ifndef NDEBUG
-			printf(" %d) Paquet: %s\n",*niveau,filesList->items[nameIndex]);
+			std::cerr << *niveau
+				<< " ) Paquet: " << filesList->items[nameIndex]
+				<< std::endl;
 #endif
 			/* Ce paquet ne doit plus faire parti au prochain tour. on met donc son decompte est -1 */
 			packagesList->pkgs[nameIndex]->dependences->decount = -1 ;
@@ -256,20 +257,22 @@ void generate_level ( itemList *filesList, pkgList *packagesList, unsigned int *
 #ifndef NDEBUG
 			printf(" niveau %d: for %s, increment: %d new niveau: %d \n",
 				*niveau,filesList->items[nameIndex],
-				packagesList->pkgs[nameIndex]->dependences->decrement,packagesList->pkgs[nameIndex]->dependences->decount);
+				packagesList->pkgs[nameIndex]->dependences->decrement,
+				packagesList->pkgs[nameIndex]->dependences->decount);
 #endif
 			packagesList->pkgs[nameIndex]->dependences->decrement = 0;
 		}
 	}
 #ifndef NDEBUG
-	printf("\n");
+	std::cerr << std::endl;
 #endif
 	if ( found != 0) {
 		(*niveau)++;
 		generate_level (filesList,packagesList,niveau);
 	} else {
 #ifndef NDEBUG
-		cerr << "generate_level() FINISH" << endl;
+		std::cerr << "generate_level() FINISH"
+			<< std::endl;
 #endif
 	}
 }

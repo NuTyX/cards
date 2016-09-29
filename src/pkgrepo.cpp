@@ -971,8 +971,8 @@ int Pkgrepo::parseConfig(const string& fileName, Config& config)
 			return result;
 	}
 #ifndef NDEBUG
-	cerr << config.name << endl;
-	cerr << config.version << endl;
+	cerr << "name:" << config.name << endl
+		<< "version:" << config.version << endl;
 #endif
 	if ( config.name.size() == 0 ) {
 		config.name="current";
@@ -991,30 +991,20 @@ int Pkgrepo::parseConfig(const string& fileName, Config& config)
 		if (DU.Url.size() == 0 )
 			continue;
 
-		string categoryDir, url;
-		categoryDir = DU.Dir;
-
+		string categoryDir = DU.Dir;
 		string category = basename(const_cast<char*>(categoryDir.c_str()));
+		string url = DU.Url
+			+ "/"
+			+ getMachineType()
+			+ "/"
+			+ config.version
+			+ "/"
+			+ category;
 
-		pos = DU.Url.find (config.version);
-		/*
-		This give the chance to use TWO formats of url
-		1. http://downloads.nutyx.org/
-		2. http://downloads.nutyx/folder1/folder2/../folderN/<version>/
-		*/
-		if (pos != std::string::npos) {
-			url = DU.Url.substr(0,pos-1) + "/" + getMachineType() + "/" + config.version + "/" + category;
-#ifndef NDEBUG
-			cerr << pos << endl;
-#endif
-		} else {
-			url = DU.Url + "/" + getMachineType() + "/" + config.version + "/"  + category;
-		}
 #ifndef NDEBUG
 		cerr << url << endl;
 #endif
 		i->Url = url;
-
 	}
 	return result;
 }

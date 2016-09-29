@@ -82,10 +82,10 @@ struct Config {
 	std::vector<std::string> locale;
 	std::vector<DirUrl> dirUrl;
 	std::vector<std::string> baseDir;
+	std::vector<std::string> archs;
 };
 
 int getConfig(const std::string& fileName, Config& config);
-FILE *openFile(const char *fileName);
 void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmemb);
 std::string trimFileName(const std::string& filename);
 time_t getEpochModifyTimeFile(const std::string& filename);
@@ -115,10 +115,9 @@ template <class T>
 int parseFile( T& target, const char* fileName)
 {
   using namespace std;
-	FILE *fp = NULL;
-	if (( fp = openFile (fileName)) == NULL ) {
+	FILE *fp = fopen (fileName, "r");
+	if (!fp)
 		return -1;
-	}
 	const int length = BUFSIZ;
 	char input[length];
 	string line;

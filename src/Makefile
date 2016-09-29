@@ -176,22 +176,22 @@ endif
 .PHONY:	install clean distclean dist
 
 install: all
-	install -D -m0755 pkgadd $(DESTDIR)$(BINDIR)/pkgadd
-	install -D -m0755 cards $(DESTDIR)$(BINDIR)/cards
-	install -D -m0755 setup-nutyx-log $(DESTDIR)$(SBINDIR)/setup-nutyx-log
-	install -D -m0644 pkgadd.conf $(DESTDIR)$(ETCDIR)/pkgadd.conf
-	install -D -m0644 cards.conf $(DESTDIR)$(ETCDIR)/cards.conf.example
-	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkgrm
-	ln -sf pkgadd $(DESTDIR)$(BINDIR)/pkginfo
+	install -D -m0755 pkgadd $(BINDIR)/pkgadd
+	install -D -m0755 cards $(BINDIR)/cards
+	install -D -m0755 setup-nutyx-log $(SBINDIR)/setup-nutyx-log
+	install -D -m0644 pkgadd.conf $(ETCDIR)/pkgadd.conf
+	install -D -m0644 cards.conf $(ETCDIR)/cards.conf.example
+	ln -sf pkgadd $(BINDIR)/pkgrm
+	ln -sf pkgadd $(BINDIR)/pkginfo
 
 install-libs:
 	if [ ! -d $(DESTDIR)/usr/include ]; then mkdir -p $(DESTDIR)/usr/include;fi
 	cp -f libcards.h $(DESTDIR)/usr/include/
-	if [ ! -d $(DESTDIR)$(LIBDIR) ]; then mkdir -p $(DESTDIR)$(LIBDIR);fi
-	if [ -L $(DESTDIR)$(LIBDIR)/libcards.so ]; then rm $(DESTDIR)$(LIBDIR)/libcards.so;fi
-	if [ -L $(DESTDIR)$(LIBDIR)/libcards.a ]; then rm $(DESTDIR)$(LIBDIR)/libcards.a;fi
-	cp -f libcards.a libcards.so.$(VERSION) $(DESTDIR)$(LIBDIR)
-	ln -sf libcards.so.$(VERSION) $(DESTDIR)$(LIBDIR)/libcards.so
+	if [ ! -d $(LIBDIR) ]; then mkdir -p $(LIBDIR);fi
+	if [ -L $(LIBDIR)/libcards.so ]; then rm $(LIBDIR)/libcards.so;fi
+	if [ -L $(LIBDIR)/libcards.a ]; then rm $(LIBDIR)/libcards.a;fi
+	cp -f libcards.a libcards.so.$(VERSION) $(LIBDIR)
+	ln -sf libcards.so.$(VERSION) $(LIBDIR)/libcards.so
 
 clean:
 	rm -f .tools_depend

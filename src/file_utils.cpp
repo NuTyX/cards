@@ -27,9 +27,8 @@ using namespace std;
 int getConfig(const string& fileName, Config& config)
 {
 	FILE* fp = fopen(fileName.c_str(), "r");
-	if (!fp) {
+	if (!fp)
 		return -1;
-	}
 	const int length = BUFSIZ;
 	char line[length];
 	string s;
@@ -86,23 +85,19 @@ int getConfig(const string& fileName, Config& config)
 			if (key == "version") {
 				config.version = val;
 			}
+			if (key == "arch") {
+				config.archs.push_back(val);
+			}
+#ifndef NDEBUG
+		cerr << "name: " << config.name << endl
+			<< "version: " << config.version << endl;
+		for ( auto i : config.dirUrl) cerr << "Dir: " << i.Dir << endl
+			<< "Url: " << i.Url << endl;
+#endif
 		}
 	}
 	fclose(fp);
 	return 0;
-}
-
-FILE *openFile(const char *fileName)
-{
-	FILE *fileHandler = NULL;
-	if ( (fileHandler = fopen(fileName,"r")) == NULL ) {
-		fprintf(stderr,"Failed to open %s\n",fileName);
-		if (errno) {
-			perror(fileName);
-		}
-		return NULL;
-	}
-	return fileHandler;
 }
 
 void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmemb)
@@ -340,7 +335,7 @@ int findDir(itemList* filesList, const char* path)
 	DIR *sd;
 	struct dirent *dir;
 	d = opendir(path);
-	char fullPath[255];
+	char fullPath[MAXPATHLEN];
 	if (d) {
 		while ((dir = readdir(d)) != NULL) {
 			if ( dir->d_name[0] != '.' ) { // ignore any .directories
@@ -475,10 +470,9 @@ int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, i
 }
 int readFileStripSpace(itemList* fileContent, const char* fileName)
 {
-	FILE* fp = NULL;
-	if ((fp = openFile (fileName)) == NULL ) {
+	FILE* fp = fopen(fileName, "r");
+	if (!fp)
 		return -1;
-	}
 	const int lenght = BUFSIZ;
 	char input[lenght];
 	while (fgets(input, lenght, fp)) {
@@ -493,10 +487,9 @@ int readFileStripSpace(itemList* fileContent, const char* fileName)
 }
 int readFile(itemList* fileContent, const char* fileName)
 {
-	FILE* fp = NULL;
-	if ((fp = openFile (fileName)) == NULL ) {
+	FILE* fp = fopen(fileName, "r");
+	if (!fp)
 		return -1;
-	}
 	const int length = BUFSIZ;
 	char input[length];
 	while (fgets(input, length, fp)) {
@@ -508,10 +501,9 @@ int readFile(itemList* fileContent, const char* fileName)
 }
 int parseFile(set<string>& fileContent, const char* fileName)
 {
-	FILE* fp = NULL;
-	if ((fp = openFile (fileName)) == NULL ) {
+	FILE* fp = fopen(fileName, "r");
+	if (!fp)
 		return -1;
-	}
 	const int length = BUFSIZ;
   char input[length];
 	string line;
@@ -526,10 +518,9 @@ int parseFile(set<string>& fileContent, const char* fileName)
 
 int parseFile(vector<string>& fileContent, const char* fileName)
 {
-	FILE* fp = NULL;
-	if ((fp = openFile (fileName)) == NULL ) {
+	FILE* fp = fopen(fileName, "r");
+	if (!fp)
 		return -1;
-	}
 	const int length = BUFSIZ;
 	char input[length];
 	string line;
