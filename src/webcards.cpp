@@ -11,81 +11,84 @@
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 
-#include <sys/stat.h>
-
-#include <iostream>
-#include <stdlib.h>
-#include <string.h>
-#include <string>
-
-#include "file_utils.h"
+#include "webcards.h"
+#include "www/config_webcards.h"
+#include "www/menu_webcards.h"
 
 using namespace std;
 
-void printFile(const char* fileName) {
-	vector<string> fileContent;
-	if  ( parseFile(fileContent,fileName) == 0 )
-		for (auto i:fileContent) cout << i <<endl;
-}
-/* TODO maybe not that clean
-	I guess this will endup in a file somewhere
-*/
-void head(string &title)
+content_t getContent(std::set<string>& list)
 {
-	cout << "Content-type:text/html\r\n\r\n"
-	<< "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"" << endl
-	<< "     \"http://www.w3.org/TR/html4/strict.dtd\">" << endl
-	<< "<HTML>" << endl
-	<< "   <HEAD>" << endl
-	<< "      <TITLE>" << title << "</TITLE>" << endl
-	<< "      <META charset=\"utf-8\" />" << endl
-	<< "      <LINK rel=\"shortcut icon\" href=\"../favicon.icon\">"
-	<< endl;
-	
+  content_t content;
+  for ( auto i : list) {
+   string fullName = "content/" + i;
+   contentInfo_t contentInfo;
+   contentInfo.date = getModifyTimeFile(fullName);
+	 vector<string> contentFile;
+	 parseFile(contentInfo.text,fullName.c_str());
+	 content[i] = contentInfo;
+  }
+	return content;
 }
-/* TODO maybe not that clean
-	Same same
-*/
-void footer(void)
-{
-	cout << "<hr>" << endl
-	<< "  <footer >" << endl
-	<< "     <p id=\"foot\"><img src=\"../graphics/logo_nutyx_25.png\" "
-	<< "alt=\"NuTyX logo\"> ...<br />" << endl
-	<< "     &copy; 2007 - 2016 "
-	<< "<a href=\"http://nutyx.org\">NuTyX</a>.<br /><br />" << endl
-	<< "     <a href=\"http://www.wtfpl.net/\">" << endl
-	<< "     <img src=\"http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png\"" << endl
-	<< "     width=\"80\" height=\"15\" alt=\"WTFPL\" /></a><br><br>" << endl
-	<< "     Powered by cards "
-	<< VERSION 
-	<< "</p>" << endl
-	<< "   </footer>" << endl
-        << "  </table>" << endl 
-	<< " </body>" << endl
-	<< "</html>" << endl;
-}
+
 int main (int argc, char** argv)
 {
-	string argument = basename(argv[0]);
-	string::size_type pos = argument.find( '.' );
-	if ( pos != string::npos && pos+1 < argument.length() ) {
-		string fileName = argument.substr(0,pos);
-		fileName += ".html";
-		fileName = "." + fileName;
-		head(argument);
-		printFile ("../css/.nutyx.css");
-		printFile (".menu.html");
+	set<string> ArticleNamesList;
+	findFile(ArticleNamesList, "content/");
+	content_t Content;
+	Content = getContent(ArticleNamesList);
+	string::size_type pos;
+	char * pPwd = getenv ("SCRIPT_NAME");
 
-		cout  << "<table border=\"0\" cellpadding=\"15\" cellspacing=\"10\" width=\"100%\">"
-			<< "<tr valign=\"top\">"
-			<< "<td valign=\"top\" align=\"left\" width=\"100%\">"
-			<< "<p class=\"updated\"> "
-			<<  getModifyTimeFile(fileName)
-			<< " UTC</p>" << endl;
-			printFile (fileName.c_str());
-		footer();
+	if ( !pPwd)
+		return 0;
+
+	char * pArgument = getenv ("QUERY_STRING");
+
+	if ( !pArgument)
+    return 0;
+
+	string  sPwd =  pPwd;
+	pos = sPwd.find_last_of( "/\\" );
+	if ( pos == string::npos )
+		return 0;
+
+	string sPath = sPwd.substr(0,pos);
+	string sArgument = pArgument;
+
+	HEADERTEXT;
+	CSSDATA;
+	pos = sPath.find_last_of( "/\\" );
+
+	if ( pos == string::npos )
+		return 0;
+
+	string sLang = sPath.substr(pos+1);
+	if ( sLang == "fr" )
+		MENUFR;
+	else if ( sLang == "tr" )
+		MENUTR;
+	else
+		MENUEN;
+
+	string docName = "index";
+	pos = sArgument.find("page=");
+	if ( pos != string::npos )
+		docName = sArgument.substr(pos+5);
+
+	if ( Content.find(docName) != Content.end() ){
+		cout << "<table border=\"0\" cellpadding=\"15\" cellspacing=\"10\" width=\"100%\">"
+		<< "<tr valign=\"top\">"
+		<< "<td valign=\"top\" align=\"left\" width=\"100%\">"
+		<< "<p class=\"updated\"> "
+		<< Content[docName].date
+		<< " UTC</p>" << endl;
+		for (auto i : Content[docName].text) cout << i << endl;
+	} else {
+		docName="under-construction";
+		for (auto i : Content[docName].text) cout << i << endl;
 	}
+	FOOTERTEXT;
 	return 0;
 }
 // vim:set ts=2 :
