@@ -22,7 +22,7 @@
 using namespace std;
 
 Pkginst::Pkginst(const string& commandName,const string& configFileName)
-	: Pkgadd(commandName), Pkgrepo(configFileName)
+	: Pkgadd(commandName), Repodwl(configFileName)
 {
 }
 void Pkginst::generateDependencies(const pair<string,time_t>& packageName)

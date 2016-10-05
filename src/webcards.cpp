@@ -30,7 +30,44 @@ content_t getContent(std::set<string>& list)
   }
 	return content;
 }
-
+void printFormatedBinaryPackageList(void)
+{
+	string row = "odd";
+	vector<RepoInfo> List;
+	Pkgrepo repoList(".webcards.conf");
+	List = repoList.getRepoInfo();
+	cout << "<h1>NuTyX Packages 8.2</h1>" << endl
+		<< " <table>" << endl
+		<< "  <tr class=\"header\">" << endl
+		<< "   <td>ARCH</td>"
+		<< "   <td>COLLECTION</td>"
+		<< "   <td>NAME</td>"
+		<< "   <td>VERSION</td>"
+		<< "   <td>DESCRIPTION</td>"
+		<< "   <td>DATE</td>" << endl
+		<< "  </tr>" << endl
+		<< "  <tbody id=\"fbody\">" << endl;
+	for (auto i : List) {
+		for (auto j : i.basePackageList) {
+			cout << "   <tr class=\"" <<  row << "\">"
+				<< endl
+				<< "    <td>" << i.arch << "</td>"
+				<< "<td>" << i.collection << "</td>"
+				<< "<td>" << j.basePackageName << "</td>"
+				<< "<td>" << j.version << "-" << j.release << "</td>"
+				<< "<td>" << j.description << "</td>"
+				<< "<td>" << getDateFromEpoch(j.buildDate) 
+				<< "</td>" << endl
+				<< "   </tr>" << endl;
+			if ( row=="odd")
+				row="even";
+			else
+				row="odd";
+		}
+	}
+	cout << " </trbody>" << endl
+		<< " </table>" << endl;
+}
 int main (int argc, char** argv)
 {
 	set<string> ArticleNamesList;
@@ -76,17 +113,44 @@ int main (int argc, char** argv)
 	if ( pos != string::npos )
 		docName = sArgument.substr(pos+5);
 
-	if ( Content.find(docName) != Content.end() ){
-		cout << "<table border=\"0\" cellpadding=\"15\" cellspacing=\"10\" width=\"100%\">"
-		<< "<tr valign=\"top\">"
-		<< "<td valign=\"top\" align=\"left\" width=\"100%\">"
-		<< "<p class=\"updated\"> "
-		<< Content[docName].date
-		<< " UTC</p>" << endl;
-		for (auto i : Content[docName].text) cout << i << endl;
+	if ( docName == "packages" ) {
+		cout << "<table width=\"25%\" cellspacing=\"0\">" << endl
+			<< "<tr class=\"header\">" << endl
+			<< "<td><input id=\"searchInput\" placeholder=\"Search for ... \"></td>" << endl
+			<< "</tr>" << endl
+			<< "</table>" << endl
+			<< "<table>" << endl ;
+		printFormatedBinaryPackageList();
+		cout << "<script src=\"https://code.jquery.com/jquery-2.1.4.min.js\"></script>" 
+			<< endl
+			<< "<script>" << endl
+			<< "jQuery(function() {" << endl
+			<< "jQuery(\"#searchInput\").keyup(function() {" << endl
+			<< "         var rows = jQuery(\"#fbody\").find(\"tr\").hide();" << endl
+			<< "         var data = this.value.split(\" \");" << endl
+			<< "         jQuery.each(data, function(i, v) {" << endl
+			<< "         v = v.toLowerCase();" << endl
+			<< "         rows.filter(function() {" << endl
+			<< "         return (this.textContent || this.innerText || this.text() || \"\").toLowerCase().indexOf(v) >= 0;" << endl
+			<< "        })" << endl
+			<< "       .show();" << endl
+			<< "     });" << endl
+			<< "   	});" << endl
+			<< "   });" << endl
+			<< "  </script>" << endl;
 	} else {
-		docName="under-construction";
-		for (auto i : Content[docName].text) cout << i << endl;
+		if ( Content.find(docName) != Content.end() ){
+			cout << "<table border=\"0\" cellpadding=\"15\" cellspacing=\"10\" width=\"100%\">"
+			<< "<tr valign=\"top\">"
+			<< "<td valign=\"top\" align=\"left\" width=\"100%\">"
+			<< "<p class=\"updated\"> "
+			<< Content[docName].date
+			<< " UTC</p>" << endl;
+			for (auto i : Content[docName].text) cout << i << endl;
+		} else {
+			docName="under-construction";
+			for (auto i : Content[docName].text) cout << i << endl;
+		}
 	}
 	FOOTERTEXT;
 	return 0;

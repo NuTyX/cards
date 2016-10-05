@@ -22,7 +22,6 @@
 #ifndef PKGREPO_H
 #define PKGREPO_H
 
-#include "file_download.h"
 #include "file_utils.h"
 
 struct PortFilesList {
@@ -91,73 +90,19 @@ struct PortsDirectory {
 	std::string Url;
 	std::vector<BasePackageInfo> basePackageList;
 };
-
-class Pkgrepo
-{
-	protected:
 /**
- *
- * \parse the config file
+ * \representation of the Repo mainly for the website
  **/
-		int parseConfig(const std::string& fileName);
-
-/**
- * \parse the .PKGREPO file which belong to the collection found
- * in the configuration file cards.conf. It populate the 
- * the m_packageList.basePackageName part by looking
- * the downloaded .PKGREPO file of each activate collection
- * 
- * Depends on: m_config.dirUrl
- *
- * populate: m_portsDirectoryList (Dir, Url, BasePackageInfo for each possible port found in Dir)
- * with the contents of the collection .PKGREPO file
- *
- **/
-		void parsePkgRepoCollectionFile();
-
-/**
- * \parse the directory directly based on what we have locally.
- * This method is used in the case of synchronisation with the mirror
- * is NOT possible. If they are no directories, they will be nothing add
- *
- * Depends on: m_config.dirUrl
- *
- * populate:  m_portsDirectoryList  ( Dir, BasePackageInfo->basePackageName only )
- *
- **/
-		void parseCollectionDirectory();
-
-/**
- * \parse the ".PKGREPO" file of a port directory
- * if it found a first line with the date of construction
- * and the extension of the archive then it populate
- * the list of packages
- *
- * Depends on: parsePkgRepoCollectionFile
- *
- * Populate: m_portFilesList (md5SUM.name,arch)
- *
- */
-		void parseCurrentPackagePkgRepoFile();
-
-/**
- * \parse the "Pkgfile" file for each basePackage
- * add the version of the port found in the Pkgfile
- *
- */
-		void parsePackagePkgfileFile();
-
-/**
- *
- * \parse the .PKGREPO of all the packageName directory
- * 
- *
- */
-		void parsePackagesPkgRepoFile();
-
-	public:
+struct RepoInfo {
+	std::string arch;
+	std::string collection;
+	std::vector<BasePackageInfo> basePackageList;
+};
+class Pkgrepo {
+public:
 
 		Pkgrepo(const std::string& fileName);
+		virtual ~Pkgrepo() {}
 		static int parseConfig(const std::string& fileName,
 			Config& config);
 /**
@@ -170,7 +115,7 @@ class Pkgrepo
  * add: the .PKGREPO of the packageName port from the mirror
  *
  */
-		void downloadPortsPkgRepo(const std::string& packageName);
+//		void downloadPortsPkgRepo(const std::string& packageName);
 
 /**
  * \download the packagefileName
@@ -182,7 +127,7 @@ class Pkgrepo
  * add: The packageFileName from the mirror
  *
  */
-		void downloadPackageFileName(const std::string& packageFileName);
+//		void downloadPackageFileName(const std::string& packageFileName);
 
 
 /**
@@ -254,7 +199,7 @@ class Pkgrepo
 /*
  *	\return true if binarie name exist
  */
-		bool checkBinaryExist(const std::string& packageName);
+// ==>>>>>		bool checkBinaryExist(const std::string& packageName);
 /*
  *  \retun list of packages of the collection
  */
@@ -268,7 +213,7 @@ class Pkgrepo
  *
  *  Populate: nothing
  */
-		std::string getPackageFileName(const std::string& packageName);
+// ==>>>>     	std::string getPackageFileName(const std::string& packageName);
 /*
  *	\return the build time of the binary 
  */
@@ -284,7 +229,11 @@ class Pkgrepo
  *
  */
 		unsigned int getBinaryPackageList();
-
+/*
+ * \populate RepoInfo List
+ *
+ */
+		std::vector<RepoInfo> getRepoInfo();
 /*
  * \printout the list of available ports which are compiled
  *  return a list of name version
@@ -295,7 +244,67 @@ class Pkgrepo
 		bool getBinaryPackageInfo(const std::string& packageName);
 		bool getPortInfo(const std::string& portName);
 
-	protected:
+protected:
+/**
+ *
+ * \parse the config file
+ **/
+    int parseConfig(const std::string& fileName);
+
+/**
+ * \parse the .PKGREPO file which belong to the collection found
+ * in the configuration file cards.conf. It populate the
+ * the m_packageList.basePackageName part by looking
+ * the downloaded .PKGREPO file of each activate collection
+ *
+ * Depends on: m_config.dirUrl
+ *
+ * populate: m_portsDirectoryList (Dir, Url, BasePackageInfo for each possible port found in Dir)
+ * with the contents of the collection .PKGREPO file
+ *
+ **/
+    void parsePkgRepoCollectionFile();
+
+/**
+ * \parse the directory directly based on what we have locally.
+ * This method is used in the case of synchronisation with the mirror
+ * is NOT possible. If they are no directories, they will be nothing add
+ *
+ * Depends on: m_config.dirUrl
+ *
+ * populate:  m_portsDirectoryList  ( Dir, BasePackageInfo->basePackageName only )
+ *
+ **/
+    void parseCollectionDirectory();
+
+/**
+ * \parse the ".PKGREPO" file of a port directory
+ * if it found a first line with the date of construction
+ * and the extension of the archive then it populate
+ * the list of packages
+ *
+ * Depends on: parsePkgRepoCollectionFile
+ *
+ * Populate: m_portFilesList (md5SUM.name,arch)
+ *
+ */
+    void parseCurrentPackagePkgRepoFile();
+
+/**
+ * \parse the "Pkgfile" file for each basePackage
+ * add the version of the port found in the Pkgfile
+ *
+ */
+    void parsePackagePkgfileFile();
+
+/**
+ *
+ * \parse the .PKGREPO of all the packageName directory
+ *
+ *
+ */
+    void parsePackagesPkgRepoFile();
+
 		bool m_parsePkgRepoCollectionFile;
 		bool m_parseCollectionDirectory;
 		bool m_parsePackagesPkgRepoFile;

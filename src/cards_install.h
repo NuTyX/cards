@@ -49,4 +49,5 @@ class Cards_install: public Pkginst
 
 };
 
-#endif /* CARDS_INSTALL_H */ 
+#endif /* CARDS_INSTALL_H */
+// vim:set ts=2 :

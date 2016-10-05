@@ -22,10 +22,10 @@
 
 #include "pkgdbh.h"
 #include "pkgadd.h"
-#include "pkgrepo.h"
+#include "repodwl.h"
 #include "process.h"
 
-class Pkginst : public Pkgadd, public Pkgrepo {
+class Pkginst : public Pkgadd, public Repodwl {
 public:
 	Pkginst(const std::string& commandName, const std::string& configFileName);
 	void generateDependencies(const std::pair<std::string,time_t>& packageName);

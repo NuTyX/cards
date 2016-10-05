@@ -1,4 +1,4 @@
-//  pkgrepo.cc
+//  pkgrepo.cpp
 //
 //  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
 //  Copyright (c) 2014 by NuTyX team (http://nutyx.org)
@@ -186,39 +186,6 @@ void Pkgrepo::parseCollectionDirectory()
 	}
 	if (m_portsDirectoryList.size() > 0)
 		m_parseCollectionDirectory = true;
-}
-void Pkgrepo::downloadPortsPkgRepo(const string& packageName)
-{
-	InfoFile downloadFile;
-	vector<InfoFile> downloadFilesList;
-	bool found = false;
-	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
-		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
-			if ( m_BasePackageInfo_i->basePackageName == packageName ) {
-				found = true;
-				break;
-			}
-		}
-		if (found)
-			break;
-	}
-/*
-	We should check if the PKGREPO of the port is available
-	.PKGREPO file is /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO */
-
-	if ( m_PortsDirectory_i->Url.size() > 0 ) {
-		downloadFile.url = m_PortsDirectory_i->Url + "/" + m_BasePackageInfo_i->basePackageName  + "/.PKGREPO";
-		downloadFile.dirname = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName;
-		downloadFile.filename = "/.PKGREPO";
-		downloadFile.md5sum = m_BasePackageInfo_i-> md5SUM;
-			downloadFilesList.push_back(downloadFile);
-	}
-#ifndef NDEBUG
-	cerr << m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName  << endl;
-#endif
-	if ( downloadFilesList.size() > 0 ) {
-		FileDownload FD(downloadFilesList,false);
-	}
 }
 set<string> Pkgrepo::getListOfPackagesFromDirectory(const string& path)
 {
@@ -411,35 +378,6 @@ void Pkgrepo::parsePackagePkgfileFile()
 	if (!m_parseCollectionDirectory)
 		parseCollectionDirectory();
 
-	InfoFile downloadFile;
-	vector<InfoFile> downloadFilesList;
-	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
-		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			for (std::vector<PortFilesList>::iterator p = j->portFilesList.begin(); p != j ->portFilesList.end();++p) {
-#ifndef NDEBUG
-				cerr << p->md5SUM << " " << p->name << endl << endl;
-#endif
-				if ( p->name == "Pkgfile" ){
-					if ( ! checkFileExist(i->Dir + "/" + j->basePackageName  + "/" + p->name) ) {
-						downloadFile.url = i->Url + "/" + j->basePackageName  + "/" + p->name;
-						downloadFile.dirname = i->Dir + "/" + j->basePackageName;
-						downloadFile.filename = "/"+p->name;
-						downloadFile.md5sum = p-> md5SUM;
-						downloadFilesList.push_back(downloadFile);
-#ifndef NDEBUG
-						cerr << i->Dir + "/" + j->basePackageName  + "/" + p->name << endl;
-#endif
-					}
-				}
-			}
-		}
-	}
-	if ( downloadFilesList.size() > 0 ) {
-		FileDownload FD(downloadFilesList,false);
-	}
-/*
- * Time to add the various informations
- */
 	std::string::size_type pos;
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
@@ -451,8 +389,9 @@ void Pkgrepo::parsePackagePkgfileFile()
 			j->fileDate = getModifyTimeFile(pkgFile);
 			vector<string> pkgFileContent;
 			if ( parseFile(pkgFileContent,pkgFile.c_str()) != 0) {
-				cerr << "Cannot read the file: " << pkgFile << endl;
-				cerr << " ... continue with next" << endl;
+				cout << "You should use " << YELLOW << "ports -u" << NORMAL << " for " << i->Dir << endl;
+				cerr << "Cannot read the file: " << pkgFile << endl 
+					<< " ... continue with next" << endl;
 				j->basePackageName = "";
 				continue;
 			}
@@ -488,52 +427,6 @@ void Pkgrepo::parsePackagePkgfileFile()
 		} 
 	}
 	m_parsePackagePkgfileFile = true;
-}
-void Pkgrepo::downloadPackageFileName(const std::string& packageName)
-{
-	string basePackageName = packageName;
-	string::size_type pos = packageName.find('.');
-	if (pos != string::npos) {
-		basePackageName=packageName.substr(0,pos);
-	}
-
-	bool found = false;
-	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i != m_portsDirectoryList.end();++m_PortsDirectory_i) {
-		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin();m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
-			if ( m_BasePackageInfo_i->basePackageName == basePackageName) {
-				found=true;
-				break;
-			}
-		}
-		if (found)
-			break;
-	}
-	if (found) {
-#ifndef NDEBUG
-		cerr << packageName << endl;
-#endif
-		if ( ! checkFileExist (m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO"))
-			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
-		parseCurrentPackagePkgRepoFile();
-
-		for ( m_PortFilesList_i = m_portFilesList.begin();m_PortFilesList_i != m_portFilesList.end();++m_PortFilesList_i) {
-			if (m_PortFilesList_i->name == packageName)
-				break;
-		}
-
-		string url = m_PortsDirectory_i->Url + "/" + m_BasePackageInfo_i->basePackageName + "/" + m_PortFilesList_i->name + m_BasePackageInfo_i->s_buildDate + m_PortFilesList_i->arch + m_BasePackageInfo_i->extention;
-		string dir = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName;
-		string fileName = m_PortFilesList_i->name + m_BasePackageInfo_i->s_buildDate + m_PortFilesList_i-> arch + m_BasePackageInfo_i->extention;
-#ifndef NDEBUG
-		cerr << url << " "
-		<< dir << " "
-		<< fileName << " "
-		<< m_PortFilesList_i->md5SUM << " "
-		<< endl;
-#endif
-		FileDownload FD(url,dir,fileName,true);
-		FD.downloadFile();
-	}
 }
 set<string> Pkgrepo::getListOfPackagesFromCollection(const string& collectionName)
 {
@@ -582,6 +475,31 @@ unsigned int Pkgrepo::getBinaryPackageList()
 	}
 	for ( auto i : binaryList) cout << i << endl;
 	return binaryList.size();
+}
+std::vector<RepoInfo> Pkgrepo::getRepoInfo()
+{
+	string::size_type pos;
+	std::vector<RepoInfo> List;
+	if (!m_parsePkgRepoCollectionFile)
+		parsePkgRepoCollectionFile();
+	// For each defined collection
+	for (auto i : m_portsDirectoryList) {
+		RepoInfo ArchCollectionBasePackageList;
+		pos = i.Dir.find_last_of("/\\");
+		if ( pos != string::npos ) {
+			ArchCollectionBasePackageList.collection=i.Dir.substr(pos+1);
+			string s = i.Dir.substr(0, pos );
+			pos = s.rfind("/");
+			if ( pos != string::npos )
+				ArchCollectionBasePackageList.arch = s.substr(pos+1);
+		} else {
+			ArchCollectionBasePackageList.collection="unknow";
+			ArchCollectionBasePackageList.arch="unknow";
+		}
+		ArchCollectionBasePackageList.basePackageList=i.basePackageList;
+		List.push_back(ArchCollectionBasePackageList);
+	}
+	return List;
 }
 unsigned int Pkgrepo::getPortsList()
 {
@@ -825,69 +743,6 @@ bool Pkgrepo::checkPortExist(const string& portName)
 		}
 	}
 	return false;
-}
-bool Pkgrepo::checkBinaryExist(const string& packageName)
-{
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
-
-	string basePackageName = packageName;
-	string::size_type pos = packageName.find('.');
-	if (pos != string::npos)
-		basePackageName=packageName.substr(0,pos);
-#ifndef NDEBUG
-	cerr << "basePackageName: " << basePackageName << endl;
-#endif
-	bool baseBinaryfound = false;
-	bool Binaryfound = false;
-	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
-#ifndef NDEBUG
-		 cerr << m_PortsDirectory_i->Url << " " <<  m_PortsDirectory_i->Dir << endl;
-#endif
-		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
-#ifndef NDEBUG
-			cerr << "m_BasePackageInfo_i->basePackageName: " << m_BasePackageInfo_i->basePackageName << ":" << m_BasePackageInfo_i->s_buildDate <<"." <<  endl;
-#endif
-			if ( m_BasePackageInfo_i->basePackageName == basePackageName ) {
-				baseBinaryfound = true;
-				break;
-			}
-		}
-		if (baseBinaryfound)
-					break;
-	}
-	if (baseBinaryfound) {
-		if ( ! checkFileExist ( m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO")) {
-			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
-		}
-		string pkgRepoFile= m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO";
-		string pkgReporMD5sum = m_BasePackageInfo_i->md5SUM;
-		if ( ! checkMD5sum( pkgRepoFile.c_str(), pkgReporMD5sum.c_str())) {
-			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
-		}
-		parseCurrentPackagePkgRepoFile();
-		for ( m_PortFilesList_i = m_portFilesList.begin();m_PortFilesList_i != m_portFilesList.end();++m_PortFilesList_i) {
-#ifndef NDEBUG
-			cerr << m_PortFilesList_i->name << endl;
-#endif
-			if (m_PortFilesList_i->name == packageName) {
-				Binaryfound = true;
-				break;
-			}
-		}
-		if (Binaryfound)
-			m_packageFileName = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/" + packageName + m_BasePackageInfo_i->s_buildDate + m_PortFilesList_i-> arch + m_BasePackageInfo_i->extention;
-#ifndef NDEBUG
-		cerr << packageName << " is " << m_packageFileName << endl;
-#endif
-	}
-	return Binaryfound;
-}
-string Pkgrepo::getPackageFileName(const string& packageName)
-{
-	m_packageFileName = packageName;
-	checkBinaryExist(packageName);
-	return m_packageFileName;
 }
 time_t Pkgrepo::getBinaryBuildTime (const string& packageName)
 {

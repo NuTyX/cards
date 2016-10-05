@@ -21,14 +21,8 @@
 #ifndef WEBCARDS_H
 #define WEBCARD_H
 
-#include <sys/stat.h>
+#include "pkgrepo.h"
 
-#include <iostream>
-#include <stdlib.h>
-#include <string.h>
-#include <string>
-
-#include "file_utils.h"
 struct contentInfo_t {
 	std::string date;
 	std::vector<std::string> text;

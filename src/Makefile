@@ -44,6 +44,7 @@ CARDSOBJECTS =	system_utils.o \
 		archive_utils.o \
 		pkgrepo.o \
 		file_download.o \
+		repodwl.o \
 		compile_dependencies_utils.o \
 		argument_parser.o \
 		cards_argument_parser.o \
@@ -87,6 +88,7 @@ WEBOBJECTS =  system_utils.o \
 	md5.o \
 	file_utils.o \
 	string_utils.o \
+	pkgrepo.o \
 	webcards.o
 
 HEADERS = system_utils.h \
@@ -130,7 +132,7 @@ libs:	.libs_depend $(LIBOBJECTS)
 	-@echo "#endif" >> libcards.h
 	-@echo "// vim:set ts=2 :" >> libcards.h
 
-all: setup-nutyx-log pkgadd cards webcards conf
+all: setup-nutyx-log pkgadd cards conf
 
 webcards: .web_depend $(WEBOBJECTS)
 	$(CXX) $(WEBOBJECTS) -o index.cgi
@@ -192,6 +194,9 @@ install-libs:
 	if [ -L $(LIBDIR)/libcards.a ]; then rm $(LIBDIR)/libcards.a;fi
 	cp -f libcards.a libcards.so.$(VERSION) $(LIBDIR)
 	ln -sf libcards.so.$(VERSION) $(LIBDIR)/libcards.so
+
+install-webcards:
+	install -D -m0755  index.cgi $(DESTDIR)/index.cgi
 
 clean:
 	rm -f .tools_depend
