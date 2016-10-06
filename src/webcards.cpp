@@ -30,43 +30,79 @@ content_t getContent(std::set<string>& list)
   }
 	return content;
 }
-void printFormatedBinaryPackageList(void)
+contentInfo_t getFormatedBinaryPackageList()
 {
+	time_t timer;
+	time(&timer);
 	string row = "odd";
+	contentInfo_t contentInfo;
+	contentInfo.date = getDateFromEpoch(timer);
 	vector<RepoInfo> List;
 	Pkgrepo repoList(".webcards.conf");
+	set<string> listOfPackages;
 	List = repoList.getRepoInfo();
-	cout << "<h1>NuTyX Packages 8.2</h1>" << endl
-		<< " <table>" << endl
-		<< "  <tr class=\"header\">" << endl
-		<< "   <td>ARCH</td>"
-		<< "   <td>COLLECTION</td>"
-		<< "   <td>NAME</td>"
-		<< "   <td>VERSION</td>"
-		<< "   <td>DESCRIPTION</td>"
-		<< "   <td>DATE</td>" << endl
-		<< "  </tr>" << endl
-		<< "  <tbody id=\"fbody\">" << endl;
 	for (auto i : List) {
 		for (auto j : i.basePackageList) {
-			cout << "   <tr class=\"" <<  row << "\">"
-				<< endl
-				<< "    <td>" << i.arch << "</td>"
-				<< "<td>" << i.collection << "</td>"
-				<< "<td>" << j.basePackageName << "</td>"
-				<< "<td>" << j.version << "-" << j.release << "</td>"
-				<< "<td>" << j.description << "</td>"
-				<< "<td>" << getDateFromEpoch(j.buildDate) 
-				<< "</td>" << endl
-				<< "   </tr>" << endl;
+			listOfPackages.insert("<td>" \
++ i.arch + "</td>" \
++ "<td>" + i.branch + "</td>"  \
++ "<td>" + i.collection + "</td>" \
++ "<td>" + j.basePackageName + "</td>" \
++ "<td>" + j.version + "-" + itos(j.release) + "</td>" \
++ "<td>" + j.description + "</td>" \
++ "<td>" + getDateFromEpoch(j.buildDate) + "</td>");
+		}
+	}
+	contentInfo.text.push_back("<h1>NuTyX Packages 8.2</h1>");
+	contentInfo.text.push_back(" <h2>" + itos(listOfPackages.size()) \
++ " packages founds</h2>");
+  contentInfo.text.push_back("<table width=\"25%\" cellspacing=\"0\">");
+  contentInfo.text.push_back("<tr class=\"header\">");
+  contentInfo.text.push_back("<td><input id=\"searchInput\" \
+placeholder=\"Search for ... \"></td>");
+  contentInfo.text.push_back("</tr>");
+  contentInfo.text.push_back("</table>");
+  contentInfo.text.push_back("<table>");
+	contentInfo.text.push_back("  <tr class=\"header\">");
+	contentInfo.text.push_back("  <td>ARCH</td><td>BRANCH</td>\
+<td>COLLECTION</td>\
+<td>NAME</td>\
+<td>VERSION</td>\
+<td>DESCRIPTION</td>\
+<td>UPDATE</td>");
+	contentInfo.text.push_back("<tbody id=\"fbody\">");
+	for (auto i : listOfPackages ){
+			contentInfo.text.push_back("<tr class=\"" +  row + "\">");
+			contentInfo.text.push_back(i);
+			contentInfo.text.push_back("</tr>");
 			if ( row=="odd")
 				row="even";
 			else
 				row="odd";
-		}
 	}
-	cout << " </trbody>" << endl
-		<< " </table>" << endl;
+	contentInfo.text.push_back(" </trbody>");
+	contentInfo.text.push_back(" </table>");
+  contentInfo.text.push_back("<script \
+src=\"https://code.jquery.com/jquery-2.1.4.min.js\"></script>");
+  contentInfo.text.push_back("<script>");
+  contentInfo.text.push_back("jQuery(function() {");
+  contentInfo.text.push_back("jQuery(\"#searchInput\").keyup(function() {");
+  contentInfo.text.push_back("         var rows = jQuery(\"#fbody\").find(\"tr\").hide();");
+  contentInfo.text.push_back("         var data = this.value.split(\" \");");
+  contentInfo.text.push_back("         jQuery.each(data, function(i, v) {");
+  contentInfo.text.push_back("         v = v.toLowerCase();");
+  contentInfo.text.push_back("         rows.filter(function() {");
+  contentInfo.text.push_back("         return (this.textContent || \
+this.innerText || this.text() \
+|| \"\").toLowerCase().indexOf(v) >= 0;");
+  contentInfo.text.push_back("        })");
+  contentInfo.text.push_back("       .show();");
+  contentInfo.text.push_back("     });");
+  contentInfo.text.push_back("    });");
+  contentInfo.text.push_back("   });");
+  contentInfo.text.push_back("  </script>");
+
+	return contentInfo;
 }
 int main (int argc, char** argv)
 {
@@ -75,15 +111,26 @@ int main (int argc, char** argv)
 	content_t Content;
 	Content = getContent(ArticleNamesList);
 	string::size_type pos;
-	char * pPwd = getenv ("SCRIPT_NAME");
+	char * pArgument = getenv ("QUERY_STRING");
+	if ( !pArgument)
+		return 0;
+	FILE *pVisits = fopen("content/.visits","r+");
+	if (pVisits != NULL) {
+		time_t timer;
+		time(&timer);
+		char * pIP = getenv ("REMOTE_ADDR");
+		char * pRA = getenv ("HTTP_USER_AGENT");
+		fseek(pVisits,0,SEEK_END);
+		if (pIP)
+			fprintf(pVisits,"%d,%s,%s,%s\n",timer,pIP,pRA,pArgument);
+		else
+			fprintf(pVisits,"%d,%s,%s,%s\n",timer,"NotAvailable",pRA,pArgument);
+		fclose(pVisits);
+	}
 
+	char * pPwd = getenv ("SCRIPT_NAME");
 	if ( !pPwd)
 		return 0;
-
-	char * pArgument = getenv ("QUERY_STRING");
-
-	if ( !pArgument)
-    return 0;
 
 	string  sPwd =  pPwd;
 	pos = sPwd.find_last_of( "/\\" );
@@ -112,45 +159,21 @@ int main (int argc, char** argv)
 	pos = sArgument.find("page=");
 	if ( pos != string::npos )
 		docName = sArgument.substr(pos+5);
-
-	if ( docName == "packages" ) {
-		cout << "<table width=\"25%\" cellspacing=\"0\">" << endl
-			<< "<tr class=\"header\">" << endl
-			<< "<td><input id=\"searchInput\" placeholder=\"Search for ... \"></td>" << endl
-			<< "</tr>" << endl
-			<< "</table>" << endl
-			<< "<table>" << endl ;
-		printFormatedBinaryPackageList();
-		cout << "<script src=\"https://code.jquery.com/jquery-2.1.4.min.js\"></script>" 
-			<< endl
-			<< "<script>" << endl
-			<< "jQuery(function() {" << endl
-			<< "jQuery(\"#searchInput\").keyup(function() {" << endl
-			<< "         var rows = jQuery(\"#fbody\").find(\"tr\").hide();" << endl
-			<< "         var data = this.value.split(\" \");" << endl
-			<< "         jQuery.each(data, function(i, v) {" << endl
-			<< "         v = v.toLowerCase();" << endl
-			<< "         rows.filter(function() {" << endl
-			<< "         return (this.textContent || this.innerText || this.text() || \"\").toLowerCase().indexOf(v) >= 0;" << endl
-			<< "        })" << endl
-			<< "       .show();" << endl
-			<< "     });" << endl
-			<< "   	});" << endl
-			<< "   });" << endl
-			<< "  </script>" << endl;
+	if ( docName == "packages" )
+		Content[docName] = getFormatedBinaryPackageList();
+	if ( Content.find(docName) != Content.end() ){
+		cout << "<table border=\"0\" cellpadding=\"15\" cellspacing=\"10\" width=\"100%\">"
+		<< "<tr valign=\"top\">"
+		<< "<td valign=\"top\" align=\"left\" width=\"100%\">"
+		<< "<p class=\"updated\"> "
+		<< Content[docName].date
+		<< " UTC</p>" << endl;
+		for (auto i : Content[docName].text) cout << i << endl;
 	} else {
-		if ( Content.find(docName) != Content.end() ){
-			cout << "<table border=\"0\" cellpadding=\"15\" cellspacing=\"10\" width=\"100%\">"
-			<< "<tr valign=\"top\">"
-			<< "<td valign=\"top\" align=\"left\" width=\"100%\">"
-			<< "<p class=\"updated\"> "
-			<< Content[docName].date
-			<< " UTC</p>" << endl;
-			for (auto i : Content[docName].text) cout << i << endl;
-		} else {
-			docName="under-construction";
-			for (auto i : Content[docName].text) cout << i << endl;
-		}
+		cout << "<h1>" << docName << " is not existing yet</h1>"
+			<< endl;
+		docName="under-construction";
+		for (auto i : Content[docName].text) cout << i << endl;
 	}
 	FOOTERTEXT;
 	return 0;

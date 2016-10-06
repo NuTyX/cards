@@ -94,6 +94,7 @@ struct PortsDirectory {
  * \representation of the Repo mainly for the website
  **/
 struct RepoInfo {
+	std::string branch;
 	std::string arch;
 	std::string collection;
 	std::vector<BasePackageInfo> basePackageList;

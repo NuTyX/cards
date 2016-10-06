@@ -490,8 +490,13 @@ std::vector<RepoInfo> Pkgrepo::getRepoInfo()
 			ArchCollectionBasePackageList.collection=i.Dir.substr(pos+1);
 			string s = i.Dir.substr(0, pos );
 			pos = s.rfind("/");
-			if ( pos != string::npos )
-				ArchCollectionBasePackageList.arch = s.substr(pos+1);
+			if ( pos != string::npos ) {
+				ArchCollectionBasePackageList.branch = s.substr(pos+1);
+				s = i.Dir.substr(0,pos);
+				pos = s.rfind("/");
+				if ( pos != string::npos )
+					ArchCollectionBasePackageList.arch = s.substr(pos+1);
+			}
 		} else {
 			ArchCollectionBasePackageList.collection="unknow";
 			ArchCollectionBasePackageList.arch="unknow";
