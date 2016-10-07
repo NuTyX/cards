@@ -34,7 +34,7 @@ VARDIR = ${DESTDIR}/var
 AR?=ar
 RANLIB?=ranlib
 
-VERSION = 2.1.95
+VERSION = 2.1.96
 
 NAME = cards-$(VERSION)
 

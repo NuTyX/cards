@@ -791,25 +791,29 @@ bool Pkgrepo::search(const string& s)
 		for (auto j : i.basePackageList) {
 			string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
 			if ( convertToLowerCase(s) == j.basePackageName ) {
-				packageToInsert = "(" + baseDir + ") " + j.basePackageName + " " + j.version + " " + j.description;
+				packageToInsert = "(" + baseDir + ") " + j.basePackageName \
+				+ " " + j.version + " " + j.description;
 				packageList.insert(packageToInsert);
 				found = true;
 			}
 			pos = j.basePackageName.find(convertToLowerCase(s));
 			if (pos != std::string::npos) {
-				packageToInsert = "(" + baseDir + ") " + j.basePackageName + " " + j.version + " " + j.description;
+				packageToInsert = "(" + baseDir + ") " + j.basePackageName \
+				+ " " + j.version + " " + j.description;
 				packageList.insert(packageToInsert);
 				found = true;
 			}
 			pos = convertToLowerCase(j.description).find(convertToLowerCase(s));
 			if (pos != std::string::npos) {
-				packageToInsert = "(" + baseDir + ") " + j.basePackageName + " " + j.version + " " + j.description;
+				packageToInsert = "(" + baseDir + ") " + j.basePackageName \
+				+ " " + j.version + " " + j.description;
 				packageList.insert(packageToInsert);
 				found = true;
 			}
 			pos = convertToLowerCase(j.version).find(convertToLowerCase(s));
 			if (pos != std::string::npos) {
-				packageToInsert = "(" + baseDir + ") " + j.basePackageName + " " + j.version + " " + j.description;
+				packageToInsert = "(" + baseDir + ") " + j.basePackageName \
+				+ " " + j.version + " " + j.description;
 				packageList.insert(packageToInsert);
 				found = true;
 			}
@@ -846,7 +850,9 @@ int Pkgrepo::parseConfig(const string& fileName, Config& config)
 	if ( result != 0 )
 		return result;
 
-	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
+	for (vector<DirUrl>::iterator i = config.dirUrl.begin();
+	i != config.dirUrl.end();
+	++i) {
 		DirUrl DU = *i ;
 		if (DU.Url.size() == 0 )
 			continue;

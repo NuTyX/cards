@@ -21,7 +21,10 @@
 #define CONFIGWEBCARDS_H
 #define CSSDATA cout << " <style type=\"text/css\">" << endl \
  << " body{" << endl \
- << "   background: #eee url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAMAAAC6sdbXAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF3d3d////riJKgAAAAAJ0Uk5T/wDltzBKAAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
+ << "   background: #eee url(data:image/png;base64,iVBORw0KGgo\
+AAAANSUhEUgAAAAUAAAAFCAMAAAC6sdbXAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZS\
+BJbWFnZVJlYWR5ccllPAAAAAZQTFRF3d3d////riJKgAAAAAJ0Uk5T/wDltzBK\
+AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "   font: 14px;" << endl \
  << "}" << endl \
  << "header {" << endl \
@@ -61,7 +64,8 @@
  << "img { border: 0; }" << endl \
  << "nav.img { border: 0; }" << endl \
  << "h1 { text-decoration: underline; }" << endl \
- << "h2, p { text-align: left; color: #444; text-shadow: 0 1px 0 #fff; }" << endl \
+ << "h2, p { text-align: left; color: #444; text-shadow: 0 1px 0 #fff; }" \
+ << endl \
  << "p1 {" << endl \
  << "    display: inline-block;" << endl \
  << "    vertical-align: top;" << endl \
@@ -70,7 +74,8 @@
  << "    font-size:1em;" << endl \
  << "}" << endl \
  << ".url {" << endl \
- << "   text-decoration: none; /* Les liens ne seront plus soulignés */" << endl \
+ << "   text-decoration: none; /* Les liens ne seront plus soulignés */" \
+ << endl \
  << "   color:#000097;" << endl \
  << "}" << endl \
  << ".url:hover { color:#C00000; }" << endl \
@@ -130,7 +135,8 @@
   << "alt=\"NuTyX logo\"><br>" << endl \
   << "<a href=\".\">NuTyX</a>.<br><br>" << endl \
   << "     <a href=\"http://www.wtfpl.net/\">" << endl \
-  << "     <img src=\"http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png\"" << endl \
+  << "     <img src=\"http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png\"" \
+  << endl \
   << "     width=\"80\" height=\"15\" alt=\"WTFPL\" /></a><br><br>" << endl \
   << "   </footer>" << endl \
   << "  </table>" << endl \
@@ -146,6 +152,26 @@
 	<< "      <META charset=\"utf-8\" />" << endl \
 	<< "      <LINK rel=\"shortcut icon\" href=\"../favicon.icon\">" \
 	<< endl
+
+#define SEARCH cout << "   <div>" \
+  << "  <form method=\"get\" action=\".\">" \
+  << "     <fieldset>" \
+  << "          <label for=\"search-field\">Search for ...</label>" \
+  << "          <input id=\"search-field\" type=\"text\" name=\"search\" \
+size=\"18\" maxlength=\"200\" />" \
+  << "     </fieldset>" \
+  << "  </form>" \
+  << "   </div>"
+
+#define SEARCHPKG contentInfo.text.push_back( "   <div>"); \
+  contentInfo.text.push_back( "  <form method=\"get\" action=\".\">"); \
+  contentInfo.text.push_back( "     <fieldset>"); \
+  contentInfo.text.push_back( "          <label for=\"search-field\">Search for ...</label>"); \
+  contentInfo.text.push_back( "          <input id=\"search-field\" type=\"text\" name=\"searchpkg\" \
+size=\"18\" maxlength=\"200\" />"); \
+  contentInfo.text.push_back( "     </fieldset>"); \
+  contentInfo.text.push_back( "  </form>"); \
+  contentInfo.text.push_back( "   </div>")
 
 #endif /* CONFIGWEBCARDS_H */
 // vim:set ts=2 :

@@ -17,6 +17,16 @@
 
 using namespace std;
 
+void lastUpdate(std::string& date)
+{
+	cout << "<table border=\"0\" cellpadding=\"15\" \
+	cellspacing=\"10\" width=\"100%\">"
+	<< "<tr valign=\"top\">"
+	<< "<td valign=\"top\" align=\"left\" width=\"100%\">"
+	<< "<p class=\"updated\"> "
+	<< date
+	<< " UTC</p>" << endl;
+}
 content_t getContent(std::set<string>& list)
 {
   content_t content;
@@ -30,7 +40,7 @@ content_t getContent(std::set<string>& list)
   }
 	return content;
 }
-contentInfo_t getFormatedBinaryPackageList()
+contentInfo_t getFormatedBinaryPackageList(string& search)
 {
 	time_t timer;
 	time(&timer);
@@ -43,7 +53,8 @@ contentInfo_t getFormatedBinaryPackageList()
 	List = repoList.getRepoInfo();
 	for (auto i : List) {
 		for (auto j : i.basePackageList) {
-			listOfPackages.insert("<td>" \
+			if ( search.size() == 0 ) {
+				listOfPackages.insert("<td>" \
 + i.arch + "</td>" \
 + "<td>" + i.branch + "</td>"  \
 + "<td>" + i.collection + "</td>" \
@@ -51,17 +62,41 @@ contentInfo_t getFormatedBinaryPackageList()
 + "<td>" + j.version + "-" + itos(j.release) + "</td>" \
 + "<td>" + j.description + "</td>" \
 + "<td>" + getDateFromEpoch(j.buildDate) + "</td>");
+			} else {
+				string::size_type pos;
+				if ( convertToLowerCase(search) == j.basePackageName ) {
+					listOfPackages.insert("<td>" \
++ i.arch + "</td>" \
++ "<td>" + i.branch + "</td>"  \
++ "<td>" + i.collection + "</td>" \
++ "<td>" + j.basePackageName + "</td>" \
++ "<td>" + j.version + "-" + itos(j.release) + "</td>" \
++ "<td>" + j.description + "</td>" \
++ "<td>" + getDateFromEpoch(j.buildDate) + "</td>");
+					continue;
+				}
+				pos = j.description.find(convertToLowerCase(search));
+				if (pos != std::string::npos) {
+					listOfPackages.insert("<td>" \
++ i.arch + "</td>" \
++ "<td>" + i.branch + "</td>"  \
++ "<td>" + i.collection + "</td>" \
++ "<td>" + j.basePackageName + "</td>" \
++ "<td>" + j.version + "-" + itos(j.release) + "</td>" \
++ "<td>" + j.description + "</td>" \
++ "<td>" + getDateFromEpoch(j.buildDate) + "</td>");
+					continue;
+				}
+			}
 		}
 	}
+	if (listOfPackages.size() == 0)
+		return contentInfo;
+
 	contentInfo.text.push_back("<h1>NuTyX Packages 8.2</h1>");
 	contentInfo.text.push_back(" <h2>" + itos(listOfPackages.size()) \
 + " packages founds</h2>");
-  contentInfo.text.push_back("<table width=\"25%\" cellspacing=\"0\">");
-  contentInfo.text.push_back("<tr class=\"header\">");
-  contentInfo.text.push_back("<td><input id=\"searchInput\" \
-placeholder=\"Search for ... \"></td>");
-  contentInfo.text.push_back("</tr>");
-  contentInfo.text.push_back("</table>");
+	SEARCHPKG;
   contentInfo.text.push_back("<table>");
 	contentInfo.text.push_back("  <tr class=\"header\">");
 	contentInfo.text.push_back("  <td>ARCH</td><td>BRANCH</td>\
@@ -82,25 +117,6 @@ placeholder=\"Search for ... \"></td>");
 	}
 	contentInfo.text.push_back(" </trbody>");
 	contentInfo.text.push_back(" </table>");
-  contentInfo.text.push_back("<script \
-src=\"https://code.jquery.com/jquery-2.1.4.min.js\"></script>");
-  contentInfo.text.push_back("<script>");
-  contentInfo.text.push_back("jQuery(function() {");
-  contentInfo.text.push_back("jQuery(\"#searchInput\").keyup(function() {");
-  contentInfo.text.push_back("         var rows = jQuery(\"#fbody\").find(\"tr\").hide();");
-  contentInfo.text.push_back("         var data = this.value.split(\" \");");
-  contentInfo.text.push_back("         jQuery.each(data, function(i, v) {");
-  contentInfo.text.push_back("         v = v.toLowerCase();");
-  contentInfo.text.push_back("         rows.filter(function() {");
-  contentInfo.text.push_back("         return (this.textContent || \
-this.innerText || this.text() \
-|| \"\").toLowerCase().indexOf(v) >= 0;");
-  contentInfo.text.push_back("        })");
-  contentInfo.text.push_back("       .show();");
-  contentInfo.text.push_back("     });");
-  contentInfo.text.push_back("    });");
-  contentInfo.text.push_back("   });");
-  contentInfo.text.push_back("  </script>");
 
 	return contentInfo;
 }
@@ -156,24 +172,69 @@ int main (int argc, char** argv)
 		MENUEN;
 
 	string docName = "index";
+	if  ( sArgument.size() < 1 ) {
+		SEARCH;
+		lastUpdate(Content[docName].date);
+		for (auto i : Content[docName].text) cout << i << endl;
+	}
 	pos = sArgument.find("page=");
-	if ( pos != string::npos )
+	if ( pos != string::npos )	{
 		docName = sArgument.substr(pos+5);
-	if ( docName == "packages" )
-		Content[docName] = getFormatedBinaryPackageList();
-	if ( Content.find(docName) != Content.end() ){
-		cout << "<table border=\"0\" cellpadding=\"15\" cellspacing=\"10\" width=\"100%\">"
-		<< "<tr valign=\"top\">"
-		<< "<td valign=\"top\" align=\"left\" width=\"100%\">"
-		<< "<p class=\"updated\"> "
-		<< Content[docName].date
-		<< " UTC</p>" << endl;
-		for (auto i : Content[docName].text) cout << i << endl;
-	} else {
-		cout << "<h1>" << docName << " is not existing yet</h1>"
+		if ( docName == "packages" ) {
+			string search = "";
+			Content[docName] = getFormatedBinaryPackageList(search);
+		}
+		if ( Content.find(docName) != Content.end() ){
+			if ( docName != "packages" )
+				SEARCH;
+			lastUpdate(Content[docName].date);
+			for (auto i : Content[docName].text) cout << i << endl;
+		} else {
+			cout << "<h1>" << docName << " is not existing yet</h1>"
 			<< endl;
-		docName="under-construction";
-		for (auto i : Content[docName].text) cout << i << endl;
+			docName="under-construction";
+			for (auto i : Content[docName].text) cout << i << endl;
+		}
+	}
+	pos = sArgument.find("search=");
+	if ( pos != string::npos )	{
+		string sSearch = sArgument.substr(pos+7);
+		if (sSearch.size() < 2) {
+			cout << endl
+			<< "<div class=\"note\"><img alt=\"[Note]\" \
+			src=\"../graphics/note.gif\" />min 2 characters...</div>" << endl;
+		} else {
+			docName = "packages";
+			vector<string> searchList;
+			for (auto i : Content) {
+				for (auto j : i.second.text) {
+					if ( i.first == "packages" )
+						continue;
+					string lower = convertToLowerCase(j);
+					pos = lower.find(convertToLowerCase(sSearch));
+					if (pos != string::npos) {
+						searchList.push_back("<a href=\"?page=" + i.first
+						+ "\">" + i.first + "</a><br>...<br>");
+						searchList.push_back(j);
+						searchList.push_back("</div></pre>...<br><br>");
+					}
+				}
+			}
+			for ( auto i : searchList) cout << i << endl;
+		}
+	}
+	pos = sArgument.find("searchpkg=");
+	if ( pos != string::npos )	{
+		string sSearch = sArgument.substr(pos+10);
+		if (sSearch.size() < 2) {
+			cout << "<div class=\"note\"><img alt=\"[Note]\" \
+			src=\"../graphics/note.gif\" />min 2 characters...</div>" << endl;
+		} else {
+			docName = "packages";
+			Content[docName] = getFormatedBinaryPackageList(sSearch);
+			if ( Content[docName].text.size() > 0)
+				for (auto i : Content[docName].text) cout << i << endl;
+		}
 	}
 	FOOTERTEXT;
 	return 0;
