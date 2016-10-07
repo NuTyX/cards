@@ -90,12 +90,17 @@ contentInfo_t getFormatedBinaryPackageList(string& search)
 			}
 		}
 	}
-	if (listOfPackages.size() == 0)
-		return contentInfo;
-
 	contentInfo.text.push_back("<h1>NuTyX Packages 8.2</h1>");
-	contentInfo.text.push_back(" <h2>" + itos(listOfPackages.size()) \
+	if (listOfPackages.size() == 0 )
+		contentInfo.text.push_back(" <h2>no matching package found</h2>");
+	if (listOfPackages.size() == 1 ) {
+		contentInfo.text.push_back(" <h2>" + itos(listOfPackages.size()) \
++ " package found</h2>");
+	}
+	if (listOfPackages.size() >1) {
+		contentInfo.text.push_back(" <h2>" + itos(listOfPackages.size()) \
 + " packages founds</h2>");
+	}
 	SEARCHPKG;
   contentInfo.text.push_back("<table>");
 	contentInfo.text.push_back("  <tr class=\"header\">");
@@ -106,7 +111,8 @@ contentInfo_t getFormatedBinaryPackageList(string& search)
 <td>DESCRIPTION</td>\
 <td>UPDATE</td>");
 	contentInfo.text.push_back("<tbody id=\"fbody\">");
-	for (auto i : listOfPackages ){
+	if (search.size() > 0) {
+		for (auto i : listOfPackages ){
 			contentInfo.text.push_back("<tr class=\"" +  row + "\">");
 			contentInfo.text.push_back(i);
 			contentInfo.text.push_back("</tr>");
@@ -114,8 +120,9 @@ contentInfo_t getFormatedBinaryPackageList(string& search)
 				row="even";
 			else
 				row="odd";
+		}
 	}
-	contentInfo.text.push_back(" </trbody>");
+	contentInfo.text.push_back(" </tbody>");
 	contentInfo.text.push_back(" </table>");
 
 	return contentInfo;
