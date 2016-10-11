@@ -1,4 +1,4 @@
-//  webcards.cc
+//  webcards.cpp
 //
 //  Copyright (c) 2016 by NuTyX team (http://nutyx.org)
 //
@@ -17,13 +17,20 @@
 
 using namespace std;
 
+void sideBar( const char *forum)
+{
+	cout << "  <td class=\"sidebar\" width=\"20%\">" << endl
+		<< "   <h4>Forum</h4>" << endl
+		<< "    <div>" << endl;
+	mysql forumDB("content/.mysql.conf");
+	forumDB.lastPosts(forum,10);
+	cout << "    </div>" << endl
+		<< "<hr>";
+
+}
 void lastUpdate(std::string& date)
 {
-	cout << "<table border=\"0\" cellpadding=\"15\" \
-	cellspacing=\"10\" width=\"100%\">"
-	<< "<tr valign=\"top\">"
-	<< "<td valign=\"top\" align=\"left\" width=\"100%\">"
-	<< "<p class=\"updated\"> "
+	cout << "    <p class=\"updated\"> "
 	<< date
 	<< " UTC</p>" << endl;
 }
@@ -54,37 +61,21 @@ contentInfo_t getFormatedBinaryPackageList(string& search)
 	for (auto i : List) {
 		for (auto j : i.basePackageList) {
 			if ( search.size() == 0 ) {
-				listOfPackages.insert("<td>" \
-+ i.arch + "</td>" \
-+ "<td>" + i.branch + "</td>"  \
-+ "<td>" + i.collection + "</td>" \
-+ "<td>" + j.basePackageName + "</td>" \
-+ "<td>" + j.version + "-" + itos(j.release) + "</td>" \
-+ "<td>" + j.description + "</td>" \
-+ "<td>" + getDateFromEpoch(j.buildDate) + "</td>");
+				INSERTPACKAGE;
 			} else {
 				string::size_type pos;
+				pos = i.collection.find(convertToLowerCase(search));
+				if (pos != std::string::npos) {
+					INSERTPACKAGE;
+					continue;
+				}
 				if ( convertToLowerCase(search) == j.basePackageName ) {
-					listOfPackages.insert("<td>" \
-+ i.arch + "</td>" \
-+ "<td>" + i.branch + "</td>"  \
-+ "<td>" + i.collection + "</td>" \
-+ "<td>" + j.basePackageName + "</td>" \
-+ "<td>" + j.version + "-" + itos(j.release) + "</td>" \
-+ "<td>" + j.description + "</td>" \
-+ "<td>" + getDateFromEpoch(j.buildDate) + "</td>");
+					INSERTPACKAGE;
 					continue;
 				}
 				pos = j.description.find(convertToLowerCase(search));
 				if (pos != std::string::npos) {
-					listOfPackages.insert("<td>" \
-+ i.arch + "</td>" \
-+ "<td>" + i.branch + "</td>"  \
-+ "<td>" + i.collection + "</td>" \
-+ "<td>" + j.basePackageName + "</td>" \
-+ "<td>" + j.version + "-" + itos(j.release) + "</td>" \
-+ "<td>" + j.description + "</td>" \
-+ "<td>" + getDateFromEpoch(j.buildDate) + "</td>");
+					INSERTPACKAGE;
 					continue;
 				}
 			}
@@ -177,7 +168,22 @@ int main (int argc, char** argv)
 		MENUTR;
 	else
 		MENUEN;
-
+	/* The main table */
+	cout << "<table border=\"0\" cellpadding=\"15\" \
+cellspacing=\"10\" width=\"100%\">" << endl
+  << " <tr valign=\"top\">" << endl;
+	const char * forumAdress;
+	const char * search;
+	if ( sLang == "fr" )
+	{
+		forumAdress = "http://forum.nutyx.org";
+		search = "Recherche ...";
+	} else{
+		forumAdress = "http://forums.nutyx.org";
+		search = "Search ...";
+	}
+	sideBar(forumAdress);
+	cout << "  <td valign=\"top\" align=\"left\" width=\"100%\">" << endl;
 	string docName = "index";
 	if  ( sArgument.size() < 1 ) {
 		SEARCH;
@@ -244,6 +250,14 @@ int main (int argc, char** argv)
 		}
 	}
 	FOOTERTEXT;
+
+	/* This will never changer */
+
+	cout << "   </tr>" <<endl
+	<< "  </table>" << endl
+  << " </body>" << endl
+  << "</html>" << endl;
+
 	return 0;
 }
 // vim:set ts=2 :

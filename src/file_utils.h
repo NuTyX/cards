@@ -74,6 +74,11 @@ struct DirUrl {
 
 struct Config {
 	Config() {}
+	std::string hostname;
+	std::string database;
+	std::string username;
+	std::string password;
+	std::string socket;
 	std::string collection;
 	std::string name;
 	std::string version;
@@ -85,7 +90,7 @@ struct Config {
 	std::vector<std::string> archs;
 };
 
-int getConfig(const std::string& fileName, Config& config);
+int getConfig(const char *fileName, Config& config);
 void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmemb);
 std::string trimFileName(const std::string& filename);
 time_t getEpochModifyTimeFile(const std::string& filename);

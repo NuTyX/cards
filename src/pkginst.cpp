@@ -21,7 +21,7 @@
 
 using namespace std;
 
-Pkginst::Pkginst(const string& commandName,const string& configFileName)
+Pkginst::Pkginst(const string& commandName,const char *configFileName)
 	: Pkgadd(commandName), Repodwl(configFileName)
 {
 }

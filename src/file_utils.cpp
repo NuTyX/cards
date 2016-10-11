@@ -24,9 +24,9 @@
 
 using namespace std;
 
-int getConfig(const string& fileName, Config& config)
+int getConfig(const char *fileName, Config& config)
 {
-	FILE* fp = fopen(fileName.c_str(), "r");
+	FILE* fp = fopen(fileName, "r");
 	if (!fp)
 		return -1;
 	const int length = BUFSIZ;
@@ -85,6 +85,14 @@ int getConfig(const string& fileName, Config& config)
 			if (key == "version") {
 				config.version = val;
 			}
+			if (key == "hostname")
+				config.hostname = val;
+			if (key == "username")
+				config.username = val;
+			if (key == "database")
+				config.database = val;
+			if (key == "password")
+				config.password = val;
 			if (key == "arch") {
 				config.archs.push_back(val);
 			}

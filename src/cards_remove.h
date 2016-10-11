@@ -33,7 +33,7 @@ class Cards_remove: public Pkgrm
 	public:
 		Cards_remove(const std::string& commandName,
 		const CardsArgumentParser& argParser,
-		const std::string& configFileName);
+		const char *configFileName);
 
 	private:
 		const CardsArgumentParser& m_argParser;

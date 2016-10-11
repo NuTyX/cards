@@ -90,6 +90,7 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "td { padding: 0em 0.5em 0em 0.5em; }" << endl \
  << "tr.header { color: white; background-color: #606060; }" << endl \
  << "tr.odd { background-color: #D0D0D0; }" << endl \
+ << ".sidebar { background-color: #E0E0E0; }" << endl \
  << "pre.command { border-left: 0.2em solid #C70000; }" << endl \
  << "pre.command_user { border-left: 0.2em solid #00C700; }" << endl \
  << "pre.output { font-weight:normal; }" << endl \
@@ -118,7 +119,7 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "}" << endl \
  << "/* Last edited info */" << endl \
  << "p.updated {" << endl \
- << "    text-align: right;" << endl \
+ << "    text-align: left;" << endl \
  << "    font-size: small;" << endl \
  << "    font-weight: bold;" << endl \
  << "    font-style: italic;" << endl \
@@ -128,7 +129,7 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "</head>" << endl
 
 #define FOOTERTEXT   cout << "<hr>" << endl \
-  << "   <footer >" << endl \
+  << "    <footer >" << endl \
   << "     <p id=\"foot\"> Powered by cards " <<  VERSION \
   << "     &copy; 2007 - 2016 " \
   << "<br> <img src=\"../graphics/logo_nutyx_25.png\" " \
@@ -138,10 +139,7 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
   << "     <img src=\"http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png\"" \
   << endl \
   << "     width=\"80\" height=\"15\" alt=\"WTFPL\" /></a><br><br>" << endl \
-  << "   </footer>" << endl \
-  << "  </table>" << endl \
-  << " </body>" << endl \
-  << "</html>" << endl
+  << "    </footer>" << endl
 
 #define HEADERTEXT  	cout << "Content-type:text/html\r\n\r\n" \
 	<< "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"" << endl \
@@ -153,15 +151,16 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
 	<< "      <LINK rel=\"shortcut icon\" href=\"../favicon.icon\">" \
 	<< endl
 
-#define SEARCH cout << "   <div>" \
-  << "  <form method=\"get\" action=\".\">" \
-  << "     <fieldset>" \
-  << "          <label for=\"search-field\">Search for ...</label>" \
+#define SEARCH cout << "   <div>" << endl \
+  << "  <form method=\"get\" action=\".\">" << endl \
+  << "     <fieldset>" << endl \
+  << "          <label for=\"search-field\">" \
+	<< search << "</label>" << endl \
   << "          <input id=\"search-field\" type=\"text\" name=\"search\" \
-size=\"18\" maxlength=\"200\" />" \
-  << "     </fieldset>" \
-  << "  </form>" \
-  << "   </div>"
+size=\"18\" maxlength=\"200\" />" << endl \
+	<< "     </fieldset>" << endl \
+  << "  </form>" << endl \
+  << "   </div>" << endl
 
 #define SEARCHPKG contentInfo.text.push_back( "   <div>"); \
   contentInfo.text.push_back( "  <form method=\"get\" action=\".\">"); \

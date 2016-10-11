@@ -25,7 +25,7 @@
 
 
 Cards_create::Cards_create(const CardsArgumentParser& argParser,
-	const std::string& configFileName,
+	const char *configFileName,
 	const std::vector<std::string>& listOfPackages)
 	: Pkginst("cards create",configFileName),m_argParser(argParser)
 {
@@ -34,14 +34,14 @@ Cards_create::Cards_create(const CardsArgumentParser& argParser,
 		basename(const_cast<char*>(i.c_str())) );
 }
 Cards_create::Cards_create(const CardsArgumentParser& argParser,
-	const std::string& configFileName,
+	const char *configFileName,
 	const std::string& packageName)
 	: Pkginst("cards create",configFileName),m_argParser(argParser)
 {
 	parseArguments();
 	createBinaries(configFileName, packageName);
 }
-void Cards_create::createBinaries(const std::string& configFileName,
+void Cards_create::createBinaries(const char *configFileName,
 	const std::string& packageName)
 {
 	using namespace std;

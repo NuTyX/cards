@@ -34,7 +34,7 @@ VARDIR = ${DESTDIR}/var
 AR?=ar
 RANLIB?=ranlib
 
-VERSION = 2.1.96.1
+VERSION = 2.1.97
 
 NAME = cards-$(VERSION)
 
@@ -46,6 +46,8 @@ CFLAGS += -D_GNU_SOURCE
 
 LIBARCHIVELIBS := $(shell pkg-config --libs --static libarchive)
 LIBCURLLIBS := $(shell pkg-config --libs --static libcurl)
+
+LIBMYSQLCLIENT := -lmysqlclient
 
 LDFLAGS += $(LIBARCHIVELIBS)
 

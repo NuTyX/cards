@@ -27,7 +27,8 @@ private:
 	std::set<std::pair<std::string,time_t>> m_ListOfPackages;
 	const CardsArgumentParser& m_argParser;
 public:
-	Cards_upgrade(const CardsArgumentParser& argParser,const std::string& configFileName);
+	Cards_upgrade(const CardsArgumentParser& argParser,
+		const char *configFileName);
 	void upgradePackages();
 	// show the packages that should be update without upgrade them
 	void dry();

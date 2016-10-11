@@ -21,7 +21,7 @@
 #include "repodwl.h"
 
 using namespace std;
-Repodwl::Repodwl(const string& fileName)
+Repodwl::Repodwl(const char *fileName)
 	: Pkgrepo(fileName)
 {
 }

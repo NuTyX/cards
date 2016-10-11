@@ -48,7 +48,7 @@ Pkgrepo::Pkgrepo(const std::string& fileName)
 void Pkgrepo::parsePkgRepoCollectionFile()
 {
 if (m_parsePkgRepoCollectionFile == false) {
-	parseConfig(m_configFileName);
+	parseConfig(m_configFileName.c_str());
 	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
 		PortsDirectory portsDirectory;
 		portsDirectory.Dir = i->Dir;
@@ -162,7 +162,7 @@ if (m_parsePkgRepoCollectionFile == false) {
 }
 void Pkgrepo::parseCollectionDirectory()
 {
-	parseConfig(m_configFileName);
+	parseConfig(m_configFileName.c_str());
 	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
 		// We don't want to check the folders which cannot sync with any mirror
 		if ( i->Url.size() > 0 )
@@ -822,11 +822,11 @@ bool Pkgrepo::search(const string& s)
 	for (auto i : packageList) cout << i << endl;
 	return found;
 }
-int Pkgrepo::parseConfig(const string& fileName)
+int Pkgrepo::parseConfig(const char *fileName)
 {
 	return parseConfig(fileName,m_config);
 }
-int Pkgrepo::parseConfig(const string& fileName, Config& config)
+int Pkgrepo::parseConfig(const char *fileName, Config& config)
 {
 	int result = 0;
 	if (checkFileExist("/var/lib/pkg/nutyx-version") ) {

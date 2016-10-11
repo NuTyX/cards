@@ -32,13 +32,13 @@ class Cards_install: public Pkginst
 {
 	public:
 		Cards_install(const CardsArgumentParser& argParser,
-			const std::string& configFileName);
+			const char *configFileName);
 
 		/* To install the dependencies of a package
 		 * created with cards create command
 		 */
 		Cards_install(const CardsArgumentParser& argParser,
-			const std::string& configFileName,
+			const char *configFileName,
 			const std::vector<std::string>& listOfPackages);
 			
 	private:

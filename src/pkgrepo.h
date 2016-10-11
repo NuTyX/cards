@@ -104,7 +104,7 @@ public:
 
 		Pkgrepo(const std::string& fileName);
 		virtual ~Pkgrepo() {}
-		static int parseConfig(const std::string& fileName,
+		static int parseConfig(const char *fileName,
 			Config& config);
 /**
  * \download the .PKGREPO of packageName
@@ -250,7 +250,7 @@ protected:
  *
  * \parse the config file
  **/
-    int parseConfig(const std::string& fileName);
+    int parseConfig(const char *fileName);
 
 /**
  * \parse the .PKGREPO file which belong to the collection found

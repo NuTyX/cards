@@ -98,7 +98,7 @@ of compilation" << endl
 		}
 		if (cardsArgPars.command() == CardsArgumentParser::CMD_CONFIG) {
 			Config config;
-			Pkgrepo::parseConfig(configFile, config);
+			Pkgrepo::parseConfig(configFile.c_str(), config);
 			unsigned int index = 0;
 			string prtDir, url ;
 
@@ -125,7 +125,7 @@ of compilation" << endl
 				return EXIT_SUCCESS;
 			}
 			// create (compile and install) the List of deps (including the final package)
-			Cards_create CC(cardsArgPars,configFile,listOfPackages);
+			Cards_create CC(cardsArgPars,configFile.c_str(),listOfPackages);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_CREATE) {
 
@@ -144,10 +144,12 @@ of compilation" << endl
 			vector<string> listOfDeps = CD.getDependencies();
 
 			if (!listOfDeps.empty())
-				Cards_install CI(cardsArgPars,configFile,listOfDeps);
+				Cards_install CI(cardsArgPars,configFile.c_str(),listOfDeps);
 
 			// compilation of the final port"
-			Cards_create CC( cardsArgPars,configFile,cardsArgPars.otherArguments()[0]);
+			Cards_create CC( cardsArgPars,
+				configFile.c_str(),
+				cardsArgPars.otherArguments()[0]);
 			return EXIT_SUCCESS;
 
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_BASE) {
@@ -169,13 +171,13 @@ of compilation" << endl
 			return EXIT_SUCCESS;
 		} else if ( (cardsArgPars.command() == CardsArgumentParser::CMD_UPGRADE) ||
 					(cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) ) {
-			Cards_upgrade CU(cardsArgPars,configFile);
+			Cards_upgrade CU(cardsArgPars,configFile.c_str());
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
-				Cards_install CI(cardsArgPars,configFile);
+				Cards_install CI(cardsArgPars,configFile.c_str());
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_REMOVE) {
-			Cards_remove CR("cards remove",cardsArgPars, configFile);
+			Cards_remove CR("cards remove",cardsArgPars, configFile.c_str());
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
 			CardsDepends CD(cardsArgPars);
@@ -193,7 +195,7 @@ of compilation" << endl
 				(cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) ||
 				(cardsArgPars.command() == CardsArgumentParser::CMD_FILES)  ||
 				(cardsArgPars.command() == CardsArgumentParser::CMD_QUERY)) {
-			Cards_info CI(cardsArgPars,configFile);
+			Cards_info CI(cardsArgPars,configFile.c_str());
 			return EXIT_SUCCESS;
 		}
 	} catch (runtime_error& e) {

@@ -34,6 +34,7 @@
   << "            <li><a href=\"documentation\">Documentation</a></li>" << endl \
   << "            <li><a href=\"installation\">Installation</a></li>" << endl \
   << "            <li><a href=\"faq\">FAQ</a></li>" << endl \
+  << "            <li><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Téléchargements</a></li>"  << endl \
   << "            <li><a href=\"screenshots\">Captures Ecrans</a></li>"  << endl \
   << "            <li><a href=\"wallpapers\">Fonds Ecrans</a></li>"  << endl \
   << "            <li><a href=\"packages\">Paquets</a></li>" << endl \
@@ -61,6 +62,7 @@
   << "            <li><a href=\"documentation\">Dökümantasyon</a></li>" << endl \
   << "            <li><a href=\"installation\">Kurulum</a></li>" << endl \
   << "            <li><a href=\"faq\">Sık Sorulan Sorular</a></li>" << endl \
+  << "            <li><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Indirmeler</a></li>"  << endl \
   << "            <li><a href=\"screenshots\">Screenshots</a></li>"  << endl \
   << "            <li><a href=\"wallpapers\">Wallpapers</a></li>"  << endl \
   << "            <li><a href=\"packages\">Paketler</a></li>" << endl \
@@ -89,6 +91,7 @@
   << "            <li><a href=\"documentation\">Documentation</a></li>" << endl \
   << "            <li><a href=\"installation\">Installation</a></li>" << endl \
   << "            <li><a href=\"faq\">FAQ</a></li>" << endl \
+  << "            <li><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Downloads</a></li>"  << endl \
   << "            <li><a href=\"screenshots\">Screenshots</a></li>"  << endl \
   << "            <li><a href=\"wallpapers\">Wallpapers</a></li>"  << endl \
   << "            <li><a href=\"packages\">Packages</a></li>" << endl \

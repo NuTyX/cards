@@ -19,7 +19,8 @@
 //
 
 #include "cards_upgrade.h"
-Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,const std::string& configFileName)
+Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
+	const char *configFileName)
 	: Pkginst("cards upgrade",configFileName), m_argParser(argParser)
 {
 	using namespace std;

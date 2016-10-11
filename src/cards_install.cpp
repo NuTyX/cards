@@ -25,7 +25,7 @@
 
 
 Cards_install::Cards_install(const CardsArgumentParser& argParser,
-		const std::string& configFileName)
+		const char *configFileName)
 	: Pkginst("cards install",configFileName),m_argParser(argParser)
 {
 	parseArguments();
@@ -70,7 +70,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	}	
 }
 Cards_install::Cards_install(const CardsArgumentParser& argParser,
-	const std::string& configFileName,
+	const char *configFileName,
 	const std::vector<std::string>& listOfPackages)
 	: Pkginst("cards install",configFileName),m_argParser(argParser)
 {

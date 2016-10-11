@@ -29,7 +29,7 @@ using namespace std;
 
 Cards_remove::Cards_remove(const string& commandName,
 	const CardsArgumentParser& argParser,
-	const string& configFileName)
+	const char *configFileName)
 	: Pkgrm(commandName),m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))

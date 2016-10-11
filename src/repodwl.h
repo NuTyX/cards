@@ -25,7 +25,7 @@
 
 class Repodwl: public Pkgrepo {
 public:
-		Repodwl(const std::string& fileName);
+		Repodwl(const char *fileName);
 /**
  * \download the .PKGREPO of packageName
  *

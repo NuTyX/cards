@@ -89,6 +89,7 @@ WEBOBJECTS =  system_utils.o \
 	file_utils.o \
 	string_utils.o \
 	pkgrepo.o \
+	mysql.o \
 	webcards.o
 
 HEADERS = system_utils.h \
@@ -135,7 +136,7 @@ libs:	.libs_depend $(LIBOBJECTS)
 all: setup-nutyx-log pkgadd cards conf
 
 webcards: .web_depend $(WEBOBJECTS)
-	$(CXX) $(WEBOBJECTS) -o index.cgi
+	$(CXX) $(WEBOBJECTS) -o index.cgi $(LIBMYSQLCLIENT)
 
 setup-nutyx-log:
 	${CC} system_log.c -o $@

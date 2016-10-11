@@ -1,7 +1,7 @@
-//  pkginst.h
+// mysql.h
 //
-//  Copyright (c) 2015-2016 by NuTyX team (http://nutyx.org)
-// 
+//  Copyright (c) 2016 by NuTyX team (http://nutyx.org)
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -14,25 +14,36 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
-#ifndef PKGINST_H
-#define PKGINST_H
+#ifndef MYSQL_H
+#define MYSQL_H
+#include <mysql/mysql.h>
 
-#include "pkgdbh.h"
-#include "pkgadd.h"
-#include "repodwl.h"
-#include "process.h"
+#include "file_utils.h"
 
-class Pkginst : public Pkgadd, public Repodwl {
+class mysql
+{
 public:
-	Pkginst(const std::string& commandName, const char *configFileName);
-	void generateDependencies(const std::pair<std::string,time_t>& packageName);
-	void generateDependencies();
+	virtual ~mysql();
+	mysql(const char *configFileName);
+	void lastPosts(const char *forum,int n);
 
-protected:
-	std::vector<std::string> m_dependenciesList;
+private:
+	const char *m_hostname;
+	const char *m_database;
+	const char *m_username;
+	const char *m_password;
+	const char *m_socket;
+	enum {
+		m_port_no = 3306,
+		m_opt = 0
+	};
+	MYSQL *m_connection;
+	MYSQL_RES *m_result;
+	MYSQL_ROW rows;
+	Config mysqlConfig;	
 };
-#endif /* PKGINST_H */
-// vim:set ts=2 :
+#endif /* MYSQL_H */
+// vim:set ts=2 : 
