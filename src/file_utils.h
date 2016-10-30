@@ -107,7 +107,7 @@ void removeFile(const std::string& basedir, const std::string& filename);
 int copyFile(const char *  destFile, const char *  origFile);
 int findFile(std::set<std::string>& filesList, const std::string& basedir);
 int findDir(itemList *filenameList, const char *path);
-int findRecursiveFile(std::set<std::string>& filenameList, char *filename, regex_t *reg, int spec);
+int findRecursiveFile(std::set<std::string>& filenameList, const char *filename, int spec);
 int readFileStripSpace(itemList *fileContent, const char *fileName);
 int readFile(itemList *fileContent, const char *fileName);
 int parseFile(std::set<std::string>& fileContent, const char* fileName);

@@ -95,6 +95,7 @@ typedef std::map<std::string, pkginfo_t> packages_t;
 typedef std::map<std::string, std::string> alias_t;
 
 enum rule_event_t {
+	REPLACE,
 	UPGRADE,
 	INSTALL
 };
@@ -135,11 +136,16 @@ public:
 protected:
 	// Database
 
+	std::set<std::string> getFilesOfPackage(const std::string& packageName);
 	int getListOfPackageNames(const std::string& path);
 	std::pair<std::string, pkginfo_t> getInfosPackage(const std::string& packageName);
-	void buildDatabaseWithNameVersion();
-	void buildDatabaseWithDetailInfos(const bool& silent);
-	void buildDatabaseWithDetailInfos(const std::string& path);
+	void buildSimpleDatabase();
+	void buildCompleteDatabase(const bool& silent);
+	void buildDatabase(const bool& progress,
+		const bool& simple,
+		const bool& all,
+		const bool& files,
+		const std::string& packageName);
 
 
 	void addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& info);

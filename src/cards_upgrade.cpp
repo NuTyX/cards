@@ -38,7 +38,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	}
 
 	parsePkgRepoCollectionFile();
-	buildDatabaseWithNameVersion();
+	buildSimpleDatabase();
 	for (auto i : m_listOfInstPackages) {
 		if (!checkBinaryExist(i.first)) {
 			cerr << i.first << " not exist" << endl;

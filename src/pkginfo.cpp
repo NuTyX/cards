@@ -171,13 +171,17 @@ void Pkginfo::run()
 		getListOfPackageNames(m_root);
 		if (m_installed_mode) {
 			// List installed packages
-			buildDatabaseWithNameVersion();
+			buildSimpleDatabase();
 			for (auto i : m_listOfInstPackages) {
-				cout << "(" << i.second.collection << ")" << " " << i.first << " " << i.second.version << "-" << i.second.release << endl;
+				cout << "(" << i.second.collection << ")"
+				<< " " << i.first << " "
+				<< i.second.version << "-" << i.second.release << endl;
 			}
 		} else if (m_list_mode) {
 			// List package or file contents
-			buildDatabaseWithDetailInfos(false);
+//			buildDatabase(false,false,false,false,"");
+//			buildCompleteDatabase(false);
+			buildDatabase(true,false,false,false,m_arg);
 			if (checkPackageNameExist(m_arg)) {
 				string arg = m_listOfAlias[m_arg];
 				copy(m_listOfInstPackages[arg].files.begin(), m_listOfInstPackages[arg].files.end(), ostream_iterator<string>(cout, "\n"));
@@ -191,12 +195,10 @@ void Pkginfo::run()
 		} else if (m_runtimedependencies_mode) {
 			/* 	Get runtimedependencies of the file found in the directory path
 				get the list of installed packages silently */
-			buildDatabaseWithDetailInfos(true);
-			regex_t r;
+			buildCompleteDatabase(true);
 			int Result;
-			regcomp(&r, ".", REG_EXTENDED | REG_NOSUB);
 			set<string>filenameList;
-			Result = findRecursiveFile (filenameList, const_cast<char*>(m_arg.c_str()), &r, WS_DEFAULT);
+			Result = findRecursiveFile (filenameList, m_arg.c_str(), WS_DEFAULT);
 			// get the list of libraries for all the possible files 
 			set<string> librariesList;
 			for (auto i : filenameList) Result = getRuntimeLibrariesList(librariesList,i);
@@ -237,7 +239,7 @@ void Pkginfo::run()
 			}	
 		} else if (m_libraries_mode + m_runtime_mode > 0) {
 			// get the list of installed packages silently
-			buildDatabaseWithDetailInfos(true);
+			buildCompleteDatabase(true);
 			set<string> librariesList;
 			int Result = -1;
 			if (checkPackageNameExist(m_arg)) {
@@ -292,7 +294,7 @@ void Pkginfo::run()
 			}	
 		} else if (m_epoc) {
 			// get the buildtime of the package: return 0 if not found
-			buildDatabaseWithDetailInfos(true);
+			buildCompleteDatabase(true);
 			if (checkPackageNameExist(m_arg)) {
 				cout << m_listOfInstPackages[m_arg].build << endl;
 			} else {
@@ -300,7 +302,7 @@ void Pkginfo::run()
 			}
 		} else if (m_details_mode) {
 			// get all details of a package
-			buildDatabaseWithDetailInfos(false);
+			buildCompleteDatabase(false);
 			if (checkPackageNameExist(m_arg)) {
 				string arg = m_listOfAlias[m_arg];
 				cout << "Name           : " << arg << endl;
@@ -333,7 +335,7 @@ void Pkginfo::run()
 			}
 		} else if (m_owner_mode) {
 			// List owner(s) of file or directory
-			buildDatabaseWithDetailInfos(false);
+			buildCompleteDatabase(false);
 			regex_t preg;
 			if (regcomp(&preg, m_arg.c_str(), REG_EXTENDED | REG_NOSUB)) {
 				m_actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;

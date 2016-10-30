@@ -28,7 +28,6 @@
 #include <fstream>
 #include <iterator>
 #include <cstdio>
-#include <regex.h>
 #include <unistd.h>
 
 using namespace std;
@@ -106,7 +105,7 @@ void Pkgadd::run()
 	getListOfPackageNames(m_root);
 
 	// Retrieving info about all the packages
-	buildDatabaseWithDetailInfos(false);
+	buildCompleteDatabase(false);
 
 	// Reading the archiving to find a list of files
 	pair<string, pkginfo_t> package = openArchivePackage(m_packageArchiveName);
@@ -126,25 +125,33 @@ void Pkgadd::run()
 		treatErrors(package.first);
 	}
 
-	set<string> non_install_files = applyInstallRules(package.first, package.second, m_actionRules);
+	set<string> non_install_files = applyInstallRules(package.first,
+		package.second, m_actionRules);
 	if (!m_upgrade) {
 #ifndef NDEBUG
 		cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
 #endif
 		if (m_runPrePost) preRun();
 	}
-	set<string> conflicting_files = getConflictsFilesList(package.first, package.second);
+	set<string> conflicting_files = getConflictsFilesList(package.first,
+		package.second);
 	if (!conflicting_files.empty()) {
 		if (m_force) {
 			Db_lock lock(m_root, true);
 			set<string> keep_list;
-			if (m_upgrade) // Don't remove files matching the rules in configuration
+			// Don't remove files matching the rules in configuration
+			if (m_upgrade)
 				keep_list = getKeepFileList(conflicting_files, m_actionRules);
-			removePackageFilesRefsFromDB(conflicting_files, keep_list); // Remove unwanted conflicts
+			// Remove unwanted conflicts
+			removePackageFilesRefsFromDB(conflicting_files, keep_list);
 		} else {
-			copy(conflicting_files.begin(), conflicting_files.end(), ostream_iterator<string>(cerr, "\n"));
+			copy(conflicting_files.begin(), conflicting_files.end(),
+				ostream_iterator<string>(cerr, "\n"));
 			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
-			treatErrors("'" + package.first + "'" +": listed file(s) already installed (use -f to ignore and overwrite)");
+			treatErrors("'"
+				+ package.first
+				+ "'"
+				+": listed file(s) already installed (use -f to ignore and overwrite)");
 		}
 	}
 
@@ -155,14 +162,16 @@ void Pkgadd::run()
 #endif
 		if (m_runPrePost) preRun();
 		Db_lock lock(m_root, true);
-		removePackageFilesRefsFromDB(package.first);	// Remove metadata about the package removed
+		// Remove metadata about the package removed
+		removePackageFilesRefsFromDB(package.first);
 		keep_list = getKeepFileList(package.second.files, m_actionRules);
 		removePackageFiles(package.first, keep_list);
 	}
 	{
 		Db_lock lock(m_root, true);
 		// Installation progressInfo of the files on the HD
-		installArchivePackage(m_packageArchiveName, keep_list, non_install_files);
+		installArchivePackage(m_packageArchiveName,
+			keep_list, non_install_files);
 
 		// Add the metadata about the package to the DB
 		moveMetaFilesPackage(package.first,package.second);
@@ -190,13 +199,19 @@ void Pkgadd::postRun()
 void Pkgadd::printHelp() const
 {
 	cout << USAGE << m_utilName << " [options] <file>" << endl
-	     << OPTIONS << endl
-	     << "  -i, --ignore        do not execute pre/post install scripts" << endl
-	     << "  -u, --upgrade       upgrade package with the same name" << endl
-	     << "  -f, --force         force install, overwrite conflicting files" << endl
-	     << "  -r, --root <path>   specify alternative installation root" << endl
-	     << "  -v, --version       print version and exit" << endl
-	     << "  -h, --help          print help and exit" << endl;
+	<< OPTIONS << endl
+	<< "  -i, --ignore        do not execute pre/post install scripts"
+	<< endl
+	<< "  -u, --upgrade       upgrade package with the same name"
+	<< endl
+	<< "  -f, --force         force install, overwrite conflicting files"
+	<< endl
+	<< "  -r, --root <path>   specify alternative installation root"
+	<< endl
+	<< "  -v, --version       print version and exit"
+	<< endl
+	<< "  -h, --help          print help and exit"
+	<< endl;
 }
 
 set<string> Pkgadd::getKeepFileList(const set<string>& files,
@@ -208,7 +223,9 @@ set<string> Pkgadd::getKeepFileList(const set<string>& files,
 	getInstallRulesList(rules, UPGRADE, found);
 
 	for (auto i : files) {
-		for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
+		for (vector<rule_t>::reverse_iterator j = found.rbegin();
+		j != found.rend();
+		j++) {
 			if (checkRuleAppliesToFile(*j, i)) {
 				if (!(*j).action)
 					keep_list.insert(keep_list.end(), i);
@@ -239,7 +256,9 @@ set<string> Pkgadd::applyInstallRules(const string& name,
 
 	for (auto i : info.files) {
 		bool install_file = true;
-		for (vector<rule_t>::reverse_iterator j = found.rbegin(); j != found.rend(); j++) {
+		for (vector<rule_t>::reverse_iterator j = found.rbegin();
+		j != found.rend();
+		j++) {
 			if (checkRuleAppliesToFile(*j, i)) {
 				install_file = (*j).action;
 				break;

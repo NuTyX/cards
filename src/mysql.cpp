@@ -44,7 +44,8 @@ mysql::~mysql()
 }
 void mysql::lastPosts(const char *forum, int n)
 {
-	if(mysql_query(m_connection, "select id_topic,id_msg, poster_name, poster_time, subject from smf_messages"))
+	if(mysql_query(m_connection,
+	"select id_topic,id_msg, poster_name, poster_time, subject from smf_messages"))
 		cerr << mysql_error(m_connection) << endl;
 	m_result= mysql_use_result(m_connection);
 	vector<string> list;

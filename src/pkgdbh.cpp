@@ -207,7 +207,8 @@ void Pkgdbh::progressInfo() const
 		case PKG_MOVE_META_END:
 			break;
     case DB_OPEN_START:
-			cout << "Retrieve info about the " << m_packageNamesList.size() << " packages: ";
+			cout << "Retrieve info about the "
+			<< m_packageNamesList.size() << " packages: ";
 			break;
     case DB_OPEN_RUN:
 			if ( m_packageNamesList.size()>100) {
@@ -294,7 +295,9 @@ int Pkgdbh::getNumberOfPackages()
 {
   return getListOfPackageNames("");
 }
-/* Append to the "DB" the number of packages founds (directory containg a file named files */
+/* Append to the "DB" the number of packages founds
+ * (directory containg a file named files
+ * */
 int Pkgdbh::getListOfPackageNames (const string& path)
 {
 	if (! m_packageNamesList.empty())
@@ -309,71 +312,217 @@ int Pkgdbh::getListOfPackageNames (const string& path)
 		treatErrors(pathdb);
 	}
 #ifndef NDEBUG
-	cerr << "Number of Packages: " << m_packageNamesList.size() << endl;
+	cerr << "Number of Packages: "
+		<< m_packageNamesList.size()
+		<< endl;
 #endif
 	return m_packageNamesList.size();
 }
 /* get details infos of a package */
-pair<string, pkginfo_t> Pkgdbh::getInfosPackage(const string& packageName)
+pair<string, pkginfo_t> Pkgdbh::getInfosPackage
+	(const string& packageName)
 {
 	pair<string, pkginfo_t> result;
 	
 	result.first = packageName;
 	return result;
 }
-/* Populate the database with Name and version only */
-void Pkgdbh::buildDatabaseWithNameVersion()
+std::set<std::string> Pkgdbh::getFilesOfPackage
+	( const std::string& packageName )
+{
+	string pkgName = m_listOfAlias[packageName];
+	std::set<std::string> packageFiles;
+	const string filelist = m_root
+		+ PKG_DB_DIR
+		+ pkgName
+		+ PKG_FILES;
+	int fd = open(filelist.c_str(), O_RDONLY);
+	if (fd == -1) {
+		m_actualError = CANNOT_OPEN_FILE;
+		treatErrors(filelist);
+	}
+	stdio_filebuf<char> listbuf(fd, ios::in, getpagesize());
+	istream in(&listbuf);
+	if (!in)
+		throw RunTimeErrorWithErrno("could not read " + filelist);
+	while (!in.eof()){
+	// read alls the files for alls the packages founds
+	for (;;) {
+			string file;
+			getline(in, file);
+			if (file.empty())
+				break; // End of record
+			packageFiles.insert(file);
+		}
+	}
+	return packageFiles;
+}
+/*
+ * Populate the database in following modes:
+ * - if nothing specify only get the List of PackageNames
+ *   and populate the alias list.
+ * - if simple then only with name, version, release, collection
+ *   build date and group name
+ * - if all then all the availables attributes
+ * - if files then all the files of the package(s)
+ * - if packageName size() > 0 then we do just for the packageName
+ *
+ */
+void Pkgdbh::buildDatabase
+	(const bool& progress, const bool& simple,
+	const bool& all, const bool& files,
+	const std::string& packageName)
+{
+	/*
+	 * This part is done in every situation
+	 */
+	cleanupMetaFiles(m_root);
+	if (progress) {
+		m_actualAction = DB_OPEN_START;
+		progressInfo();
+	}
+#ifndef NDEBUG
+	cerr << "m_root: " << m_root << endl;
+#endif
+	if (m_packageNamesList.empty() )
+		getListOfPackageNames (m_root);
+
+	for ( auto pkgName : m_packageNamesList) {
+		if (progress) {
+			m_actualAction = DB_OPEN_RUN;
+			if ( m_packageNamesList.size() > 100 )
+				progressInfo();
+		}
+		const string metaFile = m_root
+		+ PKG_DB_DIR
+		+ pkgName
+		+ '/'
+		+ PKG_META;
+		std::set<std::string> fileContent;
+		parseFile(fileContent,metaFile.c_str());
+		m_listOfAlias[pkgName] = pkgName;
+		for ( auto attribute : fileContent) {
+			if ( attribute[0] != 'A' )
+				break;
+			m_listOfAlias[attribute.substr(1)] = pkgName;
+		}
+	}
+	if ( !simple && !all && !files && (packageName.size() == 0) )
+		return;
+	if (packageName.size() > 0) {
+		string pkgName = m_listOfAlias[packageName];
+		pkginfo_t info;
+		info.files = getFilesOfPackage(pkgName);
+		m_listOfInstPackages[pkgName] = info;
+	}
+	if ( !simple && !all && !files ) {
+		if (progress) {
+			m_actualAction = DB_OPEN_END;
+			progressInfo();
+		}
+		return;
+	}
+	if (simple) {
+		pkginfo_t info;
+		for ( auto pkgName : m_packageNamesList) {
+			if (progress) {
+				m_actualAction = DB_OPEN_RUN;
+				if ( m_packageNamesList.size() > 100 )
+					progressInfo();
+			}
+			const string metaFile = m_root
+			+ PKG_DB_DIR
+			+ pkgName
+			+ '/'
+			+ PKG_META;
+			std::set<std::string> fileContent;
+			parseFile(fileContent,metaFile.c_str());
+			m_listOfAlias[pkgName] = pkgName;
+			unsigned short flags = 0;
+			info.release = 1;
+			for ( auto attribute : fileContent) {
+				if ( attribute[0] == 'B' ) {
+					info.build = strtoul(attribute.substr(1).c_str(),NULL,0);
+				}
+				if ( attribute[0] == 'V' ) {
+					info.version = attribute.substr(1);
+				}
+				if ( attribute[0] == 'c' ) {
+					info.collection = attribute.substr(1);
+				}
+				if ( attribute[0] == 'g' ) {
+					info.group = attribute.substr(1);
+				}
+				if ( attribute[0] == 'r' ) {
+					info.release = atoi(attribute.substr(1).c_str());
+				}
+			}
+		}
+	}
+	if (progress)
+	{
+		m_actualAction = DB_OPEN_END;
+		progressInfo();
+	}
+}
+/*
+ * Populate the database with:
+ * - Name
+ * - version
+ * - release
+ * - collection
+ * - Build date
+ * - Group name
+ * */
+void Pkgdbh::buildSimpleDatabase()
 {
 	if (m_miniDB_Empty) {
 		if (m_packageNamesList.empty() )
 			getListOfPackageNames (m_root);
-		bool cf = false;
-		bool vf = false;
-		bool rf = false;
-		bool bf = false;
 		for ( auto i : m_packageNamesList) {
 			pkginfo_t info;
 			const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
 			itemList * contentFile = initItemList();
 			readFile(contentFile,metaFile.c_str());
-			cf = false;
-			vf = false;
-			rf = false;
-			bf = false;
+			unsigned short flags = 0;
 			info.release = 1;
 			m_listOfAlias[i] = i;
 			for (unsigned int li=0; li < contentFile->count ; ++li) {
 				if ( contentFile->items[li][0] == 'c' ) {
 					string collection = contentFile->items[li];
 					info.collection = collection.substr(1);
-					cf = true;
+					flags++;
+				}
+				if ( contentFile->items[li][0] == 'g' ) {
+					string group = contentFile->items[li];
+					info.group = group.substr(1);
+					flags=flags + 2;
 				}
 				if ( contentFile->items[li][0] == 'V' ) {
 					string version = contentFile->items[li];
 					info.version = version.substr(1);
-					vf = true;
+					flags = flags + 4;
 				}
 				if ( contentFile->items[li][0] == 'r' ) {
 					string release = contentFile->items[li];
 					info.release = atoi(release.substr(1).c_str());
-					rf = true;
+					flags = flags + 8;
 				}
 				if ( contentFile->items[li][0] == 'B' ) {
 					string build = contentFile->items[li];
 					info.build = strtoul(build.substr(1).c_str(),NULL,0);
-					bf = true;
+					flags = flags + 16;
 				}
+				/* As an alias in not always present we cannot
+				 * depend on a found one to break */
 				if ( contentFile->items[li][0] == 'A' ) {
 					string alias = contentFile->items[li];
 					m_listOfAlias[alias.substr(1)] = i;
 				}
-/*				if ( cf && vf && rf && bf) {
+				if ( flags == 31 ) {
 					m_listOfInstPackages[i] = info;
 					break;
-				} */
-			}
-			if ( (  rf ) && (  bf ) && (  vf ) && (  cf ) ) {
-				m_listOfInstPackages[i] = info;
+				}
 			}
 			freeItemList(contentFile);
 		}
@@ -385,7 +534,7 @@ void Pkgdbh::buildDatabaseWithNameVersion()
 #endif
 }
 /* Populate the database with all details infos */
-void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
+void Pkgdbh::buildCompleteDatabase(const bool& silent)
 {
 	cleanupMetaFiles(m_root);
 	if (m_DB_Empty) {
@@ -503,7 +652,8 @@ void Pkgdbh::buildDatabaseWithDetailInfos(const bool& silent)
 		}
 #ifndef NDEBUG
 		cerr << endl;
-		cerr << m_listOfInstPackages.size() << " packages found in database " << endl;
+		cerr << m_listOfInstPackages.size()
+		<< " packages found in database " << endl;
 #endif
 		if (!silent)
 		{

@@ -54,7 +54,7 @@ Cards_remove::Cards_remove(const string& commandName,
 			throw runtime_error("No package found for the base System" );
 
 		// Retrieve info about all the packages
-		buildDatabaseWithNameVersion();
+		buildSimpleDatabase();
 
 		set< pair<string,string> > listOfPackagesToRemove;
 		pair<string,string> PackageToRemove;

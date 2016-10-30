@@ -161,7 +161,7 @@ void Cards_create::createBinaries(const char *configFileName,
 		string version = packageArchive.version();
 		message = "CREATED: " + name + " " + version;
 		m_upgrade=0;
-		buildDatabaseWithNameVersion();
+		buildSimpleDatabase();
 		if ( checkPackageNameExist(name) ) {
 			message = name + ": is ALLREADY installed";
 			m_upgrade=1;

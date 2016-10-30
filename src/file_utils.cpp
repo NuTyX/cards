@@ -415,7 +415,8 @@ bool createRecursiveDirs(const string& path)
   }
   return false;
 }
-int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, int spec)
+
+int findRecursiveFile(set<string>& filenameList, const char *filename, int spec)
 {
 	struct dirent *dent;
 	DIR *dir;
@@ -459,18 +460,13 @@ int findRecursiveFile(set<string>& filenameList, char *filename, regex_t *reg, i
 		{
 			/* recursively follow dirs */
 			if ((spec & WS_RECURSIVE))
-				findRecursiveFile(filenameList, fn, reg, spec);
+				findRecursiveFile(filenameList, fn, spec);
 
 			if (!(spec & WS_MATCHDIRS))
 				continue;
 		}
-
-		/* pattern match */
-		if (!regexec(reg, fn, 0, 0, 0))
-		{
-			sfilename=fn;
-			filenameList.insert(sfilename);
-		}				
+		sfilename=fn;
+		filenameList.insert(sfilename);
 	}
 
 	if (dir) closedir(dir);

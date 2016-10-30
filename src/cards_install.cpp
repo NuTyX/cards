@@ -37,8 +37,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 		}
 	}
 	Pkgrepo::parseConfig(configFileName, m_config);
-	buildDatabaseWithNameVersion();
-
+	buildSimpleDatabase();
 	for( auto i : m_argParser.otherArguments() ) {
 		std::set<std::string> ListOfPackage = getListOfPackagesFromCollection(i);
 		if ( (!ListOfPackage.empty()) && (!checkBinaryExist(i)) ) {
@@ -75,7 +74,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	: Pkginst("cards install",configFileName),m_argParser(argParser)
 {
 	parseArguments();
-	buildDatabaseWithDetailInfos(false);
+	buildCompleteDatabase(false);
 	for (auto i : listOfPackages) {
 		std::string packageName = basename(const_cast<char*>(i.c_str()));
 		if ( packageName == m_argParser.otherArguments()[0])

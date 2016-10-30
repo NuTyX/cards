@@ -255,7 +255,7 @@ vector<string>& CardsDepends::getNeededDependencies()
 {
 	m_packageName = m_argParser.otherArguments()[0].c_str();
 
-	buildDatabaseWithNameVersion();
+	buildSimpleDatabase();
 
 	depends();
 

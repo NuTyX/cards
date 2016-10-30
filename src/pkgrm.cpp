@@ -52,7 +52,7 @@ void Pkgrm::run()
 	getListOfPackageNames(m_root);
 
 	// Retrieve info about all the packages
-	buildDatabaseWithDetailInfos(false);
+	buildCompleteDatabase(false);
 
 	if (!checkPackageNameExist(m_packageName)) {
 			m_actualError = PACKAGE_NOT_INSTALL;
