@@ -1104,7 +1104,10 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 		cerr << it->first << it->second << endl;
 		cerr << "packageArchiveName:" <<packageArchive.first << endl;
 #endif
-		if ( checkPackageNameBuildDateSame(*it)  ) {  // If actual and already present erase the dep
+		/*
+		 * If actual and already present erase the dep
+		 */
+		if ( checkPackageNameBuildDateSame(*it)  ) {
 			packageNameDepsBuildTime.erase(it);
 #ifndef NDEBUG
 			cerr << "----> " << it->first << " deleted" << endl;

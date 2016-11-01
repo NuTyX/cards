@@ -149,19 +149,18 @@ protected:
 
 
 	void addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& info);
-	void addPackageFilesRefsToDB_2(const std::string& name, const pkginfo_t& info);
 	
 	bool checkPackageNameUptodate(const std::pair<std::string, pkginfo_t>& archiveName);
 	bool checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild);
-	bool checkPackageNameExist_2(const std::string& name);	
+
 	/* Remove the physical files after followings some rules */
 	void removePackageFiles(const std::string& name);
-	
 	void removePackageFiles(const std::string& name, const std::set<std::string>& keep_list);
 
-	/* Remove meta data about the removed package */
+	/*
+	 * Remove meta data about the removed package 
+	 */
 	void removePackageFilesRefsFromDB(const std::string& name);
-	void removePackageFilesRefsFromDB_2(const std::string& name, const std::set<std::string>& keep_list);
 	void removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list);
 	std::set<std::string> getConflictsFilesList(const std::string& name, const pkginfo_t& info);
 
@@ -170,8 +169,11 @@ protected:
 	std::set< std::pair<std::string, time_t> > getPackageDependencies(const std::string& filename);
 	void extractAndRunPREfromPackage(const std::string& filename);
 	void installArchivePackage(const std::string& filename, const std::set<std::string>& keep_list, const std::set<std::string>& non_install_files);
-	void moveMetaFilesPackage(const std::string& name, pkginfo_t& info); // the folder holding the meta datas is going to be create here
-	void installArchivePackage_2(const std::string& filename, const std::set<std::string>& keep_list, const std::set<std::string>& non_install_files) const;
+
+	/*
+	 * The folder holding the meta datas is going to be create here
+	 */
+	void moveMetaFilesPackage(const std::string& name, pkginfo_t& info);
 
 
 	void readRulesFile();
