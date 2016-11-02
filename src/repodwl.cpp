@@ -70,6 +70,7 @@ void Repodwl::downloadPackageFileName(const string& packageName)
 		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin();m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
 			if ( m_BasePackageInfo_i->basePackageName == basePackageName) {
 				found=true;
+				break;
 			}
 		}
 		if (found)

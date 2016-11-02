@@ -374,7 +374,7 @@ void Pkgdbh::buildDatabase
 	const std::string& packageName)
 {
 	/*
-	 * This part is done in every situation
+	 * This part is done in every cases
 	 */
 	cleanupMetaFiles(m_root);
 	if (progress) {
@@ -443,18 +443,28 @@ void Pkgdbh::buildDatabase
 			for ( auto attribute : fileContent) {
 				if ( attribute[0] == 'B' ) {
 					info.build = strtoul(attribute.substr(1).c_str(),NULL,0);
+					flags++;
 				}
 				if ( attribute[0] == 'V' ) {
 					info.version = attribute.substr(1);
+					flags=flags + 2;
 				}
 				if ( attribute[0] == 'c' ) {
 					info.collection = attribute.substr(1);
+					flags = flags + 4;
 				}
+				/* As a group in not always present we cannot
+				 * depend on a found one to break */
 				if ( attribute[0] == 'g' ) {
 					info.group = attribute.substr(1);
 				}
 				if ( attribute[0] == 'r' ) {
 					info.release = atoi(attribute.substr(1).c_str());
+					flags = flags + 8;
+				}
+				if ( flags == 15 ) {
+					m_listOfInstPackages[pkgName] = info;
+					break;
 				}
 			}
 		}
@@ -484,46 +494,35 @@ void Pkgdbh::buildSimpleDatabase()
 			const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
 			itemList * contentFile = initItemList();
 			readFile(contentFile,metaFile.c_str());
-			unsigned short flags = 0;
 			info.release = 1;
 			m_listOfAlias[i] = i;
 			for (unsigned int li=0; li < contentFile->count ; ++li) {
 				if ( contentFile->items[li][0] == 'c' ) {
 					string collection = contentFile->items[li];
 					info.collection = collection.substr(1);
-					flags++;
-				}
-				if ( contentFile->items[li][0] == 'g' ) {
-					string group = contentFile->items[li];
-					info.group = group.substr(1);
-					flags=flags + 2;
 				}
 				if ( contentFile->items[li][0] == 'V' ) {
 					string version = contentFile->items[li];
 					info.version = version.substr(1);
-					flags = flags + 4;
 				}
 				if ( contentFile->items[li][0] == 'r' ) {
 					string release = contentFile->items[li];
 					info.release = atoi(release.substr(1).c_str());
-					flags = flags + 8;
 				}
 				if ( contentFile->items[li][0] == 'B' ) {
 					string build = contentFile->items[li];
 					info.build = strtoul(build.substr(1).c_str(),NULL,0);
-					flags = flags + 16;
 				}
-				/* As an alias in not always present we cannot
-				 * depend on a found one to break */
+				if ( contentFile->items[li][0] == 'g' ) {
+					string group = contentFile->items[li];
+					info.group = group.substr(1);
+				}
 				if ( contentFile->items[li][0] == 'A' ) {
 					string alias = contentFile->items[li];
 					m_listOfAlias[alias.substr(1)] = i;
 				}
-				if ( flags == 31 ) {
-					m_listOfInstPackages[i] = info;
-					break;
-				}
 			}
+			m_listOfInstPackages[i] = info;
 			freeItemList(contentFile);
 		}
 		m_miniDB_Empty=false;

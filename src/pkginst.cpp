@@ -93,11 +93,11 @@ void Pkginst::generateDependencies()
 			cerr << "checkPackageNameBuildDateSame yes: " << PackageTime.first << PackageTime.second << endl;
 		}
 #endif
-		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
-			if ( sit->first == PackageTime.first )
+		for ( auto sit : directDependencies) {
+			if ( sit.first == PackageTime.first )
 				continue;
 			for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
-				if ( *sit == *vit) {
+				if ( sit == *vit) {
 					dependenciesWeMustAdd.erase(vit);
 					break;
 				}
@@ -111,10 +111,12 @@ void Pkginst::generateDependencies()
 		}
 	}
 	bool found = false ;
-	for ( std::vector<pair <string,time_t> >::reverse_iterator vrit = depencenciestoSort.rbegin(); vrit != depencenciestoSort.rend();++vrit) {
+	for ( std::vector<pair <string,time_t> >::reverse_iterator vrit = depencenciestoSort.rbegin();
+		vrit != depencenciestoSort.rend();
+		++vrit) {
 		found = false ;
-		for (vector<string>::const_iterator i = m_dependenciesList.begin();i != m_dependenciesList.end();i++) {
-			if (*i == vrit->first) {
+		for (auto i : m_dependenciesList) {
+			if ( i == vrit->first) {
 				found = true ;
 				break;
 			}

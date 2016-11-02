@@ -41,6 +41,9 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	for( auto i : m_argParser.otherArguments() ) {
 		std::set<std::string> ListOfPackage = getListOfPackagesFromCollection(i);
 		if ( (!ListOfPackage.empty()) && (!checkBinaryExist(i)) ) {
+			/*
+			* It's a collection
+			*/
 			for (auto i : ListOfPackage ) {
 				if (checkPackageNameExist(i))
 					continue;
@@ -48,6 +51,9 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 				generateDependencies();
 			}
 		} else {
+			/*
+			 * It's a normal package
+			 */
 			m_packageName = i;
 			generateDependencies();
 		}
