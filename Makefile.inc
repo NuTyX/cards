@@ -51,5 +51,13 @@ LIBMYSQLCLIENT := -lmysqlclient
 
 LDFLAGS += $(LIBARCHIVELIBS)
 
+.SUFFIXES:	.cpp .cc .cxx .c
+
+# Be quiet when building...
+.SILENT:
+
+.cxx.o:
+	echo compiling $< ...
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o $@ $<
 
 # End of file

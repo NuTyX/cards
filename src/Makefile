@@ -150,16 +150,16 @@ cards:  .cards_depend $(CARDSOBJECTS)
 	$(CXX) $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
 
 .libs_depend:
-	$(CXX) $(CXXFLAGS) -MM $(LIBOBJECTS:.o=.cpp) > .libs_depend
+	$(CXX) $(CXXFLAGS) -MM $(LIBOBJECTS:.o=.cxx) > .libs_depend
 
 .tools_depend:
-	$(CXX) $(CXXFLAGS) -MM $(TOOLSOBJECTS:.o=.cpp) > .tools_depend
+	$(CXX) $(CXXFLAGS) -MM $(TOOLSOBJECTS:.o=.cxx) > .tools_depend
 
 .cards_depend:
-	$(CXX) $(CXXFLAGS) -MM $(CARDSOBJECTS:.o=.cpp) > .cards_depend
+	$(CXX) $(CXXFLAGS) -MM $(CARDSOBJECTS:.o=.cxx) > .cards_depend
 
 .web_depend:
-	$(CXX) $(CXXFLAGS) -MM $(WEBOBJECTS:.o=.cpp) > .web_depend
+	$(CXX) $(CXXFLAGS) -MM $(WEBOBJECTS:.o=.cxx) > .web_depend
 
 ifeq (.cards_depend,$(wildcard .cards_depend))
 include .cards_depend
