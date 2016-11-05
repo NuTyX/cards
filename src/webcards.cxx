@@ -1,4 +1,4 @@
-//  webcards.cpp
+//  webcards.cxx
 //
 //  Copyright (c) 2016 by NuTyX team (http://nutyx.org)
 //
@@ -69,7 +69,8 @@ contentInfo_t getFormatedBinaryPackageList(string& search)
 					INSERTPACKAGE;
 					continue;
 				}
-				if ( convertToLowerCase(search) == j.basePackageName ) {
+				pos = j.basePackageName.find(convertToLowerCase(search));
+				if (pos != std::string::npos) {
 					INSERTPACKAGE;
 					continue;
 				}
