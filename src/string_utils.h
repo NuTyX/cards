@@ -60,9 +60,15 @@ void addItemToItemList(itemList *list, const char *item);
 void freeItemList(itemList *list);
 
 
-keyValue splitKeyValue(std::string s, char delimiter);
-std::set<std::string> getKeysList(std::string file, std::string delimiter);
-std::string getValueOfKey(std::string file, std::string delimiter,std::string parameter);
+keyValue splitKeyValue
+(std::string s, char delimiter);
+
+std::set<std::string> getKeysList
+(std::string file, std::string delimiter);
+
+std::string getValueOfKey
+(std::string file, std::string delimiter,std::string parameter);
+
 std::string getValue(const std::string& s, char delimiter);
 std::string getValueBefore( const std::string& s, char del );
 std::string itos(unsigned int value);
@@ -83,8 +89,13 @@ std::string getFirstValueOfKeyBeforeDelim(const std::string& s, char delimiter);
 /* strip whitespace in the beginning and end of string, return a stripped string */
 std::string stripWhiteSpace(const std::string& s);
 
+/* populate a vector of string with delimited string */
+std::vector<std::string> parseDelimitedList
+(const std::string& s, const char delimiter);
+
 /* populate a set of string with delimited string */
-std::vector<std::string> parseDelimitedList(const std::string& s, const char delimiter);
+std::set<std::string> parseDelimitedSetList
+(const std::string& s, const char delimiter);
 
 /* make sure s1 starts with s2 */
 bool startsWith(const std::string& s, const std::string& with);
@@ -94,7 +105,9 @@ bool startsWithNoCase(const std::string& s1, const std::string& s2);
 
 std::string convertToLowerCase(const std::string& s);
 std::string convertToUpperCase(const std::string& s);
-std::string replaceAll( std::string& in, const std::string& oldString, const std::string& newString );
+
+std::string replaceAll
+( std::string& in, const std::string& oldString, const std::string& newString );
 
 /* split a string into parts
 	param s string to be split

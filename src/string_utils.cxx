@@ -1,4 +1,4 @@
-//  strings_utils.cc
+//  strings_utils.cxx
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
 //  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
@@ -240,20 +240,34 @@ string getFirstValueOfKeyBeforeDelim(const string& s, char delimiter)
 }
 vector<string> parseDelimitedList(const string& s, const char delimiter)
 {
-	vector<string> depList;
+	vector<string> list;
 	if ( s.empty() )
-		return depList;
+		return list;
 	string::size_type start = 0, end = 0;
-	while (  (end = s.find(delimiter,start)) < string::npos   ) 
+	while (  (end = s.find(delimiter,start)) < string::npos ) 
 	{
 		end = s.find(delimiter,start );
-		depList.push_back(s.substr( start, end - start ));
+		list.push_back(s.substr( start, end - start ));
 		start = end +1;
 	}
-	depList.push_back(s.substr(start));
-	return depList;
+	list.push_back(s.substr(start));
+	return list;
 }
-		
+set<string> parseDelimitedSetList(const string& s, const char delimiter)
+{
+	set<string> list;
+	if ( s.empty() )
+		return list;
+	string::size_type start = 0, end = 0;
+	while ( ( end = s.find(delimiter,start)) < string::npos )
+	{
+		end = s.find(delimiter,start );
+		list.insert(s.substr( start, end - start ));
+		start = end + 1;
+	}
+	list.insert(s.substr(start));
+	return list;
+}
 string stripWhiteSpace(const string& s)
 {
 	if ( s.empty() )

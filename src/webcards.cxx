@@ -16,7 +16,45 @@
 #include "www/menu_webcards.h"
 
 using namespace std;
-
+void endOfPage(void)
+{
+	cout << "   </tr>" <<endl
+	<< "  </table>" << endl
+	<< " </body>" << endl
+	<< "</html>" << endl;
+}
+string::size_type parseArguments(arguments_t &arguments)
+{
+	/* All the possible arguments */
+	set<string> listOfArguments;
+	char * pArgument = getenv ("QUERY_STRING");
+	string::size_type pos;
+	listOfArguments = parseDelimitedSetList(pArgument,'?');
+	arguments.docName="index";
+	for ( auto i : listOfArguments) {
+		pos = i.find("arch=");
+		if ( pos != string::npos ){
+			arguments.packageArch = i.substr(pos+5);
+		}
+		pos = i.find("branch=");
+		if ( pos != string::npos ){
+			arguments.packageBranch = i.substr(pos+7);
+		}
+		pos = i.find("page=");
+		if ( pos != string::npos ){
+			arguments.docName = i.substr(pos+5);
+		}
+		pos = i.find("search=");
+		if ( pos != string::npos ){
+			arguments.stringSearch = i.substr(pos+7);
+		}
+		pos = i.find("searchpkg=");
+		if ( pos != string::npos ){
+			arguments.packageSearch = i.substr(pos+10);
+		}
+	}
+	return pos;
+}
 void sideBar( const char *forum)
 {
 	cout << "  <td class=\"sidebar\" width=\"20%\">" << endl
@@ -47,8 +85,9 @@ content_t getContent(std::set<string>& list)
   }
 	return content;
 }
-contentInfo_t getFormatedBinaryPackageList(string& search)
+contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 {
+	string search = arguments.packageSearch;
 	time_t timer;
 	time(&timer);
 	string row = "odd";
@@ -82,7 +121,7 @@ contentInfo_t getFormatedBinaryPackageList(string& search)
 			}
 		}
 	}
-	contentInfo.text.push_back("<h1>NuTyX Packages 8.2</h1>");
+	contentInfo.text.push_back("<h1>NuTyX Packages</h1>");
 	if (listOfPackages.size() == 0 )
 		contentInfo.text.push_back(" <h2>no matching package found</h2>");
 	if (listOfPackages.size() == 1 ) {
@@ -94,7 +133,7 @@ contentInfo_t getFormatedBinaryPackageList(string& search)
 + " packages founds</h2>");
 	}
 	SEARCHPKG;
-  contentInfo.text.push_back("<table>");
+	contentInfo.text.push_back("<table>");
 	contentInfo.text.push_back("  <tr class=\"header\">");
 	contentInfo.text.push_back("  <td>ARCH</td><td>BRANCH</td>\
 <td>COLLECTION</td>\
@@ -122,13 +161,20 @@ contentInfo_t getFormatedBinaryPackageList(string& search)
 int main (int argc, char** argv)
 {
 	set<string> ArticleNamesList;
+
 	findFile(ArticleNamesList, "content/");
+	/* All the contents */
 	content_t Content;
 	Content = getContent(ArticleNamesList);
+
 	string::size_type pos;
+	arguments_t arguments;
+
 	char * pArgument = getenv ("QUERY_STRING");
+	/* If no arguments, no need to go on */
 	if ( !pArgument)
 		return 0;
+
 	FILE *pVisits = fopen("content/.visits","r+");
 	if (pVisits != NULL) {
 		time_t timer;
@@ -144,16 +190,19 @@ int main (int argc, char** argv)
 	}
 
 	char * pPwd = getenv ("SCRIPT_NAME");
+
+	/* If PATH is not found, no need to continue */
 	if ( !pPwd)
 		return 0;
 
 	string  sPwd =  pPwd;
 	pos = sPwd.find_last_of( "/\\" );
+
+	/* If PATH is not found, no need to continue */
 	if ( pos == string::npos )
 		return 0;
 
 	string sPath = sPwd.substr(0,pos);
-	string sArgument = pArgument;
 
 	HEADERTEXT;
 	CSSDATA;
@@ -169,6 +218,7 @@ int main (int argc, char** argv)
 		MENUTR;
 	else
 		MENUEN;
+
 	/* The main table */
 	cout << "<table border=\"0\" cellpadding=\"15\" \
 cellspacing=\"10\" width=\"100%\">" << endl
@@ -185,47 +235,44 @@ cellspacing=\"10\" width=\"100%\">" << endl
 	}
 	sideBar(forumAdress);
 	cout << "  <td valign=\"top\" align=\"left\" width=\"100%\">" << endl;
-	string docName = "index";
-	if  ( sArgument.size() < 1 ) {
-		SEARCH;
-		lastUpdate(Content[docName].date);
-		for (auto i : Content[docName].text) cout << i << endl;
-	}
-	pos = sArgument.find("page=");
-	if ( pos != string::npos )	{
-		docName = sArgument.substr(pos+5);
-		if ( docName == "packages" ) {
-			string search = "";
-			Content[docName] = getFormatedBinaryPackageList(search);
-		}
-		if ( Content.find(docName) != Content.end() ){
-			if ( docName != "packages" )
-				SEARCH;
-			lastUpdate(Content[docName].date);
-			for (auto i : Content[docName].text) cout << i << endl;
-		} else {
-			cout << "<h1>" << docName << " is not existing yet</h1>"
-			<< endl;
-			docName="under-construction";
-			for (auto i : Content[docName].text) cout << i << endl;
-		}
-	}
-	pos = sArgument.find("search=");
-	if ( pos != string::npos )	{
-		string sSearch = sArgument.substr(pos+7);
-		if (sSearch.size() < 2) {
-			cout << endl
-			<< "<div class=\"note\"><img alt=\"[Note]\" \
+
+	/* Parse all knows argument so far */
+	pos = parseArguments(arguments);
+
+/*	if  ( pos == string::npos )
+		return 0;
+*/
+	if ( arguments.packageSearch.size() > 0 ) {
+		if (arguments.packageSearch.size() < 2) {
+			cout << "<div class=\"note\"><img alt=\"[Note]\" \
 			src=\"../graphics/note.gif\" />min 2 characters...</div>" << endl;
 		} else {
-			docName = "packages";
+			Content["packages"] = getFormatedBinaryPackageList
+				(arguments);
+			if ( Content["packages"].text.size() > 0) {
+				lastUpdate(Content["packages"].date);
+				for (auto i : Content["packages"].text)
+					cout << i << endl;
+			}
+		}
+		FOOTERTEXT;
+		endOfPage();
+		return 0;
+	}
+	if ( arguments.stringSearch.size() > 0) {
+		if (arguments.stringSearch.size() < 3) {
+			cout << endl
+			<< "<div class=\"note\"><img alt=\"[Note]\" \
+			src=\"../graphics/note.gif\" />min 3 characters...</div>" << endl;
+		} else {
+			arguments.docName = "packages";
 			vector<string> searchList;
 			for (auto i : Content) {
 				for (auto j : i.second.text) {
 					if ( i.first == "packages" )
 						continue;
 					string lower = convertToLowerCase(j);
-					pos = lower.find(convertToLowerCase(sSearch));
+					pos = lower.find(convertToLowerCase(arguments.stringSearch));
 					if (pos != string::npos) {
 						searchList.push_back("<a href=\"?page=" + i.first
 						+ "\">" + i.first + "</a><br>...<br>");
@@ -236,29 +283,36 @@ cellspacing=\"10\" width=\"100%\">" << endl
 			}
 			for ( auto i : searchList) cout << i << endl;
 		}
+		FOOTERTEXT;
+		endOfPage();
+		return 0;
 	}
-	pos = sArgument.find("searchpkg=");
-	if ( pos != string::npos )	{
-		string sSearch = sArgument.substr(pos+10);
-		if (sSearch.size() < 2) {
-			cout << "<div class=\"note\"><img alt=\"[Note]\" \
-			src=\"../graphics/note.gif\" />min 2 characters...</div>" << endl;
-		} else {
-			docName = "packages";
-			Content[docName] = getFormatedBinaryPackageList(sSearch);
-			if ( Content[docName].text.size() > 0)
-				for (auto i : Content[docName].text) cout << i << endl;
-		}
+	if ( arguments.docName == "packages" ) {
+		contentInfo_t contentInfo;
+		contentInfo.text.push_back("<h1>NuTyX Packages</h1>");
+		SEARCHPKG;
+		for (auto i : contentInfo.text) cout << i << endl;
+		FOOTERTEXT;
+		endOfPage();
+		return 0;
 	}
-	FOOTERTEXT;
-
-	/* This will never changer */
-
-	cout << "   </tr>" <<endl
-	<< "  </table>" << endl
-  << " </body>" << endl
-  << "</html>" << endl;
-
+	if ( Content.find(arguments.docName) != Content.end() ){
+		SEARCH;
+		lastUpdate(Content[arguments.docName].date);
+		for (auto i : Content[arguments.docName].text) cout << i << endl;
+		FOOTERTEXT;
+		endOfPage();
+		return 0;
+	}
+	else
+	{
+		cout << "<h1>" << arguments.docName << " is not existing yet</h1>"
+		<< endl;
+		for (auto i : Content["under-construction"].text) cout << i << endl;
+		FOOTERTEXT;
+		endOfPage();
+		return 0;
+	}
 	return 0;
 }
 // vim:set ts=2 :

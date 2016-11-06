@@ -37,6 +37,13 @@ struct contentInfo_t {
 	std::string date;
 	std::vector<std::string> text;
 };
+struct arguments_t {
+	std::string packageArch;   /* The arch of the package to search */
+	std::string packageBranch; /* The branch of the package to search */
+	std::string docName; 	   /* The page to show */
+	std::string stringSearch;  /* The string to search */
+	std::string packageSearch; /* The package to search */
+};
 typedef std::map<std::string, contentInfo_t> content_t;
 #endif /* WEBCARDS_H */
 // vim:set ts=2 :

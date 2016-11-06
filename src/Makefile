@@ -137,6 +137,7 @@ all: setup-nutyx-log pkgadd cards conf
 
 webcards: .web_depend $(WEBOBJECTS)
 	$(CXX) $(WEBOBJECTS) -o index.cgi $(LIBMYSQLCLIENT)
+	echo "index.cgi is ready"
 
 setup-nutyx-log:
 	${CC} system_log.c -o $@
@@ -145,9 +146,11 @@ conf:
 
 pkgadd: .tools_depend $(TOOLSOBJECTS)
 	$(CXX) $(TOOLSOBJECTS) -o $@ -static $(LIBARCHIVELIBS) 
+	echo "$@ is ready"
 
 cards:  .cards_depend $(CARDSOBJECTS)
 	$(CXX) $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
+	echo "$@ is ready"
 
 .libs_depend:
 	$(CXX) $(CXXFLAGS) -MM $(LIBOBJECTS:.o=.cxx) > .libs_depend
@@ -179,47 +182,47 @@ endif
 .PHONY:	install clean distclean dist
 
 install: all
-	install -D -m0755 pkgadd $(BINDIR)/pkgadd
-	install -D -m0755 cards $(BINDIR)/cards
-	install -D -m0755 setup-nutyx-log $(SBINDIR)/setup-nutyx-log
-	install -D -m0644 pkgadd.conf $(ETCDIR)/pkgadd.conf
-	install -D -m0644 cards.conf $(ETCDIR)/cards.conf.example
-	ln -sf pkgadd $(BINDIR)/pkgrm
-	ln -sf pkgadd $(BINDIR)/pkginfo
+	install -v -D -m0755 pkgadd $(BINDIR)/pkgadd
+	install -v -D -m0755 cards $(BINDIR)/cards
+	install -v -D -m0755 setup-nutyx-log $(SBINDIR)/setup-nutyx-log
+	install -v -D -m0644 pkgadd.conf $(ETCDIR)/pkgadd.conf
+	install -v -D -m0644 cards.conf $(ETCDIR)/cards.conf.example
+	ln -sfv pkgadd $(BINDIR)/pkgrm
+	ln -sfv pkgadd $(BINDIR)/pkginfo
 
 install-libs:
-	if [ ! -d $(DESTDIR)/usr/include ]; then mkdir -p $(DESTDIR)/usr/include;fi
-	cp -f libcards.h $(DESTDIR)/usr/include/
-	if [ ! -d $(LIBDIR) ]; then mkdir -p $(LIBDIR);fi
-	if [ -L $(LIBDIR)/libcards.so ]; then rm $(LIBDIR)/libcards.so;fi
-	if [ -L $(LIBDIR)/libcards.a ]; then rm $(LIBDIR)/libcards.a;fi
-	cp -f libcards.a libcards.so.$(VERSION) $(LIBDIR)
-	ln -sf libcards.so.$(VERSION) $(LIBDIR)/libcards.so
+	if [ ! -d $(DESTDIR)/usr/include ]; then mkdir -pv $(DESTDIR)/usr/include;fi
+	cp -fv libcards.h $(DESTDIR)/usr/include/
+	if [ ! -d $(LIBDIR) ]; then mkdir -pv $(LIBDIR);fi
+	if [ -L $(LIBDIR)/libcards.so ]; then rm -v $(LIBDIR)/libcards.so;fi
+	if [ -L $(LIBDIR)/libcards.a ]; then rm -v $(LIBDIR)/libcards.a;fi
+	cp -fv libcards.a libcards.so.$(VERSION) $(LIBDIR)
+	ln -sfv libcards.so.$(VERSION) $(LIBDIR)/libcards.so
 
 install-webcards:
-	install -D -m0755  index.cgi $(DESTDIR)/index.cgi
+	install -v -D -m0755  index.cgi $(DESTDIR)/index.cgi
 
 clean:
-	rm -f .tools_depend
-	rm -f .cards_depend
-	rm -f .libs_depend
-	rm -f .web_depend
-	rm -f $(TOOLSOBJECTS)
-	rm -f $(CARDSOBJECTS)
-	rm -f $(WEBOBJECTS)
-	rm -f $(MANPAGES)
-	rm -f $(MANPAGES:=.txt)
-	rm -f libcards.so.$(VERSION)
-	rm -f libcards.h
-	rm -f libcards.a
-	rm -f setup-nutyx-log
-	rm -f test
-	rm -f pkgadd
-	rm -f cards
-	rm -f cards.conf
-	rm -f index.cgi
+	rm -fv .tools_depend
+	rm -fv .cards_depend
+	rm -fv .libs_depend
+	rm -fv .web_depend
+	rm -fv $(TOOLSOBJECTS)
+	rm -fv $(CARDSOBJECTS)
+	rm -fv $(WEBOBJECTS)
+	rm -fv $(MANPAGES)
+	rm -fv $(MANPAGES:=.txt)
+	rm -fv libcards.so.$(VERSION)
+	rm -fv libcards.h
+	rm -fv libcards.a
+	rm -fv setup-nutyx-log
+	rm -fv test
+	rm -fv pkgadd
+	rm -fv cards
+	rm -fv cards.conf
+	rm -fv index.cgi
 
 distclean: clean
-	rm -f pkgadd pkginfo pkgrm cards
+	rm -fv pkgadd pkginfo pkgrm cards
 
 # End of file
