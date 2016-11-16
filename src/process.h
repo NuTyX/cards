@@ -2,7 +2,7 @@
 //
 //  AUTHORS:     Johannes Winkelmann, jw@tks6.net
 //              Output redirection by Logan Ingalls, log@plutor.org
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by

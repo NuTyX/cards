@@ -27,22 +27,24 @@
   << "       <a href=\".\"><img id=\"logo\" src=\"../graphics/logo_nutyx_120.png\" alt=\"logo nutyx\" /></a>" << endl \
   << "      </td>" << endl \
   << "      <td>" << endl \
-  << "       <nav>" << endl \
-  << "        <ul>" << endl \
-  << "            <li><a href=\"news\">Nouvelles</a></li>" << endl \
-  << "            <li><a href=\"information\">Information</a></li>" << endl \
-  << "            <li><a href=\"documentation\">Documentation</a></li>" << endl \
-  << "            <li><a href=\"installation\">Installation</a></li>" << endl \
-  << "            <li><a href=\"faq\">FAQ</a></li>" << endl \
-  << "            <li><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Téléchargements</a></li>"  << endl \
-  << "            <li><a href=\"screenshots\">Captures Ecrans</a></li>"  << endl \
-  << "            <li><a href=\"wallpapers\">Fonds Ecrans</a></li>"  << endl \
-  << "            <li><a href=\"packages\">Paquets</a></li>" << endl \
-  << "            <li><a href=\"http://forum.nutyx.org/index.php?action=recent\">Forum</a></li>" << endl \
-  << "           <li><a href=\"http://github.com/NuTyX\">Code</a></li>" << endl \
-  << "            <li><a href=\"../en\" title=\"Home\"> <img src=\"../graphics/gb.gif\" alt=\"Home\" height=\"12\" width=\"35\"></a>" << endl \
-  << "        </ul>" << endl \
-  << "       </nav>" << endl \
+  << "       <table class=\"sidebar\" >" << endl \
+  << "        <tr>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"news\">Nouvelles</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"information\">Information</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"documentation\">Documentation</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"installation\">Installation</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"packages\">Paquets</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"faq\">FAQ</a><br><br>" << endl \
+  << "        </tr>" << endl \
+  << "        <tr>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Téléchargements</a><br><br>"  << endl \
+  << "            <td class=\"menu\"><br><a href=\"http://forum.nutyx.org/index.php?action=recent\">Forum</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"http://github.com/NuTyX\">Code</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"screenshots\">Captures d'écrans</a><br><br>"  << endl \
+  << "            <td class=\"menu\"><br><a href=\"wallpapers\">Fonds d'écrans</a><br><br>"  << endl \
+  << "            <td class=\"menu\"><br><a href=\"../en\" title=\"Home\"> <img src=\"../graphics/gb.gif\" alt=\"Home\" height=\"12\" width=\"35\"></a><br><br>" << endl \
+  << "        </tr>" << endl \
+  << "       </table>" << endl \
   << "      </td>" << endl \
   << "     </tr>" << endl \
   << "    </table>" << endl \
@@ -55,22 +57,24 @@
   << "       <a href=\".\"><img id=\"logo\" src=\"../graphics/logo_nutyx_120.png\" alt=\"logo nutyx\" /></a>" << endl \
   << "      </td>" << endl \
   << "      <td>" << endl \
-  << "       <nav>" << endl \
-  << "        <ul>" << endl \
-  << "            <li><a href=\"news\">Haberler</a></li>" << endl \
-  << "            <li><a href=\"information\">Bilgilendirme</a></li>" << endl \
-  << "            <li><a href=\"documentation\">Dökümantasyon</a></li>" << endl \
-  << "            <li><a href=\"installation\">Kurulum</a></li>" << endl \
-  << "            <li><a href=\"faq\">Sık Sorulan Sorular</a></li>" << endl \
-  << "            <li><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Indirmeler</a></li>"  << endl \
-  << "            <li><a href=\"screenshots\">Screenshots</a></li>"  << endl \
-  << "            <li><a href=\"wallpapers\">Wallpapers</a></li>"  << endl \
-  << "            <li><a href=\"packages\">Paketler</a></li>" << endl \
-  << "            <li><a href=\"http://forums.nutyx.org/index.php?action=recent\">Forum</a></li>" << endl \
-  << "           <li><a href=\"http://github.com/NuTyX\">Kaynak Kod</a></li>" << endl \
-  << "            <li><a href=\"../en\" title=\"Home\"> <img src=\"../graphics/gb.gif\" alt=\"Home\" height=\"12\" width=\"35\"></a>" << endl \
-  << "        </ul>" << endl \
-  << "       </nav>" << endl \
+  << "       <table>" << endl \
+  << "        <tr>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"news\">Haberler</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"information\">Bilgilendirme</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"documentation\">Dökümantasyon</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"installation\">Kurulum</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"packages\">Paketler</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"faq\">Sık Sorulan Sorular</a><br><br>" << endl \
+  << "        </tr>" << endl \
+  << "        <tr>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Indirmeler</a><br><br>"  << endl \
+  << "            <td class=\"menu\"><br><a href=\"http://forums.nutyx.org/index.php?action=recent\">Forum</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"http://github.com/NuTyX\">Kaynak Kod</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"screenshots\">Screenshots</a><br><br>"  << endl \
+  << "            <td class=\"menu\"><br><a href=\"wallpapers\">Wallpapers</a><br><br>"  << endl \
+  << "            <td class=\"menu\"><br><a href=\"../en\" title=\"Home\"> <img src=\"../graphics/gb.gif\" alt=\"Home\" height=\"12\" width=\"35\"></a><br><br>" << endl \
+  << "        </tr>" << endl \
+  << "       </table>" << endl \
   << "      </td>" << endl \
   << "     </tr>" << endl \
   << "    </table>" << endl \
@@ -84,22 +88,24 @@
   << "       <a href=\".\"><img id=\"logo\" src=\"../graphics/logo_nutyx_120.png\" alt=\"logo nutyx\" /></a>" << endl \
   << "      </td>" << endl \
   << "      <td>" << endl \
-  << "       <nav>" << endl \
-  << "        <ul>" << endl \
-  << "            <li><a href=\"news\">News</a></li>" << endl \
-  << "            <li><a href=\"information\">Information</a></li>" << endl \
-  << "            <li><a href=\"documentation\">Documentation</a></li>" << endl \
-  << "            <li><a href=\"installation\">Installation</a></li>" << endl \
-  << "            <li><a href=\"faq\">FAQ</a></li>" << endl \
-  << "            <li><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Downloads</a></li>"  << endl \
-  << "            <li><a href=\"screenshots\">Screenshots</a></li>"  << endl \
-  << "            <li><a href=\"wallpapers\">Wallpapers</a></li>"  << endl \
-  << "            <li><a href=\"packages\">Packages</a></li>" << endl \
-  << "            <li><a href=\"http://forums.nutyx.org/index.php?action=recent\">Forum</a></li>" << endl \
-  << "           <li><a href=\"http://github.com/NuTyX\">Code</a></li>" << endl \
-  << "            <li><a href=\"../fr\" title=\"Acceuil\"> <img src=\"../graphics/fr.gif\" alt=\"Accueil\" height=\"12\" width=\"35\"></a>" << endl \
-  << "        </ul>" << endl \
-  << "       </nav>" << endl \
+  << "       <table>" << endl \
+  << "        <tr>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"news\">News</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"information\">Information</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"documentation\">Documentation</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"installation\">Installation</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"packages\">Packages</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"faq\">FAQ</a><br><br>" << endl \
+  << "        </tr>" << endl \
+  << "        <tr>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Downloads</a><br><br>"  << endl \
+  << "            <td class=\"menu\"><br><a href=\"http://forums.nutyx.org/index.php?action=recent\">Forum</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"http://github.com/NuTyX\">Code</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"screenshots\">Screenshots</a><br><br>"  << endl \
+  << "            <td class=\"menu\"><br><a href=\"wallpapers\">Wallpapers</a><br><br>"  << endl \
+  << "            <td class=\"menu\"><br><a href=\"../fr\" title=\"Acceuil\"> <img src=\"../graphics/fr.gif\" alt=\"Accueil\" height=\"12\" width=\"35\"></a><br><br>" << endl \
+  << "        </tr>" << endl \
+  << "       </table>" << endl \
   << "      </td>" << endl \
   << "     </tr>" << endl \
   << "    </table>" << endl \

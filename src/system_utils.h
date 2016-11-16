@@ -28,6 +28,8 @@
 #include <iterator>
 #include <iostream>
 
+#include <locale.h>
+#include <libintl.h>
 
 std::string getMachineType ();
 

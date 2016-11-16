@@ -1,4 +1,4 @@
-//  pkgrepo.cpp
+//  pkgrepo.cxx
 //
 //  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
 //  Copyright (c) 2014 by NuTyX team (http://nutyx.org)

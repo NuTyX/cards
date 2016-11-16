@@ -1,6 +1,6 @@
-// archive_utils.cc
+// archive_utils.cxx
 //
-// Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+// Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 //
 // This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -61,24 +61,24 @@ void ArchiveUtils::treatErrors(const std::string& message) const
 	switch (m_actualError)
 	{
 		case CANNOT_OPEN_ARCHIVE:
-			throw runtime_error("could not open the archive " + message);
+			throw runtime_error(gettext("could not open the archive ") + message);
 			break;
 		case CANNOT_READ_ARCHIVE:
-			throw runtime_error("could not read the archive " + message);
+			throw runtime_error(gettext("could not read the archive ") + message);
 			break;
 		case CANNOT_FIND_META_FILE:
-			throw runtime_error("invalid meta data in file " + message);
+			throw runtime_error(gettext("Invalid meta data in file ") + message);
 			break;
 		case CANNOT_FIND_MTREE_FILE:
-			throw runtime_error("invalid mtree in file " + message);
+			throw runtime_error(gettext("Invalid mtree in file ") + message);
 			break;
 		case EMPTY_ARCHIVE:
-			throw runtime_error(message + " is not an archive");
+			throw runtime_error(message + gettext(" is not an archive"));
 			break;
 		case CANNOT_FIND_NAME:
-			throw runtime_error(message + " is not a CARDS archive");
+			throw runtime_error(message + gettext(" is not a CARDS archive"));
 		case CANNOT_FIND_ARCH:
-			throw runtime_error("archive " + message + ": invalid architecture");
+			throw runtime_error(gettext("archive ") + message + gettext(": invalid architecture"));
 			break;
 	}
 }
@@ -95,7 +95,7 @@ unsigned int long ArchiveUtils::size()
 void ArchiveUtils::list()
 {
 	if ( m_contentMtree.size() == 0) {
-		cout << "Not found" << endl;
+		cout << gettext("Not found") << endl;
 	} else {
 		for (vector<string>::const_iterator i = m_contentMtree.begin(); i != m_contentMtree.end(); i++) {
 			cout << *i << endl;

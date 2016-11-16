@@ -1,4 +1,4 @@
-//  pkgadd.cc
+//  pkgadd.cxx
 //
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)

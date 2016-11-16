@@ -1,4 +1,4 @@
-//  pkgdbh.cc
+//  pkgdbh.cxx
 //
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
@@ -207,8 +207,8 @@ void Pkgdbh::progressInfo() const
 		case PKG_MOVE_META_END:
 			break;
     case DB_OPEN_START:
-			cout << "Retrieve info about the "
-			<< m_packageNamesList.size() << " packages: ";
+			cout << gettext("Retrieve info about the ")
+			<< m_packageNamesList.size() << gettext(" packages: ");
 			break;
     case DB_OPEN_RUN:
 			if ( m_packageNamesList.size()>100) {

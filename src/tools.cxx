@@ -52,6 +52,9 @@ Pkgdbh* select_utility(const string& name)
 int main(int argc, char** argv)
 {
 	string name = basename(argv[0]);
+	setlocale(LC_ALL,"");
+	bindtextdomain(GETTEXT_PACKAGE,PACKAGE_LOCALE_DIR);
+	textdomain(GETTEXT_PACKAGE);
 
 	try {
 		unique_ptr<Pkgdbh> util(select_utility(name));

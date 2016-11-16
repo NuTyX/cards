@@ -30,6 +30,7 @@ MANDIR = ${DESTDIR}/usr/share/man
 LIBDIR = ${DESTDIR}/usr/lib
 ETCDIR = ${DESTDIR}/etc
 VARDIR = ${DESTDIR}/var
+LOCALEDIR = ${DESTDIR}/usr/share/locale
 
 AR?=ar
 RANLIB?=ranlib

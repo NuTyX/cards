@@ -1,5 +1,5 @@
 /*
- * cards_remove.cpp
+ * cards_remove.cxx
  * 
  * Copyright 2013-2016 Thierry Nuttens <tnut@nutyx.org>
  * 

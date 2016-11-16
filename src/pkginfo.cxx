@@ -1,4 +1,4 @@
-//  pkginfo.cc
+//  pkginfo.cxx
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
@@ -342,7 +342,7 @@ void Pkginfo::run()
 				treatErrors(m_arg);
 			}
 			vector<pair<string, string> > result;
-			result.push_back(pair<string, string>("Package", "File"));
+			result.push_back(pair<string, string>(gettext("Package"), gettext("File")));
 			unsigned int width = result.begin()->first.length(); // Width of "Package"
 #ifndef NDEBUG
 			cerr << m_arg << endl;
@@ -365,7 +365,7 @@ void Pkginfo::run()
 					cout << left << setw(width + 2) << i.first << i.second << endl;
 				}
 			} else {
-				cout << m_utilName << ": no owner(s) found" << endl;
+				cout << m_utilName << gettext(": no owner(s) found") << endl;
 			}
 		}
 	}
@@ -376,19 +376,19 @@ void Pkginfo::finish()
 void Pkginfo::printHelp() const
 {
 	cout << USAGE << m_utilName << " [options]" << endl
-	     << OPTIONS << endl
-	     << "  -i, --installed             list installed packages" << endl
-         << "  -d, --details               list details about the <package>" << endl
-         << "  -L, --libraries             list all the runtime libraries for the <package>" << endl
-	     << "  -l, --list <package|file>   list files in <package> or <file>" << endl
-	     << "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
-	     << "  -f, --footprint <file>      print footprint for <file>" << endl
-         << "  -a, --archive <file>        print Name, Version, Release, BuildDate and Deps of the <file>" << endl
-	     << "  -b, --buildtime <package>   return the build time of the package" << endl
-         << "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
-         << "  --runtimedepfiles <path>    return on a single line all the runtime dependencies for the files found in the <path>" << endl
-	     << "  -r, --root <path>           specify alternative installation root" << endl
-	     << "  -v, --version               print version and exit" << endl
-	     << "  -h, --help                  print help and exit" << endl;
+		<< OPTIONS << endl
+		<< "  -i, --installed             list installed packages" << endl
+		<< "  -d, --details               list details about the <package>" << endl
+		<< "  -L, --libraries             list all the runtime libraries for the <package>" << endl
+		<< "  -l, --list <package|file>   list files in <package> or <file>" << endl
+		<< "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
+		<< "  -f, --footprint <file>      print footprint for <file>" << endl
+		<< "  -a, --archive <file>        print Name, Version, Release, BuildDate and Deps of the <file>" << endl
+		<< "  -b, --buildtime <package>   return the build time of the package" << endl
+		<< "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
+		<< "  --runtimedepfiles <path>    return on a single line all the runtime dependencies for the files found in the <path>" << endl
+		<< "  -r, --root <path>           specify alternative installation root" << endl
+		<< "  -v, --version               print version and exit" << endl
+		<< "  -h, --help                  print help and exit" << endl;
 }
 // vim:set ts=2 :

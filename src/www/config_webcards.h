@@ -73,12 +73,6 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "    color:#585858;" << endl \
  << "    font-size:1em;" << endl \
  << "}" << endl \
- << ".url {" << endl \
- << "   text-decoration: none; /* Les liens ne seront plus soulignés */" \
- << endl \
- << "   color:#000097;" << endl \
- << "}" << endl \
- << ".url:hover { color:#C00000; }" << endl \
  << "pre {" << endl \
  << "   padding: 0.5em 1em;" << endl \
  << "   margin: 1em 0em 1em 2em;" << endl \
@@ -123,6 +117,53 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "    font-size: small;" << endl \
  << "    font-weight: bold;" << endl \
  << "    font-style: italic;" << endl \
+ << "}" << endl \
+ << "a:link {" << endl \
+ << "    font-weight:bold;" << endl \
+ << "    color: #703030;" << endl \
+ << "    text-decoration: none;" << endl \
+ << "    font-family: arial;" << endl \
+ << "}" << endl \
+ << "a:visited {" << endl \
+ << "    font-weight:bold;" << endl \
+ << "    color: #503030;" << endl \
+ << "}" << endl \
+ << "a:hover {" << endl \
+ << "    color: #403030;" << endl \
+ << "    text-decoration: underline;" << endl \
+ << "}" << endl \
+ << "table {" << endl \
+ << "    width: 100%;" << endl \
+ << "}" << endl \
+ << "td.menu {" << endl \
+ << "    font: courrier;" << endl \
+ << "    background-color: #959595;" << endl \
+ << "    text-decoration: none;" << endl \
+ << "    vertical-align:middle;" << endl \
+ << "    text-align:center;" << endl \
+ << "    height:60px;" << endl \
+ << "}" << endl \
+ << "td.menu:hover {" << endl \
+ << "    text-decoration: none;" << endl \
+ << "    background-color: #AAAAAA;" << endl \
+ << "    text-transform: uppercase;" << endl \
+ << "}" << endl \
+ << "td.menu a:link {" << endl \
+ << "    font-weight:bold;" << endl \
+ << "    color: black;" << endl \
+ << "    text-decoration: none;" << endl \
+ << "    font-family: arial;" << endl \
+ << "}" << endl \
+ << "td.menu a:visited {" << endl \
+ << "    font-weight:bold;" << endl \
+ << "    color: black;" << endl \
+ << "    text-decoration: none;" << endl \
+ << "    font-family: arial;" << endl \
+ << "}" << endl \
+ << "td.menu a:hover {" << endl \
+ << "    color: black;" << endl \
+ << "    text-decoration: none;" << endl \
+ << "    font-family: arial;" << endl \
  << "}" << endl \
  << " @media print { header, footer {display:none } }" << endl \
  << " </style>" << endl \

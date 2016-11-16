@@ -22,6 +22,8 @@
 #include <mysql/mysql.h>
 
 #include "file_utils.h"
+namespace Sql
+{
 
 class mysql
 {
@@ -45,5 +47,6 @@ private:
 	MYSQL_ROW rows;
 	Config mysqlConfig;	
 };
+} /* namespace Sql */
 #endif /* MYSQL_H */
 // vim:set ts=2 : 

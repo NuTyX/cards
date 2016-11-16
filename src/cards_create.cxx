@@ -1,5 +1,5 @@
 /*
- * cards_create.cpp
+ * cards_create.cxx
  * 
  * Copyright 2016 Thierry Nuttens <tnut@nutyx.org>
  * 

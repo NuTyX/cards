@@ -1,4 +1,4 @@
-// mysql.cpp
+// mysql.cxx
 //
 //  Copyright (c) 2016 by NuTyX team (http://nutyx.org)
 //
@@ -19,6 +19,8 @@
 //
 #include "mysql.h"
 using namespace std;
+namespace Sql
+{
 mysql::mysql(const char *configFileName)
 {
 	getConfig(configFileName,mysqlConfig);
@@ -45,7 +47,7 @@ mysql::~mysql()
 void mysql::lastPosts(const char *forum, int n)
 {
 	if(mysql_query(m_connection,
-	"select id_topic,id_msg, poster_name, poster_time, subject from smf_messages"))
+	"select id_topic,id_msg, poster_name, poster_time, subject from smf_messages order by id_msg"))
 		cerr << mysql_error(m_connection) << endl;
 	m_result= mysql_use_result(m_connection);
 	vector<string> list;
@@ -54,7 +56,7 @@ void mysql::lastPosts(const char *forum, int n)
 		string id_topic = rows[0];
 		string id_msg = rows[1];
 		string time = "<p class=\"updated\">";
-		time +=getDateFromEpoch(strtoul(rows[3],NULL,0)) + "</p>";
+		time +=getDateFromEpoch(strtoul(rows[3],NULL,0)) + " UTC</p>";
 		string author = "<i>";
 		author += rows[2];
 		string subject = rows[4];
@@ -74,4 +76,5 @@ void mysql::lastPosts(const char *forum, int n)
 		i++;
 	}
 }
+} /* namespace Sql */
 // vim:set ts=2 :

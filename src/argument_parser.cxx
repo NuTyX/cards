@@ -1,7 +1,7 @@
-// argument_parser.cc
+// argument_parser.cxx
 //
 //  Copyright (c) 2004 by Johannes Winkelmann (jw at tks6 dot net)
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ int ArgParser::addCommand(APCmd& cmd,
     APCmd apcmd;
     apcmd.id = m_cmdIdCounter;
 
-    PREDEFINED_CMD_HELP.init("help", 'h', "\t   Print this help message");
+    PREDEFINED_CMD_HELP.init("help", 'h', gettext("\t   Print this help message"));
 
     // add predefined commands
     addOption(cmd, PREDEFINED_CMD_HELP, false);

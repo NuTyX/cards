@@ -1,5 +1,5 @@
 /*
- * cards_info.cpp
+ * cards_info.cxx
  * 
  * Copyright 2015-2016 Thierry Nuttens <tnut@nutyx.org>
  * 

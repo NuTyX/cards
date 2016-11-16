@@ -16,6 +16,8 @@
 #include "www/menu_webcards.h"
 
 using namespace std;
+using namespace Sql;
+
 void endOfPage(void)
 {
 	cout << "   </tr>" <<endl

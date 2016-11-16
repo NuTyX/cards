@@ -25,6 +25,8 @@
 #define GIGA 1e9
 #define MEGA 1e6
 #define KILO 1e3
+#define PACKAGE_LOCALE_DIR "/usr/share/locale"
+#define GETTEXT_PACKAGE "cards"
 
 #include "error_treat.h"
 

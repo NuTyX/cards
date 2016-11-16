@@ -1,5 +1,5 @@
 /*
- * cards_install.cpp
+ * cards_install.cxx
  * 
  * Copyright 2015 - 2016 Thierry Nuttens <tnut@nutyx.org>
  * 

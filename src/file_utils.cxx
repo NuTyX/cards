@@ -1,8 +1,8 @@
-//  files_utils.cc
+//  files_utils.cxx
 //
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmem
     return NULL;
   if (fseek (file, offset, SEEK_SET))
   {
-    printf("Cannot seek\n");
+    cerr << "Cannot seek" << endl;
     return NULL;
   }
   mvar = var;
@@ -127,7 +127,7 @@ void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmem
       mvar = malloc (size * nmemb + 1);
     if (mvar == NULL)
     {
-      printf("Out of memory\n");
+      cerr << "Out of memory" << endl;
       return NULL;
     }
     ((char *) mvar)[size * nmemb] = '\0';

@@ -1,6 +1,6 @@
-// cards.cpp
+// cards.cxx
 //
-//  Copyright (c) 2014-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014-2016 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -40,6 +40,10 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	string command = basename(argv[1]);
+	setlocale(LC_ALL,"");
+	bindtextdomain(GETTEXT_PACKAGE,PACKAGE_LOCALE_DIR);
+	textdomain(GETTEXT_PACKAGE);
+
 	string configFile = "/etc/cards.conf";
 	try {
 		CardsArgumentParser cardsArgPars;
