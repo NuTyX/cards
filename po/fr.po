@@ -55,3 +55,65 @@ msgstr "Pas trouvé"
 msgid "\t   Print this help message"
 msgstr "\t   Affiche cet aide"
 
+msgid "Name           : "
+msgstr "Nom                 : "
+
+msgid "Series(base)   : "
+msgstr "Séries(base)        : "
+
+msgid "Group          : "
+msgstr "Groupe              : "
+
+msgid "Collection     : "
+msgstr "Collection          : "
+
+msgid "URL            : "
+msgstr "URL                 : "
+
+msgid "Maintainer(s)  : "
+msgstr "Mainteneur(s)       : "
+
+msgid "Packager(s)    : "
+msgstr "Empaqueteur(s)      : "
+
+msgid "Description    : "
+msgstr "Description         : "
+
+msgid "Version        : "
+msgstr "Version             : "
+
+msgid "Release        : "
+msgstr "Release             : "
+
+msgid "Build date     : "
+msgstr "Date de construction: "
+
+msgid "Installed date : "
+msgstr "Date d'installation : "
+
+msgid "Installed Size : "
+msgstr "Taille installée    : "
+
+msgid "bytes"
+msgstr "octets"
+
+msgid "Number of Files: "
+msgstr "Nombre de fichiers  : "
+
+msgid " file(s)"
+msgstr " fichier(s)"
+
+msgid "Arch           : "
+msgstr "Arch                : "
+
+msgid "Dependencies   : "
+msgstr "Dépendances         : "
+
+msgid "list installed packages"
+msgstr "liste les paquets installés"
+
+msgid "list details about the <package>"
+msgstr "liste les détails du <paquet>"
+
+msgid "list files in <package> or <file>"
+msgstr "liste les fichiers du <paquet> ou <fichier>"

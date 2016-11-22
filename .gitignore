@@ -19,3 +19,4 @@ libcards*
 ChangeLog
 archives
 tests/test
+*.mo

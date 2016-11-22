@@ -148,16 +148,17 @@ void Pkginfo::run()
 {
 	if (m_archiveinfo) {
 		pair<string, pkginfo_t> packageArchive = openArchivePackage(m_packageArchiveName) ;
-		cout	<< packageArchive.first << " Description    : " << packageArchive.second.description << endl
-			<< packageArchive.first << " URL            : " << packageArchive.second.url << endl
-			<< packageArchive.first << " Maintainer(s)  : " << packageArchive.second.maintainer << endl
-			<< packageArchive.first << " Packager(s)    : " << packageArchive.second.packager << endl
-			<< packageArchive.first << " Version        : " << packageArchive.second.version << endl
-			<< packageArchive.first << " Release        : " << packageArchive.second.release << endl
-			<< packageArchive.first << " Architecture   : " << packageArchive.second.arch  << endl
-			<< packageArchive.first << " Build date     : " << packageArchive.second.build << endl;
+		cout
+      << packageArchive.first << _("Description    : ") << packageArchive.second.description << endl
+			<< packageArchive.first << _("URL            : ") << packageArchive.second.url << endl
+			<< packageArchive.first << _("Maintainer(s)  : ") << packageArchive.second.maintainer << endl
+			<< packageArchive.first << _("Packager(s)    : ") << packageArchive.second.packager << endl
+			<< packageArchive.first << _("Version        : ") << packageArchive.second.version << endl
+			<< packageArchive.first << _("Release        : ") << packageArchive.second.release << endl
+			<< packageArchive.first << _("Architecture   : ") << packageArchive.second.arch  << endl
+			<< packageArchive.first << _("Build date     : ") << packageArchive.second.build << endl;
 		if (packageArchive.second.dependencies.size() > 0 ) {
-			cout << packageArchive.first << " Dependencies   : ";
+			cout << packageArchive.first << _("Dependencies   : ");
 			for ( auto i : packageArchive.second.dependencies) cout << i.first << i.second << " ";
 			cout << endl;
 		}
@@ -305,30 +306,30 @@ void Pkginfo::run()
 			buildCompleteDatabase(false);
 			if (checkPackageNameExist(m_arg)) {
 				string arg = m_listOfAlias[m_arg];
-				cout << "Name           : " << arg << endl;
+				cout << _("Name           : ") << arg << endl;
 				if (m_listOfInstPackages[arg].alias.size() > 0 ) {
 					cout << "Alias          : ";
 					for ( auto i : m_listOfInstPackages[arg].alias) cout << i << " ";
 						cout << endl;
 				}
-				cout	<< "Description    : " << m_listOfInstPackages[arg].description << endl
-					<< "Series(base)   : " << m_listOfInstPackages[arg].base << endl
-					<< "Group          : " << m_listOfInstPackages[arg].group << endl
-					<< "Collection     : " << m_listOfInstPackages[arg].collection << endl
-					<< "URL            : " << m_listOfInstPackages[arg].url << endl
-					<< "Maintainer(s)  : " << m_listOfInstPackages[arg].maintainer << endl
-					<< "Packager(s)    : " << m_listOfInstPackages[arg].packager << endl
-					<< "Version        : " << m_listOfInstPackages[arg].version << endl
-					<< "Release        : " << m_listOfInstPackages[arg].release << endl
-					<< "Build date     : " << getDateFromEpoch(m_listOfInstPackages[arg].build) << endl
-					<< "Installed date : " << getDateFromEpoch(m_listOfInstPackages[arg].install) << endl
-					<< "Installed Size : " << sizeHumanRead(m_listOfInstPackages[arg].size)
-					<< "bytes" << endl
-					<< "Number of Files: " << m_listOfInstPackages[arg].files.size()
-					<< " file(s)" << endl
-					<< "Arch           : " << m_listOfInstPackages[arg].arch << endl;
+				cout << _("Description    : ") << m_listOfInstPackages[arg].description << endl
+					<< _("Series(base)   : ") << m_listOfInstPackages[arg].base << endl
+					<< _("Group          : ") << m_listOfInstPackages[arg].group << endl
+					<< _("Collection     : ") << m_listOfInstPackages[arg].collection << endl
+					<< _("URL            : ") << m_listOfInstPackages[arg].url << endl
+					<< _("Maintainer(s)  : ") << m_listOfInstPackages[arg].maintainer << endl
+					<< _("Packager(s)    : ") << m_listOfInstPackages[arg].packager << endl
+					<< _("Version        : ") << m_listOfInstPackages[arg].version << endl
+					<< _("Release        : ") << m_listOfInstPackages[arg].release << endl
+					<< _("Build date     : ") << getDateFromEpoch(m_listOfInstPackages[arg].build) << endl
+					<< _("Installed date : ") << getDateFromEpoch(m_listOfInstPackages[arg].install) << endl
+					<< _("Installed Size : ") << sizeHumanRead(m_listOfInstPackages[arg].size)
+					<< _("bytes") << endl
+					<< _("Number of Files: ") << m_listOfInstPackages[arg].files.size()
+					<< _(" file(s)") << endl
+					<< _("Arch           : ") << m_listOfInstPackages[arg].arch << endl;
 				if ( m_listOfInstPackages[m_arg].dependencies.size() > 0 ) {
-					cout << "Dependencies   : ";
+					cout << _("Dependencies   : ");
 					for ( auto i : m_listOfInstPackages[arg].dependencies) cout << i.first << " ";
 					cout << endl;
 				}
@@ -342,7 +343,7 @@ void Pkginfo::run()
 				treatErrors(m_arg);
 			}
 			vector<pair<string, string> > result;
-			result.push_back(pair<string, string>(gettext("Package"), gettext("File")));
+			result.push_back(pair<string, string>(_("Package"), _("File")));
 			unsigned int width = result.begin()->first.length(); // Width of "Package"
 #ifndef NDEBUG
 			cerr << m_arg << endl;
@@ -365,7 +366,7 @@ void Pkginfo::run()
 					cout << left << setw(width + 2) << i.first << i.second << endl;
 				}
 			} else {
-				cout << m_utilName << gettext(": no owner(s) found") << endl;
+				cout << m_utilName << _(": no owner(s) found") << endl;
 			}
 		}
 	}
@@ -377,18 +378,27 @@ void Pkginfo::printHelp() const
 {
 	cout << USAGE << m_utilName << " [options]" << endl
 		<< OPTIONS << endl
-		<< "  -i, --installed             list installed packages" << endl
-		<< "  -d, --details               list details about the <package>" << endl
+		<< "  -i, --installed             "
+		<< _("list installed packages") << endl
+		<< "  -d, --details               "
+		<< _("list details about the <package>") << endl
 		<< "  -L, --libraries             list all the runtime libraries for the <package>" << endl
-		<< "  -l, --list <package|file>   list files in <package> or <file>" << endl
-		<< "  -o, --owner <pattern>       list owner(s) of file(s) matching <pattern>" << endl
-		<< "  -f, --footprint <file>      print footprint for <file>" << endl
+		<< "  -l, --list <package|file>   "
+		<< _("list files in <package> or <file>") << endl
+		<< "  -o, --owner <pattern>       "
+		<< _("list owner(s) of file(s) matching <pattern>") << endl
+		<< "  -f, --footprint <file>      "
+		<< _("print footprint for <file>") << endl
 		<< "  -a, --archive <file>        print Name, Version, Release, BuildDate and Deps of the <file>" << endl
 		<< "  -b, --buildtime <package>   return the build time of the package" << endl
 		<< "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
-		<< "  --runtimedepfiles <path>    return on a single line all the runtime dependencies for the files found in the <path>" << endl
-		<< "  -r, --root <path>           specify alternative installation root" << endl
-		<< "  -v, --version               print version and exit" << endl
-		<< "  -h, --help                  print help and exit" << endl;
+		<< "  --runtimedepfiles <path>    "
+		<< _("return on a single line all the runtime dependencies for the files found in the <path>") << endl
+		<< "  -r, --root <path>           "        
+		<< _("specify alternative installation root") << endl
+		<< "  -v, --version               "
+		<< _("print version and exit") << endl
+		<< "  -h, --help                  "
+		<< _("print help and exit") << endl;
 }
 // vim:set ts=2 :

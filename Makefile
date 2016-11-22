@@ -3,6 +3,8 @@ DIRSRC = src
 
 DIRMAN = man
 
+DIRPO = po
+
 DIRTEST = tests
 
 DIRSCRIPTS = scripts
@@ -27,12 +29,14 @@ all:
 	$(MAKE) -C $(DIRSRC) all
 	$(MAKE) -C $(DIRSCRIPTS) all
 	$(MAKE) -C $(DIRMAN) all
+	$(MAKE) -C $(DIRPO) all
 
 install: all
 
 	$(MAKE) -C $(DIRSRC) install
 	$(MAKE) -C $(DIRSCRIPTS) install
 	$(MAKE) -C $(DIRMAN) install
+	$(MAKE) -C $(DIRPO) install
 
 install-libs:
 	$(MAKE) -C $(DIRSRC) install-libs
@@ -64,6 +68,7 @@ clean:
 	$(MAKE) -C $(DIRSRC) clean
 	$(MAKE) -C $(DIRSCRIPTS) clean
 	$(MAKE) -C $(DIRMAN) clean
+	$(MAKE) -C $(DIRPO) clean
 	$(MAKE) -C $(DIRTEST) clean
 	$(MAKE) -C $(DIRFLTK) clean
 
