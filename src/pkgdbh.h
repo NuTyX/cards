@@ -148,27 +148,37 @@ protected:
 		const std::string& packageName);
 
 
-	void addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& info);
+	void addPackageFilesRefsToDB(const std::string& name,
+		const pkginfo_t& info);
 	
-	bool checkPackageNameUptodate(const std::pair<std::string, pkginfo_t>& archiveName);
-	bool checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild);
+	bool checkPackageNameUptodate(const std::pair<std::string,
+		pkginfo_t>& archiveName);
+	bool checkPackageNameBuildDateSame(const std::pair<std::string,
+		time_t>& dependencieNameBuild);
 
-	/* Remove the physical files after followings some rules */
+	/* 
+	 * Remove the physical files after followings some rules 
+	 */
 	void removePackageFiles(const std::string& name);
-	void removePackageFiles(const std::string& name, const std::set<std::string>& keep_list);
+	void removePackageFiles(const std::string& name,
+		const std::set<std::string>& keep_list);
 
 	/*
 	 * Remove meta data about the removed package 
 	 */
 	void removePackageFilesRefsFromDB(const std::string& name);
-	void removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list);
-	std::set<std::string> getConflictsFilesList(const std::string& name, const pkginfo_t& info);
+	void removePackageFilesRefsFromDB(std::set<std::string> files,
+		const std::set<std::string>& keep_list);
+	std::set<std::string> getConflictsFilesList(const std::string& name,
+		const pkginfo_t& info);
 
 	// Tar.gz
 	std::pair<std::string, pkginfo_t> openArchivePackage(const std::string& filename);
 	std::set< std::pair<std::string, time_t> > getPackageDependencies(const std::string& filename);
 	void extractAndRunPREfromPackage(const std::string& filename);
-	void installArchivePackage(const std::string& filename, const std::set<std::string>& keep_list, const std::set<std::string>& non_install_files);
+	void installArchivePackage(const std::string& filename,
+		const std::set<std::string>& keep_list,
+		const std::set<std::string>& non_install_files);
 
 	/*
 	 * The folder holding the meta datas is going to be create here
@@ -177,8 +187,10 @@ protected:
 
 
 	void readRulesFile();
-	void getInstallRulesList(const std::vector<rule_t>& rules, rule_event_t event, std::vector<rule_t>& found) const;
-	bool checkRuleAppliesToFile(const rule_t& rule, const std::string& file);
+	void getInstallRulesList(const std::vector<rule_t>& rules,
+		rule_event_t event, std::vector<rule_t>& found) const;
+	bool checkRuleAppliesToFile(const rule_t& rule,
+		const std::string& file);
 
 	void getFootprintPackage(std::string& filename);
 	void runLdConfig();

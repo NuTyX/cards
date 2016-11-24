@@ -81,112 +81,112 @@ void Pkgdbh::treatErrors(const string& s) const
 		case CANNOT_GENERATE_LEVEL:
 			break;
 		case CANNOT_DOWNLOAD_FILE:
-			throw runtime_error("could not download " + s);
+			throw runtime_error(_("could not download ") + s);
 			break;
 		case CANNOT_CREATE_FILE:
-			throw RunTimeErrorWithErrno("could not created  " + s);
+			throw RunTimeErrorWithErrno(_("could not created ") + s);
 			break;
 		case CANNOT_OPEN_FILE:
-			throw RunTimeErrorWithErrno("could not open " + s);
+			throw RunTimeErrorWithErrno(_("could not open ") + s);
 			break;
 		case CANNOT_FIND_FILE:
-			throw RunTimeErrorWithErrno("could not find " + s);
+			throw RunTimeErrorWithErrno(_("could not find ") + s);
 			break;
 		case CANNOT_READ_FILE:
-			throw runtime_error("could not read " + s);
+			throw runtime_error(_("could not read ") + s);
 			break;
 		case CANNOT_PARSE_FILE:
-			throw runtime_error("could not parse " + s);
+			throw runtime_error(_("could not parse ") + s);
 			break;
 		case CANNOT_READ_DIRECTORY:
-			throw RunTimeErrorWithErrno("could not read directory " + s);
+			throw RunTimeErrorWithErrno(_("could not read directory ") + s);
 			break;
 		case CANNOT_WRITE_FILE:
-			throw RunTimeErrorWithErrno("could not write file " + s);
+			throw RunTimeErrorWithErrno(_("could not write file ") + s);
 			break;
 		case CANNOT_SYNCHRONIZE:
-			throw RunTimeErrorWithErrno("could not synchronize " + s);
+			throw RunTimeErrorWithErrno(_("could not synchronize ") + s);
 			break;
 		case CANNOT_RENAME_FILE:
-			throw RunTimeErrorWithErrno("could not rename " + s);
+			throw RunTimeErrorWithErrno(_("could not rename ") + s);
 			break;
 		case CANNOT_COPY_FILE:
-			throw RunTimeErrorWithErrno("could not copy " + s);
+			throw RunTimeErrorWithErrno(_("could not copy ") + s);
 			break;
 		case CANNOT_DETERMINE_NAME_BUILDNR:
-			throw RunTimeErrorWithErrno("could not determine name / build number " + s);
+			throw RunTimeErrorWithErrno(_("could not determine name / build number ") + s);
 			break;
 		case WRONG_ARCHITECTURE:
-			throw runtime_error(s + ": wrong architecture" );
+			throw runtime_error(s + _(": wrong architecture") );
 			break;
 		case EMPTY_PACKAGE:
-			throw RunTimeErrorWithErrno("could not synchronize " + s);
+			throw RunTimeErrorWithErrno(_("empty package ") + s);
 			break;
 		case CANNOT_FORK:
-			throw RunTimeErrorWithErrno("fork() failed " + s);
+			throw RunTimeErrorWithErrno(_("fork() failed ") + s);
 			break;
 		case WAIT_PID_FAILED:
-			throw RunTimeErrorWithErrno("waitpid() failed " + s);
+			throw RunTimeErrorWithErrno(_("waitpid() failed ") + s);
 			break;
 		case DATABASE_LOCKED:
-			throw RunTimeErrorWithErrno("Database  " + s + " locked by another user");
+			throw RunTimeErrorWithErrno(_("Database  ") + s + _(" locked by another user"));
 			break;
 		case CANNOT_LOCK_DIRECTORY:
-			throw RunTimeErrorWithErrno("could lock directory " + s);
+			throw RunTimeErrorWithErrno(_("could not lock directory ") + s);
 			break;
 		case CANNOT_REMOVE_FILE:
-			throw RunTimeErrorWithErrno("could not remove file " + s);
+			throw RunTimeErrorWithErrno(_("could not remove file ") + s);
 			break;
 		case CANNOT_RENAME_DIRECTORY:
-			throw RunTimeErrorWithErrno("could not rename directory  " + s);
+			throw RunTimeErrorWithErrno(_("could not rename directory ") + s);
 			break;
 		case OPTION_ONE_ARGUMENT:
-			throw RunTimeErrorWithErrno(s + " require one argument");
+			throw RunTimeErrorWithErrno(s + _(" require one argument"));
 			break;
 		case INVALID_OPTION:
-			throw runtime_error(s + " invalid option" );
+			throw runtime_error(s + _(" invalid option") );
 			break;
 		case OPTION_MISSING:
-			throw runtime_error(s + " option missing");
+			throw runtime_error(s + _(" option missing"));
 			break;
 		case TOO_MANY_OPTIONS:
-			throw runtime_error(s+ ": to many options");
+			throw runtime_error(s+ _(": to many options"));
 			break;
 		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
-			throw runtime_error(s + " only root can install / upgrade / remove packages");
+			throw runtime_error(s + _(" only root can install / upgrade / remove packages"));
 			break;
 		case PACKAGE_ALLREADY_INSTALL:
-			throw runtime_error("package " + s + " already installed (use -u to upgrade)");
+			throw runtime_error(_("package ") + s + _(" already installed (use -u to upgrade)"));
 			break;
 		case PACKAGE_NOT_INSTALL:
-			throw runtime_error("package " + s + " not yet installed");
+			throw runtime_error(_("package ") + s + _(" not yet installed"));
 			break;
 		case PACKAGE_NOT_PREVIOUSLY_INSTALL:
-			throw runtime_error("package " + s + " not previously installed (skip -u to install)");
+			throw runtime_error(_("package ") + s + _(" not previously installed (skip -u to install)"));
 			break;
 		case LISTED_FILES_ALLREADY_INSTALLED:
-			throw runtime_error(s + "listed file(s) already installed (use -f to ignore and overwrite)");
+			throw runtime_error(s + _("listed file(s) already installed (use -f to ignore and overwrite)"));
 			break;
 		case PKGADD_CONFIG_LINE_TOO_LONG:
-			throw RunTimeErrorWithErrno(s + ": line too long, aborting");
+			throw RunTimeErrorWithErrno(s + _(": line too long, aborting"));
 			break;
 		case PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS:
-			throw RunTimeErrorWithErrno(s + ": wrong number of arguments, aborting");
+			throw RunTimeErrorWithErrno(s + _(": wrong number of arguments, aborting"));
 			break;
 		case PKGADD_CONFIG_UNKNOWN_ACTION:
-			throw RunTimeErrorWithErrno(s + "': config unknown action, should be YES or NO, aborting");
+			throw RunTimeErrorWithErrno(s + _("': config unknown action, should be YES or NO, aborting"));
 			break;
 		case PKGADD_CONFIG_UNKNOWN_EVENT:
-			throw RunTimeErrorWithErrno(s + "' unknown event, aborting");
+			throw RunTimeErrorWithErrno(s + _("' unknown event, aborting"));
 			break;
 		case CANNOT_COMPILE_REGULAR_EXPRESSION:
-			throw runtime_error("error compiling regular expression '" + s + "', aborting");
+			throw runtime_error(_("error compiling regular expression '") + s + _("', aborting"));
 			break;
 		case NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE:
-			throw runtime_error(s + " is neither an installed package nor a package file");
+			throw runtime_error(s + _(" is neither an installed package nor a package file"));
 			break;
 		case PACKAGE_NOT_FOUND:
-			throw runtime_error("The package " + s + " does not exist");
+			throw runtime_error(_("The package ") + s + _(" does not exist"));
 			break;
 	}
 }
@@ -207,8 +207,8 @@ void Pkgdbh::progressInfo() const
 		case PKG_MOVE_META_END:
 			break;
     case DB_OPEN_START:
-			cout << gettext("Retrieve info about the ")
-			<< m_packageNamesList.size() << gettext(" packages: ");
+			cout << _("Retrieve info about the ")
+			<< m_packageNamesList.size() << _(" packages: ");
 			break;
     case DB_OPEN_RUN:
 			if ( m_packageNamesList.size()>100) {
@@ -221,14 +221,14 @@ void Pkgdbh::progressInfo() const
       printf("100 %%\n");
       break;
 		case PKG_PREINSTALL_START:
-			cout << "pre-install: start" << endl;
+			cout << _("pre-install: start") << endl;
 			break;
 		case PKG_PREINSTALL_END:
-			cout << "pre-install: finish" << endl;
+			cout << _("pre-install: finish") << endl;
 			break;
     case PKG_INSTALL_START:
       j = 0;
-      cout << "   ADD: ("
+      cout << _("   ADD: (")
 				<< m_packageArchiveCollection
 				<< ") "
 				<< m_packageName
@@ -237,7 +237,7 @@ void Pkgdbh::progressInfo() const
 				<< "-"
 				<< m_packageArchiveRelease
 				<< ", "
-				<< m_filesNumber << " files: ";
+				<< m_filesNumber << _(" files: ");
       break;
     case PKG_INSTALL_RUN:
       if ( m_filesNumber > 100)
@@ -251,10 +251,10 @@ void Pkgdbh::progressInfo() const
       printf("100 %%\n");
       break;
 		case PKG_POSTINSTALL_START:
-			cout << "post-install: start" << endl;
+			cout << _("post-install: start") << endl;
 			break;
 		case PKG_POSTINSTALL_END:
-			cout << "post-install: finish" << endl;
+			cout << _("post-install: finish") << endl;
 			break;
 		case DB_ADD_PKG_START:
 			break;
@@ -262,7 +262,7 @@ void Pkgdbh::progressInfo() const
 			break;
 		case RM_PKG_FILES_START:
 			j=0;
-			cout << "REMOVE: ("
+			cout << _("REMOVE: (")
 				<< m_packageCollection
 				<< ") "
 				<< m_packageName
@@ -272,7 +272,7 @@ void Pkgdbh::progressInfo() const
 				<< m_packageRelease
 				<< ", "
 				<< m_filesList.size()
-				<< " files: ";
+				<< _(" files: ");
 			break;
 		case RM_PKG_FILES_RUN:
 			if ( m_filesList.size()>100)
@@ -823,7 +823,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 					cerr << m_utilName << ": could not remove " << filename << ": " << msg << endl;
 				}
 #ifndef NDEBUG
-				cout  << "File: " << filename << " is removed"<< endl;
+				cerr  << "File: " << filename << " is removed"<< endl;
 #endif
 			}
 	}
@@ -832,7 +832,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 		cerr << m_utilName << ": could not remove " << packagenamedir << ": " << msg << endl;
 	}
 #ifndef NDEBUG
-	cout  << "Directory: " << packagenamedir << " is removed"<< endl;
+	cerr  << "Directory: " << packagenamedir << " is removed"<< endl;
 #endif
 }
 
@@ -1155,7 +1155,7 @@ void Pkgdbh::extractAndRunPREfromPackage(const string& filename)
 			if (archive_read_extract(archive, entry, flags) != ARCHIVE_OK)
 			{
 				const char* msg = archive_error_string(archive);
-				cerr << m_utilName << ": could not install " + archive_filename << " : " << msg << endl;
+				cerr << m_utilName << _(": could not install ") + archive_filename << " : " << msg << endl;
 				exit(EXIT_FAILURE);
 			}
 			break;

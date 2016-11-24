@@ -9,6 +9,126 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "could not download "
+msgstr "ne peut pas télécharger "
+
+msgid "could not created "
+msgstr "ne peut pas créer "
+
+msgid "could not open "
+msgstr "ne peut pas ouvrir "
+
+msgid "could not find "
+msgstr "ne peut pas trouver "
+
+msgid "could not read "
+msgstr "ne peut pas lire "
+
+msgid "could not parse "
+msgstr "impossible d'analyser "
+
+msgid "could not read directory "
+msgstr "ne peut pas lire le dossier "
+
+msgid "could not write file "
+msgstr "ne peut pas écrire le fichier "
+
+msgid "could not synchronize "
+msgstr "impossible de synchroniser "
+
+msgid "could not rename "
+msgstr "impossible de renomer "
+
+msgid "could not copy "
+msgstr "impossible de copier "
+
+msgid "could not determine name / build number "
+msgstr "impossible de déterminer le nom / la valeur de construction "
+
+msgid ": wrong architecture"
+msgstr ": mauvaise architecture"
+
+msgid "empty package "
+msgstr "paquet vide "
+
+msgid "fork() failed "
+msgstr "fork() failed "
+
+msgid "waitpid() failed "
+msgstr "waitpid() failed "
+
+msgid "Database  "
+msgstr "Base de données  "
+
+msgid " locked by another user"
+msgstr " vérouillée par un/une autre utilisateur/utilisatrice"
+
+msgid "could not lock directory "
+msgstr "ne peut pas vérouiller le dossier "
+
+msgid "could not remove file "
+msgstr "ne peut pas supprimer le fichier "
+
+msgid "could not rename directory "
+msgstr "ne peut pas renommer le dossier "
+
+msgid " require one argument"
+msgstr " nécessite un argument"
+
+msgid " invalid option"
+msgstr " option non valide"
+
+msgid " option missing"
+msgstr " option manquante"
+
+msgid ": to many options"
+msgstr ": trop d'options"
+
+msgid " only root can install / upgrade / remove packages"
+msgstr " seul l'utilisateur root peut installer / mettre à jour / supprimer des paquets"
+
+msgid " already installed (use -u to upgrade)"
+msgstr " déjà installé (utilisez -u pour le mettre à jour)"
+
+msgid " not yet installed"
+msgstr " pas encore installé"
+
+msgid "package "
+msgstr "le paquet "
+
+msgid " not previously installed (skip -u to install)"
+msgstr " pas installé précédement (supprimez -u pour installer)"
+
+msgid "listed file(s) already installed (use -f to ignore and overwrite)"
+msgstr "fichier(s) listé(s) déjà installé(s) (utilisez -f pour les ignorer et les remplacer)"
+
+msgid ": line too long, aborting"
+msgstr ": ligne trop longue, abandon"
+
+msgid ": wrong number of arguments, aborting"
+msgstr ": nombre d'arguments incorrect, abandon"
+
+msgid "': config unknown action, should be YES or NO, aborting"
+msgstr "': action de config inconnue, doit être YES ou NO, abandon"
+
+msgid "' unknown event, aborting"
+msgstr "' évenement inconnu, abandon"
+
+msgid "error compiling regular expression '"
+msgstr "erreur de compilation d'une expression régulière '"
+
+msgid "', aborting"
+msgstr "', abandon"
+
+msgid " is neither an installed package nor a package file"
+msgstr " n'est pas un paquet installé ni une archive cards"
+
+msgid "The package "
+msgstr "Le paquet  "
+
+msgid " does not exist"
+msgstr " n'existe pas"
+
 msgid "Retrieve info about the "
 msgstr "Obtenir les infos sur les "
 
@@ -20,6 +140,30 @@ msgstr "Paquet"
 
 msgid "File"
 msgstr "Fichier"
+
+msgid "pre-install: start"
+msgstr "pre-installation: démarrée"
+
+msgid "pre-install: finish"
+msgstr "pre-installation: finie"
+
+msgid "post-install: start"
+msgstr "post-installation: démarrée"
+
+msgid "post-install: finish"
+msgstr "post-installation: finie"
+
+msgid "   ADD: ("
+msgstr "  AJOUTE: ("
+
+msgid "REMOVE: ("
+msgstr "SUPPRIME: ("
+
+msgid " files: "
+msgstr " fichiers: "
+
+msgid ": could not install "
+msgstr ": ne peut pas installer "
 
 msgid ": no owner(s) found"
 msgstr ": aucun paquet trouvé"
