@@ -165,7 +165,7 @@ void Pkgdbh::treatErrors(const string& s) const
 			throw runtime_error(_("package ") + s + _(" not previously installed (skip -u to install)"));
 			break;
 		case LISTED_FILES_ALLREADY_INSTALLED:
-			throw runtime_error(s + _("listed file(s) already installed (use -f to ignore and overwrite)"));
+			throw runtime_error(s + _(": listed file(s) already installed (use -f to ignore and overwrite)"));
 			break;
 		case PKGADD_CONFIG_LINE_TOO_LONG:
 			throw RunTimeErrorWithErrno(s + _(": line too long, aborting"));
@@ -933,10 +933,15 @@ void Pkgdbh::removePackageFilesRefsFromDB(set<string> files, const set<string>& 
 		m_packageCollection = m_listOfInstPackages[m_packageName].collection;
 	}
 	// Remove all references
-	for (packages_t::iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i)
-		for (set<string>::const_iterator j = files.begin(); j != files.end(); ++j)
-			i->second.files.erase(*j);
-
+	for (packages_t::iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
+		for ( auto j : files ) {
+			size_t s = i->second.files.size();
+			i->second.files.erase(j);
+			// If number of references have change, we refresh the disk copy
+			if ( s != i->second.files.size())
+				addPackageFilesRefsToDB(i->first,i->second);
+		}
+	}
 #ifndef NDEBUG
 	cerr << "Removing files:" << endl;
 	copy(files.begin(), files.end(), ostream_iterator<string>(cerr, "\n"));

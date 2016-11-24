@@ -148,10 +148,7 @@ void Pkgadd::run()
 			copy(conflicting_files.begin(), conflicting_files.end(),
 				ostream_iterator<string>(cerr, "\n"));
 			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
-			treatErrors("'"
-				+ package.first
-				+ "'"
-				+": listed file(s) already installed (use -f to ignore and overwrite)");
+			treatErrors(package.first);
 		}
 	}
 
@@ -189,7 +186,7 @@ void Pkgadd::postRun()
 		progressInfo();
 		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
 		if (postinstall.executeShell()) {
-			cerr << "WARNING Run post-install FAILED. continue" << endl;
+			cerr << _("WARNING Run post-install FAILED, continue") << endl;
 		}
 		m_actualAction = PKG_POSTINSTALL_END;
 		progressInfo();

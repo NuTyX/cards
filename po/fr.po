@@ -52,7 +52,7 @@ msgid "empty package "
 msgstr "paquet vide "
 
 msgid "fork() failed "
-msgstr "fork() failed "
+msgstr "erreur lors de la création du nouveau processus "
 
 msgid "waitpid() failed "
 msgstr "waitpid() failed "
@@ -99,8 +99,8 @@ msgstr "le paquet "
 msgid " not previously installed (skip -u to install)"
 msgstr " pas installé précédement (supprimez -u pour installer)"
 
-msgid "listed file(s) already installed (use -f to ignore and overwrite)"
-msgstr "fichier(s) listé(s) déjà installé(s) (utilisez -f pour les ignorer et les remplacer)"
+msgid ": listed file(s) already installed (use -f to ignore and overwrite)"
+msgstr ": fichier(s) listé(s) déjà installé(s) (utilisez -f pour les ignorer et les remplacer)"
 
 msgid ": line too long, aborting"
 msgstr ": ligne trop longue, abandon"
@@ -261,3 +261,6 @@ msgstr "liste les détails du <paquet>"
 
 msgid "list files in <package> or <file>"
 msgstr "liste les fichiers du <paquet> ou <fichier>"
+
+msgid "WARNING Run post-install FAILED, continue"
+msgstr "AVERTISSEMENT l'exécution de la post-intallation a échoué, le processus continue"
