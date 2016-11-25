@@ -24,11 +24,11 @@
 #include "pkgrepo.h"
 #include "mysql.h"
 
-#define INSERTPACKAGE listOfPackages.insert("<td>" \
+#define INSERTPACKAGE(name) listOfPackages.insert("<td>" \
 + i.arch + "</td>" \
 + "<td>" + i.branch + "</td>"  \
 + "<td>" + i.collection + "</td>" \
-+ "<td>" + j.basePackageName + "</td>" \
++ "<td>" + name + "</td>" \
 + "<td>" + j.version + "-" + itos(j.release) + "</td>" \
 + "<td>" + j.description + "</td>" \
 + "<td>" + getDateFromEpoch(j.buildDate) + "</td>")

@@ -31,7 +31,7 @@ string::size_type parseArguments(arguments_t &arguments)
 	set<string> listOfArguments;
 	char * pArgument = getenv ("QUERY_STRING");
 	string::size_type pos;
-	listOfArguments = parseDelimitedSetList(pArgument,'?');
+	listOfArguments = parseDelimitedSetList(pArgument,'&');
 	arguments.docName="index";
 	for ( auto i : listOfArguments) {
 		pos = i.find("arch=");
@@ -55,6 +55,10 @@ string::size_type parseArguments(arguments_t &arguments)
 			arguments.packageSearch = i.substr(pos+10);
 		}
 	}
+	if ( arguments.packageArch.size() == 0)
+		arguments.packageArch="x86_64";
+	if ( arguments.packageBranch.size() == 0)
+		arguments.packageBranch="stable";
 	return pos;
 }
 void sideBar( const char *forum)
@@ -102,23 +106,39 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 	for (auto i : List) {
 		for (auto j : i.basePackageList) {
 			if ( search.size() == 0 ) {
-				INSERTPACKAGE;
+				INSERTPACKAGE(j.basePackageName);
 			} else {
+				if ( ( arguments.packageBranch != i.branch ) &&
+					( arguments.packageBranch != "all" ) )
+					continue;
+				if ( ( arguments.packageArch != i.arch ) &&
+					( arguments.packageArch != "all" )  )
+					continue;
 				string::size_type pos;
 				pos = i.collection.find(convertToLowerCase(search));
 				if (pos != std::string::npos) {
-					INSERTPACKAGE;
+					INSERTPACKAGE(j.basePackageName);
 					continue;
 				}
 				pos = j.basePackageName.find(convertToLowerCase(search));
 				if (pos != std::string::npos) {
-					INSERTPACKAGE;
+					INSERTPACKAGE(j.basePackageName);
 					continue;
 				}
 				pos = j.description.find(convertToLowerCase(search));
 				if (pos != std::string::npos) {
-					INSERTPACKAGE;
+					INSERTPACKAGE(j.basePackageName);
 					continue;
+				}
+				set<string> groupList;
+				groupList = parseDelimitedSetList(j.group,' ');
+				for ( auto k : groupList ) {
+					if ( convertToLowerCase(search) == k ) {
+						string name = j.basePackageName
+							+ "."
+							+ k;
+						INSERTPACKAGE(name);
+					}
 				}
 			}
 		}
