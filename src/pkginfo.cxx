@@ -379,19 +379,23 @@ void Pkginfo::printHelp() const
 	cout << USAGE << m_utilName << " [options]" << endl
 		<< OPTIONS << endl
 		<< "  -i, --installed             "
-		<< _("list installed packages") << endl
+		<< _("list of installed packages") << endl
 		<< "  -d, --details               "
 		<< _("list details about the <package>") << endl
-		<< "  -L, --libraries             list all the runtime libraries for the <package>" << endl
+		<< "  -L, --libraries             "
+		<< _("list all the runtime libraries for the <package>") << endl
 		<< "  -l, --list <package|file>   "
 		<< _("list files in <package> or <file>") << endl
 		<< "  -o, --owner <pattern>       "
 		<< _("list owner(s) of file(s) matching <pattern>") << endl
 		<< "  -f, --footprint <file>      "
 		<< _("print footprint for <file>") << endl
-		<< "  -a, --archive <file>        print Name, Version, Release, BuildDate and Deps of the <file>" << endl
-		<< "  -b, --buildtime <package>   return the build time of the package" << endl
-		<< "  -R, --runtimedep <package>  return on a single line all the runtime dependencies" << endl
+		<< "  -a, --archive <file>        "
+		<< _("print Name, Version, Release, BuildDate and Deps of the <file>") << endl
+		<< "  -b, --buildtime <package>   "
+		<< _("return the build time of the package") << endl
+		<< "  -R, --runtimedep <package>  "
+		<< _("return on a single line all the runtime dependencies") << endl
 		<< "  --runtimedepfiles <path>    "
 		<< _("return on a single line all the runtime dependencies for the files found in the <path>") << endl
 		<< "  -r, --root <path>           "        

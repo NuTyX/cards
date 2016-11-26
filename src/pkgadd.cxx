@@ -67,7 +67,8 @@ void Pkgadd::parseArguments(int argc, char** argv)
 		} else if (option == "-f" || option == "--force") {
 			m_force = true;
 		} else if (option[0] == '-' || !m_packageArchiveName.empty()) {
-			throw runtime_error("invalid option " + option);
+			m_actualError = INVALID_OPTION;
+			treatErrors(option);
 		} else {
 			m_packageArchiveName = option;
 		}
@@ -197,17 +198,23 @@ void Pkgadd::printHelp() const
 {
 	cout << USAGE << m_utilName << " [options] <file>" << endl
 	<< OPTIONS << endl
-	<< "  -i, --ignore        do not execute pre/post install scripts"
+	<< "  -i, --ignore        "
+	<< _("do not execute pre/post install scripts")
 	<< endl
-	<< "  -u, --upgrade       upgrade package with the same name"
+	<< "  -u, --upgrade       "
+	<< _("upgrade package with the same name")
 	<< endl
-	<< "  -f, --force         force install, overwrite conflicting files"
+	<< "  -f, --force         "
+	<< _("force install, overwrite conflicting files")
 	<< endl
-	<< "  -r, --root <path>   specify alternative installation root"
+	<< "  -r, --root <path>   "
+	<< _("specify alternative installation root")
 	<< endl
-	<< "  -v, --version       print version and exit"
+	<< "  -v, --version       "
+	<< _("print version and exit")
 	<< endl
-	<< "  -h, --help          print help and exit"
+	<< "  -h, --help          "
+	<< _("print help and exit")
 	<< endl;
 }
 

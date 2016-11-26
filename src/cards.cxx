@@ -53,51 +53,88 @@ int main(int argc, char** argv)
 			configFile=cardsArgPars.getOptionValue(CardsArgumentParser::OPT_CONFIG_FILE);
 
 		if (cardsArgPars.command() == CardsArgumentParser::CMD_HELP) {
-			cout << "Usage: " << BLUE << cardsArgPars.appName()  << " command " << NORMAL << "[options]"<< endl;
+			cout << _("Usage: ") << BLUE << cardsArgPars.appName()  << _(" command ") << NORMAL << "[options]"<< endl;
 
-			cout << "where possible " << BLUE << "command" << NORMAL<< " are:" << endl;
+			cout << "where possible" << BLUE << _(" command ") << NORMAL<< "are:" << endl;
 
 			cout << GREEN << "\nINFORMATION" << NORMAL << endl;
-			cout << BLUE << "  help" << NORMAL << "                       show this help" << endl;
-			cout << BLUE << "  list" << NORMAL << " [-b][-p]              show a list of installed packages" << endl
-				<< "                             available binaries" << endl
-				<< "                             available ports" << endl;
+			cout << BLUE << "  help                       "
+				<< NORMAL << _("show this help") << endl;
+			cout << BLUE << "  list [-b][-p]              "
+				<< NORMAL << _("list of installed packages") << endl
+				<< "                             "
+				<< _("Available binaries in depot.") << endl
+				<< "                             "
+				<< _("Available ports.") << endl;
 
-			cout << BLUE << "  info" << NORMAL << " [-b][-p] <package>    print info about install package" << endl
-				<< "                             available binaries" << endl
-				<< "                             available ports" << endl;
-			cout << BLUE << "  config" << NORMAL << "                     show the configuration of your " <<  cardsArgPars.appName() << endl;
-			cout << BLUE << "  level [-I]" << NORMAL << "                 show all the ports founds. The list is showned by order \
-of compilation" << endl
-				<< "                             If -I it will ignore the WARNING about NOT FOUND <dependencies> from <port>" << endl;
+			cout << BLUE << _("  info") << NORMAL << " [-b][-p] <package>    "
+				<< _("print info about install package") << endl
+				<< "                             "
+				<< _("Available binaries in depot.") << endl
+				<< "                             "
+				<< _("Available ports.") << endl;
+			cout << BLUE << "  config" << NORMAL << "                     "
+				<< _("show the configuration of your ")
+				<<  cardsArgPars.appName() << endl;
+			cout << BLUE << "  level [-I]" << NORMAL << "                 "
+				<< _("show all the ports founds. The list is showned by order of compilation")
+				<< endl
+				<< "                             "
+				<< _("If -I it will ignore the WARNING about NOT FOUND <dependencies> from <port>")
+				<< endl;
 			cout << GREEN << "\nPORTS SPECIFIC SCENARIO" << NORMAL << endl;
-			cout << BLUE << "  depends" << NORMAL << " [-i] <port>        show dependencies for the port in compilation order." << endl
-				<< "                             If -i it will shows the installed dependencies as well." << endl;
-			cout << BLUE << "  deptree" << NORMAL << "   <port>           show dependencies in a tree." << endl;
-			cout << BLUE << "  depcreate" << NORMAL << " <port>           compile and install the port and its dependencies." << endl;
-			cout << BLUE << "  create" << NORMAL << "    <port>           install all the dependencies from binaries and then compile the port." << endl;
+			cout << BLUE << "  depends" << NORMAL << " [-i] <port>        "
+				<< _("show dependencies for the port in compilation order.")
+				<< endl
+				<< "                             "
+				<< _("If -i it will shows the installed dependencies as well.")
+				<< endl;
+			cout << BLUE << "  deptree" << NORMAL << "   <port>           "
+				<< _("show dependencies in a tree.") << endl;
+			cout << BLUE << "  depcreate" << NORMAL << " <port>           "
+				<< _("compile and install the port and its dependencies.")
+				<< endl;
+			cout << BLUE << "  create" << NORMAL << "    <port>           "
+				<< _("install all the dependencies from binaries and then compile the port.")
+				<< endl;
 
 			cout << GREEN << "\nDIFFERENCES / UPGRADE / CLEANUP" << NORMAL << endl;
-			cout << BLUE << "  diff" << NORMAL << " [-p]                  list outdated packages." << endl
+			cout << BLUE << "  diff" << NORMAL << " [-p]                  "
+				<< _("list outdated packages.") << endl
 				<< "                             list outdated ports" << endl;
-			cout << BLUE << "  upgrade" << NORMAL << "                    upgrade outdated packages." << endl;
-			cout << BLUE << "  purge" << NORMAL << "                      cleanup downloaded binaries in cache." << endl;
+			cout << BLUE << "  upgrade" << NORMAL << "                    "
+				<< _("upgrade outdated packages.") << endl;
+			cout << BLUE << "  purge" << NORMAL << "                      "
+				<< _("cleanup downloaded binaries in cache.") << endl;
 			cout << GREEN << "\nSEARCHING" << NORMAL << endl;
-			cout << BLUE << "  search" << NORMAL << " <expr>              show port names or description containing 'expr'" << endl;
-			cout << BLUE << "  query" << NORMAL << "  <file>              list owner of file(s) matching the query." << endl;
-			cout << BLUE << "  files" << NORMAL << "  <package>           list the file(s) owned by the <package>" << endl;
+			cout << BLUE << "  search" << NORMAL << " <expr>              "
+				<< _("show port names or description containing 'expr'")
+				<< endl;
+			cout << BLUE << "  query" << NORMAL << "  <file>              "
+				<< _("list owner of file(s) matching the query.") << endl;
+			cout << BLUE << "  files" << NORMAL << "  <package>           "
+				<< _("list the file(s) owned by the <package>") << endl;
 			cout << GREEN << "\nSYNCHRONISATION" << NORMAL << endl;
-			cout << BLUE << "  sync" << NORMAL << "                       synchronize the local and remote meta datas." << endl;
+			cout << BLUE << "  sync" << NORMAL << "                       "
+				<< _("synchronize the local and remote meta datas.") << endl;
 			cout << GREEN << "\nINSTALL, UPDATE and REMOVAL" << NORMAL << endl;
-			cout << BLUE << "  install" << NORMAL << " [-u][-f] <package> install the binary found on the mirror." << endl
-				<< "                             If -u it will upgrade the installed package." << endl
-				<< "                             If -f it will force the installation in case of files conflicts." << endl;
-			cout << BLUE << "  remove" << NORMAL << " [-a] <package>      remove the installed package." << endl
-				<< "                             If -a it will remove the sub-package as well." << endl;
+			cout << BLUE << "  install" << NORMAL << " [-u][-f] <package> "
+				<< _("install the binary found on the mirror.") << endl
+				<< "                             "
+				<< _("If -u it will upgrade the installed package.") << endl
+				<< "                             "
+				<< _("If -f it will force the installation in case of files conflicts.") << endl;
+			cout << BLUE << "  remove" << NORMAL << " [-a] <package>      "
+				<< _("remove the installed package.") << endl
+				<< "                             "
+				<< _("If -a it will remove the sub-package as well.") << endl;
 			cout << GREEN << "\nBASE SYSTEM" << NORMAL << endl;
-			cout << BLUE << "  base" << NORMAL << " -r                    return to a base system." << endl
-				<< "                             You need to have a valid 'base' directory" << endl
-				<< "                             define in /etc/cards.conf otherwise it will fails." << endl;
+			cout << BLUE << "  base" << NORMAL << " -r                    "
+				<< _("return to a base system.") << endl
+				<< "                             "
+				<< _("You need to have a valid 'base' directory") << endl
+				<< "                             "
+				<< _("configured in the /etc/cards.conf file otherwise the command will abort.") << endl;
 			return EXIT_SUCCESS;
 		}
 		if (cardsArgPars.command() == CardsArgumentParser::CMD_CONFIG) {
@@ -108,16 +145,20 @@ of compilation" << endl
 
 			for ( auto i : config.dirUrl ) {
 				index++;
-				cout << index << " Directory: " << i.Dir ;
+				cout << index << _(" Directory: ") << i.Dir ;
 				if ( i.Url != "" )
-					cout << " from " << i.Url ;
+					cout << _(" from ")
+					<< i.Url ;
 				cout << endl;
 			}
-			for ( auto i : config.baseDir ) cout << "Base System list directory: " << i << endl;
-			cout <<   "Binaries : " << config.arch << endl;
+			for ( auto i : config.baseDir )
+				cout << _("Base System list directory: ") << i << endl;
+			cout <<   _("Binaries : ")
+				<< config.arch << endl;
 			for ( auto i : config.locale ) cout << "Locale   : " << i << endl;
 			if ( config.logdir != "") {
-				cout << "log directory: " << config.logdir << endl;
+				cout << _("log directory: ")
+					<< config.logdir << endl;
 			}
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPCREATE) {
@@ -125,7 +166,9 @@ of compilation" << endl
 			CardsDepends CD(cardsArgPars);
 			vector<string> listOfPackages = CD.getNeededDependencies();
 			if ( listOfPackages.empty() ) {
-				cout << "The package " << cardsArgPars.otherArguments()[0] << " is already installed" << endl;
+				cout << _("The package ")
+				<< cardsArgPars.otherArguments()[0]
+				<< _(" is already installed") << endl;
 				return EXIT_SUCCESS;
 			}
 			// create (compile and install) the List of deps (including the final package)

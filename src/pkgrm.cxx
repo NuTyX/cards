@@ -69,8 +69,11 @@ void Pkgrm::printHelp() const
 {
 	cout << USAGE << m_utilName << " [options] <package>" << endl
 	     << OPTIONS << endl
-	     << "  -r, --root <path>   specify alternative installation root" << endl
-	     << "  -v, --version       print version and exit" << endl
-	     << "  -h, --help          print help and exit" << endl;
+	     << "  -r, --root <path>   "
+	     << _("specify alternative installation root") << endl
+	     << "  -v, --version       "
+	     << _("print version and exit") << endl
+	     << "  -h, --help          "
+	     << _("print help and exit") << endl;
 }
 // vim:set ts=2 :

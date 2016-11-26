@@ -9,6 +9,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "invalid option "
+msgstr "option invalide "
+
 msgid "could not download "
 msgstr "ne peut pas télécharger "
 
@@ -126,11 +129,17 @@ msgstr " n'est pas un paquet installé ni une archive cards"
 msgid "The package "
 msgstr "Le paquet  "
 
+msgid " is already installed"
+msgstr " est déjà installé"
+
 msgid " does not exist"
 msgstr " n'existe pas"
 
 msgid "Retrieve info about the "
 msgstr "Obtenir les infos sur les "
+
+msgid "Usage: "
+msgstr "Utilisation: "
 
 msgid " packages: "
 msgstr " paquets: "
@@ -140,6 +149,21 @@ msgstr "Paquet"
 
 msgid "File"
 msgstr "Fichier"
+
+msgid " Directory: "
+msgstr " Dossier:  "
+
+msgid " from "
+msgstr " depuis "
+
+msgid "Binaries : "
+msgstr "Binaires : "
+
+msgid "Base System list directory: "
+msgstr "Liste des dossiers pour le système de base: "
+
+msgid "log directory: "
+msgstr "Dossier des logs: "
 
 msgid "pre-install: start"
 msgstr "pre-installation: démarrée"
@@ -185,7 +209,6 @@ msgstr " n'est pas une archive"
 
 msgid  " is not a CARDS archive"
 msgstr " n'est pas une archive CARDS"
-
 
 msgid "archive "
 msgstr "archive "
@@ -253,7 +276,7 @@ msgstr "Arch                : "
 msgid "Dependencies   : "
 msgstr "Dépendances         : "
 
-msgid "list installed packages"
+msgid "list of installed packages"
 msgstr "liste les paquets installés"
 
 msgid "list details about the <package>"
@@ -262,5 +285,135 @@ msgstr "liste les détails du <paquet>"
 msgid "list files in <package> or <file>"
 msgstr "liste les fichiers du <paquet> ou <fichier>"
 
+msgid "do not execute pre/post install scripts"
+msgstr "ne pas exécuter les scripts de pré/post installation"
+
+msgid "upgrade package with the same name"
+msgstr "met à jour le paquet avec le même nom"
+
+msgid "force install, overwrite conflicting files"
+msgstr "force l'installation, remplace les fichiers déjà installés par un autre paquet"
+
+msgid "list all the runtime libraries for the <package>"
+msgstr "liste toutes les librairies utilisées par le paquet <package>"
+
+msgid "list owner(s) of file(s) matching <pattern>"
+msgstr "liste les fichiers et le paquet d'appartenance correspondant à la chaîne <pattern>"
+
 msgid "WARNING Run post-install FAILED, continue"
 msgstr "AVERTISSEMENT l'exécution de la post-intallation a échoué, le processus continue"
+
+msgid "print footprint for <file>"
+msgstr "affiche la liste des fichiers contenu dand le fichier <file>"
+
+msgid "return the build time of the package"
+msgstr "renvoit la date de construction du paquet"
+
+msgid "print Name, Version, Release, BuildDate and Deps of the <file>"
+msgstr "affiche le nom, la version, la release, la date de construction et les dépendances de fonctionnement du fichier <file>"
+
+msgid "return on a single line all the runtime dependencies"
+msgstr "renvoit toutes les dépendances utilisées pour le fonctionnement du paquet sur une seule ligne"
+
+msgid "return on a single line all the runtime dependencies for the files found in the <path>"
+msgstr "renvoit toutes les dépendances utilisées pour le fonctionnement des fichiers trouvés dans le chemin <path>"
+
+msgid "specify alternative installation root"
+msgstr "spécifie un chemin alternatif à la racine de l'installation"
+
+msgid "print version and exit"
+msgstr "affiche la version et quitte l'application"
+
+msgid "print help and exit"
+msgstr "affiche l'aide et quitte l'application"
+
+msgid " command "
+msgstr " commandes "
+
+msgid "where possible"
+msgstr "où les possibles"
+
+msgid "are:"
+msgstr "sont: "
+
+msgid "show this help"
+msgstr "affiche cet aide"
+
+msgid "Available binaries in depot."
+msgstr "Binaires disponibles dans les dépots."
+
+msgid "Available ports."
+msgstr "Ports disponibles."
+
+msgid "print info about install package"
+msgstr "affiche les détails d'information du paquet"
+
+msgid "show the configuration of your "
+msgstr "affiche la configuration de votre "
+
+msgid "show all the ports founds. The list is showned by order of compilation"
+msgstr "affiche tous les ports trouvés. La liste est affichée par ordre de compilation"
+
+msgid "If -I it will ignore the WARNING about NOT FOUND <dependencies> from <port>"
+msgstr "Si -I il ignore les WARNING à propos des dépendances non trouvées du port (NOT FOUND <dependencies> from <port>)"
+
+msgid "show dependencies for the port in compilation order."
+msgstr "affiche les dépendances du port par ordre de compilation"
+
+msgid "If -i it will shows the installed dependencies as well."
+msgstr "Si -i affiche également les dépendances déjà installées."
+
+msgid "show dependencies in a tree."
+msgstr "affiche les dépendances dans un arbre descendant."
+
+msgid "compile and install the port and its dependencies."
+msgstr "compile et installe le port et ses dependances."
+
+msgid "install all the dependencies from binaries and then compile the port."
+msgstr "installe toutes les dépendances depuis les binaires et compile le port à la fin."
+
+msgid "list outdated packages."
+msgstr "liste les paquets obsolètes."
+
+msgid "upgrade outdated packages."
+msgstr "met à jour les paquets obsolètes."
+
+msgid "cleanup downloaded binaries in cache."
+msgstr "supprime les binaires téléchargés dans le cache."
+
+msgid "show port names or description containing 'expr'"
+msgstr "affiche le nom ou la description du port contenant l'expression 'expr'"
+
+msgid "list owner of file(s) matching the query."
+msgstr "liste les fichiers et le paquet d'appartenance correspondant à la requête."
+
+msgid "list the file(s) owned by the <package>"
+msgstr "liste le(s) fichier(s) appartenant(s) au paquet <package>"
+
+msgid "synchronize the local and remote meta datas."
+msgstr "synchronise les metadonnées locales et distantes "
+
+msgid "install the binary found on the mirror."
+msgstr "installe le binaire trouvé sur le serveur."
+
+msgid "If -u it will upgrade the installed package."
+msgstr "Si -u, met à jour le paquet installé."
+
+msgid "If -f it will force the installation in case of files conflicts."
+msgstr "Si -f, force l'installation du paquet en cas de fichier(s) en double."
+
+msgid "remove the installed package."
+msgstr "supprime le paquet installé."
+
+msgid "If -a it will remove the sub-package as well."
+msgstr "Si -a, supprime également les sous-paquets."
+
+msgid "return to a base system."
+msgstr "retourne sur un système de base"
+
+msgid "You need to have a valid 'base' directory"
+msgstr "Vous devez avoir un dosssier 'base' valide"
+
+msgid "configured in the /etc/cards.conf file otherwise the command will abort."
+msgstr "configuré dans le fichier /etc/cards.conf sinon la commande sera avortée."
+
