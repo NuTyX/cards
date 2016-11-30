@@ -43,7 +43,11 @@ struct arguments_t {
 	std::string docName; 	   /* The page to show */
 	std::string stringSearch;  /* The string to search */
 	std::string packageSearch; /* The package to search */
+	std::string type; /* Type of search collection, package, etc */
 };
 typedef std::map<std::string, contentInfo_t> content_t;
+
+void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments);
+
 #endif /* WEBCARDS_H */
 // vim:set ts=2 :

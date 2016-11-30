@@ -54,12 +54,81 @@ string::size_type parseArguments(arguments_t &arguments)
 		if ( pos != string::npos ){
 			arguments.packageSearch = i.substr(pos+10);
 		}
+		pos = i.find("type=");
+		if ( pos != string::npos ){
+			arguments.type = i.substr(pos+5);
+		}
 	}
 	if ( arguments.packageArch.size() == 0)
 		arguments.packageArch="x86_64";
 	if ( arguments.packageBranch.size() == 0)
 		arguments.packageBranch="stable";
+	if ( arguments.type.size() == 0)
+		arguments.type="pkg";
 	return pos;
+}
+void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
+{
+	contentInfo.text.push_back( "  <form method=\"get\" action=\".\">");
+	contentInfo.text.push_back( "  <fieldset>");
+	contentInfo.text.push_back( "   <table>");
+	contentInfo.text.push_back( "    <tr class=\"odd\">");
+	contentInfo.text.push_back( "     <td width=\"20%\">");
+	contentInfo.text.push_back( "      <h4>Type</h4>");
+	contentInfo.text.push_back( "     <td>");
+	if ( arguments.type == "pkg" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"type\" value=\"pkg\" checked=\"checked\"/> PACKAGE" );
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"type\" value=\"pkg\" /> PACKAGE" );
+	if ( arguments.type == "col" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"type\" value=\"col\" checked=\"checked\"/> COLLECTION" );
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"type\" value=\"col\" /> COLLECTION" );
+	contentInfo.text.push_back( "    <tr class=\"even\">");
+	contentInfo.text.push_back( "     <td>");
+	contentInfo.text.push_back( "      <h4>Branch</h4>");
+	contentInfo.text.push_back( "     <td>");
+	if ( arguments.packageBranch == "all" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" checked=\"checked\"/> All" );
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" /> All");
+	contentInfo.text.push_back( "     <br>");
+	if ( arguments.packageBranch == "stable" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"stable\" checked=\"checked\"/> stable");
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"stable\" /> stable");
+	contentInfo.text.push_back( "     <br>");
+	if ( arguments.packageBranch == "development" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"development\" checked=\"checked\" /> development");
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"development\" /> development");
+	contentInfo.text.push_back( "    <tr class=\"odd\">");
+	contentInfo.text.push_back( "     <td>");
+	contentInfo.text.push_back( "      <h4>Arch</h4>");
+	contentInfo.text.push_back( "     <td>");
+	if ( arguments.packageArch == "all" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" checked=\"checked\" /> All");
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" /> All");
+	contentInfo.text.push_back( "     <br>");
+	if ( arguments.packageArch == "i686" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"i686\" checked=\"checked\" /> i686");
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"i686\" /> i686");
+	contentInfo.text.push_back( "     <br>");
+	if ( arguments.packageArch == "x86_64" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" checked=\"checked\" /> x86_64");
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" /> x86_64");
+	contentInfo.text.push_back( "    <tr class=\"even\" valign=\"middle\">");
+	contentInfo.text.push_back( "     <td>");
+	contentInfo.text.push_back( "      <h4>Search ...</h4>");
+	contentInfo.text.push_back( "     <td>");
+	contentInfo.text.push_back( "        <input id=\"search-field\" type=\"text\" name=\"searchpkg\" size=\"18\" maxlength=\"200\" value=\""
+		+ arguments.packageSearch + "\" />");
+	contentInfo.text.push_back( "   </table>");
+	contentInfo.text.push_back( "  </fieldset>");
+	contentInfo.text.push_back( "  </form>");
 }
 void sideBar( const char *forum)
 {
@@ -105,6 +174,19 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 	List = repoList.getRepoInfo();
 	for (auto i : List) {
 		for (auto j : i.basePackageList) {
+			if ( arguments.type == "col" ) {
+				if ( convertToLowerCase(search) == i.collection ) {
+					if ( ( arguments.packageBranch != i.branch ) &&
+						( arguments.packageBranch != "all" ) )
+						continue;
+					if ( ( arguments.packageArch != i.arch ) &&
+						( arguments.packageArch != "all" )  )
+						continue;
+					INSERTPACKAGE(j.basePackageName);
+					continue;
+				}
+				continue;
+			}
 			if ( search.size() == 0 ) {
 				INSERTPACKAGE(j.basePackageName);
 			} else {
@@ -154,7 +236,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 		contentInfo.text.push_back(" <h2>" + itos(listOfPackages.size()) \
 + " packages founds</h2>");
 	}
-	SEARCHPKG;
+	searchpkg(contentInfo,arguments);
 	contentInfo.text.push_back("<table>");
 	contentInfo.text.push_back("  <tr class=\"header\">");
 	contentInfo.text.push_back("  <td>ARCH</td><td>BRANCH</td>\
@@ -312,7 +394,7 @@ cellspacing=\"10\" width=\"100%\">" << endl
 	if ( arguments.docName == "packages" ) {
 		contentInfo_t contentInfo;
 		contentInfo.text.push_back("<h1>NuTyX Packages</h1>");
-		SEARCHPKG;
+		searchpkg(contentInfo,arguments);
 		for (auto i : contentInfo.text) cout << i << endl;
 		FOOTERTEXT;
 		endOfPage();

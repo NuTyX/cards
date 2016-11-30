@@ -173,9 +173,8 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
   << "    <footer >" << endl \
   << "     <p id=\"foot\"> Powered by cards " <<  VERSION \
   << "     &copy; 2007 - 2016 " \
-  << "<br> <img src=\"../graphics/logo_nutyx_25.png\" " \
-  << "alt=\"NuTyX logo\"><br>" << endl \
   << "<a href=\".\">NuTyX</a>.<br><br>" << endl \
+  << "Hosted by <a href=\"http://tuxfamily.org\"><img src=\"../graphics/logo_tuxfamily_50.png\"/></a><br><br>" << endl \
   << "     <a href=\"http://www.wtfpl.net/\">" << endl \
   << "     <img src=\"http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png\"" \
   << endl \
