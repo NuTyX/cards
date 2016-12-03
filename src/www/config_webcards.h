@@ -178,7 +178,10 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
   << "     <a href=\"http://www.wtfpl.net/\">" << endl \
   << "     <img src=\"http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png\"" \
   << endl \
-  << "     width=\"80\" height=\"15\" alt=\"WTFPL\" /></a><br><br>" << endl \
+  << "     width=\"80\" height=\"15\" alt=\"WTFPL\" /></a> " << endl \
+  << "     <a href=\"http://www.anybrowser.org/campaign/\">" << endl \
+  << "       <img src=\"../graphics/abblue.gif\" width=\"80\" height=\"15\"" << endl \
+  << "       alt=\"anybrowser\"></a>" << endl \
   << "    </footer>" << endl
 
 #define HEADERTEXT  	cout << "Content-type:text/html\r\n\r\n" \
@@ -201,37 +204,6 @@ size=\"18\" maxlength=\"200\" />" << endl \
 	<< "     </fieldset>" << endl \
   << "  </form>" << endl \
   << "   </div>" << endl
-
-#define SEARCHPKG	contentInfo.text.push_back( "  <form method=\"get\" action=\".\">"); \
-	contentInfo.text.push_back( "  <fieldset>"); \
-	contentInfo.text.push_back( "   <table>"); \
-	contentInfo.text.push_back( "    <tr class=\"odd\">"); \
-	contentInfo.text.push_back( "     <td width=\"20%\">"); \
-	contentInfo.text.push_back( "      <h4>Branch</h4>"); \
-	contentInfo.text.push_back( "     <td>"); \
-	contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" /> All"); \
-	contentInfo.text.push_back( "     <br>"); \
-	contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"stable\" checked=\"checked\"/> stable"); \
-	contentInfo.text.push_back( "     <br>"); \
-	contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"development\" /> development"); \
-	contentInfo.text.push_back( "    <tr class=\"even\">"); \
-	contentInfo.text.push_back( "     <td>"); \
-	contentInfo.text.push_back( "      <h4>Arch</h4>"); \
-	contentInfo.text.push_back( "     <td>"); \
-	contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" /> All"); \
-	contentInfo.text.push_back( "     <br>"); \
-	contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"i686\" /> i686"); \
-	contentInfo.text.push_back( "     <br>"); \
-	contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" checked=\"checked\"/> x86_64"); \
-	contentInfo.text.push_back( "    <tr class=\"odd\" valign=\"middle\">"); \
-	contentInfo.text.push_back( "     <td>"); \
-	contentInfo.text.push_back( "      <h4>Search ...</h4>"); \
-	contentInfo.text.push_back( "     <td>"); \
-  contentInfo.text.push_back( "        <input id=\"search-field\" type=\"text\" name=\"searchpkg\" \
-size=\"18\" maxlength=\"200\" />"); \
-	contentInfo.text.push_back( "   </table>"); \
-	contentInfo.text.push_back( "  </fieldset>"); \
-	contentInfo.text.push_back( "  </form>")
 
 #endif /* CONFIGWEBCARDS_H */
 // vim:set ts=2 :

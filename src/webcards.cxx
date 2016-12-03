@@ -182,13 +182,13 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 					if ( ( arguments.packageArch != i.arch ) &&
 						( arguments.packageArch != "all" )  )
 						continue;
-					INSERTPACKAGE(j.basePackageName);
+					INSERTPACKAGE(j.basePackageName, j.basePackageName);
 					continue;
 				}
 				continue;
 			}
 			if ( search.size() == 0 ) {
-				INSERTPACKAGE(j.basePackageName);
+				INSERTPACKAGE(j.basePackageName, j.basePackageName);
 			} else {
 				if ( ( arguments.packageBranch != i.branch ) &&
 					( arguments.packageBranch != "all" ) )
@@ -199,17 +199,17 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 				string::size_type pos;
 				pos = i.collection.find(convertToLowerCase(search));
 				if (pos != std::string::npos) {
-					INSERTPACKAGE(j.basePackageName);
+					INSERTPACKAGE(j.basePackageName, j.basePackageName);
 					continue;
 				}
 				pos = j.basePackageName.find(convertToLowerCase(search));
 				if (pos != std::string::npos) {
-					INSERTPACKAGE(j.basePackageName);
+					INSERTPACKAGE(j.basePackageName, j.basePackageName);
 					continue;
 				}
 				pos = j.description.find(convertToLowerCase(search));
 				if (pos != std::string::npos) {
-					INSERTPACKAGE(j.basePackageName);
+					INSERTPACKAGE(j.basePackageName, j.basePackageName);
 					continue;
 				}
 				set<string> groupList;
@@ -219,7 +219,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 						string name = j.basePackageName
 							+ "."
 							+ k;
-						INSERTPACKAGE(name);
+						INSERTPACKAGE(j.basePackageName, name);
 					}
 				}
 			}

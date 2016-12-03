@@ -24,11 +24,14 @@
 #include "pkgrepo.h"
 #include "mysql.h"
 
-#define INSERTPACKAGE(name) listOfPackages.insert("<td>" \
+#define INSERTPACKAGE(basename, name) listOfPackages.insert("<td>" \
 + i.arch + "</td>" \
 + "<td>" + i.branch + "</td>"  \
 + "<td>" + i.collection + "</td>" \
-+ "<td>" + name + "</td>" \
++ "<td> <a href=\"http://downloads.nutyx.org/" \
++ i.arch + "/" + i.branch + "/" \
++ i.collection + "/" + basename + "/Pkgfile\">" \
++ name + "</a></td>" \
 + "<td>" + j.version + "-" + itos(j.release) + "</td>" \
 + "<td>" + j.description + "</td>" \
 + "<td>" + getDateFromEpoch(j.buildDate) + "</td>")
