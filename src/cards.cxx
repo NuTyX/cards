@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <memory>
 #include "file_download.h"
 #include "cards_base.h"
 #include "cards_sync.h"
@@ -172,7 +173,8 @@ int main(int argc, char** argv)
 				return EXIT_SUCCESS;
 			}
 			// create (compile and install) the List of deps (including the final package)
-			Cards_create CC(cardsArgPars,configFile.c_str(),listOfPackages);
+			unique_ptr<Cards_create> i(new Cards_create(cardsArgPars,
+				configFile.c_str(),listOfPackages));
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_CREATE) {
 
@@ -183,20 +185,20 @@ int main(int argc, char** argv)
 			}
 			if  ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
 				// go back to a base system
-				Cards_base CB(cardsArgPars);
-				CB.run(argc, argv);
+				unique_ptr<Cards_base> i(new Cards_base(cardsArgPars));
+				i->run(argc, argv);
 			}
 			// get the list of the dependencies"
 			CardsDepends CD(cardsArgPars);
 			vector<string> listOfDeps = CD.getDependencies();
 
 			if (!listOfDeps.empty())
-				Cards_install CI(cardsArgPars,configFile.c_str(),listOfDeps);
+				unique_ptr<Cards_install> i(new Cards_install(cardsArgPars,configFile.c_str(),listOfDeps));
 
 			// compilation of the final port"
-			Cards_create CC( cardsArgPars,
+			unique_ptr<Cards_create> i(new Cards_create( cardsArgPars,
 				configFile.c_str(),
-				cardsArgPars.otherArguments()[0]);
+				cardsArgPars.otherArguments()[0]));
 			return EXIT_SUCCESS;
 
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_BASE) {
@@ -205,44 +207,44 @@ int main(int argc, char** argv)
 				cardsArgPars.printHelp("base");
 				return EXIT_SUCCESS;
 			}
-			Cards_base CB(cardsArgPars);
-			CB.run(argc, argv);
+			unique_ptr<Cards_base> i(new Cards_base(cardsArgPars));
+			i->run(argc, argv);
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
-			Cards_sync CS(cardsArgPars);
-			CS.run();
+			unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
+			i->run();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_PURGE) {
-			Cards_sync CS(cardsArgPars);
-			CS.purge();
+			unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
+			i->purge();
 			return EXIT_SUCCESS;
 		} else if ( (cardsArgPars.command() == CardsArgumentParser::CMD_UPGRADE) ||
 					(cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) ) {
-			Cards_upgrade CU(cardsArgPars,configFile.c_str());
+			unique_ptr<Cards_upgrade> i(new Cards_upgrade(cardsArgPars,configFile.c_str()));
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
-				Cards_install CI(cardsArgPars,configFile.c_str());
+			unique_ptr<Cards_install> i(new Cards_install(cardsArgPars,configFile.c_str()));
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_REMOVE) {
-			Cards_remove CR("cards remove",cardsArgPars, configFile.c_str());
+			unique_ptr<Cards_remove> i(new Cards_remove("cards remove",cardsArgPars, configFile.c_str()));
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
-			CardsDepends CD(cardsArgPars);
-			CD.showLevel();
+			unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+			i->showLevel();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
-			CardsDepends CD(cardsArgPars);
-			CD.showDependencies();
+			unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+			i->showDependencies();
 			return EXIT_SUCCESS;
 		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
-			CardsDepends CD(cardsArgPars);
-			return CD.deptree();
+			unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+			return i->deptree();
 		} else if ( (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) ||
 				(cardsArgPars.command() == CardsArgumentParser::CMD_LIST)   ||
 				(cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) ||
 				(cardsArgPars.command() == CardsArgumentParser::CMD_FILES)  ||
 				(cardsArgPars.command() == CardsArgumentParser::CMD_QUERY)) {
-			Cards_info CI(cardsArgPars,configFile.c_str());
+				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
 			return EXIT_SUCCESS;
 		}
 	} catch (runtime_error& e) {
