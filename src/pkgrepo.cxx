@@ -789,30 +789,33 @@ bool Pkgrepo::search(const string& s)
 	std::string::size_type pos;
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
+			bool installed = false;
 			string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
 			if ( convertToLowerCase(s) == j.basePackageName ) {
-				packageToInsert = "(" + baseDir + ") " + j.basePackageName \
-				+ " " + j.version + " " + j.description;
+				if (installed)
+					packageToInsert = GREEN;
+				packageToInsert += "(" + baseDir + ") " + j.basePackageName \
+					+ " " + j.version + " " + j.description + NORMAL;
 				packageList.insert(packageToInsert);
 				found = true;
 			}
 			pos = j.basePackageName.find(convertToLowerCase(s));
 			if (pos != std::string::npos) {
-				packageToInsert = "(" + baseDir + ") " + j.basePackageName \
+				packageToInsert += "(" + baseDir + ") " + j.basePackageName \
 				+ " " + j.version + " " + j.description;
 				packageList.insert(packageToInsert);
 				found = true;
 			}
 			pos = convertToLowerCase(j.description).find(convertToLowerCase(s));
 			if (pos != std::string::npos) {
-				packageToInsert = "(" + baseDir + ") " + j.basePackageName \
+				packageToInsert += "(" + baseDir + ") " + j.basePackageName \
 				+ " " + j.version + " " + j.description;
 				packageList.insert(packageToInsert);
 				found = true;
 			}
 			pos = convertToLowerCase(j.version).find(convertToLowerCase(s));
 			if (pos != std::string::npos) {
-				packageToInsert = "(" + baseDir + ") " + j.basePackageName \
+				packageToInsert += "(" + baseDir + ") " + j.basePackageName \
 				+ " " + j.version + " " + j.description;
 				packageList.insert(packageToInsert);
 				found = true;
