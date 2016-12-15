@@ -18,6 +18,17 @@
 using namespace std;
 using namespace Sql;
 
+void visitOfPage(char * argument)
+{
+	FILE *pVisits = fopen("content/.visits","r+");
+	if (pVisits != NULL) {
+		time_t timer;
+		time(&timer);
+		fseek(pVisits,0,SEEK_END);
+		fprintf(pVisits,"%d,%s\n",timer,argument);
+		fclose(pVisits);
+	}
+}
 void endOfPage(void)
 {
 	cout << "   </tr>" <<endl
@@ -279,20 +290,6 @@ int main (int argc, char** argv)
 	if ( !pArgument)
 		return 0;
 
-	FILE *pVisits = fopen("content/.visits","r+");
-	if (pVisits != NULL) {
-		time_t timer;
-		time(&timer);
-		char * pIP = getenv ("REMOTE_ADDR");
-		char * pRA = getenv ("HTTP_USER_AGENT");
-		fseek(pVisits,0,SEEK_END);
-		if (pIP)
-			fprintf(pVisits,"%d,%s,%s,%s\n",timer,pIP,pRA,pArgument);
-		else
-			fprintf(pVisits,"%d,%s,%s,%s\n",timer,"NotAvailable",pRA,pArgument);
-		fclose(pVisits);
-	}
-
 	char * pPwd = getenv ("SCRIPT_NAME");
 
 	/* If PATH is not found, no need to continue */
@@ -347,6 +344,7 @@ cellspacing=\"10\" width=\"100%\">" << endl
 		return 0;
 */
 	if ( arguments.packageSearch.size() > 0 ) {
+		visitOfPage(pArgument);
 		if (arguments.packageSearch.size() < 2) {
 			cout << "<div class=\"note\"><img alt=\"[Note]\" \
 			src=\"../graphics/note.gif\" />min 2 characters...</div>" << endl;
@@ -392,6 +390,7 @@ cellspacing=\"10\" width=\"100%\">" << endl
 		return 0;
 	}
 	if ( arguments.docName == "packages" ) {
+		visitOfPage(pArgument);
 		contentInfo_t contentInfo;
 		contentInfo.text.push_back("<h1>NuTyX Packages</h1>");
 		searchpkg(contentInfo,arguments);

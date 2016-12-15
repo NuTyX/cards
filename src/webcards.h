@@ -51,6 +51,7 @@ struct arguments_t {
 typedef std::map<std::string, contentInfo_t> content_t;
 
 void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments);
+void visitOfPage(char * Argument);
 
 #endif /* WEBCARDS_H */
 // vim:set ts=2 :

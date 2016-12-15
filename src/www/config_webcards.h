@@ -21,6 +21,9 @@
 #define CONFIGWEBCARDS_H
 #define CSSDATA cout << " <style type=\"text/css\">" << endl \
  << " body{" << endl \
+ << "   text-align: left;" << endl \
+ << "   color: #444;" << endl \
+ << "   text-shadow: 0 1px 0 #fff;" << endl \
  << "   background: #eee url(data:image/png;base64,iVBORw0KGgo\
 AAAANSUhEUgAAAAUAAAAFCAMAAAC6sdbXAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZS\
 BJbWFnZVJlYWR5ccllPAAAAAZQTFRF3d3d////riJKgAAAAAJ0Uk5T/wDltzBK\
@@ -64,7 +67,6 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "img { border: 0; }" << endl \
  << "nav.img { border: 0; }" << endl \
  << "h1 { text-decoration: underline; }" << endl \
- << "h2, p { text-align: left; color: #444; text-shadow: 0 1px 0 #fff; }" \
  << endl \
  << "p1 {" << endl \
  << "    display: inline-block;" << endl \
