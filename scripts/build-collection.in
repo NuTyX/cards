@@ -192,6 +192,9 @@ echo '**************************************************************************
 ******************************************************************************
 '|more
 }
+interrupted() {
+echo "Interrupted !!!"
+}
 trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
 umount_all() {
 for FOLDER in $MOUNT_POINTS
