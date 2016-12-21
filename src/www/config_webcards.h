@@ -23,7 +23,6 @@
  << " body{" << endl \
  << "   text-align: left;" << endl \
  << "   color: #444;" << endl \
- << "   text-shadow: 0 1px 0 #fff;" << endl \
  << "   background: #eee url(data:image/png;base64,iVBORw0KGgo\
 AAAANSUhEUgAAAAUAAAAFCAMAAAC6sdbXAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZS\
 BJbWFnZVJlYWR5ccllPAAAAAZQTFRF3d3d////riJKgAAAAAJ0Uk5T/wDltzBK\

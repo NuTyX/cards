@@ -174,32 +174,14 @@ public:
 		bool checkPortExist(const std::string& portName);
 
 /*
- *	\return true if binarie name exist
- */
-// ==>>>>>		bool checkBinaryExist(const std::string& packageName);
-/*
  *  \retun list of packages of the collection
  */
 		std::set<std::string> getListOfPackagesFromCollection(const std::string& collectionName);
 
 /*
- *  \return the location and the filename of the package if exist else
- *	return the packageName
- *
- *  Depends on: parsePkgRepoCollectionFile
- *
- *  Populate: nothing
- */
-// ==>>>>     	std::string getPackageFileName(const std::string& packageName);
-/*
  *	\return the build time of the binary 
  */
 		time_t getBinaryBuildTime (const std::string& portName);
-
-/*
- * \return true if one or more occurencies found
- */
-		bool search(const std::string& s);
 
 /*
  * \printout the list of available binaries packages

@@ -774,57 +774,6 @@ time_t Pkgrepo::getBinaryBuildTime (const string& packageName)
 	}
 	return buildTime;
 }
-bool Pkgrepo::search(const string& s)
-{
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
-
-	if (s.size() < 2) {
-		cout << "your string is too short, min 2 characters" << endl;	
-		return false;
-	}
-	bool found = false;
-	set<string> packageList;
-	string packageToInsert;
-	std::string::size_type pos;
-	for (auto i : m_portsDirectoryList) {
-		for (auto j : i.basePackageList) {
-			bool installed = false;
-			string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
-			if ( convertToLowerCase(s) == j.basePackageName ) {
-				if (installed)
-					packageToInsert = GREEN;
-				packageToInsert += "(" + baseDir + ") " + j.basePackageName \
-					+ " " + j.version + " " + j.description + NORMAL;
-				packageList.insert(packageToInsert);
-				found = true;
-			}
-			pos = j.basePackageName.find(convertToLowerCase(s));
-			if (pos != std::string::npos) {
-				packageToInsert += "(" + baseDir + ") " + j.basePackageName \
-				+ " " + j.version + " " + j.description;
-				packageList.insert(packageToInsert);
-				found = true;
-			}
-			pos = convertToLowerCase(j.description).find(convertToLowerCase(s));
-			if (pos != std::string::npos) {
-				packageToInsert += "(" + baseDir + ") " + j.basePackageName \
-				+ " " + j.version + " " + j.description;
-				packageList.insert(packageToInsert);
-				found = true;
-			}
-			pos = convertToLowerCase(j.version).find(convertToLowerCase(s));
-			if (pos != std::string::npos) {
-				packageToInsert += "(" + baseDir + ") " + j.basePackageName \
-				+ " " + j.version + " " + j.description;
-				packageList.insert(packageToInsert);
-				found = true;
-			}
-		}
-	}
-	for (auto i : packageList) cout << i << endl;
-	return found;
-}
 int Pkgrepo::parseConfig(const char *fileName)
 {
 	return parseConfig(fileName,m_config);

@@ -65,7 +65,80 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 		run();		
 	}
 	if ((m_argParser.command() == CardsArgumentParser::CMD_SEARCH) ) {
-		search(m_argParser.otherArguments()[0]);
+		std::vector<RepoInfo> List;
+		List = getRepoInfo();
+		buildSimpleDatabase();
+		for (auto i : List) {
+			for (auto j : i.basePackageList) {
+				string::size_type pos;
+				pos = i.collection.find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if  ( pos != std::string::npos ) {
+					cout << "(" << i.collection << ") ";
+					if ( checkPackageNameExist(j.basePackageName) ) {
+						cout << GREEN;
+					}
+					cout << j.basePackageName
+						<< NORMAL
+						<< " " << j.version
+						<< " " << j.description
+						<< endl;
+					continue;
+				}
+				pos = j.basePackageName.find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if  ( pos != std::string::npos ) {
+					cout << "(" << i.collection << ") ";
+					if ( checkPackageNameExist(j.basePackageName) ) {
+						cout << GREEN;
+					}
+					cout << j.basePackageName
+						<< NORMAL
+						<< " " << j.version
+						<< " " << j.description
+						<< endl;
+					continue;
+				}
+				pos = j.description.find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if (pos != std::string::npos) {
+					cout << "(" << i.collection << ") ";
+					if ( checkPackageNameExist(j.basePackageName) ) {
+						cout << GREEN;
+					}
+					cout << j.basePackageName
+						<< NORMAL
+						<< " " << j.version
+						<< " " << j.description
+						<< endl;
+					continue;
+				}
+				bool found = false;
+				set<string> groupList;
+				groupList = parseDelimitedSetList(j.group,' ');
+				for ( auto k : groupList ) {
+					if ( k == j.basePackageName)
+						continue;
+					if ( convertToLowerCase(m_argParser.otherArguments()[0]) == k ) {
+					string name = j.basePackageName
+						+ "."
+						+ k;
+					cout << "(" << i.collection << ") ";
+					if ( checkPackageNameExist(name )) {
+						cout << GREEN;
+					}
+					cout << name
+						<< NORMAL
+						<< " " << j.version
+						<< " " << j.description
+						<< endl;
+					name="";
+					found = true;
+					continue;
+					}
+				}
+				if (found)
+					continue;
+			}
+		}
+
 	}
 }
 // vim:set ts=2 :

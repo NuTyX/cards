@@ -198,7 +198,7 @@ that belong to this collection will be deleted.",
 
 	OPT_IGNORE.init("ignore",
 		'I',
-		  "   Ignore errors and list the level anyway.");
+		  "   Ignore WARNINGS and list the level anyway.");
 
 	OPT_SIZE.init("size",
 		's',
