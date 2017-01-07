@@ -218,7 +218,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 					INSERTPACKAGE(j.basePackageName, j.basePackageName);
 					continue;
 				}
-				pos = j.description.find(convertToLowerCase(search));
+				pos = convertToLowerCase(j.description).find(convertToLowerCase(search));
 				if (pos != std::string::npos) {
 					INSERTPACKAGE(j.basePackageName, j.basePackageName);
 					continue;
@@ -230,6 +230,14 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 						string name = j.basePackageName
 							+ "."
 							+ k;
+						INSERTPACKAGE(j.basePackageName, name);
+					}
+				}
+				set<string> aliasList;
+				aliasList = parseDelimitedSetList(j.alias,' ');
+				for ( auto k : aliasList ) {
+					if ( convertToLowerCase(search) == k ) {
+						string name = j.basePackageName;
 						INSERTPACKAGE(j.basePackageName, name);
 					}
 				}

@@ -97,7 +97,7 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 						<< endl;
 					continue;
 				}
-				pos = j.description.find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				pos = convertToLowerCase(j.description).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if (pos != std::string::npos) {
 					cout << "(" << i.collection << ") ";
 					if ( checkPackageNameExist(j.basePackageName) ) {
@@ -136,6 +136,27 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 				}
 				if (found)
 					continue;
+				set<string> aliasList;
+				aliasList = parseDelimitedSetList(j.alias,' ');
+				for ( auto k : aliasList ) {
+					if ( k == j.basePackageName)
+						continue;
+					if ( convertToLowerCase(m_argParser.otherArguments()[0]) == k ) {
+						string name = j.basePackageName;
+						cout << "(" << i.collection << ") ";
+						if ( checkPackageNameExist(name )) {
+							cout << GREEN;
+						}
+					cout << name
+						<< NORMAL
+						<< " " << j.version
+						<< " " << j.description
+						<< endl;
+					name="";
+					found = true;
+					continue;
+					}
+				}
 			}
 		}
 
