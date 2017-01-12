@@ -398,7 +398,6 @@ cellspacing=\"10\" width=\"100%\">" << endl
 		return 0;
 	}
 	if ( arguments.docName == "packages" ) {
-		visitOfPage(pArgument);
 		contentInfo_t contentInfo;
 		contentInfo.text.push_back("<h1>NuTyX Packages</h1>");
 		searchpkg(contentInfo,arguments);

@@ -225,7 +225,7 @@ setup_pkgmk_conf() {
 cat > /$VERSION/$CHROOT/etc/pkgmk.conf << "EOF"
 export CFLAGS="-O2 -pipe"
 export CXXFLAGS="${CFLAGS}"
-export MAKEFLAGS="-j8"
+export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
 PKGMK_GROUPS=(devel man doc service)
 PKGMK_LOCALES=(fr de it es nl pt da nn sv fi tr ru)
 PKGMK_CLEAN="no"
