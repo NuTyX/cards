@@ -23,7 +23,6 @@ echo '**************************************************************************
  This script is able to compile any port from any official collections that
  are one of:
  - base
- - base-extra
  - cli
  - cli-extra
  - gui
@@ -102,7 +101,7 @@ echo '**************************************************************************
   Its specify the version we are going to use
   (currently it can be 'development' or 'stable' and its specify
   the collection which is one of following possible collection:
-  base, base-extra, cli, cli-extra, gui, gui-extra, enlightenment,
+  base, cli, cli-extra, gui, gui-extra, enlightenment,
   gnome, kde5, mate or xfce4.
   You note that even under kde5 (for example)
   we have two collection kde5 and kde5-extra, even then the script
@@ -110,13 +109,13 @@ echo '**************************************************************************
 
  Parameter 2 (optionnal):
   This parameter specify the port you want to build only.
-  Currently this option works only with base, base-extra, cli,
+  Currently this option works only with base, cli,
   cli-extra, gui or gui-extra collections.
   Example:
 
-   build-collection /development/base-extra kernel
+   build-collection /development/cli-extra irssi
 
-  This example will build (or rebuild) the kernel binaries only
+  This example will build (or rebuild) the irssi binaries only
 
  3. CONFIGURATION OF THE HOST NuTyX
 
@@ -248,7 +247,6 @@ dir /DEPOT/enlightenment
 dir /DEPOT/gui
 dir /DEPOT/cli
 dir /DEPOT/base
-dir /DEPOT/base-extra
 base /DEPOT/base
 base /DEPOT/cli
 base /DEPOT/gui
@@ -260,7 +258,6 @@ dir /DEPOT/xfce4
 dir /DEPOT/gui
 dir /DEPOT/cli
 dir /DEPOT/base
-dir /DEPOT/base-extra
 base /DEPOT/base
 base /DEPOT/cli
 base /DEPOT/gui
@@ -272,7 +269,6 @@ dir /DEPOT/mate
 dir /DEPOT/gui
 dir /DEPOT/cli
 dir /DEPOT/base
-dir /DEPOT/base-extra
 base /DEPOT/base
 base /DEPOT/cli
 base /DEPOT/gui
@@ -283,7 +279,6 @@ logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 dir /DEPOT/gnome
 dir /DEPOT/gui
 dir /DEPOT/cli
-dir /DEPOT/base-extra
 dir /DEPOT/base
 base /DEPOT/base
 base /DEPOT/cli
@@ -296,7 +291,6 @@ dir /DEPOT/kde5
 dir /DEPOT/gui
 dir /DEPOT/cli
 dir /DEPOT/base
-dir /DEPOT/base-extra
 base /DEPOT/base
 base /DEPOT/cli
 base /DEPOT/gui
@@ -313,7 +307,6 @@ logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 		COLLECTION="core"
 		echo "dir /DEPOT/cli
 dir /DEPOT/base
-dir /DEPOT/base-extra
 base /DEPOT/base
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 	fi
@@ -322,9 +315,7 @@ logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 		echo "dir /DEPOT/gui
 dir /DEPOT/cli
 dir /DEPOT/base
-dir /DEPOT/base-extra
 base /DEPOT/base
-base /DEPOT/base-extra
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 	fi
 	if [ "$CHROOT" == "systemd" ]; then
@@ -333,28 +324,18 @@ logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 dir /DEPOT/gui
 dir /DEPOT/cli
 dir /DEPOT/base
-dir /DEPOT/base-extra
 base /DEPOT/base
 base /DEPOT/cli
 base /DEPOT/gui
 base /DEPOT/systemd
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 	fi
-	if [ "$CHROOT" == "base-extra" ]; then
-		COLLECTION="extra"
-		echo "dir /DEPOT/base-extra
-dir /DEPOT/base
-base /DEPOT/base
-base /DEPOT/base-extra" > $DIR/etc/cards.conf || exit 1
-	fi
 	if [ "$CHROOT" == "cli-extra" ]; then
 		COLLECTION="extra"
 		echo "dir /DEPOT/cli-extra
 dir /DEPOT/cli
-dir /DEPOT/base-extra
 dir /DEPOT/base
 base /DEPOT/base
-base /DEPOT/base-extra
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 	fi
 	if [ "$CHROOT" == "gui-extra" ]; then
@@ -363,7 +344,6 @@ logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 dir /DEPOT/gui
 dir /DEPOT/cli-extra
 dir /DEPOT/cli
-dir /DEPOT/base-extra
 dir /DEPOT/base
 base /DEPOT/base
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
@@ -414,8 +394,7 @@ if [ "$CHROOT" == "systemd"  ]; then
 	&& cards install systemd && cards install systemd.devel \
 	&& cd /root/$COLLECTION && bash scripts/$CHROOT"
 fi
-if [ "$CHROOT" == "base-extra" ] \
-|| [ "$CHROOT" == "cli-extra"  ] \
+if [ "$CHROOT" == "cli-extra"  ] \
 || [ "$CHROOT" == "gui-extra"  ]; then
 	setup_collection
 	DEVEL="cards.devel \

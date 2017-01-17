@@ -19,13 +19,13 @@ It might look like this:
 
 # root directories
 
-dir /usr/ports/lxde-extra
-dir /usr/ports/lxde
+dir /usr/ports/xfce4-extra
+dir /usr/ports/xfce4
 dir /usr/ports/gui
 dir /usr/ports/cli
 dir /usr/ports/base
 
-dir /var/lib/pkg/repo/kde5|http://downloads.nutyx.org/x86_64/development/
+dir /var/lib/pkg/repo/kde5-extra|http://downloads.nutyx.org/x86_64/development/
 dir /var/lib/pkg/repo/kde5|http://downloads.nutyx.org/folder1/folder2/development/
 dir /var/lib/pkg/repo/xfce4-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/repo/xfce4|http://downloads.nutyx.org
@@ -33,7 +33,6 @@ dir /var/lib/pkg/repo/gui-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/repo/gui|http://downloads.nutyx.org
 dir /var/lib/pkg/repo/cli-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/repo/cli|http://downloads.nutyx.org
-dir /var/lib/pkg/repo/base-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/repo/base|http://downloads.nutyx.org
 
 

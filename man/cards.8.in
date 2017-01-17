@@ -205,9 +205,9 @@ file. If no directory are defined, this command will abort.
 All scenarios: Cleanup all the archives of the binaries found in the folders synchronised with any mirror. By default, folders are:
 .B /var/lib/pkg/depot/base
 ,
-.B /var/lib/pkg/depot/console
+.B /var/lib/pkg/depot/cli
 and
-.B /var/lib/pkg/depot/desktop
+.B /var/lib/pkg/depot/gui
 
 .SH "OPTIONS"
 

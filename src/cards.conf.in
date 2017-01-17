@@ -46,16 +46,15 @@
 # dir /usr/ports/gui
 # dir /usr/ports/cli-extra
 # dir /usr/ports/cli
-# dir /usr/ports/base-extra
 # dir /usr/ports/base
 
 ## The NuTyX name and version are found in the /var/lib/pkg/nutyx-version file
-## The Colletion name (xfce4-extra, xfce4, gui, gui-extra, cli, cli-extra, base, base-extra)
+## The Colletion name (xfce4-extra, xfce4, gui, gui-extra, cli, cli-extra, base)
 ## must exist on the mirror http://downloads.nutyx.org (in this case)
 ## Check for your version what are the available collections at http://downloads.nutyx.org/<NuTyX-version>
 #
 ## Le nom et la version de NuTyX se trouvent dans le fichier /var/lib/pkg/nutyx-version
-## Le nom des collections (xfce4-extra, xfce4, gui, gui-extra,cli, cli-extra, base, base-extra)
+## Le nom des collections (xfce4-extra, xfce4, gui, gui-extra,cli, cli-extra, base)
 ## doivent exister sur le mirroir http://downloads.nutyx.org (dans ce cas)
 ## Vérifiez quelles sont les collections disponibles sur http://downloads.nutyx.org/<NuTyX-version>
 #
@@ -75,7 +74,6 @@ dir /var/lib/pkg/depot/gui-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/gui|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/cli-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/cli|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/base-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/base|http://downloads.nutyx.org
 
 # A collection can be
@@ -91,10 +89,9 @@ dir /var/lib/pkg/depot/base|http://downloads.nutyx.org
 #  En effet, nous ne souhaitons pas supprimer le paquet glibc par exemple :)
 #  De plus, si l'on veut revenir à un système de base, les dossiers suivant doivent contenir des paquets
 #
-## In the following setting, packages from base system and base-extra will not be deleted
-## Dans le cas ci-dessous, les paquets des collections base et base-extra ne seront pas supprimés
+## In the following setting, packages from base system will not be deleted
+## Dans le cas ci-dessous, les paquets des collections base ne seront pas supprimés
 base /var/lib/pkg/depot/base
-base /var/lib/pkg/depot/base-extra
 
 ##
 ## We can specify which locale should be installed (more than one are allowed)
