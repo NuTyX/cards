@@ -147,6 +147,9 @@ msgstr " paquets: "
 msgid "Package"
 msgstr "Paquet"
 
+msgid "<package>"
+msgstr "<paquet>"
+
 msgid "File"
 msgstr "Fichier"
 
@@ -304,19 +307,19 @@ msgid "WARNING Run post-install FAILED, continue"
 msgstr "AVERTISSEMENT l'exécution de la post-intallation a échoué, le processus continue"
 
 msgid "print footprint for <file>"
-msgstr "affiche la liste des fichiers contenu dand le fichier <file>"
+msgstr "affiche la liste des fichiers contenu dans le fichier <fichier>"
 
 msgid "return the build time of the package"
 msgstr "renvoit la date de construction du paquet"
 
 msgid "print Name, Version, Release, BuildDate and Deps of the <file>"
-msgstr "affiche le nom, la version, la release, la date de construction et les dépendances de fonctionnement du fichier <file>"
+msgstr "affiche le nom, la version, la release, la date de construction et les dépendances de fonctionnement du fichier <fichier>"
 
 msgid "return on a single line all the runtime dependencies"
 msgstr "renvoit toutes les dépendances utilisées pour le fonctionnement du paquet sur une seule ligne"
 
 msgid "return on a single line all the runtime dependencies for the files found in the <path>"
-msgstr "renvoit toutes les dépendances utilisées pour le fonctionnement des fichiers trouvés dans le chemin <path>"
+msgstr "renvoit toutes les dépendances utilisées pour le fonctionnement des fichiers trouvés dans le chemin <chemin>"
 
 msgid "specify alternative installation root"
 msgstr "spécifie un chemin alternatif à la racine de l'installation"
@@ -388,7 +391,7 @@ msgid "list owner of file(s) matching the query."
 msgstr "liste les fichiers et le paquet d'appartenance correspondant à la requête."
 
 msgid "list the file(s) owned by the <package>"
-msgstr "liste le(s) fichier(s) appartenant(s) au paquet <package>"
+msgstr "liste le(s) fichier(s) appartenant(s) au paquet <paquet>"
 
 msgid "synchronize the local and remote meta datas."
 msgstr "synchronise les metadonnées locales et distantes "
@@ -416,4 +419,77 @@ msgstr "Vous devez avoir un dosssier 'base' valide"
 
 msgid "configured in the /etc/cards.conf file otherwise the command will abort."
 msgstr "configuré dans le fichier /etc/cards.conf sinon la commande sera avortée."
+
+msgid "shows help about cards."
+msgstr "affiche l'aide de cards."
+
+msgid "You can also check 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.conf'."
+msgstr "Vou pouvez aussi lire 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.conf'."
+
+msgid "print info about cards configuration."
+msgstr "affiche les informations de la configuration de cards."
+
+msgid "It can show the defined Directories where alls the packages are located. The locale which are going to be installed, the architecture of your machine, the base system directory and the logfile directory."
+msgstr "Il peut afficher les répertoires défini dans lesquels les paquets sont stockés. La locale qui sera installée, l'architecture de la machine, le répertoire contenant la liste des paquets pour revenir à un système de base et le répertoire contenant les logs de compilation."
+
+msgid "return to a basic system."
+msgstr "retour à un système de base."
+
+msgid "It will REMOVE ALL THE PACKAGES not listed in the base system list directory."
+msgstr "Va SUPPRIMER TOUS LES PAQUETS qui ne sont pas dans la liste des dossiers définis dans le répertoire de base."
+
+msgid "list the file(s) of the installed <package>."
+msgstr "Affiche le(s) fichier(s) du <paquet> installé."
+
+msgid "synchronize local and remote metadatas."
+msgstr "synchronise les metadonnées locales et distantes."
+
+msgid "print info about a package."
+msgstr "affiche les information d'un paquet"
+
+msgid "If -p or -b are passed as optional arguments, it will be the info of a port or the info of a binary available in the depot."
+msgstr "Si un argument -p ou -b est utilisé, ce seront les informations d'un port ou les information d'un binaire disponible sur le dépot."
+
+msgid "list installed packages."
+msgstr "Liste des paquets installés"
+
+msgid "If -p or -b are passed as optional arguments, It will respectively list the local available ports or the remote available binaries."
+msgstr "Si un argument -p ou -b est utilisé, ce sera la liste des ports diponibles ou la liste des paquets disponibles sur le serveur."
+
+msgid "install one or more <package>, a <file> or a <collection>."
+msgstr "installe un ou plusieurs <paquet>, <fichier> ou <collection>."
+
+msgid "remove one or more packages or a complete collection."
+msgstr "supprime un ou plusieurs paquets ou une collection complète."
+
+msgid "generate all the levels."
+msgstr "génère tous les niveaux."
+
+msgid "This command is used by the packager. It allows to see which package depends on which dependency. It is used for the compilation of a port."
+msgstr "Cette commmande est utilisée par l'empaqueteur. Elle permet de visualiser quelle dépendance pour quel paquet. Elle est utile pour la compilation d'un port."
+
+msgid "If -p is passed, the list is checked against founds Pkgfile ports."
+msgstr "Si l'argument -p est utilisé, la liste concerne les ports (Pkgfile) des paquets."
+
+msgid "list the dependencies of the port."
+msgstr "liste les dépendances du port."
+
+msgid "list the dependencies tree of the port."
+msgstr "liste les dépendances du port sous forme d'arbre."
+
+msgid "search for <expr>."
+msgstr "recherche l'<expression>."
+
+msgid "create a package AND it's dependencies from the recipe found in the ports."
+msgstr "crée un paquet ET ses dépendances depuis les recettes trouvées dans les ports."
+
+msgid "create a package from the recipe found in the port."
+msgstr "crée un paquet unique depuis la recette trouvée dans le port."
+
+msgid "remove archives from installed packages."
+msgstr "supprime les archives des paquets qui ont été installés."
+
+msgid "upgrade you installation with a single command."
+msgstr "met à jour votre installation avec une seule commande."
+
 

@@ -110,7 +110,7 @@ base /var/lib/pkg/depot/base
 ##
 ## Cards can log the output of the creation of the final package when a:
 #
-#   cards create -r <nom of package>
+#   cards create -r <name of package>
 #
 ## if following variable is set and is refering to a folder: the compilation will be logged
 ##

@@ -1,6 +1,6 @@
 // cards_argument_parser.cxx
 // 
-//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -63,49 +63,47 @@ ArgParser::APOpt CardsArgumentParser::OPT_CONFIG_FILE;
 CardsArgumentParser::CardsArgumentParser()
 {
 	addCommand(CMD_HELP, "help",
-		"shows help about cards.",
-"You can also check 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.conf'.",
+		_("shows help about cards."),
+_("You can also check 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.conf'."),
 	ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_CONFIG, "config",
-		"print info about cards configuration.",
-"It can show the defined Directories where alls the packages are located. The locale which are going to be installed, the architecture of your machine, the base system directory and the logfile directory.",
+		_("print info about cards configuration."),
+_("It can show the defined Directories where alls the packages are located. The locale which are going to be installed, the architecture of your machine, the base system directory and the logfile directory."),
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_BASE, "base",
-		"return to a basic system.",
-"You should never use this command unless you knows exactly what it means.\n\n\
-It will REMOVE ALL THE PACKAGES not listed in the base system list directory.\n\n\
-It is mainly used for the packager.",
+		_("return to a basic system."),
+_("It will REMOVE ALL THE PACKAGES not listed in the base system list directory."),
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_FILES, "files",
-		"list the file(s) of the installed <package>.",
+		_("list the file(s) of the installed <package>."),
 "",
-		ArgParser::EQ, 1 , "<package>");
+		ArgParser::EQ, 1 , _("<package>"));
 
 	addCommand(CMD_SYNC, "sync",
-		"synchronize local and remote metadatas.",
+		_("synchronize local and remote metadatas."),
 "",
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_QUERY, "query",
-		"list owner(s) of file(s) matching the query.",
+		_("list owner of file(s) matching the query."),
 "",
-		ArgParser::EQ, 1 , "<pattern>");
+		ArgParser::EQ, 1 , _("<pattern>"));
 
 	addCommand(CMD_INFO, "info",
-		"print info about a package.",
-"If -p or -b are passed as optional arguments, it will be the info of a port or the info of a binary available in the depot.",
-		ArgParser::EQ, 1 , "<package>");
+		_("print info about a package."),
+_("If -p or -b are passed as optional arguments, it will be the info of a port or the info of a binary available in the depot."),
+		ArgParser::EQ, 1 , _("<package>"));
 
 	addCommand(CMD_LIST, "list",
-		"list installed packages.",
-"If -p or -b are passed as optional arguments, It will respectively list the local available ports or the remote available binaries.",
+		_("list installed packages."),
+_("If -p or -b are passed as optional arguments, It will respectively list the local available ports or the remote available binaries."),
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_INSTALL, "install",
-		"install one or more <package>, a <file> or a <collection>.",
+		_("install one or more <package>, a <file> or a <collection>."),
 "If the argument is a package name, it will first download the request package, then analyse it and finally download it's dependencies, then analyse them and so on. When all the dependencies are downloaded, they will be installed in the right order then finally the request package will be installed.\n\
 If the argument is a file, it will simply installed it. The file can have any name as long it's a valid package.\n\
 If -u is passed as optional argument, it will upgrade the package.\n\
@@ -113,55 +111,55 @@ If -f is passed as optional argument, it will force the install means overwrite 
 		ArgParser::MIN, 1, "<package> | <file> | <collection>");
 
 	addCommand(CMD_REMOVE, "remove",
-		"remove one or more packages or a complete collection.",
+		_("remove one or more packages or a complete collection."),
 "It can remove one or more packages. If you want to remove a package from the base list, \n\
 you should pass the -a argument. If you specify an existing collection, all packages  \n\
 that belong to this collection will be deleted.",
 		ArgParser::MIN, 1 , "<package> | <collection>");
 
 	addCommand(CMD_LEVEL, "level",
-		"generate all the levels.",
-"This command is used by the packager. It allows to see which package depends on which dependency. It is used for the compilation of a port.",
+		_("generate all the levels."),
+_("This command is used by the packager. It allows to see which package depends on which dependency. It is used for the compilation of a port."),
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_DIFF, "diff",
-		"list outdated packages.",
-"If -p is passed, the list is checked against founds Pkgfile ports.",
+		_("list outdated packages."),
+_("If -p is passed, the list is checked against founds Pkgfile ports."),
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_DEPENDS, "depends",
-		"list the dependencies of the port.",
-"This command is used for the packager. It shows the list of the dependencies of the package. It is used for the compilation of a port.",
+		_("list the dependencies of the port."),
+_("This command is used for the packager. It shows the list of the dependencies of the package. It is used for the compilation of a port."),
 		ArgParser::EQ, 1,"<port>");
 
 	addCommand(CMD_DEPTREE, "deptree",
-		"list the dependencies tree of the port.",
+		_("list the dependencies tree of the port."),
 "It's mainly use to know if they are no duplicate call of any dependency.",
 		ArgParser::EQ, 1,"<port>");
 
 	addCommand(CMD_SEARCH, "search",
-		"search for <expr>.",
-"It can be in ports names, in binaries names, in ports description or binaries description. The <expr> must be 2 characters minimum.",
+		_("search for <expr>."),
+_("It can be in ports names, in binaries names, in ports description or binaries description. The <expr> must be 2 characters minimum."),
 		ArgParser::EQ, 1, "<expr>");
 
 	addCommand(CMD_DEPCREATE, "depcreate",
-		"create a package AND it's dependencies from the recipe found in the ports.",
-"This command is used for the packager. All the dependencies include the final package will be compiled.",
+		_("create a package AND it's dependencies from the recipe found in the ports."),
+_("This command is used for the packager. All the dependencies include the final package will be compiled."),
 		ArgParser::EQ,1 , "<package>");
 
 	addCommand(CMD_CREATE, "create",
-		"create a package from the recipe found in the port.",
-"This command is used for the packager. All the dependencies must be compiled, up to date and available for the creation of the final package. If somes dependencies are missing, the command will abort. A compilation logfile can be define in /etc/cards.conf as: logdir /var/log/pkgbuild for example.",
+		_("create a package from the recipe found in the port."),
+_("This command is used for the packager. All the dependencies must be compiled, up to date and available for the creation of the final package. If somes dependencies are missing, the command will abort. A compilation logfile can be define in /etc/cards.conf as: logdir /var/log/pkgbuild for example."),
 		ArgParser::EQ, 1, "<package>");
 
 	addCommand(CMD_PURGE, "purge",
-		"remove archives from installed packages.",
-"This command can be used if you want to save some space on the harddisk. It will delete all the downloads binaries which are located in the binaries sections directories.",
+		_("remove archives from installed packages."),
+_("This command can be used if you want to save some space on the harddisk. It will delete all the downloads binaries which are located in the binaries sections directories."),
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_UPGRADE, "upgrade",
-		"upgrade you installation with a single command.",
-"This command can upgrade at onces alls your installed packages.",
+		_("upgrade you installation with a single command."),
+_("This command can upgrade at onces alls your installed packages."),
 		ArgParser::NONE, 0 , "");
 
 	OPT_FORCE.init("force",

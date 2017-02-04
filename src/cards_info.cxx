@@ -1,7 +1,7 @@
 /*
  * cards_info.cxx
  * 
- * Copyright 2015-2016 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -2,7 +2,7 @@
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -148,17 +148,18 @@ void Pkginfo::run()
 {
 	if (m_archiveinfo) {
 		pair<string, pkginfo_t> packageArchive = openArchivePackage(m_packageArchiveName) ;
+		string name = packageArchive.first + " : ";
 		cout
-      << packageArchive.first << _("Description    : ") << packageArchive.second.description << endl
-			<< packageArchive.first << _("URL            : ") << packageArchive.second.url << endl
-			<< packageArchive.first << _("Maintainer(s)  : ") << packageArchive.second.maintainer << endl
-			<< packageArchive.first << _("Packager(s)    : ") << packageArchive.second.packager << endl
-			<< packageArchive.first << _("Version        : ") << packageArchive.second.version << endl
-			<< packageArchive.first << _("Release        : ") << packageArchive.second.release << endl
-			<< packageArchive.first << _("Architecture   : ") << packageArchive.second.arch  << endl
-			<< packageArchive.first << _("Build date     : ") << packageArchive.second.build << endl;
+      << name << _("Description    : ") << packageArchive.second.description << endl
+			<< name << _("URL            : ") << packageArchive.second.url << endl
+			<< name << _("Maintainer(s)  : ") << packageArchive.second.maintainer << endl
+			<< name << _("Packager(s)    : ") << packageArchive.second.packager << endl
+			<< name << _("Version        : ") << packageArchive.second.version << endl
+			<< name << _("Release        : ") << packageArchive.second.release << endl
+			<< name << _("Architecture   : ") << packageArchive.second.arch  << endl
+			<< name << _("Build date     : ") << packageArchive.second.build << endl;
 		if (packageArchive.second.dependencies.size() > 0 ) {
-			cout << packageArchive.first << _("Dependencies   : ");
+			cout << name << _("Dependencies   : ");
 			for ( auto i : packageArchive.second.dependencies) cout << i.first << i.second << " ";
 			cout << endl;
 		}
