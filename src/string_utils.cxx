@@ -270,15 +270,16 @@ set<string> parseDelimitedSetList(const string& s, const char delimiter)
 }
 vector<string> parseHTMLDelimitedList
 (const vector<string>& text,
-	const char delimiter)
+	const string delimiter)
 {
 	string::size_type start = 0, end = 0;
 	vector<string> page;
 	vector<string> body;
-	string startTagValue = "<" + delimiter, endTagValue = "</";
+	string startTagValue = delimiter, endTagValue = "</";
 	/* First pass to check if we have h2, h3, h3, h4, h5 , h6 paragraphs
      h1 can only be ones at the first line */
 	bool haveContent=false;
+	int ref=0;
 	for (vector<string>::const_iterator i = text.begin(); i != text.end(); ++i) {
 		string line = *i;
 		start = 0;
@@ -288,13 +289,16 @@ vector<string> parseHTMLDelimitedList
 		/* line contains startTag  not found, just copy the line*/
 		if ( start == string::npos) {
 			/* if they is no content yet we go on with copy */
-			if (! haveContent )
+			if (! haveContent ) {
 				page.push_back(line);
+			} else {
+				body.push_back(line);
+			}
 			continue;
 		}
 
 		/* line contains <h1>... is the title, this should happens only once */
-		if ( line[start+1] == '1' ) {
+		if ( line[start+2] == '1' ) {
 			page.push_back(line);
 			continue;
 		}
@@ -305,20 +309,39 @@ vector<string> parseHTMLDelimitedList
 			page.push_back(line);
 			continue;
 		}
+
 		/* start is pos of first character of our line to add into contents */
 		start++;
 		end = line.find(endTagValue);
 		/* line contains endTag
 		We store the line as it is*/
 		if ( end != string::npos) {
+			ref++;
+			string sRef = "";
+			sRef += "<li><a href=\"#";
+			sRef += itos(ref);
+			sRef += "\">";
+			sRef += line.substr(start, end - start);
+			sRef += "</a>";
 			/* First time we find a paragraph header ? */
-			if ( ! haveContent )
-				page.push_back( "Content" );
+			if ( ! haveContent ) {
+				page.push_back( "<div class=\"toc\">");
+				page.push_back( " <h4>Content</h4>" );
+				page.push_back( "  <ul>" );
+			}
 			haveContent = true;
-			page.push_back(line.substr(start, end-start));
-			body.push_back(line);
+			page.push_back(sRef);
+			string Newline = "";
+			Newline += "<a name=\"";
+			Newline += itos(ref);
+			Newline += "\"></a>";
+			Newline += line;
+			body.push_back(Newline);
 		}
 	}
+	if ( haveContent )
+		page.push_back( "</ul>\n</div>");
+
 	/* they is no content, page is completed */
 	if (! haveContent )
 		return page;

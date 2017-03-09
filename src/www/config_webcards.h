@@ -103,6 +103,14 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "   border: 2px solid #dbddec;" << endl \
  << "   padding: 0.5em 0.5em 0.5em 0.5em;" << endl \
  << "}" << endl \
+ << "div.toc {" << endl \
+ << "   margin: 0em 0em 0em 0em;" << endl \
+ << "   font-size: 0.9em;" << endl \
+ << "   color:#222222;" << endl \
+ << "   border: 1px solid #999999;" << endl \
+ << "   padding: 0em 2em 0em 1em;" << endl \
+ << "   width: -moz-max-content;" << endl \
+ << "}" << endl \
  << "div.important img { padding: 0.4em; }" << endl \
  << "div.note img { padding: 0em 0.4em; }" << endl \
  << "div.pied_page { text-align: center; }" << endl \
