@@ -1,7 +1,7 @@
 //  string_utils.h
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -91,13 +91,17 @@ std::string getFirstValueOfKeyBeforeDelim(const std::string& s, char delimiter);
 /* strip whitespace in the beginning and end of string, return a stripped string */
 std::string stripWhiteSpace(const std::string& s);
 
-/* populate a vector of string with delimited string */
+/* populate a vector of string with delimited character */
 std::vector<std::string> parseDelimitedList
 (const std::string& s, const char delimiter);
 
-/* populate a set of string with delimited string */
+/* populate a set of string with delimited character */
 std::set<std::string> parseDelimitedSetList
 (const std::string& s, const char delimiter);
+
+/* populate a vector of string with delimed char from an html formated text */
+std::vector<std::string> parseHTMLDelimitedList
+(const std::vector<std::string>& text, const char delimiter);
 
 /* make sure s1 starts with s2 */
 bool startsWith(const std::string& s, const std::string& with);

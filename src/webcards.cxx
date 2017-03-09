@@ -409,6 +409,8 @@ cellspacing=\"10\" width=\"100%\">" << endl
 	if ( Content.find(arguments.docName) != Content.end() ){
 		SEARCH;
 		lastUpdate(Content[arguments.docName].date);
+//		vector<string> page = parseHTMLDelimitedList( Content[arguments.docName].text, 'h');
+//		for (auto i : page) cout << i << endl;
 		for (auto i : Content[arguments.docName].text) cout << i << endl;
 		FOOTERTEXT;
 		endOfPage();

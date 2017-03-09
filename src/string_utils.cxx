@@ -1,7 +1,7 @@
 //  strings_utils.cxx
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
-//  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -267,6 +267,67 @@ set<string> parseDelimitedSetList(const string& s, const char delimiter)
 	}
 	list.insert(s.substr(start));
 	return list;
+}
+vector<string> parseHTMLDelimitedList
+(const vector<string>& text,
+	const char delimiter)
+{
+	string::size_type start = 0, end = 0;
+	vector<string> page;
+	vector<string> body;
+	string startTagValue = "<" + delimiter, endTagValue = "</";
+	/* First pass to check if we have h2, h3, h3, h4, h5 , h6 paragraphs
+     h1 can only be ones at the first line */
+	bool haveContent=false;
+	for (vector<string>::const_iterator i = text.begin(); i != text.end(); ++i) {
+		string line = *i;
+		start = 0;
+		end = 0;
+		start = line.find(startTagValue);
+
+		/* line contains startTag  not found, just copy the line*/
+		if ( start == string::npos) {
+			/* if they is no content yet we go on with copy */
+			if (! haveContent )
+				page.push_back(line);
+			continue;
+		}
+
+		/* line contains <h1>... is the title, this should happens only once */
+		if ( line[start+1] == '1' ) {
+			page.push_back(line);
+			continue;
+		}
+
+		/* line contains first '>' after startTag found ? */
+		start = line.find('>', start + 1);
+		if ( start == string::npos) {
+			page.push_back(line);
+			continue;
+		}
+		/* start is pos of first character of our line to add into contents */
+		start++;
+		end = line.find(endTagValue);
+		/* line contains endTag
+		We store the line as it is*/
+		if ( end != string::npos) {
+			/* First time we find a paragraph header ? */
+			if ( ! haveContent )
+				page.push_back( "Content" );
+			haveContent = true;
+			page.push_back(line.substr(start, end-start));
+			body.push_back(line);
+		}
+	}
+	/* they is no content, page is completed */
+	if (! haveContent )
+		return page;
+
+	for (vector<string>::const_iterator i = body.begin(); i != body.end(); ++i) {
+		string line = *i;
+		page.push_back(line);
+	}
+	return page;
 }
 string stripWhiteSpace(const string& s)
 {
