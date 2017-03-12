@@ -1,6 +1,6 @@
 //  webcards.cxx
 //
-//  Copyright (c) 2016 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2017 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,92 @@
 using namespace std;
 using namespace Sql;
 
+vector<string> parseHTMLDelimitedList
+(const vector<string>& text,
+	const string startTagValue,
+	const string contentTitle )
+{
+	string::size_type start = 0, end = 0;
+	vector<string> page;
+	vector<string> body;
+	string endTagValue = "</";
+	/* First pass to check if we have h2, h3, h3, h4, h5 , h6 paragraphs
+     h1 can only be ones at the first line */
+	bool haveContent=false;
+	int ref=0;
+	for (vector<string>::const_iterator i = text.begin(); i != text.end(); ++i) {
+		string line = *i;
+		start = 0;
+		end = 0;
+		start = line.find(startTagValue);
+
+		/* line contains startTag  not found, just copy the line*/
+		if ( start == string::npos) {
+			/* if they is no content yet we go on with copy */
+			if (! haveContent ) {
+				page.push_back(line);
+			} else {
+				body.push_back(line);
+			}
+			continue;
+		}
+
+		/* line contains <h1>... is the title, this should happens only once */
+		if ( line[start+2] == '1' ) {
+			page.push_back(line);
+			continue;
+		}
+
+		/* line contains first '>' after startTag found ? */
+		start = line.find('>', start + 1);
+		if ( start == string::npos) {
+			page.push_back(line);
+			continue;
+		}
+
+		/* start is pos of first character of our line to add into contents */
+		start++;
+		end = line.find(endTagValue);
+		/* line contains endTag
+		We store the line as it is*/
+		if ( end != string::npos) {
+			ref++;
+			string sRef = "";
+			sRef += "<li><a href=\"#";
+			sRef += itos(ref);
+			sRef += "\">";
+			sRef += line.substr(start, end - start);
+			sRef += "</a>";
+			/* First time we find a paragraph header ? */
+			if ( ! haveContent ) {
+				page.push_back( "<div class=\"toc\">\n <h2>");
+				page.push_back( contentTitle );
+				page.push_back( "</h2>");
+				page.push_back( "  <ul style=\"list-style-type: none; padding: 0;\">" );
+			}
+			haveContent = true;
+			page.push_back(sRef);
+			string Newline = "";
+			Newline += "<a name=\"";
+			Newline += itos(ref);
+			Newline += "\"></a>";
+			Newline += line;
+			body.push_back(Newline);
+		}
+	}
+	if ( haveContent )
+		page.push_back( "</ul>\n</div>");
+
+	/* they is no content, page is completed */
+	if (! haveContent )
+		return page;
+
+	for (vector<string>::const_iterator i = body.begin(); i != body.end(); ++i) {
+		string line = *i;
+		page.push_back(line);
+	}
+	return page;
+}
 void visitOfPage(char * argument)
 {
 	FILE *pVisits = fopen("content/.visits","r+");
@@ -321,26 +407,32 @@ int main (int argc, char** argv)
 		return 0;
 
 	string sLang = sPath.substr(pos+1);
-	if ( sLang == "fr" )
+	const char * tocTitle;
+	const char * search;
+	if ( sLang == "fr" ) {
 		MENUFR;
-	else if ( sLang == "tr" )
-		MENUTR;
-	else
-		MENUEN;
+		tocTitle = "Sommaire";
+		search = "Recherche ...";
 
+	} else if ( sLang == "tr" ) {
+		MENUTR;
+		search = "Ara ...";
+		tocTitle = "İçindekiler ";
+	 } else {
+		MENUEN;
+		search = "Search ...";
+		tocTitle = "Contents";
+	}
 	/* The main table */
 	cout << "<table border=\"0\" cellpadding=\"15\" \
 cellspacing=\"10\" width=\"100%\">" << endl
   << " <tr valign=\"top\">" << endl;
 	const char * forumAdress;
-	const char * search;
 	if ( sLang == "fr" )
 	{
 		forumAdress = "http://forum.nutyx.org";
-		search = "Recherche ...";
 	} else{
 		forumAdress = "http://forums.nutyx.org";
-		search = "Search ...";
 	}
 	sideBar(forumAdress);
 	cout << "  <td valign=\"top\" align=\"left\" width=\"100%\">" << endl;
@@ -409,9 +501,10 @@ cellspacing=\"10\" width=\"100%\">" << endl
 	if ( Content.find(arguments.docName) != Content.end() ){
 		SEARCH;
 		lastUpdate(Content[arguments.docName].date);
-		vector<string> page = parseHTMLDelimitedList( Content[arguments.docName].text, "<h");
+		vector<string> page = parseHTMLDelimitedList( Content[arguments.docName].text,
+			"<h",
+			tocTitle);
 		for (auto i : page) cout << i << endl;
-//		for (auto i : Content[arguments.docName].text) cout << i << endl;
 		FOOTERTEXT;
 		endOfPage();
 		return 0;

@@ -82,7 +82,7 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "   font-family: monospace;" << endl \
  << "   background-color: #D0D0D0;" << endl \
  << "}" << endl \
- << "td { padding: 0em 0.5em 0em 0.5em; }" << endl \
+ << "td { padding: 0.5em 0.5em 0.5em 0.5em; }" << endl \
  << "tr.header { color: white; background-color: #606060; }" << endl \
  << "tr.odd { background-color: #D0D0D0; }" << endl \
  << ".sidebar { background-color: #E0E0E0; }" << endl \
@@ -106,10 +106,10 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "div.toc {" << endl \
  << "   margin: 0em 0em 0em 0em;" << endl \
  << "   font-size: 0.9em;" << endl \
- << "   color:#222222;" << endl \
  << "   border: 1px solid #999999;" << endl \
  << "   padding: 0em 2em 0em 1em;" << endl \
  << "   width: -moz-max-content;" << endl \
+ << "   background-color: #e9e9ef;" << endl \
  << "}" << endl \
  << "div.important img { padding: 0.4em; }" << endl \
  << "div.note img { padding: 0em 0.4em; }" << endl \

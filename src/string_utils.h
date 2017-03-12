@@ -99,10 +99,6 @@ std::vector<std::string> parseDelimitedList
 std::set<std::string> parseDelimitedSetList
 (const std::string& s, const char delimiter);
 
-/* populate a vector of string with delimed string from an html formated text */
-std::vector<std::string> parseHTMLDelimitedList
-(const std::vector<std::string>& text, const std::string delimiter);
-
 /* make sure s1 starts with s2 */
 bool startsWith(const std::string& s, const std::string& with);
 

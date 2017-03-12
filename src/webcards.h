@@ -50,6 +50,12 @@ struct arguments_t {
 };
 typedef std::map<std::string, contentInfo_t> content_t;
 
+/* populate a vector of string with delimed string from an html formated text */
+std::vector<std::string> parseHTMLDelimitedList
+(const std::vector<std::string>& text,
+const std::string delimiter, const std::string contentTitle);
+
+
 void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments);
 void visitOfPage(char * Argument);
 
