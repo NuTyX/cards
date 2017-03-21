@@ -108,7 +108,7 @@ void Cards_sync::treatErrors(const std::string& s) const
 			throw RunTimeErrorWithErrno("could not create directory " + s);
 			break;
 		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
-			throw runtime_error(s + " only root can install / sync / purge / upgrade / remove packages");
+			throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
 			break;
 	}
 }

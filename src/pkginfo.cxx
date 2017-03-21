@@ -181,8 +181,13 @@ void Pkginfo::run()
 			}
 		} else if (m_list_mode) {
 			// List package or file contents
-//			buildDatabase(false,false,false,false,"");
 //			buildCompleteDatabase(false);
+			buildDatabase(true,false,false,false,"");
+			if ( (! checkPackageNameExist(m_arg)) &&
+					(! checkPackageNameExist(m_arg)) ) {
+				m_actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
+				treatErrors(m_arg);
+			}
 			buildDatabase(true,false,false,false,m_arg);
 			if (checkPackageNameExist(m_arg)) {
 				string arg = m_listOfAlias[m_arg];
@@ -190,9 +195,6 @@ void Pkginfo::run()
 			} else if (checkFileExist(m_arg)) {
 				pair<string, pkginfo_t> package = openArchivePackage(m_arg);
 				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
-			} else {
-				m_actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
-				treatErrors(m_arg);
 			}
 		} else if (m_runtimedependencies_mode) {
 			/* 	Get runtimedependencies of the file found in the directory path

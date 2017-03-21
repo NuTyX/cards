@@ -80,7 +80,7 @@ int ArgParser::addCommand(APCmd& cmd,
     APCmd apcmd;
     apcmd.id = m_cmdIdCounter;
 
-    PREDEFINED_CMD_HELP.init("help", 'h', gettext("\t   Print this help message"));
+    PREDEFINED_CMD_HELP.init("help", 'h', _("\t   Print this help message"));
 
     // add predefined commands
     addOption(cmd, PREDEFINED_CMD_HELP, false);
@@ -177,7 +177,7 @@ void ArgParser::parse(int argc, char** argv)
     }
 
     if (!commandFound) {
-        parseError("No command used");
+        parseError(_("No specify command"));
         exit(-1);
     }
 
@@ -189,7 +189,7 @@ void ArgParser::parse(int argc, char** argv)
 
         if (argv[i][0] == '-') {
             if (argv[i][1] == '\0') {
-                parseError("Illegal token: '-'", cmd->name);
+                parseError(_("Illegal token: '-'"), cmd->name);
             } else if (argv[i][1] == '-') {
 
                 char* valPtr = strchr(argv[i]+2, '=');
@@ -200,7 +200,7 @@ void ArgParser::parse(int argc, char** argv)
 
                 if (m_optionsByLongName.find(argv[i]+2) ==
                     m_optionsByLongName.end()) {
-                    parseError("unknown option:" + string(argv[i]+2),
+                    parseError(_("unknown option: ") + string(argv[i]+2),
                                cmd->name);
                 }
 
@@ -208,7 +208,7 @@ void ArgParser::parse(int argc, char** argv)
                 string val = "";
                 if (o->requiresValue) {
                     if (valPtr == NULL || *valPtr == 0) {
-                        parseError("Value required for option '" +
+                        parseError(_("Value required for option '") +
                                    string(argv[i]+2), cmd->name);
                     } else {
                         val = valPtr;
@@ -217,13 +217,13 @@ void ArgParser::parse(int argc, char** argv)
                 m_setOptions[o->id] = val;
             } else {
                 if (argv[i][2] != '\0') {
-                    parseError("invalid short option '" +
+                    parseError(_("invalid short option '") +
                                string(argv[i]+1) + "'", cmd->name);
                 }
 
                 if (m_optionsByShortName.find(argv[i][1]) ==
                     m_optionsByShortName.end()) {
-                    parseError("unknown short option:" + string(argv[i]+1),
+                    parseError(_("unknown short option: ") + string(argv[i]+1),
                                cmd->name);
                 }
 
@@ -231,7 +231,7 @@ void ArgParser::parse(int argc, char** argv)
                 string val = "";
                 if (o->requiresValue) {
                     if (i+1 == argc) {
-                        parseError("Option required for option '" +
+                        parseError(_("Option required for option '") +
                                    string(argv[i]+1), cmd->name);
                     } else {
                         val = argv[i+1];
@@ -256,11 +256,11 @@ void ArgParser::parse(int argc, char** argv)
         it = cmd->mandatoryOptions.begin();
         for (; it != cmd->mandatoryOptions.end(); ++it) {
             if (!isSet(it->second->id)) {
-                parseError("Command " + cmd->name +
-                           " requires option " +
+                parseError(_("Command ") + cmd->name +
+                           _(" requires option ") +
                            string("-") + it->second->shortName +
                            string(",  ") +
-                           string("--") + it->second->longName + " not found",
+                           string("--") + it->second->longName + _(" not found"),
                            cmd->name);
             }
         }
@@ -272,7 +272,7 @@ void ArgParser::parse(int argc, char** argv)
             if (m_otherArguments.size() != cmd->argNumber) {
                 ostringstream ostr;
                 ostr << BLUE << cmd->name << NORMAL
-                     << " takes exactly "
+                     << _(" takes exactly ")
                      << cmd->argNumber
                      << (cmd->argNumber == 1 ? " argument." : " arguments.");
 
@@ -283,9 +283,9 @@ void ArgParser::parse(int argc, char** argv)
             if (m_otherArguments.size() < cmd->argNumber) {
                 ostringstream ostr;
                 ostr << BLUE << cmd->name << NORMAL
-                     << " takes at least "
+                     << _(" takes at least ")
                      << cmd->argNumber
-                     << (cmd->argNumber == 1 ? " argument." : " arguments.");
+                     << (cmd->argNumber == 1 ? _(" argument.") : _(" arguments."));
 
                 parseError(ostr.str(), cmd->name);
             }
@@ -294,9 +294,9 @@ void ArgParser::parse(int argc, char** argv)
             if (m_otherArguments.size() > cmd->argNumber) {
                 ostringstream ostr;
                 ostr << BLUE << cmd->name << NORMAL
-                     << " takes at most "
+                     << _(" takes at most ")
                      << cmd->argNumber
-                     << (cmd->argNumber == 1 ? " argument." : " arguments.");
+                     << (cmd->argNumber == 1 ? _(" argument.") : _(" arguments."));
 
                 parseError(ostr.str(), cmd->name);
             }
@@ -433,9 +433,9 @@ std::string ArgParser::generateUsage() const
 	usage += COMMAND;
 	usage += " ";
 	usage += OPTIONS;
-	usage += " <arguments>\n\n Where ";
+	usage += _(" <arguments>\n\n Where ");
 	usage += COMMAND;
-	usage += " is one of the following:\n\n";
+	usage += _(" is one of the following:\n\n");
 
 	std::map<std::string, Command*>::const_iterator it;
 	it = m_commands.begin();

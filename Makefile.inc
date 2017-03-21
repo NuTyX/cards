@@ -35,7 +35,7 @@ LOCALEDIR = ${DESTDIR}/usr/share/locale
 AR?=ar
 RANLIB?=ranlib
 
-VERSION = 2.1.107
+VERSION = 2.2
 
 NAME = cards-$(VERSION)
 

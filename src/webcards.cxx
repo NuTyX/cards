@@ -27,6 +27,7 @@ vector<string> parseHTMLDelimitedList
 	vector<string> page;
 	vector<string> body;
 	string endTagValue = "</";
+	int previousHeaderLevel = '2';
 	/* First pass to check if we have h2, h3, h3, h4, h5 , h6 paragraphs
      h1 can only be ones at the first line */
 	bool haveContent=false;
@@ -47,9 +48,9 @@ vector<string> parseHTMLDelimitedList
 			}
 			continue;
 		}
-
+		int headerLevel =  line[start+2];
 		/* line contains <h1>... is the title, this should happens only once */
-		if ( line[start+2] == '1' ) {
+		if ( headerLevel == '1' ) {
 			page.push_back(line);
 			continue;
 		}
@@ -67,13 +68,6 @@ vector<string> parseHTMLDelimitedList
 		/* line contains endTag
 		We store the line as it is*/
 		if ( end != string::npos) {
-			ref++;
-			string sRef = "";
-			sRef += "<li><a href=\"#";
-			sRef += itos(ref);
-			sRef += "\">";
-			sRef += line.substr(start, end - start);
-			sRef += "</a>";
 			/* First time we find a paragraph header ? */
 			if ( ! haveContent ) {
 				page.push_back( "<div class=\"toc\">\n <h2>");
@@ -82,6 +76,26 @@ vector<string> parseHTMLDelimitedList
 				page.push_back( "  <ul style=\"list-style-type: none; padding: 0;\">" );
 			}
 			haveContent = true;
+			ref++;
+
+			string sRef = "";
+			if ( headerLevel != previousHeaderLevel ) {
+				int i = headerLevel ;
+				while ( i > previousHeaderLevel ) { /* means > '2' */
+					sRef += "<li>\n <ul style=\"list-style-type: none;\">";
+					i--;
+				}
+				i = headerLevel ;
+				while ( i < previousHeaderLevel ) {
+					sRef += "  </ul>\n</li>";
+					i++;
+				}
+			}
+			sRef += "<li><a href=\"#";
+			sRef += itos(ref);
+			sRef += "\">";
+			sRef += line.substr(start, end - start);
+			sRef += "</a>";
 			page.push_back(sRef);
 			string Newline = "";
 			Newline += "<a name=\"";
@@ -90,6 +104,8 @@ vector<string> parseHTMLDelimitedList
 			Newline += line;
 			body.push_back(Newline);
 		}
+		/* We'll need to know what was the previous level */
+		previousHeaderLevel = headerLevel;
 	}
 	if ( haveContent )
 		page.push_back( "</ul>\n</div>");

@@ -56,9 +56,9 @@ int main(int argc, char** argv)
 		if (cardsArgPars.command() == CardsArgumentParser::CMD_HELP) {
 			cout << _("Usage: ") << BLUE << cardsArgPars.appName()  << _(" command ") << NORMAL << "[options]"<< endl;
 
-			cout << "where possible" << BLUE << _(" command ") << NORMAL<< "are:" << endl;
+			cout << _("Where possible") << BLUE << _(" command ") << NORMAL<< _("is:") << endl;
 
-			cout << GREEN << "\nINFORMATION" << NORMAL << endl;
+			cout << GREEN << _("\nINFORMATION") << NORMAL << endl;
 			cout << BLUE << "  help                       "
 				<< NORMAL << _("show this help") << endl;
 			cout << BLUE << "  list [-b][-p]              "
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 				<< "                             "
 				<< _("If -I it will ignore the WARNING about NOT FOUND <dependencies> from <port>")
 				<< endl;
-			cout << GREEN << "\nPORTS SPECIFIC SCENARIO" << NORMAL << endl;
+			cout << GREEN << _("\nPORTS SPECIFIC SCENARIO") << NORMAL << endl;
 			cout << BLUE << "  depends" << NORMAL << " [-i] <port>        "
 				<< _("show dependencies for the port in compilation order.")
 				<< endl
@@ -99,7 +99,7 @@ int main(int argc, char** argv)
 				<< _("install all the dependencies from binaries and then compile the port.")
 				<< endl;
 
-			cout << GREEN << "\nDIFFERENCES / UPGRADE / CLEANUP" << NORMAL << endl;
+			cout << GREEN << _("\nDIFFERENCES / UPGRADE / CLEANUP") << NORMAL << endl;
 			cout << BLUE << "  diff" << NORMAL << " [-p]                  "
 				<< _("list outdated packages.") << endl
 				<< "                             list outdated ports" << endl;
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
 				<< _("upgrade outdated packages.") << endl;
 			cout << BLUE << "  purge" << NORMAL << "                      "
 				<< _("cleanup downloaded binaries in cache.") << endl;
-			cout << GREEN << "\nSEARCHING" << NORMAL << endl;
+			cout << GREEN << _("\nSEARCHING") << NORMAL << endl;
 			cout << BLUE << "  search" << NORMAL << " <expr>              "
 				<< _("show port names or description containing 'expr'")
 				<< endl;
@@ -115,10 +115,10 @@ int main(int argc, char** argv)
 				<< _("list owner of file(s) matching the query.") << endl;
 			cout << BLUE << "  files" << NORMAL << "  <package>           "
 				<< _("list the file(s) owned by the <package>") << endl;
-			cout << GREEN << "\nSYNCHRONISATION" << NORMAL << endl;
+			cout << GREEN << _("\nSYNCHRONIZATION") << NORMAL << endl;
 			cout << BLUE << "  sync" << NORMAL << "                       "
 				<< _("synchronize the local and remote meta datas.") << endl;
-			cout << GREEN << "\nINSTALL, UPDATE and REMOVAL" << NORMAL << endl;
+			cout << GREEN << _("\nINSTALL, UPDATE and REMOVAL") << NORMAL << endl;
 			cout << BLUE << "  install" << NORMAL << " [-u][-f] <package> "
 				<< _("install the binary found on the mirror.") << endl
 				<< "                             "
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
 				<< _("remove the installed package.") << endl
 				<< "                             "
 				<< _("If -a it will remove the sub-package as well.") << endl;
-			cout << GREEN << "\nBASE SYSTEM" << NORMAL << endl;
+			cout << GREEN << _("\nBASE SYSTEM") << NORMAL << endl;
 			cout << BLUE << "  base" << NORMAL << " -r                    "
 				<< _("return to a base system.") << endl
 				<< "                             "

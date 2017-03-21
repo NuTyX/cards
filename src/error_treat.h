@@ -33,12 +33,12 @@
 #define WHITE "\033[1;37m"
 #define NORMAL "\033[1;0m"
 
-#define ACTION "\033[1;33maction:\033[1;0m"
-#define USAGE "\033[1;33musage: \033[1;0m"
-#define OPTIONS "\033[1;33moptions\033[1;0m"
-#define REQUIRED "\033[1;33mrequired\033[1;0m"
-#define DESCRIPTION  "\033[1;33mdescription: \033[1;0m"
-#define COMMAND "\033[1;34mcommand\033[1;0m"
+#define ACTION _("\033[1;33maction:\033[1;0m")
+#define USAGE _("\033[1;33musage: \033[1;0m")
+#define OPTIONS _("\033[1;33moptions\033[1;0m")
+#define REQUIRED _("\033[1;33mrequired\033[1;0m")
+#define DESCRIPTION  _("\033[1;33mdescription: \033[1;0m")
+#define COMMAND _("\033[1;34mcommand\033[1;0m")
 
 #include <cstring>
 #include <stdexcept>

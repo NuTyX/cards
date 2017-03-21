@@ -106,9 +106,9 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "div.toc {" << endl \
  << "   margin: 0em 0em 0em 0em;" << endl \
  << "   font-size: 0.9em;" << endl \
+ << "   display: table;" << endl \
  << "   border: 1px solid #999999;" << endl \
  << "   padding: 0em 2em 0em 1em;" << endl \
- << "   width: -moz-max-content;" << endl \
  << "   background-color: #e9e9ef;" << endl \
  << "}" << endl \
  << "div.important img { padding: 0.4em; }" << endl \

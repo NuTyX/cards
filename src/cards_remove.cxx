@@ -51,7 +51,7 @@ Cards_remove::Cards_remove(const string& commandName,
 			}
 		}	
 		if (basePackagesList.empty())
-			throw runtime_error("No package found for the base System" );
+			throw runtime_error(_("No package found for the base System") );
 
 		// Retrieve info about all the packages
 		buildSimpleDatabase();
