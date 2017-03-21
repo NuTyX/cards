@@ -496,7 +496,7 @@ msgid "shows help about cards."
 msgstr "affiche l'aide de cards."
 
 msgid "You can also check 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.conf'."
-msgstr "Vou pouvez aussi lire 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.conf'."
+msgstr "Vous pouvez aussi lire 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.conf'."
 
 msgid "print info about cards configuration."
 msgstr "affiche les informations de la configuration de cards."
@@ -517,10 +517,10 @@ msgid "synchronize local and remote metadatas."
 msgstr "synchronise les metadonnées locales et distantes."
 
 msgid "print info about a package."
-msgstr "affiche les information d'un paquet"
+msgstr "affiche les informations d'un paquet"
 
 msgid "If -p or -b are passed as optional arguments, it will be the info of a port or the info of a binary available in the depot."
-msgstr "Si un argument -p ou -b est utilisé, ce seront les informations d'un port ou les information d'un binaire disponible sur le dépot."
+msgstr "Si un argument -p ou -b est utilisé, ce seront les informations d'un port ou les informations d'un binaire disponible sur le dépot."
 
 msgid "list installed packages."
 msgstr "Liste des paquets installés"
@@ -678,7 +678,7 @@ msgid "<file>"
 msgstr "<config>"
 
 msgid "This command can upgrade at onces alls your installed out of date packages."
-msgstr "Cette commande peut mettre à jour tous vos paquets installés et obsolètes."
+msgstr "Cette commande permet de mettre à jour tous vos paquets installés et obsolètes."
 
 msgid "\nPORTS SPECIFIC SCENARIO"
 msgstr "\nSCENARIO SPECIFIQUE AUX PORTS"
