@@ -47,7 +47,7 @@ mysql::~mysql()
 void mysql::lastPosts(const char *forum, int n)
 {
 	if(mysql_query(m_connection,
-	"select id_topic,id_msg, poster_name, poster_time, subject from smf_messages order by id_msg"))
+	"select id_topic,id_msg, poster_name, poster_time, subject, icon from smf_messages order by id_msg"))
 		cerr << mysql_error(m_connection) << endl;
 	m_result= mysql_use_result(m_connection);
 	vector<string> list;
@@ -60,13 +60,15 @@ void mysql::lastPosts(const char *forum, int n)
 		string author = "<i>";
 		author += rows[2];
 		string subject = rows[4];
+		string icon = rows[5];
 		string message = time; 
 		message += author;
-		message += "</i><br><a href=\"" + sforum;
+		message += " </i><br><img src=\"../../graphics/" + icon;
+    message += ".gif\" alt=\"\" /> <a href=\"" + sforum;
 		message += "/index.php?topic=" + id_topic;
 		message += ".msg" + id_msg;
 		message += "#msg" + id_msg;
-		message += "\">" +subject;
+		message += "\">" + subject;
 		message += "</a><br><br>";
 		list.push_back(message);
 	}
