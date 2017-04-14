@@ -8,4 +8,4 @@ To be able to compile flcards for test, we need:
  xorg-libxfixes.devel \
  xorg-libxft.devel \
  xorg-libxinerama.devel \
- xorg-mesa.devel xorg-proto
+ mesa.devel xorg-proto
