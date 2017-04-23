@@ -30,6 +30,9 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 {
 	parseArguments();
 	for( auto i : m_argParser.otherArguments() ) {
+		if (checkFileExist(i)) {
+			continue;
+		}
 		if ( getListOfPackagesFromCollection(i).empty() &&
 			(! checkBinaryExist(i) ) ) {
 			m_actualError = PACKAGE_NOT_FOUND;
@@ -50,6 +53,18 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 				m_packageName = i;
 				generateDependencies();
 			}
+		} else if (checkFileExist(i)) {
+			m_packageArchiveName = i;
+			ArchiveUtils packageArchive(m_packageArchiveName.c_str());
+			std::string name = packageArchive.name();
+			if (checkPackageNameExist(name )) {
+				m_upgrade=1;
+			} else {
+				m_upgrade=0;
+			}
+			name = "(" + packageArchive.collection()+") " + name;
+			run();
+			syslog(LOG_INFO,name.c_str());
 		} else {
 			/*
 			 * It's a normal package
