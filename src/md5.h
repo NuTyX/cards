@@ -1,6 +1,7 @@
-// md5.h
 //
-// Copyright (c) by Christophe <Devine devine at cr0 dot net>
+//  md5.h
+//
+//  Copyright (c) by Christophe <Devine devine at cr0 dot net>
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -20,6 +21,8 @@
 
 #ifndef MD5_H
 #define MD5_H
+
+#include <string.h>
 
 #define uint8  unsigned char
 #define uint32 unsigned long int

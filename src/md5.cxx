@@ -1,4 +1,5 @@
-// md5.cc
+//
+// md5.cxx
 //
 // Copyright (c) by Christophe <Devine devine at cr0 dot net>
 //
@@ -18,8 +19,6 @@
 //  USA.
 //
 
-
-#include <string.h>
 #include "md5.h"
 
 #define GET_UINT32(n,b,i)                                       \
