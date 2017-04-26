@@ -1,3 +1,4 @@
+//
 //  archive_utils.h
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
@@ -19,16 +20,13 @@
 //  USA.
 //
 
-
 #ifndef ARCHIVEUTILS_H
 #define ARCHIVEUTILS_H
 
-#include <time.h>
+#include "string_utils.h"
+
 #include <archive.h>
 #include <archive_entry.h>
-
-#include "string_utils.h"
-#include "error_treat.h"
 
 
 #if ARCHIVE_VERSION_NUMBER >= 3000000
