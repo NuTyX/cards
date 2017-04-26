@@ -1,7 +1,8 @@
-// system_utils.h
+//
+//  system_utils.h
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
-//  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,15 +22,17 @@
 
 #ifndef SYSTEM_UTILS_H
 #define SYSTEM_UTILS_H
-#include <syslog.h>
-#include <stdio.h>
-#include <sys/utsname.h>
+
 #include <string>
 #include <iterator>
 #include <iostream>
 
+#include <syslog.h>
+#include <stdio.h>
+#include <sys/utsname.h>
 #include <locale.h>
 #include <libintl.h>
+
 #define _ gettext
 
 std::string getMachineType ();
