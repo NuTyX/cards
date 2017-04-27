@@ -1,8 +1,9 @@
+//
 //  pkgdbh.h
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,11 +26,16 @@
 
 #include "archive_utils.h"
 #include "file_utils.h"
+#include "process.h"
 
 #include <stdexcept>
 #include <csignal>
-#include <cerrno>
-#include <sys/types.h>
+#include <algorithm>
+
+#include <regex.h>
+#include <ext/stdio_filebuf.h>
+#include <pwd.h>
+#include <grp.h>
 
 #define PKG_DB_DIR       "var/lib/pkg/DB/"
 #define PKG_FILES        "/files"
@@ -142,10 +148,10 @@ protected:
 	void buildSimpleDatabase();
 	void buildCompleteDatabase(const bool& silent);
 	void buildDatabase(const bool& progress,
-		const bool& simple,
-		const bool& all,
-		const bool& files,
-		const std::string& packageName);
+	const bool& simple,
+	const bool& all,
+	const bool& files,
+	const std::string& packageName);
 
 
 	void addPackageFilesRefsToDB(const std::string& name,
@@ -177,8 +183,8 @@ protected:
 	std::set< std::pair<std::string, time_t> > getPackageDependencies(const std::string& filename);
 	void extractAndRunPREfromPackage(const std::string& filename);
 	void installArchivePackage(const std::string& filename,
-		const std::set<std::string>& keep_list,
-		const std::set<std::string>& non_install_files);
+	const std::set<std::string>& keep_list,
+	const std::set<std::string>& non_install_files);
 
 	/*
 	 * The folder holding the meta datas is going to be create here
