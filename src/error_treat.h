@@ -1,6 +1,7 @@
+//
 //  error_treat.h
 // 
-//  Copyright (c) 2014-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014-2017 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,11 +19,12 @@
 //  USA.
 //
 
-
 #ifndef ERRORTREAT_H
 #define ERRORTREAT_H
 
 #include "system_utils.h"
+
+#include <cstring>
 
 #define RED "\033[1;31m"
 #define GREEN "\033[1;32m"
@@ -40,9 +42,6 @@
 #define DESCRIPTION  _("\033[1;33mdescription: \033[1;0m")
 #define COMMAND _("\033[1;34mcommand\033[1;0m")
 
-#include <cstring>
-#include <stdexcept>
-#include <cerrno>
 
 enum error
 {
