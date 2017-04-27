@@ -1,3 +1,4 @@
+//
 //  strings_utils.cxx
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
@@ -19,12 +20,7 @@
 //  USA.
 //
 
-
 #include "string_utils.h"
-#include <iostream>
-#include <cctype>
-#include <fstream>
-#include <sys/stat.h>
 
 using namespace std;
 
