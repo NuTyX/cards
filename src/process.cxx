@@ -1,8 +1,9 @@
+//
 //  process.cxx
 //
 //  AUTHORS:     Johannes Winkelmann, jw@tks6.net
 //              Output redirection by Logan Ingalls, log@plutor.org
-//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -20,24 +21,9 @@
 //  USA.
 //
 
-#include <list>
-using namespace std;
-
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-
-#include <cassert>
-#include <cstddef>
-#include <cstdlib>
-#include <cstdio>
-
 #include "process.h"
-#include "string_utils.h"
 
-// using namespace StringHelper;
+using namespace std;
 
 process::process( const string& app, const string& arguments, int fdlog )
 	: application( app ), arguments( arguments ), fileDescriptorLog ( fdlog )
