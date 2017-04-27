@@ -1,3 +1,4 @@
+//
 //  string_utils.h
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
@@ -22,24 +23,20 @@
 #ifndef STRING_UTILS_H
 #define STRING_UTILS_H
 
+#include "error_treat.h"
+
+#include <fstream>
+#include <map>
+#include <set>
+#include <vector>
+
+#include <sys/stat.h>
+
 #define GIGA 1e9
 #define MEGA 1e6
 #define KILO 1e3
 #define PACKAGE_LOCALE_DIR "/usr/share/locale"
 #define GETTEXT_PACKAGE "cards"
-
-#include "error_treat.h"
-
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-
-#include <list>
-#include <set>
-#include <map>
-#include <vector>
-#include <sys/types.h>
-
 
 void *Malloc(size_t s);
 
@@ -49,19 +46,34 @@ struct keyValue
 	std::string value;
 };
 
-/* itemList is a list of *char dynamically allocated */
+/**
+ itemList is a list of char* dynamically allocated
+ */
 typedef struct
 {
 	char **items;
 	unsigned int count;
 } itemList;
 
-/***  itemList: Create the list, Add Item to the list, free the list  ***/
+/**
+  initItemList: Create an item List
+*/
 itemList *initItemList(void);
+
+/**
+ addItemToItemList: Add an item to an already created itemList
+*/
 void addItemToItemList(itemList *list, const char *item);
+
+/**
+freeItemList: Destroy the itemList created and free the allocated memory
+*/
+ 
 void freeItemList(itemList *list);
 
-
+/**
+ splitKeyValue: Split a string value into a keyValue structure
+*/
 keyValue splitKeyValue
 (std::string s, char delimiter);
 
@@ -102,7 +114,10 @@ std::set<std::string> parseDelimitedSetList
 /* make sure s1 starts with s2 */
 bool startsWith(const std::string& s, const std::string& with);
 
-/* make sure s1 starts with s2 */
+/**
+ startsWithNoCase
+ make sure s1 starts with s2
+*/
 bool startsWithNoCase(const std::string& s1, const std::string& s2);
 
 std::string convertToLowerCase(const std::string& s);
@@ -111,13 +126,15 @@ std::string convertToUpperCase(const std::string& s);
 std::string replaceAll
 ( std::string& in, const std::string& oldString, const std::string& newString );
 
-/* split a string into parts
+/**
+  Split a string into parts
 	param s string to be split
 	param del delimter
 	param startPos position to start at
 	param useEmpty include empty (whitespace only9 results in the result
 
-	return a list of string */
+	return a list of string 
+*/
 template <class T>
 void split( const std::string& s, char del,
             T& target,
