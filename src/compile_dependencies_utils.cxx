@@ -1,3 +1,4 @@
+//
 //  compile_dependencies_utils.cxx
 //
 //  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
@@ -18,13 +19,8 @@
 //  USA.
 //
 
-#include <iostream>
-#include <cstdlib>
-#include <set>
-#include <string>
-
-#include "file_utils.h"
 #include "compile_dependencies_utils.h"
+
 depList *initDepsList(void)
 {
 	depList *list;

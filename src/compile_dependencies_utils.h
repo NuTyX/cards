@@ -1,4 +1,5 @@
-// cards_depends.h
+//
+// compile_dependencies_utils.h
 // 
 //  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 // 
@@ -17,9 +18,17 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
-#ifndef CARDS_DEPENDS_H
-#define CARDS_DEPENDS_H
 
+#ifndef COMPILE_DEPENDENCIES_UTILS_H
+#define COMPILE_DEPENDENCIES_UTILS_H
+
+#include "string_utils.h"
+#include "file_utils.h"
+#include "cards_argument_parser.h"
+
+#include <iostream>
+#include <cstdlib>
+#include <set>
 #include <string>
 #include <list>
 #include <map>
@@ -29,14 +38,10 @@
 #include <errno.h>
 #include <locale.h>
 #include <string.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h>
-
 #include <dirent.h>
-#include "string_utils.h"
-#include "cards_argument_parser.h"
 
 /* depList is a dependances List */
 typedef struct
@@ -63,7 +68,9 @@ typedef struct
 } pkgList;
 
 
-/*** depList: Create the list, Add dependence to the list, free the list  ***/
+/*
+ *  depList: Create the list, Add dependence to the list, free the list
+ */
 depList *initDepsList(void);
 void addDepToDepList(depList *list, unsigned int nameIndex, int niveau);
 void freeDepList(depList *list);
@@ -84,5 +91,5 @@ int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenci
 void generate_level ( itemList *filesList, pkgList *packagesList, unsigned int *niveau);
 
 char *getLongPackageName(itemList *filesList, const char * packageName);
-#endif
+#endif /* COMPILE_DEPENDENCIES_UTILS_H */
 // vim:set ts=2 :
