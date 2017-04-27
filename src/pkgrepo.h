@@ -1,7 +1,8 @@
+//
 //  pkgrepo.h
 //
 //  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
-//  Copyright (c) 2014-2016 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014-2017 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,6 +25,7 @@
 
 #include "file_utils.h"
 
+
 struct PortFilesList {
 	std::string md5SUM;
 	std::string name;
@@ -33,6 +35,7 @@ struct PortFilesList {
 /**
  * \representation of the .PKGREPO file which belong to the collection directory
  * define in the configuration file cards.conf.
+
  *************************************************
  * 73193bfc1cb30fe02a880ed088ed7590#1414192958#aalib#1.4rc5##n.a#n.a#n.a#n.a#.cards.tar.xz
  * 650ed499ce78791d45b91aaf7f91b445#1428615787#firefox#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org#.cards.tar.xz

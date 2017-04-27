@@ -1,7 +1,8 @@
+//
 //  pkgrepo.cxx
 //
 //  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
-//  Copyright (c) 2014 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014-2017 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,13 +20,8 @@
 //  USA.
 //
 
-#include <iostream>
-#include <cstdio>
-#include <cstring>
-#include <sstream>
 
 #include "pkgrepo.h"
-#include "error_treat.h"
 
 using namespace std;
 Pkgrepo::Pkgrepo(const std::string& fileName)
@@ -398,7 +394,19 @@ void Pkgrepo::parsePackagePkgfileFile()
 			j->release = 1;
 			for (vector<string>::const_iterator p = pkgFileContent.begin();p != pkgFileContent.end();++p) {
 				string line = stripWhiteSpace(*p);
-				if ( line.substr( 0, 8 ) == "version=" ){
+				if ( line.substr( 0, 12 ) == "description=" ){
+					j->description = getValueBefore( getValue( line, '=' ), '#' );
+					j->description = stripWhiteSpace( j->description );
+				} else if ( line.substr( 0, 4 ) == "url=" ){
+					j->URL = getValueBefore( getValue( line, '=' ), '#' );
+					j->URL = stripWhiteSpace( j->URL );
+				} else if ( line.substr( 0, 9 ) == "packager=" ){
+					j->packager = getValueBefore( getValue( line, '=' ), '#' );
+					j->packager = stripWhiteSpace( j->packager );
+				} else if ( line.substr( 0, 11 ) == "maintainer=" ){
+					j->maintainer = getValueBefore( getValue( line, '=' ), '#' );
+					j->maintainer = stripWhiteSpace( j->maintainer );
+				} else if ( line.substr( 0, 8 ) == "version=" ){
 					j->version = getValueBefore( getValue( line, '=' ), '#' );
 					j->version = stripWhiteSpace( j->version );
 				} else if ( line.substr( 0, 8 ) == "release=" ){
