@@ -1,3 +1,4 @@
+//
 // cards.cxx
 //
 //  Copyright (c) 2014-2017 by NuTyX team (http://nutyx.org)
@@ -18,9 +19,6 @@
 //  USA.
 //
 
-#include <iostream>
-#include <cstdlib>
-#include <memory>
 #include "file_download.h"
 #include "cards_base.h"
 #include "cards_sync.h"
@@ -30,10 +28,12 @@
 #include "cards_create.h"
 #include "cards_info.h"
 #include "cards_upgrade.h"
-
 #include "pkgrepo.h"
 #include "pkginfo.h"
 #include "pkgrm.h"
+
+#include <cstdlib>
+#include <memory>
 
 using namespace std;
 

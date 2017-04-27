@@ -23,6 +23,8 @@
 
 #include "cards_info.h"
 
+using namespace std;
+
 Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& configFileName)
 	: Pkginfo("cards info"),Pkgrepo(configFileName), m_argParser(argParser)
 {

@@ -1,3 +1,4 @@
+//
 // cards_depends.h
 // 
 //  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
@@ -17,21 +18,22 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
+
 #ifndef CARDSDEPENDS_H
 #define CARDSDEPENDS_H
 
+#include "cards_argument_parser.h"
+#include "compile_dependencies_utils.h"
+#include "string_utils.h"
+#include "pkgdbh.h"
+
+
 #include <locale.h>
 #include <string.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h>
-
 #include <dirent.h>
-#include "string_utils.h"
-#include "pkgdbh.h"
-#include "cards_argument_parser.h"
-#include "compile_dependencies_utils.h"
 
 struct LevelName {
 	int l;
