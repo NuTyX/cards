@@ -1,6 +1,7 @@
+//
 //  runtime_dependencies_utils.h
 //
-//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,17 +19,22 @@
 //  USA.
 //
 
-#ifndef DEPENDENCIES_UTILS_H
-#define DEPENDENCIES_UTILS_H
-
+#ifndef RUNTIME_DEPENDENCIES_UTILS_H
+#define RUNTIME_DEPENDENCIES_UTILS_H
 
 #include "string_utils.h"
+#include "file_utils.h"
 #include "elf_common.h"
 #include "elf.h"
 
-using namespace std;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
-int getRuntimeLibrariesList (set<string>& runtimeLibrariesList, const string& filename);
 
-#endif /* DEPENDENCIES_UTILS_H */
+int getRuntimeLibrariesList (std::set<std::string>& runtimeLibrariesList, const std::string& filename);
+
+#endif /* RUNTIME_DEPENDENCIES_UTILS_H */
 // vim:set ts=2 :
