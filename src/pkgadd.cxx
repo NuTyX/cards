@@ -1,8 +1,9 @@
+//
 //  pkgadd.cxx
 //
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,16 +20,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
-#include "file_utils.h"
+
 #include "pkgadd.h"
-#include "process.h"
-
-#include <algorithm>
-
-#include <fstream>
-#include <iterator>
-#include <cstdio>
-#include <unistd.h>
 
 using namespace std;
 
