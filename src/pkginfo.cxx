@@ -1,3 +1,4 @@
+//
 //  pkginfo.cxx
 // 
 //  Copyright (c) 2000-2005 Per Liden
@@ -21,14 +22,8 @@
 //
 
 #include "pkginfo.h"
-#include <iterator>
-#include <vector>
-#include <iomanip>
-#include <sys/types.h>
 
-#include <stdio.h>
-#include <unistd.h>
-#include <sstream>
+using namespace std;
 
 Pkginfo::Pkginfo(const string& commandName)
 	: Pkgdbh(commandName),
