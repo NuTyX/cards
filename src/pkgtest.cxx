@@ -1,7 +1,7 @@
 /*
- * pkgtest.cc
+ * pkgtest.cxx
  * 
- * Copyright 2016 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2016-2017 Thierry Nuttens <tnut@nutyx.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
  */
 
 #include "pkgtest.h"
+
+using namespace std;
 
 Pkgtest::Pkgtest()
 	:Pkginfo("pkgtest"), Pkgrepo("/etc/cards.conf")
