@@ -1,3 +1,4 @@
+//
 //  file_utils.h
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
@@ -19,25 +20,18 @@
 //  USA.
 //
 
-
 #ifndef FILE_UTILS_H
 #define FILE_UTILS_H
 
 #include "md5.h"
 #include "string_utils.h"
-#include "system_utils.h"
 
-#include <fstream>
-#include <cstdio>
-#include <ext/stdio_filebuf.h>
 #include <utime.h>
-#include <sys/stat.h>
-#include <sys/file.h>
-#include <sys/param.h>
-#include <libgen.h>
-#include <unistd.h>
 #include <dirent.h>
-#include <regex.h>
+#include <sys/param.h>
+#include <sys/file.h>
+#include <unistd.h>
+#include <libgen.h>
 #include <err.h>
 
 #define S_CARDS_MODE  0755
