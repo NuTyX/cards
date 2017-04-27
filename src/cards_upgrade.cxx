@@ -1,3 +1,4 @@
+//
 // cards_upgrade.cxx
 //
 //  Copyright (c) 2015-2017 by NuTyX team (http://nutyx.org)
@@ -19,6 +20,7 @@
 //
 
 #include "cards_upgrade.h"
+
 Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	const char *configFileName)
 	: Pkginst("cards upgrade",configFileName), m_argParser(argParser)

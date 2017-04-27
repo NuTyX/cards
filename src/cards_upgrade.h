@@ -1,3 +1,4 @@
+//
 // cards_upgrade.h
 // 
 //  Copyright (c) 2015-2017 by NuTyX team (http://nutyx.org)
@@ -17,8 +18,10 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
+
 #ifndef CARDS_UPGRADE_H
 #define CARDS_UPGRADE_H
+
 #include "pkginst.h"
 #include "cards_argument_parser.h"
 
