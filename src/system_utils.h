@@ -35,6 +35,9 @@
 
 #define _ gettext
 
+/**
+ Return the same as 'uname -m' commands
+ */
 std::string getMachineType ();
 
 #endif /* SYSTEM_UTILS_H */

@@ -1,7 +1,8 @@
+//
 //  repodwl.h
 //
 //  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
-//  Copyright (c) 2014-2015 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014-2017 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -20,6 +21,7 @@
 //
 #ifndef REPODWL_H
 #define REPODWL_H
+
 #include "file_download.h"
 #include "pkgrepo.h"
 
