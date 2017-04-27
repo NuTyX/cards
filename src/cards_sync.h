@@ -1,3 +1,4 @@
+//
 // cards_sync.h
 // 
 //  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
@@ -17,11 +18,26 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
+
 #ifndef CARDS_SYNC_H
 #define CARDS_SYNC_H
 
-#include <curl/curl.h>
+#include "file_utils.h"
+#include "file_download.h"
 #include "cards_argument_parser.h"
+#include "pkgrepo.h"
+
+#include <cstring>
+#include <cstdlib>
+#include <iostream>
+
+#include <curl/curl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <libgen.h>
+#include <dirent.h>
+
 class Cards_sync
 {
 public:

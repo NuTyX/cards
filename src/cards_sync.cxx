@@ -1,3 +1,4 @@
+//
 // cards_sync.cxx
 //
 //  Copyright (c) 2002-2005 Johannes Winkelmann jw at tks6 dot net 
@@ -19,19 +20,6 @@
 //  USA.
 //
 
-#include <iostream>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <libgen.h>
-#include <dirent.h>
-#include <cstring>
-#include <cstdlib>
-
-#include "file_utils.h"
-#include "file_download.h"
-#include "pkgrepo.h"
 #include "cards_sync.h"
 
 const std::string Cards_sync::DEFAULT_REPOFILE = ".PKGREPO";

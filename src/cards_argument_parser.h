@@ -1,3 +1,4 @@
+//
 // cards_argument_parser.h
 // 
 //  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
