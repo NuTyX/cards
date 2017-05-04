@@ -33,14 +33,17 @@ struct PortFilesList {
 };
 
 /**
- * \representation of the .PKGREPO file which belong to the collection directory
+ * representation of the .PKGREPO file which belong to the collection directory
  * define in the configuration file cards.conf.
+ *
+ */
 
- *************************************************
+/*
+ **************************************************
  * 73193bfc1cb30fe02a880ed088ed7590#1414192958#aalib#1.4rc5##n.a#n.a#n.a#n.a#.cards.tar.xz
  * 650ed499ce78791d45b91aaf7f91b445#1428615787#firefox#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org#.cards.tar.xz
  *************************************************
- **/
+ */
 struct BasePackageInfo {
 	std::string md5SUM;
 	std::string s_buildDate;
@@ -60,18 +63,23 @@ struct BasePackageInfo {
 };
 
 /**
- * \representation of the .PKGREPO file locate in each port directory.
+ * representation of the .PKGREPO file locate in each port directory.
  * The difference with the collection .PKGREPO, it contains the list of
  * possible files (binaries, Pkgfile, README etc)
- * Example of firefox/.PKGREPO contents:
+ * 
+ * 
+ */
+
+ /* 
+  * Example of firefox/.PKGREPO contents:
  ******************************************************
- * 1428615787#.cards.tar.xz#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org
- * ada2187e655daaec9195802b955cce4b#firefox#i686
- * 30413e9eac84e9a727c9f89fda341fb0#firefox.devel#any
- * 23e6f253809cdac206693c84a56184be#firefox.post-install
- * d47bfe8887dbbad7effc320ddf116d2e#Pkgfile
+  1428615787#.cards.tar.xz#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org
+  ada2187e655daaec9195802b955cce4b#firefox#i686
+  30413e9eac84e9a727c9f89fda341fb0#firefox.devel#any
+  23e6f253809cdac206693c84a56184be#firefox.post-install
+  d47bfe8887dbbad7effc320ddf116d2e#Pkgfile
  *******************************************************
- **/
+ */
 struct FileList {
 	std::string basePackageName;
 	std::string description;
@@ -94,8 +102,8 @@ struct PortsDirectory {
 	std::vector<BasePackageInfo> basePackageList;
 };
 /**
- * \representation of the Repo mainly for the website
- **/
+ * representation of the Repo mainly for the website
+**/
 struct RepoInfo {
 	std::string branch;
 	std::string arch;
@@ -112,7 +120,7 @@ public:
 
 /**
  *
- * \parse the basePackage Directory for binary package
+ * parse the basePackage Directory for binary package
  *  return a list of packages found 
  * 
  */
@@ -121,7 +129,7 @@ public:
 
 /**
  *
- * \return a list of ports which has to be compiled OR
+ *  return a list of ports which has to be compiled OR
  *  has to be updated
  *
  * Depends on: parsePkgRepoCollectionFile
@@ -131,73 +139,73 @@ public:
  */
 		std::set<std::string> getListOutOfDate();
 
-/*
- *	\return the folder of the port name
+/**
+ *	return the folder of the port name
  *
  */
 		std::string getPortDir (const std::string& portName);
 
 
-/*
+/**
  *
- * 	\return the basename of the portname
+ * 	return the basename of the portname
  *
  */
 		std::string getBasePortName (const std::string& portName);
-/*
- *      \return the basename of the packagename
+/**
+ *      return the basename of the packagename
  *
  */
 		std::string getBasePackageName(const std::string& packageName);
-/*
+/**
  *
- *	\return the version of the packagename
+ *	return the version of the packagename
  */
 
 		std::string getBasePackageVersion(const std::string& packageName);
 
-/*
- *  \return the version of the port name
+/**
+ *  return the version of the port name
  */
 		std::string getPortVersion (const std::string& portName);
 
-/*
- *  \return the release of the packagename
+/**
+ *  return the release of the packagename
  *
  */
 		int getBasePackageRelease (const std::string& packageName);
 
-/*
- *  \return the release of the port name
+/**
+ *  return the release of the port name
  */
 		int getPortRelease(const std::string& portName);
-/*
- *  \return true if port name exist
+/**
+ *  return true if port name exist
  */ 
 		bool checkPortExist(const std::string& portName);
 
-/*
- *  \retun list of packages of the collection
+/**
+ *  retun list of packages of the collection
  */
 		std::set<std::string> getListOfPackagesFromCollection(const std::string& collectionName);
 
-/*
- *	\return the build time of the binary 
+/**
+ *	return the build time of the binary 
  */
 		time_t getBinaryBuildTime (const std::string& portName);
 
-/*
- * \printout the list of available binaries packages
+/**
+ * printout the list of available binaries packages
  *
  */
 		unsigned int getBinaryPackageList();
-/*
- * \populate RepoInfo List
+/**
+ * populate RepoInfo List
  *
  */
 		std::vector<RepoInfo> getRepoInfo();
-/*
- * \printout the list of available ports which are compiled
+/**
+ * printout the list of available ports which are compiled
  *  return a list of name version
  *
  */
@@ -209,12 +217,12 @@ public:
 protected:
 /**
  *
- * \parse the config file
+ * parse the config file
  **/
     int parseConfig(const char *fileName);
 
 /**
- * \parse the .PKGREPO file which belong to the collection found
+ * parse the .PKGREPO file which belong to the collection found
  * in the configuration file cards.conf. It populate the
  * the m_packageList.basePackageName part by looking
  * the downloaded .PKGREPO file of each activate collection
@@ -228,7 +236,7 @@ protected:
     void parsePkgRepoCollectionFile();
 
 /**
- * \parse the directory directly based on what we have locally.
+ * parse the directory directly based on what we have locally.
  * This method is used in the case of synchronisation with the mirror
  * is NOT possible. If they are no directories, they will be nothing add
  *
@@ -240,7 +248,7 @@ protected:
     void parseCollectionDirectory();
 
 /**
- * \parse the ".PKGREPO" file of a port directory
+ * parse the ".PKGREPO" file of a port directory
  * if it found a first line with the date of construction
  * and the extension of the archive then it populate
  * the list of packages
@@ -253,7 +261,7 @@ protected:
     void parseCurrentPackagePkgRepoFile();
 
 /**
- * \parse the "Pkgfile" file for each basePackage
+ * parse the "Pkgfile" file for each basePackage
  * add the version of the port found in the Pkgfile
  *
  */
@@ -261,7 +269,7 @@ protected:
 
 /**
  *
- * \parse the .PKGREPO of all the packageName directory
+ * parse the .PKGREPO of all the packageName directory
  *
  *
  */

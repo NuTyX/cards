@@ -61,7 +61,7 @@ public:
 	 */
 	enum ArgNumberCheck { NONE, MIN, EQ, MAX };
 
-	/*
+	/**
 	 * APOpt and APCmd are the classes used in client code, to make
 	 * efficient comparison of the selected command.
 	 *
@@ -157,11 +157,11 @@ public:
 	 *
 	 * \param cmd a reference to the command; use it to compare the actually selected command against this one after parsing
 	 * \param name the name of the command to be parsed from the command line
-   * \param shortInfo a short description, used for general help screen
+	 * \param shortInfo a short description, used for general help screen
 	 * \param description a description, used for the help screens
 	 * \param argNumberCheck what kind of argument number checking
 	 * \param argNumber optional number of arguments
-	 * \param otherOptions value to display in the help screen for following (non option) arguments
+	 * \param otherArguments value to display in the help screen for following (non option) arguments
 	 */
 	int addCommand(APCmd& cmd,
 				   const std::string& name,
@@ -179,11 +179,6 @@ public:
 	 * \param cmd the command to add an option to
 	 * \param key the option reference; use it to check for certain options after parsing
 	 * \param required whether this option is required
-	 * \param longName the long name of this command (to be used with '--'); leave it empty if you don't want to use a long option name
-	 * \param shortName the short name of this command (to be used with '-'); pass 0 if you don't want to use a short option name
-	 * \param description the description of this option, to be used in the help screen
-	 * \param valueRequired whether this option requires a value
-	 * \param valueName the name of the value, to be used in the help screen
 	 */
 	int addOption(const APCmd& cmd,
 				  APOpt& key,
@@ -206,12 +201,12 @@ public:
 	std::string appName() const;
 
 	/**
-	 * \return true if \a key is set, false otherwise
+	 * \return true if \param key is set, false otherwise
 	 */
 	bool isSet(const APOpt& key) const;
 
 	/**
-	 * \return the value attached to the option \key if any
+	 * \return the value attached to the option \param key if any
 	 */
 	std::string getOptionValue(const APOpt& key) const;
 

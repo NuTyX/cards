@@ -11,7 +11,12 @@ DIRSCRIPTS = scripts
 
 DIRFLTK = fltk
 
+DIRDOC = documentation
+
 .PHONY: cards
+
+html:
+	$(MAKE) -C $(DIRDOC) html
 
 webcards:
 	$(MAKE) -C $(DIRSRC) webcards
@@ -63,6 +68,7 @@ cards:
 
 man:
 	$(MAKE) -C $(DIRMAN) man
+
 clean:
 
 	$(MAKE) -C $(DIRSRC) clean
@@ -71,6 +77,7 @@ clean:
 	$(MAKE) -C $(DIRPO) clean
 	$(MAKE) -C $(DIRTEST) clean
 	$(MAKE) -C $(DIRFLTK) clean
+	$(MAKE) -C $(DIRDOC) clean
 
 dist: distclean
 

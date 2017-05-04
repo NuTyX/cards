@@ -1,0 +1,126 @@
+/**
+
+\page recept Recept Basics
+
+\section recept_introduction Introduction
+
+A port is a directory containing the files needed for building a package.
+The command <b>pkgmk</b> will be used to &quot;build&quot; the package, which can be installed afterwards.
+
+This means that this directory must contain as a minimum a file named <b><span style="color: #007a00;">Pkgfile</span></b>.
+The building of the package will be controlled by the contents of this file. It contains all the information necessary to compile and install the package from source.
+
+The name <b>port</b> comes from the BSD world where a port refer to software &quot;ported&quot; to another operating system or platform.
+In our case, the port is simply the definitions for building a package.
+
+\section recept_minimal_syntax_of_a_port Minimal syntax of a port
+
+The minimum information required for producing a binary are:
+
+<ul>
+ <li>
+   <i><b>name:</b></i> the name of the build package.
+ <li>
+   <i><b>version:</b></i> the version of the sources of the package.
+ <li>
+   <i><b>release:</b></i> the nth attempt at building the package. Its value will always start at <b><i>1</i></b>
+ <li>
+   <i><b>source:</b></i> the address of the sources of the package we want to build.
+ <li>
+   <i><b>build():</b></i> the function which contains the recipe.
+</ul>
+
+A little example with comments: 
+
+\code
+# Name of the package
+name=gnome-terminal
+
+# Version of the package
+version=2.6.4
+
+# Release of the package
+release=1
+
+# Location of the sources of the package to be built
+source=(http://ftp.gnome.org/pub/gnome/sources/$name/${version%.*}/$name-$version.tar.bz2)
+
+# Recipe for building the package (often uses three standard commands)
+build() {
+cd $name-$version
+./configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info
+make
+make DESTDIR=$PKG install
+} 
+\endcode
+
+If you compare this example with an official NuTyX port, you can see that the official one contains more information.
+We will see this in the next paragraph. One line could catch you:
+
+\code
+http://ftp.gnome.org/pub/gnome/sources/$name/${version%.*}/
+\endcode
+
+The syntax ${version%.*} allows us to substitute a variable of N digits for a variable of N-1 digits.
+It's often necessary for the sources of gnome packages. In our example, the line:
+
+\code
+http://ftp.gnome.org/pub/gnome/sources/$name/${version%.*}/
+\endcode
+
+is identical to
+
+\code
+http://ftp.gnome.org/pub/gnome/sources/$name/2.6/
+\endcode
+
+since the variable version=2.6.4
+
+
+\section recept_pratical_example_of_a_port Practical example of a port
+
+\subsection xfce4-libutil_pkgfile The xfce4-libutil/Pkgfile file 
+
+
+\par Listing 1 - "The xfce4-libutil Pkgfile"
+\code
+# Depends on: glib intltool
+
+description="libxfce4util, base library for Xfce"
+url="http://docs.xfce.org/"
+maintainer="git.xfce.org/xfce/xfce4-libutils"
+packager="tyrry at nutyx dot org, tnut at nutyx dot org"
+
+name=xfce4-libutil
+version=4.8.2
+release=1
+
+_name=libxfce4util
+
+source=(http://archive.xfce.org/src/xfce/${_name}/${version%.*}/${_name}-$version.tar.bz2)
+
+build() {
+   cd ${_name}-$version
+
+   ./configure --prefix=/usr \
+               --disable-static
+
+   make
+
+   make DESTDIR=$PKG install
+}
+\endcode
+
+If you want to make sure that the build bot is able to compile the package without any problems, it's important to specify all the dependencies needed for the compilation of the package.
+Dependencies starting from the NuTyX base are always included.
+Indeed the bot will always build the package by starting from  the NuTyX base.
+
+The line <b># Depends on: </b> is used for this purpose.
+It defines all the needed dependencies for the <b>compilation</b> of the package.
+Dependencies are separated by a comma, a space or both.
+
+
+\section recept_conclusion Conclusion
+You can try to <a href="build-package.html">build your first package</a>
+
+*/

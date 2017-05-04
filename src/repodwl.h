@@ -29,7 +29,7 @@ class Repodwl: public Pkgrepo {
 public:
 		Repodwl(const char *fileName);
 /**
- * \download the .PKGREPO of packageName
+ * download the .PKGREPO of packageName
  *
  * Depends on: parsePkgRepoCollectionFile
  *
@@ -41,7 +41,7 @@ public:
     void downloadPortsPkgRepo(const std::string& packageName);
 
 /**
- * \download the packagefileName
+ * download the packagefileName
  *
  * Depends on: parsePkgRepoCollectionFile
  *

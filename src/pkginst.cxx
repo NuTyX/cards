@@ -27,7 +27,7 @@ Pkginst::Pkginst(const string& commandName,const char *configFileName)
 	: Pkgadd(commandName), Repodwl(configFileName)
 {
 }
-void Pkginst::generateDependencies(const pair<string,time_t>& packageName)
+void Pkginst::generateDependencies(const std::pair<std::string,time_t>& packageName)
 {
 	m_packageName=packageName.first;
 	generateDependencies();

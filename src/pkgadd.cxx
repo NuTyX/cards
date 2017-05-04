@@ -32,7 +32,7 @@ Pkgadd::Pkgadd()
 	m_force(false)
 {
 }
-Pkgadd::Pkgadd(const string& commandName)
+Pkgadd::Pkgadd(const std::string& commandName)
 	: Pkgdbh(commandName),
 	m_runPrePost(true),
 	m_upgrade(false),

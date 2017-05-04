@@ -778,7 +778,7 @@ bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 	return true;
 }
 /* Remove meta data about the removed package */
-void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
+void Pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 {
 	if ( checkPackageNameExist(name)){
 		m_packageVersion = m_listOfInstPackages[name].version;
@@ -816,7 +816,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const string& name)
 }
 
 /* Remove the physical files after followings some rules */
-void Pkgdbh::removePackageFiles(const string& name)
+void Pkgdbh::removePackageFiles(const std::string& name)
 {
 	m_filesList = m_listOfInstPackages[name].files;
 	m_listOfInstPackages.erase(name);
@@ -855,7 +855,7 @@ void Pkgdbh::removePackageFiles(const string& name)
 	progressInfo();
 }
 
-void Pkgdbh::removePackageFiles(const string& name, const set<string>& keep_list)
+void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::string>& keep_list)
 {
 	m_filesList = m_listOfInstPackages[name].files;
 	m_listOfInstPackages.erase(name);
@@ -904,7 +904,7 @@ void Pkgdbh::removePackageFiles(const string& name, const set<string>& keep_list
 	progressInfo();
 }
 
-void Pkgdbh::removePackageFilesRefsFromDB(set<string> files, const set<string>& keep_list)
+void Pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list)
 {
 	if ( checkPackageNameExist(m_packageName)){
 		m_packageVersion = m_listOfInstPackages[m_packageName].version;

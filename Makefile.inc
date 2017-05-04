@@ -31,11 +31,20 @@ LIBDIR = ${DESTDIR}/usr/lib
 ETCDIR = ${DESTDIR}/etc
 VARDIR = ${DESTDIR}/var
 LOCALEDIR = ${DESTDIR}/usr/share/locale
+DOCDIR    = ${DESTDIR}/usr/share/doc
 
+INSTALL   = /usr/bin/install -c
+RMDIR     = rm -rf
+DOXYDOC   = /usr/bin/doxygen
 AR?=ar
 RANLIB?=ranlib
 
-VERSION = 2.2.1
+INSTALL_BIN  = $(INSTALL) -m 755
+INSTALL_DATA = $(INSTALL) -m 644
+INSTALL_DIR  = $(INSTALL) -d
+
+
+VERSION = 2.2.2
 
 NAME = cards-$(VERSION)
 

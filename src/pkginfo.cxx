@@ -25,7 +25,7 @@
 
 using namespace std;
 
-Pkginfo::Pkginfo(const string& commandName)
+Pkginfo::Pkginfo(const std::string& commandName)
 	: Pkgdbh(commandName),
 	m_runtimedependencies_mode(0),
 	m_footprint_mode(0),

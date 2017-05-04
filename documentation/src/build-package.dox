@@ -1,0 +1,186 @@
+/**
+
+  \page build-package How to build a package
+
+\section build_package_introduction Introduction
+
+\htmlonly
+We have provided the <a href="bash-basics.html">required Know-how</a>,
+the <a href="recept.html"> minimum syntax of instructions</a> for you to choose from.
+\endhtmlonly
+
+Come and join the many participants of all ages, male and female, from all over the world, and venture along this exciting road we call NuTyX.
+We can promise you a rewarding experience as you build your very first NuTyX system, following our (NuTyX) rules.
+
+\section build_my_first_package Build my first package
+
+We will see how to build and install a first package in a very straigtforward way.
+
+This tutorial explain you in a very simple way the construction of your first binary package.
+
+They are no prerequest, this exercice can be done regardless the state of your NuTyX.
+
+The choosen receipt is a little text editor which don't need any dependencies.
+
+For this package, we won't use an isolate environment named chroot.
+We will see in the next article, how to build in such isolate environment.
+Because that's the only working method if we need to build a package having dependencies.
+
+\section build_package_make_the_recept Make the recept
+
+Create the directory
+\code{.sh}
+sudo mkdir -p /usr/ports/perso/nano
+\endcode
+
+Create the recept:
+\code{.sh}
+echo '
+description="Text Editor"
+maintainer="Nano team"
+packager="François Perrin francois dot perrin at myworld dot com"
+url="http://www.nano-editor.org/"
+
+name=nano
+version=2.7.2
+release=1
+
+source=(${url}/dist/v${version:0:3}/$name-$version.tar.xz)
+
+build() {
+  cd $name-$version
+
+  ./configure --prefix=/usr \
+       --sysconfdir=/etc    \
+       --enable-utf8        \
+       --enable-color       \
+       --enable-multibuffer \
+       --enable-nanorc      \
+       --docdir=/usr/share/doc/$name-$version
+   make
+
+   make DESTDIR=$PKG install
+
+   rm $PKG/usr/share/info/dir
+}' > /usr/ports/perso/nano/Pkgfile
+\endcode     
+
+\section build_package_install_the_development_packages Install the development packages
+
+\code{.sh}
+
+get cards.devel
+
+\endcode
+
+\section build_package_compile_the_package Compile the package
+
+\code{.sh}
+
+cd /usr/ports/perso/nano
+sudo pkgmk -d
+
+\endcode
+
+\section build_package_install_the_package Install the package
+
+\code{.sh}
+
+sudo pkgadd nano1*
+
+\endcode
+
+\section build_package_the_configuration_files The configuration files
+
+\subsection cards_conf The /etc/cards.conf file
+
+This file is always present on a NuTyX installation.</p>
+
+It's a bit like "the spine" of your NuTyX.
+
+<b>/etc/cards.conf</b> file will reflect the way you use NuTyX. 
+ 
+All the collections that you want to use in your NuTyX can be specified in two way:
+
+\li configuration example of <b>cli</b> collection in  binaries from a remote server
+
+\code{.sh}
+dir /var/lib/pkg/depot/cli|http://downloads.nutyx.org
+
+\endcode
+
+\li configuration example of <b>cli</b> in local ports
+
+\code{.sh}
+dir /usr/ports/cli
+
+\endcode
+
+This file is also responsible for the list of packages you want to keep when you execute the command:
+
+\code{.sh}
+cards base -r
+
+\endcode
+
+And finaly, it's specify which locale should be installed.
+
+You can find more information by reading the cards.conf manual
+\code{.sh}
+man cards.conf
+\endcode     
+\subsection pkgmk_conf The /etc/pkgmk.conf file
+
+This file is used when compiling news ports.
+It specify all the variables used by the <b>pkgmk</b> command.
+
+Please take the time to read the man page of pkgmk.conf
+
+\code{.sh}
+man pkgmk.conf
+
+\endcode
+
+\subsection example_pkgmk_conf Example of /etc/pkgmk.conf file
+
+\code{.sh}
+export CFLAGS="-O2 -pipe"
+export CXXFLAGS="${CFLAGS}"
+
+case ${PKGMK_ARCH} in
+        "x86_64"|"")
+		export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
+                ;;
+        "i686")
+                export CFLAGS="${CFLAGS} -m32"
+                export CXXFLAGS="${CXXFLAGS} -m32"
+                export LDFLAGS="${LDFLAGS} -m32"
+                ;;
+        *)
+                echo "Unknown architecture selected! Exiting."
+                exit 1
+                ;;
+esac
+# Those settings are typically set for packaging
+# without sub packages and only french locale
+# They are also the default ones
+#
+# PKGMK_GROUPS=()
+# PKGMK_LOCALES=(fr)
+# PKGMK_COMPRESS_PACKAGE="no"
+# PKGMK_CLEAN="yes"
+# PKGMK_IGNORE_FOOTPRINT="yes"
+# PKGMK_KEEP_SOURCES="no"
+# PKGMK_SOURCE_DIR="$PWD"
+# PKGMK_WORK_DIR="$PWD/work"
+# PKGMK_IGNORE_REPO="yes"
+# PKGMK_IGNORE_COLLECTION="yes"
+# PKGMK_IGNORE_RUNTIMEDEPS="yes"
+\endcode
+
+\section build_package_build-package-conclusion Conclusion
+
+You should now check all the <a href="recept-syntax.html">details information about a port</a>.
+We are now ready to build our packages <a href="build-in-chroot.html">in a chroot.</a>
+
+*/
