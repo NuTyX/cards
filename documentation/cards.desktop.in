@@ -1,0 +1,9 @@
+[Desktop Entry]
+Categories=Development;Documentation
+Exec=xdg-open file:///usr/share/doc/cards-#VERSION#/index.html
+Icon=system-software-install
+StartupNotify=false
+Type=Application
+Terminal=false
+Name=CARDS Documentation
+Name[fr]=Documentation de CARDS

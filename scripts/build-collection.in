@@ -27,11 +27,6 @@ echo '**************************************************************************
  - cli-extra
  - gui
  - gui-extra
- - gnome
- - xfce4
- - kde5
- - mate
- - enlightenment
 
  IMPORTANTS NOTES:
  a. We make a difference only for base, cli and gui
@@ -241,67 +236,13 @@ EOF
 setup_collection() {
 	local DIR
 	DIR="/$VERSION/$CHROOT"
-	if [ "$CHROOT" == "enlightenment" ]; then
-		echo "dir /DEPOT/enlightenment-extra
-dir /DEPOT/enlightenment
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base
-base /DEPOT/base
-base /DEPOT/cli
-base /DEPOT/gui
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-	fi
-	if [ "$CHROOT" == "xfce4" ]; then
-		echo "dir /DEPOT/xfce4-extra
-dir /DEPOT/xfce4
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base
-base /DEPOT/base
-base /DEPOT/cli
-base /DEPOT/gui
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-	fi
-	if [ "$CHROOT" == "mate" ]; then
-		echo "dir /DEPOT/mate-extra
-dir /DEPOT/mate
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base
-base /DEPOT/base
-base /DEPOT/cli
-base /DEPOT/gui
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-	fi
-	if [ "$CHROOT" == "gnome" ]; then
-		echo "dir /DEPOT/gnome-extra
-dir /DEPOT/gnome
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base
-base /DEPOT/base
-base /DEPOT/cli
-base /DEPOT/gui
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-	fi
-	if [ "$CHROOT" == "kde5" ]; then
-		echo "dir /DEPOT/kde5-extra
-dir /DEPOT/kde5
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base
-base /DEPOT/base
-base /DEPOT/cli
-base /DEPOT/gui
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-	fi
+
 	if [ "$CHROOT" == "base" ]; then
 		COLLECTION="core"
 		echo "dir /DEPOT/base
 base /DEPOT/base
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-
+		return
 	fi
 	if [ "$CHROOT" == "cli" ]; then
 		COLLECTION="core"
@@ -309,6 +250,7 @@ logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 dir /DEPOT/base
 base /DEPOT/base
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
+		return
 	fi
 	if [ "$CHROOT" == "gui" ]; then
 		COLLECTION="core"
@@ -317,6 +259,7 @@ dir /DEPOT/cli
 dir /DEPOT/base
 base /DEPOT/base
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
+		return
 	fi
 	if [ "$CHROOT" == "systemd" ]; then
 		COLLECTION="core"
@@ -329,6 +272,7 @@ base /DEPOT/cli
 base /DEPOT/gui
 base /DEPOT/systemd
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
+		return
 	fi
 	if [ "$CHROOT" == "cli-extra" ]; then
 		COLLECTION="extra"
@@ -337,6 +281,7 @@ dir /DEPOT/cli
 dir /DEPOT/base
 base /DEPOT/base
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
+		return
 	fi
 	if [ "$CHROOT" == "gui-extra" ]; then
 		COLLECTION="extra"
@@ -347,8 +292,23 @@ dir /DEPOT/cli
 dir /DEPOT/base
 base /DEPOT/base
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
+		return
 	fi
+
+	echo "dir /DEPOT/$CHROOT-extra
+dir /DEPOT/$CHROOT
+dir /DEPOT/gui
+dir /DEPOT/cli
+dir /DEPOT/base
+base /DEPOT/base
+base /DEPOT/cli
+base /DEPOT/gui
+logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 }
+##
+# BEGIN HERE
+#
+[ -z "$ROOTMOUNT" ] && ROOTMOUNT="/srv"
 
 if [ "${1}" == "-h" ] || [ "${1}" == "--help" ];then
 	usage
@@ -436,19 +396,36 @@ if [ "$a" != "y" ]; then
 fi
 
 mkdir -p $1/DEPOT || error $1
-mount $1/DEPOT || error $1
+if [ -d ${ROOTMOUNT}/`uname -m`/${VERSION} ]; then
+	mount --bind ${ROOTMOUNT}/`uname -m`/${VERSION} $1/DEPOT || error $1
+else
+	mount $1/DEPOT || error $1
+fi
 MOUNT_POINTS="$1/DEPOT"
 
-mkdir -p $1/LOGS || error $1
-mount $1/LOGS || error $1
+mkdir -p $1/LOGS
+if [ -d ${ROOTMOUNT}/logs/`uname -m`/${VERSION}/${CHROOT} ];then
+	mount --bind ${ROOTMOUNT}/logs/`uname -m`/${VERSION}/${CHROOT} $1/LOGS || error $1
+else
+	mount $1/LOGS || error $1
+fi
 MOUNT_POINTS="$MOUNT_POINTS $1/LOGS"
 
+
 mkdir -p $1/sources || error $1
-mount $1/sources || error $1
+if [ -d ${ROOTMOUNT}/sources ]; then
+	mount --bind ${ROOTMOUNT}/sources $1/sources || error $1
+else
+	mount $1/sources || error $1
+fi
 MOUNT_POINTS="$MOUNT_POINTS $1/sources"
 
 mkdir -p $1/root/$COLLECTION || error $1
-mount $1/root/$COLLECTION || error $1
+if [ -d /root/$COLLECTION ]; then
+	mount --bind /root/$COLLECTION $1/root/$COLLECTION || error $1
+else
+	mount $1/root/$COLLECTION || error $1
+fi
 MOUNT_POINTS="$MOUNT_POINTS $1/root/$COLLECTION"
 
 KERNEL="NONE" LFS="$1" DEPOT="/DEPOT" install-nutyx || error $1
