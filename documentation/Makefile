@@ -41,6 +41,7 @@ alldocs: dist
 
 clean:
 	$(RM) Doxyfile
+	$(RM) cards.desktop
 	$(RMDIR) htdocs latex
 	$(RM) *~ *.bck *.bak *.log
 
@@ -53,6 +54,7 @@ install: html
 		$(INSTALL_DATA) $$file $(DOCDIR)/$(NAME); \
 	  done \
 	fi
+	install -v -D -m0644 cards.desktop $(APPDIR)/cards.desktop
 
 uninstall:
 	$(RMDIR) $(DOCDIR)
@@ -63,7 +65,7 @@ uninstall:
 # is not made by default.
 # Use `make html' or `make dist' to create the html docs
 
-html: clean Doxyfile
+html: clean Doxyfile cards.desktop
 	echo "Generating HTML documentation..."
 	if test "x$(DOXYDOC)" = "x" ; then \
 	  echo "Sorry - doxygen not found. Please install doxygen and run configure."; \

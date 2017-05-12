@@ -32,6 +32,7 @@ ETCDIR = ${DESTDIR}/etc
 VARDIR = ${DESTDIR}/var
 LOCALEDIR = ${DESTDIR}/usr/share/locale
 DOCDIR    = ${DESTDIR}/usr/share/doc
+APPDIR    = ${DESTDIR}/usr/share/applications
 
 INSTALL   = /usr/bin/install -c
 RMDIR     = rm -rf
