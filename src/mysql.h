@@ -24,6 +24,12 @@
 #include "file_utils.h"
 namespace Sql
 {
+struct boardInfo_t {
+	std::string category;
+	std::string name;
+};
+typedef std::map< std::string, boardInfo_t > board_t;
+typedef std::map< std::string, std::string > category_t;
 
 class mysql
 {

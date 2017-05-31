@@ -46,29 +46,60 @@ mysql::~mysql()
 }
 void mysql::lastPosts(const char *forum, int n)
 {
+	boardInfo_t info;
 	if(mysql_query(m_connection,
-	"select id_topic,id_msg, poster_name, poster_time, subject, icon from smf_messages order by id_msg"))
+	"select id_board, name, id_cat from smf_boards order by id_board"))
+		cerr << mysql_error(m_connection) << endl;
+	m_result= mysql_use_result(m_connection);
+	board_t listOfBoards;
+
+	while ((rows = mysql_fetch_row(m_result)) != NULL) {
+		info.category = rows[2];
+		info.name = rows[1];
+		listOfBoards[ rows[0] ] = info;
+	}
+
+	if(mysql_query(m_connection,
+	"select id_cat, name from smf_categories order by id_cat"))
+		cerr << mysql_error(m_connection) << endl;
+	m_result= mysql_use_result(m_connection);
+	category_t listOfCategories;
+
+	while ((rows = mysql_fetch_row(m_result)) != NULL) {
+		listOfCategories[ rows[0] ] = rows[1];
+	}
+
+	if(mysql_query(m_connection,
+	"select id_topic, id_msg, poster_name, poster_time, subject, icon, id_board from smf_messages order by id_msg"))
 		cerr << mysql_error(m_connection) << endl;
 	m_result= mysql_use_result(m_connection);
 	vector<string> list;
 	string sforum = forum;
 	while ((rows = mysql_fetch_row(m_result)) != NULL) {
+		string category = "<div style=\"text-transform: uppercase;\">";
+		category += listOfCategories[ listOfBoards[rows[6]].category ] + ":</div>";
 		string id_topic = rows[0];
 		string id_msg = rows[1];
 		string time = "<p class=\"updated\">";
 		time +=getDateFromEpoch(strtoul(rows[3],NULL,0)) + " UTC</p>";
+        string board = "<b>";
+		board += listOfBoards[ rows[6] ].name;
 		string author = "<i>";
 		author += rows[2];
+		author += "</i>";
 		string subject = rows[4];
 		string icon = rows[5];
-		string message = time; 
+		string message = time;
+		message += category;
+		message += board + "</b><br>";
 		message += author;
-		message += " </i><br><img src=\"../../graphics/" + icon;
-    message += ".gif\" alt=\"\" /> <a href=\"" + sforum;
+		message += "<br><img src=\"../../graphics/" + icon;
+		message += ".gif\" alt=\"\" /> <a href=\"" + sforum;
 		message += "/index.php?topic=" + id_topic;
 		message += ".msg" + id_msg;
 		message += "#msg" + id_msg;
-		message += "\">" + subject;
+		message += "\">";
+		message += subject;
 		message += "</a><br><br>";
 		list.push_back(message);
 	}
@@ -76,6 +107,8 @@ void mysql::lastPosts(const char *forum, int n)
 	while ( i < n + 1) {
 		cout << list[list.size()-i] << endl;
 		i++;
+		if ( i != n + 1)
+			cout << "<hr align=\"center\" style=\"width: 50%;\">" << endl;
 	}
 }
 } /* namespace Sql */

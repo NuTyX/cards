@@ -305,10 +305,17 @@ base /DEPOT/cli
 base /DEPOT/gui
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 }
-##
-# BEGIN HERE
 #
-[ -z "$ROOTMOUNT" ] && ROOTMOUNT="/srv"
+#
+###############################################################################
+# BEGIN HERE
+###############################################################################
+#
+# ROOTMOUNT is set to '/srv/www' by default
+# It make it easy to access files if http server is installed
+# and configured as default
+#
+[ -z "$ROOTMOUNT" ] && ROOTMOUNT="/srv/www"
 
 if [ "${1}" == "-h" ] || [ "${1}" == "--help" ];then
 	usage
