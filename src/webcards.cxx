@@ -211,6 +211,11 @@ void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
 	else
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"stable\" /> stable");
 	contentInfo.text.push_back( "     <br>");
+	if ( arguments.packageBranch == "current" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"current\" checked=\"checked\" /> current");
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"current\" /> current");
+	contentInfo.text.push_back( "     <br>");
 	if ( arguments.packageBranch == "development" )
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"development\" checked=\"checked\" /> development");
 	else

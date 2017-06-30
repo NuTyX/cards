@@ -106,9 +106,9 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "div.toc {" << endl \
  << "   margin: 0em 0em 0em 0em;" << endl \
  << "   font-size: 0.9em;" << endl \
- << "   display: table;" << endl \
  << "   border: 1px solid #999999;" << endl \
  << "   padding: 0em 2em 0em 1em;" << endl \
+ << "   width: -moz-max-content;" << endl \
  << "   background-color: #e9e9ef;" << endl \
  << "}" << endl \
  << "div.important img { padding: 0.4em; }" << endl \
@@ -128,14 +128,11 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "    font-style: italic;" << endl \
  << "}" << endl \
  << "a:link {" << endl \
- << "    font-weight:bold;" << endl \
  << "    color: #703030;" << endl \
  << "    text-decoration: none;" << endl \
- << "    font-family: arial;" << endl \
  << "}" << endl \
  << "a:visited {" << endl \
- << "    font-weight:bold;" << endl \
- << "    color: #503030;" << endl \
+ << "    color: #0b0080;" << endl \
  << "}" << endl \
  << "a:hover {" << endl \
  << "    color: #403030;" << endl \
