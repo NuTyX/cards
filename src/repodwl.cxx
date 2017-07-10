@@ -101,8 +101,7 @@ void Repodwl::downloadPackageFileName(const string& packageName)
 			<< m_PortFilesList_i->md5SUM << " "
 			<< endl;
 #endif
-		FileDownload FD(url,dir,fileName,true);
-		FD.downloadFile();
+		FileDownload FD(url,dir,fileName,m_PortFilesList_i->md5SUM,true);
 	}
 }
 bool Repodwl::checkBinaryExist(const string& packageName)

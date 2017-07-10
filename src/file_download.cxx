@@ -87,13 +87,15 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 	* progress if true, show what's going on
 	*/
 FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, std::string MD5Sum, bool progress )
-  : m_url(url),m_downloadFileName(dirName+"/"+fileName),m_MD5Sum(MD5Sum)
+  : m_url(url),m_downloadFileName(dirName+"/"+fileName),m_MD5Sum(MD5Sum),m_progress(progress)
 {
   curl_global_init(CURL_GLOBAL_ALL);
   m_curl = curl_easy_init();
   if (! m_curl)
     throw runtime_error ("Curl error");
 
+	m_slist=NULL;
+	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
 	createRecursiveDirs(dirName);
 
   initFileToDownload(m_url, m_downloadFileName);
@@ -102,6 +104,9 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 	} else {
 		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
+	downloadFile();
+	if ( ! checkMD5sum() )
+		throw runtime_error (m_downloadFileName + " " + m_MD5Sum +": checksum error");
 }
 
 void FileDownload::downloadFile()
