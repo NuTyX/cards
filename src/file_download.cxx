@@ -77,6 +77,7 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 	} else {
 		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
+	downloadFile();
 }
 
 	/*

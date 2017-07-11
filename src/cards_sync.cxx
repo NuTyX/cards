@@ -141,7 +141,6 @@ void Cards_sync::run()
 		FileDownload PKGRepo(url + "/" + m_repoFile,
 			categoryDir,
 			m_repoFile, false);
-		PKGRepo.downloadFile();
 	}
 }
 void Cards_sync::purge()

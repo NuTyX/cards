@@ -614,7 +614,6 @@ int CardsDepends::deptree()
 					prtDir + "/" + dirName  ,
 					name + ".deps",
 					false);
-							DepsPort.downloadFile();
 							if (parseFile(depsPackagesList,depFile.c_str()) != 0 ) {
 								m_actualError = CANNOT_READ_FILE;
 								treatErrors(depFile);
