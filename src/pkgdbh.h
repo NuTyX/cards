@@ -21,6 +21,10 @@
 //  USA.
 //
 
+/**
+ * Pkgdbh class.
+ */
+
 #ifndef PKGDBH_H
 #define PKGDBH_H
 

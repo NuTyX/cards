@@ -19,6 +19,10 @@
 //  USA.
 //
 
+/**
+ * FileDownload class.
+ */
+
 #ifndef FILEDOWNLOAD_H
 #define FILEDOWNLOAD_H
 
@@ -43,21 +47,21 @@ class FileDownload
 	/**
 	 * Download a file without the need to check the signature of the file
 	 *
-	 * \param url Downloading address
-	 * \param dirName Folder where the download file will be stored
-	 * \param fileName Name of the download file
-	 * \param progress If true progress info will be shown
+	 * \param url Complete downloading address including the file
+	 * \param dirName Destination folder
+	 * \param fileName file where to store the downloaded datas
+	 * \param progress If true, show what's going on
 	 */
 	FileDownload(std::string url, std::string dirName, std::string fileName, bool progress);
 
 	/**
 	 * Download a file with the possibility of checking the signature of the file
 	 *
-	 * \param url Downloading address
-	 * \param dirName Folder where the download file will be stored
-	 * \param fileName Name of the download file
+	 * \param url Complete downloading address including the file
+	 * \param dirName Destination folder
+	 * \param fileName file where to store the downloaded datas
 	 * \param MD5Sum Signature to use for checking the download file
-	 * \param progress If true, progress info will be shown
+	 * \param progress If true, show what's going on
 	 */
 	FileDownload(std::string url, std::string dirName, std::string fileName, std::string MD5Sum , bool progress);
 
@@ -66,7 +70,7 @@ class FileDownload
 	 * InfoFile consist of (amount other fields.. ) Name of the file and the signature of the file to download
 	 *
 	 * \param destinationFiles List of files to download
-	 * \param progress If true, progress info will be shown
+	 * \param progress If true, show what's going on
 	 */
 	FileDownload(std::vector<InfoFile> destinationFiles,bool progress);
 
@@ -97,6 +101,10 @@ class FileDownload
 	int updateProgress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
 	size_t writeToStream(void *buffer, size_t size, size_t nmemb, void *stream);
 	void initFileToDownload(std::string _url, std::string _file);
+
+	/**
+	 * \return true if package is uptodate else false
+	 */
 	bool checkUpToDate();
 	struct dwlProgress
 	{

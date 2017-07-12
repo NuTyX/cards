@@ -63,7 +63,7 @@ Cards_remove::Cards_remove(const string& commandName,
 			bool found = false;
 			for (auto j : m_listOfInstPackages) {
 				if  (( j.second.collection == i) ||
-				( j.second.group == i) ) {
+				( j.second.group == i) || (j.second.base == i)) {
 				PackageToRemove.first=j.first;
 				PackageToRemove.second=j.second.collection;
 				listOfPackagesToRemove.insert(PackageToRemove);

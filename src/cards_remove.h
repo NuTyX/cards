@@ -21,6 +21,9 @@
  *
  */
 
+/**
+ * Cards_remove class.
+ */
 
 #ifndef CARDS_REMOVE_H
 #define CARDS_REMOVE_H
@@ -28,9 +31,25 @@
 #include "pkgrm.h"
 #include "cards_argument_parser.h"
 
+/**
+ * \brief Cards remove class
+ *
+ * This class takes care of removing installed packages, installed collection
+ * or installed family of packages (base attribute).
+ *
+ */
+
+
 class Cards_remove: public Pkgrm
 {
 	public:
+		/**
+		 * Default constructor
+		 * 
+		 * \param commandName Specify the used command name
+		 * \param argParser CardsArgumentParser type
+		 * \param configFileName Specify the configuration file name to use
+		 */
 		Cards_remove(const std::string& commandName,
 		const CardsArgumentParser& argParser,
 		const char *configFileName);

@@ -21,14 +21,33 @@
 //  USA.
 //
 
+/**
+ * Pkgadd class.
+ */
+
 #ifndef PKGADD_H
 #define PKGADD_H
 
 #include "pkgdbh.h"
 
+/**
+ * \brief Pkgadd class
+ *
+ * This class takes care of adding binaries package into the database
+ *
+ */
+
 class Pkgadd : public Pkgdbh {
 public:
+	/**
+	 * Default constructor without any argument
+	 */
 	Pkgadd();
+	/**
+	 * Alternative constructor for derivated classes
+	 * 
+	 * \param commandName Name of the command used in derivated class
+	 */
 	Pkgadd(const std::string& commandName);
 	void parseArguments(int argc, char** argv);
 	void preRun();

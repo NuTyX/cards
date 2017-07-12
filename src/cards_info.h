@@ -21,6 +21,9 @@
  * 
  */
 
+/**
+ * Cards_info class.
+ */
 
 #ifndef CARDS_INFO_H
 #define CARDS_INFO_H
@@ -29,9 +32,23 @@
 #include "pkgrepo.h"
 #include "cards_argument_parser.h"
 
+/**
+ * \brief Cards info class
+ *
+ * This class takes care of printing out information about installed packages, 
+ * availables packages on remote server or available ports that can be compiled.
+ *
+ */
+
 class Cards_info: public Pkginfo, public Pkgrepo
 {
 	public:
+		/**
+		 * Default constructor
+		 * 
+		 * \param argParser CardsArgumentParser type
+		 * \param configFileName Specify the configuration file name to use
+		 */
 		Cards_info(const CardsArgumentParser& argParser,const std::string& configFileName);
 			
 	private:

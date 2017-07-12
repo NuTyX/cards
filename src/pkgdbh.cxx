@@ -500,6 +500,10 @@ void Pkgdbh::buildSimpleDatabase()
 					string alias = contentFile->items[li];
 					m_listOfAlias[alias.substr(1)] = i;
 				}
+				if ( contentFile->items[li][0] == 'b' ) {
+					string base = contentFile->items[li];
+					info.base = base.substr(1);
+				}
 			}
 			m_listOfInstPackages[i] = info;
 			freeItemList(contentFile);

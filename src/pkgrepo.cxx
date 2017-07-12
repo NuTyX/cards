@@ -477,7 +477,12 @@ unsigned int Pkgrepo::getBinaryPackageList()
 					<< j.extention << endl ;
 #endif
 			string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
-			packageNameVersion= "(" + baseDir + ") " +j.basePackageName + " " + j.version;
+			packageNameVersion= "(" + baseDir + ") "
+				+ j.basePackageName 
+				+ " " 
+				+ j.version
+				+ " "
+				+ j.packager;
 			binaryList.insert(packageNameVersion);
 		}
 	}
@@ -541,7 +546,14 @@ unsigned int Pkgrepo::getPortsList()
 #endif
 			if (j.basePackageName.size() > 0) {
 				string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
-				cout <<  i.Dir + "/" + j.basePackageName << " " << j.version << "-" << j.release << endl;
+				cout <<  i.Dir + "/"
+					+ j.basePackageName 
+					<< " " 
+					<< j.version 
+					<< "-" 
+					<< j.release 
+					<< " "
+					<< j.packager << endl;
 				numberOfPorts++;
 			}
 		}

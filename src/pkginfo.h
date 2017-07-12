@@ -21,6 +21,10 @@
 //  USA.
 //
 
+/**
+ * Pkginfo class.
+ */
+
 #ifndef PKGINFO_H
 #define PKGINFO_H
 

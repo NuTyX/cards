@@ -54,12 +54,6 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 	}
 }
 
-/*
-* url is the complete url adress including the file
-* dirName is the Destination folder
-* fileName is the file where to store
-* progress if true, show what's going on
-*/
 FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, bool progress)
 	: m_url(url),m_downloadFileName(dirName+"/"+fileName),m_progress(progress)
 {
@@ -80,13 +74,6 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 	downloadFile();
 }
 
-	/*
-	* url is the complete url adress including the file
-	* dirName is the Destination folder
-	* fileName is the file where to store
-	* MD5Sum is the MD5SUM to check against
-	* progress if true, show what's going on
-	*/
 FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, std::string MD5Sum, bool progress )
   : m_url(url),m_downloadFileName(dirName+"/"+fileName),m_MD5Sum(MD5Sum),m_progress(progress)
 {
