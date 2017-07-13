@@ -504,6 +504,10 @@ void Pkgdbh::buildSimpleDatabase()
 					string base = contentFile->items[li];
 					info.base = base.substr(1);
 				}
+				if ( contentFile->items[li][0] == 'P' ) {
+					string packager = contentFile->items[li];
+					info.packager = packager.substr(1);
+				}
 			}
 			m_listOfInstPackages[i] = info;
 			freeItemList(contentFile);

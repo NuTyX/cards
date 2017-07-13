@@ -112,6 +112,19 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 						<< endl;
 					continue;
 				}
+				pos = convertToLowerCase(j.packager).find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if (pos != std::string::npos) {
+					cout << "(" << i.collection << ") ";
+					if ( checkPackageNameExist(j.basePackageName) ) {
+						cout << GREEN;
+					}
+					cout << j.basePackageName
+						<< NORMAL
+						<< " " << j.version
+						<< " " << j.description
+						<< endl;
+					continue;
+				}
 				bool found = false;
 				set<string> groupList;
 				groupList = parseDelimitedSetList(j.group,' ');
