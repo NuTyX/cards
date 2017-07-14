@@ -62,40 +62,6 @@ struct BasePackageInfo {
 	std::vector<PortFilesList> portFilesList;
 };
 
-/**
- * representation of the .PKGREPO file locate in each port directory.
- * The difference with the collection .PKGREPO, it contains the list of
- * possible files (binaries, Pkgfile, README etc)
- * 
- * 
- */
-
- /* 
-  * Example of firefox/.PKGREPO contents:
- ******************************************************
-  1428615787#.cards.tar.xz#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org
-  ada2187e655daaec9195802b955cce4b#firefox#i686
-  30413e9eac84e9a727c9f89fda341fb0#firefox.devel#any
-  23e6f253809cdac206693c84a56184be#firefox.post-install
-  d47bfe8887dbbad7effc320ddf116d2e#Pkgfile
- *******************************************************
- */
-struct FileList {
-	std::string basePackageName;
-	std::string description;
-	std::string URL;
-	std::string md5SUM;
-	std::string version;
-	int release;
-	std::string packager;
-	std::string maintainer;
-	std::string fileDate;
-	std::string s_buildDate;
-	time_t buildDate;
-	std::string extention;
-	std::vector<PortFilesList> portFilesList;
-};
-
 struct PortsDirectory {
 	std::string Dir;
 	std::string Url;
@@ -117,15 +83,6 @@ public:
 		virtual ~Pkgrepo() {}
 		static int parseConfig(const char *fileName,
 			Config& config);
-
-/**
- *
- * parse the basePackage Directory for binary package
- *  return a list of packages found 
- * 
- */
-	std::set<std::string> getListOfPackagesFromDirectory(const std::string& path);
-
 
 /**
  *
@@ -267,17 +224,9 @@ protected:
  */
     void parsePackagePkgfileFile();
 
-/**
- *
- * parse the .PKGREPO of all the packageName directory
- *
- *
- */
-    void parsePackagesPkgRepoFile();
 
 		bool m_parsePkgRepoCollectionFile;
 		bool m_parseCollectionDirectory;
-		bool m_parsePackagesPkgRepoFile;
 		bool m_parsePackagePkgfileFile;
 
 		std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
