@@ -1069,7 +1069,7 @@ build_needed() {
 update_collection_repo() {
 	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION ALIAS GROUP
 	if [ -f $PKGMK_REPO ]; then
-		for i in `tail -n +2  $PKGMK_REPO`
+		for i in `cat  $PKGMK_REPO`
 		do
 			if [ "`echo $i|cut -d "#" -f3`" != "" ];then
 				GROUP="`echo $i|cut -d "#" -f2|cut -d "." -f2` $GROUP"
@@ -1115,9 +1115,6 @@ update_repo() {
 	[ -z "$packager"  ] && packager="n.a."
 	if [ ! -z $TARGETS ]; then
 		EXT="`get_package_extension $TARGETS`"
-		echo -n "`get_package_builddate $TARGETS`#$EXT#$version#$release" > $PKGMK_REPO
-		echo -n "#$description#$url#$maintainer#$packager" >> .PKGREPO
-		printf "\n" >> .PKGREPO
 		for TARGET in ${TARGETS[@]}; do
 			FILE=`basename $TARGET`
 			MD5SUM=`md5sum $TARGET|cut -d " " -f1`
