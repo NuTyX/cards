@@ -1271,6 +1271,9 @@ main() {
                 exit $E_GENERAL
         fi
         . $PKGMK_CONFFILE
+
+	[ -f ../.$PKGMK_CONFFILE ] && . ../.$PKGMK_CONFFILE
+
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
 		warning "pkginfo NOT FOUND, footprint ignored."
