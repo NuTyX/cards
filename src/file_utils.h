@@ -113,13 +113,12 @@ bool checkMD5sum(const char * fileName, const char * MD5Sum);
 template <class T>
 int parseFile( T& target, const char* fileName)
 {
-  using namespace std;
 	FILE *fp = fopen (fileName, "r");
 	if (!fp)
 		return -1;
 	const int length = BUFSIZ;
 	char input[length];
-	string line;
+	std::string line;
 	while (fgets(input, length, fp)) {
 		input[strlen(input)-1] = '\0';
 		line = input;
