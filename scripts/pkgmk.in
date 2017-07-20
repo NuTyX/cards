@@ -1272,16 +1272,14 @@ main() {
         fi
         . $PKGMK_CONFFILE
 
-	[ -f ../$PKGMK_EXTRA_CONFFILE ] && . ../$PKGMK_EXTRA_CONFFILE
-
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
 		warning "pkginfo NOT FOUND, footprint ignored."
 		PKGMK_IGNORE_FOOTPRINT="yes"
 	fi
-	local FILE TARGET DIR
+	local FILE TARGET DIR NAME
 
-	name=`basename $PKGMK_ROOT`
+	NAME=`basename $PKGMK_ROOT`
 
 	DIR=`dirname $PKGMK_ROOT`
 	collection=`basename $DIR`
@@ -1297,6 +1295,7 @@ main() {
 		exit $E_PKGFILE
 	fi
 
+	[ -f ../$PKGMK_EXTRA_CONFFILE ] && . ../$PKGMK_EXTRA_CONFFILE
 	. $PKGMK_PKGFILE
 
 	if [ ! -z $pkgname ];then
@@ -1306,6 +1305,14 @@ main() {
 			name=$pkgname
 		fi
 	fi
+
+	# If variable name still not define we take the directory name
+	[ -z $name ] && name=$NAME
+	if [ "$name" != "$NAME" ]; then
+		error "Variable 'name' not the same as port name (directory)."
+		exit $E_PKGFILE
+	fi
+
 	[ "`type -t package_$pkgname`" == "function" ] && PKGMK_SPIT="yes"
 	[ ! -z $pkgver ] && version=$pkgver
 	[ ! -z $pkgrel ] && release=$pkgrel
@@ -1549,7 +1556,7 @@ PKGMK_PACKAGE_EXT="cards.tar"
 PKGMK_REPO=".PKGREPO"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
-PKGMK_FILE="Pkgfile"
+PKGMK_PKGFILE="Pkgfile"
 PKGMK_EXTRA_CONFFILE=".pkgmk.conf"
 PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 PKGMK_NOSTRIP=".nostrip"
