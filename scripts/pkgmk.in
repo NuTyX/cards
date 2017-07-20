@@ -1549,6 +1549,7 @@ PKGMK_PACKAGE_EXT="cards.tar"
 PKGMK_REPO=".PKGREPO"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
+PKGMK_FILE="Pkgfile"
 PKGMK_EXTRA_CONFFILE=".pkgmk.conf"
 PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 PKGMK_NOSTRIP=".nostrip"
