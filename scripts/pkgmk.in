@@ -1272,7 +1272,7 @@ main() {
         fi
         . $PKGMK_CONFFILE
 
-	[ -f ../.$PKGMK_CONFFILE ] && . ../.$PKGMK_CONFFILE
+	[ -f ../$PKGMK_EXTRA_CONFFILE ] && . ../$PKGMK_EXTRA_CONFFILE
 
 	PKGMK_ARCH=`uname -m`
 	if ! (`which pkginfo > /dev/null`); then
@@ -1549,7 +1549,7 @@ PKGMK_PACKAGE_EXT="cards.tar"
 PKGMK_REPO=".PKGREPO"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
-PKGMK_PKGFILE="Pkgfile"
+PKGMK_EXTRA_CONFFILE=".pkgmk.conf"
 PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 PKGMK_NOSTRIP=".nostrip"
 PKGMK_SPIT="no"
