@@ -322,6 +322,18 @@ string ArchiveUtils::maintainer()
   }
   return "";
 }
+string ArchiveUtils::contributors()
+{
+  string contributors;
+  for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+    contributors = *i;
+    if ( contributors[0] == 'C' ) {
+      return contributors.substr(1);
+      break;
+    }
+  }
+  return "";
+}
 string ArchiveUtils::packager()
 {
   string maintainer;

@@ -53,6 +53,7 @@ struct BasePackageInfo {
 	int release;
 	std::string description;
 	std::string URL;
+	std::string contributors;
 	std::string maintainer;
 	std::string packager;
 	std::string fileDate;

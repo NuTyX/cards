@@ -89,7 +89,8 @@ since the variable version=2.6.4
 description="libxfce4util, base library for Xfce"
 url="http://docs.xfce.org/"
 maintainer="git.xfce.org/xfce/xfce4-libutils"
-packager="tyrry at nutyx dot org, tnut at nutyx dot org"
+contributors="tyrry at nutyx dot org"
+packager="tnut at nutyx dot org"
 
 name=xfce4-libutil
 version=4.8.2

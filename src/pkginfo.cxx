@@ -147,7 +147,7 @@ void Pkginfo::run()
 		cout
       << name << _("Description    : ") << packageArchive.second.description << endl
 			<< name << _("URL            : ") << packageArchive.second.url << endl
-			<< name << _("Maintainer(s)  : ") << packageArchive.second.maintainer << endl
+			<< name << _("Contributor(s) : ") << packageArchive.second.contributors << endl
 			<< name << _("Packager(s)    : ") << packageArchive.second.packager << endl
 			<< name << _("Version        : ") << packageArchive.second.version << endl
 			<< name << _("Release        : ") << packageArchive.second.release << endl
@@ -315,7 +315,7 @@ void Pkginfo::run()
 					<< _("Group          : ") << m_listOfInstPackages[arg].group << endl
 					<< _("Collection     : ") << m_listOfInstPackages[arg].collection << endl
 					<< _("URL            : ") << m_listOfInstPackages[arg].url << endl
-					<< _("Maintainer(s)  : ") << m_listOfInstPackages[arg].maintainer << endl
+					<< _("Contributor(s) : ") << m_listOfInstPackages[arg].contributors << endl
 					<< _("Packager(s)    : ") << m_listOfInstPackages[arg].packager << endl
 					<< _("Version        : ") << m_listOfInstPackages[arg].version << endl
 					<< _("Release        : ") << m_listOfInstPackages[arg].release << endl

@@ -90,6 +90,7 @@ class ArchiveUtils
 	int  release();		// return the release of the package
 	std::string description();// return the description	of the package
 	std::string url();        // return the url of the package
+	std::string contributors(); // return the Contributor(s) of the package
 	std::string maintainer(); // return the Maintainer(s) of the package
 	std::string collection(); // return the collection of the package
 	std::string packager();   // return the Packager(s) of the package

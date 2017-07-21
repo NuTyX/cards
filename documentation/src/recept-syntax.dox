@@ -10,7 +10,14 @@ A pre-installation script file and / or a post-installation script file can also
 
 The command <b>pkgmk</b> will be used to &quot;build&quot; the package, which can be installed afterwards.
 
-\section recept_syntax_the_directory The port directory
+\section recept_syntax_the_collection_directory The collection directory
+
+A collection directory contains a set of ports. It can also contains a  file named <b>.pkgmk.conf</b>.
+This file will contains info that can be share between ports of the collection. It's very usefull to use
+such a file when we have to produce many packages that shares a lot of information like
+version, url, packager, contributors and even the build() function.
+ 
+\section recept_syntax_the_port_directory The port directory
 
 A package directory will always be named by the package name.
 The lenght of the name of the folder (means the lenght of the name of the package) should not exceed 50 characters.
@@ -29,7 +36,7 @@ Exemple of a directory name:
  /usr/ports/mypackages/libstd+-10
 \endcode
 
-\section recept_syntax_the_directory_contents The directory contents
+\section recept_syntax_the_port_directory_contents The port directory contents
 
 In the directory of a port, we should at least find a file named <b>Pkgfile</b>.
 We can also find pre-install and post-install scripts.
@@ -122,12 +129,19 @@ Information available on the net can be pass to the url variable, for example:
 url="http://www.gtk.org/documentation.php"
 \endcode
 
-The name of the packager(s) can be specify via the packager variable:
+The name of all the peoples that has ones contribute to the construction
+of the package can be specify via the contributors variable.
+If it's a new package, they will be no contributors yet:
 \code{.sh}
-packager="pierre at nutyx dot org, tnut at nutyx dot org"
+contributors="pierre at nutyx dot org, tnut at nutyx dot org"
 \endcode
 
-The name of the maintainer(s) can be specify via the maintainer variable:
+The name of the last packager who modify the recept can be specify via the packager variable:
+\code{.sh}
+packager="tnut at nutyx dot org"
+\endcode
+
+The name of the upstream(s) maintainer(s) can be specify via the maintainer variable:
 \code{.sh}
 maintainer="Daniel Stenberg and many more"
 \endcode
@@ -233,7 +247,8 @@ To conclude, a full example with all the possible variables:
 
 description="GTK+ is a multi-platform toolkit (version 2)"
 url="http://www.gtk.org/"
-packager="pierre at nutyx dot org, tnut at nutyx dot org"
+contributors="tyrry at nutyx dot org, pierre at nutyx dot org"
+packager="tnut at nutyx dot org"
 
 name=gtk2
 version=2.46.3

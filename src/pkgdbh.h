@@ -92,6 +92,7 @@ struct pkginfo_t {
 	std::string version;
 	int release;
 	std::string url;
+	std::string contributors;
 	std::string packager;
 	std::string maintainer;
 	time_t install; // date of last installation

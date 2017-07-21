@@ -702,7 +702,7 @@ add_meta_files() {
 	done
 }
 add_meta_to_archive() {
-	local NAME TAR SIZE_I DESC URL PACK MAINT ARCH GROUP
+	local NAME TAR SIZE_I DESC URL CONT PACK MAINT ARCH GROUP
 	NAME="`get_package_name $1`"
 	ARCH="`get_package_arch $1`"
 	GROUP="`echo $NAME|cut -d "." -f2`"
@@ -716,12 +716,14 @@ add_meta_to_archive() {
 	URL="none"
 	PACK="none"
 	MAINT="none"
+	CONT="none"
 
 	bsdtar xf $PKGMK_PACKAGE_DIR/$1
 
 	[ ! -z "$description" ] && DESC=$description
 	[ ! -z "$packager" ] && PACK=$packager
 	[ ! -z "$maintainer" ] && MAINT=$maintainer
+	[ ! -z "$contributors" ] && CONT=$contributors
 	[ ! -z "$url" ] && URL=$url
 
 	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
@@ -729,6 +731,7 @@ add_meta_to_archive() {
 	echo "N$NAME" > .META
 	echo "D$DESC" >> .META
 	echo "U$URL" >> .META
+	echo "C$CONT" >> .META
 	echo "M$MAINT" >> .META
 	echo "P$PACK" >> .META
 	echo "S$SIZE_I" >> .META
@@ -1067,7 +1070,7 @@ build_needed() {
 	echo $RESULT
 }
 update_collection_repo() {
-	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION ALIAS GROUP
+	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION ALIAS GROUP CONTRIBUTORS
 	if [ -f $PKGMK_REPO ]; then
 		for i in `tail -n +2  $PKGMK_REPO`
 		do
@@ -1085,6 +1088,7 @@ update_collection_repo() {
 			URL="`echo $HEAD|cut -d "#" -f6`"
 			MAINTAINER="`echo $HEAD|cut -d "#" -f7`"
 			PACKAGER="`echo $HEAD|cut -d "#" -f8`"
+			CONTRIBUTORS="`echo $HEAD|cut -d "#" -f9`"
 			if [ ! -z $alias ]; then
 				for i in ${alias[@]}
 				do
@@ -1094,7 +1098,7 @@ update_collection_repo() {
 				ALIAS=""
 			fi
 			[ -f ../$PKGMK_REPO ] && sed -i "/#$name#/d" ../$PKGMK_REPO
-			echo "`md5sum $PKGMK_REPO|cut -d " " -f1`#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP" \
+			echo "`md5sum $PKGMK_REPO|cut -d " " -f1`#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP#$CONTRIBUTORS" \
 			>> ../$PKGMK_REPO
 		fi
 	fi
@@ -1113,10 +1117,11 @@ update_repo() {
 	[ -z "$url"  ] && url="n.a."
 	[ -z "$maintainer"  ] && maintainer="n.a."
 	[ -z "$packager"  ] && packager="n.a."
+	[ -z "$contributors" ] && contributors="none"
 	if [ ! -z $TARGETS ]; then
 		EXT="`get_package_extension $TARGETS`"
 		echo -n "`get_package_builddate $TARGETS`#$EXT#$version#$release" > $PKGMK_REPO
-		echo -n "#$description#$url#$maintainer#$packager" >> .PKGREPO
+		echo -n "#$description#$url#$maintainer#$packager#$contributors" >> .PKGREPO
 		printf "\n" >> .PKGREPO
 		for TARGET in ${TARGETS[@]}; do
 			FILE=`basename $TARGET`

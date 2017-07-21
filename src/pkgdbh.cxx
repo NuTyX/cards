@@ -549,66 +549,70 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 			info.release = 1;
 			m_listOfAlias[i] = i;
 			for (unsigned int li=0; li< contentFile->count ; ++li) {
-			if ( contentFile->items[li][0] == 'D' ) {
-				string description = contentFile->items[li];
-				info.description = description.substr(1);
-			}
-			if ( contentFile->items[li][0] == 'B' ) {
-				string build = contentFile->items[li];
-				info.build = strtoul(build.substr(1).c_str(),NULL,0);
-			}
-			if ( contentFile->items[li][0] == 'U' ) {
-				string url = contentFile->items[li];
-				info.url = url.substr(1);
-			}
-			if ( contentFile->items[li][0] == 'M' ) {
-				string maintainer = contentFile->items[li];
-				info.maintainer = maintainer.substr(1);
-			}
-			if ( contentFile->items[li][0] == 'P' ) {
-				string packager = contentFile->items[li];
-				info.packager = packager.substr(1);
-			}
-			if ( contentFile->items[li][0] == 'V' ) {
-				string version = contentFile->items[li];
-				info.version = version.substr(1);
-			}
-			if ( contentFile->items[li][0] == 'r' ) {
-				string release = contentFile->items[li];
-				info.release = atoi(release.substr(1).c_str());
-			}
-			if ( contentFile->items[li][0] == 'a' ) {
-				string arch = contentFile->items[li];
-				info.arch = arch.substr(1);
-			}
-			if ( contentFile->items[li][0] == 'c' ) {
-				string collection = contentFile->items[li];
-				info.collection = collection.substr(1);
-			}
-			if ( contentFile->items[li][0] == 'g' ) {
-				string group = contentFile->items[li];
-				info.group = group.substr(1);
-			}
-			if ( contentFile->items[li][0] == 'b' ) {
-				string base = contentFile->items[li];
-				info.base = base.substr(1);
-			}
-			if ( contentFile->items[li][0] == 'S' ) {
-				string size = contentFile->items[li];
-				info.size = atoi(size.substr(1).c_str());
-			}
-			if ( contentFile->items[li][0] == 'A' ) {
-				string alias = contentFile->items[li];
-				info.alias.insert(alias.substr(1));
-				m_listOfAlias[alias.substr(1)] = i;
-			}
-			if ( contentFile->items[li][0] == 'R' ) {
-				string run = contentFile->items[li];
-				std::pair<std::string,time_t > NameEpoch;
-				NameEpoch.first=run.substr(1,run.size()-11);
-				NameEpoch.second=strtoul((run.substr(run.size()-10)).c_str(),NULL,0);
-				info.dependencies.insert(NameEpoch);
-			}
+				if ( contentFile->items[li][0] == 'C' ) {
+					string contributors = contentFile->items[li];
+					info.contributors = contributors.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'D' ) {
+					string description = contentFile->items[li];
+					info.description = description.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'B' ) {
+					string build = contentFile->items[li];
+					info.build = strtoul(build.substr(1).c_str(),NULL,0);
+				}
+				if ( contentFile->items[li][0] == 'U' ) {
+					string url = contentFile->items[li];
+					info.url = url.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'M' ) {
+					string maintainer = contentFile->items[li];
+					info.maintainer = maintainer.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'P' ) {
+					string packager = contentFile->items[li];
+					info.packager = packager.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'V' ) {
+					string version = contentFile->items[li];
+					info.version = version.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'r' ) {
+					string release = contentFile->items[li];
+					info.release = atoi(release.substr(1).c_str());
+				}
+				if ( contentFile->items[li][0] == 'a' ) {
+					string arch = contentFile->items[li];
+					info.arch = arch.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'c' ) {
+					string collection = contentFile->items[li];
+					info.collection = collection.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'g' ) {
+					string group = contentFile->items[li];
+					info.group = group.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'b' ) {
+					string base = contentFile->items[li];
+					info.base = base.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'S' ) {
+					string size = contentFile->items[li];
+					info.size = atoi(size.substr(1).c_str());
+				}
+				if ( contentFile->items[li][0] == 'A' ) {
+					string alias = contentFile->items[li];
+					info.alias.insert(alias.substr(1));
+					m_listOfAlias[alias.substr(1)] = i;
+				}
+				if ( contentFile->items[li][0] == 'R' ) {
+					string run = contentFile->items[li];
+					std::pair<std::string,time_t > NameEpoch;
+					NameEpoch.first=run.substr(1,run.size()-11);
+					NameEpoch.second=strtoul((run.substr(run.size()-10)).c_str(),NULL,0);
+					info.dependencies.insert(NameEpoch);
+				}
 			}
 			freeItemList(contentFile);	
 			// list of files

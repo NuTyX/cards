@@ -137,6 +137,11 @@ if (m_parsePkgRepoCollectionFile == false) {
 					basePkgInfo.group = infos[11];
 				}
 			}
+			if ( infos.size() > 12 ) {
+				if ( infos[12].size() > 0 ) {
+					basePkgInfo.contributors = infos[12];
+				}
+			}
 			portsDirectory.basePackageList.push_back(basePkgInfo);
 		}
 		m_portsDirectoryList.push_back(portsDirectory);
@@ -302,6 +307,9 @@ void Pkgrepo::parsePackagePkgfileFile()
 				} else if ( line.substr( 0, 9 ) == "packager=" ){
 					j->packager = getValueBefore( getValue( line, '=' ), '#' );
 					j->packager = stripWhiteSpace( j->packager );
+				} else if ( line.substr( 0, 13 ) == "contributors=" ){
+					j->contributors = getValueBefore( getValue( line, '=' ), '#' );
+					j->contributors = stripWhiteSpace( j->contributors );
 				} else if ( line.substr( 0, 11 ) == "maintainer=" ){
 					j->maintainer = getValueBefore( getValue( line, '=' ), '#' );
 					j->maintainer = stripWhiteSpace( j->maintainer );
@@ -483,6 +491,7 @@ bool Pkgrepo::getPortInfo(const string& portName)
 					<< "Version        : " << j.version << endl
 					<< "Release        : " << j.release << endl
 					<< "Maintainer     : " << j.maintainer << endl
+					<< "Contributors   : " << j.contributors << endl
 					<< "Packager       : " << j.packager << endl
 					<< "Date of Pkgfile: " << j.fileDate << endl
 					<< "Local Directory: " << i.Dir << endl;
@@ -511,6 +520,7 @@ bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
 					<< "Version        : " << j.version << endl
 					<< "Release        : " << j.release << endl
 					<< "Maintainer     : " << j.maintainer << endl
+					<< "Contributors   : " << j.contributors << endl
 					<< "Packager       : " << j.packager << endl
 					<< "Build date     : " << getDateFromEpoch(j.buildDate) << endl
 					<< "Binary Url     : " << i.Url << endl

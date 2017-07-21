@@ -312,6 +312,9 @@ msgstr "Collection          : "
 msgid "URL            : "
 msgstr "URL                 : "
 
+msgid "Contributor(s) : "
+msgstr "Contributeur(s)     : "
+
 msgid "Maintainer(s)  : "
 msgstr "Mainteneur(s)       : "
 
