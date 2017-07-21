@@ -1294,8 +1294,11 @@ main() {
 		error "File '$PKGMK_PKGFILE' not found."
 		exit $E_PKGFILE
 	fi
-
+	# Need to be set so that we can use the 'name' variable
+	name=$NAME
 	[ -f ../$PKGMK_EXTRA_CONFFILE ] && . ../$PKGMK_EXTRA_CONFFILE
+	# Need to reset
+	unset name
 	. $PKGMK_PKGFILE
 
 	if [ ! -z $pkgname ];then

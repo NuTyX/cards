@@ -108,6 +108,7 @@ check_ports()
 		echo "Variable 'PORT_BASE'"
 		exit 1
 	fi
+	sync_pkgmk_conf
 	cd ${PORT_BASE}
 	for DIR in *
 	do
@@ -377,6 +378,15 @@ sync_binaries () {
 	rsync -av --delete ${RSYNC_SERVER}/${ARCH}/${RSYNC_NUTYX_VERSION}/$COLLECTION/ \
 	$BINARY_BASE/
 }
+sync_pkgmk_conf() {
+	if [ -f ${PORT_BASE}/${PKGMK_CONFFILE} ]; then
+		rsync -a ${PORT_BASE}/${PKGMK_CONFFILE} \
+		${BINARY_BASE}/${PKGMK_CONFFILE}
+	else
+		rm -f ${BINARY_BASE}/${PKGMK_CONFFILE}
+	fi
+
+}
 remove_url () {
 	local URL
 	URL="`cat /etc/cards.conf|grep \"^dir[ ]*${BINARY_BASE}|\"| cut -d '|' -s -f2`"
@@ -387,6 +397,7 @@ remove_url () {
 build_binaries () {
 	local package port_version binary_version currentdir
 	currentdir=$PWD
+	sync_pkgmk_conf
 	for i in `cards level -I |grep ${BINARY_BASE}/|cut -d " " -f2`
 	do
 		package=`basename $i`
@@ -436,6 +447,7 @@ main() {
 		usage
 		exit 0
 	fi
+	sync_pkgmk_conf
 	rsync -av --exclude '.*.swp'  --exclude '*~' \
 	--delete-after ${PORT_BASE}/$1/ \
 	${BINARY_BASE}/$1/
@@ -452,5 +464,5 @@ RSYNC_SERVER="rsync://downloads.nutyx.org/nutyx"
 COLLECTION="`basename $0`"
 GIT=`pwd`
 PROJECT="`basename $GIT`"
-
+PKGMK_CONFFILE=".pkgmk.conf"
 main "$@"
