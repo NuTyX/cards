@@ -28,8 +28,13 @@ struct boardInfo_t {
 	std::string category;
 	std::string name;
 };
+struct userInfo_t {
+	std::string member_name;
+	std::string real_name;
+};
 typedef std::map< std::string, boardInfo_t > board_t;
 typedef std::map< std::string, std::string > category_t;
+typedef std::map< std::string, userInfo_t > user_t;
 
 class mysql
 {

@@ -46,6 +46,7 @@ mysql::~mysql()
 }
 void mysql::lastPosts(const char *forum, int n)
 {
+	// retrieve the list of boards
 	boardInfo_t info;
 	if(mysql_query(m_connection,
 	"select id_board, name, id_cat from smf_boards order by id_board"))
@@ -59,20 +60,36 @@ void mysql::lastPosts(const char *forum, int n)
 		listOfBoards[ rows[0] ] = info;
 	}
 
+	// retrieve the list of categories
 	if(mysql_query(m_connection,
 	"select id_cat, name from smf_categories order by id_cat"))
 		cerr << mysql_error(m_connection) << endl;
 	m_result= mysql_use_result(m_connection);
-	category_t listOfCategories;
 
+	category_t listOfCategories;
 	while ((rows = mysql_fetch_row(m_result)) != NULL) {
 		listOfCategories[ rows[0] ] = rows[1];
 	}
 
-	if(mysql_query(m_connection,
-	"select id_topic, id_msg, poster_name, poster_time, subject, icon, id_board from smf_messages order by id_msg"))
+	// retrieve the list of members
+	if (mysql_query(m_connection,
+	"select id_member, member_name, real_name from smf_members order by id_member"))
 		cerr << mysql_error(m_connection) << endl;
 	m_result= mysql_use_result(m_connection);
+
+	userInfo_t user;
+	user_t listOfUsers;
+	while (( rows = mysql_fetch_row(m_result)) != NULL) {
+		user.member_name=rows[1];
+		user.real_name=rows[2];
+		listOfUsers[ rows[0] ] = user;
+	}
+	// retrieve the list of messages
+	if(mysql_query(m_connection,
+	"select id_topic, id_msg, id_member, poster_time, subject, icon, id_board from smf_messages order by id_msg"))
+		cerr << mysql_error(m_connection) << endl;
+	m_result= mysql_use_result(m_connection);
+
 	vector<string> list;
 	string sforum = forum;
 	while ((rows = mysql_fetch_row(m_result)) != NULL) {
@@ -85,7 +102,7 @@ void mysql::lastPosts(const char *forum, int n)
         string board = "<b>";
 		board += listOfBoards[ rows[6] ].name;
 		string author = "<i>";
-		author += rows[2];
+		author += listOfUsers[ rows[2] ].real_name;
 		author += "</i>";
 		string subject = rows[4];
 		string icon = rows[5];
