@@ -318,6 +318,7 @@ get_port_version() {
 	cd $port
 	unset version
 	unset release
+	[ -f ../${PKGMK_CONFFILE} ] && . ../${PKGMK_CONFFILE}
 	. Pkgfile
 	[ ! -z $release ] && tmprel=$release
 	if [ -z $version ] && [ "$base_port" != "$package" ] ; then
@@ -325,9 +326,6 @@ get_port_version() {
 			cd $PORTS_DIR/$base_port
 			. Pkgfile
 		fi
-	fi
-	if [ -z $version ]; then
-		[ -f ../${PKGMK_CONFFILE} ] && . ../${PKGMK_CONFFILE}
 	fi
 	[ -z $release ] && release=1
 	[ ! -z $tmprel ] && release=$tmprel
