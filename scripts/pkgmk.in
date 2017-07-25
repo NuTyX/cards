@@ -762,16 +762,19 @@ add_meta_to_archive() {
 				echo "R$rd`pkginfo -b $rd`" >> .META
 			done
 		fi
-		if [ -f $PKGMK_ROOT/${NAME}.run ]; then
-			info "Adding runtime deps to Archive $NAME"
-			for rd in `cat $PKGMK_ROOT/${NAME}.run`; do
-				if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
-					error "Runtime dependency $rd not found, cannot continue"
-					clean
-					exit $E_DEPS;
-				fi
-				echo "R$rd`pkginfo -b $rd`" >> .META
-			done
+		if [ ! -z "$GROUP" ]; then
+			rds=("run_$GROUP[@]")
+			if [ ! -z "`echo ${!rds}`" ]; then
+				info "Adding runtime deps to Archive $NAME"
+				for rd in `echo ${!rds}`; do
+					if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
+						error "Runtime dependency $rd not found, cannot continue"
+						clean
+						exit $E_DEPS;
+					fi
+					echo "R$rd`pkginfo -b $rd`" >> .META
+				done
+			fi
 		fi
 	fi
 	if [ ! -z $alias ]; then
