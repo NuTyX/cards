@@ -72,10 +72,9 @@ void Cards_base::run(int argc, char** argv)
 	if (basePackagesList.size() == 0) {
 		throw runtime_error("No package found for the base System" );
 	}
-
+	set<string> installedList = getListOfPackageName();
 	// For all the installed packages
-	for (set<string>::const_iterator iP = m_packageNamesList.begin(); iP != m_packageNamesList.end(); iP++) {
-		installFullPackageName = *iP;
+	for ( auto installFullPackageName : installedList) {
 		// We need to compare the base part if it not one
 		string::size_type pos = installFullPackageName.find('.');
 		if (pos != string::npos) {
@@ -123,7 +122,6 @@ void Cards_base::run(int argc, char** argv)
 				// Remove the files on hd
 				removePackageFiles(i);
 			}
-			runLdConfig();
 		} else {
 			for (auto i : removePackagesList) cout << i << endl;
 		}

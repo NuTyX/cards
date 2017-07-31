@@ -33,7 +33,6 @@ void Pkgrm::run(int argc, char** argv)
 {
 	parseArguments(argc, argv);
 	run();
-	finish();
 }
 void Pkgrm::run()
 {

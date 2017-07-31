@@ -32,6 +32,14 @@ Pkgdbh::Pkgdbh(const string& name)
 {
 	openlog(m_utilName.c_str(),LOG_CONS,LOG_LOCAL7);
 }
+Pkgdbh::~Pkgdbh()
+{
+#ifndef NDEBUG
+		syslog(LOG_INFO,"Closing log...");
+#endif
+		runLastPostInstall();
+		void closelog(void);
+}
 void Pkgdbh::parseArguments(int argc, char** argv)
 {
 	for (int i = 1; i < argc; i++) {
@@ -270,6 +278,10 @@ void Pkgdbh::progressInfo() const
 			break;
   }
 }
+set<string> Pkgdbh::getListOfPackageName()
+{
+	return m_packageNamesList;
+}
 int Pkgdbh::getNumberOfPackages()
 {
   return getListOfPackageNames("");
@@ -336,7 +348,7 @@ std::set<std::string> Pkgdbh::getFilesOfPackage
 	}
 	return packageFiles;
 }
-/*
+/**
  * Populate the database in following modes:
  * - if nothing specify only get the List of PackageNames
  *   and populate the alias list.
@@ -454,7 +466,7 @@ void Pkgdbh::buildDatabase
 		progressInfo();
 	}
 }
-/*
+/**
  * Populate the database with:
  * - Name
  * - version
@@ -462,6 +474,7 @@ void Pkgdbh::buildDatabase
  * - collection
  * - Build date
  * - Group name
+ * - Packager name
  * */
 void Pkgdbh::buildSimpleDatabase()
 {
@@ -477,36 +490,36 @@ void Pkgdbh::buildSimpleDatabase()
 			m_listOfAlias[i] = i;
 			for (unsigned int li=0; li < contentFile->count ; ++li) {
 				if ( contentFile->items[li][0] == 'c' ) {
-					string collection = contentFile->items[li];
-					info.collection = collection.substr(1);
+					string s = contentFile->items[li];
+					info.collection = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'V' ) {
-					string version = contentFile->items[li];
-					info.version = version.substr(1);
+					string s = contentFile->items[li];
+					info.version = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'r' ) {
-					string release = contentFile->items[li];
-					info.release = atoi(release.substr(1).c_str());
+					string s = contentFile->items[li];
+					info.release = atoi(s.substr(1).c_str());
 				}
 				if ( contentFile->items[li][0] == 'B' ) {
-					string build = contentFile->items[li];
-					info.build = strtoul(build.substr(1).c_str(),NULL,0);
+					string s = contentFile->items[li];
+					info.build = strtoul(s.substr(1).c_str(),NULL,0);
 				}
 				if ( contentFile->items[li][0] == 'g' ) {
-					string group = contentFile->items[li];
-					info.group = group.substr(1);
+					string s = contentFile->items[li];
+					info.group = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'A' ) {
-					string alias = contentFile->items[li];
-					m_listOfAlias[alias.substr(1)] = i;
+					string s = contentFile->items[li];
+					m_listOfAlias[s.substr(1)] = i;
 				}
 				if ( contentFile->items[li][0] == 'b' ) {
-					string base = contentFile->items[li];
-					info.base = base.substr(1);
+					string s = contentFile->items[li];
+					info.base = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'P' ) {
-					string packager = contentFile->items[li];
-					info.packager = packager.substr(1);
+					string s = contentFile->items[li];
+					info.packager = s.substr(1);
 				}
 			}
 			m_listOfInstPackages[i] = info;
@@ -519,7 +532,9 @@ void Pkgdbh::buildSimpleDatabase()
 		cerr << "Alias: " << i.first << ", Package: " << i.second << endl;
 #endif
 }
-/* Populate the database with all details infos */
+ /**
+ * Populate the database with all details infos
+ */
 void Pkgdbh::buildCompleteDatabase(const bool& silent)
 {
 	cleanupMetaFiles(m_root);
@@ -550,67 +565,67 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 			m_listOfAlias[i] = i;
 			for (unsigned int li=0; li< contentFile->count ; ++li) {
 				if ( contentFile->items[li][0] == 'C' ) {
-					string contributors = contentFile->items[li];
-					info.contributors = contributors.substr(1);
+					string s = contentFile->items[li];
+					info.contributors = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'D' ) {
-					string description = contentFile->items[li];
-					info.description = description.substr(1);
+					string s = contentFile->items[li];
+					info.description = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'B' ) {
-					string build = contentFile->items[li];
-					info.build = strtoul(build.substr(1).c_str(),NULL,0);
+					string s = contentFile->items[li];
+					info.build = strtoul(s.substr(1).c_str(),NULL,0);
 				}
 				if ( contentFile->items[li][0] == 'U' ) {
-					string url = contentFile->items[li];
-					info.url = url.substr(1);
+					string s = contentFile->items[li];
+					info.url = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'M' ) {
-					string maintainer = contentFile->items[li];
-					info.maintainer = maintainer.substr(1);
+					string s = contentFile->items[li];
+					info.maintainer = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'P' ) {
-					string packager = contentFile->items[li];
-					info.packager = packager.substr(1);
+					string s = contentFile->items[li];
+					info.packager = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'V' ) {
-					string version = contentFile->items[li];
-					info.version = version.substr(1);
+					string s = contentFile->items[li];
+					info.version = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'r' ) {
-					string release = contentFile->items[li];
-					info.release = atoi(release.substr(1).c_str());
+					string s = contentFile->items[li];
+					info.release = atoi(s.substr(1).c_str());
 				}
 				if ( contentFile->items[li][0] == 'a' ) {
-					string arch = contentFile->items[li];
-					info.arch = arch.substr(1);
+					string s = contentFile->items[li];
+					info.arch = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'c' ) {
-					string collection = contentFile->items[li];
-					info.collection = collection.substr(1);
+					string s = contentFile->items[li];
+					info.collection = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'g' ) {
-					string group = contentFile->items[li];
-					info.group = group.substr(1);
+					string s = contentFile->items[li];
+					info.group = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'b' ) {
-					string base = contentFile->items[li];
-					info.base = base.substr(1);
+					string s = contentFile->items[li];
+					info.base = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'S' ) {
-					string size = contentFile->items[li];
-					info.size = atoi(size.substr(1).c_str());
+					string s = contentFile->items[li];
+					info.size = atoi(s.substr(1).c_str());
 				}
 				if ( contentFile->items[li][0] == 'A' ) {
-					string alias = contentFile->items[li];
-					info.alias.insert(alias.substr(1));
-					m_listOfAlias[alias.substr(1)] = i;
+					string s = contentFile->items[li];
+					info.alias.insert(s.substr(1));
+					m_listOfAlias[s.substr(1)] = i;
 				}
 				if ( contentFile->items[li][0] == 'R' ) {
-					string run = contentFile->items[li];
+					string s = contentFile->items[li];
 					std::pair<std::string,time_t > NameEpoch;
-					NameEpoch.first=run.substr(1,run.size()-11);
-					NameEpoch.second=strtoul((run.substr(run.size()-10)).c_str(),NULL,0);
+					NameEpoch.first=s.substr(1,s.size()-11);
+					NameEpoch.second=strtoul((s.substr(s.size()-10)).c_str(),NULL,0);
 					info.dependencies.insert(NameEpoch);
 				}
 			}
@@ -1300,9 +1315,27 @@ void Pkgdbh::readRulesFile()
 					m_actualError = PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS;
 					treatErrors(filename + ":" + itos(linecount));
 				}
-				if (!strcmp(event, "UPGRADE") || !strcmp(event, "INSTALL")) {
+				if (!strcmp(event, "UPGRADE") || !strcmp(event, "INSTALL") \
+					|| !strcmp(event, "LDCONF") \
+					|| !strcmp(event, "INFO") || !strcmp(event, "ICONS") \
+					|| !strcmp(event, "SCHEMAS") || !strcmp(event, "DESKTOP_DB")) {
+
 					rule_t rule;
-					rule.event = strcmp(event, "UPGRADE") ? INSTALL : UPGRADE;
+					if (!strcmp(event, "UPGRADE"))
+						rule.event = UPGRADE;
+					if (!strcmp(event, "INSTALL"))
+						rule.event = INSTALL;
+					if (!strcmp(event, "INFO"))
+						rule.event = INFO;
+					if (!strcmp(event, "LDCONF"))
+						rule.event = LDCONF;
+					if (!strcmp(event, "ICONS"))
+						rule.event = ICONS;
+					if (!strcmp(event, "SCHEMAS"))
+						rule.event = SCHEMAS;
+					if (!strcmp(event, "DESKTOP_DB"))
+						rule.event = DESKTOP_DB;
+
 					rule.pattern = pattern;
 					if (!strcmp(action, "YES")) {
 						rule.action = true;
@@ -1325,22 +1358,70 @@ void Pkgdbh::readRulesFile()
 	}
 #ifndef NDEBUG
 	cerr << "Configuration:" << endl;
-	for (auto j : m_actionRules ) cerr << "\t" << j.pattern << "\t" << j.action << endl;
+	for (auto j : m_actionRules )
+		cerr << j.event << "\t" << j.pattern << "\t" << j.action << endl;
 	cerr << endl;
 #endif
 }
-void Pkgdbh::finish()
+void Pkgdbh::runLastPostInstall()
 {
-		runLdConfig();
-}
+	if ( m_postInstallList.size() > 0 ) {
+#ifndef NDEBUG
+	for (auto i : m_postInstallList)
+		cerr << i.event << " " << i.pattern << endl;
+#endif
+	for (auto i : m_postInstallList)
+		switch ( i.event )
+		{
+			case LDCONF:
+				if (checkFileExist(m_root + LDCONFIG_CONF)) {
+					string args = "-r " + m_root;
+					process ldconfig(m_root + LDCONFIG, args,0);
+					cerr << m_root + LDCONFIG << " start" <<  endl;
+					ldconfig.execute();
+					cerr << m_root + LDCONFIG << " end" <<  endl;
+				}
+			break;
 
-void Pkgdbh::runLdConfig()
-{
-	// Only execute runLdConfig if /etc/ld.so.conf exists
-	if (checkFileExist(m_root + LDCONFIG_CONF)) {
-		string args = "-r " + m_root;
-		process ldconfig(LDCONFIG, args,0);
-		ldconfig.execute();
+			case INFO:
+				if (checkFileExist(m_root + INSTALL_INFO)) {
+					string args = INSTALL_INFO_ARGS + i.pattern;
+					process info_install(m_root + INSTALL_INFO, args,0);
+					cerr << m_root + INSTALL_INFO << " start" <<  endl;
+					info_install.execute();
+					cerr << m_root + INSTALL_INFO << " end" <<  endl;
+				}
+			break;
+
+			case ICONS:
+				if (checkFileExist(m_root + UPDATE_ICON)) {
+					string args = UPDATE_ICON_ARGS + i.pattern;
+					process update_icon_cache(m_root + UPDATE_ICON,args,0);
+					cerr << m_root + UPDATE_ICON << " start" <<  endl;
+					update_icon_cache.execute();
+					cerr << m_root + UPDATE_ICON << " end" <<  endl;
+				}
+			break;
+
+			case SCHEMAS:
+				if (checkFileExist(m_root + COMPILE_SCHEMAS)) {
+					string args = COMPILE_SCHEMAS_ARGS + i.pattern;
+					process compile_schemas(m_root + COMPILE_SCHEMAS, args,0);
+					cerr << m_root + COMPILE_SCHEMAS << " start" <<  endl;
+					compile_schemas.execute();
+					cerr << m_root + COMPILE_SCHEMAS << " end" <<  endl;
+				}
+			break;
+
+			case DESKTOP_DB:
+				if (checkFileExist(m_root + UPDATE_DESKTOP_DB)) {
+					string args = UPDATE_DESKTOP_DB_ARGS + i.pattern;
+					process update_desktop_db(m_root + UPDATE_DESKTOP_DB, args,0);
+					cerr << m_root + UPDATE_DESKTOP_DB << " start" <<  endl;
+					update_desktop_db.execute();
+					cerr << m_root + UPDATE_DESKTOP_DB << " end" <<  endl;
+				}
+		}
 	}
 }
 bool Pkgdbh::checkRuleAppliesToFile(const rule_t& rule, const string& file)

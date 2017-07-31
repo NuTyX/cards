@@ -115,6 +115,5 @@ Cards_remove::Cards_remove(const string& commandName,
 			syslog(LOG_INFO,name.c_str());
 		}
 	}
-	finish();
 }
 // vim:set ts=2 :

@@ -53,9 +53,24 @@
 #define PKGADD_CONF      "etc/pkgadd.conf"
 #define PKGADD_CONF_MAXLINE	1024
 
-#define LDCONFIG         "/sbin/ldconfig"
-#define LDCONFIG_CONF    "/etc/ld.so.conf"
+#define LDCONFIG         "sbin/ldconfig"
+#define LDCONFIG_CONF    "etc/ld.so.conf"
 #define SHELL            "bin/sh"
+
+// /usr/bin/install-info --info-dir="/usr/share/info" /usr/share/info/<file>.info"
+#define INSTALL_INFO      "usr/bin/install-info"
+#define INSTALL_INFO_ARGS " --info-dir=usr/share/info "
+// /usr/bin/gtk-update-icon-cache -f -t /usr/share/icons/hicolor
+#define UPDATE_ICON       "usr/bin/gtk-update-icon-cache"
+#define UPDATE_ICON_ARGS  " -f -t "
+
+// /usr/bin/glib-compile-schemas /usr/share/glib-2/schemas
+#define COMPILE_SCHEMAS       "usr/bin/glib-compile-schemas"
+#define COMPILE_SCHEMAS_ARGS  " "
+
+// /usr/bin/update-desktop-database -q /usr/share/applications
+#define UPDATE_DESKTOP_DB      "usr/bin/update-desktop-database"
+#define UPDATE_DESKTOP_DB_ARGS " -q "
 
 enum action 
 { 
@@ -106,9 +121,13 @@ typedef std::map<std::string, pkginfo_t> packages_t;
 typedef std::map<std::string, std::string> alias_t;
 
 enum rule_event_t {
-	REPLACE,
+	LDCONF,
 	UPGRADE,
-	INSTALL
+	INSTALL,
+	INFO,
+	ICONS,
+	SCHEMAS,
+	DESKTOP_DB
 };
 
 struct rule_t {
@@ -121,18 +140,12 @@ class Pkgdbh {
 public:
 
 	explicit Pkgdbh(const std::string& name);
-	virtual ~Pkgdbh() {
-#ifndef NDEBUG
-		syslog(LOG_INFO,"Closing log...");
-#endif
-		void closelog(void);
-	}
+	virtual ~Pkgdbh();
 
 	/* Following methods can be redefined in derivated class */
 	virtual void parseArguments(int argc, char** argv);
 	virtual void run(int argc, char** argv) {};
 	virtual void run() {};
-	virtual void finish() ;
 
 	virtual void printHelp() const {};
 
@@ -142,6 +155,7 @@ public:
 
 	void print_version() const;
 	int getNumberOfPackages();
+	std::set<std::string> getListOfPackageName();
 	bool checkPackageNameExist(const std::string& name) const;
 
 protected:
@@ -204,7 +218,7 @@ protected:
 		const std::string& file);
 
 	void getFootprintPackage(std::string& filename);
-	void runLdConfig();
+
 	std::string m_packageArchiveName;
 	std::string m_packageName;
 	std::string m_packageArchiveVersion;
@@ -217,20 +231,26 @@ protected:
 	std::string m_root;
 	std::string m_build;
 	std::vector<rule_t> m_actionRules;
+	std::vector<rule_t> m_postInstallList;
+	alias_t	m_listOfAlias;
 
 	packages_t m_listOfInstPackages;
 	packages_t m_listOfDepotPackages;
-	alias_t	m_listOfAlias;
-
-	std::set<std::string> m_packageNamesList;
-	std::set<std::string> m_filesList;
-	std::set<std::string> m_runtimeLibrariesList;
 
 	action m_actualAction;
 	error m_actualError;
+
+private:
+
+	void runLastPostInstall();
+	
+	std::set<std::string> m_runtimeLibrariesList;
+	std::set<std::string> m_filesList;
+	std::set<std::string> m_packageNamesList;
 	unsigned int m_filesNumber;
 	unsigned int m_installedFilesNumber;
-private:
+
+
 	bool m_DB_Empty;
 	bool m_miniDB_Empty;
 };

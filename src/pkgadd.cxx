@@ -43,7 +43,6 @@ void Pkgadd::run(int argc, char** argv)
 {
 	parseArguments(argc, argv);
 	run();
-	finish();
 }
 void Pkgadd::parseArguments(int argc, char** argv)
 {
@@ -171,6 +170,10 @@ void Pkgadd::run()
 		addPackageFilesRefsToDB(package.first, package.second);
 	}
 	if (m_runPrePost) postRun();
+
+	applyPostInstallRules(package.first,
+		package.second, m_actionRules);
+
 }
 void Pkgadd::postRun()
 {
@@ -280,12 +283,57 @@ set<string> Pkgadd::applyInstallRules(const string& name,
 
 	return non_install_set;
 }
+void Pkgadd::applyPostInstallRules(const string& name,
+	pkginfo_t& info,
+	const vector<rule_t>& rules)
+{
+	vector<rule_t> found;
+
+	getPostInstallRulesList(rules, found);
+
+	for (auto i : info.files) {
+		bool install_file = true;
+		for (vector<rule_t>::reverse_iterator j = found.rbegin();
+		j != found.rend();
+		j++) {
+			rule_t a=*j;
+			if (checkRuleAppliesToFile((*j), i)) {
+				install_file = (*j).action;
+				if (install_file) {
+					if ( a.event == LDCONF ) {
+						a.pattern="";
+					} else {
+						a.pattern=i;
+					}
+					bool action = false;
+					for (auto l : m_postInstallList) {
+						if ( l.event == a.event && l.pattern == a.pattern) {
+							action = true;
+							break;
+						}
+						action = false;
+					}
+					if ( action == false )
+						m_postInstallList.push_back(a);
+				}
+			}
+		}
+	}
+}
 void Pkgadd::getInstallRulesList(const vector<rule_t>& rules,
 	rule_event_t event, 
 	vector<rule_t>& found) const
 {
 	for (auto i : rules ) {
 		if (i.event == event)
+			found.push_back(i);
+	}
+}
+void Pkgadd::getPostInstallRulesList(const vector<rule_t>& rules,
+	vector<rule_t>& found) const
+{
+	for (auto i : rules ) {
+		if ( (i.event != INSTALL) && (i.event != UPGRADE))
 			found.push_back(i);
 	}
 }

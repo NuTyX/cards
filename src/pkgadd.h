@@ -66,8 +66,13 @@ private:
 	std::set<std::string> applyInstallRules(const std::string& name,
 		pkginfo_t& info,
 		const std::vector<rule_t>& rules);
+	void applyPostInstallRules(const std::string& name,
+		pkginfo_t& info,
+		const std::vector<rule_t>& rules);
 	void getInstallRulesList(const std::vector<rule_t>& rules,
 		rule_event_t event,
+		std::vector<rule_t>& found) const;
+	void getPostInstallRulesList(const std::vector<rule_t>& rules,
 		std::vector<rule_t>& found) const;
 };
 

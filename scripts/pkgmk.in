@@ -680,6 +680,13 @@ remove_service() {
 		rm -r $DIR
 	fi
 }
+build() {
+	cd $name-$version
+	./configure --prefix=/usr
+	make
+	make DESTDIR=$PKG install
+	rm -rf $PKG/usr/share/info/dir
+}
 add_meta_files() {
 	local NAME
 	NAME="`get_package_name $1`"
@@ -1278,9 +1285,11 @@ main() {
                 error "File '$PKGMK_CONFFILE' not found."
                 exit $E_GENERAL
         fi
-        . $PKGMK_CONFFILE
 
 	PKGMK_ARCH=`uname -m`
+
+        . $PKGMK_CONFFILE
+
 	if ! (`which pkginfo > /dev/null`); then
 		warning "pkginfo NOT FOUND, footprint ignored."
 		PKGMK_IGNORE_FOOTPRINT="yes"
