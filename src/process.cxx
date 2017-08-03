@@ -25,15 +25,39 @@
 
 using namespace std;
 
-process::process( const string& app, const string& arguments, int fdlog )
-	: application( app ), arguments( arguments ), fileDescriptorLog ( fdlog )
+process::process()
 {
 }
+process::process( const string& app, const string& arguments, int fdlog )
+	: m_application( app ), m_arguments( arguments ), m_fileDescriptorLog ( fdlog )
+{
+}
+void process::execute(const string& app, const string& arguments, int fdlog )
+{
+	m_application=app;
+	m_arguments=arguments;
+	m_fileDescriptorLog=fdlog;
+#ifndef NDEBUG
+		cerr << m_application << " " << m_arguments << " start" << endl;
+#endif
 
+	execute();
+#ifndef NDEBUG
+		cerr << m_application << " " << m_arguments << " end" << endl;
+#endif
+}
+string process::name()
+{
+	return m_application;
+}
+string process::args()
+{
+	return m_arguments;
+}
 int process::execute()
 {
 	list<string> args;
-	split( arguments, ' ', args, 0, false );
+	split( m_arguments, ' ', args, 0, false );
 
 	const int argc = 1 + args.size() + 1; // app, args, NULL
 
@@ -41,7 +65,7 @@ int process::execute()
 	list<string>::iterator it = args.begin();
 
 	int i = 0;
-	argv[i] = const_cast<char*>( application.c_str() );
+	argv[i] = const_cast<char*>( m_application.c_str() );
 	for ( ; it != args.end(); ++it )
 	{
 		++i;
@@ -53,7 +77,7 @@ int process::execute()
 	argv[i] = NULL;
 	int status = 0;
 
-	if ( fileDescriptorLog > 0 )
+	if ( m_fileDescriptorLog > 0 )
 	{
 		status = execLog(argc, argv);
 	}
@@ -79,7 +103,7 @@ int process::execLog(const int argc, char** argv)
 		dup2( fdpipe[1], STDOUT_FILENO );
 		dup2( fdpipe[1], STDERR_FILENO );
 
-		execv( application.c_str(), argv );
+		execv( m_application.c_str(), argv );
 		_exit( EXIT_FAILURE );
 	}
 	else if ( pid < 0 )
@@ -104,7 +128,7 @@ int process::execLog(const int argc, char** argv)
 				printf("%s", readbuf);
 				fflush(stdout);
 				fflush(stderr);
-				write( fileDescriptorLog, readbuf, bytes );
+				write( m_fileDescriptorLog, readbuf, bytes );
 			}
 		}
 		close( fdpipe[0] );
@@ -125,7 +149,7 @@ int process::exec(const int argc, char** argv)
 	if ( pid == 0 )
 	{
 		// child process
-		execv( application.c_str(), argv );
+		execv( m_application.c_str(), argv );
 		_exit( EXIT_FAILURE );
 	}
 	else if ( pid < 0 )
@@ -151,7 +175,7 @@ int process::executeShell()
 	// TODO: make shell exchangable
 	static const char SHELL[] = "/bin/sh";
 	int status = 0;
-	if ( fileDescriptorLog > 0 )
+	if ( m_fileDescriptorLog > 0 )
 	{
 		status = execShellLog(SHELL);
 	}
@@ -177,7 +201,7 @@ int process::execShellLog(const char* SHELL)
 		dup2( fdpipe[1], STDOUT_FILENO );
 		dup2( fdpipe[1], STDERR_FILENO );
 
-		execl( SHELL, SHELL, "-c", (application + " " + arguments).c_str(), NULL );
+		execl( SHELL, SHELL, "-c", (m_application + " " + m_arguments).c_str(), NULL );
 		_exit( EXIT_FAILURE );
 	}
 	else if ( pid < 0 )
@@ -202,7 +226,7 @@ int process::execShellLog(const char* SHELL)
 				printf("%s", readbuf);
 				fflush(stdout);
 				fflush(stderr);
-				write( fileDescriptorLog, readbuf, bytes );
+				write( m_fileDescriptorLog, readbuf, bytes );
 			}
 		}
 		close( fdpipe[0] );
@@ -223,7 +247,7 @@ int process::execShell(const char* SHELL)
 	pid_t pid = fork();
 	if ( pid == 0 )
 	{
-		execl( SHELL, SHELL, "-c", (application + " " + arguments).c_str(), NULL );
+		execl( SHELL, SHELL, "-c", (m_application + " " + m_arguments).c_str(), NULL );
 		_exit( EXIT_FAILURE );
 	}
 	else if ( pid < 0 )

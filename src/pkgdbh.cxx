@@ -1316,7 +1316,7 @@ void Pkgdbh::readRulesFile()
 					treatErrors(filename + ":" + itos(linecount));
 				}
 				if (!strcmp(event, "UPGRADE") || !strcmp(event, "INSTALL") \
-					|| !strcmp(event, "LDCONF") \
+					|| !strcmp(event, "LDCONF") || !strcmp(event, "MIME_DB") \
 					|| !strcmp(event, "INFO") || !strcmp(event, "ICONS") \
 					|| !strcmp(event, "SCHEMAS") || !strcmp(event, "DESKTOP_DB")) {
 
@@ -1335,6 +1335,9 @@ void Pkgdbh::readRulesFile()
 						rule.event = SCHEMAS;
 					if (!strcmp(event, "DESKTOP_DB"))
 						rule.event = DESKTOP_DB;
+					if (!strcmp(event, "MIME_DB"))
+						rule.event = MIME_DB;
+
 
 					rule.pattern = pattern;
 					if (!strcmp(action, "YES")) {
@@ -1366,62 +1369,61 @@ void Pkgdbh::readRulesFile()
 void Pkgdbh::runLastPostInstall()
 {
 	if ( m_postInstallList.size() > 0 ) {
+		m_actualAction = PKG_POSTINSTALL_START;
+		progressInfo();
 #ifndef NDEBUG
-	for (auto i : m_postInstallList)
-		cerr << i.event << " " << i.pattern << endl;
+		for (auto i : m_postInstallList)
+			cerr << i.event << " " << i.pattern << endl;
 #endif
-	for (auto i : m_postInstallList)
+		process p;
+		string args;
+		for (auto i : m_postInstallList)
 		switch ( i.event )
 		{
 			case LDCONF:
 				if (checkFileExist(m_root + LDCONFIG_CONF)) {
-					string args = "-r " + m_root;
-					process ldconfig(m_root + LDCONFIG, args,0);
-					cerr << m_root + LDCONFIG << " start" <<  endl;
-					ldconfig.execute();
-					cerr << m_root + LDCONFIG << " end" <<  endl;
+					args = "-r " + m_root;
+					p.execute(m_root + LDCONFIG, args,0);
 				}
 			break;
 
 			case INFO:
 				if (checkFileExist(m_root + INSTALL_INFO)) {
-					string args = INSTALL_INFO_ARGS + i.pattern;
-					process info_install(m_root + INSTALL_INFO, args,0);
-					cerr << m_root + INSTALL_INFO << " start" <<  endl;
-					info_install.execute();
-					cerr << m_root + INSTALL_INFO << " end" <<  endl;
+					args = INSTALL_INFO_ARGS + i.pattern;
+					p.execute(m_root + INSTALL_INFO, args,0);
 				}
 			break;
 
 			case ICONS:
 				if (checkFileExist(m_root + UPDATE_ICON)) {
-					string args = UPDATE_ICON_ARGS + i.pattern;
-					process update_icon_cache(m_root + UPDATE_ICON,args,0);
-					cerr << m_root + UPDATE_ICON << " start" <<  endl;
-					update_icon_cache.execute();
-					cerr << m_root + UPDATE_ICON << " end" <<  endl;
+					args = UPDATE_ICON_ARGS + i.pattern;
+					p.execute(m_root + UPDATE_ICON,args,0);
 				}
 			break;
 
 			case SCHEMAS:
 				if (checkFileExist(m_root + COMPILE_SCHEMAS)) {
-					string args = COMPILE_SCHEMAS_ARGS + i.pattern;
-					process compile_schemas(m_root + COMPILE_SCHEMAS, args,0);
-					cerr << m_root + COMPILE_SCHEMAS << " start" <<  endl;
-					compile_schemas.execute();
-					cerr << m_root + COMPILE_SCHEMAS << " end" <<  endl;
+					args = COMPILE_SCHEMAS_ARGS + i.pattern;
+					p.execute(m_root + COMPILE_SCHEMAS, args,0);
 				}
 			break;
 
 			case DESKTOP_DB:
 				if (checkFileExist(m_root + UPDATE_DESKTOP_DB)) {
-					string args = UPDATE_DESKTOP_DB_ARGS + i.pattern;
-					process update_desktop_db(m_root + UPDATE_DESKTOP_DB, args,0);
-					cerr << m_root + UPDATE_DESKTOP_DB << " start" <<  endl;
-					update_desktop_db.execute();
-					cerr << m_root + UPDATE_DESKTOP_DB << " end" <<  endl;
+					args = UPDATE_DESKTOP_DB_ARGS + i.pattern;
+					p.execute(m_root + UPDATE_DESKTOP_DB, args,0);
 				}
+			break;
+
+			case MIME_DB:
+				if (checkFileExist(m_root + UPDATE_MIME_DB)) {
+					args = UPDATE_MIME_DB_ARGS + i.pattern;
+					p.execute(m_root + UPDATE_MIME_DB, args,0);
+				}
+			break;
 		}
+		m_actualAction = PKG_POSTINSTALL_END;
+		progressInfo();
 	}
 }
 bool Pkgdbh::checkRuleAppliesToFile(const rule_t& rule, const string& file)

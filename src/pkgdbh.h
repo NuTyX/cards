@@ -72,6 +72,10 @@
 #define UPDATE_DESKTOP_DB      "usr/bin/update-desktop-database"
 #define UPDATE_DESKTOP_DB_ARGS " -q "
 
+// /usr/bin/update-mime-database usr/share/mime
+#define UPDATE_MIME_DB  "usr/bin/update-mime-database"
+#define UPDATE_MIME_DB_ARGS  " "
+
 enum action 
 { 
 PKG_DOWNLOAD_START,
@@ -127,7 +131,8 @@ enum rule_event_t {
 	INFO,
 	ICONS,
 	SCHEMAS,
-	DESKTOP_DB
+	DESKTOP_DB,
+	MIME_DB
 };
 
 struct rule_t {

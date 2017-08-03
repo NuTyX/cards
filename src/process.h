@@ -38,23 +38,43 @@
 #include <sys/wait.h>
 
   
-/* To execute a process 
-	Arguments:
-	1. Application to run
-	2. Arguments to pass to the application
-	3. File descriptor of the log file 
+/**
+  * To execute a process
+	* Arguments:
+	* 1. Application to run
+	* 2. Arguments to pass to the application
+	* 3. File descriptor of the log file
 */
 
 class process
 {
 public:
+	process();
 	process( const std::string& app, const std::string& args, int fileDescriptorLog=0 );
-	/* execute the process
-		return the exit status of the application */
+
+	void execute(const std::string& app, const std::string& arguments, int fileDescriptorLog=0  );
+
+	/**
+		* execute the process
+		* return the exit status of the application
+		*/
 	int execute();
-	/* execute the process using the shell 
-	return the exit status of the application */
+
+	/**
+		*  execute the process using the shell
+		*  return the exit status of the application
+		*/
 	int executeShell();
+
+	/**
+		*  return the name of the application
+		*/
+	std::string name();
+
+	/**
+		*  return the arguments of the application
+		*/
+	std::string args();
 
 private:
 
@@ -64,9 +84,9 @@ private:
 	int execShell(const char* shell);
 	int execShellLog(const char* shell);
 
-	std::string application;
-	std::string arguments;
-	int fileDescriptorLog;
+	std::string m_application;
+	std::string m_arguments;
+	int m_fileDescriptorLog;
 };
 
 #endif /* _PROCESS_H_ */
