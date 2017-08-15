@@ -457,7 +457,7 @@ main() {
 
 	chown -R 0:0 ${BINARY_BASE}/$1/
 
-	cards create -r -d $1
+	cards create -r $1
 
 }
 BUILD_PORT_VERSION=#VERSION#
