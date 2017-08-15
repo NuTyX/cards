@@ -54,6 +54,7 @@ ArgParser::APOpt CardsArgumentParser::OPT_INSTALLED;
 ArgParser::APOpt CardsArgumentParser::OPT_BINARIES;
 ArgParser::APOpt CardsArgumentParser::OPT_PORTS;
 
+ArgParser::APOpt CardsArgumentParser::OPT_DISABLE;
 ArgParser::APOpt CardsArgumentParser::OPT_IGNORE;
 
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
@@ -214,7 +215,11 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 
 	OPT_IGNORE.init("ignore",
 		'I',
-		  _("   Ignore WARNINGS and list the level anyway."));
+		_("   Ignore WARNINGS and list the level anyway."));
+
+	OPT_DISABLE.init("disable",
+		'd',
+		_("  Ignore Pre and Post install scripts."));
 
 	OPT_SIZE.init("size",
 		's',
@@ -262,6 +267,7 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 	addOption(CMD_REMOVE, OPT_ROOT,false);
 	addOption(CMD_REMOVE, OPT_CONFIG_FILE,false);
 
+	addOption(CMD_INSTALL, OPT_DISABLE,false);
 	addOption(CMD_INSTALL, OPT_UPDATE,false);
 	addOption(CMD_INSTALL, OPT_FORCE,false);
 	addOption(CMD_INSTALL, OPT_ROOT,false);
@@ -272,6 +278,7 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 	addOption(CMD_BASE, OPT_ROOT,false);
 	addOption(CMD_BASE, OPT_CONFIG_FILE,false);
 
+	addOption(CMD_CREATE, OPT_DISABLE,false);
 	addOption(CMD_CREATE, OPT_DRY,false);
 	addOption(CMD_CREATE, OPT_REMOVE,true);
 	addOption(CMD_CREATE, OPT_ROOT,false);

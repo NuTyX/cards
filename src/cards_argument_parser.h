@@ -62,6 +62,8 @@ class CardsArgumentParser : public ArgParser
 
 		static ArgParser::APOpt OPT_IGNORE;
 
+		static ArgParser::APOpt OPT_DISABLE;
+
 		static ArgParser::APOpt OPT_DRY;
 		static ArgParser::APOpt OPT_REMOVE;
 		static ArgParser::APOpt OPT_ALL;

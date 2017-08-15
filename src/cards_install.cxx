@@ -135,6 +135,8 @@ void Cards_install::parseArguments()
 		m_force=true;
 	if (m_argParser.isSet(CardsArgumentParser::OPT_UPDATE))
 		m_upgrade=true;
+	if (m_argParser.isSet(CardsArgumentParser::OPT_DISABLE))
+		m_runPrePost = false;
 }
 void Cards_install::getLocalePackagesList()
 {

@@ -169,10 +169,17 @@ void Pkgadd::run()
 		// Add the info about the files to the DB
 		addPackageFilesRefsToDB(package.first, package.second);
 	}
-	if (m_runPrePost) postRun();
-
-	applyPostInstallRules(package.first,
+	if (m_runPrePost) {
+		postRun();
+		applyPostInstallRules(package.first,
 		package.second, m_actionRules);
+	}
+	else {
+		process p;
+		string args;
+		args = "-r " + m_root;
+		p.execute(m_root + LDCONFIG, args,0);
+	}
 
 }
 void Pkgadd::postRun()
