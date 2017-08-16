@@ -303,26 +303,21 @@ void Pkgadd::applyPostInstallRules(const string& name,
 		for (vector<rule_t>::reverse_iterator j = found.rbegin();
 		j != found.rend();
 		j++) {
-			rule_t a=*j;
+			pair <string, int> a;
+			a.first=(*j).event;
+			a.second=(*j).action;
+
 			if (checkRuleAppliesToFile((*j), i)) {
 				install_file = (*j).action;
 				if (install_file) {
-					if ( a.event == LDCONF ) {
-						a.pattern="";
+					if ( a.second == LDCONF ) {
+						a.first="";
 					} else {
-						a.pattern=i;
+						a.first=i;
 					}
-					bool action = false;
-					for (auto l : m_postInstallList) {
-						if ( l.event == a.event && l.pattern == a.pattern) {
-							action = true;
-							break;
-						}
-						action = false;
-					}
-					if ( action == false )
-						m_postInstallList.push_back(a);
+					m_postInstallList.insert(a);
 				}
+				break;
 			}
 		}
 	}

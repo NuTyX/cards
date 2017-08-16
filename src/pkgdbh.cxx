@@ -1378,7 +1378,7 @@ void Pkgdbh::runLastPostInstall()
 		process p;
 		string args;
 		for (auto i : m_postInstallList)
-		switch ( i.event )
+		switch ( i.second )
 		{
 			case LDCONF:
 				if (checkFileExist(m_root + LDCONFIG_CONF)) {
@@ -1389,35 +1389,35 @@ void Pkgdbh::runLastPostInstall()
 
 			case INFO:
 				if (checkFileExist(m_root + INSTALL_INFO)) {
-					args = INSTALL_INFO_ARGS + i.pattern;
+					args = INSTALL_INFO_ARGS + i.first;
 					p.execute(m_root + INSTALL_INFO, args,0);
 				}
 			break;
 
 			case ICONS:
 				if (checkFileExist(m_root + UPDATE_ICON)) {
-					args = UPDATE_ICON_ARGS + i.pattern;
+					args = UPDATE_ICON_ARGS + i.first;
 					p.execute(m_root + UPDATE_ICON,args,0);
 				}
 			break;
 
 			case SCHEMAS:
 				if (checkFileExist(m_root + COMPILE_SCHEMAS)) {
-					args = COMPILE_SCHEMAS_ARGS + i.pattern;
+					args = COMPILE_SCHEMAS_ARGS + i.first;
 					p.execute(m_root + COMPILE_SCHEMAS, args,0);
 				}
 			break;
 
 			case DESKTOP_DB:
 				if (checkFileExist(m_root + UPDATE_DESKTOP_DB)) {
-					args = UPDATE_DESKTOP_DB_ARGS + i.pattern;
+					args = UPDATE_DESKTOP_DB_ARGS + i.first;
 					p.execute(m_root + UPDATE_DESKTOP_DB, args,0);
 				}
 			break;
 
 			case MIME_DB:
 				if (checkFileExist(m_root + UPDATE_MIME_DB)) {
-					args = UPDATE_MIME_DB_ARGS + i.pattern;
+					args = UPDATE_MIME_DB_ARGS + i.first;
 					p.execute(m_root + UPDATE_MIME_DB, args,0);
 				}
 			break;

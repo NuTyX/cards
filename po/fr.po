@@ -662,6 +662,9 @@ msgstr "\t   Supprime le(s) paquet(s) même si il(s) se trouve(nt) dans la liste
 msgid "   Ignore WARNINGS and list the level anyway."
 msgstr "   Ignore les WARNINGS et affiche malgré tout la liste des niveaux."
 
+msgid "  Ignore Pre and Post install scripts."
+msgstr "  Ignore les scripts de Pré et Post installation."
+
 msgid "\t   Just return the number of updates."
 msgstr "\t   Affiche juste le nombre de mise à jour disponible."
 

@@ -236,7 +236,7 @@ protected:
 	std::string m_root;
 	std::string m_build;
 	std::vector<rule_t> m_actionRules;
-	std::vector<rule_t> m_postInstallList;
+	std::set< std::pair<std::string, int> > m_postInstallList;
 	alias_t	m_listOfAlias;
 
 	packages_t m_listOfInstPackages;
