@@ -169,17 +169,8 @@ void Pkgadd::run()
 		// Add the info about the files to the DB
 		addPackageFilesRefsToDB(package.first, package.second);
 	}
-	if (m_runPrePost) {
+	if (m_runPrePost)
 		postRun();
-		applyPostInstallRules(package.first,
-		package.second, m_actionRules);
-	}
-	else {
-		process p;
-		string args;
-		args = "-r " + m_root;
-		p.execute(m_root + LDCONFIG, args,0);
-	}
 
 }
 void Pkgadd::postRun()
@@ -257,14 +248,18 @@ set<string> Pkgadd::applyInstallRules(const string& name,
 	// TODO: better algo(?)
 	set<string> install_set;
 	set<string> non_install_set;
-	vector<rule_t> found;
 
-	getInstallRulesList(rules, INSTALL, found);
+	vector<rule_t> files_found;
+	getInstallRulesList(rules, INSTALL, files_found);
+
+	vector<rule_t> scripts_found;
+	getPostInstallRulesList(rules, scripts_found);
 
 	for (auto i : info.files) {
+
 		bool install_file = true;
-		for (vector<rule_t>::reverse_iterator j = found.rbegin();
-		j != found.rend();
+		for (vector<rule_t>::reverse_iterator j = files_found.rbegin();
+		j != files_found.rend();
 		j++) {
 			if (checkRuleAppliesToFile(*j, i)) {
 				install_file = (*j).action;
@@ -275,16 +270,40 @@ set<string> Pkgadd::applyInstallRules(const string& name,
 			install_set.insert(install_set.end(), i);
 		else
 			non_install_set.insert(i);
+
+		pair <string, int> a;
+		for (vector<rule_t>::reverse_iterator j = scripts_found.rbegin();
+		j != scripts_found.rend();
+		j++) {
+			a.first=i;
+			a.second=(*j).event;
+
+			if (checkRuleAppliesToFile((*j), i)) {
+				install_file = (*j).action;
+				break;
+				}
+		}
+		if (install_file) {
+			if ( a.second == LDCONF ) {
+				a.first="";
+			} else {
+				a.first=i;
+			}
+			m_postInstallList.insert(a);
+		}
 	}
+	scripts_found.clear();
 	info.files.clear();
 	info.files = install_set;
 
 #ifndef NDEBUG
+	cerr << "PostInstall set:" << endl;
+	for (auto i : m_postInstallList) cerr << "  " << i.first << " " << i.second << endl;
 	cerr << "Install set:" << endl;
-	for  (auto j : info.files) cerr << "   " << j << endl;
+	for  (auto i : info.files) cerr << "   " << i << endl;
 	cerr << endl;
 	cerr << "Non-Install set:" << endl;
-	for (auto j : non_install_set) cerr << "   " << j << endl;
+	for (auto i : non_install_set) cerr << "   " << i << endl;
 	cerr << endl;
 #endif
 

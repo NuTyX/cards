@@ -1293,6 +1293,7 @@ void Pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 }
 void Pkgdbh::readRulesFile()
 {
+	m_actionRules.clear();
 	unsigned int linecount = 0;
 	const string filename = m_root + PKGADD_CONF;
 	ifstream in(filename.c_str());
@@ -1373,7 +1374,7 @@ void Pkgdbh::runLastPostInstall()
 		progressInfo();
 #ifndef NDEBUG
 		for (auto i : m_postInstallList)
-			cerr << i.event << " " << i.pattern << endl;
+			cerr << i.second << " " << i.first << endl;
 #endif
 		process p;
 		string args;
