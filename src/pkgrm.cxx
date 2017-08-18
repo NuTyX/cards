@@ -33,9 +33,6 @@ Pkgrm::Pkgrm ()
 }
 void Pkgrm::run(int argc, char** argv)
 {
-	// Checking the rules
-	readRulesFile();
-
 	parseArguments(argc, argv);
 	run();
 }

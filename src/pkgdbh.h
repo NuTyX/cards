@@ -82,7 +82,7 @@
 
 // /usr/bin/gio-querymodules /usr/lib/gio/modules
 #define GIO_QUERYMODULES "usr/bin/gio-querymodules"
-#define GIO_QUERYMODULES_ARGS " "
+#define GIO_QUERYMODULES_ARGS " usr/lib/gio/modules"
 
 // /usr/bin/gtk-query-immodules-3.0 --update-cache
 #define QUERY_IMMODULES_3 "usr/bin/gtk-query-immodules-3.0"

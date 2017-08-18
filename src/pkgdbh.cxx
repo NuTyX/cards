@@ -1293,6 +1293,7 @@ void Pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 }
 void Pkgdbh::readRulesFile()
 {
+	m_actionRules.clear();
 	unsigned int linecount = 0;
 	const string filename = m_root + PKGADD_CONF;
 	ifstream in(filename.c_str());

@@ -109,6 +109,8 @@ void Pkgadd::run()
 	// Reading the archiving to find a list of files
 	pair<string, pkginfo_t> package = openArchivePackage(m_packageArchiveName);
 
+	readRulesFile();
+
 	bool installed = checkPackageNameExist(package.first);
 	if (installed && !m_upgrade)
 	{
