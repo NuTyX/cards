@@ -401,7 +401,7 @@ build_binaries () {
 	local package port_version binary_version currentdir
 	currentdir=$PWD
 	sync_pkgmk_conf
-	if [ -n "`cards level|grep WARNING|head -1`" ];
+	if [ -n "`cards level|grep WARNING|head -1`" ]; then
 		cards level
 		exit 1;
 	fi
