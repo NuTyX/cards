@@ -31,6 +31,9 @@ Pkgadd::Pkgadd()
 	m_upgrade(false),
 	m_force(false)
 {
+	// Checking the rules
+	readRulesFile();
+
 }
 Pkgadd::Pkgadd(const std::string& commandName)
 	: Pkgdbh(commandName),
@@ -38,6 +41,9 @@ Pkgadd::Pkgadd(const std::string& commandName)
 	m_upgrade(false),
 	m_force(false)
 {
+	// Checking the rules
+	readRulesFile();
+
 }
 void Pkgadd::run(int argc, char** argv)
 {
@@ -102,9 +108,6 @@ void Pkgadd::run()
 
 	// Reading the archiving to find a list of files
 	pair<string, pkginfo_t> package = openArchivePackage(m_packageArchiveName);
-
-	// Checking the rules
-	readRulesFile();
 
 	bool installed = checkPackageNameExist(package.first);
 	if (installed && !m_upgrade)

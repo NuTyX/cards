@@ -401,7 +401,11 @@ build_binaries () {
 	local package port_version binary_version currentdir
 	currentdir=$PWD
 	sync_pkgmk_conf
-	for i in `cards level -I |grep ${BINARY_BASE}/|cut -d " " -f2`
+	if [ -n "`cards level|grep WARNING|head -1`" ];
+		cards level
+		exit 1;
+	fi
+	for i in `cards level | grep ${BINARY_BASE}/|cut -d " " -f2`
 	do
 		package=`basename $i`
 		if [  -z "`ls ${BINARY_BASE}/$package/*$ARCH.cards.tar.xz 2>/dev/null `" ];then

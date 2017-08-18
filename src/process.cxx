@@ -41,7 +41,9 @@ void process::execute(const string& app, const string& arguments, int fdlog )
 		cerr << m_application << " " << m_arguments << " start" << endl;
 #endif
 
+	cout << "  " << m_application << " " << m_arguments << endl;
 	execute();
+
 #ifndef NDEBUG
 		cerr << m_application << " " << m_arguments << " end" << endl;
 #endif

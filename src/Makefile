@@ -185,7 +185,7 @@ install: all
 	install -v -D -m0755 pkgadd $(USRBINDIR)/pkgadd
 	install -v -D -m0755 cards $(BINDIR)/cards
 	install -v -D -m0755 setup-nutyx-log $(SBINDIR)/setup-nutyx-log
-	install -v -D -m0644 pkgadd.conf $(ETCDIR)/pkgadd.conf
+	install -v -D -m0644 pkgadd.conf $(VARDIR)/pkgadd.conf
 	install -v -D -m0644 cards.conf $(ETCDIR)/cards.conf.example
 	ln -sfv pkgadd $(USRBINDIR)/pkgrm
 	ln -sfv pkgadd $(USRBINDIR)/pkginfo

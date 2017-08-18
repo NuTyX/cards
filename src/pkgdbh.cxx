@@ -1293,7 +1293,6 @@ void Pkgdbh::installArchivePackage(const string& filename, const set<string>& ke
 }
 void Pkgdbh::readRulesFile()
 {
-	m_actionRules.clear();
 	unsigned int linecount = 0;
 	const string filename = m_root + PKGADD_CONF;
 	ifstream in(filename.c_str());
@@ -1319,6 +1318,8 @@ void Pkgdbh::readRulesFile()
 				if (!strcmp(event, "UPGRADE") || !strcmp(event, "INSTALL") \
 					|| !strcmp(event, "LDCONF") || !strcmp(event, "MIME_DB") \
 					|| !strcmp(event, "INFO") || !strcmp(event, "ICONS") \
+					|| !strcmp(event, "QUERY_PIXBUF") || !strcmp(event, "GIO_QUERY") \
+					|| !strcmp(event, "QUERY_IMOD3") || !strcmp(event, "QUERY_IMOD2") \
 					|| !strcmp(event, "SCHEMAS") || !strcmp(event, "DESKTOP_DB")) {
 
 					rule_t rule;
@@ -1338,6 +1339,14 @@ void Pkgdbh::readRulesFile()
 						rule.event = DESKTOP_DB;
 					if (!strcmp(event, "MIME_DB"))
 						rule.event = MIME_DB;
+					if (!strcmp(event, "QUERY_PIXBUF"))
+						rule.event = QUERY_PIXBUF;
+					if (!strcmp(event, "GIO_QUERY"))
+						rule.event = GIO_QUERY;
+					if (!strcmp(event, "QUERY_IMOD3"))
+						rule.event = QUERY_IMOD3;
+					if (!strcmp(event, "QUERY_IMOD2"))
+						rule.event = QUERY_IMOD2;
 
 
 					rule.pattern = pattern;
@@ -1420,6 +1429,34 @@ void Pkgdbh::runLastPostInstall()
 				if (checkFileExist(m_root + UPDATE_MIME_DB)) {
 					args = UPDATE_MIME_DB_ARGS + i.first;
 					p.execute(m_root + UPDATE_MIME_DB, args,0);
+				}
+			break;
+
+			case QUERY_PIXBUF:
+				if (checkFileExist(m_root + GDK_PIXBUF_QUERY_LOADER)) {
+					args = GDK_PIXBUF_QUERY_LOADER_ARGS;
+					p.execute(m_root + GDK_PIXBUF_QUERY_LOADER, args,0);
+				}
+			break;
+
+			case GIO_QUERY:
+				if (checkFileExist(m_root + GIO_QUERYMODULES)) {
+					args = GIO_QUERYMODULES_ARGS;
+					p.execute(m_root + GIO_QUERYMODULES, args,0);
+				}
+			break;
+
+			case QUERY_IMOD3:
+				if (checkFileExist(m_root + QUERY_IMMODULES_3)) {
+					args = QUERY_IMMODULES_3_ARGS;
+					p.execute(m_root + QUERY_IMMODULES_3, args,0);
+				}
+			break;
+
+			case QUERY_IMOD2:
+				if (checkFileExist(m_root + QUERY_IMMODULES_2)) {
+					args = QUERY_IMMODULES_2_ARGS;
+					p.execute(m_root + QUERY_IMMODULES_2, args,0);
 				}
 			break;
 		}

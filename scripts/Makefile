@@ -38,7 +38,7 @@ install: all
 	install -D -m0755 pkgmk2 $(USRBINDIR)/pkgmk2
 	install -D -m0644 pkgmk.conf $(ETCDIR)/pkgmk.conf.example
 	install -D -m0755 ports $(USRBINDIR)/ports
-	install -D -m0755 cards.driver $(VARDIR)/lib/pkg/drivers/cards
+	install -D -m0755 cards.driver $(VARDIR)/drivers/cards
 
 
 clean:

@@ -28,9 +28,14 @@ using namespace std;
 Pkgrm::Pkgrm ()
 	: Pkgdbh("pkgrm")
 {
+	// Checking the rules
+	readRulesFile();
 }
 void Pkgrm::run(int argc, char** argv)
 {
+	// Checking the rules
+	readRulesFile();
+
 	parseArguments(argc, argv);
 	run();
 }

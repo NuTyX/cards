@@ -50,7 +50,7 @@
 #define PKG_POST_INSTALL ".POST"    
 
 #define PKG_REJECTED     "var/lib/pkg/rejected"
-#define PKGADD_CONF      "etc/pkgadd.conf"
+#define PKGADD_CONF      "var/lib/pkg/pkgadd.conf"
 #define PKGADD_CONF_MAXLINE	1024
 
 #define LDCONFIG         "sbin/ldconfig"
@@ -75,6 +75,22 @@
 // /usr/bin/update-mime-database usr/share/mime
 #define UPDATE_MIME_DB  "usr/bin/update-mime-database"
 #define UPDATE_MIME_DB_ARGS  " "
+
+// /usr/bin/gdk-pixbuf-query-loaders --update-cache
+#define GDK_PIXBUF_QUERY_LOADER "usr/bin/gdk-pixbuf-query-loaders"
+#define GDK_PIXBUF_QUERY_LOADER_ARGS " --update-cache"
+
+// /usr/bin/gio-querymodules /usr/lib/gio/modules
+#define GIO_QUERYMODULES "usr/bin/gio-querymodules"
+#define GIO_QUERYMODULES_ARGS " "
+
+// /usr/bin/gtk-query-immodules-3.0 --update-cache
+#define QUERY_IMMODULES_3 "usr/bin/gtk-query-immodules-3.0"
+#define QUERY_IMMODULES_3_ARGS " --update-cache"
+
+// /usr/bin/gtk-query-immodules-2.0 --update-cache
+#define QUERY_IMMODULES_2 "usr/bin/gtk-query-immodules-2.0"
+#define QUERY_IMMODULES_2_ARGS " --update-cache"
 
 enum action 
 { 
@@ -132,7 +148,11 @@ enum rule_event_t {
 	ICONS,
 	SCHEMAS,
 	DESKTOP_DB,
-	MIME_DB
+	MIME_DB,
+	QUERY_PIXBUF,
+	GIO_QUERY,
+	QUERY_IMOD3,
+	QUERY_IMOD2
 };
 
 struct rule_t {
