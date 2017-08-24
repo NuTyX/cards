@@ -27,7 +27,7 @@ The minimum information required for producing a binary are:
  <li>
    <i><b>source:</b></i> the address of the sources of the package we want to build.
  <li>
-   <i><b>build():</b></i> the function which contains the recipe.
+   <i><b>build():</b></i> the function which contains the recipe if not the standard one.
 </ul>
 
 A little example with comments: 

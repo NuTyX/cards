@@ -192,9 +192,9 @@ should never be set again.
 
 They are define in the /etc/pkgmk.conf file via the PKGMK_WORK_DIR variable (parent folder of SRC and PKG)
 
-\subsection recept_syntax_the_mandatory_build_function The mandatory build() function
+\subsection recept_syntax_the_specific_build_function The specific build() function
 
-Here is one of the most used model:
+In case your build() function look like the mostly used one :
 
 \code{.sh}
 build() {
@@ -208,6 +208,10 @@ build() {
 
 }
 \endcode
+
+In this case you can ommit the build() function, cards will provide automatically the default one (which is the code of the above one)
+
+In all other cases, you will need to create your own one.
 
 \subsection recept_syntax_the_optionnal_reconize_functions The optionnal reconize functions
 
