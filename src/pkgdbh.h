@@ -74,7 +74,7 @@
 
 // /usr/bin/update-mime-database usr/share/mime
 #define UPDATE_MIME_DB  "usr/bin/update-mime-database"
-#define UPDATE_MIME_DB_ARGS  " "
+#define UPDATE_MIME_DB_ARGS  " -n "
 
 // /usr/bin/gdk-pixbuf-query-loaders --update-cache
 #define GDK_PIXBUF_QUERY_LOADER "usr/bin/gdk-pixbuf-query-loaders"
