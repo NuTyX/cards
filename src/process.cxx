@@ -28,11 +28,11 @@ using namespace std;
 process::process()
 {
 }
-process::process( const string& app, const string& arguments, int fdlog )
+process::process( const std::string& app, const std::string& arguments, int fdlog )
 	: m_application( app ), m_arguments( arguments ), m_fileDescriptorLog ( fdlog )
 {
 }
-void process::execute(const string& app, const string& arguments, int fdlog )
+void process::execute(const std::string& app, const std::string& arguments, int fdlog )
 {
 	m_application=app;
 	m_arguments=arguments;
