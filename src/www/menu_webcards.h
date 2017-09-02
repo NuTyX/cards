@@ -38,8 +38,8 @@
   << "        </tr>" << endl \
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><br><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Téléchargements</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"http://forum.nutyx.org/index.php?action=recent\">Forum</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"http://github.com/NuTyX\">Code</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"https://forum.nutyx.org/index.php?action=recent\">Forum</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"https://github.com/NuTyX\">Code</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"screenshots\">Captures d'écrans</a><br><br>"  << endl \
   << "            <td class=\"menu\"><br><a href=\"wallpapers\">Fonds d'écrans</a><br><br>"  << endl \
   << "            <td class=\"menu\"><br><a href=\"../en\" title=\"Home\"> <img src=\"../graphics/gb.gif\" alt=\"Home\" height=\"12\" width=\"35\"></a><br><br>" << endl \
@@ -99,8 +99,8 @@
   << "        </tr>" << endl \
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><br><a href=\"http://downloads.nutyx.org/?C=M;O=D\">Downloads</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"http://forums.nutyx.org/index.php?action=recent\">Forum</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"http://github.com/NuTyX\">Code</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"https://forums.nutyx.org/index.php?action=recent\">Forum</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"https://github.com/NuTyX\">Code</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"screenshots\">Screenshots</a><br><br>"  << endl \
   << "            <td class=\"menu\"><br><a href=\"wallpapers\">Wallpapers</a><br><br>"  << endl \
   << "            <td class=\"menu\"><br><a href=\"../fr\" title=\"Acceuil\"> <img src=\"../graphics/fr.gif\" alt=\"Accueil\" height=\"12\" width=\"35\"></a><br><br>" << endl \

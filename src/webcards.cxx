@@ -451,9 +451,9 @@ cellspacing=\"10\" width=\"100%\">" << endl
 	const char * forumAdress;
 	if ( sLang == "fr" )
 	{
-		forumAdress = "http://forum.nutyx.org";
+		forumAdress = "https://forum.nutyx.org";
 	} else{
-		forumAdress = "http://forums.nutyx.org";
+		forumAdress = "https://forums.nutyx.org";
 	}
 	sideBar(forumAdress);
 	cout << "  <td valign=\"top\" align=\"left\" width=\"100%\">" << endl;
