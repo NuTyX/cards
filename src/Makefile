@@ -3,7 +3,7 @@
 #
 #  Copyright (c) 2000-2005 by Per Liden <per@fukt.bth.se>
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -182,13 +182,13 @@ endif
 .PHONY:	install clean distclean dist
 
 install: all
-	install -v -D -m0755 pkgadd $(USRBINDIR)/pkgadd
+	install -v -D -m0755 pkgadd $(BINDIR)/pkgadd
 	install -v -D -m0755 cards $(BINDIR)/cards
 	install -v -D -m0755 setup-nutyx-log $(SBINDIR)/setup-nutyx-log
 	install -v -D -m0644 pkgadd.conf $(VARDIR)/pkgadd.conf
 	install -v -D -m0644 cards.conf $(ETCDIR)/cards.conf.example
-	ln -sfv pkgadd $(USRBINDIR)/pkgrm
-	ln -sfv pkgadd $(USRBINDIR)/pkginfo
+	ln -sfv pkgadd $(BINDIR)/pkgrm
+	ln -sfv pkgadd $(BINDIR)/pkginfo
 
 install-libs:
 	if [ ! -d $(DESTDIR)/usr/include ]; then mkdir -pv $(DESTDIR)/usr/include;fi
