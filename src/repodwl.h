@@ -27,7 +27,7 @@
 
 class Repodwl: public Pkgrepo {
 public:
-		Repodwl(const char *fileName);
+	Repodwl(const char *fileName);
 /**
  * download the .PKGREPO of packageName
  *
@@ -38,7 +38,7 @@ public:
  * add: the .PKGREPO of the packageName port from the mirror
  *
  */
-    void downloadPortsPkgRepo(const std::string& packageName);
+	void downloadPortsPkgRepo(const std::string& packageName);
 
 /**
  * download the packagefileName
@@ -50,9 +50,10 @@ public:
  * add: The packageFileName from the mirror
  *
  */
-    void downloadPackageFileName(const std::string& packageFileName);
-		bool checkBinaryExist(const std::string& packageName);			
-		std::string getPackageFileName(const std::string& packageName);
+	void downloadPackageFileName(const std::string& packageFileName);
+	bool checkBinaryExist(const std::string& packageName);
+	std::string getPackageFileName(const std::string& packageName);
+	std::string getPackageFileNameSignature(const std::string& packageName);
 };
 #endif /* REPODWL_H */
 // vim:set ts=2 :

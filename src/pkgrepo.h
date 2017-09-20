@@ -237,6 +237,7 @@ protected:
 		std::vector<PortFilesList> m_portFilesList;
 
 		std::string m_packageFileName;
+		std::string m_packageFileNameSignature;
 		std::string m_configFileName;
 		Config m_config;
 

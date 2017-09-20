@@ -93,6 +93,7 @@ std::string getModifyTimeFile(const std::string& filename);
 bool checkFileExist(const std::string& filename);
 bool checkFileEmpty(const std::string& filename);
 bool checkRegularFile(const std::string& filename);
+bool checkFileSignature(const std::string& filename, const std::string& signature);
 bool checkFilesEqual(const std::string& file1, const std::string& file2);
 bool checkPermissionsEqual(const std::string& file1, const std::string& file2);
 bool createRecursiveDirs(const std::string& pathname);

@@ -183,7 +183,13 @@ bool checkFileExist(const string& filename)
   struct stat buf;
   return !lstat(filename.c_str(), &buf);
 }
+bool checkFileSignature(const string& filename, const string& signature)
+{
+	if (!checkFileExist(filename))
+		return false;
 
+	return checkMD5sum(filename.c_str(), signature.c_str());
+}
 bool checkFileEmpty(const string& filename)
 {
   struct stat buf;
@@ -196,6 +202,7 @@ bool checkFileEmpty(const string& filename)
 bool checkRegularFile(const string& filename)
 {
 	struct stat buf;
+	stat(filename.c_str(), &buf);
 	return (S_ISREG(buf.st_mode));
 }
 bool checkFilesEqual(const string& file1, const string& file2)

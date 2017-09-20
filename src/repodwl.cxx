@@ -153,8 +153,10 @@ bool Repodwl::checkBinaryExist(const string& packageName)
 				break;
 			}
 		}
-		if (Binaryfound)
+		if (Binaryfound) {
 			m_packageFileName = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/" + packageName + m_BasePackageInfo_i->s_buildDate + m_PortFilesList_i-> arch + m_BasePackageInfo_i->extention;
+			m_packageFileNameSignature = m_PortFilesList_i -> md5SUM;
+		}
 #ifndef NDEBUG
 		cerr << packageName << " is " << m_packageFileName << endl;
 #endif
@@ -167,4 +169,11 @@ string Repodwl::getPackageFileName(const string& packageName)
 	checkBinaryExist(packageName);
 	return m_packageFileName;
 }
+string Repodwl::getPackageFileNameSignature(const string& packageName)
+{
+	m_packageFileName = packageName;
+	checkBinaryExist(packageName);
+	return m_packageFileNameSignature;
+}
+
 // vim:set ts=2 :

@@ -42,6 +42,8 @@ void Pkginst::generateDependencies()
 	dependenciesWeMustAdd.push_back(PackageTime);
 	std::vector< pair<string,time_t> >::iterator vit;
 	std::set< pair<string,time_t> >::iterator sit;
+	std::string packageNameSignature;
+
 	while ( ! dependenciesWeMustAdd.empty() ) { // Main WHILE
 #ifndef NDEBUG
 		for (auto i : dependenciesWeMustAdd) cerr << i.first << " " << i.second << endl;
@@ -68,11 +70,13 @@ void Pkginst::generateDependencies()
 				cerr << m_packageName << " binary found " << endl;
 #endif
 				m_packageFileName = getPackageFileName(m_packageName);
+				packageNameSignature = getPackageFileNameSignature(m_packageName);
+
 #ifndef NDEBUG
 				cerr << m_packageFileName << " archive found " << endl;
 #endif
 			}
-			if ( ! checkFileExist(m_packageFileName)) // Binary Archive not yet downloaded
+			if ( ! checkFileSignature(m_packageFileName, packageNameSignature)) // Binary Archive not yet downloaded or corrupted
 				downloadPackageFileName(m_packageName); // Get it
 #ifndef NDEBUG
 			cerr << "getPackageDependencies(" << m_packageFileName << ")" << endl;

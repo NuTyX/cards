@@ -55,42 +55,43 @@
 
 #define LDCONFIG         "sbin/ldconfig"
 #define LDCONFIG_CONF    "etc/ld.so.conf"
+#define LDCONFIG_CONF_ARGS "-r "
 #define SHELL            "bin/sh"
 
 // /usr/bin/install-info --info-dir="/usr/share/info" /usr/share/info/<file>.info"
 #define INSTALL_INFO      "usr/bin/install-info"
-#define INSTALL_INFO_ARGS " --info-dir=usr/share/info "
+#define INSTALL_INFO_ARGS "--info-dir=usr/share/info "
 // /usr/bin/gtk-update-icon-cache -f -t /usr/share/icons/hicolor
 #define UPDATE_ICON       "usr/bin/gtk-update-icon-cache"
-#define UPDATE_ICON_ARGS  " -f -t "
+#define UPDATE_ICON_ARGS  "-f -t "
 
 // /usr/bin/glib-compile-schemas /usr/share/glib-2/schemas
 #define COMPILE_SCHEMAS       "usr/bin/glib-compile-schemas"
-#define COMPILE_SCHEMAS_ARGS  " "
+#define COMPILE_SCHEMAS_ARGS  ""
 
 // /usr/bin/update-desktop-database -q /usr/share/applications
 #define UPDATE_DESKTOP_DB      "usr/bin/update-desktop-database"
-#define UPDATE_DESKTOP_DB_ARGS " -q "
+#define UPDATE_DESKTOP_DB_ARGS "-q "
 
 // /usr/bin/update-mime-database usr/share/mime
 #define UPDATE_MIME_DB  "usr/bin/update-mime-database"
-#define UPDATE_MIME_DB_ARGS  " -n "
+#define UPDATE_MIME_DB_ARGS  "-n "
 
 // /usr/bin/gdk-pixbuf-query-loaders --update-cache
 #define GDK_PIXBUF_QUERY_LOADER "usr/bin/gdk-pixbuf-query-loaders"
-#define GDK_PIXBUF_QUERY_LOADER_ARGS " --update-cache"
+#define GDK_PIXBUF_QUERY_LOADER_ARGS "--update-cache"
 
 // /usr/bin/gio-querymodules /usr/lib/gio/modules
 #define GIO_QUERYMODULES "usr/bin/gio-querymodules"
-#define GIO_QUERYMODULES_ARGS " usr/lib/gio/modules"
+#define GIO_QUERYMODULES_ARGS "usr/lib/gio/modules"
 
 // /usr/bin/gtk-query-immodules-3.0 --update-cache
 #define QUERY_IMMODULES_3 "usr/bin/gtk-query-immodules-3.0"
-#define QUERY_IMMODULES_3_ARGS " --update-cache"
+#define QUERY_IMMODULES_3_ARGS "--update-cache"
 
 // /usr/bin/gtk-query-immodules-2.0 --update-cache
 #define QUERY_IMMODULES_2 "usr/bin/gtk-query-immodules-2.0"
-#define QUERY_IMMODULES_2_ARGS " --update-cache"
+#define QUERY_IMMODULES_2_ARGS "--update-cache"
 
 enum action 
 { 
@@ -123,6 +124,7 @@ struct pkginfo_t {
 	std::string group;
 	std::string collection;
 	std::string description;
+	std::string signature;
 	time_t build; // date of build
 	std::string version;
 	int release;

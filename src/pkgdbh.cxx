@@ -1393,7 +1393,7 @@ void Pkgdbh::runLastPostInstall()
 		{
 			case LDCONF:
 				if (checkFileExist(m_root + LDCONFIG_CONF)) {
-					args = "-r " + m_root;
+					args = LDCONFIG_CONF_ARGS + m_root;
 					p.execute(m_root + LDCONFIG, args,0);
 				}
 			break;

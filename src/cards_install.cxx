@@ -53,7 +53,10 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 				m_packageName = i;
 				generateDependencies();
 			}
-		} else if (checkFileExist(i)) {
+		} else if (checkRegularFile(i)) {
+			/*
+			 * It's a regular archive file
+			 */
 			m_packageArchiveName = i;
 			ArchiveUtils packageArchive(m_packageArchiveName.c_str());
 			std::string name = packageArchive.name();
