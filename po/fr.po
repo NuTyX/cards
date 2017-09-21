@@ -703,3 +703,6 @@ msgstr "\nINSTALLER, REMPLACER et SUPPRIMER"
 
 msgid "\nBASE SYSTEM"
 msgstr "\nSYSTEME DE BASE"
+
+msgid "Your system is up to date"
+msgstr "Votre système est à jour"

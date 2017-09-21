@@ -34,11 +34,6 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	else
 		m_root=m_root+"/";
 
-	if (getuid()) {
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-		treatErrors("");
-	}
-
 	parsePkgRepoCollectionFile();
 	buildSimpleDatabase();
 	for (auto i : m_listOfInstPackages) {
@@ -60,11 +55,24 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		if ( m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
 			size();
 		if ( (! m_argParser.isSet(CardsArgumentParser::OPT_SIZE)) &&
-			(! m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) )
-			upgrade();
+				(! m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) ) {
+			if ( m_ListOfPackages.size() == 0 ) {
+				std::cout << _("Your system is up to date") << endl;
+			} else {
+				if (getuid()) {
+					m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+					treatErrors("");
+				}
+				upgrade();
+			}
+		}
 	}
 	if ( m_argParser.command() == CardsArgumentParser::CMD_DIFF) {
-		dry();
+		if ( m_ListOfPackages.size() == 0 ) {
+			std::cout << _("Your system is up to date") << endl;
+		} else {
+			dry();
+		}
 	}
 }
 void Cards_upgrade::size()
@@ -80,7 +88,9 @@ void Cards_upgrade::Isuptodate()
 }
 void Cards_upgrade::dry()
 {
-	for (auto i : m_ListOfPackages ) std::cout << i.first  << std::endl;
+	for (auto i : m_ListOfPackages )
+		std::cout << i.first  << " ";
+	std::cout << std::endl;
 }
 void Cards_upgrade::upgrade()
 {

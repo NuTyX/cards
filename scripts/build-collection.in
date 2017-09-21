@@ -22,13 +22,11 @@ echo '**************************************************************************
 
  This script is able to compile any port from any official collections that
  are one of:
- - base
- - cli
- - cli-extra
- - gui
- - gui-extra
+
+ - base, cli ,cli-extra, gui, gui-extra or <yours>
 
  IMPORTANTS NOTES:
+
  a. We make a difference only for base, cli and gui
     and their -extra counterparts.
     Example: to compile the all cli-extra collection
@@ -37,42 +35,16 @@ echo '**************************************************************************
     build-collection /stable/cli-extra
     As simple as that :)
 
- b. You need about 10 Gbytes of free space for the mirror of NuTyX (/srv/remote),
-    another 10 Gbytes of free space for your /srv/local folder
-    and another 6 to 8 Gbytes for your  (temporary) installed NuTyX.
-    Also be aware that /srv/local/sources will continuously grow
-    until you delete some sources / package files
+ b. You need about 10 Gbytes of free space for the mirror of NuTyX (/srv/www),
+    Also be aware that /srv/www/sources will continuously grow.
 
- c. The installed NuTyX should ALWAYS be under /development or /stable.
-    It means if you have to use another (bigger) partition for example
-    then you should use a link to it:
-    Example:
-
-       ln -sv /home/thierry/chroot-64/stable /stable
-
-    Replaces 'stable' with 'development' if you plan to build
-    against the development version of the NuTyX binaries.
-    In this example the installed NuTyX will always ends up in
-    /home/thierry/chroot-64/development/xxx which is fine because
-    its another bigger partition (about 740 Gb in this case).
- 
- d. They should be TWO copies of the binaries depots packages.
-    One is the original set and is located in '/srv/remote' folder.
-    Its a copy of the official availables packages.
-    This set can be resync (to receive any updates from upstream)
-    automaticaly every hour for example.
-
-    The second set is located in '/srv/local' folder.
-    This set is your working copy.
-    Means as soon you start some compilations,
-    this set will be out of sync with the official one.
-
+ c. The installed NuTyX should ALWAYS be under /development, /current or /stable.
 
  2. HOW DOES THIS WORK ?
 
   The script will do following steps:
 
-  - install a development or stable NuTyX
+  - install a development, current or stable NuTyX
     (define by the first part of the first argument)
     into a folder (define by the first argument as well)
   - install the devel packages
@@ -84,7 +56,7 @@ echo '**************************************************************************
   - run the script found in /tmp folder which is buildup by
     collecting info from arguments
   - will compile what has to be compile with or without success
-    but in both cases will...
+    but in both cases it will...
   - exit the installed NuTyX
   - umount the depot, the ports, the sources and logs folders.
 
@@ -93,19 +65,13 @@ echo '**************************************************************************
  You can pass 1 or 2 arguments:
 
  Parameter 1 (mandatory):
-  Its specify the version we are going to use
-  (currently it can be 'development' or 'stable' and its specify
-  the collection which is one of following possible collection:
-  base, cli, cli-extra, gui, gui-extra, enlightenment,
-  gnome, kde5, mate or xfce4.
-  You note that even under kde5 (for example)
-  we have two collection kde5 and kde5-extra, even then the script
-  will automatically build both
+  Its specify the version we are going to use (currently it can be 'development' or 'stable'
+  and its specify the collection which is one of following possible collection:
+  base, cli, cli-extra, gui, gui-extra or your specific collection which can be named anything.
 
  Parameter 2 (optionnal):
+  This parameter works only with base, cli, cli-extra, gui, gui-extra collections.
   This parameter specify the port you want to build only.
-  Currently this option works only with base, cli,
-  cli-extra, gui or gui-extra collections.
   Example:
 
    build-collection /development/cli-extra irssi
@@ -114,72 +80,40 @@ echo '**************************************************************************
 
  3. CONFIGURATION OF THE HOST NuTyX
 
- Its absolutly necessary to configure properly your NuTyX host machine
- otherwise nothing will work like expected
+ Its absolutly necessary to configure properly your NuTyX host machine otherwise nothing will work like expected.
 
- File that is involve in the configuration process:
+ Configuration file that is involve in the configuration process:
 
  - /etc/fstab
 
- As explained above, we mount a lot of folders,
- means they HAVE TO BE specified in the /etc/fstab
- As we used predefined folders (/DEPOT, /sources, /LOGS)
- we specify all of them in /etc/fstab file:
+ As explained above, we mount a lot of folders, means they HAVE TO BE specified in the /etc/fstab or specified via
+ variables (see http://www.nutyx.org/fr/build-bot).
+ As we used predefined /DEPOT, /sources and /LGOS folders, they can be specify via variable or all in /etc/fstab file:
 
- Example for the cli-extra collection of the development version
- you should specify following lines:
+ Here an example for the cli-extra collection of the development version
+ you should specify following lines, adapted to your needs:
 
-/srv/local/sources /development/cli-extra/sources none bind
-/srv/local/x86_64/development /development/cli-extra/DEPOT none bind
+/srv/www/sources /development/cli-extra/sources none bind
+/srv/www/x86_64/development /development/cli-extra/DEPOT none bind
+/srv/www/logs/x86_64/development/cli-extra /development/cli-extra/LOGS none bind
 /home/thierry/git/extra /development/cli-extra/root/extra none bind
-/srv/local/logs/x86_64/development/cli-extra /development/cli-extra/LOGS none bind
-
-  Copy and adapt thoses four lines for every collection you planned to build.
-  Adapt '/home/thierry/git/extra' to your 'extra' git.
-  Replace (or add) stable version in case you plan to build
-  on the 'stable' version.
-  Replace 'x86_64' with 'i686' if you plan to build on a 32 bits platform.
   
 
  4. Setup all the needed folders and get the official depot into the
-    /srv/remote location
+ /srv/www location (adapt the folder to yours)
 
   We create all the necessary folders (for our cli-extra collection example):
 
-    mkdir -p /srv/local/sources
-    mkdir -p /srv/local/logs/x86_64/development/cli-extra
+    mkdir -p /srv/www/sources
+    mkdir -p /srv/www/logs/x86_64/development/cli-extra
 
-  Replace 'development' with 'stable' if you plan to build on the
-  'stable' version.
-  Replace 'cli-extra' collection with the one you plan to build
-
-  To get all the binaries locally and used them (highly recommended)
-  we need to rsync them, following command
-  will do that (takes quite a bit of time the first time):
-
-  rsync -av --delete  \
-  rsync://downloads.nutyx.org/nutyx/x86_64/development/ \
-  /srv/remote/x86_64/development/
-
- 5. GET the tool
-
-   get rsync
-
- 6. RSYNC the remote depot with your local depot
-
-  You will normaly use this command only ones or every time
-  you want to overwrite your work with the official depot.
-
-     rsync -av --delete \
-    /srv/remote/x86_64/development/ \
-    /srv/local/x86_64/development/
-
-  You are now ready to work.
-
- 7. DONE
-  As you are using YOUR COPY of the depot its up to you to rerun
-  the rsync command from point 6, means you want to get rid of your work
-  you did so far :)
+  To get all the binaries locally and used them (highly recommended) we need to rsync them:
+  for DIR in base cli
+  do
+   rsync -av --delete  \
+   rsync://downloads.nutyx.org/nutyx/x86_64/development/$DIR/ \
+   /srv/remote/x86_64/development/$DIR/
+  done
 
  Enjoy NuTyX :)
 
@@ -332,7 +266,6 @@ if [ $# -lt 1 ]; then
 fi
 
 if [ -d $1 ]; then
-	usage
 	mount | grep $1
 	echo "
 >>>	$1 exist ...
