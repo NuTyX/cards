@@ -202,6 +202,8 @@ bool checkFileEmpty(const string& filename)
 bool checkRegularFile(const string& filename)
 {
 	struct stat buf;
+	if (!checkFileExist(filename))
+		return false;
 	stat(filename.c_str(), &buf);
 	return (S_ISREG(buf.st_mode));
 }
