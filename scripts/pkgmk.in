@@ -1295,6 +1295,7 @@ main() {
 	fi
 	local FILE TARGET DIR NAME
 
+	version=1
 	NAME=`basename $PKGMK_ROOT`
 
 	DIR=`dirname $PKGMK_ROOT`
