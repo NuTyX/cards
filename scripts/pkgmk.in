@@ -31,7 +31,7 @@ E_DOWNLOAD=4   # error during download
 E_UNPACK=5     # error during unpacking of source file(s)
 E_MD5=6        # md5sum verification failed
 E_FOOTPRINT=7  # footprint check failure
-E_BUILD=8      # error while running 'build()'
+E_BUILD=8      # error while running 'build() function'
 E_INSTALL=9    # error while installing the package via 'pkgadd'
 E_DEPS=10      # error while searching runtime deps via 'pkginfo -b'
 E_ALIAS=11     # error duplicate alias
@@ -681,10 +681,54 @@ remove_service() {
 	fi
 }
 build() {
-	cd $name-$version
-	./configure --prefix=/usr
-	make
-	make DESTDIR=$PKG install
+	if [ -z $build ]; then
+		cd $name-$version
+		./configure --prefix=/usr
+		make
+		make DESTDIR=$PKG install
+	else
+		case $build in
+			autotools)
+				cd $name-$version
+				./configure --prefix=/usr
+				make
+				make DESTDIR=$PKG install;;
+
+			python2)
+				cd ${_name}-$version
+				python2 setup.py build
+				python2 setup.py install --prefix=/usr --root=$PKG;;
+
+			python3)
+				cd ${_name}-$version
+				 python3 setup.py build
+				 python3 setup.py install --prefix=/usr --root=$PKG;;
+
+			xorg)
+				cd ${_name}-$version
+				./configure --prefix=/usr \
+				--sysconfdir=/etc \
+				--localstatedir=/var
+				make
+				make DESTDIR=$PKG install;;
+
+			kde5)
+				cd $name-$version
+				mkdir build
+				cd    build
+				cmake -DCMAKE_INSTALL_PREFIX=/usr  \
+						-DCMAKE_BUILD_TYPE=Release \
+						-DKDE_INSTALL_LIBDIR=lib   \
+						-DBUILD_TESTING=OFF        \
+						-Wno-dev ..
+				make
+				make DESTDIR=$PKG install;;
+
+			*)
+				echo "`basename $PKGMK_COMMAND`: function build invalid build type"
+				exit E_BUILD ;;
+		esac
+	fi
 }
 add_meta_files() {
 	local NAME
@@ -1295,7 +1339,7 @@ main() {
 	fi
 	local FILE TARGET DIR NAME
 
-	version=1
+	release=1
 	NAME=`basename $PKGMK_ROOT`
 
 	DIR=`dirname $PKGMK_ROOT`
