@@ -361,12 +361,9 @@ fi
 MOUNT_POINTS="$MOUNT_POINTS $1/sources"
 
 mkdir -p $1/root/$COLLECTION || error $1
-if [ -d /root/$COLLECTION ]; then
-	mount --bind /root/$COLLECTION $1/root/$COLLECTION || error $1
-else
-	mount $1/root/$COLLECTION || error $1
-fi
-MOUNT_POINTS="$MOUNT_POINTS $1/root/$COLLECTION"
+GIT_PROJ=`grep ^/home /etc/fstab |grep $1| cut -d " " -f1`
+rsync -a --delete --exclude .git $GIT_PROJ/ $1/root/$COLLECTION/
+chown -R 1000:1000 $1/root/$COLLECTION/
 
 KERNEL="NONE" LFS="$1" DEPOT="/DEPOT" install-nutyx || error $1
 
