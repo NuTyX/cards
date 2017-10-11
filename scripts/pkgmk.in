@@ -1065,8 +1065,10 @@ recursive() {
 	for FILE in `find $PKGMK_ROOT -name $PKGMK_PKGFILE | sort`; do
 		DIR="`dirname $FILE`/"
 		if [ -d $DIR ]; then
+			[ "$PKGMK_QUIET" = "yes" ] || \
 			info "Entering directory '$DIR'."
 			(cd $DIR && $PKGMK_COMMAND $ARGS)
+			[ "$PKGMK_QUIET" = "yes" ] || \
 			info "Leaving directory '$DIR'."
 		fi
 	done
@@ -1204,6 +1206,19 @@ clean_repo_files() {
 		info "Removing MD5SUM"
 	fi
 }
+check_sources_uptodate() {
+	local newversion
+	if ! (`which lynx > /dev/null`); then
+		error "lynx is not installed, cannot check sources"
+		exit 0
+	fi
+	if [ "`type -t uptodate`" == "function" ]; then
+		newversion="`uptodate`"
+		if [ "$newversion" != "$version" ]; then
+			info "$name: $version -> $newversion"
+		fi
+	fi
+}
 interrupted() {
 	echo ""
 	error "Interrupted."
@@ -1222,10 +1237,12 @@ print_help() {
 	echo "   -r,  --recursive           search for and build packages recursively"
 	echo "   -d,  --download            download missing source file(s)"
 	echo "   -f,  --force               build packages even if they appear to be up-to-date"
+	echo "   -q,  --quiet               do not printout messages, usefull for -itd option"
 	echo "  -cs,  --check-syntax        do not build, only check package syntax"
 	echo "  -cv,  --show-version-only   do not build, only show the version of the port and exit"
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
+	echo " -itd,  --is-up-to-date       check if the version is the same as upstream sources"
 	echo " -utd,  --up-to-date          do not build, only check if package is up to date"
 	echo "  -ur,  --update-repo         do not build, only update the $PKGMK_REPO file"
 	echo "  -uc,  --update-collection   do not build, only update the $PKGMK_REPO file of the collection means from the parent directory"
@@ -1253,6 +1270,8 @@ parse_options() {
 				PKGMK_INSTALL="upgrade" ;;
 			-r|--recursive)
 				PKGMK_RECURSIVE="yes" ;;
+			-q|--quiet)
+				PKGMK_QUIET="yes" ;;
 			-d|--download)
 				PKGMK_DOWNLOAD="yes" ;;
 			-cs|--check-syntax)
@@ -1264,6 +1283,8 @@ parse_options() {
 				PKGMK_EXTRACT_ONLY="yes" ;;
 			-cv|--show-version-only)
 				PKGMK_SHOW_VERSION="yes";;
+			-itd|--is-up-to-date)
+				PKGMK_SOURCES_UP_TO_DATE="yes";;
 			-utd|--up-to-date)
 				PKGMK_UP_TO_DATE="yes" ;;
 			-uc|--update-collection)
@@ -1337,6 +1358,7 @@ main() {
 		warning "pkginfo NOT FOUND, footprint ignored."
 		PKGMK_IGNORE_FOOTPRINT="yes"
 	fi
+
 	local FILE TARGET DIR NAME
 
 	release=1
@@ -1404,49 +1426,6 @@ main() {
 	if [ "$PKGMK_SHOW_VERSION" == "yes" ]; then
 		echo "$version"
 		exit 0
-	fi
-	info "PKGMK_INSTALL: $PKGMK_INSTALL"
-	info "PKGMK_WORK_DIR: $PKGMK_WORK_DIR"
-	info "PKGMK_SOURCE_DIR: $PKGMK_SOURCE_DIR"
-
-	if [ "$PKGMK_INSTALL" = "no" ]; then
-		PKGMK_CLEAN="no"
-		warning "CLEAN IGNORED"
-	else
-		info "PKGMK_KEEP_SOURCES: $PKGMK_KEEP_SOURCES"
-		info "PKGMK_CLEAN: $PKGMK_CLEAN"
-	fi
-	if [ "$PKGMK_CLEAN" != "no" ]; then
-		PKGMK_IGNORE_FOOTPRINT="yes"
-		PKGMK_IGNORE_MD5SUM="yes"
-		warning "FOOTPRINT AND MD5SUM IGNORED"
-	else
-		if [ "$PKGMK_UPDATE_REPO" != "yes" ]; then
-			info "PKGMK_IGNORE_REPO: $PKGMK_IGNORE_REPO"
-		else
-			info "PKGMK_UPDATE_REPO: $PKGMK_UPDATE_REPO"
-		fi
-		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
-		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"	
-	fi
-	if [ "$PKGMK_IGNORE_REPO"  == "yes" ]; then
-		info "$PKGMK_REPO file will be deleted"
-	fi
-
-	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
-	if [ "$PKGMK_COMPRESS_PACKAGE" != "no" ]; then
-		info "PKGMK_COMPRESSION_MODE: $PKGMK_COMPRESSION_MODE"
-	fi
-
-	info "name: ${name}"
-	if [ ! -z "$version" ]; then
-		info "version: $version"
-	fi
-	if [ ! -z "$release" ]; then
-		info "release: $release"
-	fi
-	if [ ! -z "$basename" ]; then
-		info "basename: $basename"
 	fi
 	PKGMK_MD5SUM="$name.`uname -m`.md5sum"
 	check_directory "$PKGMK_SOURCE_DIR"
@@ -1520,6 +1499,53 @@ main() {
 		info "Extracting sources of package '${name}-$version'."
 		unpack_source
 		exit 0
+	fi
+	if [ "$PKGMK_SOURCES_UP_TO_DATE" = "yes" ]; then
+		check_sources_uptodate
+		exit 0
+	fi
+	# Print all informations
+	info "PKGMK_INSTALL: $PKGMK_INSTALL"
+	info "PKGMK_WORK_DIR: $PKGMK_WORK_DIR"
+	info "PKGMK_SOURCE_DIR: $PKGMK_SOURCE_DIR"
+
+	if [ "$PKGMK_INSTALL" = "no" ]; then
+		PKGMK_CLEAN="no"
+		warning "CLEAN IGNORED"
+	else
+		info "PKGMK_KEEP_SOURCES: $PKGMK_KEEP_SOURCES"
+		info "PKGMK_CLEAN: $PKGMK_CLEAN"
+	fi
+	if [ "$PKGMK_CLEAN" != "no" ]; then
+		PKGMK_IGNORE_FOOTPRINT="yes"
+		PKGMK_IGNORE_MD5SUM="yes"
+		warning "FOOTPRINT AND MD5SUM IGNORED"
+	else
+		if [ "$PKGMK_UPDATE_REPO" != "yes" ]; then
+			info "PKGMK_IGNORE_REPO: $PKGMK_IGNORE_REPO"
+		else
+			info "PKGMK_UPDATE_REPO: $PKGMK_UPDATE_REPO"
+		fi
+		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
+		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"
+	fi
+	if [ "$PKGMK_IGNORE_REPO"  == "yes" ]; then
+		info "$PKGMK_REPO file will be deleted"
+	fi
+
+	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
+	if [ "$PKGMK_COMPRESS_PACKAGE" != "no" ]; then
+		info "PKGMK_COMPRESSION_MODE: $PKGMK_COMPRESSION_MODE"
+	fi
+	info "name: ${name}"
+	if [ ! -z "$version" ]; then
+		info "version: $version"
+	fi
+	if [ ! -z "$release" ]; then
+		info "release: $release"
+	fi
+	if [ ! -z "$basename" ]; then
+		info "basename: $basename"
 	fi
 
 	if [ "$PKGMK_UP_TO_DATE" = "yes" ]; then
