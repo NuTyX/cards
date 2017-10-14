@@ -2,7 +2,7 @@
 // Sort a column up or down
 void Tableau::sort_column(int col, int reverse)
 {
-	std::sort(_rowdata.begin(), _rowdata.end(), SortColumn(col, reverse));
+	sort(_rowdata.begin(), _rowdata.end(), SortColumn(col, reverse));
 	redraw();
 }
 
@@ -116,14 +116,14 @@ void Tableau::resize_window()
 }
 
 /* TODO
- *  Load table with list of packages 
+ *  Load table with list of packages
  * to be done
- * Should not be a big deal, we play with a vector<char*> 
+ * Should not be a big deal, we play with a vector<char*>
  */
 void Tableau::load_table() {
     cols(0);
     Flcards_info flcards_info("/etc/cards.conf");
-    std::set<string> RowsColumns = flcards_info.getListOfInstalledPackages();
+    set<string> RowsColumns = flcards_info.getListOfInstalledPackages();
     int r = 0;
     for (auto S : RowsColumns ) {
 		char* s = new char[S.size()+1];
@@ -144,7 +144,7 @@ void Tableau::load_table() {
 		}
 		delete s;
 		r++;
-    } 
+    }
 	// How many rows we loaded
 	rows((int)_rowdata.size());
 	// Auto-calculate widths, with 20 pixel padding
@@ -173,9 +173,9 @@ void Tableau::event_callback2()
                 		if ( _sort_lastcol == COL )
 				{	// Click same column? Toggle sort
 					_sort_reverse ^= 1;
-                		} 
+                		}
 				else
-				{	// Click diff column? Up sort 
+				{	// Click diff column? Up sort
 					_sort_reverse = 0;
 				}
 				sort_column(COL, _sort_reverse);

@@ -1,24 +1,24 @@
 /*
  * flcards_info.cxx
- * 
+ *
  * Copyright 2016 Thierry Nuttens <tnut@nutyx.org>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
- * 
+ *
+ *
  */
 
 #include "flcards_info.h"
@@ -28,11 +28,11 @@ using namespace std;
 Flcards_info::Flcards_info(const string& configFileName)
 	: Pkgdbh(""),Pkgrepo(configFileName)
 {
-	m_root="/";	
+	m_root="/";
 }
 void Flcards_info::progressInfo()
 {
-	
+
 	static int j = 0;
 	int i,n;
 	n = getNumberOfPackages();
@@ -71,7 +71,7 @@ set<string> Flcards_info::getListOfInstalledPackages()
 	m_progressBar->value(0);
 
 	getListOfPackageNames (m_root);
-	buildDatabase(false,false,false,false,"");
+	buildDatabase(false,true,false,false,"");
 
 	delete m_progressBar;
 	delete m_window;
@@ -90,6 +90,7 @@ set<string> Flcards_info::getListOfInstalledPackages()
 	}
 return ListOfInstalledPackages;
 }
+
 set<string> Flcards_info::getListOfAvailablePackages()
 {
 	m_window = new Fl_Window(300,40,"Get List of Available Packages");

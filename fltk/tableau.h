@@ -17,16 +17,19 @@
 #define MARGIN 20
 #define COLHEADER { "", "", "", "", "", "", "", "", ""}
 
+using namespace std;
+
 // A single row of columns
-class Row {
+class Row
+{
 public:
-	std::vector<char*> cols;
+	vector<char*> cols;
 };
 // Class for handling the sorting column using std::sort
-class SortColumn 
+class SortColumn
 {
-
 	int _col, _reverse;
+
 public:
 	SortColumn (int col, int reverse)
 	{
@@ -50,10 +53,10 @@ public:
 	}
 };
 // Derive a custom class from Fl_Table_Row
-class Tableau : public Fl_Table_Row 
+class Tableau : public Fl_Table_Row
 {
 private:
-	std::vector<Row> _rowdata;
+	vector<Row> _rowdata;
 	int _sort_reverse;
 	int _sort_lastcol;
 
@@ -67,7 +70,7 @@ protected:
 	void draw_sort_arrow(int X, int Y, int W, int H);
 public:
 	//Constructor
-	Tableau(int x, int y, int w, int h, const char *l=0) : Fl_Table_Row(x,y,w,h,l) 
+	Tableau(int x, int y, int w, int h, const char *l=0) : Fl_Table_Row(x,y,w,h,l)
 	{
 		_sort_reverse = 0;
 		_sort_lastcol = -1;
@@ -79,6 +82,5 @@ public:
 	void autowidth(int pad); // Automatically set the columns widths to the longuest string
 	void resize_window();	// Resize the parent window to size of table
 };
-
 
 #endif
