@@ -74,6 +74,7 @@ LIBOBJECTS =  system_utils.o \
 	string_utils.o \
 	archive_utils.o \
 	pkgrepo.o \
+	repodwl.o \
 	file_download.o \
 	file_utils.o \
 	process.o \
@@ -99,6 +100,7 @@ HEADERS = system_utils.h \
 		file_utils.h \
 		archive_utils.h \
 		pkgrepo.h \
+		repodwl.h \
 		file_download.h \
 		process.h \
 		runtime_dependencies_utils.h \

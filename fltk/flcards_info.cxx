@@ -23,25 +23,27 @@
 
 #include "flcards_info.h"
 
+using namespace std;
 
 Flcards_info::Flcards_info(const string& configFileName)
 	: Pkgdbh(""),Pkgrepo(configFileName)
 {
 	m_root="/";	
 }
-void Flcards_info::progressInfo() const
+void Flcards_info::progressInfo()
 {
 	
 	static int j = 0;
-	int i;
+	int i,n;
+	n = getNumberOfPackages();
 	switch ( m_actualAction )
 	{
 		case DB_OPEN_START:
 			m_progressBar->value(0);
 			break;
 		case DB_OPEN_RUN:
-			if ( m_packageNamesList.size()>100) {
-				i = j / ( m_packageNamesList.size() / 100);
+			if (n >100) {
+				i = j / ( n / 100);
 				m_progressBar->value(i);
 			}
 			j++;
@@ -69,7 +71,7 @@ set<string> Flcards_info::getListOfInstalledPackages()
 	m_progressBar->value(0);
 
 	getListOfPackageNames (m_root);
-	buildDatabaseWithDetailInfos(false);
+	buildDatabase(false,false,false,false,"");
 
 	delete m_progressBar;
 	delete m_window;

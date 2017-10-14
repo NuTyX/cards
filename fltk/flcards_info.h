@@ -32,13 +32,13 @@
 
 class Flcards_info : public Pkgdbh, public Pkgrepo {
 public:
-	Flcards_info (const string& configFile);
+	Flcards_info (const std::string& configFile);
 	~Flcards_info() {}
-	set<string> getListOfInstalledPackages();
-	set<string> getListOfAvailablePackages();
+	std::set<std::string> getListOfInstalledPackages();
+	std::set<std::string> getListOfAvailablePackages();
 
 protected:
-	void progressInfo() const;
+	void progressInfo();
 	Fl_Window *m_window;
 	Fl_Progress *m_progressBar;
 };

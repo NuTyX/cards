@@ -44,6 +44,8 @@
 
 #include "flcards_info.h"
 
+using namespace std;
+
 #define MAX_COLS 4
 #define MAX_ROWS 20
 #define COLONNE_HEADER { "STATUS", "NAME", "VERSION", "DESCRIPTION" }
