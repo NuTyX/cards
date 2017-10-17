@@ -44,7 +44,9 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	Recherche->labelfont(2);
 	BarMenu = new Fl_Menu_Bar(0, 0, 900, 20);
 	BarMenu->menu(&Menu[0]);
-	TextDisplay = new Fl_Text_Display(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
+	Console = new Fl_Multiline_Output(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
+	Console->color(FL_BLACK);
+    Console->textcolor(FL_GRAY);
 	BtnInstall = new Fl_Button(760, 820, 100, 40, "INSTALL");
 	m_Tab = new Tableau(MARGIN, MARGIN+40, w()-MARGIN*2, h()-400);
 	m_Tab->selection_color(FL_YELLOW);
@@ -55,11 +57,19 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	m_Tab->row_height_all(18);
 	m_Tab->tooltip("Click on the header of the column to sort it");
 	m_Tab->color(FL_WHITE);
+	Cards = Cards_wrapper::instance();
+	Cards->suscribeToEvents(this);
+    cout << "Carreidas Initialisé" << endl;
+    Cards->printCardsVersion();
+    Cards->printCardsHelp();
 }
 
 mainWindow::~mainWindow()
 {
-    //dtor
+    //todo : wait end of threads
+    //Cards->join();
+    Cards->unsuscribeToEvents(this);
+    Cards->kill();
 }
 
 void mainWindow::Quitter_CB(Fl_Widget*,void* instance)
@@ -81,4 +91,9 @@ void mainWindow::Installed_Packages_CB(Fl_Widget*, void* instance)
 void Selectionner_CB(Fl_Widget *W, void *v)
 {
 	 fl_alert("callback receive!");
+}
+
+void mainWindow::OnLogMessage(const string& Message)
+{
+	Console->insert(Message.c_str());
 }

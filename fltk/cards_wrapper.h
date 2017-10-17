@@ -25,9 +25,13 @@
 #define  CARDS_WRAPPER_H
 
 #include <cstddef>
-#include <pthread.h>
+#include <thread>
+#include <vector>
+#include <algorithm>
 
+#include "console_forwarder.h"
 #include "cards_client.h"
+#include "cards_event_handler.h"
 
 using namespace std;
 
@@ -51,7 +55,12 @@ static	Cards_wrapper*  instance();
 	 */
 static	void			kill();
 
+		void			suscribeToEvents(Cards_event_handler* pCallBack);
+		void            unsuscribeToEvents(Cards_event_handler* pCallBack);
 		void			getListOfInstalledPackages();
+		void            printCardsVersion();
+		void            printCardsHelp();
+
 
 protected:
 
@@ -69,6 +78,9 @@ static	Cards_wrapper*	_ptCards_wrapper;
 
 	pthread_t			_job;
 	Cards_client*		_ptCards;
+	vector<Cards_event_handler*> _arrCardsEventHandler;
+	console_forwarder<>*    redirect;
+	static  void m_LogCallback(const char *ptr, std::streamsize count);
 
 };
 

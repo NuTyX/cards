@@ -30,6 +30,8 @@ Cards_wrapper* Cards_wrapper::_ptCards_wrapper = nullptr;
 Cards_wrapper::Cards_wrapper()
 {
 	_ptCards = new Cards_client("/etc/cards.conf");
+	//redirect std::cout to the callback function
+	redirect = new console_forwarder<>(std::cout, m_LogCallback);
 }
 
 Cards_wrapper::~Cards_wrapper()
@@ -53,4 +55,42 @@ void Cards_wrapper::kill()
 void Cards_wrapper::getListOfInstalledPackages()
 {
 
+}
+
+void Cards_wrapper::m_LogCallback(const char *ptr, std::streamsize count)
+{
+	if (Cards_wrapper::_ptCards_wrapper!=nullptr)
+	{
+	    vector<Cards_event_handler*> arr = Cards_wrapper::_ptCards_wrapper->_arrCardsEventHandler;
+		string Message(ptr,count);
+		Message += '\0';
+		for (auto* it : arr)
+		{
+			it->OnLogMessage(Message);
+		}
+	}
+}
+
+void Cards_wrapper::suscribeToEvents(Cards_event_handler* pCallBack)
+{
+	_arrCardsEventHandler.push_back(pCallBack);
+}
+
+void Cards_wrapper::unsuscribeToEvents(Cards_event_handler* pCallBack)
+{
+    vector<Cards_event_handler*>::iterator it;
+    it=find(_arrCardsEventHandler.begin(),_arrCardsEventHandler.end(),pCallBack);
+    if (it!=_arrCardsEventHandler.end())
+    {
+        _arrCardsEventHandler.erase(it);
+    }
+}
+void Cards_wrapper::printCardsVersion()
+{
+    _ptCards->print_version();
+}
+
+void Cards_wrapper::printCardsHelp()
+{
+    _ptCards->printHelp();
 }

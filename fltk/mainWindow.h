@@ -32,6 +32,7 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Table.H>
 #include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Button.H>
 #include <string>
 #include <vector>
@@ -39,13 +40,11 @@
 //Project Includes
 #include "pixmaps/flcards.xpm"
 #include "tableau.h"
+#include "cards_wrapper.h"
 
 using namespace std;
 
-
-
-
-class mainWindow : public Fl_Double_Window
+class mainWindow : public Fl_Double_Window, public Cards_event_handler
 {
     public:
         mainWindow(int W, int H, string Title);
@@ -55,7 +54,7 @@ class mainWindow : public Fl_Double_Window
 static  void Quitter_CB(Fl_Widget*,void* instance);
 static  void Available_Packages_CB(Fl_Widget*,void* instance);
 static  void Installed_Packages_CB(Fl_Widget*,void* instance);
-
+        void OnLogMessage (const string& Message);
     private:
         vector<Fl_Menu_Item> Menu;
         Tableau* m_Tab;
@@ -63,8 +62,9 @@ static  void Installed_Packages_CB(Fl_Widget*,void* instance);
         Fl_RGB_Image* p_im;
         Fl_Input* Recherche;
         Fl_Menu_Bar* BarMenu;
-        Fl_Text_Display* TextDisplay;
+        Fl_Multiline_Output* Console;
         Fl_Button* BtnInstall;
+        Cards_wrapper* Cards;
 };
 
 #endif // MAINWINDOW_H
