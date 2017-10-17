@@ -28,11 +28,13 @@ flcards:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o mainWindow.o mainWindow.cxx
 	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o flcards.o flcards.cxx
 	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o tableau.o tableau.cxx
-	$(CXX) flcards_info.o flcards.o tableau.o mainWindow.o -o $@ -lcards -lcurl -larchive $(LIBFLTK)
-	rm flcards.o flcards_info.o mainWindow.o tableau.o
+	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_wrapper.o cards_wrapper.cxx
+	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_client.o cards_client.cxx
+	$(CXX) flcards_info.o flcards.o tableau.o mainWindow.o cards_wrapper.o cards_client.o -o $@ -lcards -lcurl -larchive $(LIBFLTK)
+	rm flcards.o flcards_info.o mainWindow.o tableau.o cards_wrapper.o cards_client.o
 
 clean:
-	rm -f flcards flcards.o flcards_info.o
+	rm -f flcards flcards.o flcards_info.o mainWindow.o tableau.o cards_wrapper.o cards_client.o
 
 install:
 	install -D -m0755 flcards $(DESTDIR)$(USRBINDIR)/flcards
