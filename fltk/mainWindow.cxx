@@ -26,7 +26,7 @@
 mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
     Fl_Double_Window(W,H,Title.c_str())
 {
-    Menu.push_back((Fl_Menu_Item){"Actions", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0});
+/*    Menu.push_back((Fl_Menu_Item){"Actions", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0});
     Menu.push_back((Fl_Menu_Item){"Synchronize", 0,  0, 0, 0, FL_NORMAL_LABEL, 0, 14, 0});
     Menu.push_back((Fl_Menu_Item){"Quit", 0,  (Fl_Callback*)Quitter_CB, 0, 0, FL_NORMAL_LABEL, 0, 14, 0});
     Menu.push_back((Fl_Menu_Item){"Information", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0});
@@ -35,20 +35,22 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
     Menu.push_back((Fl_Menu_Item){0,0,0,0,0,0,0,0,0});
     Menu.push_back((Fl_Menu_Item){"About", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0});
     Menu.push_back((Fl_Menu_Item){0,0,0,0,0,0,0,0,0});
-    Menu.push_back((Fl_Menu_Item){0,0,0,0,0,0,0,0,0});
+    Menu.push_back((Fl_Menu_Item){0,0,0,0,0,0,0,0,0});*/
 
 	p_win = new Fl_Pixmap(flcards_xpm);
 	p_im = new Fl_RGB_Image(p_win);
 	icon(p_im);
-	Recherche = new Fl_Input(MARGIN+80, MARGIN, 499, 24, "Search:");
+	Recherche = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
 	Recherche->labelfont(2);
-	BarMenu = new Fl_Menu_Bar(0, 0, 900, 20);
-	BarMenu->menu(&Menu[0]);
+	Recherche->color(FL_WHITE);
+	//BarMenu = new Fl_Menu_Bar(0, 0, 900, 20);
+	//BarMenu->menu(&Menu[0]);
 	Console = new Fl_Multiline_Output(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
 	Console->color(FL_BLACK);
     Console->textcolor(FL_GRAY);
-	BtnInstall = new Fl_Button(760, 820, 100, 40, "INSTALL");
-	m_Tab = new Tableau(MARGIN, MARGIN+40, w()-MARGIN*2, h()-400);
+	BtnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "SYNC");
+	BtnSync->callback((Fl_Callback*)SyncButton_CB);
+	m_Tab = new Tableau(MARGIN, MARGIN+50, w()-MARGIN*2, h()-400);
 	m_Tab->selection_color(FL_YELLOW);
 	m_Tab->col_header(1);
 	m_Tab->col_resize(1);
@@ -59,9 +61,8 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	m_Tab->color(FL_WHITE);
 	Cards = Cards_wrapper::instance();
 	Cards->suscribeToEvents(this);
-    cout << "Carreidas Initialisé" << endl;
+    cout << "Carreidas use ";
     Cards->printCardsVersion();
-    Cards->printCardsHelp();
 }
 
 mainWindow::~mainWindow()
@@ -87,10 +88,9 @@ void mainWindow::Installed_Packages_CB(Fl_Widget*, void* instance)
 
 }
 
-
-void Selectionner_CB(Fl_Widget *W, void *v)
+void mainWindow::SyncButton_CB(Fl_Widget*, void* instance)
 {
-	 fl_alert("callback receive!");
+    Cards_wrapper::instance()->sync();
 }
 
 void mainWindow::OnLogMessage(const string& Message)

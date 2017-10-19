@@ -36,6 +36,7 @@ class Cards_event_handler
 protected:
 
     virtual void OnLogMessage (const string& Message){}
+    virtual void OnSyncFinished (){}
 
 };
 

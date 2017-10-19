@@ -32,11 +32,17 @@ Cards_wrapper::Cards_wrapper()
 	_ptCards = new Cards_client("/etc/cards.conf");
 	//redirect std::cout to the callback function
 	redirect = new console_forwarder<>(std::cout, m_LogCallback);
+	_job_running = false;
+	_job=nullptr;
 }
 
 Cards_wrapper::~Cards_wrapper()
 {
-	if (_ptCards != nullptr) delete _ptCards;
+    if (_job != nullptr)
+    {
+        if (_job->joinable()) _job->join();
+    }
+    if (_ptCards != nullptr) delete _ptCards;
 }
 
 Cards_wrapper* Cards_wrapper::instance()
@@ -90,7 +96,55 @@ void Cards_wrapper::printCardsVersion()
     _ptCards->print_version();
 }
 
-void Cards_wrapper::printCardsHelp()
+void Cards_wrapper::sync()
 {
-    _ptCards->printHelp();
+    if (!_job_running)
+    {
+        if (_job != nullptr)
+        {
+            _job->detach();
+            delete _job;
+            _job=nullptr;
+        }
+        if (_job==nullptr) _job = new thread(&Cards_wrapper::m_Sync_Thread, Cards_wrapper::_ptCards_wrapper);
+    }
+}
+
+void Cards_wrapper::m_Sync_Thread()
+{
+    _job_running =true;
+    if (m_checkRootAccess())
+    {
+		Config config;
+		string m_repoFile = ".PKGREPO";
+		Pkgrepo::parseConfig("/etc/cards.conf", config);
+		for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i)
+		{
+			DirUrl DU = *i ;
+			if (DU.Url.size() == 0 )
+			{
+				continue;
+			}
+			string categoryDir, url ;
+			categoryDir = DU.Dir;
+			url = DU.Url;
+			string category = basename(const_cast<char*>(categoryDir.c_str()));
+			string categoryPKGREPOFile = categoryDir + "/" + m_repoFile;
+			FileDownload PKGRepo(url + "/" + m_repoFile,
+				categoryDir,
+				m_repoFile, false);
+		}
+    }
+	_job_running = false;
+}
+
+bool Cards_wrapper::m_checkRootAccess()
+{
+    //setuid(0);
+    if (getuid() != 0)
+    {
+        cout << "Root privileges are needed for this action!" << endl;
+        return false;
+    }
+    return true;
 }

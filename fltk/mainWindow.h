@@ -54,16 +54,17 @@ class mainWindow : public Fl_Double_Window, public Cards_event_handler
 static  void Quitter_CB(Fl_Widget*,void* instance);
 static  void Available_Packages_CB(Fl_Widget*,void* instance);
 static  void Installed_Packages_CB(Fl_Widget*,void* instance);
+static	void SyncButton_CB(Fl_Widget*,void* instance);
         void OnLogMessage (const string& Message);
     private:
-        vector<Fl_Menu_Item> Menu;
+        //vector<Fl_Menu_Item> Menu;
         Tableau* m_Tab;
         Fl_Pixmap* p_win;
         Fl_RGB_Image* p_im;
         Fl_Input* Recherche;
         Fl_Menu_Bar* BarMenu;
         Fl_Multiline_Output* Console;
-        Fl_Button* BtnInstall;
+        Fl_Button* BtnSync;
         Cards_wrapper* Cards;
 };
 

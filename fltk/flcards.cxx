@@ -4,7 +4,6 @@
 
 int main(int argc, char **argv)
 {
-
     mainWindow win(900, 900, "flcards");
     win.resizable(win);
 	win.show(argc, argv);

@@ -29,6 +29,7 @@
 #include <vector>
 #include <algorithm>
 
+#include <libcards.h>
 #include "console_forwarder.h"
 #include "cards_client.h"
 #include "cards_event_handler.h"
@@ -53,13 +54,13 @@ static	Cards_wrapper*  instance();
 	/**
 	 * if exist, delete instance of Card_wrapper
 	 */
-static	void			kill();
+	void				kill();
 
-		void			suscribeToEvents(Cards_event_handler* pCallBack);
-		void            unsuscribeToEvents(Cards_event_handler* pCallBack);
-		void			getListOfInstalledPackages();
-		void            printCardsVersion();
-		void            printCardsHelp();
+	void				suscribeToEvents(Cards_event_handler* pCallBack);
+	void				unsuscribeToEvents(Cards_event_handler* pCallBack);
+	void				getListOfInstalledPackages();
+	void				printCardsVersion();
+	void				sync();
 
 
 protected:
@@ -75,12 +76,14 @@ private:
 						~Cards_wrapper();
 
 static	Cards_wrapper*	_ptCards_wrapper;
-
-	pthread_t			_job;
+    bool            _job_running;
+	thread*			_job;
 	Cards_client*		_ptCards;
 	vector<Cards_event_handler*> _arrCardsEventHandler;
 	console_forwarder<>*    redirect;
 	static  void m_LogCallback(const char *ptr, std::streamsize count);
+	bool                m_checkRootAccess();
+	void                m_Sync_Thread();
 
 };
 
