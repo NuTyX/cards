@@ -361,8 +361,12 @@ fi
 MOUNT_POINTS="$MOUNT_POINTS $1/sources"
 
 mkdir -p $1/root/$COLLECTION || error $1
-GIT_PROJ=`grep ^/home /etc/fstab |grep $1|grep root/$COLLECTION|cut -d " " -f1`
+GIT_PROJ=`grep ^/home /etc/fstab |grep $1/|cut -d " " -f1`
 echo "rsync -a --delete --exclude .git $GIT_PROJ/ $1/root/$COLLECTION/"
+if [ -z "$GIT_PROJ" ]; then
+	echo ">>> Cannot rsync, not set"
+	error $1
+fi
 rsync -a --delete --exclude .git $GIT_PROJ/ $1/root/$COLLECTION/ || error "rsync"
 chown -R 1000:1000 $1/root/$COLLECTION/ || error "chown $1/root/$COLLECTION"
 
