@@ -136,7 +136,17 @@ void Cards_wrapper::m_Sync_Thread()
 		}
     }
 	_job_running = false;
+	m_SyncFinishedCallback();
 }
+
+void Cards_wrapper::m_SyncFinishedCallback()
+{
+	for (auto* it : _arrCardsEventHandler)
+	{
+		it->OnSyncFinished();
+	}
+}
+
 
 bool Cards_wrapper::m_checkRootAccess()
 {

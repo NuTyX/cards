@@ -97,3 +97,8 @@ void mainWindow::OnLogMessage(const string& Message)
 {
 	Console->insert(Message.c_str());
 }
+
+void mainWindow::OnSyncFinished()
+{
+	Console->insert("Sync Finished");
+}

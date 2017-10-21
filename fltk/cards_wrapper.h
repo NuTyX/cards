@@ -1,7 +1,7 @@
 /*
  * cards_wrapper.h
  *
- * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2015-2017 Gianni P. <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,14 +76,15 @@ private:
 						~Cards_wrapper();
 
 static	Cards_wrapper*	_ptCards_wrapper;
-    bool            _job_running;
-	thread*			_job;
+	bool				_job_running;
+	thread*				_job;
 	Cards_client*		_ptCards;
 	vector<Cards_event_handler*> _arrCardsEventHandler;
-	console_forwarder<>*    redirect;
-	static  void m_LogCallback(const char *ptr, std::streamsize count);
-	bool                m_checkRootAccess();
-	void                m_Sync_Thread();
+	console_forwarder<>*	redirect;
+	static	void 		m_LogCallback(const char *ptr, std::streamsize count);
+	void				m_SyncFinishedCallback();
+	bool				m_checkRootAccess();
+	void				m_Sync_Thread();
 
 };
 
