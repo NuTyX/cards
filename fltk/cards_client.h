@@ -33,7 +33,7 @@ using namespace std;
 // Define Cards_wrapper singleton for friendship
 class Cards_wrapper;
 
-class Cards_client : public Pkgdbh, public Pkgrepo
+class Cards_client : public Pkginst
 {
 	// Only Cards_wrapper can own this class
 	friend Cards_wrapper;

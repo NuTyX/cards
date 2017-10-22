@@ -12,7 +12,7 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Table_Row.H>
-#include "flcards_info.h"
+#include "cards_wrapper.h"
 
 #define MARGIN 20
 #define COLHEADER { "", "", "", "", "", "", "", "", ""}
@@ -25,33 +25,18 @@ class Row
 public:
 	vector<char*> cols;
 };
+
 // Class for handling the sorting column using std::sort
 class SortColumn
 {
+private:
 	int _col, _reverse;
 
 public:
-	SortColumn (int col, int reverse)
-	{
-		_col = col;
-		_reverse= reverse;
-	}
-	bool operator() (const Row &a, const Row &b)
-	{
-		const char *ap = ( _col < (int)a.cols.size() ) ? a.cols[_col] : "",
-		*bp = ( _col < (int)b.cols.size() ) ? b.cols[_col] : "";
-		if ( isdigit(*ap) && isdigit(*bp) )
-		{
-			int av=0; sscanf(ap, "%d", &av);
-			int bv=0; sscanf(bp, "%d", &bv);
-			return( _reverse ? av < bv : bv < av );
-		}
-		else
-		{
-			return( _reverse ? strcmp(ap, bp) > 0 : strcmp(ap, bp) < 0 );
-		}
-	}
+	SortColumn (int col, int reverse);
+	bool operator() (const Row &a, const Row &b);
 };
+
 // Derive a custom class from Fl_Table_Row
 class Tableau : public Fl_Table_Row
 {
@@ -59,6 +44,7 @@ private:
 	vector<Row> _rowdata;
 	int _sort_reverse;
 	int _sort_lastcol;
+	Cards_wrapper* _cards;
 
 	static void event_callback(Fl_Widget*,void*);
 	void event_callback2();
@@ -70,13 +56,7 @@ protected:
 	void draw_sort_arrow(int X, int Y, int W, int H);
 public:
 	//Constructor
-	Tableau(int x, int y, int w, int h, const char *l=0) : Fl_Table_Row(x,y,w,h,l)
-	{
-		_sort_reverse = 0;
-		_sort_lastcol = -1;
-		end();
-		callback(event_callback, (void*)this);
-	}
+	Tableau(int x, int y, int w, int h, const char *l=0);
 	~Tableau(){}
 	void load_table(); // Load the packages list
 	void autowidth(int pad); // Automatically set the columns widths to the longuest string

@@ -25,7 +25,7 @@
 #include "cards_client.h"
 
 Cards_client::Cards_client(const string& pConfigFileName)
-	: Pkgdbh(""),Pkgrepo(pConfigFileName)
+	: Pkginst("",pConfigFileName.c_str())
 {
 	m_root="/";
 }

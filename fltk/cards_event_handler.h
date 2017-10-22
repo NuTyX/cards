@@ -26,6 +26,16 @@
 
 #include <cstddef>
 #include <string>
+#include <vector>
+
+using namespace std;
+
+enum CEH_RC
+{
+	OK=0,
+	NO_ROOT,
+	PKG_NOT_EXIST
+};
 
 // Define Cards_wrapper singleton for friendship
 class Cards_wrapper;
@@ -36,8 +46,10 @@ class Cards_event_handler
 protected:
 
     virtual void OnLogMessage (const string& Message){}
-    virtual void OnSyncFinished (){}
-
+    virtual void OnSyncFinished (const CEH_RC rc){}
+    virtual void ListOfInstalledPackages (const set<string>& RowsColumns ){}
+public:
+static	const string getReasonCodeString(const CEH_RC rc);
 };
 
 #endif

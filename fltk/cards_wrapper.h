@@ -36,55 +36,93 @@
 
 using namespace std;
 
-/**
- * \brief Cards wrapper class
+/** \class Cards_wrapper
+ * \brief GUI interfacing wrapper for CARDS
  *
  * This class ensure interface cards with GUI application need non-blocking operation,
  * This is a single instance (singleton) that ensure only one instance of cards library.
  *
  */
-
 class  Cards_wrapper
 {
 public:
 	/**
-	 * return or create once instance of Cards_wrapper
+	 * \brief Return or create the singleton
+	 *
+	 * This static method create the singleton if not yet done
+	 *
+	 * \return pointer of the singleton
 	 */
-static	Cards_wrapper*  instance();
+static Cards_wrapper*  instance();
+
 	/**
-	 * if exist, delete instance of Card_wrapper
+	 * \brief Kill the singleton
+	 *
+	 * if exist, delete instance of the singleton
 	 */
-	void				kill();
+	void kill();
 
-	void				suscribeToEvents(Cards_event_handler* pCallBack);
-	void				unsuscribeToEvents(Cards_event_handler* pCallBack);
-	void				getListOfInstalledPackages();
-	void				printCardsVersion();
-	void				sync();
+	/**
+	 * \brief Suscribe to CARDS events
+	 *
+	 * Record callback from client class which submit callback from Card lib
+	 */
+	void suscribeToEvents(Cards_event_handler* pCallBack);
 
+	/**
+	 * \brief Unsuscribe from CARDS Events
+	 *
+	 * Unsuscribe client class callbock form Suscribe list
+	 */
+	void unsuscribeToEvents(Cards_event_handler* pCallBack);
 
-protected:
+	/**
+	 * \brief list of installed packages
+	 *
+	 * Return list of installed packages
+	 */
+	void getListOfInstalledPackages();
+
+	/**
+	 * \brief Get CARDS Version
+	 *
+	 * Return CARDS Library version
+	 */
+	void printCardsVersion();
+
+	/**
+	 * \brief Sync CARDS database
+	 *
+	 * Launch CARD Sync operation
+	 * Callback is called when operation is done
+	 */
+	void sync();
 
 private:
-	/**
-	 * Private constructor
-	 */
-						Cards_wrapper();
-	/**
-	 * Private destructor
-	 */
-						~Cards_wrapper();
 
-static	Cards_wrapper*	_ptCards_wrapper;
-	bool				_job_running;
-	thread*				_job;
-	Cards_client*		_ptCards;
-	vector<Cards_event_handler*> _arrCardsEventHandler;
-	console_forwarder<>*	redirect;
-	static	void 		m_LogCallback(const char *ptr, std::streamsize count);
-	void				m_SyncFinishedCallback();
-	bool				m_checkRootAccess();
-	void				m_Sync_Thread();
+/**
+ * \brief Constructor
+ * Private constructor
+ */
+	Cards_wrapper();
+
+/**
+ * \brief Destructor
+ * Private destructor
+ */
+	~Cards_wrapper();
+
+static	Cards_wrapper*	_ptCards_wrapper; //Static pointer of the singleton
+
+	bool _job_running; //Flag to know if a thread is currently running
+	thread* _job; // Thread handler pointer
+	Cards_client* _ptCards; // Cards Library Handler pointer
+	vector<Cards_event_handler*> _arrCardsEventHandler; // Std array to store callback event clients
+	console_forwarder<>* redirect; // Forwarding cout message to LogCallback callback
+static void m_LogCallback(const char *ptr, std::streamsize count); //Callback for all cout text output from libcards
+	void m_SyncFinishedCallback(const CEH_RC rc); // Callback broadcast for Sync Cards operation
+	bool m_checkRootAccess(); // Just check if we have root accessing
+	void m_Sync_Thread(); // Main Thread for Cards Sync Operation
 
 };
 

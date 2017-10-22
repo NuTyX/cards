@@ -56,7 +56,7 @@ static  void Available_Packages_CB(Fl_Widget*,void* instance);
 static  void Installed_Packages_CB(Fl_Widget*,void* instance);
 static	void SyncButton_CB(Fl_Widget*,void* instance);
         void OnLogMessage (const string& Message);
-        void OnSyncFinished();
+        void OnSyncFinished(const CEH_RC rc);
     private:
         //vector<Fl_Menu_Item> Menu;
         Tableau* m_Tab;

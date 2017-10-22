@@ -98,7 +98,7 @@ void mainWindow::OnLogMessage(const string& Message)
 	Console->insert(Message.c_str());
 }
 
-void mainWindow::OnSyncFinished()
+void mainWindow::OnSyncFinished(const CEH_RC rc)
 {
-	Console->insert("Sync Finished");
+	cout << "Sync : " << Cards_event_handler::getReasonCodeString(rc) << endl;
 }

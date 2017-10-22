@@ -1,7 +1,7 @@
 /*
  * cards_wrapper.cxx
  *
- * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2015-2017 Gianni Peschiutta <@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ Cards_wrapper::Cards_wrapper()
 	_job=nullptr;
 }
 
+//Destructor
 Cards_wrapper::~Cards_wrapper()
 {
     if (_job != nullptr)
@@ -45,6 +46,7 @@ Cards_wrapper::~Cards_wrapper()
     if (_ptCards != nullptr) delete _ptCards;
 }
 
+// Return or create singleton instance
 Cards_wrapper* Cards_wrapper::instance()
 {
 	if (_ptCards_wrapper==nullptr)
@@ -52,25 +54,27 @@ Cards_wrapper* Cards_wrapper::instance()
 	return _ptCards_wrapper;
 }
 
+// Destruction of the singleton , only if instance exist
 void Cards_wrapper::kill()
 {
 	if (_ptCards_wrapper!=nullptr)
 		delete _ptCards_wrapper;
 }
 
+// Get list of installed package
 void Cards_wrapper::getListOfInstalledPackages()
 {
 
 }
 
+// Capture cout events and send it to callback receivers
 void Cards_wrapper::m_LogCallback(const char *ptr, std::streamsize count)
 {
 	if (Cards_wrapper::_ptCards_wrapper!=nullptr)
 	{
-	    vector<Cards_event_handler*> arr = Cards_wrapper::_ptCards_wrapper->_arrCardsEventHandler;
 		string Message(ptr,count);
 		Message += '\0';
-		for (auto* it : arr)
+		for (auto* it : Cards_wrapper::_ptCards_wrapper->_arrCardsEventHandler)
 		{
 			it->OnLogMessage(Message);
 		}
@@ -113,6 +117,7 @@ void Cards_wrapper::sync()
 void Cards_wrapper::m_Sync_Thread()
 {
     _job_running =true;
+    CEH_RC rc=CEH_RC::OK;
     if (m_checkRootAccess())
     {
 		Config config;
@@ -135,25 +140,27 @@ void Cards_wrapper::m_Sync_Thread()
 				m_repoFile, false);
 		}
     }
+    else
+	{
+		rc= CEH_RC::NO_ROOT;
+	}
 	_job_running = false;
-	m_SyncFinishedCallback();
+	m_SyncFinishedCallback(rc);
 }
 
-void Cards_wrapper::m_SyncFinishedCallback()
+void Cards_wrapper::m_SyncFinishedCallback(const CEH_RC rc=CEH_RC::OK)
 {
 	for (auto* it : _arrCardsEventHandler)
 	{
-		it->OnSyncFinished();
+		it->OnSyncFinished(rc);
 	}
 }
 
 
 bool Cards_wrapper::m_checkRootAccess()
 {
-    //setuid(0);
     if (getuid() != 0)
     {
-        cout << "Root privileges are needed for this action!" << endl;
         return false;
     }
     return true;

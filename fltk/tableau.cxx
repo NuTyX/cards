@@ -1,4 +1,38 @@
 #include "tableau.h"
+
+SortColumn::SortColumn (int col, int reverse)
+{
+	_col = col;
+	_reverse= reverse;
+}
+
+bool SortColumn::operator() (const Row &a, const Row &b)
+{
+	const char *ap = ( _col < (int)a.cols.size() ) ? a.cols[_col] : "",
+	*bp = ( _col < (int)b.cols.size() ) ? b.cols[_col] : "";
+	if ( isdigit(*ap) && isdigit(*bp) )
+	{
+		int av=0; sscanf(ap, "%d", &av);
+		int bv=0; sscanf(bp, "%d", &bv);
+		return( _reverse ? av < bv : bv < av );
+	}
+	else
+	{
+		return( _reverse ? strcmp(ap, bp) > 0 : strcmp(ap, bp) < 0 );
+	}
+}
+
+
+Tableau::Tableau(int x, int y, int w, int h, const char *l)
+	: Fl_Table_Row(x,y,w,h,l)
+{
+	_sort_reverse = 0;
+	_sort_lastcol = -1;
+	end();
+	_cards=Cards_wrapper::instance();
+	callback(event_callback, (void*)this);
+}
+
 // Sort a column up or down
 void Tableau::sort_column(int col, int reverse)
 {
@@ -120,12 +154,18 @@ void Tableau::resize_window()
  * to be done
  * Should not be a big deal, we play with a vector<char*>
  */
-void Tableau::load_table() {
+void Tableau::load_table()
+{
+    _cards->getListOfInstalledPackages();
+}
+
+void Tableau::ListOfInstalledPackages (const set<string>& RowsColumns )
+{
     cols(0);
-    Flcards_info flcards_info("/etc/cards.conf");
-    set<string> RowsColumns = flcards_info.getListOfInstalledPackages();
+    RowsColumns = _cards->getListOfInstalledPackages();
     int r = 0;
-    for (auto S : RowsColumns ) {
+    for (auto S : RowsColumns )
+	{
 		char* s = new char[S.size()+1];
 		copy(S.begin(),S.end(),s);
 		s[S.size()]='\0';
@@ -135,11 +175,13 @@ void Tableau::load_table() {
 		// Break line into separate word 'columns'
 		char *ss;
 		const char *delim = "\t";
-		for(int t=0; (t==0)?(ss=strtok(s,delim)):(ss=strtok(NULL,delim)); t++) {
+		for(int t=0; (t==0)?(ss=strtok(s,delim)):(ss=strtok(NULL,delim)); t++)
+		{
 			rc.push_back(strdup(ss));
 		}
 		// Keep track of max # columns
-		if ( (int)rc.size() > cols() ) {
+		if ( (int)rc.size() > cols() )
+		{
 			cols((int)rc.size());
 		}
 		delete s;
