@@ -22,50 +22,33 @@
 #ifndef CARDS_SYNC_H
 #define CARDS_SYNC_H
 
-#include "file_utils.h"
-#include "file_download.h"
+#include "pkgsync.h"
 #include "cards_argument_parser.h"
-#include "pkgrepo.h"
 
-#include <cstring>
-#include <cstdlib>
-#include <iostream>
 
-#include <curl/curl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <libgen.h>
-#include <dirent.h>
+using namespace std;
 
-class Cards_sync
-{
+/**
+ * \brief cards_sync class
+ *
+ * This class takes care of synchronising packages metadatas with remote server
+ *
+ */
+
+class Cards_sync : public Pkgsync {
 public:
+	/**
+	 * Default constructor without any argument
+	 */
+	Cards_sync();
+
 	Cards_sync (const CardsArgumentParser& argParser);
 	Cards_sync (const CardsArgumentParser& argParser,
 		const std::string& url,
 		const std::string& directory,
 		const std::string& repoFile);
-	virtual void treatErrors(const std::string& s) const;
 
-	void run();
-	void purge();
-	static const std::string DEFAULT_REPOFILE;
- 
-	
 private:
-
-	unsigned int getLocalPackages(const std::string& path);
-	unsigned int getRemotePackages(const std::string& pkgrepoFile);
-
-	void deleteFolder(const std::string& folderName);
-
-	std::set<std::string> m_localPackagesList;
-	std::set<std::string> m_remotePackagesList;
-	const std::string m_baseDirectory;
-	const std::string m_remoteUrl;
-	std::string m_repoFile;
-	error m_actualError;
 
 	const CardsArgumentParser& m_argParser;
 	

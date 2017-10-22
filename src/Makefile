@@ -57,6 +57,7 @@ CARDSOBJECTS =	system_utils.o \
 		pkginfo.o \
 		pkginst.o \
 		pkgtest.o \
+		pkgsync.o \
 		cards_create.o \
 		cards_sync.o \
 		cards_install.o \
@@ -83,7 +84,8 @@ LIBOBJECTS =  system_utils.o \
 	pkgadd.o \
 	pkgrm.o \
 	pkginfo.o \
-	pkginst.o
+	pkginst.o \
+	pkgsync.o
 
 WEBOBJECTS =  system_utils.o \
 	md5.o \
@@ -108,7 +110,8 @@ HEADERS = system_utils.h \
 		pkgadd.h \
 		pkgrm.h \
 		pkginfo.h \
-		pkginst.h
+		pkginst.h \
+		pkgsync.h
 
 
 CONSOLEKIT_CFLAGS = -I/usr/include/ConsoleKit/ck-connector -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
