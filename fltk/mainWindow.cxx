@@ -1,7 +1,7 @@
 /*
- * mainWindpow.cxx
+ * mainWindow.cxx
  *
- * Copyright 2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,28 +26,16 @@
 mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
     Fl_Double_Window(W,H,Title.c_str())
 {
-/*    Menu.push_back((Fl_Menu_Item){"Actions", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0});
-    Menu.push_back((Fl_Menu_Item){"Synchronize", 0,  0, 0, 0, FL_NORMAL_LABEL, 0, 14, 0});
-    Menu.push_back((Fl_Menu_Item){"Quit", 0,  (Fl_Callback*)Quitter_CB, 0, 0, FL_NORMAL_LABEL, 0, 14, 0});
-    Menu.push_back((Fl_Menu_Item){"Information", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0});
-    Menu.push_back((Fl_Menu_Item){"Available Packages", 0,  (Fl_Callback*)Available_Packages_CB, 0, 0, FL_NORMAL_LABEL, 0, 14, 0});
-    Menu.push_back((Fl_Menu_Item){"Installed Packages", 0,  (Fl_Callback*)Installed_Packages_CB, 0, 0, FL_NORMAL_LABEL, 0, 14, 0});
-    Menu.push_back((Fl_Menu_Item){0,0,0,0,0,0,0,0,0});
-    Menu.push_back((Fl_Menu_Item){"About", 0,  0, 0, 64, FL_NORMAL_LABEL, 0, 14, 0});
-    Menu.push_back((Fl_Menu_Item){0,0,0,0,0,0,0,0,0});
-    Menu.push_back((Fl_Menu_Item){0,0,0,0,0,0,0,0,0});*/
-
 	p_win = new Fl_Pixmap(flcards_xpm);
 	p_im = new Fl_RGB_Image(p_win);
 	icon(p_im);
 	Recherche = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
 	Recherche->labelfont(2);
 	Recherche->color(FL_WHITE);
-	//BarMenu = new Fl_Menu_Bar(0, 0, 900, 20);
-	//BarMenu->menu(&Menu[0]);
 	Console = new Fl_Multiline_Output(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
 	Console->color(FL_BLACK);
     Console->textcolor(FL_GRAY);
+    Console->labeltype(FL_NO_LABEL );
 	BtnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "SYNC");
 	BtnSync->callback((Fl_Callback*)SyncButton_CB);
 	m_Tab = new Tableau(MARGIN, MARGIN+50, w()-MARGIN*2, h()-400);
@@ -55,7 +43,6 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	m_Tab->col_header(1);
 	m_Tab->col_resize(1);
 	m_Tab->when(FL_WHEN_RELEASE);
-	m_Tab->load_table();
 	m_Tab->row_height_all(18);
 	m_Tab->tooltip("Click on the header of the column to sort it");
 	m_Tab->color(FL_WHITE);
@@ -63,6 +50,7 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	Cards->suscribeToEvents(this);
     cout << "Carreidas use ";
     Cards->printCardsVersion();
+	m_Tab->load_table();
 }
 
 mainWindow::~mainWindow()
@@ -95,10 +83,14 @@ void mainWindow::SyncButton_CB(Fl_Widget*, void* instance)
 
 void mainWindow::OnLogMessage(const string& Message)
 {
-	Console->insert(Message.c_str());
+	Fl::lock();
+	if (Console!=nullptr) Console->insert(Message.c_str());
+	Fl::unlock();
 }
 
 void mainWindow::OnSyncFinished(const CEH_RC rc)
 {
+	Fl::lock();
 	cout << "Sync : " << Cards_event_handler::getReasonCodeString(rc) << endl;
+	Fl::unlock();
 }

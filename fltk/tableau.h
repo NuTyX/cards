@@ -1,3 +1,27 @@
+/*
+ * tableau.h
+ *
+ * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ *
+ *
+ */
+
 #ifndef TABLEAU_H
 #define TABLEAU_H
 
@@ -38,7 +62,7 @@ public:
 };
 
 // Derive a custom class from Fl_Table_Row
-class Tableau : public Fl_Table_Row
+class Tableau : public Fl_Table_Row, public Cards_event_handler
 {
 private:
 	vector<Row> _rowdata;
@@ -54,6 +78,7 @@ protected:
 	// sort the table by a column
 	void sort_column(int col, int reverse=0);
 	void draw_sort_arrow(int X, int Y, int W, int H);
+	void ListOfInstalledPackages (const set<string>& RowsColumns );
 public:
 	//Constructor
 	Tableau(int x, int y, int w, int h, const char *l=0);

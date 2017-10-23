@@ -1,7 +1,7 @@
 /*
  * cards_client.h
  *
- * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,14 +33,45 @@ using namespace std;
 // Define Cards_wrapper singleton for friendship
 class Cards_wrapper;
 
+
+/** \class Cards_client
+ * \brief Interface Class to access Cards Library Method through inheritence
+ *
+ * This class ensure interface cards with GUI application need non-blocking operation,
+ * This is a single instance (singleton) that ensure only one instance of cards library.
+ *
+ */
 class Cards_client : public Pkginst
 {
 	// Only Cards_wrapper can own this class
 	friend Cards_wrapper;
 
 protected:
+	/**
+	 * \brief Constructor
+	 *
+	 * Constructor of Cards_client class
+	 *
+	 * \return pointer of the singleton
+	 */
 	Cards_client (const string& pConfigFileName);
+	/**
+	 * \brief Destructor
+	 *
+	 * Destructor of Cards_client class
+	 *
+	 * \return pointer of the singleton
+	 */
 	~Cards_client ();
+
+	/**
+	 * \brief Get list of installed package
+	 *
+	 * Return string array content installed package
+	 *
+	 * \return string array contain installed package list
+	 */
+	set<string> ListOfInstalledPackages();
 };
 
 #endif // CARDS_WRAPPER_H

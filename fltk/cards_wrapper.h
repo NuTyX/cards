@@ -1,7 +1,7 @@
 /*
  * cards_wrapper.h
  *
- * Copyright 2015-2017 Gianni P. <tnut@nutyx.org>
+ * Copyright 2017 Gianni Peschiutta <artmia@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -121,8 +121,11 @@ static	Cards_wrapper*	_ptCards_wrapper; //Static pointer of the singleton
 	console_forwarder<>* redirect; // Forwarding cout message to LogCallback callback
 static void m_LogCallback(const char *ptr, std::streamsize count); //Callback for all cout text output from libcards
 	void m_SyncFinishedCallback(const CEH_RC rc); // Callback broadcast for Sync Cards operation
+	void m_ListOfInstalledPackagesCallback(const set<string>& ListOfInstalledPackages);
+
 	bool m_checkRootAccess(); // Just check if we have root accessing
 	void m_Sync_Thread(); // Main Thread for Cards Sync Operation
+	void m_ListOfInstalledPackages_Thread();
 
 };
 

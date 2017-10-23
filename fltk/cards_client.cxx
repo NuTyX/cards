@@ -1,8 +1,7 @@
-
 /*
  * cards_client.cxx
  *
- * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,4 +31,24 @@ Cards_client::Cards_client(const string& pConfigFileName)
 
 Cards_client::~Cards_client()
 {
+}
+
+set<string> Cards_client::ListOfInstalledPackages()
+{
+	getListOfPackageNames (m_root);
+	buildDatabase(false,true,false,false,"");
+	set<string> ListOfInstalledPackages;
+	string packageDetails;
+	for (auto i : m_listOfInstPackages)
+	{
+#ifndef NDEBUG
+		cerr << i.first << endl;
+#endif
+		packageDetails = i.first + '\t'
+			+ i.second.version + '\t'
+			+ i.second.description + '\t';
+
+		ListOfInstalledPackages.insert(packageDetails);
+	}
+	return ListOfInstalledPackages;
 }

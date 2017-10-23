@@ -1,3 +1,27 @@
+/*
+ * tableau.cxx
+ *
+ * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ *
+ *
+ */
+
 #include "tableau.h"
 
 SortColumn::SortColumn (int col, int reverse)
@@ -30,6 +54,7 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	_sort_lastcol = -1;
 	end();
 	_cards=Cards_wrapper::instance();
+	_cards->suscribeToEvents(this);
 	callback(event_callback, (void*)this);
 }
 
@@ -161,8 +186,8 @@ void Tableau::load_table()
 
 void Tableau::ListOfInstalledPackages (const set<string>& RowsColumns )
 {
+	Fl::lock();
     cols(0);
-    RowsColumns = _cards->getListOfInstalledPackages();
     int r = 0;
     for (auto S : RowsColumns )
 	{
@@ -191,6 +216,7 @@ void Tableau::ListOfInstalledPackages (const set<string>& RowsColumns )
 	rows((int)_rowdata.size());
 	// Auto-calculate widths, with 20 pixel padding
 	autowidth(20);
+	Fl::unlock();
 }
 
 // Callback whenever someone clicks on different parts of the table
