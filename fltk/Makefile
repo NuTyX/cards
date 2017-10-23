@@ -38,7 +38,7 @@ clean:
 	rm -f flcards flcards.o mainWindow.o tableau.o cards_wrapper.o cards_client.o cards_event_handler.o
 
 install:
-	install -D -m0755 flcards $(DESTDIR)$(USRBINDIR)/flcards
+	install -D -m0755 flcards $(USRBINDIR)/flcards
 	install -D -m0644 pixmaps/flcards.xpm  $(DESTDIR)/usr/share/pixmaps/flcards.xpm
 	install -D -m0644 flcards.desktop $(DESTDIR)/usr/share/applications/flcards.desktop
 
