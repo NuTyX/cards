@@ -26,6 +26,10 @@ const std::string Pkgsync::DEFAULT_REPOFILE = ".PKGREPO";
 Pkgsync::Pkgsync ()
 {
 	m_repoFile = DEFAULT_REPOFILE;
+	if (m_root.empty())
+		m_root = "/";
+	if (m_configFile.empty())
+		m_configFile = "etc/cards.conf";
 }
 
 Pkgsync::Pkgsync ( const std::string& url,
@@ -39,6 +43,10 @@ Pkgsync::Pkgsync ( const std::string& url,
 	} else {
 		m_repoFile = DEFAULT_REPOFILE;
 	}
+	if (m_root.empty())
+		m_root = "/";
+	if (m_configFile.empty())
+		m_configFile = "etc/cards.conf";
 }
 void Pkgsync::treatErrors(const std::string& s) const
 {
@@ -123,9 +131,9 @@ void Pkgsync::run()
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
-
+	string configFile = m_root + m_configFile;
 	Config config;
-	Pkgrepo::parseConfig("/etc/cards.conf", config);
+	Pkgrepo::parseConfig(configFile.c_str(), config);
 	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
 		DirUrl DU = *i ;
 		if (DU.Url.size() == 0 ) {
@@ -149,7 +157,8 @@ void Pkgsync::purge()
 			treatErrors("");
 	}
 	Config config;
-	Pkgrepo::parseConfig("/etc/cards.conf", config);
+	string configFile = m_root + m_configFile;
+	Pkgrepo::parseConfig(configFile.c_str(), config);
 
 	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
 		if ( i->Url.size() == 0)
@@ -177,6 +186,12 @@ void Pkgsync::deleteFolder(const std::string& folderName)
 	}	
 	removeFile("/",folderName);
 }
-// vim:set ts2 :
-
-	
+void Pkgsync::setRootPath(const std::string& path)
+{
+	m_root=path;
+}
+void Pkgsync::setConfigFile(const std::string& file)
+{
+	m_configFile=file;
+}
+// vim:set ts=2 :

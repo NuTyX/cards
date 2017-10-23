@@ -55,6 +55,9 @@ public:
 		virtual void purge();
 		static const std::string DEFAULT_REPOFILE;
 
+		void setRootPath(const std::string& path);
+		void setConfigFile(const std::string& file);
+
 private:
 
 	unsigned int getLocalPackages(const std::string& path);
@@ -67,6 +70,8 @@ private:
 	const std::string m_baseDirectory;
 	const std::string m_remoteUrl;
 	std::string m_repoFile;
+	std::string m_root;
+  std::string m_configFile;
 	error m_actualError;
 
 	
