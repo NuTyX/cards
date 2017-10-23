@@ -32,7 +32,9 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	Recherche = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
 	Recherche->labelfont(2);
 	Recherche->color(FL_WHITE);
-	Console = new Fl_Multiline_Output(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
+	Console = new Fl_Text_Display(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
+	tbuff = new Fl_Text_Buffer();
+	Console->buffer(tbuff);
 	Console->color(FL_BLACK);
     Console->textcolor(FL_GRAY);
     Console->labeltype(FL_NO_LABEL );
@@ -84,7 +86,7 @@ void mainWindow::SyncButton_CB(Fl_Widget*, void* instance)
 void mainWindow::OnLogMessage(const string& Message)
 {
 	Fl::lock();
-	if (Console!=nullptr) Console->insert(Message.c_str());
+	if (tbuff!=nullptr) tbuff->append(Message.c_str());
 	Fl::unlock();
 }
 
