@@ -283,6 +283,8 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 	addOption(CMD_CREATE, OPT_REMOVE,true);
 	addOption(CMD_CREATE, OPT_ROOT,false);
 
+	addOption(CMD_SYNC,OPT_ROOT,false);
+
 	addOption(CardsArgumentParser::CMD_DEPENDS, OPT_INSTALLED, false);
 
 	addOption(CardsArgumentParser::CMD_LEVEL,OPT_IGNORE,false);
