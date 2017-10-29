@@ -29,6 +29,14 @@
 #include <ostream>
 
 template <class Elem = char, class Tr = std::char_traits<Elem> >
+
+/** \class console_forwarder
+ * \brief Forward standard output console to specific listener
+ *
+ * Cout string flow is redirected to a basic ostream to be handled by GUI
+ * event handler
+ *
+ */
 class console_forwarder : public std::basic_streambuf<Elem, Tr>
 {
     typedef void (*pfncb)(const Elem *, std::streamsize _Count);

@@ -53,9 +53,18 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	_sort_reverse = 0;
 	_sort_lastcol = -1;
 	end();
+	callback(event_callback, (void*)this);
+	selection_color(FL_YELLOW);
+	cols(3);
+	col_header(1);
+	col_resize(1);
+	when(FL_WHEN_RELEASE);
+	row_height_all(18);
+	tooltip("Click on the header of the column to sort it");
+	color(FL_WHITE);
 	_cards=Cards_wrapper::instance();
 	_cards->suscribeToEvents(this);
-	callback(event_callback, (void*)this);
+	load_table();
 }
 
 // Sort a column up or down
@@ -222,8 +231,8 @@ void Tableau::ListOfInstalledPackages (const set<string>& RowsColumns )
 // Callback whenever someone clicks on different parts of the table
 void Tableau::event_callback(Fl_Widget*, void *data)
 {
-	Tableau *o = (Tableau*)data;
-	o->event_callback2();
+	if (data != nullptr)
+		((Tableau*)data)->event_callback2();
 }
 
 void Tableau::event_callback2()
@@ -234,7 +243,7 @@ void Tableau::event_callback2()
 	TableContext context = callback_context();
 	switch ( context )
 	{
-        	case CONTEXT_COL_HEADER:
+        case CONTEXT_COL_HEADER:
 		{              // someone clicked on column header
 			if ( Fl::event() == FL_RELEASE && Fl::event_button() == 1 )
 			{
@@ -250,9 +259,9 @@ void Tableau::event_callback2()
 				_sort_lastcol = COL;
 			}
 			break;
-        	}
-        	default:
-            		return;
+		}
+		default:
+			return;
 	}
 
 }

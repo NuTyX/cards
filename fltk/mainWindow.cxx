@@ -23,73 +23,66 @@
 
 #include "mainWindow.h"
 
+// Constructor of the main window
 mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
     Fl_Double_Window(W,H,Title.c_str())
 {
-	p_win = new Fl_Pixmap(flcards_xpm);
-	p_im = new Fl_RGB_Image(p_win);
-	icon(p_im);
-	Recherche = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
-	Recherche->labelfont(2);
-	Recherche->color(FL_WHITE);
-	Console = new Fl_Text_Display(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
-	tbuff = new Fl_Text_Buffer();
-	Console->buffer(tbuff);
-	Console->color(FL_BLACK);
-    Console->textcolor(FL_GRAY);
-    Console->labeltype(FL_NO_LABEL );
-	BtnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "SYNC");
-	BtnSync->callback((Fl_Callback*)SyncButton_CB);
-	m_Tab = new Tableau(MARGIN, MARGIN+50, w()-MARGIN*2, h()-400);
-	m_Tab->selection_color(FL_YELLOW);
-	m_Tab->col_header(1);
-	m_Tab->col_resize(1);
-	m_Tab->when(FL_WHEN_RELEASE);
-	m_Tab->row_height_all(18);
-	m_Tab->tooltip("Click on the header of the column to sort it");
-	m_Tab->color(FL_WHITE);
-	Cards = Cards_wrapper::instance();
-	Cards->suscribeToEvents(this);
-    cout << "Carreidas use ";
-    Cards->printCardsVersion();
-	m_Tab->load_table();
+	icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
+	_search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
+	_search->labelfont(2);
+	_search->color(FL_WHITE);
+	_console = new Fl_Text_Display(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
+	_tbuff = new Fl_Text_Buffer();
+	_console->buffer(_tbuff);
+	_console->color(FL_BLACK);
+    _console->textcolor(FL_GRAY);
+    _console->labeltype(FL_NO_LABEL );
+    //Creation of the Sync Button
+	_btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
+	_btnSync->callback((Fl_Callback*)SyncButton_CB);
+
+	//Creation of the Apply Button
+	_btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
+	_btnApply->deactivate(); // Disabled by default until a modification is pending
+	_btnApply->callback((Fl_Callback*)ApplyButton_CB);
+
+	_tab = new Tableau(MARGIN, MARGIN+50, w()-MARGIN*2, h()-400);
+	_cards = Cards_wrapper::instance();
+	_cards->suscribeToEvents(this);
+    cout << "FlCards use ";
+    _cards->printCardsVersion();
 }
 
+// Main window destructor
 mainWindow::~mainWindow()
 {
     //todo : wait end of threads
     //Cards->join();
-    Cards->unsuscribeToEvents(this);
-    Cards->kill();
+    _cards->unsuscribeToEvents(this);
+    _cards->kill();
 }
 
-void mainWindow::Quitter_CB(Fl_Widget*,void* instance)
-{
-  	exit(0);
-}
-
-void mainWindow::Available_Packages_CB(Fl_Widget*, void* instance)
-{
-
-}
-
-void mainWindow::Installed_Packages_CB(Fl_Widget*, void* instance)
-{
-
-}
-
-void mainWindow::SyncButton_CB(Fl_Widget*, void* instance)
+// Callback on Sync Button click
+void mainWindow::SyncButton_CB(Fl_Widget*, void* pInstance)
 {
     Cards_wrapper::instance()->sync();
 }
 
-void mainWindow::OnLogMessage(const string& Message)
+// Callback on Apply Button click
+void mainWindow::ApplyButton_CB(Fl_Widget*, void* pInstance)
+{
+	//Nothing for moment
+}
+
+// Callback on receive text to log
+void mainWindow::OnLogMessage(const string& pMessage)
 {
 	Fl::lock();
-	if (tbuff!=nullptr) tbuff->append(Message.c_str());
+	if (_tbuff!=nullptr) _tbuff->append(pMessage.c_str());
 	Fl::unlock();
 }
 
+// Event Callback when Sync Thread is finished
 void mainWindow::OnSyncFinished(const CEH_RC rc)
 {
 	Fl::lock();

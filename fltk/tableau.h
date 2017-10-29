@@ -39,7 +39,7 @@
 #include "cards_wrapper.h"
 
 #define MARGIN 20
-#define COLHEADER { "", "", "", "", "", "", "", "", ""}
+#define COLHEADER { "Name", "Version", "Description", "", "", "", "", "", ""}
 
 using namespace std;
 
@@ -61,17 +61,41 @@ public:
 	bool operator() (const Row &a, const Row &b);
 };
 
-// Derive a custom class from Fl_Table_Row
+/** \class Tableau
+ * \brief widget to manage cards package list
+ *
+ * This class list and manage Card operation by adding , remove or upgrade package
+ *
+ */
 class Tableau : public Fl_Table_Row, public Cards_event_handler
 {
-private:
-	vector<Row> _rowdata;
-	int _sort_reverse;
-	int _sort_lastcol;
-	Cards_wrapper* _cards;
+public:
+	/**
+	 * \brief Constructor
+	 *
+	 * Constructor of Tableau class
+	 *
+	 */
+	Tableau(int x, int y, int w, int h, const char *l=0);
 
-	static void event_callback(Fl_Widget*,void*);
-	void event_callback2();
+	/**
+	 * \brief Destructor
+	 *
+	 * Destructor of Tableau class
+	 *
+	 */
+	~Tableau(){}
+
+	/**
+	 * \brief Populate the tab with package installed
+	 *
+	 * Get installed package from cards and extract a list to be
+	 * displayed as a list sorted by package name, description, version
+	 */
+	void load_table(); // Load the packages list
+	void autowidth(int pad); // Automatically set the columns widths to the longuest string
+	void resize_window();	// Resize the parent window to size of table
+
 protected:
 	// table cell drawing
 	void draw_cell(TableContext context, int R=0, int C=0, int X=0, int Y=0, int W=0, int H=0);
@@ -79,13 +103,15 @@ protected:
 	void sort_column(int col, int reverse=0);
 	void draw_sort_arrow(int X, int Y, int W, int H);
 	void ListOfInstalledPackages (const set<string>& RowsColumns );
-public:
-	//Constructor
-	Tableau(int x, int y, int w, int h, const char *l=0);
-	~Tableau(){}
-	void load_table(); // Load the packages list
-	void autowidth(int pad); // Automatically set the columns widths to the longuest string
-	void resize_window();	// Resize the parent window to size of table
+
+private:
+	vector<Row> _rowdata;
+	int _sort_reverse;
+	int _sort_lastcol;
+	Cards_wrapper* _cards;
+
+static void event_callback(Fl_Widget*,void*);
+	void event_callback2();
 };
 
 #endif

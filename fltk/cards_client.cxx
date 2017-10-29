@@ -23,20 +23,24 @@
 
 #include "cards_client.h"
 
+// Constructor
 Cards_client::Cards_client(const string& pConfigFileName)
 	: Pkginst("",pConfigFileName.c_str())
 {
 	m_root="/";
 }
 
+//Destructor
 Cards_client::~Cards_client()
 {
 }
 
+// Get a string list of installed packages
 set<string> Cards_client::ListOfInstalledPackages()
 {
 	getListOfPackageNames (m_root);
-	buildDatabase(false,true,false,false,"");
+	//buildDatabase(false,true,true,false,"");
+	buildCompleteDatabase(true);
 	set<string> ListOfInstalledPackages;
 	string packageDetails;
 	for (auto i : m_listOfInstPackages)

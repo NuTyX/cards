@@ -51,10 +51,9 @@ protected:
 	 * \brief Constructor
 	 *
 	 * Constructor of Cards_client class
-	 *
-	 * \return pointer of the singleton
 	 */
 	Cards_client (const string& pConfigFileName);
+
 	/**
 	 * \brief Destructor
 	 *

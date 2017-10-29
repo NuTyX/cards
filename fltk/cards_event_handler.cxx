@@ -23,6 +23,7 @@
 
 #include "cards_event_handler.h"
 
+// Convert Reason Code Enum to human readable text
 const string Cards_event_handler::getReasonCodeString(const CEH_RC rc)
 {
     switch (rc)

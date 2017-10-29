@@ -44,30 +44,46 @@
 
 using namespace std;
 
+/** \class mainWindow
+ * \brief FTLTK Main window of application
+ *
+ * This class derivate Fl_Double_Window for FLTK window handle
+ * Card_event_handler inheritence is done to enable
+ * receiving events callback from cards_wrapper :
+ * This is a mechanism to ensure GUI application never blocked
+ * by libcard operation. This also ensure libcard is quiet to
+ * operate like if it was been launched on a terminal.
+ */
 class mainWindow : public Fl_Double_Window, public Cards_event_handler
 {
-    public:
-        mainWindow(int W, int H, string Title);
-        virtual ~mainWindow();
+public:
+	/**
+	 * \brief Constructor
+	 *
+	 * Constructor of mainWindow class
+	 *
+	 */
+	mainWindow(int W, int H, string Title);
 
-    protected:
-static  void Quitter_CB(Fl_Widget*,void* instance);
-static  void Available_Packages_CB(Fl_Widget*,void* instance);
-static  void Installed_Packages_CB(Fl_Widget*,void* instance);
-static	void SyncButton_CB(Fl_Widget*,void* instance);
-        void OnLogMessage (const string& Message);
-        void OnSyncFinished(const CEH_RC rc);
-    private:
-        //vector<Fl_Menu_Item> Menu;
-        Tableau* m_Tab;
-        Fl_Pixmap* p_win;
-        Fl_RGB_Image* p_im;
-        Fl_Input* Recherche;
-        Fl_Menu_Bar* BarMenu;
-        Fl_Text_Display* Console;
-		Fl_Text_Buffer *tbuff;
-        Fl_Button* BtnSync;
-        Cards_wrapper* Cards;
+	virtual ~mainWindow();
+
+protected:
+//Widgets callbacks
+static void SyncButton_CB(Fl_Widget*,void* pInstance);
+static void ApplyButton_CB(Fl_Widget*,void* pInstance);
+
+//Cards Wrapper virtual events callabacks overrides
+	void OnLogMessage(const string& pMessage);
+	void OnSyncFinished(const CEH_RC rc);
+
+private:
+	Tableau* _tab;
+	Fl_Input* _search;
+	Fl_Text_Display* _console;
+	Fl_Text_Buffer * _tbuff;
+	Fl_Button* _btnSync;
+	Fl_Button* _btnApply;
+	Cards_wrapper* _cards;
 };
 
 #endif // MAINWINDOW_H

@@ -40,6 +40,13 @@ enum CEH_RC
 // Define Cards_wrapper singleton for friendship
 class Cards_wrapper;
 
+/** \class Cards_event_handler
+ * \brief Abstract class to handle event from cards_wrapper
+ *
+ * This class ensure interface cards with GUI application need non-blocking operation,
+ * This is a single instance (singleton) that ensure only one instance of cards library.
+ *
+ */
 class Cards_event_handler
 {
     friend Cards_wrapper;

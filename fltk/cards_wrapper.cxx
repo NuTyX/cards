@@ -76,6 +76,7 @@ void Cards_wrapper::getListOfInstalledPackages()
     }
 }
 
+// Thread main function to get the list of installed package
 void Cards_wrapper::m_ListOfInstalledPackages_Thread()
 {
     _job_running =true;
@@ -84,6 +85,7 @@ void Cards_wrapper::m_ListOfInstalledPackages_Thread()
     _job_running =false;
 }
 
+// Broadcast the end of the thread ot get list of package to all event suscribers
 void Cards_wrapper::m_ListOfInstalledPackagesCallback(const set<string>& ListOfInstalledPackages)
 {
 	for (auto* it : _arrCardsEventHandler)
@@ -106,11 +108,14 @@ void Cards_wrapper::m_LogCallback(const char *ptr, std::streamsize count)
 	}
 }
 
+// Add a nex suscriber to the callback event list
 void Cards_wrapper::suscribeToEvents(Cards_event_handler* pCallBack)
 {
+	// Todo : Check if the new susciber is already in the container
 	_arrCardsEventHandler.push_back(pCallBack);
 }
 
+// Remove an event suscriber from event callback list
 void Cards_wrapper::unsuscribeToEvents(Cards_event_handler* pCallBack)
 {
     vector<Cards_event_handler*>::iterator it;
@@ -121,10 +126,14 @@ void Cards_wrapper::unsuscribeToEvents(Cards_event_handler* pCallBack)
     }
 }
 
+// Get and print the libcards Version
+
 void Cards_wrapper::printCardsVersion()
 {
     _ptCards->print_version();
 }
+
+// Create a new thread for Cards Sync operation
 
 void Cards_wrapper::sync()
 {
@@ -139,6 +148,8 @@ void Cards_wrapper::sync()
         if (_job==nullptr) _job = new thread(&Cards_wrapper::m_Sync_Thread, Cards_wrapper::_ptCards_wrapper);
     }
 }
+
+// Launch a Cards Sync operation
 
 void Cards_wrapper::m_Sync_Thread()
 {
@@ -157,6 +168,8 @@ void Cards_wrapper::m_Sync_Thread()
 	m_SyncFinishedCallback(rc);
 }
 
+// Broadcast to all suscribers the Sync Finished callback
+
 void Cards_wrapper::m_SyncFinishedCallback(const CEH_RC rc=CEH_RC::OK)
 {
 	for (auto* it : _arrCardsEventHandler)
@@ -165,6 +178,8 @@ void Cards_wrapper::m_SyncFinishedCallback(const CEH_RC rc=CEH_RC::OK)
 	}
 }
 
+// Check if the application is curently running as root
+// If it is the case, it return true.
 
 bool Cards_wrapper::m_checkRootAccess()
 {
