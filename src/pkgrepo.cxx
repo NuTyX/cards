@@ -361,13 +361,13 @@ set<string> Pkgrepo::getListOfPackagesFromCollection(const string& collectionNam
 	}
 	return listOfPackages;
 }
-unsigned int Pkgrepo::getBinaryPackageList()
+set<string> Pkgrepo::getBinaryPackageList()
 {
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
 
-	std::string packageNameVersion;
-	std::set<string>  binaryList;
+	string packageNameVersion;
+	set<string>  binaryList;
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
@@ -393,8 +393,7 @@ unsigned int Pkgrepo::getBinaryPackageList()
 			binaryList.insert(packageNameVersion);
 		}
 	}
-	for ( auto i : binaryList) cout << i << endl;
-	return binaryList.size();
+	return binaryList;
 }
 std::vector<RepoInfo> Pkgrepo::getRepoInfo()
 {

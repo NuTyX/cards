@@ -153,10 +153,10 @@ public:
 		time_t getBinaryBuildTime (const std::string& portName);
 
 /**
- * printout the list of available binaries packages
+ *  return the list of available binaries packages
  *
  */
-		unsigned int getBinaryPackageList();
+		std::set<std::string> getBinaryPackageList();
 /**
  * populate RepoInfo List
  *
