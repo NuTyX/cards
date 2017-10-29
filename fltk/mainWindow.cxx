@@ -25,7 +25,7 @@
 
 // Constructor of the main window
 mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
-    Fl_Double_Window(W,H,Title.c_str())
+    Fl_Window(W,H,Title.c_str())
 {
 	icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
 	_search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");

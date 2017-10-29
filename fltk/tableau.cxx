@@ -55,9 +55,12 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	end();
 	callback(event_callback, (void*)this);
 	selection_color(FL_YELLOW);
+	when(FL_WHEN_RELEASE|FL_WHEN_CHANGED);
 	cols(3);
 	col_header(1);
+	col_header_height(25);
 	col_resize(1);
+	col_width_all(80);
 	when(FL_WHEN_RELEASE);
 	row_height_all(18);
 	tooltip("Click on the header of the column to sort it");
@@ -114,7 +117,7 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 			fl_push_clip(X,Y,W,H);
 			{
 				static const char *head[] = COLHEADER;
-				fl_draw_box(FL_THIN_UP_BOX, Y,Y,W,H, FL_BACKGROUND_COLOR);
+				fl_draw_box(FL_THIN_UP_BOX, X,Y,W,H, FL_BACKGROUND_COLOR);
 				if ( C < 9 )
 				{
 					fl_font(FL_HELVETICA_BOLD, 16);
@@ -127,7 +130,6 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 				}
 			}
 			fl_pop_clip();
-			redraw();
 			return;
 		case CONTEXT_CELL:
 		{
@@ -145,7 +147,6 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 				fl_rect(X,Y,W,H);
 			}
 			fl_pop_clip();
-			redraw();
 			return;
 		}
 		default:
@@ -169,7 +170,7 @@ void Tableau::autowidth(int pad)
 		}
 	}
 	table_resized();
-	redraw();
+	//redraw();
 }
 
 // Resze parent widows to size of tableau
@@ -196,7 +197,7 @@ void Tableau::load_table()
 void Tableau::ListOfInstalledPackages (const set<string>& RowsColumns )
 {
 	Fl::lock();
-    cols(0);
+    //cols(0);
     int r = 0;
     for (auto S : RowsColumns )
 	{

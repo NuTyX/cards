@@ -47,14 +47,14 @@ using namespace std;
 /** \class mainWindow
  * \brief FTLTK Main window of application
  *
- * This class derivate Fl_Double_Window for FLTK window handle
+ * This class derivate Fl_Window for FLTK window handle
  * Card_event_handler inheritence is done to enable
  * receiving events callback from cards_wrapper :
  * This is a mechanism to ensure GUI application never blocked
  * by libcard operation. This also ensure libcard is quiet to
  * operate like if it was been launched on a terminal.
  */
-class mainWindow : public Fl_Double_Window, public Cards_event_handler
+class mainWindow : public Fl_Window, public Cards_event_handler
 {
 public:
 	/**
