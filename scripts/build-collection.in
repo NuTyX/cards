@@ -337,8 +337,8 @@ fi
 MOUNT_POINTS="$1/DEPOT"
 
 mkdir -p $1/LOGS
-if [ -d ${ROOTMOUNT}/logs/`uname -m`/${VERSION}/${CHROOT} ];then
-	mount --bind ${ROOTMOUNT}/logs/`uname -m`/${VERSION}/${CHROOT} $1/LOGS || error $1
+if [ -d ${ROOTMOUNT}/logs/`uname -m`/${VERSION}/${COLLECTION} ];then
+	mount --bind ${ROOTMOUNT}/logs/`uname -m`/${VERSION}/${COLLECTION} $1/LOGS || error $1
 else
 	mount $1/LOGS || error $1
 fi
