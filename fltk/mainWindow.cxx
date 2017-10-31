@@ -37,6 +37,7 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	_console->color(FL_BLACK);
     _console->textcolor(FL_GRAY);
     _console->labeltype(FL_NO_LABEL );
+    //_console->scrollbar_align(FL_ALIGN_BOTTOM);
     //Creation of the Sync Button
 	_btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
 	_btnSync->callback((Fl_Callback*)SyncButton_CB);
@@ -79,6 +80,8 @@ void mainWindow::OnLogMessage(const string& pMessage)
 {
 	Fl::lock();
 	if (_tbuff!=nullptr) _tbuff->append(pMessage.c_str());
+	_console->insert_position(_console->buffer()->length());
+	_console->scroll(_console->count_lines(0,_console->buffer()->length(),1),0);
 	Fl::unlock();
 }
 

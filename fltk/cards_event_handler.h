@@ -54,7 +54,7 @@ protected:
 
     virtual void OnLogMessage (const string& Message){}
     virtual void OnSyncFinished (const CEH_RC rc){}
-    virtual void ListOfInstalledPackages (const set<string>& RowsColumns ){}
+    virtual void OnRefreshPackageFinished (const CEH_RC rc){}
 public:
 static	const string getReasonCodeString(const CEH_RC rc);
 };

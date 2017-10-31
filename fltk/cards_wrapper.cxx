@@ -22,21 +22,27 @@
  */
 
 #include "cards_wrapper.h"
+#include <sstream>
+///
+/// Singleton Management
+///
 
-// Init static pointer to null
+/** Init static pointer to null */
 Cards_wrapper* Cards_wrapper::_ptCards_wrapper = nullptr;
 
-// Constructor
+/** Constructor */
 Cards_wrapper::Cards_wrapper()
 {
 	_ptCards = new Cards_client("/etc/cards.conf");
-	//redirect std::cout to the callback function
-	redirect = new console_forwarder<>(std::cout, m_LogCallback);
+	redirect_cout = new console_forwarder<>(std::cout, m_OnLogMessage_Callback); //redirect std::cout to the callback function
+#ifndef NDEBUG
+	redirect_cerr = new console_forwarder<>(std::cerr, m_OnLogMessage_Callback); //redirect std::cerr to the callback function
+#endif // NDEBUG
 	_job_running = false;
 	_job=nullptr;
 }
 
-//Destructor
+/** Destructor */
 Cards_wrapper::~Cards_wrapper()
 {
     if (_job != nullptr)
@@ -46,7 +52,7 @@ Cards_wrapper::~Cards_wrapper()
     if (_ptCards != nullptr) delete _ptCards;
 }
 
-// Return or create singleton instance
+/** Return or create singleton instance */
 Cards_wrapper* Cards_wrapper::instance()
 {
 	if (_ptCards_wrapper==nullptr)
@@ -54,59 +60,14 @@ Cards_wrapper* Cards_wrapper::instance()
 	return _ptCards_wrapper;
 }
 
-// Destruction of the singleton , only if instance exist
+/** Destruction of the singleton , only if instance exist */
 void Cards_wrapper::kill()
 {
 	if (_ptCards_wrapper!=nullptr)
 		delete _ptCards_wrapper;
 }
 
-// Get list of installed package
-void Cards_wrapper::getListOfInstalledPackages()
-{
-	if (!_job_running)
-    {
-        if (_job != nullptr)
-        {
-            _job->detach();
-            delete _job;
-            _job=nullptr;
-        }
-        if (_job==nullptr) _job = new thread(&Cards_wrapper::m_ListOfInstalledPackages_Thread, Cards_wrapper::_ptCards_wrapper);
-    }
-}
 
-// Thread main function to get the list of installed package
-void Cards_wrapper::m_ListOfInstalledPackages_Thread()
-{
-    _job_running =true;
-	    m_ListOfInstalledPackagesCallback(_ptCards->ListOfInstalledPackages());
-
-    _job_running =false;
-}
-
-// Broadcast the end of the thread ot get list of package to all event suscribers
-void Cards_wrapper::m_ListOfInstalledPackagesCallback(const set<string>& ListOfInstalledPackages)
-{
-	for (auto* it : _arrCardsEventHandler)
-	{
-		it->ListOfInstalledPackages(ListOfInstalledPackages);
-	}
-}
-
-// Capture cout events and send it to callback receivers
-void Cards_wrapper::m_LogCallback(const char *ptr, std::streamsize count)
-{
-	if (Cards_wrapper::_ptCards_wrapper!=nullptr)
-	{
-		string Message(ptr,count);
-		Message += '\0';
-		for (auto* it : Cards_wrapper::_ptCards_wrapper->_arrCardsEventHandler)
-		{
-			it->OnLogMessage(Message);
-		}
-	}
-}
 
 // Add a nex suscriber to the callback event list
 void Cards_wrapper::suscribeToEvents(Cards_event_handler* pCallBack)
@@ -115,7 +76,7 @@ void Cards_wrapper::suscribeToEvents(Cards_event_handler* pCallBack)
 	_arrCardsEventHandler.push_back(pCallBack);
 }
 
-// Remove an event suscriber from event callback list
+/// Remove an event suscriber from event callback list
 void Cards_wrapper::unsuscribeToEvents(Cards_event_handler* pCallBack)
 {
     vector<Cards_event_handler*>::iterator it;
@@ -126,31 +87,32 @@ void Cards_wrapper::unsuscribeToEvents(Cards_event_handler* pCallBack)
     }
 }
 
-// Get and print the libcards Version
-
-void Cards_wrapper::printCardsVersion()
+const vector<Cards_package*>& Cards_wrapper::getPackageList()
 {
-    _ptCards->print_version();
+	return _arrCardsPackages;
 }
 
-// Create a new thread for Cards Sync operation
+///
+/// Thread Callers
+///
 
+/** Create a new thread for Cards Sync operation*/
 void Cards_wrapper::sync()
 {
-    if (!_job_running)
-    {
-        if (_job != nullptr)
-        {
-            _job->detach();
-            delete _job;
-            _job=nullptr;
-        }
-        if (_job==nullptr) _job = new thread(&Cards_wrapper::m_Sync_Thread, Cards_wrapper::_ptCards_wrapper);
-    }
+	if (m_IsThreadFree()) _job = new thread(&Cards_wrapper::m_Sync_Thread, Cards_wrapper::_ptCards_wrapper);
 }
 
-// Launch a Cards Sync operation
+/** Create a new thread for Cards Sync operation*/
+void Cards_wrapper::refreshPackageList()
+{
+	if (m_IsThreadFree()) _job = new thread(&Cards_wrapper::m_RefreshPackageList_Thread, Cards_wrapper::_ptCards_wrapper);
+}
 
+///
+/// Threaded Tasks
+///
+
+/** Launch a Cards Sync operation*/
 void Cards_wrapper::m_Sync_Thread()
 {
     _job_running =true;
@@ -165,12 +127,94 @@ void Cards_wrapper::m_Sync_Thread()
 		rc= CEH_RC::NO_ROOT;
 	}
 	_job_running = false;
-	m_SyncFinishedCallback(rc);
+	m_OnSyncFinished_Callback(rc);
 }
 
-// Broadcast to all suscribers the Sync Finished callback
 
-void Cards_wrapper::m_SyncFinishedCallback(const CEH_RC rc=CEH_RC::OK)
+/** Threaded task to refresh the package image container*/
+void Cards_wrapper::m_RefreshPackageList_Thread()
+{
+    _job_running =true;
+    // First pass get all package available
+	m_ClearPackagesList();
+	set<string> AvailablePackages = _ptCards->getBinaryPackageList();
+	set<string> InstalledPackages = _ptCards->ListOfInstalledPackages();
+	for (auto it : AvailablePackages)
+	{
+		Cards_package* Pack=new Cards_package();
+		string token;
+		istringstream tokenStream(it);
+		int i=0;
+		while (std::getline(tokenStream, token, '\t'))
+		{
+			switch (i)
+			{
+			case 0: //Base
+				{
+					Pack->_base = token;
+					break;
+				}
+			case 1: //Name
+				{
+					Pack->_name = token;
+					break;
+				}
+			case 2: //Version
+				{
+					Pack->_version = token;
+					break;
+				}
+			case 3: //Packager
+				{
+					Pack->_packager = token;
+					break;
+				}
+			case 4: //Description
+				{
+					Pack->_description = token;
+					break;
+				}
+			default:
+				break;
+			}
+			i++;
+		}
+		if (InstalledPackages.find(Pack->_name)!=InstalledPackages.end()) Pack->_installed=true;
+		_arrCardsPackages.push_back(Pack);
+#ifndef NDEBUG
+			cerr <<Pack->getBase()<<" : "
+				 <<Pack->getName()<<" : "
+				 <<Pack->getVersion()<<" : "
+				 <<Pack->getPackager()<<" : "
+				 <<Pack->getDescription()<<" : "
+				 <<Pack->isInstalled()<<endl;
+#endif
+	}
+	m_OnRefreshPackageFinished_Callback(CEH_RC::OK);
+    _job_running =false;
+}
+
+
+///
+/// Callbacks events
+///
+
+/** Capture cout events and send it to callback receivers*/
+void Cards_wrapper::m_OnLogMessage_Callback(const char *ptr, std::streamsize count)
+{
+	if (Cards_wrapper::_ptCards_wrapper!=nullptr)
+	{
+		string Message(ptr,count);
+		Message += '\0';
+		for (auto* it : Cards_wrapper::_ptCards_wrapper->_arrCardsEventHandler)
+		{
+			it->OnLogMessage(Message);
+		}
+	}
+}
+
+/** Broadcast to all suscribers the Sync Finished callback*/
+void Cards_wrapper::m_OnSyncFinished_Callback(const CEH_RC rc=CEH_RC::OK)
 {
 	for (auto* it : _arrCardsEventHandler)
 	{
@@ -178,9 +222,28 @@ void Cards_wrapper::m_SyncFinishedCallback(const CEH_RC rc=CEH_RC::OK)
 	}
 }
 
-// Check if the application is curently running as root
-// If it is the case, it return true.
+/** Broadcast the end of the thread ot get list of package to all event suscribers*/
+void Cards_wrapper::m_OnRefreshPackageFinished_Callback(const CEH_RC rc=CEH_RC::OK)
+{
+	for (auto* it : _arrCardsEventHandler)
+	{
+		it->OnRefreshPackageFinished(rc);
+	}
+}
 
+///
+/// Misc
+///
+
+/** Get and print the libcards Version*/
+
+void Cards_wrapper::printCardsVersion()
+{
+    _ptCards->print_version();
+}
+
+/** Check if the application is curently running as root
+  * If it is the case, it return true.*/
 bool Cards_wrapper::m_checkRootAccess()
 {
     if (getuid() != 0)
@@ -188,4 +251,32 @@ bool Cards_wrapper::m_checkRootAccess()
         return false;
     }
     return true;
+}
+
+/** Ensure the thread instance is free and ready to launch a new task */
+bool Cards_wrapper::m_IsThreadFree()
+{
+	if (!_job_running)
+    {
+        if (_job != nullptr)
+        {
+            _job->detach();
+            delete _job;
+            _job=nullptr;
+        }
+        if (_job==nullptr) return true;
+    }
+    return false;
+}
+
+void Cards_wrapper::m_ClearPackagesList()
+{
+	for (auto* it : _arrCardsPackages)
+	{
+		if (it!=nullptr)
+		{
+			delete it;
+		}
+	}
+	_arrCardsPackages.clear();
 }

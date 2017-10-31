@@ -35,24 +35,15 @@ Cards_client::~Cards_client()
 {
 }
 
-// Get a string list of installed packages
+/// Get a string list of installed packages
 set<string> Cards_client::ListOfInstalledPackages()
 {
 	getListOfPackageNames (m_root);
-	//buildDatabase(false,true,true,false,"");
 	buildCompleteDatabase(true);
 	set<string> ListOfInstalledPackages;
-	string packageDetails;
 	for (auto i : m_listOfInstPackages)
 	{
-#ifndef NDEBUG
-		cerr << i.first << endl;
-#endif
-		packageDetails = i.first + '\t'
-			+ i.second.version + '\t'
-			+ i.second.description + '\t';
-
-		ListOfInstalledPackages.insert(packageDetails);
+		ListOfInstalledPackages.insert(i.first);
 	}
 	return ListOfInstalledPackages;
 }

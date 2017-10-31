@@ -56,7 +56,7 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	callback(event_callback, (void*)this);
 	selection_color(FL_YELLOW);
 	when(FL_WHEN_RELEASE|FL_WHEN_CHANGED);
-	cols(3);
+	cols(4);
 	col_header(1);
 	col_header_height(25);
 	col_resize(1);
@@ -67,7 +67,7 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	color(FL_WHITE);
 	_cards=Cards_wrapper::instance();
 	_cards->suscribeToEvents(this);
-	load_table();
+	_cards->refreshPackageList();
 }
 
 // Sort a column up or down
@@ -105,7 +105,7 @@ void Tableau::draw_sort_arrow(int X, int Y, int W, int H)
 	}
 }
 
-//Handle drawing all cells in table
+/// Handle drawing all cells in table
 void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
 	const char *s = "";
@@ -154,7 +154,7 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 	}
 }
 
-// Automatically set columns widths to the longuest string.
+/// Automatically set columns widths to the longuest string.
 void Tableau::autowidth(int pad)
 {
 	fl_font(FL_COURIER, 16);
@@ -189,43 +189,47 @@ void Tableau::resize_window()
  * to be done
  * Should not be a big deal, we play with a vector<char*>
  */
-void Tableau::load_table()
+void Tableau::refresh_table()
 {
-    _cards->getListOfInstalledPackages();
-}
-
-void Tableau::ListOfInstalledPackages (const set<string>& RowsColumns )
-{
-	Fl::lock();
     //cols(0);
+    vector<Cards_package*> pkgList = _cards->getPackageList();
     int r = 0;
-    for (auto S : RowsColumns )
+    for (auto S : pkgList)
 	{
-		char* s = new char[S.size()+1];
-		copy(S.begin(),S.end(),s);
-		s[S.size()]='\0';
 		// Add a new row
-		Row newrow; _rowdata.push_back(newrow);
-		std::vector<char*> &rc = _rowdata[r].cols;
-		// Break line into separate word 'columns'
-		char *ss;
-		const char *delim = "\t";
-		for(int t=0; (t==0)?(ss=strtok(s,delim)):(ss=strtok(NULL,delim)); t++)
-		{
-			rc.push_back(strdup(ss));
-		}
+		Row newrow;
+		char* name = new char[S->getName().length()+1];
+		strcpy(name,S->getName().c_str());
+		newrow.cols.push_back(name);
+
+		char* description = new char[S->getDescription().length()+1];
+		strcpy(description,S->getDescription().c_str());
+		newrow.cols.push_back(description);
+
+		char* version = new char[S->getVersion().length()+1];
+		strcpy(version,S->getVersion().c_str());
+		newrow.cols.push_back(version);
+
+		if (S->isInstalled()) newrow.cols.push_back("Installed");
+
 		// Keep track of max # columns
-		if ( (int)rc.size() > cols() )
+		if ( (int)newrow.cols.size() > cols() )
 		{
-			cols((int)rc.size());
+			cols((int)newrow.cols.size());
 		}
-		delete s;
+		_rowdata.push_back(newrow);
 		r++;
     }
 	// How many rows we loaded
 	rows((int)_rowdata.size());
 	// Auto-calculate widths, with 20 pixel padding
 	autowidth(20);
+}
+
+void Tableau::OnRefreshPackageFinished (const CEH_RC rc)
+{
+	Fl::lock();
+	if (rc == CEH_RC::OK) refresh_table();
 	Fl::unlock();
 }
 

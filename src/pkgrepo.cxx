@@ -3,7 +3,7 @@
 //
 //  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
 //  Copyright (c) 2014-2017 by NuTyX team (http://nutyx.org)
-// 
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -16,7 +16,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
 
@@ -28,7 +28,7 @@ Pkgrepo::Pkgrepo(const std::string& fileName)
 	: m_configFileName(fileName)
 {
 	if (!checkFileExist(m_configFileName)) {
-		cerr << WHITE << "Warning: " << NORMAL << "No configuration file: " << YELLOW 
+		cerr << WHITE << "Warning: " << NORMAL << "No configuration file: " << YELLOW
 			<<  m_configFileName  << NORMAL
 			<< " found..." << endl
 			<< WHITE << "You should create a new one based on the " << YELLOW
@@ -176,7 +176,7 @@ void Pkgrepo::parseCollectionDirectory()
 			cerr << YELLOW << "continue with the next entry" << NORMAL << endl;
 			continue;
 		}
-		
+
 		for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); ++li) {
 			basePkgInfo.basePackageName = *li;
 			portsDirectory.basePackageList.push_back(basePkgInfo);
@@ -194,7 +194,7 @@ void Pkgrepo::parseCurrentPackagePkgRepoFile()
  From here we can check whats is available in the port directory,
  It means from here the concerned VALID .PKGREPO file MUST be available.
  It can be the Pkgfile, the binary, the post-install, etc
- We have to parse the file 
+ We have to parse the file
  /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
  .PKGREPO file = /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
 */
@@ -290,7 +290,7 @@ void Pkgrepo::parsePackagePkgfileFile()
 			vector<string> pkgFileContent;
 			if ( parseFile(pkgFileContent,pkgFile.c_str()) != 0) {
 				cout << "You should use " << YELLOW << "ports -u" << NORMAL << " for " << i->Dir << endl;
-				cerr << "Cannot read the file: " << pkgFile << endl 
+				cerr << "Cannot read the file: " << pkgFile << endl
 					<< " ... continue with next" << endl;
 				j->basePackageName = "";
 				continue;
@@ -339,7 +339,7 @@ void Pkgrepo::parsePackagePkgfileFile()
 					}
 				}
 			}
-		} 
+		}
 	}
 	m_parsePackagePkgfileFile = true;
 }
@@ -376,20 +376,22 @@ set<string> Pkgrepo::getBinaryPackageList()
 #endif
 		for (auto j : i.basePackageList) {
 #ifndef NDEBUG
-			cerr << j.basePackageName << " " 
-					<< j.description << " " 
-					<< j.md5SUM << " " 
-					<< j.version << " " 
+			cerr << j.basePackageName << " "
+					<< j.description << " "
+					<< j.md5SUM << " "
+					<< j.version << " "
 					<< j.s_buildDate << " "
 					<< j.extention << endl ;
 #endif
 			string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
-			packageNameVersion= "(" + baseDir + ") "
-				+ j.basePackageName 
-				+ " " 
+			packageNameVersion= "(" + baseDir + ")\t"
+				+ j.basePackageName
+				+ "\t"
 				+ j.version
-				+ " "
-				+ j.packager;
+				+ "\t"
+				+ j.packager
+				+ "\t"
+				+ j.description;
 			binaryList.insert(packageNameVersion);
 		}
 	}
@@ -453,11 +455,11 @@ unsigned int Pkgrepo::getPortsList()
 			if (j.basePackageName.size() > 0) {
 				string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
 				cout <<  i.Dir + "/"
-					+ j.basePackageName 
-					<< " " 
-					<< j.version 
-					<< "-" 
-					<< j.release 
+					+ j.basePackageName
+					<< " "
+					<< j.version
+					<< "-"
+					<< j.release
 					<< " "
 					<< j.packager << endl;
 				numberOfPorts++;

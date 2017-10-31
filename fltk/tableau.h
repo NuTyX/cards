@@ -39,7 +39,7 @@
 #include "cards_wrapper.h"
 
 #define MARGIN 20
-#define COLHEADER { "Name", "Version", "Description", "", "", "", "", "", ""}
+#define COLHEADER { "Name", "Description", "Version", "Installed", "", "", "", ""}
 
 using namespace std;
 
@@ -92,7 +92,7 @@ public:
 	 * Get installed package from cards and extract a list to be
 	 * displayed as a list sorted by package name, description, version
 	 */
-	void load_table(); // Load the packages list
+	void refresh_table(); // Load the packages list
 	void autowidth(int pad); // Automatically set the columns widths to the longuest string
 	void resize_window();	// Resize the parent window to size of table
 
@@ -102,7 +102,7 @@ protected:
 	// sort the table by a column
 	void sort_column(int col, int reverse=0);
 	void draw_sort_arrow(int X, int Y, int W, int H);
-	void ListOfInstalledPackages (const set<string>& RowsColumns );
+	void OnRefreshPackageFinished (const CEH_RC rc);
 
 private:
 	vector<Row> _rowdata;

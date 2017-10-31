@@ -33,6 +33,7 @@
 #include "console_forwarder.h"
 #include "cards_client.h"
 #include "cards_event_handler.h"
+#include "cards_package.h"
 
 using namespace std;
 
@@ -81,7 +82,7 @@ static Cards_wrapper*  instance();
 	 *
 	 * Return list of installed packages
 	 */
-	void getListOfInstalledPackages();
+	void refreshPackageList();
 
 	/**
 	 * \brief Get CARDS Version
@@ -97,6 +98,8 @@ static Cards_wrapper*  instance();
 	 * Callback is called when operation is done
 	 */
 	void sync();
+
+	const vector<Cards_package*>& getPackageList();
 
 private:
 
@@ -114,18 +117,32 @@ private:
 
 static	Cards_wrapper*	_ptCards_wrapper; //Static pointer of the singleton
 
+	/// Containers
+	vector<Cards_event_handler*> _arrCardsEventHandler; // Std array to store callback event clients
+	vector<Cards_package*> _arrCardsPackages;
+
+	/// Threaded Tasks
+	void m_Sync_Thread(); // Main Thread for Cards Sync Operation
+	void m_RefreshPackageList_Thread();
+
+
+	/// CallBack
+static void m_OnLogMessage_Callback(const char *ptr, std::streamsize count); //Callback for all cout text output from libcards
+	void m_OnSyncFinished_Callback(const CEH_RC rc); // Callback broadcast for Sync Cards operation
+	void m_OnRefreshPackageFinished_Callback(const CEH_RC rc);
+
+	///Misc
+	console_forwarder<>* redirect_cout; // Forwarding cout message to LogCallback callback
+#ifndef NDEBUG
+	console_forwarder<>* redirect_cerr; // Forwarding cerr message to LogCallback callback
+#endif
 	bool _job_running; //Flag to know if a thread is currently running
 	thread* _job; // Thread handler pointer
 	Cards_client* _ptCards; // Cards Library Handler pointer
-	vector<Cards_event_handler*> _arrCardsEventHandler; // Std array to store callback event clients
-	console_forwarder<>* redirect; // Forwarding cout message to LogCallback callback
-static void m_LogCallback(const char *ptr, std::streamsize count); //Callback for all cout text output from libcards
-	void m_SyncFinishedCallback(const CEH_RC rc); // Callback broadcast for Sync Cards operation
-	void m_ListOfInstalledPackagesCallback(const set<string>& ListOfInstalledPackages);
 
 	bool m_checkRootAccess(); // Just check if we have root accessing
-	void m_Sync_Thread(); // Main Thread for Cards Sync Operation
-	void m_ListOfInstalledPackages_Thread();
+	bool m_IsThreadFree();
+	void m_ClearPackagesList();
 
 };
 
