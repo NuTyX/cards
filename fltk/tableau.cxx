@@ -198,7 +198,7 @@ void Tableau::refresh_table()
     for (auto S : pkgList)
 	{
 		if (_filter.length()>0)
-			if ((S->getName().find(_filter)==string::npos) || (S->getBase().find(_filter)==string::npos) ) continue;
+			if ((S->getName().find(_filter)==string::npos) && (S->getBase().find(_filter)==string::npos) ) continue;
 		// Add a new row
 		Row newrow;
 
