@@ -56,7 +56,7 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	callback(event_callback, (void*)this);
 	selection_color(FL_YELLOW);
 	when(FL_WHEN_RELEASE|FL_WHEN_CHANGED);
-	cols(4);
+	cols(6);
 	col_header(1);
 	col_header_height(25);
 	col_resize(1);
@@ -198,9 +198,14 @@ void Tableau::refresh_table()
     for (auto S : pkgList)
 	{
 		if (_filter.length()>0)
-			if (S->getName().find(_filter)==string::npos) continue;
+			if ((S->getName().find(_filter)==string::npos) || (S->getBase().find(_filter)==string::npos) ) continue;
 		// Add a new row
 		Row newrow;
+
+		char* collection = new char[S->getBase().length()+1];
+		strcpy(collection,S->getBase().c_str());
+		newrow.cols.push_back(collection);
+
 		char* name = new char[S->getName().length()+1];
 		strcpy(name,S->getName().c_str());
 		newrow.cols.push_back(name);
@@ -213,7 +218,8 @@ void Tableau::refresh_table()
 		strcpy(version,S->getVersion().c_str());
 		newrow.cols.push_back(version);
 
-		if (S->isInstalled()) newrow.cols.push_back("Installed");
+		if (S->isInstalled()) newrow.cols.push_back("Yes");
+		else newrow.cols.push_back("No");
 
 		// Keep track of max # columns
 		if ( (int)newrow.cols.size() > cols() )

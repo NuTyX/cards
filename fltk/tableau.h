@@ -39,7 +39,7 @@
 #include "cards_wrapper.h"
 
 #define MARGIN 20
-#define COLHEADER { "Name", "Description", "Version", "Installed", "", "", "", ""}
+#define COLHEADER { "Collection", "Name", "Description", "Version", "Installed", "", "", "", ""}
 
 using namespace std;
 
