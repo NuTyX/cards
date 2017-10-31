@@ -191,11 +191,14 @@ void Tableau::resize_window()
  */
 void Tableau::refresh_table()
 {
-    //cols(0);
+    clear();
+    _rowdata.clear();
     vector<Cards_package*> pkgList = _cards->getPackageList();
     int r = 0;
     for (auto S : pkgList)
 	{
+		if (_filter.length()>0)
+			if (S->getName().find(_filter)==string::npos) continue;
 		// Add a new row
 		Row newrow;
 		char* name = new char[S->getName().length()+1];
@@ -269,4 +272,10 @@ void Tableau::event_callback2()
 			return;
 	}
 
+}
+
+void Tableau::setFilter(const string& pValue)
+{
+    _filter=pValue;
+    refresh_table();
 }

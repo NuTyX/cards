@@ -31,6 +31,8 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	_search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
 	_search->labelfont(2);
 	_search->color(FL_WHITE);
+	_search->callback(&SearchInput_CB, (void*)this);
+
 	_console = new Fl_Text_Display(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
 	_tbuff = new Fl_Text_Buffer();
 	_console->buffer(_tbuff);
@@ -40,12 +42,12 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
     //_console->scrollbar_align(FL_ALIGN_BOTTOM);
     //Creation of the Sync Button
 	_btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
-	_btnSync->callback((Fl_Callback*)SyncButton_CB);
+	_btnSync->callback(&SyncButton_CB,(void*)this);
 
 	//Creation of the Apply Button
 	_btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
 	_btnApply->deactivate(); // Disabled by default until a modification is pending
-	_btnApply->callback((Fl_Callback*)ApplyButton_CB);
+	_btnApply->callback(&ApplyButton_CB,(void*)this);
 
 	_tab = new Tableau(MARGIN, MARGIN+50, w()-MARGIN*2, h()-400);
 	_cards = Cards_wrapper::instance();
@@ -73,6 +75,13 @@ void mainWindow::SyncButton_CB(Fl_Widget*, void* pInstance)
 void mainWindow::ApplyButton_CB(Fl_Widget*, void* pInstance)
 {
 	//Nothing for moment
+}
+
+// Callback on Apply Button click
+void mainWindow::SearchInput_CB(Fl_Widget*, void* pInstance)
+{
+	mainWindow* o=(mainWindow*)pInstance;
+	o->_tab->setFilter(string(o->_search->value()));
 }
 
 // Callback on receive text to log

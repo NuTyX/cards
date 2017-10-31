@@ -95,6 +95,7 @@ public:
 	void refresh_table(); // Load the packages list
 	void autowidth(int pad); // Automatically set the columns widths to the longuest string
 	void resize_window();	// Resize the parent window to size of table
+	void setFilter(const string& pValue);
 
 protected:
 	// table cell drawing
@@ -105,6 +106,7 @@ protected:
 	void OnRefreshPackageFinished (const CEH_RC rc);
 
 private:
+	string _filter;
 	vector<Row> _rowdata;
 	int _sort_reverse;
 	int _sort_lastcol;

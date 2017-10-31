@@ -71,6 +71,7 @@ protected:
 //Widgets callbacks
 static void SyncButton_CB(Fl_Widget*,void* pInstance);
 static void ApplyButton_CB(Fl_Widget*,void* pInstance);
+static void SearchInput_CB(Fl_Widget*,void* pInstance);
 
 //Cards Wrapper virtual events callabacks overrides
 	void OnLogMessage(const string& pMessage);
