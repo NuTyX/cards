@@ -71,6 +71,10 @@ protected:
 	 * \return string array contain installed package list
 	 */
 	set<string> ListOfInstalledPackages();
+
+	void InstallPackage(const set<string>& pPackageList);
+private:
+	void getLocalePackagesList();
 };
 
 #endif // CARDS_WRAPPER_H

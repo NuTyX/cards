@@ -33,13 +33,16 @@
 #include <ctype.h>
 
 #include <FL/Fl.H>
+#include <FL/fl_ask.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Table_Row.H>
+#include <FL/Fl_Menu.H>
 #include "cards_wrapper.h"
+#include "pixmaps/checked.xpm"
 
 #define MARGIN 20
-#define COLHEADER { "Collection", "Name", "Description", "Version", "Installed", "", "", "", ""}
+#define COLHEADER { "Inst","Collection", "Name", "Description", "Version", "", "", "", ""}
 
 using namespace std;
 
@@ -47,7 +50,8 @@ using namespace std;
 class Row
 {
 public:
-	vector<char*> cols;
+	vector<string> cols;
+	bool installed;
 };
 
 // Class for handling the sorting column using std::sort
@@ -103,16 +107,16 @@ protected:
 	// sort the table by a column
 	void sort_column(int col, int reverse=0);
 	void draw_sort_arrow(int X, int Y, int W, int H);
+	void OnInstallFinished (const CEH_RC rc);
 	void OnRefreshPackageFinished (const CEH_RC rc);
-
 private:
 	string _filter;
 	vector<Row> _rowdata;
 	int _sort_reverse;
 	int _sort_lastcol;
 	Cards_wrapper* _cards;
-
 static void event_callback(Fl_Widget*,void*);
+static void ContextMenu_Callback(Fl_Widget*,void*);
 	void event_callback2();
 };
 
