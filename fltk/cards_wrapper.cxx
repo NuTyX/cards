@@ -125,8 +125,15 @@ void Cards_wrapper::m_Sync_Thread()
     CEH_RC rc=CEH_RC::OK;
     if (m_checkRootAccess())
     {
-		Pkgsync Sync;
-		Sync.run();
+    	try
+    	{
+    		Pkgsync Sync;
+			Sync.run();
+    	}
+		catch (exception& e)
+		{
+			cout << "Exception occured" <<endl;
+		}
     }
     else
 	{
