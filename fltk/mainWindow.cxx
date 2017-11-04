@@ -32,6 +32,7 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	_search->labelfont(2);
 	_search->color(FL_WHITE);
 	_search->callback(&SearchInput_CB, (void*)this);
+	_search->when(FL_WHEN_CHANGED);
 
 	_console = new Fl_Text_Display(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
 	_tbuff = new Fl_Text_Buffer();

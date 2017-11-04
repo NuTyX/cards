@@ -32,8 +32,8 @@ SortColumn::SortColumn (int col, int reverse)
 
 bool SortColumn::operator() (const Row &a, const Row &b)
 {
-	const char *ap = ( _col < (int)a.cols.size() ) ? a.cols[_col] : "",
-	*bp = ( _col < (int)b.cols.size() ) ? b.cols[_col] : "";
+	const char *ap = ( _col < (int)a.cols.size() ) ? a.cols[_col].c_str() : "",
+	*bp = ( _col < (int)b.cols.size() ) ? b.cols[_col].c_str() : "";
 	if ( isdigit(*ap) && isdigit(*bp) )
 	{
 		int av=0; sscanf(ap, "%d", &av);
@@ -46,6 +46,7 @@ bool SortColumn::operator() (const Row &a, const Row &b)
 	}
 }
 
+/// Constructor
 
 Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	: Fl_Table_Row(x,y,w,h,l)
@@ -60,8 +61,7 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	col_header(1);
 	col_header_height(25);
 	col_resize(1);
-	col_width_all(80);
-	when(FL_WHEN_RELEASE);
+	col_width_all(20);
 	row_height_all(18);
 	tooltip("Click on the header of the column to sort it");
 	color(FL_WHITE);
@@ -108,8 +108,8 @@ void Tableau::draw_sort_arrow(int X, int Y, int W, int H)
 /// Handle drawing all cells in table
 void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
-	const char *s = "";
-	if ( R < (int)_rowdata.size() && C < (int)_rowdata[R].cols.size() )
+	string s = "";
+	if ( (R < (int)_rowdata.size()) && (C < (int)_rowdata[R].cols.size()) )
 		s = _rowdata[R].cols[C];
 	switch ( context )
 	{
@@ -139,9 +139,16 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 				Fl_Color bgcolor = row_selected(R) ? selection_color() : FL_WHITE;
 				fl_color(bgcolor);
 				fl_rectf(X,Y,W,H);
-				fl_font(FL_HELVETICA, 16);
-				fl_color(FL_BLACK);
-				fl_draw(s, X+2,Y,W,H, FL_ALIGN_LEFT);  //  +2= pad left
+				if (C !=0 )
+				{
+					fl_font(FL_HELVETICA, 16);
+					fl_color(FL_BLACK);
+					fl_draw(s.c_str(), X+2,Y,W,H, FL_ALIGN_LEFT);  //  +2= pad left
+				}
+				else if (_rowdata[R].installed)
+				{
+					fl_draw_pixmap(checked_xpm,X+5,Y);
+				}
 				// Border
 				fl_color(FL_LIGHT2);
 				fl_rect(X,Y,W,H);
@@ -160,13 +167,13 @@ void Tableau::autowidth(int pad)
 	fl_font(FL_COURIER, 16);
 	// initialize all column widhths to lower value
 	for (int c = 0;c<cols();c++) col_width(c,pad);
-	for (int r=0; r<(int)_rowdata.size();r++)
+	for (auto r : _rowdata)
 	{
 		int w,h;
-		for  ( int c=0; c<(int)_rowdata[r].cols.size();c++)
+		for  ( int c=0; c<r.cols.size();c++)
 		{
-			fl_measure(_rowdata[r].cols[c], w, h, 0);	// get pixel width of the text
-			if ( (w+pad) > col_width(c) ) col_width(c, w + pad);
+			fl_measure(r.cols[c].c_str(), w, h, 0);	// get pixel width of the text
+			if ( (w) > col_width(c) ) col_width(c, w);
 		}
 	}
 	table_resized();
@@ -193,6 +200,7 @@ void Tableau::refresh_table()
 {
     clear();
     _rowdata.clear();
+    cols(5);
     vector<Cards_package*> pkgList = _cards->getPackageList();
     int r = 0;
     for (auto S : pkgList)
@@ -201,38 +209,30 @@ void Tableau::refresh_table()
 			if ((S->getName().find(_filter)==string::npos) && (S->getBase().find(_filter)==string::npos) ) continue;
 		// Add a new row
 		Row newrow;
-
-		char* collection = new char[S->getBase().length()+1];
-		strcpy(collection,S->getBase().c_str());
-		newrow.cols.push_back(collection);
-
-		char* name = new char[S->getName().length()+1];
-		strcpy(name,S->getName().c_str());
-		newrow.cols.push_back(name);
-
-		char* description = new char[S->getDescription().length()+1];
-		strcpy(description,S->getDescription().c_str());
-		newrow.cols.push_back(description);
-
-		char* version = new char[S->getVersion().length()+1];
-		strcpy(version,S->getVersion().c_str());
-		newrow.cols.push_back(version);
-
-		if (S->isInstalled()) newrow.cols.push_back("Yes");
-		else newrow.cols.push_back("No");
-
-		// Keep track of max # columns
-		if ( (int)newrow.cols.size() > cols() )
+newrow.installed = S->isInstalled();
+		if(S->isInstalled())
 		{
-			cols((int)newrow.cols.size());
+			newrow.cols.push_back("I");
 		}
+		else newrow.cols.push_back("U");
+		newrow.cols.push_back(S->getBase());
+		newrow.cols.push_back(S->getName());
+		newrow.cols.push_back(S->getDescription());
+		newrow.cols.push_back(S->getVersion());
 		_rowdata.push_back(newrow);
 		r++;
     }
 	// How many rows we loaded
 	rows((int)_rowdata.size());
 	// Auto-calculate widths, with 20 pixel padding
-	autowidth(20);
+	autowidth(30);
+}
+
+void Tableau::OnInstallFinished(const CEH_RC rc)
+{
+	Fl::lock();
+	cout << "Install : " << Cards_event_handler::getReasonCodeString(rc) << endl;
+	Fl::unlock();
 }
 
 void Tableau::OnRefreshPackageFinished (const CEH_RC rc)
@@ -251,9 +251,8 @@ void Tableau::event_callback(Fl_Widget*, void *data)
 
 void Tableau::event_callback2()
 {
-	// int ROW = callback_row();                 // unused
-
 	int COL = callback_col();
+	int ROW = callback_row();
 	TableContext context = callback_context();
 	switch ( context )
 	{
@@ -274,14 +273,52 @@ void Tableau::event_callback2()
 			}
 			break;
 		}
+		case CONTEXT_CELL:
+		{
+			if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
+			{
+				select_row(ROW);
+				 Fl_Menu_Item rclick_menu[] = {
+					{ "Install" },
+					{ "Remove" },
+					{ "Upgrade" },
+					{ 0 }
+				};
+				const Fl_Menu_Item *m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+				if ( !m )
+				{
+					return;
+				}
+				else if ( strcmp(m->label(), "Install") == 0 )
+				{
+					set<string> Packages;
+					Packages.insert(_rowdata[ROW].cols[2]);
+					_cards->install(Packages);
+				}
+				else if ( strcmp(m->label(), "Remove") == 0 )
+				{
+					cout << "Remove not yet implemented" << endl;
+				}
+				else if ( strcmp(m->label(), "Upgrade") == 0 )
+				{
+					cout << "Upgrade not yet implemented" << endl;
+				}
+			}
+			break;
+		}
 		default:
 			return;
 	}
-
 }
 
+/// Redefine filter and refresh the tab
 void Tableau::setFilter(const string& pValue)
 {
     _filter=pValue;
     refresh_table();
+}
+
+void Tableau::ContextMenu_Callback(Fl_Widget*,void*)
+{
+
 }

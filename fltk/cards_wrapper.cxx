@@ -103,6 +103,12 @@ void Cards_wrapper::sync()
 }
 
 /** Create a new thread for Cards Sync operation*/
+void Cards_wrapper::install(const set<string>& pPackageList)
+{
+	if (m_IsThreadFree()) _job = new thread(&Cards_wrapper::m_Install_Thread, Cards_wrapper::_ptCards_wrapper,pPackageList);
+}
+
+/** Create a new thread for Cards Sync operation*/
 void Cards_wrapper::refreshPackageList()
 {
 	if (m_IsThreadFree()) _job = new thread(&Cards_wrapper::m_RefreshPackageList_Thread, Cards_wrapper::_ptCards_wrapper);
@@ -119,8 +125,15 @@ void Cards_wrapper::m_Sync_Thread()
     CEH_RC rc=CEH_RC::OK;
     if (m_checkRootAccess())
     {
-		Pkgsync Sync;
-		Sync.run();
+    	try
+    	{
+    		Pkgsync Sync;
+			Sync.run();
+    	}
+		catch (exception& e)
+		{
+			cout << "Exception occured" <<endl;
+		}
     }
     else
 	{
@@ -128,6 +141,24 @@ void Cards_wrapper::m_Sync_Thread()
 	}
 	_job_running = false;
 	m_OnSyncFinished_Callback(rc);
+}
+
+/** Launch a Cards Sync operation*/
+void Cards_wrapper::m_Install_Thread(const set<string>& pPackageList)
+{
+    _job_running =true;
+    CEH_RC rc=CEH_RC::OK;
+    if (m_checkRootAccess())
+    {
+		_ptCards->InstallPackage(pPackageList);
+		m_RefreshPackageList_Thread();
+    }
+    else
+	{
+		rc= CEH_RC::NO_ROOT;
+	}
+	_job_running = false;
+	m_OnInstallFinished_Callback(rc);
 }
 
 
@@ -221,6 +252,16 @@ void Cards_wrapper::m_OnSyncFinished_Callback(const CEH_RC rc=CEH_RC::OK)
 		it->OnSyncFinished(rc);
 	}
 }
+
+/** Broadcast to all suscribers the Install Finished callback*/
+void Cards_wrapper::m_OnInstallFinished_Callback(const CEH_RC rc=CEH_RC::OK)
+{
+	for (auto* it : _arrCardsEventHandler)
+	{
+		it->OnInstallFinished(rc);
+	}
+}
+
 
 /** Broadcast the end of the thread ot get list of package to all event suscribers*/
 void Cards_wrapper::m_OnRefreshPackageFinished_Callback(const CEH_RC rc=CEH_RC::OK)

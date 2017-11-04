@@ -99,6 +99,8 @@ static Cards_wrapper*  instance();
 	 */
 	void sync();
 
+	void install(const set<string>& pPackageList);
+
 	const vector<Cards_package*>& getPackageList();
 
 private:
@@ -123,12 +125,14 @@ static	Cards_wrapper*	_ptCards_wrapper; //Static pointer of the singleton
 
 	/// Threaded Tasks
 	void m_Sync_Thread(); // Main Thread for Cards Sync Operation
+	void m_Install_Thread(const set<string>& pPackageList); // Thread to install package
 	void m_RefreshPackageList_Thread();
 
 
 	/// CallBack
 static void m_OnLogMessage_Callback(const char *ptr, std::streamsize count); //Callback for all cout text output from libcards
 	void m_OnSyncFinished_Callback(const CEH_RC rc); // Callback broadcast for Sync Cards operation
+	void m_OnInstallFinished_Callback(const CEH_RC rc);
 	void m_OnRefreshPackageFinished_Callback(const CEH_RC rc);
 
 	///Misc
