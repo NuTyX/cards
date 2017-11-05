@@ -23,14 +23,14 @@
 
 #include "cards_client.h"
 
-// Constructor
+/// Constructor
 Cards_client::Cards_client(const string& pConfigFileName)
 	: Pkginst("",pConfigFileName.c_str())
 {
 	m_root="/";
 }
 
-//Destructor
+///Destructor
 Cards_client::~Cards_client()
 {
 }
@@ -48,51 +48,57 @@ set<string> Cards_client::ListOfInstalledPackages()
 	return ListOfInstalledPackages;
 }
 
+/// Install a package list
 void Cards_client::InstallPackage(const set<string>& pPackageList)
 {
-    cout << "sudo cards install";
-    for (auto pack:pPackageList)
+	cout << "sudo cards install";
+	for (auto pack:pPackageList)
 	{
 		cout << " " << pack;
 	}
 	cout << endl << "Resolve package dependencies..." << endl;
-    for (auto pack:pPackageList)
+	for (auto pack:pPackageList)
 	{
 		m_packageName = pack;
 		generateDependencies();
 	}
 	getLocalePackagesList();
-	for ( auto i : m_dependenciesList ) {
+	for ( auto i : m_dependenciesList )
+	{
 		m_packageArchiveName = getPackageFileName(i);
 		ArchiveUtils packageArchive(m_packageArchiveName.c_str());
 		std::string name = packageArchive.name();
-		if ( checkPackageNameExist(name )) {
+		if ( checkPackageNameExist(name ))
+		{
 			m_upgrade=1;
-		} else {
+		}
+		else
+		{
 			m_upgrade=0;
 		}
 		name = "(" + packageArchive.collection()+") " + name;
 		run();
 		syslog(LOG_INFO,name.c_str());
-
 	}
 }
 
+/// Fill m_dependenciesList with LocalPackageList
 void Cards_client::getLocalePackagesList()
 {
-	if (m_config.locale.empty())
-		return;
+	if (m_config.locale.empty()) return;
 	std::vector<std::string> tmpList;
-	for ( auto i :  m_config.locale ) {
-		for ( auto j :m_dependenciesList ) {
+	for ( auto i :  m_config.locale )
+	{
+		for ( auto j :m_dependenciesList )
+		{
 			std::string packageName  = j + "." + i;
 #ifndef NDEBUG
 			std::cerr << packageName << std::endl;
 #endif
-			if (checkBinaryExist(packageName)) {
+			if (checkBinaryExist(packageName))
+			{
 				m_packageFileName = getPackageFileName(packageName);
-				if ( ! checkFileExist(m_packageFileName) )
-					downloadPackageFileName(packageName);
+				if ( ! checkFileExist(m_packageFileName) ) downloadPackageFileName(packageName);
 				tmpList.push_back(packageName);
 			}
 		}

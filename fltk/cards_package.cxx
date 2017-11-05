@@ -23,19 +23,22 @@
 
 #include "cards_package.h"
 
+/// Constructor
 Cards_package::Cards_package()
 {
-	_installed = false;
+	_status = (CPSTATUS) 0;
 }
 
+/// Destructor
 Cards_package::~Cards_package()
 {
-
+// Nothing for moment
 }
 
-string Cards_package::getBase()
+/// Return
+string Cards_package::getCollection()
 {
-	return _base;
+	return _collection;
 }
 
 string Cards_package::getName()
@@ -60,5 +63,30 @@ string Cards_package::getDescription()
 
 bool Cards_package::isInstalled()
 {
-	return _installed;
+	return _status & CPSTATUS::INSTALLED;
+}
+
+bool Cards_package::isToBeInstalled()
+{
+	return _status & CPSTATUS::TO_INSTALL;
+}
+
+bool Cards_package::isToBeRemoved()
+{
+	return _status & CPSTATUS::TO_REMOVE;
+}
+
+void Cards_package::setStatus(CPSTATUS pstatus)
+{
+	_status = (CPSTATUS)(_status | pstatus);
+}
+
+void Cards_package::unSetStatus(CPSTATUS pstatus)
+{
+	_status = (CPSTATUS)(_status | (~pstatus));
+}
+
+CPSTATUS Cards_package::getStatus()
+{
+	return _status;
 }

@@ -23,6 +23,7 @@
 
 #include "cards_wrapper.h"
 #include <sstream>
+
 ///
 /// Singleton Management
 ///
@@ -45,11 +46,11 @@ Cards_wrapper::Cards_wrapper()
 /** Destructor */
 Cards_wrapper::~Cards_wrapper()
 {
-    if (_job != nullptr)
-    {
-        if (_job->joinable()) _job->join();
-    }
-    if (_ptCards != nullptr) delete _ptCards;
+	if (_job != nullptr)
+	{
+		if (_job->joinable()) _job->join();
+	}
+	if (_ptCards != nullptr) delete _ptCards;
 }
 
 /** Return or create singleton instance */
@@ -70,21 +71,21 @@ void Cards_wrapper::kill()
 
 
 // Add a nex suscriber to the callback event list
-void Cards_wrapper::suscribeToEvents(Cards_event_handler* pCallBack)
+void Cards_wrapper::subscribeToEvents(Cards_event_handler* pCallBack)
 {
 	// Todo : Check if the new susciber is already in the container
 	_arrCardsEventHandler.push_back(pCallBack);
 }
 
 /// Remove an event suscriber from event callback list
-void Cards_wrapper::unsuscribeToEvents(Cards_event_handler* pCallBack)
+void Cards_wrapper::unsubscribeFromEvents(Cards_event_handler* pCallBack)
 {
-    vector<Cards_event_handler*>::iterator it;
-    it=find(_arrCardsEventHandler.begin(),_arrCardsEventHandler.end(),pCallBack);
-    if (it!=_arrCardsEventHandler.end())
-    {
-        _arrCardsEventHandler.erase(it);
-    }
+	vector<Cards_event_handler*>::iterator it;
+	it=find(_arrCardsEventHandler.begin(),_arrCardsEventHandler.end(),pCallBack);
+	if (it!=_arrCardsEventHandler.end())
+	{
+		_arrCardsEventHandler.erase(it);
+	}
 }
 
 const vector<Cards_package*>& Cards_wrapper::getPackageList()
@@ -121,21 +122,21 @@ void Cards_wrapper::refreshPackageList()
 /** Launch a Cards Sync operation*/
 void Cards_wrapper::m_Sync_Thread()
 {
-    _job_running =true;
-    CEH_RC rc=CEH_RC::OK;
-    if (m_checkRootAccess())
-    {
-    	try
-    	{
-    		Pkgsync Sync;
+	_job_running =true;
+	CEH_RC rc=CEH_RC::OK;
+	if (m_checkRootAccess())
+	{
+		try
+		{
+			Pkgsync Sync;
 			Sync.run();
     	}
 		catch (exception& e)
 		{
 			cout << "Exception occured" <<endl;
 		}
-    }
-    else
+	}
+	else
 	{
 		rc= CEH_RC::NO_ROOT;
 	}
@@ -146,14 +147,14 @@ void Cards_wrapper::m_Sync_Thread()
 /** Launch a Cards Sync operation*/
 void Cards_wrapper::m_Install_Thread(const set<string>& pPackageList)
 {
-    _job_running =true;
-    CEH_RC rc=CEH_RC::OK;
-    if (m_checkRootAccess())
-    {
+	_job_running =true;
+	CEH_RC rc=CEH_RC::OK;
+	if (m_checkRootAccess())
+	{
 		_ptCards->InstallPackage(pPackageList);
 		m_RefreshPackageList_Thread();
-    }
-    else
+	}
+	else
 	{
 		rc= CEH_RC::NO_ROOT;
 	}
@@ -165,8 +166,8 @@ void Cards_wrapper::m_Install_Thread(const set<string>& pPackageList)
 /** Threaded task to refresh the package image container*/
 void Cards_wrapper::m_RefreshPackageList_Thread()
 {
-    _job_running =true;
-    // First pass get all package available
+	_job_running =true;
+	// First pass get all package available
 	m_ClearPackagesList();
 	set<string> AvailablePackages = _ptCards->getBinaryPackageList();
 	set<string> InstalledPackages = _ptCards->ListOfInstalledPackages();
@@ -180,40 +181,40 @@ void Cards_wrapper::m_RefreshPackageList_Thread()
 		{
 			switch (i)
 			{
-			case 0: //Base
+				case 0: //Base
 				{
-					Pack->_base = token;
+					Pack->_collection = token;
 					break;
 				}
-			case 1: //Name
+				case 1: //Name
 				{
 					Pack->_name = token;
 					break;
 				}
-			case 2: //Version
+				case 2: //Version
 				{
 					Pack->_version = token;
 					break;
 				}
-			case 3: //Packager
+				case 3: //Packager
 				{
 					Pack->_packager = token;
 					break;
 				}
-			case 4: //Description
+				case 4: //Description
 				{
 					Pack->_description = token;
 					break;
 				}
-			default:
-				break;
+				default:
+					break;
 			}
 			i++;
 		}
-		if (InstalledPackages.find(Pack->_name)!=InstalledPackages.end()) Pack->_installed=true;
+		if (InstalledPackages.find(Pack->_name)!=InstalledPackages.end()) Pack->setStatus(INSTALLED);
 		_arrCardsPackages.push_back(Pack);
 #ifndef NDEBUG
-			cerr <<Pack->getBase()<<" : "
+			cerr <<Pack->getCollection()<<" : "
 				 <<Pack->getName()<<" : "
 				 <<Pack->getVersion()<<" : "
 				 <<Pack->getPackager()<<" : "
@@ -280,34 +281,34 @@ void Cards_wrapper::m_OnRefreshPackageFinished_Callback(const CEH_RC rc=CEH_RC::
 
 void Cards_wrapper::printCardsVersion()
 {
-    _ptCards->print_version();
+	_ptCards->print_version();
 }
 
 /** Check if the application is curently running as root
   * If it is the case, it return true.*/
 bool Cards_wrapper::m_checkRootAccess()
 {
-    if (getuid() != 0)
-    {
-        return false;
-    }
-    return true;
+	if (getuid() != 0)
+	{
+		return false;
+	}
+	return true;
 }
 
 /** Ensure the thread instance is free and ready to launch a new task */
 bool Cards_wrapper::m_IsThreadFree()
 {
 	if (!_job_running)
-    {
-        if (_job != nullptr)
-        {
-            _job->detach();
-            delete _job;
-            _job=nullptr;
-        }
-        if (_job==nullptr) return true;
-    }
-    return false;
+	{
+		if (_job != nullptr)
+		{
+			_job->detach();
+			delete _job;
+			_job=nullptr;
+		}
+		if (_job==nullptr) return true;
+	}
+	return false;
 }
 
 void Cards_wrapper::m_ClearPackagesList()

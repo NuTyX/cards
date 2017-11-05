@@ -29,6 +29,14 @@
 
 using namespace std;
 
+enum CPSTATUS
+{
+	INSTALLED = 0x01,
+	TO_INSTALL = 0x02,
+	TO_REMOVE = 0x04,
+	TO_UPGRADE = 0x08
+};
+
 class Cards_wrapper;
 
 class Cards_package
@@ -37,20 +45,25 @@ class Cards_package
 public:
 	Cards_package();
 	~Cards_package();
-	string getBase();
+	string getCollection();
 	string getName();
 	string getVersion();
 	string getPackager();
 	string getDescription();
 	bool isInstalled();
+	bool isToBeInstalled();
+	bool isToBeRemoved();
+	void setStatus(CPSTATUS pstatus);
+	void unSetStatus(CPSTATUS pstatus);
+	CPSTATUS getStatus();
 
 protected:
-	string _base;
+	string _collection;
 	string _name;
 	string _version;
 	string _packager;
 	string _description;
-	bool _installed;
+	CPSTATUS _status;
 };
 
 #endif

@@ -66,18 +66,18 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	tooltip("Click on the header of the column to sort it");
 	color(FL_WHITE);
 	_cards=Cards_wrapper::instance();
-	_cards->suscribeToEvents(this);
+	_cards->subscribeToEvents(this);
 	_cards->refreshPackageList();
 }
 
-// Sort a column up or down
+/// Sort a column up or down
 void Tableau::sort_column(int col, int reverse)
 {
 	sort(_rowdata.begin(), _rowdata.end(), SortColumn(col, reverse));
 	redraw();
 }
 
-// Draw sort arrow
+/// Draw sort arrow
 void Tableau::draw_sort_arrow(int X, int Y, int W, int H)
 {
 	int xlft = X+(W-6)-8;
@@ -206,7 +206,7 @@ void Tableau::refresh_table()
     for (auto S : pkgList)
 	{
 		if (_filter.length()>0)
-			if ((S->getName().find(_filter)==string::npos) && (S->getBase().find(_filter)==string::npos) ) continue;
+			if ((S->getName().find(_filter)==string::npos) && (S->getCollection().find(_filter)==string::npos) ) continue;
 		// Add a new row
 		Row newrow;
 newrow.installed = S->isInstalled();
@@ -215,7 +215,7 @@ newrow.installed = S->isInstalled();
 			newrow.cols.push_back("I");
 		}
 		else newrow.cols.push_back("U");
-		newrow.cols.push_back(S->getBase());
+		newrow.cols.push_back(S->getCollection());
 		newrow.cols.push_back(S->getName());
 		newrow.cols.push_back(S->getDescription());
 		newrow.cols.push_back(S->getVersion());

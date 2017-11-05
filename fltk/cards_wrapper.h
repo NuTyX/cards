@@ -68,14 +68,14 @@ static Cards_wrapper*  instance();
 	 *
 	 * Record callback from client class which submit callback from Card lib
 	 */
-	void suscribeToEvents(Cards_event_handler* pCallBack);
+	void subscribeToEvents(Cards_event_handler* pCallBack);
 
 	/**
 	 * \brief Unsuscribe from CARDS Events
 	 *
 	 * Unsuscribe client class callbock form Suscribe list
 	 */
-	void unsuscribeToEvents(Cards_event_handler* pCallBack);
+	void unsubscribeFromEvents(Cards_event_handler* pCallBack);
 
 	/**
 	 * \brief list of installed packages
