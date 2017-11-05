@@ -25,7 +25,7 @@
 
 // Constructor of the main window
 mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
-    Fl_Window(W,H,Title.c_str())
+	Fl_Window(W,H,Title.c_str())
 {
 	icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
 	_search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
@@ -38,10 +38,10 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	_tbuff = new Fl_Text_Buffer();
 	_console->buffer(_tbuff);
 	_console->color(FL_BLACK);
-    _console->textcolor(FL_GRAY);
-    _console->labeltype(FL_NO_LABEL );
-    //_console->scrollbar_align(FL_ALIGN_BOTTOM);
-    //Creation of the Sync Button
+	_console->textcolor(FL_GRAY);
+	_console->labeltype(FL_NO_LABEL );
+	//_console->scrollbar_align(FL_ALIGN_BOTTOM);
+	//Creation of the Sync Button
 	_btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
 	_btnSync->callback(&SyncButton_CB,(void*)this);
 
@@ -52,24 +52,24 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 
 	_tab = new Tableau(MARGIN, MARGIN+50, w()-MARGIN*2, h()-400);
 	_cards = Cards_wrapper::instance();
-	_cards->suscribeToEvents(this);
-    cout << "FlCards use ";
-    _cards->printCardsVersion();
+	_cards->subscribeToEvents(this);
+	cout << "FlCards use ";
+	_cards->printCardsVersion();
 }
 
 // Main window destructor
 mainWindow::~mainWindow()
 {
-    //todo : wait end of threads
-    //Cards->join();
-    _cards->unsuscribeToEvents(this);
-    _cards->kill();
+	//todo : wait end of threads
+	//Cards->join();
+	_cards->unsubscribeFromEvents(this);
+	_cards->kill();
 }
 
 // Callback on Sync Button click
 void mainWindow::SyncButton_CB(Fl_Widget*, void* pInstance)
 {
-    Cards_wrapper::instance()->sync();
+	Cards_wrapper::instance()->sync();
 }
 
 // Callback on Apply Button click

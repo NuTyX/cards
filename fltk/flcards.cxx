@@ -26,8 +26,8 @@
 int main(int argc, char **argv)
 {
 	Fl::lock();
-    mainWindow win(900, 900, "flcards");
-    win.resizable(win);
+	mainWindow win(900, 900, "flcards");
+	win.resizable(win);
 	win.show(argc, argv);
-    return Fl::run();
+	return Fl::run();
 }
