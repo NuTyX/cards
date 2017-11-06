@@ -102,3 +102,18 @@ void mainWindow::OnSyncFinished(const CEH_RC rc)
 	cout << "Sync : " << Cards_event_handler::getReasonCodeString(rc) << endl;
 	Fl::unlock();
 }
+
+void mainWindow::OnJobListChange(const CEH_RC rc)
+{
+	Fl::lock();
+	vector<Cards_package*> jobList = _cards->getJobList();
+	if (jobList.size() > 0)
+	{
+		_btnApply->activate();
+	}
+	else
+	{
+		_btnApply->deactivate();
+	}
+	Fl::unlock();
+}

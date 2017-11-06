@@ -135,8 +135,15 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 		{
 			fl_push_clip(X,Y,W,H);
 			{
+				Cards_package* pack = _cards->getPackage(_rowdata[R].cols[2]);
+				Fl_Color PackState = FL_WHITE;
+				if (pack!=nullptr)
+				{
+					if (pack->isToBeInstalled()) PackState = FL_GREEN;
+					else if (pack->isToBeRemoved()) PackState= FL_RED;
+				}
 				//Bg color
-				Fl_Color bgcolor = row_selected(R) ? selection_color() : FL_WHITE;
+				Fl_Color bgcolor = row_selected(R) ? selection_color() : PackState;
 				fl_color(bgcolor);
 				fl_rectf(X,Y,W,H);
 				if (C !=0 )
@@ -180,7 +187,7 @@ void Tableau::autowidth(int pad)
 	//redraw();
 }
 
-// Resze parent widows to size of tableau
+/// Resize parent widows to size of tableau
 void Tableau::resize_window()
 {
 	// Determine exact outer width of tableau with all columns visible
@@ -191,11 +198,7 @@ void Tableau::resize_window()
 	window()->resize(window()->x(), window()->y(), width, window()->h()); // resize window to fit
 }
 
-/* TODO
- *  Load table with list of packages
- * to be done
- * Should not be a big deal, we play with a vector<char*>
- */
+/// Refresh Table
 void Tableau::refresh_table()
 {
     clear();
@@ -277,13 +280,36 @@ void Tableau::event_callback2()
 		{
 			if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
 			{
-				select_row(ROW);
-				 Fl_Menu_Item rclick_menu[] = {
+				Cards_package* pack = _cards->getPackage(_rowdata[ROW].cols[2]);
+				if (pack==nullptr) break;
+				Fl_Menu_Item rclick_menu[] = {
 					{ "Install" },
 					{ "Remove" },
-					{ "Upgrade" },
+					{ "Cancel" },
 					{ 0 }
 				};
+#ifndef _NDEBUG
+					cerr << pack->getName() << " : " << (pack->isToBeInstalled() ? "To install" : "Nothing" ) << endl;
+					cerr << pack->getName() << " : " << (pack->isToBeRemoved() ? "To remove" : "Nothing" ) << endl;
+#endif // _NDEBUG
+				if (pack->isInstalled())
+				{
+					rclick_menu[0].deactivate();
+					if (pack->isToBeRemoved())
+					{
+							rclick_menu[1].deactivate();
+					}
+					else rclick_menu[2].deactivate();
+				}
+				if (!pack->isInstalled())
+				{
+					rclick_menu[1].deactivate();
+					if (pack->isToBeInstalled())
+					{
+						rclick_menu[0].deactivate();
+					}
+					else rclick_menu[2].deactivate();
+				}
 				const Fl_Menu_Item *m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
 				if ( !m )
 				{
@@ -291,19 +317,34 @@ void Tableau::event_callback2()
 				}
 				else if ( strcmp(m->label(), "Install") == 0 )
 				{
-					set<string> Packages;
+					/*set<string> Packages;
 					Packages.insert(_rowdata[ROW].cols[2]);
-					_cards->install(Packages);
+					_cards->install(Packages);*/
+					pack->setStatus(TO_INSTALL);
+					_cards->refreshJobList();
+#ifndef _NDEBUG
+					cerr << pack->getName() << " : " << (pack->isToBeInstalled() ? "To install" : "Nothing" ) << endl;
+#endif // _NDEBUG
 				}
 				else if ( strcmp(m->label(), "Remove") == 0 )
 				{
-					cout << "Remove not yet implemented" << endl;
+					if (pack->isInstalled())
+					{
+						pack->setStatus(TO_REMOVE);
+						_cards->refreshJobList();
+#ifndef _NDEBUG
+						cerr << pack->getName() << " : " << (pack->isToBeRemoved() ? "To remove" : "Nothing" ) << endl;
+#endif // _NDEBUG
+					}
 				}
-				else if ( strcmp(m->label(), "Upgrade") == 0 )
+				else if ( strcmp(m->label(), "Cancel") == 0 )
 				{
-					cout << "Upgrade not yet implemented" << endl;
+					if (pack->isToBeInstalled()) pack->unSetStatus(TO_INSTALL);
+					if (pack->isToBeRemoved()) pack->unSetStatus(TO_REMOVE);
+					_cards->refreshJobList();
 				}
 			}
+			select_row(ROW);
 			break;
 		}
 		default:

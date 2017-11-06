@@ -93,6 +93,41 @@ const vector<Cards_package*>& Cards_wrapper::getPackageList()
 	return _arrCardsPackages;
 }
 
+Cards_package* Cards_wrapper::getPackage(const string& pName)
+{
+	Cards_package* ptr=nullptr;
+	for (Cards_package* it : _arrCardsPackages)
+	{
+		if (it->getName()==pName)
+		{
+			ptr=it;
+			break;
+		}
+	}
+	return ptr;
+}
+
+void Cards_wrapper::refreshJobList()
+{
+    _arrCardsJobList.clear();
+    for (Cards_package* it:_arrCardsPackages)
+	{
+		if (it->isToBeInstalled() || it->isToBeRemoved())
+		{
+			_arrCardsJobList.push_back(it);
+#ifndef _NDEBUG
+			cerr << "Add Job to list for package " << it->getName() << " Size of job list=" << _arrCardsJobList.size() << endl;
+#endif // _NDEBUG
+		}
+	}
+	m_OnJobListChanged_Callback(OK);
+}
+
+const vector<Cards_package*>& Cards_wrapper::getJobList()
+{
+	return _arrCardsJobList;
+}
+
 ///
 /// Thread Callers
 ///
@@ -133,7 +168,7 @@ void Cards_wrapper::m_Sync_Thread()
     	}
 		catch (exception& e)
 		{
-			cout << "Exception occured" <<endl;
+			cout << "Exception occured during Sync thread : " << e.what() << endl;
 		}
 	}
 	else
@@ -151,8 +186,15 @@ void Cards_wrapper::m_Install_Thread(const set<string>& pPackageList)
 	CEH_RC rc=CEH_RC::OK;
 	if (m_checkRootAccess())
 	{
-		_ptCards->InstallPackage(pPackageList);
-		m_RefreshPackageList_Thread();
+		try
+		{
+			_ptCards->InstallPackage(pPackageList);
+			m_RefreshPackageList_Thread();
+		}
+		catch (exception& e)
+		{
+			cout << "Exception occured during Install Thread : " << e.what() << endl;
+		}
 	}
 	else
 	{
@@ -177,7 +219,7 @@ void Cards_wrapper::m_RefreshPackageList_Thread()
 		string token;
 		istringstream tokenStream(it);
 		int i=0;
-		while (std::getline(tokenStream, token, '\t'))
+		while (getline(tokenStream, token, '\t'))
 		{
 			switch (i)
 			{
@@ -270,6 +312,15 @@ void Cards_wrapper::m_OnRefreshPackageFinished_Callback(const CEH_RC rc=CEH_RC::
 	for (auto* it : _arrCardsEventHandler)
 	{
 		it->OnRefreshPackageFinished(rc);
+	}
+}
+
+/** Broadcast the end of the thread ot get list of package to all event suscribers*/
+void Cards_wrapper::m_OnJobListChanged_Callback(const CEH_RC rc=CEH_RC::OK)
+{
+	for (auto* it : _arrCardsEventHandler)
+	{
+		it->OnJobListChange(rc);
 	}
 }
 

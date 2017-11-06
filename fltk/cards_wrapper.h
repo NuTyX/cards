@@ -103,6 +103,11 @@ static Cards_wrapper*  instance();
 
 	const vector<Cards_package*>& getPackageList();
 
+	Cards_package* getPackage(const string& pName);
+
+	void refreshJobList();
+
+	const vector<Cards_package*>& getJobList();
 private:
 
 /**
@@ -122,6 +127,7 @@ static	Cards_wrapper*	_ptCards_wrapper; //Static pointer of the singleton
 	/// Containers
 	vector<Cards_event_handler*> _arrCardsEventHandler; // Std array to store callback event clients
 	vector<Cards_package*> _arrCardsPackages;
+	vector<Cards_package*> _arrCardsJobList;
 
 	/// Threaded Tasks
 	void m_Sync_Thread(); // Main Thread for Cards Sync Operation
@@ -134,6 +140,7 @@ static void m_OnLogMessage_Callback(const char *ptr, std::streamsize count); //C
 	void m_OnSyncFinished_Callback(const CEH_RC rc); // Callback broadcast for Sync Cards operation
 	void m_OnInstallFinished_Callback(const CEH_RC rc);
 	void m_OnRefreshPackageFinished_Callback(const CEH_RC rc);
+	void m_OnJobListChanged_Callback(const CEH_RC rc);
 
 	///Misc
 	console_forwarder<>* redirect_cout; // Forwarding cout message to LogCallback callback

@@ -56,6 +56,7 @@ protected:
     virtual void OnSyncFinished (const CEH_RC rc){}
     virtual void OnInstallFinished (const CEH_RC rc){}
     virtual void OnRefreshPackageFinished (const CEH_RC rc){}
+    virtual void OnJobListChange (const CEH_RC rc){}
 public:
 static	const string getReasonCodeString(const CEH_RC rc);
 };
