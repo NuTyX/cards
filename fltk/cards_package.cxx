@@ -83,7 +83,7 @@ void Cards_package::setStatus(CPSTATUS pstatus)
 
 void Cards_package::unSetStatus(CPSTATUS pstatus)
 {
-	_status = (CPSTATUS)(_status | (~pstatus));
+	_status = (CPSTATUS)(_status & (~pstatus));
 }
 
 CPSTATUS Cards_package::getStatus()

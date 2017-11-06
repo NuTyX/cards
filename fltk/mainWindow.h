@@ -76,6 +76,7 @@ static void SearchInput_CB(Fl_Widget*,void* pInstance);
 //Cards Wrapper virtual events callabacks overrides
 	void OnLogMessage(const string& pMessage);
 	void OnSyncFinished(const CEH_RC rc);
+	void OnJobListChange(const CEH_RC rc);
 
 private:
 	Tableau* _tab;
