@@ -57,6 +57,7 @@ void Cards_client::InstallPackages(const set<string>& pPackageList)
 	{
 		cout << " " << pack;
 	}
+	cout << endl;
 	// Get the list of installed packages
 	getListOfPackageNames(m_root);
 
