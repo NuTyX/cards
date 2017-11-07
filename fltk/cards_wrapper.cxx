@@ -34,7 +34,6 @@ Cards_wrapper* Cards_wrapper::_ptCards_wrapper = nullptr;
 /** Constructor */
 Cards_wrapper::Cards_wrapper()
 {
-	_ptCards = new Cards_client("/etc/cards.conf");
 	redirect_cout = new console_forwarder<>(std::cout, m_OnLogMessage_Callback); //redirect std::cout to the callback function
 #ifndef NDEBUG
 	redirect_cerr = new console_forwarder<>(std::cerr, m_OnLogMessage_Callback); //redirect std::cerr to the callback function
@@ -46,11 +45,7 @@ Cards_wrapper::Cards_wrapper()
 /** Destructor */
 Cards_wrapper::~Cards_wrapper()
 {
-	if (_job != nullptr)
-	{
-		if (_job->joinable()) _job->join();
-	}
-	if (_ptCards != nullptr) delete _ptCards;
+	JoinThreads();
 }
 
 /** Return or create singleton instance */
@@ -115,7 +110,7 @@ void Cards_wrapper::refreshJobList()
 		if (it->isToBeInstalled() || it->isToBeRemoved())
 		{
 			_arrCardsJobList.push_back(it);
-#ifndef _NDEBUG
+#ifndef NDEBUG
 			cerr << "Add Job to list for package " << it->getName() << " Size of job list=" << _arrCardsJobList.size() << endl;
 #endif // _NDEBUG
 		}
@@ -139,9 +134,9 @@ void Cards_wrapper::sync()
 }
 
 /** Create a new thread for Cards Sync operation*/
-void Cards_wrapper::install(const set<string>& pPackageList)
+void Cards_wrapper::doJobList()
 {
-	if (m_IsThreadFree()) _job = new thread(&Cards_wrapper::m_Install_Thread, Cards_wrapper::_ptCards_wrapper,pPackageList);
+	if (m_IsThreadFree()) _job = new thread(&Cards_wrapper::m_DoJobList_Thread, Cards_wrapper::_ptCards_wrapper);
 }
 
 /** Create a new thread for Cards Sync operation*/
@@ -180,28 +175,52 @@ void Cards_wrapper::m_Sync_Thread()
 }
 
 /** Launch a Cards Sync operation*/
-void Cards_wrapper::m_Install_Thread(const set<string>& pPackageList)
+void Cards_wrapper::m_DoJobList_Thread()
 {
 	_job_running =true;
 	CEH_RC rc=CEH_RC::OK;
 	if (m_checkRootAccess())
 	{
+		Cards_client Cards();
 		try
 		{
-			_ptCards->InstallPackage(pPackageList);
-			m_RefreshPackageList_Thread();
+			cout << "Determine Packages Install and Remove List..." << endl;
+			set<string> Removelist;
+			set<string> InstallList;
+			for (Cards_package* it:_arrCardsJobList)
+			{
+				if (it->isToBeInstalled()) InstallList.insert(it->getName());
+				if (it->isToBeRemoved()) Removelist.insert(it->getName());
+			}
+			cout << "Ok, " << Removelist.size() << "Package(s) will be removed and "
+				<< InstallList.size() << " Package(s) will be installed... " << endl;
+			if (Removelist.size() > 0)
+			{
+				Cards_client Cards;
+				Cards.RemovePackages(Removelist);
+			}
+			if (InstallList.size() > 0)
+			{
+				Cards_client Cards;
+				Cards.InstallPackages(InstallList);
+			}
+			rc= CEH_RC::OK;
 		}
 		catch (exception& e)
 		{
-			cout << "Exception occured during Install Thread : " << e.what() << endl;
+			cout << "Exception occured during processing job list Thread : " << e.what() << endl;
+			rc= CEH_RC::EXCEPTION;
 		}
+		m_RefreshPackageList_Thread();
 	}
 	else
 	{
 		rc= CEH_RC::NO_ROOT;
 	}
+	_arrCardsJobList.clear();
+	refreshJobList();
 	_job_running = false;
-	m_OnInstallFinished_Callback(rc);
+	m_OnDoJobListFinished_Callback(rc);
 }
 
 
@@ -209,10 +228,11 @@ void Cards_wrapper::m_Install_Thread(const set<string>& pPackageList)
 void Cards_wrapper::m_RefreshPackageList_Thread()
 {
 	_job_running =true;
+	Cards_client Cards;
 	// First pass get all package available
 	m_ClearPackagesList();
-	set<string> AvailablePackages = _ptCards->getBinaryPackageList();
-	set<string> InstalledPackages = _ptCards->ListOfInstalledPackages();
+	set<string> AvailablePackages = Cards.getBinaryPackageList();
+	set<string> InstalledPackages = Cards.ListOfInstalledPackages();
 	for (auto it : AvailablePackages)
 	{
 		Cards_package* Pack=new Cards_package();
@@ -255,14 +275,6 @@ void Cards_wrapper::m_RefreshPackageList_Thread()
 		}
 		if (InstalledPackages.find(Pack->_name)!=InstalledPackages.end()) Pack->setStatus(INSTALLED);
 		_arrCardsPackages.push_back(Pack);
-#ifndef NDEBUG
-			cerr <<Pack->getCollection()<<" : "
-				 <<Pack->getName()<<" : "
-				 <<Pack->getVersion()<<" : "
-				 <<Pack->getPackager()<<" : "
-				 <<Pack->getDescription()<<" : "
-				 <<Pack->isInstalled()<<endl;
-#endif
 	}
 	m_OnRefreshPackageFinished_Callback(CEH_RC::OK);
     _job_running =false;
@@ -297,11 +309,11 @@ void Cards_wrapper::m_OnSyncFinished_Callback(const CEH_RC rc=CEH_RC::OK)
 }
 
 /** Broadcast to all suscribers the Install Finished callback*/
-void Cards_wrapper::m_OnInstallFinished_Callback(const CEH_RC rc=CEH_RC::OK)
+void Cards_wrapper::m_OnDoJobListFinished_Callback(const CEH_RC rc=CEH_RC::OK)
 {
 	for (auto* it : _arrCardsEventHandler)
 	{
-		it->OnInstallFinished(rc);
+		it->OnDoJobListFinished(rc);
 	}
 }
 
@@ -332,7 +344,8 @@ void Cards_wrapper::m_OnJobListChanged_Callback(const CEH_RC rc=CEH_RC::OK)
 
 void Cards_wrapper::printCardsVersion()
 {
-	_ptCards->print_version();
+	Cards_client Cards;
+	Cards.print_version();
 }
 
 /** Check if the application is curently running as root
@@ -372,4 +385,9 @@ void Cards_wrapper::m_ClearPackagesList()
 		}
 	}
 	_arrCardsPackages.clear();
+}
+
+void Cards_wrapper::JoinThreads()
+{
+	if (!m_IsThreadFree()) _job->join();
 }

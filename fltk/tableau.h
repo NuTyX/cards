@@ -107,7 +107,7 @@ protected:
 	// sort the table by a column
 	void sort_column(int col, int reverse=0);
 	void draw_sort_arrow(int X, int Y, int W, int H);
-	void OnInstallFinished (const CEH_RC rc);
+	void OnDoJobListFinished (const CEH_RC rc);
 	void OnRefreshPackageFinished (const CEH_RC rc);
 private:
 	string _filter;
