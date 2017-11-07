@@ -51,6 +51,7 @@ bool SortColumn::operator() (const Row &a, const Row &b)
 Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	: Fl_Table_Row(x,y,w,h,l)
 {
+	type(SELECT_SINGLE);
 	_sort_reverse = 0;
 	_sort_lastcol = -1;
 	end();
@@ -184,7 +185,6 @@ void Tableau::autowidth(int pad)
 		}
 	}
 	table_resized();
-	//redraw();
 }
 
 /// Resize parent widows to size of tableau
@@ -231,10 +231,11 @@ newrow.installed = S->isInstalled();
 	autowidth(30);
 }
 
-void Tableau::OnInstallFinished(const CEH_RC rc)
+/// Callback
+void Tableau::OnDoJobListFinished(const CEH_RC rc)
 {
 	Fl::lock();
-	cout << "Install : " << Cards_event_handler::getReasonCodeString(rc) << endl;
+	cout << "Job list result : " << Cards_event_handler::getReasonCodeString(rc) << endl;
 	Fl::unlock();
 }
 
@@ -245,7 +246,7 @@ void Tableau::OnRefreshPackageFinished (const CEH_RC rc)
 	Fl::unlock();
 }
 
-// Callback whenever someone clicks on different parts of the table
+/// Callback whenever someone clicks on different parts of the table
 void Tableau::event_callback(Fl_Widget*, void *data)
 {
 	if (data != nullptr)
@@ -288,10 +289,10 @@ void Tableau::event_callback2()
 					{ "Cancel" },
 					{ 0 }
 				};
-#ifndef _NDEBUG
-					cerr << pack->getName() << " : " << (pack->isToBeInstalled() ? "To install" : "Nothing" ) << endl;
-					cerr << pack->getName() << " : " << (pack->isToBeRemoved() ? "To remove" : "Nothing" ) << endl;
-#endif // _NDEBUG
+#ifndef NDEBUG
+					cout << pack->getName() << " : " << (pack->isToBeInstalled() ? "To install" : "Nothing" ) << endl;
+					cout << pack->getName() << " : " << (pack->isToBeRemoved() ? "To remove" : "Nothing" ) << endl;
+#endif // NDEBUG
 				if (pack->isInstalled())
 				{
 					rclick_menu[0].deactivate();
@@ -322,9 +323,9 @@ void Tableau::event_callback2()
 					_cards->install(Packages);*/
 					pack->setStatus(TO_INSTALL);
 					_cards->refreshJobList();
-#ifndef _NDEBUG
-					cerr << pack->getName() << " : " << (pack->isToBeInstalled() ? "To install" : "Nothing" ) << endl;
-#endif // _NDEBUG
+#ifndef NDEBUG
+					cout << pack->getName() << " : " << (pack->isToBeInstalled() ? "To install" : "Nothing" ) << endl;
+#endif // NDEBUG
 				}
 				else if ( strcmp(m->label(), "Remove") == 0 )
 				{
@@ -332,9 +333,9 @@ void Tableau::event_callback2()
 					{
 						pack->setStatus(TO_REMOVE);
 						_cards->refreshJobList();
-#ifndef _NDEBUG
-						cerr << pack->getName() << " : " << (pack->isToBeRemoved() ? "To remove" : "Nothing" ) << endl;
-#endif // _NDEBUG
+#ifndef NDEBUG
+						cout << pack->getName() << " : " << (pack->isToBeRemoved() ? "To remove" : "Nothing" ) << endl;
+#endif // NDEBUG
 					}
 				}
 				else if ( strcmp(m->label(), "Cancel") == 0 )

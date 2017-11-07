@@ -34,7 +34,8 @@ enum CEH_RC
 {
 	OK=0,
 	NO_ROOT,
-	PKG_NOT_EXIST
+	PKG_NOT_EXIST,
+	EXCEPTION
 };
 
 // Define Cards_wrapper singleton for friendship
@@ -54,7 +55,7 @@ protected:
 
     virtual void OnLogMessage (const string& Message){}
     virtual void OnSyncFinished (const CEH_RC rc){}
-    virtual void OnInstallFinished (const CEH_RC rc){}
+    virtual void OnDoJobListFinished (const CEH_RC rc){}
     virtual void OnRefreshPackageFinished (const CEH_RC rc){}
     virtual void OnJobListChange (const CEH_RC rc){}
 public:

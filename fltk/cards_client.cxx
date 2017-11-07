@@ -24,8 +24,8 @@
 #include "cards_client.h"
 
 /// Constructor
-Cards_client::Cards_client(const string& pConfigFileName)
-	: Pkginst("",pConfigFileName.c_str())
+Cards_client::Cards_client()
+	: Pkginst("","/etc/cards.conf")
 {
 	m_root="/";
 }
@@ -49,13 +49,20 @@ set<string> Cards_client::ListOfInstalledPackages()
 }
 
 /// Install a package list
-void Cards_client::InstallPackage(const set<string>& pPackageList)
+void Cards_client::InstallPackages(const set<string>& pPackageList)
 {
-	cout << "sudo cards install";
+	if (pPackageList.size()==0) return;
+	cout << endl << "sudo cards install";
 	for (auto pack:pPackageList)
 	{
 		cout << " " << pack;
 	}
+	// Get the list of installed packages
+	getListOfPackageNames(m_root);
+
+	// Retrieve info about all the packages
+	buildCompleteDatabase(false);
+
 	cout << endl << "Resolve package dependencies..." << endl;
 	for (auto pack:pPackageList)
 	{
@@ -67,7 +74,7 @@ void Cards_client::InstallPackage(const set<string>& pPackageList)
 	{
 		m_packageArchiveName = getPackageFileName(i);
 		ArchiveUtils packageArchive(m_packageArchiveName.c_str());
-		std::string name = packageArchive.name();
+		string name = packageArchive.name();
 		if ( checkPackageNameExist(name ))
 		{
 			m_upgrade=1;
@@ -76,9 +83,40 @@ void Cards_client::InstallPackage(const set<string>& pPackageList)
 		{
 			m_upgrade=0;
 		}
-		name = "(" + packageArchive.collection()+") " + name;
 		run();
-		syslog(LOG_INFO,name.c_str());
+	}
+}
+
+/// Install a package list
+void Cards_client::RemovePackages(const set<string>& pPackageList)
+{
+	if (pPackageList.size()==0) return;
+	cout << endl << "sudo cards remove";
+	for (auto pack:pPackageList)
+	{
+		cout << " " << pack;
+	}
+	cout << endl;
+
+	Db_lock lock(m_root, true);
+	// Get the list of installed packages
+	getListOfPackageNames(m_root);
+	// Retrieve info about all the packages
+	buildCompleteDatabase(false);
+	for (auto pack:pPackageList)
+	{
+
+		if (!checkPackageNameExist(pack))
+		{
+			m_actualError = PACKAGE_NOT_INSTALL;
+			treatErrors(pack);
+		}
+
+		// Remove metadata about the package removed
+		removePackageFilesRefsFromDB(pack);
+
+		// Remove the files on hd
+		removePackageFiles(pack);
 	}
 }
 
@@ -92,9 +130,6 @@ void Cards_client::getLocalePackagesList()
 		for ( auto j :m_dependenciesList )
 		{
 			std::string packageName  = j + "." + i;
-#ifndef NDEBUG
-			std::cerr << packageName << std::endl;
-#endif
 			if (checkBinaryExist(packageName))
 			{
 				m_packageFileName = getPackageFileName(packageName);
@@ -105,7 +140,4 @@ void Cards_client::getLocalePackagesList()
 		if (tmpList.size() > 0 )
 			for (auto i : tmpList) m_dependenciesList.push_back(i);
 	}
-#ifndef NDEBUG
-	for (auto i : m_dependenciesList ) std::cerr << i << std::endl;
-#endif
 }

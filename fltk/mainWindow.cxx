@@ -40,7 +40,7 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	_console->color(FL_BLACK);
 	_console->textcolor(FL_GRAY);
 	_console->labeltype(FL_NO_LABEL );
-	//_console->scrollbar_align(FL_ALIGN_BOTTOM);
+
 	//Creation of the Sync Button
 	_btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
 	_btnSync->callback(&SyncButton_CB,(void*)this);
@@ -55,6 +55,7 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	_cards->subscribeToEvents(this);
 	cout << "FlCards use ";
 	_cards->printCardsVersion();
+	this->callback(&OnExit_CB,(void*)this);
 }
 
 // Main window destructor
@@ -75,7 +76,7 @@ void mainWindow::SyncButton_CB(Fl_Widget*, void* pInstance)
 // Callback on Apply Button click
 void mainWindow::ApplyButton_CB(Fl_Widget*, void* pInstance)
 {
-	//Nothing for moment
+	Cards_wrapper::instance()->doJobList();
 }
 
 // Callback on Apply Button click
@@ -116,4 +117,10 @@ void mainWindow::OnJobListChange(const CEH_RC rc)
 		_btnApply->deactivate();
 	}
 	Fl::unlock();
+}
+
+void mainWindow::OnExit_CB(Fl_Widget* pWidget, void* pInstance)
+{
+	//Cards_wrapper::instance()->JoinThreads();
+	((Fl_Window*)pInstance)->hide();
 }

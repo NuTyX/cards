@@ -52,7 +52,7 @@ protected:
 	 *
 	 * Constructor of Cards_client class
 	 */
-	Cards_client (const string& pConfigFileName);
+	Cards_client ();
 
 	/**
 	 * \brief Destructor
@@ -72,7 +72,19 @@ protected:
 	 */
 	set<string> ListOfInstalledPackages();
 
-	void InstallPackage(const set<string>& pPackageList);
+	/**
+	 * \brief Install a package list
+	 *
+	 * Launch Cards Install process
+	 */
+	void InstallPackages(const set<string>& pPackageList);
+
+	/**
+	 * \brief Remove a package list
+	 *
+	 * Launch Cards Remove process
+	 */
+	void RemovePackages(const set<string>& pPackageList);
 private:
 	void getLocalePackagesList();
 };

@@ -38,6 +38,11 @@ const string Cards_event_handler::getReasonCodeString(const CEH_RC rc)
 			return "This application need root privileges, please restart it with super user rights!";
 			break;
 		}
+		case CEH_RC::EXCEPTION:
+		{
+			return "An exception occured during cardslib operation. See messages above to know the reason";
+			break;
+		}
 		default:
 		{
 			return "Unknown reason... Please contact Nutyx team to signal this case";
