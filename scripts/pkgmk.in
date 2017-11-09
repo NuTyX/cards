@@ -1357,6 +1357,8 @@ main() {
 	if ! (`which pkginfo > /dev/null`); then
 		warning "pkginfo NOT FOUND, footprint ignored."
 		PKGMK_IGNORE_FOOTPRINT="yes"
+		warning "pkginfo NOT FOUND, runtime dependencies ignored."
+		PKGMK_IGNORE_RUNTIMEDEPS="yes"
 	fi
 
 	local FILE TARGET DIR NAME
