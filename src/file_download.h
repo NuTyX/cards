@@ -98,7 +98,7 @@ class FileDownload
 
 	static int updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
 	static size_t writeToStreamHandle(void *buffer, size_t size, size_t nmemb, void *stream);
-	int updateProgress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
+	virtual int updateProgress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
 	size_t writeToStream(void *buffer, size_t size, size_t nmemb, void *stream);
 	void initFileToDownload(std::string _url, std::string _file);
 
@@ -112,7 +112,6 @@ class FileDownload
 		CURL *curl;
 	};
 	struct curl_slist *m_slist;
-	void updateProgress();
 
 	CURL*       m_curl;
 	CURLcode    m_curlCode;
