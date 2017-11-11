@@ -67,6 +67,7 @@ int get_64bit_elf_header_part(FILE *file)
 }
 int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fileName)
 {
+
 #ifndef NDEBUG
 	printf("sizeof unsigned char: %d\n",sizeof(unsigned char));
 	printf("sizeof unsigned short int: %d\n",sizeof(unsigned short int));
@@ -376,7 +377,10 @@ int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fil
 			edyn < dynamics_section_64bits + dynamic_size_64bits;
 			edyn ++)
 		{
-			if (edyn->d_tag != DT_NEEDED)
+#ifndef NDEBUG
+    printf("Tag: %d\n",edyn->d_tag);
+#endif
+			if (edyn->d_tag == DT_NULL)
 				break;
 			if (edyn->d_tag == DT_NEEDED) /* if it's a lib */
 			{
