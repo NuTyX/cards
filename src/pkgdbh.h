@@ -61,6 +61,7 @@
 // /usr/bin/install-info --info-dir="/usr/share/info" /usr/share/info/<file>.info"
 #define INSTALL_INFO      "usr/bin/install-info"
 #define INSTALL_INFO_ARGS "--info-dir=usr/share/info "
+
 // /usr/bin/gtk-update-icon-cache -f -t /usr/share/icons/hicolor
 #define UPDATE_ICON       "usr/bin/gtk-update-icon-cache"
 #define UPDATE_ICON_ARGS  "-f -t "
@@ -92,6 +93,18 @@
 // /usr/bin/gtk-query-immodules-2.0 --update-cache
 #define QUERY_IMMODULES_2 "usr/bin/gtk-query-immodules-2.0"
 #define QUERY_IMMODULES_2_ARGS "--update-cache"
+
+// /usr/bin/mkfontdir /usr/share/fonts/<dir>/
+#define MKFONTDIR       "usr/bin/mkfontdir"
+#define MKFONTDIR_ARGS  ""
+
+// /usr/bin/mkfontscale /usr/share/fonts/<dir>/
+#define MKFONTSCALE     "usr/bin/mkfontscale"
+#define MKFONTSCALE_ARGS  ""
+
+// /usr/bin/fc-cache /usr/share/fonts/<dir>/
+#define FC_CACHE     "usr/bin/fc-cache"
+#define FC_CACHE_ARGS  ""
 
 enum action 
 { 
@@ -148,6 +161,7 @@ enum rule_event_t {
 	INSTALL,
 	INFO,
 	ICONS,
+	FONTS,
 	SCHEMAS,
 	DESKTOP_DB,
 	MIME_DB,

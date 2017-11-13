@@ -1319,6 +1319,7 @@ void Pkgdbh::readRulesFile()
 				if (!strcmp(event, "UPGRADE") || !strcmp(event, "INSTALL") \
 					|| !strcmp(event, "LDCONF") || !strcmp(event, "MIME_DB") \
 					|| !strcmp(event, "INFO") || !strcmp(event, "ICONS") \
+					|| !strcmp(event, "FONTS") \
 					|| !strcmp(event, "QUERY_PIXBUF") || !strcmp(event, "GIO_QUERY") \
 					|| !strcmp(event, "QUERY_IMOD3") || !strcmp(event, "QUERY_IMOD2") \
 					|| !strcmp(event, "SCHEMAS") || !strcmp(event, "DESKTOP_DB")) {
@@ -1332,6 +1333,8 @@ void Pkgdbh::readRulesFile()
 						rule.event = INFO;
 					if (!strcmp(event, "LDCONF"))
 						rule.event = LDCONF;
+					if (!strcmp(event, "FONTS"))
+						rule.event = FONTS;
 					if (!strcmp(event, "ICONS"))
 						rule.event = ICONS;
 					if (!strcmp(event, "SCHEMAS"))
@@ -1411,6 +1414,21 @@ void Pkgdbh::runLastPostInstall()
 					p.execute(m_root + UPDATE_ICON,args,0);
 				}
 			break;
+
+			case FONTS:
+				if (checkFileExist(m_root + MKFONTSCALE)) {
+					args = MKFONTSCALE_ARGS + i.first;
+					p.execute(m_root + MKFONTSCALE, args,0);
+				}
+				if (checkFileExist(m_root + MKFONTDIR)) {
+					args = MKFONTDIR_ARGS + i.first;
+					p.execute(m_root + MKFONTDIR, args,0);
+				}
+				if (checkFileExist(m_root + FC_CACHE)) {
+					args = FC_CACHE_ARGS + i.first;
+					p.execute(m_root + FC_CACHE, args,0);
+				}
+				break;
 
 			case SCHEMAS:
 				if (checkFileExist(m_root + COMPILE_SCHEMAS)) {
