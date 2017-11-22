@@ -23,3 +23,5 @@ documentation/htdocs
 documentation/Doxyfile
 documentation/latex
 *.mo
+*.save
+*.layout

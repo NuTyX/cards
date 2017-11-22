@@ -318,7 +318,7 @@ void Cards_wrapper::m_OnDoJobListFinished_Callback(const CEH_RC rc=CEH_RC::OK)
 }
 
 
-/** Broadcast the end of the thread ot get list of package to all event suscribers*/
+/** Broadcast the end of the thread to get list of packages to all event suscribers*/
 void Cards_wrapper::m_OnRefreshPackageFinished_Callback(const CEH_RC rc=CEH_RC::OK)
 {
 	for (auto* it : _arrCardsEventHandler)

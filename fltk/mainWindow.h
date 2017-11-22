@@ -40,6 +40,7 @@
 //Project Includes
 #include "pixmaps/flcards.xpm"
 #include "tableau.h"
+#include "pack_list.h"
 #include "cards_wrapper.h"
 
 using namespace std;
@@ -81,6 +82,7 @@ static void OnExit_CB(Fl_Widget*,void* pInstance);
 
 private:
 	Tableau* _tab;
+    PackList* _packList;
 	Fl_Input* _search;
 	Fl_Text_Display* _console;
 	Fl_Text_Buffer * _tbuff;

@@ -49,8 +49,8 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	_btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
 	_btnApply->deactivate(); // Disabled by default until a modification is pending
 	_btnApply->callback(&ApplyButton_CB,(void*)this);
-
-	_tab = new Tableau(MARGIN, MARGIN+50, w()-MARGIN*2, h()-400);
+	_packList = new PackList(MARGIN,MARGIN +50 , 72,h()-400);
+	_tab = new Tableau(MARGIN+92, MARGIN+50, w()-MARGIN*2-92, h()-400);
 	_cards = Cards_wrapper::instance();
 	_cards->subscribeToEvents(this);
 	cout << "FlCards use ";
