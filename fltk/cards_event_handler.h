@@ -50,10 +50,11 @@ class Cards_wrapper;
  */
 class Cards_event_handler
 {
+	// Only Cards_wrapper can access those protected methods
     friend Cards_wrapper;
 protected:
 
-    virtual void OnLogMessage (const string& Message){}
+    virtual void OnLogMessage (const string& Message){} //NOP method like
     virtual void OnSyncFinished (const CEH_RC rc){}
     virtual void OnDoJobListFinished (const CEH_RC rc){}
     virtual void OnRefreshPackageFinished (const CEH_RC rc){}
