@@ -26,12 +26,40 @@
 
 #include <FL/Fl.H>
 #include <FL/Fl_Pack.H>
+#include <FL/Fl_Widget.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Pixmap.H>
+#include "pixmaps/lxde.xpm"
+#include "pixmaps/xfce.xpm"
+#include "pixmaps/lxqt.xpm"
+#include "pixmaps/mate.xpm"
+#include "pixmaps/gnome.xpm"
+#include "pixmaps/kde.xpm"
 
-class PackList  : public Fl_Pack
+#include <iostream>
+
+#include "cards_wrapper.h"
+
+using namespace std;
+
+enum Collections
+{
+	LXDE,
+	XFCE,
+	LXQT,
+	MATE,
+	GNOME,
+	KDE
+};
+
+class PackList : public Fl_Pack
 {
 public:
 	PackList (int x, int y, int w, int h);
 	~PackList(){}
+
+protected:
+static void OnClickButton (Fl_Widget* widget, long p);
 };
 
 #endif

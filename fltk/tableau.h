@@ -109,6 +109,7 @@ protected:
 	void draw_sort_arrow(int X, int Y, int W, int H);
 	void OnDoJobListFinished (const CEH_RC rc);
 	void OnRefreshPackageFinished (const CEH_RC rc);
+	void OnJobListChange(const CEH_RC rc);
 private:
 	string _filter;
 	vector<Row> _rowdata;
@@ -116,7 +117,6 @@ private:
 	int _sort_lastcol;
 	Cards_wrapper* _cards;
 static void event_callback(Fl_Widget*,void*);
-static void ContextMenu_Callback(Fl_Widget*,void*);
 	void event_callback2();
 };
 

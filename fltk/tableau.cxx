@@ -360,7 +360,7 @@ void Tableau::setFilter(const string& pValue)
     refresh_table();
 }
 
-void Tableau::ContextMenu_Callback(Fl_Widget*,void*)
+void Tableau::OnJobListChange(const CEH_RC rc)
 {
-
+	redraw();
 }
