@@ -89,6 +89,7 @@ void PackList::OnClickButton(Fl_Widget* w, long p)
 		case LXDE:
 		{
 			Collec_List.insert("(lxde)");
+			Collec_List.insert("(lxde-extra)");
 			break;
 		}
 		case XFCE:
