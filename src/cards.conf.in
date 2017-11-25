@@ -65,7 +65,14 @@
 # dir /var/lib/pkg/depot/mate-extra|http://downloads.nutyx.org
 # dir /var/lib/pkg/depot/mate|http://downloads.nutyx.org
 #
-
+dir /var/lib/pkg/depot/lxqt-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/lxqt|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/lxde-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/lxde|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/gnome-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/gnome|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/mate-extra|http://downloads.nutyx.org
+dir /var/lib/pkg/depot/mate|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/kde5-extra|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/kde5|http://downloads.nutyx.org
 dir /var/lib/pkg/depot/xfce4-extra|http://downloads.nutyx.org
