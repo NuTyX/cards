@@ -24,10 +24,11 @@
 #include "mainWindow.h"
 
 // Constructor of the main window
-mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
+mainWindow::mainWindow(int W, int H, string Title) :
 	Fl_Window(W,H,Title.c_str())
 {
 	icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
+	Config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
 	_search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
 	_search->labelfont(2);
 	_search->color(FL_WHITE);
@@ -49,8 +50,11 @@ mainWindow::mainWindow(int W=900, int H=900, string Title="Default") :
 	_btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
 	_btnApply->deactivate(); // Disabled by default until a modification is pending
 	_btnApply->callback(&ApplyButton_CB,(void*)this);
-	_packList = new PackList(MARGIN,MARGIN +50 , 72,h()-400);
-	_tab = new Tableau(MARGIN+92, MARGIN+50, w()-MARGIN*2-92, h()-400);
+	Fl_Scroll* ToolBoxContain = new Fl_Scroll (MARGIN,MARGIN +50 , 64,h()-400);
+	ToolBoxContain->begin();
+	_packList = new PackList(MARGIN,MARGIN +50 , 64,h()-400);
+	ToolBoxContain->end();
+	_tab = new Tableau(MARGIN+100, MARGIN+50, w()-MARGIN*2-100, h()-400);
 	_cards = Cards_wrapper::instance();
 	_cards->subscribeToEvents(this);
 	cout << "FlCards use ";
@@ -101,6 +105,11 @@ void mainWindow::OnSyncFinished(const CEH_RC rc)
 {
 	Fl::lock();
 	cout << "Sync : " << Cards_event_handler::getReasonCodeString(rc) << endl;
+	if (rc==NO_ROOT)
+	{
+		fl_alert("Please launch this application with root privileges");
+		hide();
+	}
 	Fl::unlock();
 }
 
@@ -121,6 +130,6 @@ void mainWindow::OnJobListChange(const CEH_RC rc)
 
 void mainWindow::OnExit_CB(Fl_Widget* pWidget, void* pInstance)
 {
-	//Cards_wrapper::instance()->JoinThreads();
+	Cards_wrapper::instance()->JoinThreads();
 	((Fl_Window*)pInstance)->hide();
 }

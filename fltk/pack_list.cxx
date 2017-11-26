@@ -29,7 +29,7 @@ PackList::PackList (int x, int y, int w, int h)
 	this->box(FL_DOWN_FRAME);
 	this->begin();
 	//lxde
-	Fl_Button* lxde = new Fl_Button(0,0,72,72,"");
+	Fl_Button* lxde = new Fl_Button(0,0,52,52,"");
 	Fl_Pixmap* lxde_Icon = new Fl_Pixmap(lxde_xpm);
 	lxde->tooltip("Lxde : a lightweight desktop environment based on X11");
 	lxde->image(lxde_Icon);
@@ -37,7 +37,7 @@ PackList::PackList (int x, int y, int w, int h)
 	lxde->callback(&OnClickButton,Collections::LXDE);
 
 	//Xfce
-	Fl_Button* xfce = new Fl_Button(0,0,72,72,"");
+	Fl_Button* xfce = new Fl_Button(0,0,52,52,"");
 	Fl_Pixmap* xfce_Icon = new Fl_Pixmap(xfce_xpm);
 	xfce->tooltip("xfce : a lightweight desktop environment based on GTK+");
 	xfce->image(xfce_Icon);
@@ -45,7 +45,7 @@ PackList::PackList (int x, int y, int w, int h)
 	xfce->callback(&OnClickButton,Collections::XFCE);
 
 	//lxqt
-	Fl_Button* lxqt = new Fl_Button(0,0,72,72,"");
+	Fl_Button* lxqt = new Fl_Button(0,0,52,52,"");
 	Fl_Pixmap* lxqt_icon = new Fl_Pixmap(lxqt_xpm);
 	lxqt->tooltip("lxqt : a lightweight desktop environment based on Qt");
 	lxqt->image(lxqt_icon);
@@ -53,7 +53,7 @@ PackList::PackList (int x, int y, int w, int h)
 	lxqt->callback(&OnClickButton,Collections::LXQT);
 
 	//Mate
-	Fl_Button* Mate = new Fl_Button(0,0,72,72,"");
+	Fl_Button* Mate = new Fl_Button(0,0,52,52,"");
 	Fl_Pixmap* Mate_Icon = new Fl_Pixmap(mate_xpm);
 	Mate->tooltip("Mate : a Gnome 2 desktop environment fork, light and functional");
 	Mate->image(Mate_Icon);
@@ -61,7 +61,7 @@ PackList::PackList (int x, int y, int w, int h)
 	Mate->callback(&OnClickButton,Collections::MATE);
 
 	//Gnome 3
-	Fl_Button* Gnome = new Fl_Button(0,0,72,72,"");
+	Fl_Button* Gnome = new Fl_Button(0,0,52,52,"");
 	Fl_Pixmap* Gnome_Icon = new Fl_Pixmap(gnome_xpm);
 	Gnome->tooltip("Gnome 3 : The mythic desktop environment");
 	Gnome->image(Gnome_Icon);
@@ -69,7 +69,7 @@ PackList::PackList (int x, int y, int w, int h)
 	Gnome->callback(&OnClickButton,Collections::GNOME);
 
 	//KDE
-	Fl_Button* KDE = new Fl_Button(0,0,72,72,"");
+	Fl_Button* KDE = new Fl_Button(0,0,52,52,"");
 	Fl_Pixmap* KDE_Icon = new Fl_Pixmap(kde_xpm);
 	KDE->tooltip("KDE : a heavy powerfull Desktop Environment");
 	KDE->image(KDE_Icon);

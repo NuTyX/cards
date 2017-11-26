@@ -110,6 +110,7 @@ protected:
 	void OnDoJobListFinished (const CEH_RC rc);
 	void OnRefreshPackageFinished (const CEH_RC rc);
 	void OnJobListChange(const CEH_RC rc);
+	void OnSyncFinished(const CEH_RC rc);
 private:
 	string _filter;
 	vector<Row> _rowdata;

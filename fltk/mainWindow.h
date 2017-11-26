@@ -34,6 +34,7 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Preferences.H>
 #include <string>
 #include <vector>
 
@@ -89,6 +90,7 @@ private:
 	Fl_Button* _btnSync;
 	Fl_Button* _btnApply;
 	Cards_wrapper* _cards;
+	Fl_Preferences* Config;
 };
 
 #endif // MAINWINDOW_H

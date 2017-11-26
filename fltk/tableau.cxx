@@ -68,7 +68,8 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	color(FL_WHITE);
 	_cards=Cards_wrapper::instance();
 	_cards->subscribeToEvents(this);
-	_cards->refreshPackageList();
+	_cards->sync();
+	//_cards->refreshPackageList();
 }
 
 /// Sort a column up or down
@@ -140,8 +141,8 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 				Fl_Color PackState = FL_WHITE;
 				if (pack!=nullptr)
 				{
-					if (pack->isToBeInstalled()) PackState = FL_GREEN;
-					else if (pack->isToBeRemoved()) PackState= FL_RED;
+					if (pack->isToBeInstalled()) PackState = FL_DARK_GREEN;
+					else if (pack->isToBeRemoved()) PackState= FL_DARK_RED;
 				}
 				//Bg color
 				Fl_Color bgcolor = row_selected(R) ? selection_color() : PackState;
@@ -246,6 +247,17 @@ void Tableau::OnRefreshPackageFinished (const CEH_RC rc)
 	Fl::unlock();
 }
 
+// Event Callback when Sync Thread is finished
+void Tableau::OnSyncFinished(const CEH_RC rc)
+{
+	Fl::lock();
+	if (rc==CEH_RC::OK)
+	{
+		_cards->refreshPackageList();
+	}
+	Fl::unlock();
+}
+
 /// Callback whenever someone clicks on different parts of the table
 void Tableau::event_callback(Fl_Widget*, void *data)
 {
@@ -279,10 +291,10 @@ void Tableau::event_callback2()
 		}
 		case CONTEXT_CELL:
 		{
+		    Cards_package* pack = _cards->getPackage(_rowdata[ROW].cols[2]);
+            if (pack==nullptr) break;
 			if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
 			{
-				Cards_package* pack = _cards->getPackage(_rowdata[ROW].cols[2]);
-				if (pack==nullptr) break;
 				Fl_Menu_Item rclick_menu[] = {
 					{ "Install" },
 					{ "Remove" },
@@ -345,6 +357,9 @@ void Tableau::event_callback2()
 					_cards->refreshJobList();
 				}
 			}
+            if (pack->isToBeInstalled()) selection_color(FL_GREEN);
+            else if (pack->isToBeRemoved()) selection_color(FL_RED);
+            else selection_color(FL_YELLOW);
 			select_row(ROW);
 			break;
 		}

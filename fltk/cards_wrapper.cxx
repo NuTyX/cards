@@ -131,18 +131,21 @@ const vector<Cards_package*>& Cards_wrapper::getJobList()
 void Cards_wrapper::sync()
 {
 	if (m_IsThreadFree()) _job = new thread(&Cards_wrapper::m_Sync_Thread, Cards_wrapper::_ptCards_wrapper);
+	_job->detach();
 }
 
 /** Create a new thread for Cards Sync operation*/
 void Cards_wrapper::doJobList()
 {
 	if (m_IsThreadFree()) _job = new thread(&Cards_wrapper::m_DoJobList_Thread, Cards_wrapper::_ptCards_wrapper);
+	_job->detach();
 }
 
 /** Create a new thread for Cards Sync operation*/
 void Cards_wrapper::refreshPackageList()
 {
 	if (m_IsThreadFree()) _job = new thread(&Cards_wrapper::m_RefreshPackageList_Thread, Cards_wrapper::_ptCards_wrapper);
+	_job->detach();
 }
 
 ///
@@ -366,7 +369,6 @@ bool Cards_wrapper::m_IsThreadFree()
 	{
 		if (_job != nullptr)
 		{
-			_job->detach();
 			delete _job;
 			_job=nullptr;
 		}
