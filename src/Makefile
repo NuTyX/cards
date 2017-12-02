@@ -30,6 +30,7 @@ TOOLSOBJECTS =	system_utils.o \
 		archive_utils.o \
 		file_utils.o \
 		process.o \
+		pkg.o \
 		runtime_dependencies_utils.o \
 		pkgdbh.o \
 		pkgadd.o \
@@ -50,6 +51,7 @@ CARDSOBJECTS =	system_utils.o \
 		cards_argument_parser.o \
 		file_utils.o \
 		process.o \
+		pkg.o \
 		runtime_dependencies_utils.o \
 		pkgdbh.o \
 		pkgadd.o \
@@ -79,6 +81,7 @@ LIBOBJECTS =  system_utils.o \
 	file_download.o \
 	file_utils.o \
 	process.o \
+	pkg.o \
 	runtime_dependencies_utils.o \
 	pkgdbh.o \
 	pkgadd.o \
@@ -105,6 +108,7 @@ HEADERS = system_utils.h \
 		repodwl.h \
 		file_download.h \
 		process.h \
+		pkg.h \
 		runtime_dependencies_utils.h \
 		pkgdbh.h \
 		pkgadd.h \
