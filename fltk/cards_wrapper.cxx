@@ -393,3 +393,11 @@ void Cards_wrapper::JoinThreads()
 {
 	if (!m_IsThreadFree()) _job->join();
 }
+
+void Cards_wrapper::OnProgressInfo(int percent)
+{
+	for (auto* it : _arrCardsEventHandler)
+	{
+		it->OnProgressInfo(percent);
+	}
+}

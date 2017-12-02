@@ -1,6 +1,7 @@
 /*
- * flcards.cxx
+ * version.h
  *
+ * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,13 +22,23 @@
  *
  */
 
-#include "mainWindow.h"
+#ifndef VERSION_H
+#define VERSION_H
 
-int main(int argc, char **argv)
-{
-	Fl::lock();
-	mainWindow win;
-	win.resizable(win);
-	win.show(argc, argv);
-	return Fl::run();
-}
+#define STRINGIZE2(s) #s
+#define STRINGIZE(s) STRINGIZE2(s)
+
+#define VERSION_MAJOR				1
+#define VERSION_MINOR				0
+#define VERSION_REVISION			0
+#define VERSION_BUILD				0
+
+#define APP_NAME_STR				"flcards"
+#define VER_FILE_VERSION			VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, VERSION_BUILD
+#define VER_FILE_VERSION_STR		STRINGIZE(VERSION_MAJOR)        \
+									"." STRINGIZE(VERSION_MINOR)    \
+									"." STRINGIZE(VERSION_REVISION)
+
+#define APP_NAME_VERSION_STR		APP_NAME_STR \
+									" " VER_FILE_VERSION_STR
+#endif

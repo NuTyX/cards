@@ -59,6 +59,7 @@ protected:
     virtual void OnDoJobListFinished (const CEH_RC rc){}
     virtual void OnRefreshPackageFinished (const CEH_RC rc){}
     virtual void OnJobListChange (const CEH_RC rc){}
+    virtual void OnProgressInfo (int percent){}
 public:
 static	const string getReasonCodeString(const CEH_RC rc);
 };

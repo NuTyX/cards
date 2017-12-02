@@ -32,7 +32,15 @@ using namespace std;
 
 // Define Cards_wrapper singleton for friendship
 class Cards_wrapper;
+class Cards_client;
 
+// Abstract Class to enable events callbacks
+class Cards_client_events
+{
+	friend Cards_client;
+protected:
+	void OnProgressInfo(int percent){}
+};
 
 /** \class Cards_client
  * \brief Interface Class to access Cards Library Method through inheritence
@@ -85,8 +93,24 @@ protected:
 	 * Launch Cards Remove process
 	 */
 	void RemovePackages(const set<string>& pPackageList);
+		/**
+	 * \brief Suscribe to CARDS events
+	 *
+	 * Record callback from client class which submit callback from Card lib
+	 */
+	void subscribeToEvents(Cards_client_events* pCallBack);
+
+	/**
+	 * \brief Unsuscribe from CARDS Events
+	 *
+	 * Unsuscribe client class callbock form Suscribe list
+	 */
+	void unsubscribeFromEvents(Cards_client_events* pCallBack);
+protected:
+	void progressInfo();
 private:
 	void getLocalePackagesList();
+	vector<Cards_client_events*> _arrCallback;
 };
 
 #endif // CARDS_WRAPPER_H

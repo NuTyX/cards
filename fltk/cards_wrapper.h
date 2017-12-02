@@ -37,6 +37,14 @@
 
 using namespace std;
 
+enum CARDS_ACTIONS
+{
+	SYNC,
+	UPG,
+	DOJOB,
+	REFRESH
+};
+
 /** \class Cards_wrapper
  * \brief GUI interfacing wrapper for CARDS
  *
@@ -44,7 +52,7 @@ using namespace std;
  * This is a single instance (singleton) that ensure only one instance of cards library.
  *
  */
-class  Cards_wrapper
+class  Cards_wrapper : public Cards_client_events
 {
 public:
 	/**
@@ -110,6 +118,9 @@ static Cards_wrapper*  instance();
 	const vector<Cards_package*>& getJobList();
 
 	void JoinThreads();
+protected:
+	void OnProgressInfo(int percent);
+
 private:
 
 /**

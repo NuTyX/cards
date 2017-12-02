@@ -142,3 +142,49 @@ void Cards_client::getLocalePackagesList()
 			for (auto i : tmpList) m_dependenciesList.push_back(i);
 	}
 }
+
+void Cards_client::progressInfo()
+{
+	int Value=0;
+	static int j = 0;
+	int i,n;
+	n = getNumberOfPackages();
+	switch ( m_actualAction )
+	{
+		case DB_OPEN_START:
+			Value=0;
+			break;
+		case DB_OPEN_RUN:
+			if (n >100) {
+				i = j / ( n / 100);
+				Value=i;
+			}
+			j++;
+			break;
+		case DB_OPEN_END:
+				Value=100;
+				break;
+	}
+	for (Cards_client_events* it : _arrCallback)
+	{
+		it->OnProgressInfo(Value);
+	}
+}
+
+// Add a nex suscriber to the callback event list
+void Cards_client::subscribeToEvents(Cards_client_events* pCallBack)
+{
+	// Todo : Check if the new susciber is already in the container
+	_arrCallback.push_back(pCallBack);
+}
+
+/// Remove an event suscriber from event callback list
+void Cards_client::unsubscribeFromEvents(Cards_client_events* pCallBack)
+{
+	vector<Cards_client_events*>::iterator it;
+	it=find(_arrCallback.begin(),_arrCallback.end(),pCallBack);
+	if (it!=_arrCallback.end())
+	{
+		_arrCallback.erase(it);
+	}
+}

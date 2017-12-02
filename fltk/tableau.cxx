@@ -68,8 +68,7 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	color(FL_WHITE);
 	_cards=Cards_wrapper::instance();
 	_cards->subscribeToEvents(this);
-	_cards->sync();
-	//_cards->refreshPackageList();
+	_cards->refreshPackageList();
 }
 
 /// Sort a column up or down
@@ -210,10 +209,12 @@ void Tableau::refresh_table()
     for (auto S : pkgList)
 	{
 		if (_filter.length()>0)
-			if ((S->getName().find(_filter)==string::npos) && (S->getCollection().find(_filter)==string::npos) ) continue;
+			if ((S->getName().find(_filter)==string::npos) &&
+				(S->getCollection().find(_filter)==string::npos) &&
+				(S->getDescription().find(_filter)==string::npos) ) continue;
 		// Add a new row
 		Row newrow;
-newrow.installed = S->isInstalled();
+		newrow.installed = S->isInstalled();
 		if(S->isInstalled())
 		{
 			newrow.cols.push_back("I");

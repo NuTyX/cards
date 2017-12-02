@@ -1,5 +1,5 @@
 /*
- * flcards.cxx
+ * progressbox.h
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
  *
@@ -21,13 +21,26 @@
  *
  */
 
-#include "mainWindow.h"
+#ifndef PROGRESSBOX_H
+#define PROGRESSBOX_H
 
-int main(int argc, char **argv)
+#include <FL/Fl.H>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Progress.H>
+#include "cards_wrapper.h"
+
+class ProgressBox : public Fl_Double_Window, public Cards_event_handler
 {
-	Fl::lock();
-	mainWindow win;
-	win.resizable(win);
-	win.show(argc, argv);
-	return Fl::run();
-}
+public:
+	ProgressBox (CARDS_ACTIONS action);
+	~ProgressBox ();
+protected:
+	void OnDoJobListFinished (const CEH_RC rc);
+	void OnSyncFinished(const CEH_RC rc);
+	void OnProgressInfo(int percent);
+private:
+	Fl_Progress* _progress;
+	Cards_wrapper* _cards;
+};
+
+#endif

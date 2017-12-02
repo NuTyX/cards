@@ -43,6 +43,7 @@
 #include "tableau.h"
 #include "pack_list.h"
 #include "cards_wrapper.h"
+#include "progressbox.h"
 
 using namespace std;
 
@@ -65,7 +66,7 @@ public:
 	 * Constructor of mainWindow class
 	 *
 	 */
-	mainWindow(int W, int H, string Title);
+	mainWindow();
 
 	virtual ~mainWindow();
 

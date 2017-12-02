@@ -22,13 +22,14 @@
  */
 
 #include "mainWindow.h"
+#include "version.h"
 
-// Constructor of the main window
-mainWindow::mainWindow(int W, int H, string Title) :
-	Fl_Window(W,H,Title.c_str())
+/// Constructor of the main window
+mainWindow::mainWindow() :
+	Fl_Window(900,900,APP_NAME_VERSION_STR)
 {
 	icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
-	Config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
+	Config = new Fl_Preferences(Fl_Preferences::USER,"nutyx",APP_NAME_STR);
 	_search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
 	_search->labelfont(2);
 	_search->color(FL_WHITE);
@@ -74,13 +75,23 @@ mainWindow::~mainWindow()
 // Callback on Sync Button click
 void mainWindow::SyncButton_CB(Fl_Widget*, void* pInstance)
 {
+	ProgressBox* box = new ProgressBox(SYNC);
+	box->set_modal();
 	Cards_wrapper::instance()->sync();
+	box->show();
+	while (box->shown()) Fl::wait();
+	delete box;
 }
 
 // Callback on Apply Button click
 void mainWindow::ApplyButton_CB(Fl_Widget*, void* pInstance)
 {
+	ProgressBox* box = new ProgressBox(DOJOB);
+	box->set_modal();
 	Cards_wrapper::instance()->doJobList();
+	box->show();
+	while (box->shown()) Fl::wait();
+	delete box;
 }
 
 // Callback on Apply Button click
@@ -108,7 +119,6 @@ void mainWindow::OnSyncFinished(const CEH_RC rc)
 	if (rc==NO_ROOT)
 	{
 		fl_alert("Please launch this application with root privileges");
-		hide();
 	}
 	Fl::unlock();
 }
