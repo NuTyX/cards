@@ -24,7 +24,7 @@
 #define PKGREPO_H
 
 #include "file_utils.h"
-
+#include "pkg.h"
 
 struct PortFilesList {
 	std::string md5SUM;
@@ -121,7 +121,6 @@ public:
  */
 
 		std::string getBasePackageVersion(const std::string& packageName);
-
 /**
  *  return the version of the port name
  */
@@ -157,6 +156,12 @@ public:
  *
  */
 		std::set<std::string> getBinaryPackageList();
+
+/**
+ *  return a Pkg set List of available binaries packages
+ *
+ */
+		std::set<Pkg*> getListOfPackages();
 /**
  * populate RepoInfo List
  *

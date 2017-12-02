@@ -48,8 +48,12 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 	}
 	if ((m_argParser.command() == CardsArgumentParser::CMD_LIST) ) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
-			set<string> binaryList = getBinaryPackageList();
-			for ( auto i : binaryList) cout << i << endl;
+			set<Pkg*> binaryList = getListOfPackages();
+			for ( auto i : binaryList) cout << "(" << i->getCollection()
+				<< ") "
+				<< i->getName() << " "
+				<< i->getVersion() << " "
+				<< i->getDescription() << endl;
 
 		} else if (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) {
 			getPortsList();

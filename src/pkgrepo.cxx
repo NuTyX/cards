@@ -24,6 +24,7 @@
 #include "pkgrepo.h"
 
 using namespace std;
+
 Pkgrepo::Pkgrepo(const std::string& fileName)
 	: m_configFileName(fileName)
 {
@@ -397,7 +398,38 @@ set<string> Pkgrepo::getBinaryPackageList()
 	}
 	return binaryList;
 }
-std::vector<RepoInfo> Pkgrepo::getRepoInfo()
+set<Pkg*> Pkgrepo::getListOfPackages()
+{
+	if (!m_parsePkgRepoCollectionFile)
+		parsePkgRepoCollectionFile();
+
+	set<Pkg*> pkgList;
+	// For each defined collection
+	for (auto i : m_portsDirectoryList) {
+		// For each directory found in this collection
+#ifndef NDEBUG
+		cerr << i.Dir << " " << i.Url << endl;
+#endif
+		for (auto j : i.basePackageList) {
+#ifndef NDEBUG
+			cerr << j.basePackageName << " "
+				<< j.description << " "
+				<< j.version << endl;
+#endif
+			Pkg* pkg = new Pkg();
+			string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
+			pkg->setName(j.basePackageName);
+			pkg->setVersion(j.version);
+			pkg->setDescription(j.description);
+			pkg->setCollection(baseDir);
+			pkg->setPackager(j.packager);
+
+			pkgList.insert(pkg);
+		}
+	}
+	return pkgList;
+}
+vector<RepoInfo> Pkgrepo::getRepoInfo()
 {
 	string::size_type pos;
 	std::vector<RepoInfo> List;
