@@ -37,8 +37,8 @@ ProgressBox::ProgressBox(CARDS_ACTIONS action) :
 		case SYNC:
 		{
 			label("Database Synchronization ...");
-			Fl_Output Message(50,60,200,30);
-			Message.value("Synchronizing, please wait...");
+			Fl_Output* Message = new Fl_Output(50,60,200,30);
+			Message->value("Synchronizing, please wait...");
 
 			break;
 		}
