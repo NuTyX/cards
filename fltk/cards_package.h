@@ -26,16 +26,9 @@
 
 #include <cstddef>
 #include <string>
+#include <libcards.h>
 
 using namespace std;
-
-enum CPSTATUS
-{
-	INSTALLED = 0x01,
-	TO_INSTALL = 0x02,
-	TO_REMOVE = 0x04,
-	TO_UPGRADE = 0x08
-};
 
 class Cards_wrapper;
 

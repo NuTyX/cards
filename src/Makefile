@@ -43,6 +43,7 @@ CARDSOBJECTS =	system_utils.o \
 		md5.o \
 		string_utils.o \
 		archive_utils.o \
+		pkg.o \
 		pkgrepo.o \
 		file_download.o \
 		repodwl.o \
@@ -51,7 +52,6 @@ CARDSOBJECTS =	system_utils.o \
 		cards_argument_parser.o \
 		file_utils.o \
 		process.o \
-		pkg.o \
 		runtime_dependencies_utils.o \
 		pkgdbh.o \
 		pkgadd.o \
@@ -104,11 +104,11 @@ HEADERS = system_utils.h \
 		string_utils.h \
 		file_utils.h \
 		archive_utils.h \
+		pkg.h \
 		pkgrepo.h \
 		repodwl.h \
 		file_download.h \
 		process.h \
-		pkg.h \
 		runtime_dependencies_utils.h \
 		pkgdbh.h \
 		pkgadd.h \

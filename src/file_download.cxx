@@ -25,6 +25,16 @@
 
 using namespace std;
 
+FileDownloadEvent::FileDownloadEvent()
+{
+	FileDownload::SuscribeToEvents(this);
+}
+
+FileDownloadEvent::~FileDownloadEvent()
+{
+	FileDownload::UnSuscribeFromEvents(this);
+}
+
 FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 	: m_progress(progress)
 {
@@ -178,6 +188,11 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 
 	fprintf(stderr,"\r    %sB  (%sB/s) %d %% - %d s   ",
 	(sizeHumanRead((int)dlnow)).c_str(), (sizeHumanRead((int)SpeedDownload)).c_str(), (int)((dlnow/dltotal) * 100 ), (int)((dltotal - dlnow)/SpeedDownload) );
+	FileDownloadState state;
+	state.dlnow = dlnow;
+	state.dltotal = dltotal;
+	state.dlspeed = (int)SpeedDownload;
+	SendProgressEvent(state);
 	return 0;
 }
 int FileDownload::updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
@@ -217,3 +232,30 @@ bool FileDownload::checkUpToDate()
 	return true;
 }
 // vim:set ts=2 :
+
+set<FileDownloadEvent*> FileDownload::m_arrCallBacks;
+
+void FileDownload::SendProgressEvent(FileDownloadState& event)
+{
+	for (auto it : m_arrCallBacks)
+	{
+		it->OnFileDownloadProgressInfo(event);
+	}
+}
+
+void FileDownload::SuscribeToEvents(FileDownloadEvent* callback)
+{
+	if ((FileDownload::m_arrCallBacks.find(callback)!=FileDownload::m_arrCallBacks.end()) || (callback!=nullptr))
+	{
+		FileDownload::m_arrCallBacks.insert(callback);
+	}
+}
+
+void FileDownload::UnSuscribeFromEvents(FileDownloadEvent* callback)
+{
+	auto it =  FileDownload::m_arrCallBacks.find(callback);
+	if (it != FileDownload::m_arrCallBacks.end())
+	{
+		FileDownload::m_arrCallBacks.erase(it);
+	}
+}

@@ -1,8 +1,8 @@
 //
 //  file_download.h
-// 
+//
 //  Copyright (c) 2013-2015 by NuTyX team (http://nutyx.org)
-// 
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -15,7 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
 
@@ -31,6 +31,50 @@
 
 #include "string_utils.h"
 #include "file_utils.h"
+
+/**
+ * \brief File Download State class
+ *
+ * This class provide container to provide progress update datas
+ * to client who suscribe to the progress event
+ *
+ */
+
+class FileDownloadState
+{
+	public:
+	double dlnow;
+	double dltotal;
+	double dlspeed;
+	std::string FileName;
+};
+
+class FileDownload;
+
+/**
+ * \brief File Download Event class
+ *
+ * This abstract class provide inherit definition for a callback
+ * suscriber to be callable by FileDownload Progress Update
+ *
+ */
+
+class FileDownloadEvent
+{
+	friend FileDownload;
+public:
+	FileDownloadEvent();
+	~FileDownloadEvent();
+
+	protected:
+
+	/**
+	 * Callback called when new progress data are available
+	 *
+	 * \param state Class container datas for current download
+	 */
+	virtual void OnFileDownloadProgressInfo(FileDownloadState state){};
+};
 
 /**
  * \brief File Download class
@@ -84,6 +128,8 @@ class FileDownload
 		curl_easy_cleanup(m_curl);
 	}
 
+	static void SuscribeToEvents(FileDownloadEvent* callback);
+	static void UnSuscribeFromEvents(FileDownloadEvent* callback);
 	private:
 
 	/**
@@ -106,6 +152,7 @@ class FileDownload
 	 * \return true if package is uptodate else false
 	 */
 	bool checkUpToDate();
+	void SendProgressEvent(FileDownloadState& event);
 	struct dwlProgress
 	{
 		double lastruntime;
@@ -122,6 +169,7 @@ class FileDownload
 	bool        m_checkMD5;
 	bool        m_progress;
 	std::string      m_MD5Sum;
+	static std::set<FileDownloadEvent*> m_arrCallBacks;
 };
 
 #endif /* FILEDOWNLOAD_H */

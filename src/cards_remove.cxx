@@ -1,24 +1,24 @@
 /*
  * cards_remove.cxx
- * 
+ *
  * Copyright 2013-2017 Thierry Nuttens <tnut@nutyx.org>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
- * 
+ *
+ *
  */
 
 
@@ -49,7 +49,7 @@ Cards_remove::Cards_remove(const string& commandName,
 				m_actualError = CANNOT_READ_DIRECTORY;
 				treatErrors(i);
 			}
-		}	
+		}
 		if (basePackagesList.empty())
 			throw runtime_error(_("No package found for the base System") );
 
@@ -93,18 +93,18 @@ Cards_remove::Cards_remove(const string& commandName,
 					break;
 				}
 			}
-			if (found){	
+			if (found){
 				cout << "The package '" << i.first
 					<< "' is in the base list" << endl;
-				cout << "   specify -a to remove it anyway" << endl;  
+				cout << "   specify -a to remove it anyway" << endl;
 				continue;
 			}
-			
+
 			m_packageName = i.first;
 			run();
 			string name = "(" +  m_packageCollection + ") ";
 			name += i.first;
-			syslog(LOG_INFO,name.c_str());
+			syslog(LOG_INFO,"%s",name.c_str());
 		}
 	} else {
 		for ( auto i : m_argParser.otherArguments() ) {
@@ -112,7 +112,7 @@ Cards_remove::Cards_remove(const string& commandName,
 			run();
 			string name = "(" + m_packageCollection + ") ";
 			name += m_packageName;
-			syslog(LOG_INFO,name.c_str());
+			syslog(LOG_INFO,"%s",name.c_str());
 		}
 	}
 }

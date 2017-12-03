@@ -46,6 +46,7 @@ Cards_wrapper::Cards_wrapper()
 Cards_wrapper::~Cards_wrapper()
 {
 	JoinThreads();
+	m_ClearPackagesList();
 }
 
 /** Return or create singleton instance */
@@ -400,4 +401,9 @@ void Cards_wrapper::OnProgressInfo(int percent)
 	{
 		it->OnProgressInfo(percent);
 	}
+}
+
+void Cards_wrapper::OnFileDownloadProgressInfo(FileDownloadState state)
+{
+	cout << "Fichier = " << state.FileName << " , Total = " << state.dltotal;
 }
