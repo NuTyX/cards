@@ -52,7 +52,7 @@ enum CARDS_ACTIONS
  * This is a single instance (singleton) that ensure only one instance of cards library.
  *
  */
-class  Cards_wrapper : public Cards_client_events, public FileDownloadEvent
+class  Cards_wrapper : public Cards_client_events
 {
 public:
 	/**
@@ -120,7 +120,7 @@ static Cards_wrapper*  instance();
 	void JoinThreads();
 protected:
 	void OnProgressInfo(int percent);
-	void OnFileDownloadProgressInfo(FileDownloadState state);
+
 private:
 
 /**

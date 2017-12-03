@@ -191,7 +191,8 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 	FileDownloadState state;
 	state.dlnow = dlnow;
 	state.dltotal = dltotal;
-	state.dlspeed = (int)SpeedDownload;
+	state.dlspeed = SpeedDownload;
+	//state.filename = m_downloadFileName;
 	SendProgressEvent(state);
 	return 0;
 }
@@ -235,7 +236,7 @@ bool FileDownload::checkUpToDate()
 
 set<FileDownloadEvent*> FileDownload::m_arrCallBacks;
 
-void FileDownload::SendProgressEvent(FileDownloadState& event)
+void FileDownload::SendProgressEvent(FileDownloadState event)
 {
 	for (auto it : m_arrCallBacks)
 	{
@@ -245,7 +246,7 @@ void FileDownload::SendProgressEvent(FileDownloadState& event)
 
 void FileDownload::SuscribeToEvents(FileDownloadEvent* callback)
 {
-	if ((FileDownload::m_arrCallBacks.find(callback)!=FileDownload::m_arrCallBacks.end()) || (callback!=nullptr))
+	if ((FileDownload::m_arrCallBacks.find(callback)==FileDownload::m_arrCallBacks.end()) && (callback!=nullptr))
 	{
 		FileDownload::m_arrCallBacks.insert(callback);
 	}

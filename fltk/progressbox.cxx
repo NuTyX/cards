@@ -22,15 +22,14 @@
  */
 
 #include "progressbox.h"
+#include <FL/Fl_Output.H>
 
 ProgressBox::ProgressBox(CARDS_ACTIONS action) :
 	Fl_Double_Window(300,150)
 {
 	begin();
-	_progress = new Fl_Progress(50,60,200,30);
-	_progress->maximum(100.0);
-	_progress->minimum(0.0);
-	_progress->value(50.0);
+	_jobProgress = nullptr;
+	_fileProgress = nullptr;
 	_cards = Cards_wrapper::instance();
 	_cards->subscribeToEvents(this);
 	switch (action)
@@ -38,11 +37,25 @@ ProgressBox::ProgressBox(CARDS_ACTIONS action) :
 		case SYNC:
 		{
 			label("Database Synchronization ...");
+			Fl_Output Message(50,60,200,30);
+			Message.value("Synchronizing, please wait...");
+
 			break;
 		}
 		case DOJOB:
 		{
 			label("Package Install/Remove Job ...");
+			_jobProgress = new Fl_Progress(50,60,200,30);
+			_jobProgress->maximum(100.0);
+			_jobProgress->minimum(0.0);
+			_jobProgress->value(0.0);
+			_jobProgress->label("Job Progression");
+			_fileProgress = new Fl_Progress(50,100,200,30);
+			_fileProgress->maximum(100.0);
+			_fileProgress->minimum(0.0);
+			_fileProgress->value(0.0);
+			_fileProgress->label("Job Progression");
+			_fileProgress->align(FL_ALIGN_BOTTOM);
 		}
 	}
 	end();
@@ -51,7 +64,8 @@ ProgressBox::ProgressBox(CARDS_ACTIONS action) :
 ProgressBox::~ProgressBox()
 {
 	_cards->unsubscribeFromEvents(this);
-	delete _progress;
+	if (_fileProgress!= nullptr) delete _fileProgress;
+	if (_jobProgress!= nullptr) delete _jobProgress;
 }
 
 void ProgressBox::OnSyncFinished(const CEH_RC rc)
@@ -71,6 +85,16 @@ void ProgressBox::OnDoJobListFinished(const CEH_RC rc)
 void ProgressBox::OnProgressInfo(int percent)
 {
 	Fl::lock();
-	_progress->value((float)percent);
+	_jobProgress->value((float)percent);
+	Fl::unlock();
+}
+
+void ProgressBox::OnFileDownloadProgressInfo(FileDownloadState state)
+{
+	Fl::lock();
+	if (_fileProgress!=nullptr)
+	{
+		_fileProgress->value(state.dlnow/state.dltotal*100);
+	}
 	Fl::unlock();
 }

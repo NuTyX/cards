@@ -29,7 +29,7 @@
 #include <FL/Fl_Progress.H>
 #include "cards_wrapper.h"
 
-class ProgressBox : public Fl_Double_Window, public Cards_event_handler
+class ProgressBox : public Fl_Double_Window, public Cards_event_handler, public FileDownloadEvent
 {
 public:
 	ProgressBox (CARDS_ACTIONS action);
@@ -38,8 +38,10 @@ protected:
 	void OnDoJobListFinished (const CEH_RC rc);
 	void OnSyncFinished(const CEH_RC rc);
 	void OnProgressInfo(int percent);
+	void OnFileDownloadProgressInfo(FileDownloadState state);
 private:
-	Fl_Progress* _progress;
+	Fl_Progress* _jobProgress;
+	Fl_Progress* _fileProgress;
 	Cards_wrapper* _cards;
 };
 

@@ -46,7 +46,7 @@ class FileDownloadState
 	double dlnow;
 	double dltotal;
 	double dlspeed;
-	std::string FileName;
+	std::string filename;
 };
 
 class FileDownload;
@@ -152,7 +152,7 @@ class FileDownload
 	 * \return true if package is uptodate else false
 	 */
 	bool checkUpToDate();
-	void SendProgressEvent(FileDownloadState& event);
+	void SendProgressEvent(FileDownloadState event);
 	struct dwlProgress
 	{
 		double lastruntime;
