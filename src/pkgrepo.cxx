@@ -403,7 +403,7 @@ set<Pkg*> Pkgrepo::getListOfPackages()
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
 
-	set<Pkg*> pkgList;
+	// set<Pkg*> pkgList;
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
@@ -424,10 +424,10 @@ set<Pkg*> Pkgrepo::getListOfPackages()
 			pkg->setCollection(baseDir);
 			pkg->setPackager(j.packager);
 
-			pkgList.insert(pkg);
+			m_packagesList.insert(pkg);
 		}
 	}
-	return pkgList;
+	return m_packagesList;
 }
 vector<RepoInfo> Pkgrepo::getRepoInfo()
 {
@@ -787,5 +787,14 @@ int Pkgrepo::parseConfig(const char *fileName, Config& config)
 		i->Url = url;
 	}
 	return result;
+}
+void Pkgrepo::clearPackagesList()
+{
+	for (auto i : m_packagesList )
+	{
+		if (i !=nullptr)
+			delete i;
+	}
+	m_packagesList.clear();
 }
 // vim:set ts=2 :

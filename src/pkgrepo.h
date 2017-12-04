@@ -81,7 +81,7 @@ class Pkgrepo {
 public:
 
 		Pkgrepo(const std::string& fileName);
-		virtual ~Pkgrepo() {}
+		virtual ~Pkgrepo() { clearPackagesList(); }
 		static int parseConfig(const char *fileName,
 			Config& config);
 
@@ -247,6 +247,9 @@ protected:
 		Config m_config;
 
 		std::vector<PortsDirectory> m_portsDirectoryList;
+private:
+		void clearPackagesList();
+		std::set<Pkg*> m_packagesList;
 };
 #endif /* PKGREPO_H */
 // vim:set ts=2 :
