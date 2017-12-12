@@ -121,6 +121,7 @@ void mainWindow::OnSyncFinished(const CEH_RC rc)
 	{
 		fl_alert("Please launch this application with root privileges");
 	}
+	Fl::flush();
 	Fl::unlock();
 }
 
@@ -136,6 +137,7 @@ void mainWindow::OnJobListChange(const CEH_RC rc)
 	{
 		_btnApply->deactivate();
 	}
+	Fl::flush();
 	Fl::unlock();
 }
 

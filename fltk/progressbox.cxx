@@ -80,6 +80,7 @@ void ProgressBox::OnDoJobListFinished(const CEH_RC rc)
 {
 	Fl::lock();
 	this->hide();
+	Fl::flush();
 	Fl::unlock();
 }
 
@@ -87,6 +88,7 @@ void ProgressBox::OnProgressInfo(int percent)
 {
 	Fl::lock();
 	_jobProgress->value((float)percent);
+	Fl::flush();
 	Fl::unlock();
 }
 
@@ -97,6 +99,7 @@ void ProgressBox::OnFileDownloadProgressInfo(FileDownloadState state)
 	{
 		_fileProgress->value(state.dlnow/state.dltotal*100);
 	}
+	Fl::flush();
 	Fl::unlock();
 }
 
