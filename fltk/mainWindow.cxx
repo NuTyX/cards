@@ -108,6 +108,7 @@ void mainWindow::OnLogMessage(const string& pMessage)
 	if (_tbuff!=nullptr) _tbuff->append(pMessage.c_str());
 	_console->insert_position(_console->buffer()->length());
 	_console->scroll(_console->count_lines(0,_console->buffer()->length(),1),0);
+	Fl::flush();
 	Fl::unlock();
 }
 
@@ -140,6 +141,10 @@ void mainWindow::OnJobListChange(const CEH_RC rc)
 
 void mainWindow::OnExit_CB(Fl_Widget* pWidget, void* pInstance)
 {
-	Cards_wrapper::instance()->JoinThreads();
-	((Fl_Window*)pInstance)->hide();
+	while (Cards_wrapper::instance()->IsJobRunning())
+	{
+		Fl::wait(1);
+	}
+	//((mainWindow*)pWidget)->hide();
+    exit(0);
 }

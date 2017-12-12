@@ -33,7 +33,6 @@
 #include "pixmaps/xfce.xpm"
 #include "pixmaps/lxqt.xpm"
 #include "pixmaps/mate.xpm"
-#include "pixmaps/gnome.xpm"
 #include "pixmaps/kde.xpm"
 
 #include <iostream>

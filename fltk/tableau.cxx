@@ -245,6 +245,7 @@ void Tableau::OnRefreshPackageFinished (const CEH_RC rc)
 {
 	Fl::lock();
 	if (rc == CEH_RC::OK) refresh_table();
+	Fl::flush();
 	Fl::unlock();
 }
 

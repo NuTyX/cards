@@ -60,14 +60,6 @@ PackList::PackList (int x, int y, int w, int h)
 	Mate->align(FL_ALIGN_IMAGE_NEXT_TO_TEXT);
 	Mate->callback(&OnClickButton,Collections::MATE);
 
-	//Gnome 3
-	Fl_Button* Gnome = new Fl_Button(0,0,52,52,"");
-	Fl_Pixmap* Gnome_Icon = new Fl_Pixmap(gnome_xpm);
-	Gnome->tooltip("Gnome 3 : The mythic desktop environment");
-	Gnome->image(Gnome_Icon);
-	Gnome->align(FL_ALIGN_IMAGE_NEXT_TO_TEXT);
-	Gnome->callback(&OnClickButton,Collections::GNOME);
-
 	//KDE
 	Fl_Button* KDE = new Fl_Button(0,0,52,52,"");
 	Fl_Pixmap* KDE_Icon = new Fl_Pixmap(kde_xpm);

@@ -45,7 +45,6 @@ Cards_wrapper::Cards_wrapper()
 /** Destructor */
 Cards_wrapper::~Cards_wrapper()
 {
-	JoinThreads();
 	m_ClearPackagesList();
 }
 
@@ -102,6 +101,8 @@ Cards_package* Cards_wrapper::getPackage(const string& pName)
 	}
 	return ptr;
 }
+
+/// Update the job list
 
 void Cards_wrapper::refreshJobList()
 {
@@ -380,7 +381,7 @@ bool Cards_wrapper::m_IsThreadFree()
 
 void Cards_wrapper::m_ClearPackagesList()
 {
-	for (auto* it : _arrCardsPackages)
+	for (auto it : _arrCardsPackages)
 	{
 		if (it!=nullptr)
 		{
@@ -390,9 +391,9 @@ void Cards_wrapper::m_ClearPackagesList()
 	_arrCardsPackages.clear();
 }
 
-void Cards_wrapper::JoinThreads()
+bool Cards_wrapper::IsJobRunning()
 {
-	if (!m_IsThreadFree()) _job->join();
+	return _job_running;
 }
 
 void Cards_wrapper::OnProgressInfo(int percent)

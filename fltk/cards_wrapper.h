@@ -117,7 +117,7 @@ static Cards_wrapper*  instance();
 
 	const vector<Cards_package*>& getJobList();
 
-	void JoinThreads();
+	bool IsJobRunning();
 protected:
 	void OnProgressInfo(int percent);
 

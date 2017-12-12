@@ -39,6 +39,7 @@ protected:
 	void OnSyncFinished(const CEH_RC rc);
 	void OnProgressInfo(int percent);
 	void OnFileDownloadProgressInfo(FileDownloadState state);
+static void Callback(Fl_Widget*,void* pInstance);
 private:
 	Fl_Progress* _jobProgress;
 	Fl_Progress* _fileProgress;

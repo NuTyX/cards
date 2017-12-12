@@ -25,7 +25,7 @@
 #include <FL/Fl_Output.H>
 
 ProgressBox::ProgressBox(CARDS_ACTIONS action) :
-	Fl_Double_Window(300,150)
+	Fl_Double_Window(300,200)
 {
 	begin();
 	_jobProgress = nullptr;
@@ -58,6 +58,7 @@ ProgressBox::ProgressBox(CARDS_ACTIONS action) :
 			_fileProgress->align(FL_ALIGN_BOTTOM);
 		}
 	}
+	this->callback(&Callback,(void*)this);
 	end();
 }
 
@@ -97,4 +98,9 @@ void ProgressBox::OnFileDownloadProgressInfo(FileDownloadState state)
 		_fileProgress->value(state.dlnow/state.dltotal*100);
 	}
 	Fl::unlock();
+}
+
+void ProgressBox::Callback(Fl_Widget*,void* pInstance)
+{
+	return;
 }
