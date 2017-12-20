@@ -186,7 +186,7 @@ void Cards_wrapper::m_DoJobList_Thread()
 	CEH_RC rc=CEH_RC::OK;
 	if (m_checkRootAccess())
 	{
-		Cards_client Cards();
+		Cards_client Cards;
 		try
 		{
 			cout << "Determine Packages Install and Remove List..." << endl;

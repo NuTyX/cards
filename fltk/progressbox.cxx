@@ -25,7 +25,7 @@
 #include <FL/Fl_Output.H>
 
 ProgressBox::ProgressBox(CARDS_ACTIONS action) :
-	Fl_Double_Window(300,200)
+	Fl_Double_Window(300,100)
 {
 	begin();
 	_jobProgress = nullptr;
@@ -45,17 +45,18 @@ ProgressBox::ProgressBox(CARDS_ACTIONS action) :
 		case DOJOB:
 		{
 			label("Package Install/Remove Job ...");
-			_jobProgress = new Fl_Progress(50,60,200,30);
+			/*_jobProgress = new Fl_Progress(50,60,200,30);
 			_jobProgress->maximum(100.0);
 			_jobProgress->minimum(0.0);
 			_jobProgress->value(0.0);
-			_jobProgress->label("Job Progression");
-			_fileProgress = new Fl_Progress(50,100,200,30);
+			_jobProgress->label("Job Progression");*/
+			_fileProgress = new Fl_Progress(50,35,200,30);
 			_fileProgress->maximum(100.0);
 			_fileProgress->minimum(0.0);
 			_fileProgress->value(0.0);
 			_fileProgress->label("Job Progression");
 			_fileProgress->align(FL_ALIGN_BOTTOM);
+			_fileProgress->color(FL_BLUE);
 		}
 	}
 	this->callback(&Callback,(void*)this);
@@ -66,7 +67,7 @@ ProgressBox::~ProgressBox()
 {
 	_cards->unsubscribeFromEvents(this);
 	if (_fileProgress!= nullptr) delete _fileProgress;
-	if (_jobProgress!= nullptr) delete _jobProgress;
+	//if (_jobProgress!= nullptr) delete _jobProgress;
 }
 
 void ProgressBox::OnSyncFinished(const CEH_RC rc)
