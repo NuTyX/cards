@@ -83,6 +83,8 @@ static void OnExit_CB(Fl_Widget*,void* pInstance);
 	void OnJobListChange(const CEH_RC rc);
 
 private:
+	void LoadConfig();
+	void SaveConfig();
 	Tableau* _tab;
     PackList* _packList;
 	Fl_Input* _search;

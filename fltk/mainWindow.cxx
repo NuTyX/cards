@@ -29,7 +29,7 @@ mainWindow::mainWindow() :
 	Fl_Window(900,900,APP_NAME_VERSION_STR)
 {
 	icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
-	Config = new Fl_Preferences(Fl_Preferences::USER,"nutyx",APP_NAME_STR);
+	Config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
 	_search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
 	_search->labelfont(2);
 	_search->color(FL_WHITE);
@@ -61,16 +61,43 @@ mainWindow::mainWindow() :
 	cout << "FlCards use ";
 	_cards->printCardsVersion();
 	this->callback(&OnExit_CB,(void*)this);
+	LoadConfig();
 }
 
 // Main window destructor
 mainWindow::~mainWindow()
 {
-	//todo : wait end of threads
-	//Cards->join();
 	_cards->unsubscribeFromEvents(this);
 	_cards->kill();
 }
+
+// Preference File Loading and apply
+void mainWindow::LoadConfig()
+{
+	if (Config != nullptr)
+	{
+		int X,Y,H,W;
+		Config->get("MainWindowX",X,100);
+		Config->get("MainWindowY",Y,100);
+		Config->get("MainWindowH",H,900);
+		Config->get("MainWindowW",W,900);
+		resize(X,Y,W,H);
+	}
+}
+
+// Preference File Save and flush
+void mainWindow::SaveConfig()
+{
+	if (Config != nullptr)
+	{
+		Config->set("MainWindowX",x_root());
+		Config->set("MainWindowY",y_root());
+		Config->set("MainWindowH",h());
+		Config->set("MainWindowW",w());
+		Config->flush();
+	}
+}
+
 
 // Callback on Sync Button click
 void mainWindow::SyncButton_CB(Fl_Widget*, void* pInstance)
@@ -147,6 +174,6 @@ void mainWindow::OnExit_CB(Fl_Widget* pWidget, void* pInstance)
 	{
 		Fl::wait(1);
 	}
-	//((mainWindow*)pWidget)->hide();
+	((mainWindow*)pWidget)->SaveConfig();
     exit(0);
 }
