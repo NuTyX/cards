@@ -362,7 +362,7 @@ void Tableau::event_callback2()
             if (pack->isToBeInstalled()) selection_color(FL_GREEN);
             else if (pack->isToBeRemoved()) selection_color(FL_RED);
             else selection_color(FL_YELLOW);
-			select_row(ROW);
+			//select_row(ROW);
 			break;
 		}
 		default:
