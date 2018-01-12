@@ -66,6 +66,7 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	row_height_all(18);
 	tooltip("Click on the header of the column to sort it");
 	color(FL_WHITE);
+	selection_color(FL_YELLOW);
 	_cards=Cards_wrapper::instance();
 	_cards->subscribeToEvents(this);
 	_cards->refreshPackageList();
@@ -136,15 +137,8 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 		{
 			fl_push_clip(X,Y,W,H);
 			{
-				Cards_package* pack = _cards->getPackage(_rowdata[R].cols[2]);
-				Fl_Color PackState = FL_WHITE;
-				if (pack!=nullptr)
-				{
-					if (pack->isToBeInstalled()) PackState = FL_DARK_GREEN;
-					else if (pack->isToBeRemoved()) PackState= FL_DARK_RED;
-				}
 				//Bg color
-				Fl_Color bgcolor = row_selected(R) ? selection_color() : PackState;
+				Fl_Color bgcolor = row_selected(R) ? selection_color() : FL_WHITE;
 				fl_color(bgcolor);
 				fl_rectf(X,Y,W,H);
 				if (C !=0 )
@@ -153,7 +147,15 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
 					fl_color(FL_BLACK);
 					fl_draw(s.c_str(), X+2,Y,W,H, FL_ALIGN_LEFT);  //  +2= pad left
 				}
-				else if (_rowdata[R].installed)
+				else if (_rowdata[R].pack->isToBeInstalled())
+				{
+					fl_draw_pixmap(download_xpm,X+5,Y);
+				}
+				else if (_rowdata[R].pack->isToBeRemoved())
+				{
+					fl_draw_pixmap(deleted_xpm,X+5,Y);
+				}
+				else if (_rowdata[R].pack->isInstalled())
 				{
 					fl_draw_pixmap(checked_xpm,X+5,Y);
 				}
@@ -205,7 +207,6 @@ void Tableau::refresh_table()
     _rowdata.clear();
     cols(5);
     vector<Cards_package*> pkgList = _cards->getPackageList();
-    int r = 0;
     for (auto S : pkgList)
 	{
 		if (_filter.length()>0)
@@ -214,18 +215,17 @@ void Tableau::refresh_table()
 				(S->getDescription().find(_filter)==string::npos) ) continue;
 		// Add a new row
 		Row newrow;
-		newrow.installed = S->isInstalled();
-		if(S->isInstalled())
+		newrow.pack=S;
+		if(newrow.pack->isInstalled())
 		{
 			newrow.cols.push_back("I");
 		}
 		else newrow.cols.push_back("U");
-		newrow.cols.push_back(S->getCollection());
-		newrow.cols.push_back(S->getName());
-		newrow.cols.push_back(S->getDescription());
-		newrow.cols.push_back(S->getVersion());
+		newrow.cols.push_back(newrow.pack->getCollection());
+		newrow.cols.push_back(newrow.pack->getName());
+		newrow.cols.push_back(newrow.pack->getDescription());
+		newrow.cols.push_back(newrow.pack->getVersion());
 		_rowdata.push_back(newrow);
-		r++;
     }
 	// How many rows we loaded
 	rows((int)_rowdata.size());
@@ -293,7 +293,7 @@ void Tableau::event_callback2()
 		}
 		case CONTEXT_CELL:
 		{
-		    Cards_package* pack = _cards->getPackage(_rowdata[ROW].cols[2]);
+		    Cards_package* pack = _rowdata[ROW].pack;
             if (pack==nullptr) break;
 			if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
 			{
@@ -332,9 +332,6 @@ void Tableau::event_callback2()
 				}
 				else if ( strcmp(m->label(), "Install") == 0 )
 				{
-					/*set<string> Packages;
-					Packages.insert(_rowdata[ROW].cols[2]);
-					_cards->install(Packages);*/
 					pack->setStatus(TO_INSTALL);
 					_cards->refreshJobList();
 #ifndef NDEBUG
@@ -359,10 +356,7 @@ void Tableau::event_callback2()
 					_cards->refreshJobList();
 				}
 			}
-            if (pack->isToBeInstalled()) selection_color(FL_GREEN);
-            else if (pack->isToBeRemoved()) selection_color(FL_RED);
-            else selection_color(FL_YELLOW);
-			//select_row(ROW);
+			select_row(ROW);
 			break;
 		}
 		default:

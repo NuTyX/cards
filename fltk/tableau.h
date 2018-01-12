@@ -40,6 +40,8 @@
 #include <FL/Fl_Menu.H>
 #include "cards_wrapper.h"
 #include "pixmaps/checked.xpm"
+#include "pixmaps/download.xpm"
+#include "pixmaps/deleted.xpm"
 
 #define MARGIN 20
 #define COLHEADER { "Inst","Collection", "Name", "Description", "Version", "", "", "", ""}
@@ -50,8 +52,9 @@ using namespace std;
 class Row
 {
 public:
-	vector<string> cols;
-	bool installed;
+					Row(){pack=nullptr;}
+	Cards_package*	pack;
+	vector<string>	cols;
 };
 
 // Class for handling the sorting column using std::sort
