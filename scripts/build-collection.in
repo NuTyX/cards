@@ -172,7 +172,7 @@ setup_collection() {
 	DIR="/$VERSION/$COLLECTION"
 
 	if [ "$COLLECTION" == "base" ]; then
-		GIT="x86_64-sysV"
+		GIT="base-sysV"
 		echo "dir /DEPOT/$COLLECTION
 base /DEPOT/base
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
@@ -214,7 +214,7 @@ base /DEPOT/base
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 		return
 	fi
-	if [ "$COLLECTION" == "nonfree" ]; then
+	if [ "$COLLECTION" == "nos" ]; then
 		echo "dir /DEPOT/$COLLECTION
 dir /DEPOT/gui
 dir /DEPOT/cli
@@ -278,10 +278,10 @@ mkdir -p $1/etc || exit 1
 
 setup_collection
 
-if [ "$GIT" == "x86_64-sysV" ] \
+if [ "$GIT" == "base-sysV" ] \
 || [ "$GIT" == "core"  ] \
 || [ "$GIT" == "extra" ] \
-|| [ "$GIT" == "nonfree" ]; then
+|| [ "$GIT" == "nos" ]; then
 	DEVEL="cards.devel \
 && cd /root/$GIT \
 && bash scripts/$COLLECTION"
