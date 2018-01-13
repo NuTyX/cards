@@ -57,7 +57,7 @@ using namespace std;
  * by libcard operation. This also ensure libcard is quiet to
  * operate like if it was been launched on a terminal.
  */
-class mainWindow : public Fl_Window, public Cards_event_handler
+class mainWindow : public Fl_Double_Window, public Cards_event_handler
 {
 public:
 	/**
@@ -69,7 +69,7 @@ public:
 	mainWindow();
 
 	virtual ~mainWindow();
-
+	void LoadConfig();
 protected:
 //Widgets callbacks
 static void SyncButton_CB(Fl_Widget*,void* pInstance);
@@ -83,7 +83,6 @@ static void OnExit_CB(Fl_Widget*,void* pInstance);
 	void OnJobListChange(const CEH_RC rc);
 
 private:
-	void LoadConfig();
 	void SaveConfig();
 	Tableau* _tab;
     PackList* _packList;

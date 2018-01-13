@@ -26,7 +26,7 @@
 
 /// Constructor of the main window
 mainWindow::mainWindow() :
-	Fl_Window(900,900,APP_NAME_VERSION_STR)
+	Fl_Double_Window(900,900,APP_NAME_VERSION_STR)
 {
 	icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
 	Config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
@@ -61,7 +61,6 @@ mainWindow::mainWindow() :
 	cout << "FlCards use ";
 	_cards->printCardsVersion();
 	this->callback(&OnExit_CB,(void*)this);
-	LoadConfig();
 }
 
 // Main window destructor
@@ -79,8 +78,8 @@ void mainWindow::LoadConfig()
 		int X,Y,H,W;
 		Config->get("MainWindowX",X,100);
 		Config->get("MainWindowY",Y,100);
-		Config->get("MainWindowH",H,900);
-		Config->get("MainWindowW",W,900);
+		Config->get("MainWindowH",H,700);
+		Config->get("MainWindowW",W,700);
 		resize(X,Y,W,H);
 	}
 }

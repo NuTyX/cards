@@ -29,5 +29,6 @@ int main(int argc, char **argv)
 	mainWindow win;
 	win.resizable(win);
 	win.show(argc, argv);
+	win.LoadConfig();
 	return Fl::run();
 }

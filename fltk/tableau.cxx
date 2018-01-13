@@ -70,6 +70,7 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
 	_cards=Cards_wrapper::instance();
 	_cards->subscribeToEvents(this);
 	_cards->refreshPackageList();
+	resizable (this);
 }
 
 /// Sort a column up or down
