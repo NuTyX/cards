@@ -159,9 +159,9 @@ void Cards_install::getLocalePackagesList()
 				tmpList.insert(packageName);
 			}
 		}
-		if (tmpList.size() > 0 )
-			for (auto i : tmpList) m_dependenciesList.push_back(i);
 	}
+	if (tmpList.size() > 0 )
+		for (auto i : tmpList) m_dependenciesList.push_back(i);
 #ifndef NDEBUG
 	for (auto i : m_dependenciesList ) std::cerr << i << std::endl;
 #endif

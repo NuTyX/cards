@@ -125,7 +125,7 @@ void Cards_client::RemovePackages(const set<string>& pPackageList)
 void Cards_client::getLocalePackagesList()
 {
 	if (m_config.locale.empty()) return;
-	std::vector<std::string> tmpList;
+	std::set<std::string> tmpList;
 	for ( auto i :  m_config.locale )
 	{
 		for ( auto j :m_dependenciesList )
@@ -135,12 +135,12 @@ void Cards_client::getLocalePackagesList()
 			{
 				m_packageFileName = getPackageFileName(packageName);
 				if ( ! checkFileExist(m_packageFileName) ) downloadPackageFileName(packageName);
-				tmpList.push_back(packageName);
+				tmpList.insert(packageName);
 			}
 		}
-		if (tmpList.size() > 0 )
-			for (auto i : tmpList) m_dependenciesList.push_back(i);
 	}
+	if (tmpList.size() > 0 )
+		for (auto i : tmpList) m_dependenciesList.push_back(i);
 }
 
 void Cards_client::progressInfo()
