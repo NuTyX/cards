@@ -31,15 +31,13 @@
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><br><a href=\"news\">Nouvelles</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"downloads\">Téléchargements</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"information\">Information</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"documentation\">Documentation</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"packages\">Paquets</a><br><br>" << endl \
   << "        </tr>" << endl \
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><br><a href=\"faq\">FAQ</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"information\">Information</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"screenshots\">Captures d'écrans</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"wallpapers\">Fonds d'écrans</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"https://forum.nutyx.org/index.php?action=recent\">Forum</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"../en\" title=\"Home\"> <img src=\"../graphics/gb.gif\" alt=\"Home\" height=\"12\" width=\"35\"></a><br><br>" << endl \
   << "        </tr>" << endl \
   << "       </table>" << endl \
@@ -59,15 +57,13 @@
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><br><a href=\"news\">Haberler</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"downloads\">Indirmeler</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"information\">Bilgilendirme</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"documentation\">Dökümantasyon</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"packages\">Paketler</a><br><br>" << endl \
   << "        </tr>" << endl \
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><br><a href=\"faq\">Sık Sorulan Sorular</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"information\">Bilgilendirme</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"screenshots\">Screenshots</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"wallpapers\">Wallpapers</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"https://forums.nutyx.org/index.php?action=recent\">Forum</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"../en\" title=\"Home\"> <img src=\"../graphics/gb.gif\" alt=\"Home\" height=\"12\" width=\"35\"></a><br><br>" << endl \
   << "        </tr>" << endl \
   << "       </table>" << endl \
@@ -88,15 +84,13 @@
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><br><a href=\"news\">News</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"downloads\">Downloads</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"information\">Information</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"documentation\">Documentation</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"packages\">Packages</a><br><br>" << endl \
   << "        </tr>" << endl \
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><br><a href=\"faq\">FAQ</a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"information\">Information</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"screenshots\">Screenshots</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"wallpapers\">Wallpapers</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"https://forums.nutyx.org/index.php?action=recent\">Forum</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"../fr\" title=\"Acceuil\"> <img src=\"../graphics/fr.gif\" alt=\"Accueil\" height=\"12\" width=\"35\"></a><br><br>" << endl \
   << "        </tr>" << endl \
   << "       </table>" << endl \
