@@ -51,11 +51,14 @@ mainWindow::mainWindow() :
 	_btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
 	_btnApply->deactivate(); // Disabled by default until a modification is pending
 	_btnApply->callback(&ApplyButton_CB,(void*)this);
-	Fl_Scroll* ToolBoxContain = new Fl_Scroll (MARGIN,MARGIN +50 , 64,h()-400);
-	ToolBoxContain->begin();
-	_packList = new PackList(MARGIN,MARGIN +50 , 64,h()-400);
-	ToolBoxContain->end();
-	_tab = new Tableau(MARGIN+100, MARGIN+50, w()-MARGIN*2-100, h()-400);
+	//Fl_Scroll* ToolBoxContain = new Fl_Scroll (MARGIN,MARGIN +50 , 64,h()-400);
+	//ToolBoxContain->begin();
+	_packList = new PackList(MARGIN,MARGIN +50 , 120,h()-400);
+	_packList->resizable(0);
+	size_range(400,500,0,0);
+	//ToolBoxContain->end();
+	_tab = new Tableau(MARGIN+130, MARGIN+50, w()-MARGIN*2-130, h()-400);
+	resizable(_tab);
 	_cards = Cards_wrapper::instance();
 	_cards->subscribeToEvents(this);
 	cout << "FlCards use ";

@@ -68,6 +68,7 @@ PackList::PackList (int x, int y, int w, int h)
 	KDE->align(FL_ALIGN_IMAGE_NEXT_TO_TEXT);
 	KDE->callback(&OnClickButton,Collections::KDE);
 	this->end();
+    resizable(0);
 }
 
 void PackList::OnClickButton(Fl_Widget* w, long p)
