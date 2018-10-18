@@ -4,8 +4,4 @@ To be able to compile flcards for test, we need:
  libcards.devel \
  fltk fltk.devel \
  xorg-libx11.devel \
- xorg-libxext.devel \
- xorg-libxfixes.devel \
- xorg-libxft.devel \
- xorg-libxinerama.devel \
- mesa.devel xproto
+ xorgproto
