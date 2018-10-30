@@ -22,6 +22,8 @@ file(GLOB SOURCES *.c*)
 file(GLOB_RECURSE HEADERS "*.h*")
 
 # Add FlTk Dependency
+
+set(FLTK_SKIP_OPENGL ON)
 find_package(FLTK REQUIRED)
 include_directories (${FLTK_INCLUDE_DIR})
 
