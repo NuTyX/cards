@@ -66,7 +66,7 @@ public:
 	 * Constructor of mainWindow class
 	 *
 	 */
-	mainWindow();
+	mainWindow(bool pInstaller=false);
 
 	virtual ~mainWindow();
 	void LoadConfig();

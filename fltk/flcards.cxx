@@ -21,12 +21,51 @@
  *
  */
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 #include "mainWindow.h"
+
+int helpFlag = 0;
+bool isInstaller = false;
+
+int arg_parser( int argc, char** argv, int &i )
+{
+    if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0)
+    {
+        helpFlag = 1;
+        i += 1;
+        return 1;
+    }
+    if (strcmp("-ni", argv[i]) == 0 || strcmp("--nutyx-installer", argv[i]) == 0)
+    {
+        isInstaller = true;
+        i += 1;
+        return 1;
+    }
+    return 0;
+}
 
 int main(int argc, char **argv)
 {
 	Fl::lock();
-	mainWindow win;
+	int i = 1;
+    if (Fl::args(argc, argv, i, arg_parser) < argc)
+        // note the concatenated strings to give a single format string!
+        Fl::fatal("error: unknown option: %s\n"
+              "usage: %s [options]\n"
+              " -h | --help             : print extended help message\n"
+              " -ni | --nutyx-installer : launch FlCards in Installer mode\n"
+              " plus standard fltk options\n",
+              argv[i], argv[0]);
+    if (helpFlag)
+        Fl::fatal("usage: %s [options]\n"
+              " -h | --help             : print extended help message\n"
+              " -ni | --nutyx-installer : launch FlCards in Installer mode\n"
+              " plus standard fltk options:\n"
+              "%s\n", argv[0], Fl::help);
+	mainWindow win(isInstaller);
 	win.resizable(win);
 	win.show(argc, argv);
 	win.LoadConfig();

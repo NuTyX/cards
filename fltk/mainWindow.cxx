@@ -25,10 +25,11 @@
 #include "version.h"
 
 /// Constructor of the main window
-mainWindow::mainWindow() :
+mainWindow::mainWindow(bool pInstaller) :
 	Fl_Double_Window(900,900,APP_NAME_VERSION_STR)
 {
 	icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
+    size_range(400,500,0,0);
 	Config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
 	_search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
 	_search->labelfont(2);
@@ -51,13 +52,20 @@ mainWindow::mainWindow() :
 	_btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
 	_btnApply->deactivate(); // Disabled by default until a modification is pending
 	_btnApply->callback(&ApplyButton_CB,(void*)this);
-	//Fl_Scroll* ToolBoxContain = new Fl_Scroll (MARGIN,MARGIN +50 , 64,h()-400);
-	//ToolBoxContain->begin();
-	_packList = new PackList(MARGIN,MARGIN +50 , 120,h()-400);
-	_packList->resizable(0);
-	size_range(400,500,0,0);
-	//ToolBoxContain->end();
-	_tab = new Tableau(MARGIN+130, MARGIN+50, w()-MARGIN*2-130, h()-400);
+
+	//Default Tab size and position
+	int TabLeftCoord = MARGIN;
+	int TabWidth = w()-MARGIN*2;
+	if (pInstaller)
+    {
+        // Gui Package Button for easy install of a desktop manager
+        _packList = new PackList(MARGIN,MARGIN +50 , 120,h()-400);
+        _packList->resizable(0);
+        TabLeftCoord += 130;
+        TabWidth -= 130;
+    }
+
+	_tab = new Tableau(TabLeftCoord, MARGIN+50, TabWidth, h()-400);
 	resizable(_tab);
 	_cards = Cards_wrapper::instance();
 	_cards->subscribeToEvents(this);
