@@ -44,8 +44,10 @@
 #include "pack_list.h"
 #include "cards_wrapper.h"
 #include "progressbox.h"
+#include "cards_log.h"
 
 using namespace std;
+using namespace cards;
 
 /** \class mainWindow
  * \brief FTLTK Main window of application
@@ -57,42 +59,46 @@ using namespace std;
  * by libcard operation. This also ensure libcard is quiet to
  * operate like if it was been launched on a terminal.
  */
-class mainWindow : public Fl_Double_Window, public Cards_event_handler
+class mainWindow : public Fl_Double_Window, public CEventHandler
 {
 public:
-	/**
-	 * \brief Constructor
-	 *
-	 * Constructor of mainWindow class
-	 *
-	 */
-	mainWindow(bool pInstaller=false);
+    /**
+     * \brief Constructor
+     *
+     * Constructor of mainWindow class
+     *
+     */
+    mainWindow(bool pInstaller=false);
 
-	virtual ~mainWindow();
-	void LoadConfig();
+    virtual ~mainWindow();
+    void LoadConfig();
+
 protected:
 //Widgets callbacks
-static void SyncButton_CB(Fl_Widget*,void* pInstance);
-static void ApplyButton_CB(Fl_Widget*,void* pInstance);
-static void SearchInput_CB(Fl_Widget*,void* pInstance);
-static void OnExit_CB(Fl_Widget*,void* pInstance);
+    static void SyncButton_CB(Fl_Widget*,void* pInstance);
+    static void ApplyButton_CB(Fl_Widget*,void* pInstance);
+    static void SearchInput_CB(Fl_Widget*,void* pInstance);
+    static void OnExit_CB(Fl_Widget*,void* pInstance);
 
 //Cards Wrapper virtual events callabacks overrides
-	void OnLogMessage(const string& pMessage);
-	void OnSyncFinished(const CEH_RC rc);
-	void OnJobListChange(const CEH_RC rc);
+    void OnSyncFinished(const CEH_RC rc);
+    void OnJobListChange(const CEH_RC rc);
+
+//Cards Log callback
+    void OnLogMessage(const string& pMessage);
 
 private:
-	void SaveConfig();
-	Tableau* _tab;
+    void SaveConfig();
+    Tableau* _tab;
     PackList* _packList;
-	Fl_Input* _search;
-	Fl_Text_Display* _console;
-	Fl_Text_Buffer * _tbuff;
-	Fl_Button* _btnSync;
-	Fl_Button* _btnApply;
-	Cards_wrapper* _cards;
-	Fl_Preferences* Config;
+    Fl_Input* _search;
+    Fl_Text_Display* _console;
+    Fl_Text_Buffer * _tbuff;
+    Fl_Button* _btnSync;
+    Fl_Button* _btnApply;
+    CWrapper* _cards;
+    Fl_Preferences* _config;
+    CLogger* _log;
 };
 
 #endif // MAINWINDOW_H

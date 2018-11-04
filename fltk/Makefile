@@ -33,12 +33,14 @@ flcards:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_package.o cards_package.cxx
 	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o pack_list.o pack_list.cxx
 	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o progressbox.o progressbox.cxx
+	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_log.o cards_log.cxx
 
-	$(CXX) flcards.o tableau.o mainWindow.o cards_wrapper.o cards_client.o cards_event_handler.o cards_package.o pack_list.o progressbox.o -o $@ -lcards -lcurl -larchive $(LIBFLTK)
-	rm flcards.o mainWindow.o tableau.o cards_wrapper.o cards_client.o cards_event_handler.o cards_package.o pack_list.o progressbox.o
+
+	$(CXX) flcards.o tableau.o mainWindow.o cards_wrapper.o cards_client.o cards_event_handler.o cards_package.o cards_log.o pack_list.o progressbox.o -o $@ -lcards -lcurl -larchive $(LIBFLTK)
+	rm flcards.o mainWindow.o tableau.o cards_wrapper.o cards_client.o cards_event_handler.o cards_package.o cards_log.o pack_list.o progressbox.o
 
 clean:
-	rm -f flcards flcards.o mainWindow.o tableau.o cards_wrapper.o cards_client.o cards_event_handler.o cards_package.o pack_list.o progressbox.o
+	rm -f flcards flcards.o mainWindow.o tableau.o cards_wrapper.o cards_client.o cards_event_handler.o cards_package.o cards_log.o pack_list.o progressbox.o
 
 install:
 	install -D -m0755 flcards $(USRBINDIR)/flcards

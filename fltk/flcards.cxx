@@ -26,10 +26,18 @@
 #include <vector>
 
 #include "mainWindow.h"
+#include "cards_log.h"
+
+using namespace std;
+using namespace cards;
 
 int helpFlag = 0;
 bool isInstaller = false;
 
+
+///
+/// Argument parser for FlCards application in Fltk context
+///
 int arg_parser( int argc, char** argv, int &i )
 {
     if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0)
@@ -47,10 +55,14 @@ int arg_parser( int argc, char** argv, int &i )
     return 0;
 }
 
+///
+/// Main Program
+///
 int main(int argc, char **argv)
 {
-	Fl::lock();
-	int i = 1;
+    // Enable Multithreading on Fltk
+    Fl::lock();
+    int i = 1;
     if (Fl::args(argc, argv, i, arg_parser) < argc)
         // note the concatenated strings to give a single format string!
         Fl::fatal("error: unknown option: %s\n"
@@ -65,9 +77,12 @@ int main(int argc, char **argv)
               " -ni | --nutyx-installer : launch FlCards in Installer mode\n"
               " plus standard fltk options:\n"
               "%s\n", argv[0], Fl::help);
-	mainWindow win(isInstaller);
-	win.resizable(win);
-	win.show(argc, argv);
-	win.LoadConfig();
-	return Fl::run();
+
+    //Enable Log Manager
+    Fl::add_idle(CLogger::loopCallback);
+    mainWindow win(isInstaller);
+    win.resizable(win);
+    win.show(argc, argv);
+    win.LoadConfig();
+    return Fl::run();
 }

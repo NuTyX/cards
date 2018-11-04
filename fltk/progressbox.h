@@ -29,21 +29,23 @@
 #include <FL/Fl_Progress.H>
 #include "cards_wrapper.h"
 
-class ProgressBox : public Fl_Double_Window, public Cards_event_handler, public FileDownloadEvent
+using namespace cards;
+
+class ProgressBox : public Fl_Double_Window, public CEventHandler, public FileDownloadEvent
 {
 public:
-	ProgressBox (CARDS_ACTIONS action);
-	~ProgressBox ();
+    ProgressBox (CW_ACTIONS action);
+    ~ProgressBox ();
 protected:
-	void OnDoJobListFinished (const CEH_RC rc);
-	void OnSyncFinished(const CEH_RC rc);
-	void OnProgressInfo(int percent);
-	void OnFileDownloadProgressInfo(FileDownloadState state);
+    void OnDoJobListFinished (const CEH_RC rc);
+    void OnSyncFinished(const CEH_RC rc);
+    void OnProgressInfo(int percent);
+    void OnFileDownloadProgressInfo(FileDownloadState state);
 static void Callback(Fl_Widget*,void* pInstance);
 private:
-	Fl_Progress* _jobProgress;
-	Fl_Progress* _fileProgress;
-	Cards_wrapper* _cards;
+    Fl_Progress* _jobProgress;
+    Fl_Progress* _fileProgress;
+    CWrapper* _cards;
 };
 
 #endif

@@ -23,30 +23,33 @@
 
 #include "cards_event_handler.h"
 
-/// Convert Reason Code Enum to human readable text
-const string Cards_event_handler::getReasonCodeString(const CEH_RC rc)
+namespace cards
 {
-    switch (rc)
+    /// Convert Reason Code Enum to human readable text
+    const string CEventHandler::getReasonCodeString(const CEH_RC rc)
     {
-		case CEH_RC::OK:
-		{
-			return "Finished";
-			break;
-		}
-		case CEH_RC::NO_ROOT:
-		{
-			return "This application need root privileges, please restart it with super user rights!";
-			break;
-		}
-		case CEH_RC::EXCEPTION:
-		{
-			return "An exception occured during cardslib operation. See messages above to know the reason";
-			break;
-		}
-		default:
-		{
-			return "Unknown reason... Please contact Nutyx team to signal this case";
-			break;
-		}
+        switch (rc)
+        {
+            case CEH_RC::OK:
+            {
+                return "Finished";
+                break;
+            }
+            case CEH_RC::NO_ROOT:
+            {
+                return "This application need root privileges, please restart it with super user rights!";
+                break;
+            }
+            case CEH_RC::EXCEPTION:
+            {
+                return "An exception occured during cardslib operation. See messages above to know the reason";
+                break;
+            }
+            default:
+            {
+                return "Unknown reason... Please contact Nutyx team to signal this case";
+                break;
+            }
+        }
     }
 }

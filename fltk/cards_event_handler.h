@@ -28,40 +28,46 @@
 #include <string>
 #include <set>
 
-using namespace std;
-
-enum CEH_RC
+namespace cards
 {
-	OK=0,
-	NO_ROOT,
-	PKG_NOT_EXIST,
-	EXCEPTION
-};
+    using namespace std;
 
-// Define Cards_wrapper singleton for friendship
-class Cards_wrapper;
+    enum CEH_RC
+    {
+        OK=0,
+        NO_ROOT,
+        PKG_NOT_EXIST,
+        EXCEPTION
+    };
 
-/** \class Cards_event_handler
- * \brief Abstract class to handle event from cards_wrapper
- *
- * This class ensure interface cards with GUI application need non-blocking operation,
- * This is a single instance (singleton) that ensure only one instance of cards library.
- *
- */
-class Cards_event_handler
-{
-	// Only Cards_wrapper can access those protected methods
-    friend Cards_wrapper;
-protected:
+    // Define Cards_wrapper singleton for friendship
+    class CWrapper;
 
-    virtual void OnLogMessage (const string& Message){} //NOP method like
-    virtual void OnSyncFinished (const CEH_RC rc){}
-    virtual void OnDoJobListFinished (const CEH_RC rc){}
-    virtual void OnRefreshPackageFinished (const CEH_RC rc){}
-    virtual void OnJobListChange (const CEH_RC rc){}
-    virtual void OnProgressInfo (int percent){}
-public:
-static	const string getReasonCodeString(const CEH_RC rc);
-};
+    // Define Cards CLogger singleton for friednship
+    class CLogger;
+    /** \class Cards_event_handler
+     * \brief Abstract class to handle event from cards_wrapper
+     *
+     * This class ensure interface cards with GUI application need non-blocking operation,
+     * This is a single instance (singleton) that ensure only one instance of cards library.
+     *
+     */
+    class CEventHandler
+    {
+        // Wrapper and Logger can access those protected methods
+        friend CWrapper;
+        friend CLogger;
+    protected:
 
+        virtual void OnLogMessage (const string& Message){} //NOP method like
+        virtual void OnSyncFinished (const CEH_RC rc){}
+        virtual void OnDoJobListFinished (const CEH_RC rc){}
+        virtual void OnRefreshPackageFinished (const CEH_RC rc){}
+        virtual void OnJobListChange (const CEH_RC rc){}
+        virtual void OnProgressInfo (int percent){}
+
+    public:
+        static	const string getReasonCodeString(const CEH_RC rc);
+    };
+}
 #endif

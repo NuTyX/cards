@@ -23,70 +23,67 @@
 
 #include "cards_package.h"
 
-/// Constructor
-Cards_package::Cards_package()
+namespace cards
 {
-	_status = (CPSTATUS) 0;
-}
+    /// Constructor
+    CPackage::CPackage()
+    {
+        _status = (CPSTATUS) 0;
+    }
 
-/// Destructor
-Cards_package::~Cards_package()
-{
-// Nothing for moment
-}
+    /// Return
+    string CPackage::getCollection()
+    {
+        return _collection;
+    }
 
-/// Return
-string Cards_package::getCollection()
-{
-	return _collection;
-}
+    string CPackage::getName()
+    {
+        return _name;
+    }
 
-string Cards_package::getName()
-{
-	return _name;
-}
+    string CPackage::getVersion()
+    {
+        return _version;
+    }
 
-string Cards_package::getVersion()
-{
-	return _version;
-}
+    string CPackage::getPackager()
+    {
+        return _packager;
+    }
 
-string Cards_package::getPackager()
-{
-	return _packager;
-}
+    string CPackage::getDescription()
+    {
+        return _description;
+    }
 
-string Cards_package::getDescription()
-{
-	return _description;
-}
+    bool CPackage::isInstalled()
+    {
+        return _status & CPSTATUS::INSTALLED;
+    }
 
-bool Cards_package::isInstalled()
-{
-	return _status & CPSTATUS::INSTALLED;
-}
+    bool CPackage::isToBeInstalled()
+    {
+        return _status & CPSTATUS::TO_INSTALL;
+    }
 
-bool Cards_package::isToBeInstalled()
-{
-	return _status & CPSTATUS::TO_INSTALL;
-}
+    bool CPackage::isToBeRemoved()
+    {
+        return _status & CPSTATUS::TO_REMOVE;
+    }
 
-bool Cards_package::isToBeRemoved()
-{
-	return _status & CPSTATUS::TO_REMOVE;
-}
+    void CPackage::setStatus(CPSTATUS pstatus)
+    {
+        _status = (CPSTATUS)(_status | pstatus);
+    }
 
-void Cards_package::setStatus(CPSTATUS pstatus)
-{
-	_status = (CPSTATUS)(_status | pstatus);
-}
+    void CPackage::unSetStatus(CPSTATUS pstatus)
+    {
+        _status = (CPSTATUS)(_status & (~pstatus));
+    }
 
-void Cards_package::unSetStatus(CPSTATUS pstatus)
-{
-	_status = (CPSTATUS)(_status & (~pstatus));
-}
-
-CPSTATUS Cards_package::getStatus()
-{
-	return _status;
+    CPSTATUS CPackage::getStatus()
+    {
+        return _status;
+    }
 }

@@ -40,25 +40,26 @@
 #include "cards_wrapper.h"
 
 using namespace std;
+using namespace cards;
 
 enum Collections
 {
-	LXDE,
-	XFCE,
-	LXQT,
-	MATE,
-	GNOME,
-	KDE
+    LXDE,
+    XFCE,
+    LXQT,
+    MATE,
+    GNOME,
+    KDE
 };
 
 class PackList : public Fl_Pack
 {
 public:
-	PackList (int x, int y, int w, int h);
-	~PackList(){}
+    PackList (int x, int y, int w, int h);
+    ~PackList(){}
 
 protected:
-static void OnClickButton (Fl_Widget* widget, long p);
+    static void OnClickButton (Fl_Widget* widget, long p);
 };
 
 #endif

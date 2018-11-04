@@ -24,87 +24,87 @@
 #include "progressbox.h"
 #include <FL/Fl_Output.H>
 
-ProgressBox::ProgressBox(CARDS_ACTIONS action) :
-	Fl_Double_Window(300,100)
+ProgressBox::ProgressBox(CW_ACTIONS action) :
+    Fl_Double_Window(300,100)
 {
-	begin();
-	_jobProgress = nullptr;
-	_fileProgress = nullptr;
-	_cards = Cards_wrapper::instance();
-	_cards->subscribeToEvents(this);
-	switch (action)
-	{
-		case SYNC:
-		{
-			label("Database Synchronization ...");
-			Fl_Output* Message = new Fl_Output(50,60,200,30);
-			Message->value("Synchronizing, please wait...");
+    begin();
+    _jobProgress = nullptr;
+    _fileProgress = nullptr;
+    _cards = CWrapper::instance();
+    _cards->subscribeToEvents(this);
+    switch (action)
+    {
+        case SYNC:
+        {
+            label("Database Synchronization ...");
+            Fl_Output* Message = new Fl_Output(50,60,200,30);
+            Message->value("Synchronizing, please wait...");
 
-			break;
-		}
-		case DOJOB:
-		{
-			label("Package Install/Remove Job ...");
-			/*_jobProgress = new Fl_Progress(50,60,200,30);
-			_jobProgress->maximum(100.0);
-			_jobProgress->minimum(0.0);
-			_jobProgress->value(0.0);
-			_jobProgress->label("Job Progression");*/
-			_fileProgress = new Fl_Progress(50,35,200,30);
-			_fileProgress->maximum(100.0);
-			_fileProgress->minimum(0.0);
-			_fileProgress->value(0.0);
-			_fileProgress->label("Job Progression");
-			_fileProgress->align(FL_ALIGN_BOTTOM);
-			_fileProgress->color(FL_BLUE);
-		}
-	}
-	this->callback(&Callback,(void*)this);
-	end();
+            break;
+        }
+        case DOJOB:
+        {
+            label("Package Install/Remove Job ...");
+            /*_jobProgress = new Fl_Progress(50,60,200,30);
+            _jobProgress->maximum(100.0);
+            _jobProgress->minimum(0.0);
+            _jobProgress->value(0.0);
+            _jobProgress->label("Job Progression");*/
+            _fileProgress = new Fl_Progress(50,35,200,30);
+            _fileProgress->maximum(100.0);
+            _fileProgress->minimum(0.0);
+            _fileProgress->value(0.0);
+            _fileProgress->label("Job Progression");
+            _fileProgress->align(FL_ALIGN_BOTTOM);
+            _fileProgress->color(FL_BLUE);
+        }
+    }
+    this->callback(&Callback,(void*)this);
+    end();
 }
 
 ProgressBox::~ProgressBox()
 {
-	_cards->unsubscribeFromEvents(this);
-	if (_fileProgress!= nullptr) delete _fileProgress;
-	//if (_jobProgress!= nullptr) delete _jobProgress;
+    _cards->unsubscribeFromEvents(this);
+    if (_fileProgress!= nullptr) delete _fileProgress;
+    //if (_jobProgress!= nullptr) delete _jobProgress;
 }
 
 void ProgressBox::OnSyncFinished(const CEH_RC rc)
 {
-	Fl::lock();
-	this->hide();
-	Fl::unlock();
+    Fl::lock();
+    this->hide();
+    Fl::unlock();
 }
 
 void ProgressBox::OnDoJobListFinished(const CEH_RC rc)
 {
-	Fl::lock();
-	this->hide();
-	Fl::flush();
-	Fl::unlock();
+    Fl::lock();
+    this->hide();
+    Fl::flush();
+    Fl::unlock();
 }
 
 void ProgressBox::OnProgressInfo(int percent)
 {
-	Fl::lock();
-	_jobProgress->value((float)percent);
-	Fl::flush();
-	Fl::unlock();
+    Fl::lock();
+    _jobProgress->value((float)percent);
+    Fl::flush();
+    Fl::unlock();
 }
 
 void ProgressBox::OnFileDownloadProgressInfo(FileDownloadState state)
 {
-	Fl::lock();
-	if (_fileProgress!=nullptr)
-	{
-		_fileProgress->value(state.dlnow/state.dltotal*100);
-	}
-	Fl::flush();
-	Fl::unlock();
+    Fl::lock();
+    if (_fileProgress!=nullptr)
+    {
+        _fileProgress->value(state.dlnow/state.dltotal*100);
+    }
+    Fl::flush();
+    Fl::unlock();
 }
 
 void ProgressBox::Callback(Fl_Widget*,void* pInstance)
 {
-	return;
+    return;
 }

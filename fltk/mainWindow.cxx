@@ -26,37 +26,39 @@
 
 /// Constructor of the main window
 mainWindow::mainWindow(bool pInstaller) :
-	Fl_Double_Window(900,900,APP_NAME_VERSION_STR)
+    Fl_Double_Window(900,900,APP_NAME_VERSION_STR)
 {
-	icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
+    _log = CLogger::instance();
+    _log->subscribe(this);
+    icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
     size_range(400,500,0,0);
-	Config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
-	_search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
-	_search->labelfont(2);
-	_search->color(FL_WHITE);
-	_search->callback(&SearchInput_CB, (void*)this);
-	_search->when(FL_WHEN_CHANGED);
+    _config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
+    _search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
+    _search->labelfont(2);
+    _search->color(FL_WHITE);
+    _search->callback(&SearchInput_CB, (void*)this);
+    _search->when(FL_WHEN_CHANGED);
 
-	_console = new Fl_Text_Display(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
-	_tbuff = new Fl_Text_Buffer();
-	_console->buffer(_tbuff);
-	_console->color(FL_BLACK);
-	_console->textcolor(FL_GRAY);
-	_console->labeltype(FL_NO_LABEL );
+    _console = new Fl_Text_Display(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
+    _tbuff = new Fl_Text_Buffer();
+    _console->buffer(_tbuff);
+    _console->color(FL_BLACK);
+    _console->textcolor(FL_GRAY);
+    _console->labeltype(FL_NO_LABEL );
 
-	//Creation of the Sync Button
-	_btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
-	_btnSync->callback(&SyncButton_CB,(void*)this);
+    //Creation of the Sync Button
+    _btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
+    _btnSync->callback(&SyncButton_CB,(void*)this);
 
-	//Creation of the Apply Button
-	_btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
-	_btnApply->deactivate(); // Disabled by default until a modification is pending
-	_btnApply->callback(&ApplyButton_CB,(void*)this);
+    //Creation of the Apply Button
+    _btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
+    _btnApply->deactivate(); // Disabled by default until a modification is pending
+    _btnApply->callback(&ApplyButton_CB,(void*)this);
 
-	//Default Tab size and position
-	int TabLeftCoord = MARGIN;
-	int TabWidth = w()-MARGIN*2;
-	if (pInstaller)
+    //Default Tab size and position
+    int TabLeftCoord = MARGIN;
+    int TabWidth = w()-MARGIN*2;
+    if (pInstaller)
     {
         // Gui Package Button for easy install of a desktop manager
         _packList = new PackList(MARGIN,MARGIN +50 , 120,h()-400);
@@ -65,125 +67,129 @@ mainWindow::mainWindow(bool pInstaller) :
         TabWidth -= 130;
     }
 
-	_tab = new Tableau(TabLeftCoord, MARGIN+50, TabWidth, h()-400);
-	resizable(_tab);
-	_cards = Cards_wrapper::instance();
-	_cards->subscribeToEvents(this);
-	cout << "FlCards use ";
-	_cards->printCardsVersion();
-	this->callback(&OnExit_CB,(void*)this);
+    _tab = new Tableau(TabLeftCoord, MARGIN+50, TabWidth, h()-400);
+    resizable(_tab);
+    _cards = CWrapper::instance();
+    _cards->subscribeToEvents(this);
+    //_log->log(_("FlCards use ") + _cards->getCardsVersion());
+    this->callback(&OnExit_CB,(void*)this);
 }
 
 // Main window destructor
 mainWindow::~mainWindow()
 {
-	_cards->unsubscribeFromEvents(this);
-	_cards->kill();
+    _cards->unsubscribeFromEvents(this);
+    _cards->kill();
 }
 
 // Preference File Loading and apply
 void mainWindow::LoadConfig()
 {
-	if (Config != nullptr)
-	{
-		int X,Y,H,W;
-		Config->get("MainWindowX",X,100);
-		Config->get("MainWindowY",Y,100);
-		Config->get("MainWindowH",H,700);
-		Config->get("MainWindowW",W,700);
-		resize(X,Y,W,H);
-	}
+    if (_config != nullptr)
+    {
+        int X,Y,H,W;
+        _config->get("MainWindowX",X,100);
+        _config->get("MainWindowY",Y,100);
+        _config->get("MainWindowH",H,700);
+        _config->get("MainWindowW",W,700);
+        resize(X,Y,W,H);
+    }
 }
 
 // Preference File Save and flush
 void mainWindow::SaveConfig()
 {
-	if (Config != nullptr)
-	{
-		Config->set("MainWindowX",x_root());
-		Config->set("MainWindowY",y_root());
-		Config->set("MainWindowH",h());
-		Config->set("MainWindowW",w());
-		Config->flush();
-	}
+    if (_config != nullptr)
+    {
+        _config->set("MainWindowX",x_root());
+        _config->set("MainWindowY",y_root());
+        _config->set("MainWindowH",h());
+        _config->set("MainWindowW",w());
+        _config->flush();
+    }
 }
 
 
 // Callback on Sync Button click
 void mainWindow::SyncButton_CB(Fl_Widget*, void* pInstance)
 {
-	ProgressBox* box = new ProgressBox(SYNC);
-	box->set_modal();
-	Cards_wrapper::instance()->sync();
-	box->show();
-	while (box->shown()) Fl::wait();
-	delete box;
+    ProgressBox* box = new ProgressBox(SYNC);
+    box->set_modal();
+    CWrapper::instance()->sync();
+    box->show();
+    while (box->shown()) Fl::wait();
+    delete box;
 }
 
 // Callback on Apply Button click
 void mainWindow::ApplyButton_CB(Fl_Widget*, void* pInstance)
 {
-	ProgressBox* box = new ProgressBox(DOJOB);
-	box->set_modal();
-	Cards_wrapper::instance()->doJobList();
-	box->show();
-	while (box->shown()) Fl::wait();
-	delete box;
+    ProgressBox* box = new ProgressBox(DOJOB);
+    box->set_modal();
+    CWrapper::instance()->doJobList();
+    box->show();
+    while (box->shown()) Fl::wait();
+    delete box;
 }
 
 // Callback on Apply Button click
 void mainWindow::SearchInput_CB(Fl_Widget*, void* pInstance)
 {
-	mainWindow* o=(mainWindow*)pInstance;
-	o->_tab->setFilter(string(o->_search->value()));
+    mainWindow* o=(mainWindow*)pInstance;
+    o->_tab->setFilter(string(o->_search->value()));
 }
 
 // Callback on receive text to log
 void mainWindow::OnLogMessage(const string& pMessage)
 {
-	Fl::lock();
-	if (_tbuff!=nullptr) _tbuff->append(pMessage.c_str());
-	_console->insert_position(_console->buffer()->length());
-	_console->scroll(_console->count_lines(0,_console->buffer()->length(),1),0);
-	Fl::flush();
-	Fl::unlock();
+    Fl::lock();
+    if (_tbuff!=nullptr) _tbuff->append(pMessage.c_str());
+    _console->insert_position(_console->buffer()->length());
+    _console->scroll(_console->count_lines(0,_console->buffer()->length(),1),0);
+    Fl::flush();
+    Fl::unlock();
 }
 
 // Event Callback when Sync Thread is finished
 void mainWindow::OnSyncFinished(const CEH_RC rc)
 {
-	Fl::lock();
-	cout << "Sync : " << Cards_event_handler::getReasonCodeString(rc) << endl;
-	if (rc==NO_ROOT)
-	{
-		fl_alert("Please launch this application with root privileges");
-	}
-	Fl::flush();
-	Fl::unlock();
+    Fl::lock();
+    cout << "Sync : " << CEventHandler::getReasonCodeString(rc) << endl;
+    if (rc==NO_ROOT)
+    {
+        fl_alert("Please launch this application with root privileges");
+    }
+    Fl::flush();
+    Fl::unlock();
 }
 
 void mainWindow::OnJobListChange(const CEH_RC rc)
 {
-	Fl::lock();
-	vector<Cards_package*> jobList = _cards->getJobList();
-	if (jobList.size() > 0)
-	{
-		_btnApply->activate();
-	}
-	else
-	{
-		_btnApply->deactivate();
-	}
-	Fl::flush();
-	Fl::unlock();
+    Fl::lock();
+    vector<CPackage*> jobList = _cards->getJobList();
+    if (jobList.size() > 0)
+    {
+        _btnApply->activate();
+    }
+    else
+    {
+        _btnApply->deactivate();
+    }
+    Fl::flush();
+    Fl::unlock();
 }
 
+///
+/// \brief mainWindow::OnExit_CB
+/// \param pWidget
+/// \param pInstance
+///
 void mainWindow::OnExit_CB(Fl_Widget* pWidget, void* pInstance)
 {
-	while (Cards_wrapper::instance()->IsJobRunning())
-	{
-		Fl::wait(1);
-	}
-	((mainWindow*)pWidget)->SaveConfig();
+    while (CWrapper::instance()->IsJobRunning())
+    {
+        Fl::wait(1);
+    }
+    ((mainWindow*)pWidget)->SaveConfig();
     exit(0);
 }

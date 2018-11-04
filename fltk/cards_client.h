@@ -28,89 +28,96 @@
 
 #include <libcards.h>
 
-using namespace std;
+#include "cards_log.h"
 
-// Define Cards_wrapper singleton for friendship
-class Cards_wrapper;
-class Cards_client;
-
-// Abstract Class to enable events callbacks
-class Cards_client_events
+namespace cards
 {
-	friend Cards_client;
-protected:
-	void OnProgressInfo(int percent){}
-};
+    using namespace std;
 
-/** \class Cards_client
- * \brief Interface Class to access Cards Library Method through inheritence
- *
- * This class ensure interface cards with GUI application need non-blocking operation,
- * This is a single instance (singleton) that ensure only one instance of cards library.
- *
- */
-class Cards_client : public Pkginst
-{
-	// Only Cards_wrapper can own this class
-	friend Cards_wrapper;
+    // Define Cards_wrapper singleton for friendship
+    class CWrapper;
+    class CClient;
 
-protected:
-	/**
-	 * \brief Constructor
-	 *
-	 * Constructor of Cards_client class
-	 */
-	Cards_client ();
+    // Abstract Class to enable events callbacks
+    class CClientEvents
+    {
+        friend CClient;
+    protected:
+        void OnProgressInfo(int percent){}
+    };
 
-	/**
-	 * \brief Destructor
-	 *
-	 * Destructor of Cards_client class
-	 *
-	 * \return pointer of the singleton
-	 */
-	~Cards_client ();
+    /** \class Cards_client
+     * \brief Interface Class to access Cards Library Method through inheritence
+     *
+     * This class ensure interface cards with GUI application need non-blocking operation,
+     * This is a single instance (singleton) that ensure only one instance of cards library.
+     *
+     */
+    class CClient : public Pkginst
+    {
+        // Only Cards_wrapper can own this class
+        friend CWrapper;
 
-	/**
-	 * \brief Get list of installed package
-	 *
-	 * Return string array content installed package
-	 *
-	 * \return string array contain installed package list
-	 */
-	set<string> ListOfInstalledPackages();
+    protected:
+        /**
+         * \brief Constructor
+         *
+         * Constructor of Cards_client class
+         */
+        CClient ();
 
-	/**
-	 * \brief Install a package list
-	 *
-	 * Launch Cards Install process
-	 */
-	void InstallPackages(const set<string>& pPackageList);
+        /**
+         * \brief Destructor
+         *
+         * Destructor of Cards_client class
+         *
+         * \return pointer of the singleton
+         */
+        virtual ~CClient (){};
 
-	/**
-	 * \brief Remove a package list
-	 *
-	 * Launch Cards Remove process
-	 */
-	void RemovePackages(const set<string>& pPackageList);
-		/**
-	 * \brief Suscribe to CARDS events
-	 *
-	 * Record callback from client class which submit callback from Card lib
-	 */
-	void subscribeToEvents(Cards_client_events* pCallBack);
+        /**
+         * \brief Get list of installed package
+         *
+         * Return string array content installed package
+         *
+         * \return string array contain installed package list
+         */
+        set<string> ListOfInstalledPackages();
 
-	/**
-	 * \brief Unsuscribe from CARDS Events
-	 *
-	 * Unsuscribe client class callbock form Suscribe list
-	 */
-	void unsubscribeFromEvents(Cards_client_events* pCallBack);
-protected:
-	void progressInfo();
-private:
-	void getLocalePackagesList();
-	vector<Cards_client_events*> _arrCallback;
-};
+        /**
+         * \brief Install a package list
+         *
+         * Launch Cards Install process
+         */
+        void InstallPackages(const set<string>& pPackageList);
 
+        /**
+         * \brief Remove a package list
+         *
+         * Launch Cards Remove process
+         */
+        void RemovePackages(const set<string>& pPackageList);
+            /**
+         * \brief Suscribe to CARDS events
+         *
+         * Record callback from client class which submit callback from Card lib
+         */
+        void subscribeToEvents(CClientEvents* pCallBack);
+
+        /**
+         * \brief Unsuscribe from CARDS Events
+         *
+         * Unsuscribe client class callbock form Suscribe list
+         */
+        void unsubscribeFromEvents(CClientEvents* pCallBack);
+
+    protected:
+        void progressInfo();
+
+    private:
+        CLogger* _log;
+        void getLocalePackagesList();
+        vector<CClientEvents*> _arrCallback;
+    };
+}
 #endif // CARDS_WRAPPER_H

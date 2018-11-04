@@ -30,33 +30,35 @@
 
 using namespace std;
 
-class Cards_wrapper;
-
-class Cards_package
+namespace cards
 {
-	friend Cards_wrapper;
-public:
-	Cards_package();
-	~Cards_package();
-	string getCollection();
-	string getName();
-	string getVersion();
-	string getPackager();
-	string getDescription();
-	bool isInstalled();
-	bool isToBeInstalled();
-	bool isToBeRemoved();
-	void setStatus(CPSTATUS pstatus);
-	void unSetStatus(CPSTATUS pstatus);
-	CPSTATUS getStatus();
+    class CWrapper;
 
-protected:
-	string _collection;
-	string _name;
-	string _version;
-	string _packager;
-	string _description;
-	CPSTATUS _status;
-};
+    class CPackage
+    {
+        friend CWrapper;
+    public:
+        CPackage();
+        virtual ~CPackage(){}
+        string getCollection();
+        string getName();
+        string getVersion();
+        string getPackager();
+        string getDescription();
+        bool isInstalled();
+        bool isToBeInstalled();
+        bool isToBeRemoved();
+        void setStatus(CPSTATUS pstatus);
+        void unSetStatus(CPSTATUS pstatus);
+        CPSTATUS getStatus();
 
+    protected:
+        string _collection;
+        string _name;
+        string _version;
+        string _packager;
+        string _description;
+        CPSTATUS _status;
+    };
+}
 #endif
