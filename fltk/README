@@ -1,7 +1,18 @@
 To be able to compile flcards for test, we need:
 
- get libcards \
- libcards.devel \
+ get cards.devel \
+ libcards libcards.devel \
  fltk fltk.devel \
- xorg-libx11.devel \
- xorgproto
+ xorg-libx11 xorg-libx11.devel \
+ xorg-libxext xorg-libxext.devel \
+ xorg-libxfixes xorg-libxfixes.devel \
+ xorg-libxft xorg-libxft.devel \
+ xorg-libxrender xorg-libxrender.devel \
+ xorg-libxinerama xorg-libxinerama.devel \
+ mesa mesa.devel xorgproto
+
+Then just do a:
+
+  make flcards
+
+the flcards binary will be available in fltk folder
