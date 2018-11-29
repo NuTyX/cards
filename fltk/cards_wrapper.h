@@ -120,7 +120,10 @@ namespace cards
 
         const vector<CPackage*>& getJobList();
 
-        bool IsJobRunning();
+        const set<string>& getCollectionList();
+
+        bool isJobRunning();
+
     protected:
         void OnProgressInfo(int percent);
 
@@ -144,6 +147,7 @@ namespace cards
         vector<CEventHandler*> _arrEventHandler; // Std array to store callback event clients
         vector<CPackage*> _arrPackages;
         vector<CPackage*> _arrJobList;
+        set<string> _arrCollections;
 
         /// Threaded Tasks
         void m_Sync_Thread(); // Main Thread for Cards Sync Operation

@@ -35,6 +35,7 @@
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Preferences.H>
+#include <FL/Fl_Check_Button.H>
 #include <string>
 #include <vector>
 
@@ -48,6 +49,17 @@
 
 using namespace std;
 using namespace cards;
+
+
+enum widgetID
+{
+    BTN_SYNC,
+    BTN_APPLY,
+    SEARCH_CHANGE,
+    CHKB_PACKAGE,
+    CHKB_COLLECT,
+    EVT_EXIT
+};
 
 /** \class mainWindow
  * \brief FTLTK Main window of application
@@ -74,21 +86,17 @@ public:
     void LoadConfig();
 
 protected:
-//Widgets callbacks
-    static void SyncButton_CB(Fl_Widget*,void* pInstance);
-    static void ApplyButton_CB(Fl_Widget*,void* pInstance);
-    static void SearchInput_CB(Fl_Widget*,void* pInstance);
-    static void OnExit_CB(Fl_Widget*,void* pInstance);
+//Fltk callbacks
+    static void onWindowEvent(Fl_Widget* pWidget,long pID);
 
-//Cards Wrapper virtual events callabacks overrides
+//Cards Wrapper callbacks
     void OnSyncFinished(const CEH_RC rc);
     void OnJobListChange(const CEH_RC rc);
-
-//Cards Log callback
     void OnLogMessage(const string& pMessage);
 
 private:
     void SaveConfig();
+    void SetCollectionModeCheck(bool pMode=false);
     Tableau* _tab;
     PackList* _packList;
     Fl_Input* _search;
@@ -96,6 +104,8 @@ private:
     Fl_Text_Buffer * _tbuff;
     Fl_Button* _btnSync;
     Fl_Button* _btnApply;
+    Fl_Check_Button* _cbPackageView;
+    Fl_Check_Button* _cbCollectionView;
     CWrapper* _cards;
     Fl_Preferences* _config;
     CLogger* _log;

@@ -55,14 +55,14 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
     _sort_reverse = 0;
     _sort_lastcol = -1;
     end();
-    callback(event_callback, (void*)this);
+    callback(event_callback, reinterpret_cast<void*>(this));
     selection_color(FL_YELLOW);
     when(FL_WHEN_RELEASE|FL_WHEN_CHANGED);
     cols(6);
     col_header(1);
     col_header_height(25);
     col_resize(1);
-    col_width_all(20);
+    col_width_all(30);
     row_height_all(18);
     tooltip("Click on the header of the column to sort it");
     color(FL_WHITE);
@@ -71,6 +71,7 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
     _cards->subscribeToEvents(this);
     _cards->refreshPackageList();
     resizable (this);
+    _mode_collection=false;
 }
 
 /// Sort a column up or down
@@ -148,17 +149,20 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
                     fl_color(FL_BLACK);
                     fl_draw(s.c_str(), X+2,Y,W,H, FL_ALIGN_LEFT);  //  +2= pad left
                 }
-                else if (_rowdata[R].pack->isToBeInstalled())
+                else if (_rowdata[R].pack!=nullptr)
                 {
-                    fl_draw_pixmap(download_xpm,X+5,Y);
-                }
-                else if (_rowdata[R].pack->isToBeRemoved())
-                {
-                    fl_draw_pixmap(deleted_xpm,X+5,Y);
-                }
-                else if (_rowdata[R].pack->isInstalled())
-                {
-                    fl_draw_pixmap(checked_xpm,X+5,Y);
+                    if (_rowdata[R].pack->isToBeInstalled())
+                    {
+                        fl_draw_pixmap(download_xpm,X+5,Y);
+                    }
+                    else if (_rowdata[R].pack->isToBeRemoved())
+                    {
+                        fl_draw_pixmap(deleted_xpm,X+5,Y);
+                    }
+                    else if (_rowdata[R].pack->isInstalled())
+                    {
+                        fl_draw_pixmap(checked_xpm,X+5,Y);
+                    }
                 }
                 // Border
                 fl_color(FL_LIGHT2);
@@ -177,14 +181,19 @@ void Tableau::autowidth(int pad)
 {
     fl_font(FL_COURIER, 16);
     // initialize all column widhths to lower value
-    for (int c = 0;c<cols();c++) col_width(c,pad);
+    int c;
+    for (c = 0;c<cols();c++) col_width(c,pad);
+    col_width(c-1,500);
     for (auto r : _rowdata)
     {
         int w,h;
-        for  ( int c=0; c<r.cols.size();c++)
+        for  ( c=0; c<r.cols.size();c++)
         {
-            fl_measure(r.cols[c].c_str(), w, h, 0);	// get pixel width of the text
-            if ( (w) > col_width(c) ) col_width(c, w);
+            fl_measure(r.cols[c].c_str(), w, h, 0);// get pixel width of the text
+            if ( (w) > col_width(c) )
+            {
+                col_width(c, w);
+            }
         }
     }
     table_resized();
@@ -203,6 +212,34 @@ void Tableau::resize_window()
 
 /// Refresh Table
 void Tableau::refresh_table()
+{
+    if (_mode_collection) refresh_collection_mode();
+    else refresh_package_mode();
+}
+
+void Tableau::refresh_collection_mode()
+{
+    clear();
+    _rowdata.clear();
+    cols(2);
+    set<string> CollectionList = _cards->getCollectionList();
+    for (auto S : CollectionList)
+    {
+        if (_filter.length()>0)
+            if (S.find(_filter)==string::npos) continue;
+        Row newrow;
+        newrow.pack=nullptr;
+        newrow.cols.push_back("U");
+        newrow.cols.push_back(S);
+        _rowdata.push_back(newrow);
+    }
+    // How many rows we loaded
+    rows((int)_rowdata.size());
+    // Auto-calculate widths, with 20 pixel padding
+    autowidth(40);
+}
+
+void Tableau::refresh_package_mode()
 {
     clear();
     _rowdata.clear();
@@ -231,7 +268,7 @@ void Tableau::refresh_table()
     // How many rows we loaded
     rows((int)_rowdata.size());
     // Auto-calculate widths, with 20 pixel padding
-    autowidth(30);
+    autowidth(40);
 }
 
 /// Callback
@@ -375,4 +412,15 @@ void Tableau::setFilter(const string& pValue)
 void Tableau::OnJobListChange(const CEH_RC rc)
 {
     redraw();
+}
+
+bool Tableau::setCollectionMode(bool pMode)
+{
+    _mode_collection=pMode;
+    return _mode_collection;
+}
+
+bool Tableau::getCollectionMode()
+{
+    return _mode_collection;
 }

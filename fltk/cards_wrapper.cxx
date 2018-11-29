@@ -40,7 +40,7 @@ namespace cards
     {
         _job_running = false;
         _job=nullptr;
-        _log=CLogger::instance();
+        _log=CLogger::instance();;
     }
 
     /** Destructor */
@@ -87,6 +87,14 @@ namespace cards
         return _arrPackages;
     }
 
+    const set<string>& CWrapper::getCollectionList()
+    {
+        return _arrCollections;
+    }
+
+    ///
+    ///
+    ///
     CPackage* CWrapper::getPackage(const string& pName)
     {
         CPackage* ptr=nullptr;
@@ -119,6 +127,7 @@ namespace cards
         m_OnJobListChanged_Callback(OK);
     }
 
+    /** Return the current job list */
     const vector<CPackage*>& CWrapper::getJobList()
     {
         return _arrJobList;
@@ -131,22 +140,32 @@ namespace cards
     /** Create a new thread for Cards Sync operation*/
     void CWrapper::sync()
     {
-        if (m_IsThreadFree()) _job = new thread(&CWrapper::m_Sync_Thread, CWrapper::_ptCWrapper);
-        _job->detach();
+        if (m_IsThreadFree())
+        {
+            _job = new thread(&CWrapper::m_Sync_Thread, CWrapper::_ptCWrapper);
+            _job->detach();
+            _log->log(_("Synchronization started ..."));
+        }
     }
 
     /** Create a new thread for Cards Sync operation*/
     void CWrapper::doJobList()
     {
-        if (m_IsThreadFree()) _job = new thread(&CWrapper::m_DoJobList_Thread, CWrapper::_ptCWrapper);
-        _job->detach();
+        if (m_IsThreadFree())
+        {
+            _job = new thread(&CWrapper::m_DoJobList_Thread, CWrapper::_ptCWrapper);
+            _job->detach();
+        }
     }
 
     /** Create a new thread for Cards Sync operation*/
     void CWrapper::refreshPackageList()
     {
-        if (m_IsThreadFree()) _job = new thread(&CWrapper::m_RefreshPackageList_Thread, CWrapper::_ptCWrapper);
-        _job->detach();
+        if (m_IsThreadFree())
+        {
+            _job = new thread(&CWrapper::m_RefreshPackageList_Thread, CWrapper::_ptCWrapper);
+            _job->detach();
+        }
     }
 
     ///
@@ -174,7 +193,9 @@ namespace cards
         {
             rc= CEH_RC::NO_ROOT;
         }
+        _log->log(_("Synchronization finished"));
         _job_running = false;
+
         m_OnSyncFinished_Callback(rc);
     }
 
@@ -279,6 +300,7 @@ namespace cards
             }
             if (InstalledPackages.find(Pack->_name)!=InstalledPackages.end()) Pack->setStatus(INSTALLED);
             _arrPackages.push_back(Pack);
+            if (_arrCollections.find(Pack->_collection)==_arrCollections.end()) _arrCollections.insert(Pack->_collection);
         }
         m_OnRefreshPackageFinished_Callback(CEH_RC::OK);
         _job_running =false;
@@ -375,7 +397,7 @@ namespace cards
         _arrPackages.clear();
     }
 
-    bool CWrapper::IsJobRunning()
+    bool CWrapper::isJobRunning()
     {
         return _job_running;
     }

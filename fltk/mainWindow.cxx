@@ -31,33 +31,39 @@ mainWindow::mainWindow(bool pInstaller) :
     _log = CLogger::instance();
     _log->subscribe(this);
     icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
-    size_range(400,500,0,0);
+    size_range(700,500,0,0);
     _config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
-    _search = new Fl_Input(MARGIN+450, MARGIN+5, 400, 30, "Search:");
+    _search = new Fl_Input(MARGIN+560, MARGIN+5, 300, 30, "Search:");
     _search->labelfont(2);
     _search->color(FL_WHITE);
-    _search->callback(&SearchInput_CB, (void*)this);
+    _search->callback(&onWindowEvent,SEARCH_CHANGE);
     _search->when(FL_WHEN_CHANGED);
 
-    _console = new Fl_Text_Display(MARGIN, 600, w()-MARGIN*2, 300-MARGIN, "Info about the selected package:");
+    _console = new Fl_Text_Display(MARGIN, 800, w()-MARGIN*2, 100-MARGIN, "Info about the selected package:");
     _tbuff = new Fl_Text_Buffer();
     _console->buffer(_tbuff);
-    _console->color(FL_BLACK);
-    _console->textcolor(FL_GRAY);
+    _console->color(FL_GRAY);
+    _console->textcolor(FL_BLACK);
     _console->labeltype(FL_NO_LABEL );
 
     //Creation of the Sync Button
     _btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
-    _btnSync->callback(&SyncButton_CB,(void*)this);
+    _btnSync->callback(&onWindowEvent,BTN_SYNC);
 
     //Creation of the Apply Button
     _btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
     _btnApply->deactivate(); // Disabled by default until a modification is pending
-    _btnApply->callback(&ApplyButton_CB,(void*)this);
+    _btnApply->callback(&onWindowEvent,BTN_APPLY);
+
+    _cbPackageView = new Fl_Check_Button (MARGIN+230,MARGIN,70,40,"Package");;
+    _cbPackageView->callback(&onWindowEvent,CHKB_PACKAGE);
+    _cbCollectionView = new Fl_Check_Button (MARGIN+350,MARGIN,100,40,"Collection");
+    _cbCollectionView->callback(&onWindowEvent,CHKB_COLLECT);
+
 
     //Default Tab size and position
     int TabLeftCoord = MARGIN;
-    int TabWidth = w()-MARGIN*2;
+    int TabWidth = w()-300-MARGIN*2;
     if (pInstaller)
     {
         // Gui Package Button for easy install of a desktop manager
@@ -67,12 +73,13 @@ mainWindow::mainWindow(bool pInstaller) :
         TabWidth -= 130;
     }
 
-    _tab = new Tableau(TabLeftCoord, MARGIN+50, TabWidth, h()-400);
+    _tab = new Tableau(TabLeftCoord, MARGIN+50, TabWidth, h()-200);
     resizable(_tab);
     _cards = CWrapper::instance();
     _cards->subscribeToEvents(this);
+    SetCollectionModeCheck(false); // Set default mode
     //_log->log(_("FlCards use ") + _cards->getCardsVersion());
-    this->callback(&OnExit_CB,(void*)this);
+    this->callback(&onWindowEvent,EVT_EXIT);
 }
 
 // Main window destructor
@@ -109,34 +116,64 @@ void mainWindow::SaveConfig()
     }
 }
 
-
-// Callback on Sync Button click
-void mainWindow::SyncButton_CB(Fl_Widget*, void* pInstance)
+// Process Fltk Window events
+void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 {
-    ProgressBox* box = new ProgressBox(SYNC);
-    box->set_modal();
-    CWrapper::instance()->sync();
-    box->show();
-    while (box->shown()) Fl::wait();
-    delete box;
-}
-
-// Callback on Apply Button click
-void mainWindow::ApplyButton_CB(Fl_Widget*, void* pInstance)
-{
-    ProgressBox* box = new ProgressBox(DOJOB);
-    box->set_modal();
-    CWrapper::instance()->doJobList();
-    box->show();
-    while (box->shown()) Fl::wait();
-    delete box;
-}
-
-// Callback on Apply Button click
-void mainWindow::SearchInput_CB(Fl_Widget*, void* pInstance)
-{
-    mainWindow* o=(mainWindow*)pInstance;
-    o->_tab->setFilter(string(o->_search->value()));
+    if (pWidget==nullptr) return;
+    mainWindow* win = reinterpret_cast<mainWindow*>(pWidget);
+    while (win->parent()!=nullptr) win = reinterpret_cast<mainWindow*>(win->parent());
+    switch (static_cast<widgetID>(pID))
+    {
+        case BTN_SYNC:
+        {
+            ProgressBox* box = new ProgressBox(SYNC);
+            box->set_modal();
+            CWrapper::instance()->sync();
+            box->show();
+            while (box->shown()) Fl::wait();
+            delete box;
+            break;
+        }
+        case BTN_APPLY:
+        {
+            ProgressBox* box = new ProgressBox(DOJOB);
+            box->set_modal();
+            CWrapper::instance()->doJobList();
+            box->show();
+            while (box->shown()) Fl::wait();
+            delete box;
+            break;
+        }
+        case SEARCH_CHANGE:
+        {
+            win->_tab->setFilter(string(win->_search->value()));
+            break;
+        }
+        case CHKB_PACKAGE:
+        {
+            if (reinterpret_cast<Fl_Check_Button*>(pWidget)->value()>0) win->SetCollectionModeCheck(false);
+            break;
+        }
+        case CHKB_COLLECT:
+        {
+            if (reinterpret_cast<Fl_Check_Button*>(pWidget)->value()>0) win->SetCollectionModeCheck(true);
+            break;
+        }
+        case EVT_EXIT:
+        {
+            while (CWrapper::instance()->isJobRunning())
+            {
+                Fl::wait(1);
+            }
+            win->SaveConfig();
+            exit(0);
+            break;
+        }
+        default:
+        {
+            win->_log->log(_("Unkown Event : ") + to_string(pID));
+        }
+    }
 }
 
 // Callback on receive text to log
@@ -179,17 +216,19 @@ void mainWindow::OnJobListChange(const CEH_RC rc)
     Fl::unlock();
 }
 
-///
-/// \brief mainWindow::OnExit_CB
-/// \param pWidget
-/// \param pInstance
-///
-void mainWindow::OnExit_CB(Fl_Widget* pWidget, void* pInstance)
+void mainWindow::SetCollectionModeCheck(bool pMode)
 {
-    while (CWrapper::instance()->IsJobRunning())
+    if (_tab->setCollectionMode(pMode))
     {
-        Fl::wait(1);
+        _cbCollectionView->value(true);
+        _cbPackageView->value(false);
+        _tab->refresh_table();
     }
-    ((mainWindow*)pWidget)->SaveConfig();
-    exit(0);
+    else
+    {
+        _cbCollectionView->value(false);
+        _cbPackageView->value(true);
+        _tab->refresh_table();
+    }
 }
+
