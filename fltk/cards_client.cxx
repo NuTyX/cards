@@ -82,8 +82,6 @@ namespace cards
             {
                 m_upgrade=0;
             }
-            // We don't want to have trouble with conflict files, lets force the installation by default
-            m_force=true;
             run();
         }
     }
