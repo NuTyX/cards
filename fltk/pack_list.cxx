@@ -26,7 +26,7 @@
 PackList::PackList (int x, int y, int w, int h)
     : Fl_Pack(x,y,w,h)
 {
-    this->box(FL_DOWN_FRAME);
+    //this->box(FL_DOWN_FRAME);
     this->begin();
     //lxde
     Fl_Button* lxde = new Fl_Button(0,0,52,52,"");
@@ -67,6 +67,14 @@ PackList::PackList (int x, int y, int w, int h)
     KDE->image(KDE_Icon);
     KDE->align(FL_ALIGN_IMAGE_NEXT_TO_TEXT);
     KDE->callback(&OnClickButton,Collections::KDE);
+
+    //GNOME
+    Fl_Button* GNOME = new Fl_Button(0,0,52,52,"");
+    Fl_Pixmap* GNOME_Icon = new Fl_Pixmap(gnome_xpm);
+    GNOME->tooltip("Gnome : a famous linux desktop environment");
+    GNOME->image(GNOME_Icon);
+    GNOME->align(FL_ALIGN_IMAGE_NEXT_TO_TEXT);
+    GNOME->callback(&OnClickButton,Collections::GNOME);
     this->end();
     resizable(0);
 }

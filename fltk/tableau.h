@@ -104,8 +104,6 @@ public:
     void autowidth(int pad); // Automatically set the columns widths to the longuest string
     void resize_window();	// Resize the parent window to size of table
     void setFilter(const string& pValue);
-    bool setCollectionMode(bool pMode);
-    bool getCollectionMode();
 
 protected:
     // table cell drawing
@@ -123,12 +121,9 @@ private:
     vector<Row> _rowdata;
     int _sort_reverse;
     int _sort_lastcol;
-    bool _mode_collection; // Flag to sort only collection package list;
     CWrapper* _cards;
 static void event_callback(Fl_Widget*,void*);
     void event_callback2();
-    void refresh_package_mode();
-    void refresh_collection_mode();
 };
 
 #endif

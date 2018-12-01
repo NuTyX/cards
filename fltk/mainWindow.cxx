@@ -39,9 +39,9 @@ mainWindow::mainWindow(bool pInstaller) :
     _search->callback(&onWindowEvent,SEARCH_CHANGE);
     _search->when(FL_WHEN_CHANGED);
 
-    _console = new Fl_Text_Display(MARGIN, 800, w()-MARGIN*2, 100-MARGIN, "Info about the selected package:");
-    _tbuff = new Fl_Text_Buffer();
-    _console->buffer(_tbuff);
+    _console = new Fl_Text_Display(MARGIN, 700, w()-MARGIN*2, 200-MARGIN, "Cards operation");
+    _consoleBuff = new Fl_Text_Buffer();
+    _console->buffer(_consoleBuff);
     _console->color(FL_GRAY);
     _console->textcolor(FL_BLACK);
     _console->labeltype(FL_NO_LABEL );
@@ -55,29 +55,33 @@ mainWindow::mainWindow(bool pInstaller) :
     _btnApply->deactivate(); // Disabled by default until a modification is pending
     _btnApply->callback(&onWindowEvent,BTN_APPLY);
 
-    _cbPackageView = new Fl_Check_Button (MARGIN+230,MARGIN,70,40,"Package");;
-    _cbPackageView->callback(&onWindowEvent,CHKB_PACKAGE);
-    _cbCollectionView = new Fl_Check_Button (MARGIN+350,MARGIN,100,40,"Collection");
-    _cbCollectionView->callback(&onWindowEvent,CHKB_COLLECT);
-
 
     //Default Tab size and position
     int TabLeftCoord = MARGIN;
-    int TabWidth = w()-300-MARGIN*2;
-    if (pInstaller)
-    {
-        // Gui Package Button for easy install of a desktop manager
-        _packList = new PackList(MARGIN,MARGIN +50 , 120,h()-400);
-        _packList->resizable(0);
-        TabLeftCoord += 130;
-        TabWidth -= 130;
-    }
+    int TabWidth = w()-300-MARGIN*3;
 
-    _tab = new Tableau(TabLeftCoord, MARGIN+50, TabWidth, h()-200);
-    resizable(_tab);
+    _tabs = new Fl_Tabs(TabLeftCoord,MARGIN +50 , TabWidth,h()-325);
+    {
+        Fl_Group* _grpPackage = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Packages");
+        {
+            _table = new Tableau(TabLeftCoord, MARGIN+80, TabWidth, h()-330);
+            resizable(_table);
+        }
+        _grpPackage->end();
+        Fl_Group* _grpCollection = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Collections");
+        {
+            _packList = new PackList(TabLeftCoord,MARGIN +80 , TabWidth,h()-330);
+            resizable (_packList);
+        }
+        _grpCollection->end();
+        if (pInstaller) _tabs->value(_grpCollection);
+    }
+    _tabs->end();
+    _info = new Fl_Text_Display (TabLeftCoord + TabWidth+MARGIN,MARGIN +80 , 300,h()-325,"Package Information");
+    _infoBuff = new Fl_Text_Buffer();
+    _info->buffer(_infoBuff);
     _cards = CWrapper::instance();
     _cards->subscribeToEvents(this);
-    SetCollectionModeCheck(false); // Set default mode
     //_log->log(_("FlCards use ") + _cards->getCardsVersion());
     this->callback(&onWindowEvent,EVT_EXIT);
 }
@@ -146,17 +150,7 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
         }
         case SEARCH_CHANGE:
         {
-            win->_tab->setFilter(string(win->_search->value()));
-            break;
-        }
-        case CHKB_PACKAGE:
-        {
-            if (reinterpret_cast<Fl_Check_Button*>(pWidget)->value()>0) win->SetCollectionModeCheck(false);
-            break;
-        }
-        case CHKB_COLLECT:
-        {
-            if (reinterpret_cast<Fl_Check_Button*>(pWidget)->value()>0) win->SetCollectionModeCheck(true);
+            win->_table->setFilter(string(win->_search->value()));
             break;
         }
         case EVT_EXIT:
@@ -180,7 +174,7 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 void mainWindow::OnLogMessage(const string& pMessage)
 {
     Fl::lock();
-    if (_tbuff!=nullptr) _tbuff->append(pMessage.c_str());
+    if (_consoleBuff!=nullptr) _consoleBuff->append(pMessage.c_str());
     _console->insert_position(_console->buffer()->length());
     _console->scroll(_console->count_lines(0,_console->buffer()->length(),1),0);
     Fl::flush();
@@ -191,7 +185,7 @@ void mainWindow::OnLogMessage(const string& pMessage)
 void mainWindow::OnSyncFinished(const CEH_RC rc)
 {
     Fl::lock();
-    cout << "Sync : " << CEventHandler::getReasonCodeString(rc) << endl;
+    _log->log( "Sync : " + CEventHandler::getReasonCodeString(rc));
     if (rc==NO_ROOT)
     {
         fl_alert("Please launch this application with root privileges");
@@ -216,19 +210,32 @@ void mainWindow::OnJobListChange(const CEH_RC rc)
     Fl::unlock();
 }
 
-void mainWindow::SetCollectionModeCheck(bool pMode)
+void mainWindow::OnPackageInfo(CPackage& pPackage)
 {
-    if (_tab->setCollectionMode(pMode))
+    Fl::lock();
+    if (_infoBuff!=nullptr)
     {
-        _cbCollectionView->value(true);
-        _cbPackageView->value(false);
-        _tab->refresh_table();
-    }
-    else
-    {
-        _cbCollectionView->value(false);
-        _cbPackageView->value(true);
-        _tab->refresh_table();
-    }
-}
+        _infoBuff->remove(0,_infoBuff->length());
+        if (pPackage.getName()=="")
+            _infoBuff->append("No information available for this package");
+        else
+        {
+            _infoBuff->append(string("Name : " + pPackage.getName()+"\n").c_str());
+            _infoBuff->append(string("Alias : " + pPackage.getAlias()+"\n").c_str());
+            _infoBuff->append(string("Description : " + pPackage.getDescription()+"\n").c_str());
+            _infoBuff->append(string("Packager : " + pPackage.getPackager()+"\n").c_str());
+            //_infoBuff->append(string("Base : " + pPackage.getBase()+"\n").c_str());
+            _infoBuff->append(string("Build Date : " + pPackage.getBuildDate()+"\n").c_str());
+            _infoBuff->append(string("Collection : " + pPackage.getCollection()+"\n").c_str());
+            _infoBuff->append(string("Contributor : " + pPackage.getContributor()+"\n").c_str());
+            _infoBuff->append(string("Dependencies : " + pPackage.getDependencies()+"\n").c_str());
+            _infoBuff->append(string("Number of files : " + pPackage.getFileNumber()+"\n").c_str());
+            //_infoBuff->append(string("Group : " + pPackage.getGroup()+"\n").c_str());
+            //_infoBuff->append(string("Release : " + pPackage.getRelease()+"\n").c_str());
+            _infoBuff->append(string("Size : " + pPackage.getSize()+"\n").c_str());
+        }
 
+    }
+    Fl::flush();
+    Fl::unlock();
+}

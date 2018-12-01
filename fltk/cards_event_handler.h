@@ -28,6 +28,8 @@
 #include <string>
 #include <set>
 
+#include "cards_package.h"
+
 namespace cards
 {
     using namespace std;
@@ -65,6 +67,7 @@ namespace cards
         virtual void OnRefreshPackageFinished (const CEH_RC rc){}
         virtual void OnJobListChange (const CEH_RC rc){}
         virtual void OnProgressInfo (int percent){}
+        virtual void OnPackageInfo (CPackage& package){}
 
     public:
         static	const string getReasonCodeString(const CEH_RC rc);

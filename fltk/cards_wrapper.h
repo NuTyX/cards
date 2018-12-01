@@ -124,6 +124,8 @@ namespace cards
 
         bool isJobRunning();
 
+        void getPackageInfo(const string& pName);
+
     protected:
         void OnProgressInfo(int percent);
 
@@ -153,6 +155,7 @@ namespace cards
         void m_Sync_Thread(); // Main Thread for Cards Sync Operation
         void m_DoJobList_Thread(); // Thread to install package
         void m_RefreshPackageList_Thread();
+        void m_GetPackageInfo_Thread(string pName);
 
         /// Utils
         CLogger* _log;

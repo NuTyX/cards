@@ -169,6 +169,39 @@ namespace cards
         }
     }
 
+    CPackage CClient::getPackageInfo(const string& pName)
+    {
+        CPackage Pack;
+        buildCompleteDatabase(true);
+        if (checkPackageNameExist(pName))
+        {
+            Pack._name = m_listOfAlias[pName];
+            if (m_listOfInstPackages[Pack._name].alias.size() > 0 )
+            {
+                for ( auto i : m_listOfInstPackages[Pack._name].alias)
+                    Pack._alias +=  i + string(" ");
+            }
+            Pack._description = m_listOfInstPackages[Pack._name].description;
+            Pack._base = m_listOfInstPackages[Pack._name].base;
+            Pack._group = m_listOfInstPackages[Pack._name].group;
+            Pack._collection = m_listOfInstPackages[Pack._name].collection;
+            Pack._url = m_listOfInstPackages[Pack._name].url;
+            Pack._contributor = m_listOfInstPackages[Pack._name].contributors;
+            Pack._packager = m_listOfInstPackages[Pack._name].packager;
+            Pack._version = m_listOfInstPackages[Pack._name].version;
+            Pack._release = m_listOfInstPackages[Pack._name].release;
+            Pack._build_date = getDateFromEpoch(m_listOfInstPackages[Pack._name].build);
+            Pack._size = sizeHumanRead(m_listOfInstPackages[Pack._name].size);
+            Pack._number_files = to_string(m_listOfInstPackages[Pack._name].files.size());
+            Pack._arch = m_listOfInstPackages[Pack._name].arch;
+            if ( m_listOfInstPackages[Pack._name].dependencies.size() > 0 )
+            {
+                for ( auto i : m_listOfInstPackages[Pack._name].dependencies)
+                    Pack._dependencies += i.first + string(" ");
+            }
+        }
+        return Pack;
+    }
     // Add a nex suscriber to the callback event list
     void CClient::subscribeToEvents(CClientEvents* pCallBack)
     {

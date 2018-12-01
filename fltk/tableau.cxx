@@ -71,7 +71,6 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
     _cards->subscribeToEvents(this);
     _cards->refreshPackageList();
     resizable (this);
-    _mode_collection=false;
 }
 
 /// Sort a column up or down
@@ -212,34 +211,6 @@ void Tableau::resize_window()
 
 /// Refresh Table
 void Tableau::refresh_table()
-{
-    if (_mode_collection) refresh_collection_mode();
-    else refresh_package_mode();
-}
-
-void Tableau::refresh_collection_mode()
-{
-    clear();
-    _rowdata.clear();
-    cols(2);
-    set<string> CollectionList = _cards->getCollectionList();
-    for (auto S : CollectionList)
-    {
-        if (_filter.length()>0)
-            if (S.find(_filter)==string::npos) continue;
-        Row newrow;
-        newrow.pack=nullptr;
-        newrow.cols.push_back("U");
-        newrow.cols.push_back(S);
-        _rowdata.push_back(newrow);
-    }
-    // How many rows we loaded
-    rows((int)_rowdata.size());
-    // Auto-calculate widths, with 20 pixel padding
-    autowidth(40);
-}
-
-void Tableau::refresh_package_mode()
 {
     clear();
     _rowdata.clear();
@@ -395,6 +366,7 @@ void Tableau::event_callback2()
                 }
             }
             select_row(ROW);
+            _cards->getPackageInfo(pack->getName());
             break;
         }
         default:
@@ -414,13 +386,4 @@ void Tableau::OnJobListChange(const CEH_RC rc)
     redraw();
 }
 
-bool Tableau::setCollectionMode(bool pMode)
-{
-    _mode_collection=pMode;
-    return _mode_collection;
-}
 
-bool Tableau::getCollectionMode()
-{
-    return _mode_collection;
-}

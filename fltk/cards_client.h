@@ -111,6 +111,7 @@ namespace cards
          */
         void unsubscribeFromEvents(CClientEvents* pCallBack);
 
+        CPackage getPackageInfo(const string& pName);
     protected:
         void progressInfo();
 

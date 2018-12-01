@@ -34,6 +34,7 @@
 #include "pixmaps/lxqt.xpm"
 #include "pixmaps/mate.xpm"
 #include "pixmaps/kde.xpm"
+#include "pixmaps/gnome.xpm"
 
 #include <iostream>
 

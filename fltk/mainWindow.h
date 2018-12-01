@@ -30,6 +30,7 @@
 #include <FL/fl_ask.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Menu_Bar.H>
+#include <FL/Fl_Tabs.H>
 #include <FL/Fl_Table.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Multiline_Output.H>
@@ -93,19 +94,20 @@ protected:
     void OnSyncFinished(const CEH_RC rc);
     void OnJobListChange(const CEH_RC rc);
     void OnLogMessage(const string& pMessage);
+    void OnPackageInfo(CPackage& pPackage);
 
 private:
     void SaveConfig();
-    void SetCollectionModeCheck(bool pMode=false);
-    Tableau* _tab;
+    Tableau* _table;
     PackList* _packList;
     Fl_Input* _search;
     Fl_Text_Display* _console;
-    Fl_Text_Buffer * _tbuff;
+    Fl_Text_Display* _info;
+    Fl_Text_Buffer * _consoleBuff;
+    Fl_Text_Buffer * _infoBuff;
     Fl_Button* _btnSync;
     Fl_Button* _btnApply;
-    Fl_Check_Button* _cbPackageView;
-    Fl_Check_Button* _cbCollectionView;
+    Fl_Tabs* _tabs;
     CWrapper* _cards;
     Fl_Preferences* _config;
     CLogger* _log;

@@ -168,6 +168,34 @@ namespace cards
         }
     }
 
+    void CWrapper::getPackageInfo(const string& pName)
+    {
+        if (m_IsThreadFree())
+        {
+            _job = new thread(&CWrapper::m_GetPackageInfo_Thread, CWrapper::_ptCWrapper,pName);
+            _job->detach();
+        }
+    }
+
+    void CWrapper::m_GetPackageInfo_Thread(string pName)
+    {
+        _job_running =true;
+        CClient Cards;
+        CPackage Pack = Cards.getPackageInfo(pName);
+        if (Pack.getName().length() > 0)
+        {
+            for (auto* it : _arrEventHandler)
+            {
+                it->OnPackageInfo(Pack);
+            }
+        }
+        for (auto* it : _arrEventHandler)
+        {
+            it->OnPackageInfo(Pack);
+        }
+        _job_running =false;
+    }
+
     ///
     /// Threaded Tasks
     ///
