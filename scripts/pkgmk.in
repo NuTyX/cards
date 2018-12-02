@@ -1023,6 +1023,7 @@ build_package() {
 			add_meta_files `basename $TARGET`
 			add_meta_to_archive `basename $TARGET`
 		fi
+		check_build
 		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
 			remove_work_dir
 		fi
@@ -1226,6 +1227,19 @@ check_sources_uptodate() {
 			info "$name: $version -> $newversion"
 		fi
 	fi
+}
+check_build() {
+	local LIST
+	cd $PKG
+	LIST=`find . ! -type d -name "*.la"`
+	if [ ! -z $LIST ];then
+		warning "following files should be removed"
+		for i in $LIST
+		do
+			echo $i
+		done
+	fi
+	cd -
 }
 interrupted() {
 	echo ""
