@@ -44,7 +44,7 @@
 #include "pixmaps/deleted.xpm"
 
 #define MARGIN 20
-#define COLHEADER { "Inst","Collection", "Name", "Description"}
+#define COLHEADER { "","Collection", "Name", "Description"}
 
 using namespace std;
 using namespace cards;
