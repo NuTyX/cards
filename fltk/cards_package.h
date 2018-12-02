@@ -47,17 +47,7 @@ namespace cards
         string getVersion();
         string getPackager();
         string getDescription();
-        string getAlias();
-        string getBase();
-        string getGroup();
-        string getUrl();
-        string getContributor();
-        string getRelease();
-        string getBuildDate();
-        string getFileNumber();
-        string getArch();
-        string getDependencies();
-        string getSize();
+
         bool isInstalled();
         bool isToBeInstalled();
         bool isToBeRemoved();
@@ -68,20 +58,10 @@ namespace cards
     protected:
         string _collection;
         string _name;
-        string _alias;
         string _version;
         string _packager;
         string _description;
-        string _base;
-        string _group;
-        string _url;
-        string _contributor;
-        string _release;
-        string _build_date;
-        string _number_files;
-        string _arch;
-        string _dependencies;
-        string _size;
+
         CPSTATUS _status;
     };
 }

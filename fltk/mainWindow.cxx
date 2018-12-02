@@ -221,18 +221,10 @@ void mainWindow::OnPackageInfo(CPackage& pPackage)
         else
         {
             _infoBuff->append(string("Name : " + pPackage.getName()+"\n").c_str());
-            _infoBuff->append(string("Alias : " + pPackage.getAlias()+"\n").c_str());
             _infoBuff->append(string("Description : " + pPackage.getDescription()+"\n").c_str());
+            _infoBuff->append(string("Version : " + pPackage.getVersion()+"\n").c_str());
             _infoBuff->append(string("Packager : " + pPackage.getPackager()+"\n").c_str());
-            //_infoBuff->append(string("Base : " + pPackage.getBase()+"\n").c_str());
-            _infoBuff->append(string("Build Date : " + pPackage.getBuildDate()+"\n").c_str());
             _infoBuff->append(string("Collection : " + pPackage.getCollection()+"\n").c_str());
-            _infoBuff->append(string("Contributor : " + pPackage.getContributor()+"\n").c_str());
-            _infoBuff->append(string("Dependencies : " + pPackage.getDependencies()+"\n").c_str());
-            _infoBuff->append(string("Number of files : " + pPackage.getFileNumber()+"\n").c_str());
-            //_infoBuff->append(string("Group : " + pPackage.getGroup()+"\n").c_str());
-            //_infoBuff->append(string("Release : " + pPackage.getRelease()+"\n").c_str());
-            _infoBuff->append(string("Size : " + pPackage.getSize()+"\n").c_str());
         }
 
     }

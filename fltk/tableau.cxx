@@ -58,7 +58,7 @@ Tableau::Tableau(int x, int y, int w, int h, const char *l)
     callback(event_callback, reinterpret_cast<void*>(this));
     selection_color(FL_YELLOW);
     when(FL_WHEN_RELEASE|FL_WHEN_CHANGED);
-    cols(6);
+    cols(4);
     col_header(1);
     col_header_height(25);
     col_resize(1);
@@ -121,7 +121,7 @@ void Tableau::draw_cell(TableContext context, int R, int C, int X, int Y, int W,
             {
                 static const char *head[] = COLHEADER;
                 fl_draw_box(FL_THIN_UP_BOX, X,Y,W,H, FL_BACKGROUND_COLOR);
-                if ( C < 9 )
+                if ( C < 4 )
                 {
                     fl_font(FL_HELVETICA_BOLD, 16);
                     fl_color(FL_BLACK);
@@ -233,7 +233,6 @@ void Tableau::refresh_table()
         newrow.cols.push_back(newrow.pack->getCollection());
         newrow.cols.push_back(newrow.pack->getName());
         newrow.cols.push_back(newrow.pack->getDescription());
-        newrow.cols.push_back(newrow.pack->getVersion());
         _rowdata.push_back(newrow);
     }
     // How many rows we loaded

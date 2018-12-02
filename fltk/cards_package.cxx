@@ -57,61 +57,6 @@ namespace cards
         return _description;
     }
 
-    string CPackage::getAlias()
-    {
-        return _alias;
-    }
-
-    string CPackage::getBase()
-    {
-        return _base;
-    }
-
-    string CPackage::getGroup()
-    {
-        return _group;
-    }
-
-    string CPackage::getUrl()
-    {
-        return _url;
-    }
-
-    string CPackage::getContributor()
-    {
-        return _contributor;
-    }
-
-    string CPackage::getRelease()
-    {
-        return _release;
-    }
-
-    string CPackage::getBuildDate()
-    {
-        return _build_date;
-    }
-
-    string CPackage::getFileNumber()
-    {
-        return _number_files;
-    }
-
-    string CPackage::getArch()
-    {
-        return _arch;
-    }
-
-    string CPackage::getDependencies()
-    {
-        return _dependencies;
-    }
-
-    string CPackage::getSize()
-    {
-        return _size;
-    }
-
     bool CPackage::isInstalled()
     {
         return _status & CPSTATUS::INSTALLED;
