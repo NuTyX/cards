@@ -177,7 +177,7 @@ void Pkgdbh::treatErrors(const string& s) const
 			break;
 	}
 }
-void Pkgdbh::progressInfo() const
+void Pkgdbh::progressInfo()
 {
   static int j = 0;
   int i;

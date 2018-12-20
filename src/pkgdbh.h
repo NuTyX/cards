@@ -190,7 +190,7 @@ public:
 
 	virtual void printHelp() const {};
 
-	virtual void progressInfo() const;
+	virtual void progressInfo();
 	virtual void treatErrors(const std::string& s) const;
 
 
