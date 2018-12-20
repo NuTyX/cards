@@ -1,7 +1,7 @@
 //
 // compile_dependencies_utils.h
 // 
-//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2018 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,9 +22,7 @@
 #ifndef COMPILE_DEPENDENCIES_UTILS_H
 #define COMPILE_DEPENDENCIES_UTILS_H
 
-#include "string_utils.h"
 #include "file_utils.h"
-#include "cards_argument_parser.h"
 
 #include <iostream>
 #include <cstdlib>

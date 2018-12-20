@@ -172,7 +172,7 @@ setup_collection() {
 	DIR="/$VERSION/$COLLECTION"
 
 	if [ "$COLLECTION" == "base" ]; then
-		GIT="base-sysV"
+		GIT="base"
 		echo "dir /DEPOT/$COLLECTION
 base /DEPOT/base
 logdir /LOGS" > $DIR/etc/cards.conf || exit 1
@@ -278,7 +278,7 @@ mkdir -p $1/etc || exit 1
 
 setup_collection
 
-if [ "$GIT" == "base-sysV" ] \
+if [ "$GIT" == "base" ] \
 || [ "$GIT" == "core"  ] \
 || [ "$GIT" == "extra" ] \
 || [ "$GIT" == "nos" ]; then
