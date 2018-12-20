@@ -145,23 +145,19 @@ namespace cards
     {
         int Value=0;
         static int j = 0;
-        int i,n;
-        n = getNumberOfPackages();
+        int i;
         switch ( m_actualAction )
         {
-            case DB_OPEN_START:
-                Value=0;
-                break;
-            case DB_OPEN_RUN:
-                if (n >100) {
-                    i = j / ( n / 100);
-                    Value=i;
+            case PKG_INSTALL_RUN:
+            {
+                if (getFilesNumber() > 100)
+                {
+                    i= getInstalledFilesNumber() / ( getFilesNumber() /100);
                 }
+                Value = i;
                 j++;
                 break;
-            case DB_OPEN_END:
-                    Value=100;
-                    break;
+            }
         }
         for (CClientEvents* it : _arrCallback)
         {

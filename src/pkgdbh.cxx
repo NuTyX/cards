@@ -314,7 +314,7 @@ pair<string, pkginfo_t> Pkgdbh::getInfosPackage
 	(const string& packageName)
 {
 	pair<string, pkginfo_t> result;
-	
+
 	result.first = packageName;
 	return result;
 }
@@ -629,7 +629,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					info.dependencies.insert(NameEpoch);
 				}
 			}
-			freeItemList(contentFile);	
+			freeItemList(contentFile);
 			// list of files
 			const string filelist = m_root + PKG_DB_DIR + i + PKG_FILES;
 			int fd = open(filelist.c_str(), O_RDONLY);
@@ -1079,7 +1079,7 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 	}
 	result.second.dependencies = packageArchive.listofDependenciesBuildDate();
 	m_packageName = packageArchiveName;
-	return result;	
+	return result;
 }
 set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename)
 {
@@ -1641,6 +1641,16 @@ void Pkgdbh::getFootprintPackage(string& filename)
 void Pkgdbh::print_version() const
 {
 	cout << m_utilName << " (cards) " << VERSION << endl;
+}
+
+unsigned int Pkgdbh::getFilesNumber()
+{
+    return m_filesNumber;
+}
+
+unsigned int Pkgdbh::getInstalledFilesNumber()
+{
+    return m_installedFilesNumber;
 }
 
 Db_lock::Db_lock(const string& m_root, bool exclusive)

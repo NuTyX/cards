@@ -1,10 +1,10 @@
 //
 //  pkgdbh.h
-// 
+//
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
 //  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
-// 
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -17,7 +17,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
 
@@ -47,7 +47,7 @@
 #define PKG_RECEPT       "Pkgfile"
 #define PKG_README       "README"
 #define PKG_PRE_INSTALL  ".PRE"
-#define PKG_POST_INSTALL ".POST"    
+#define PKG_POST_INSTALL ".POST"
 
 #define PKG_REJECTED     "var/lib/pkg/rejected"
 #define PKGADD_CONF      "var/lib/pkg/pkgadd.conf"
@@ -106,8 +106,8 @@
 #define FC_CACHE     "usr/bin/fc-cache"
 #define FC_CACHE_ARGS  ""
 
-enum action 
-{ 
+enum action
+{
 PKG_DOWNLOAD_START,
 PKG_DOWNLOAD_RUN,
 PKG_DOWNLOAD_END,
@@ -198,6 +198,8 @@ public:
 	int getNumberOfPackages();
 	std::set<std::string> getListOfPackageName();
 	bool checkPackageNameExist(const std::string& name) const;
+	unsigned int getFilesNumber();
+	unsigned int getInstalledFilesNumber();
 
 protected:
 	// Database
@@ -216,21 +218,21 @@ protected:
 
 	void addPackageFilesRefsToDB(const std::string& name,
 		const pkginfo_t& info);
-	
+
 	bool checkPackageNameUptodate(const std::pair<std::string,
 		pkginfo_t>& archiveName);
 	bool checkPackageNameBuildDateSame(const std::pair<std::string,
 		time_t>& dependencieNameBuild);
 
-	/* 
-	 * Remove the physical files after followings some rules 
+	/*
+	 * Remove the physical files after followings some rules
 	 */
 	void removePackageFiles(const std::string& name);
 	void removePackageFiles(const std::string& name,
 		const std::set<std::string>& keep_list);
 
 	/*
-	 * Remove meta data about the removed package 
+	 * Remove meta data about the removed package
 	 */
 	void removePackageFilesRefsFromDB(const std::string& name);
 	void removePackageFilesRefsFromDB(std::set<std::string> files,
@@ -284,7 +286,7 @@ protected:
 private:
 
 	void runLastPostInstall();
-	
+
 	std::set<std::string> m_runtimeLibrariesList;
 	std::set<std::string> m_filesList;
 	std::set<std::string> m_packageNamesList;
