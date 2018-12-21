@@ -43,7 +43,7 @@ namespace cards
     {
         friend CClient;
     protected:
-        void OnProgressInfo(int percent){}
+        virtual void OnProgressInfo(int percent){}
     };
 
     /** \class Cards_client

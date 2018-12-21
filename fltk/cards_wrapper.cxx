@@ -228,7 +228,6 @@ namespace cards
         CEH_RC rc=CEH_RC::OK;
         if (m_checkRootAccess())
         {
-            CClient Cards;
             try
             {
                 _log->log(_("Determine Packages Install and Remove List..."));
@@ -244,11 +243,13 @@ namespace cards
                 if (Removelist.size() > 0)
                 {
                     CClient Cards;
+                    Cards.subscribeToEvents(this);
                     Cards.RemovePackages(Removelist);
                 }
                 if (InstallList.size() > 0)
                 {
                     CClient Cards;
+                    Cards.subscribeToEvents(this);
                     Cards.InstallPackages(InstallList);
                 }
                 rc= CEH_RC::OK;

@@ -88,7 +88,7 @@ void ProgressBox::OnDoJobListFinished(const CEH_RC rc)
 void ProgressBox::OnProgressInfo(int percent)
 {
     Fl::lock();
-    _jobProgress->value((float)percent);
+    _fileProgress->value((float)percent);
     Fl::flush();
     Fl::unlock();
 }
