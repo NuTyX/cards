@@ -33,7 +33,7 @@ mainWindow::mainWindow(bool pInstaller) :
     icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
     size_range(700,500,0,0);
     _config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
-    _search = new Fl_Input(MARGIN+560, MARGIN+5, 300, 30, "Search:");
+    _search = new Fl_Input(MARGIN+560, MARGIN+5, 300, 30, "Search...");
     _search->labelfont(2);
     _search->color(FL_WHITE);
     _search->callback(&onWindowEvent,SEARCH_CHANGE);

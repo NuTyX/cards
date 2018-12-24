@@ -89,7 +89,7 @@ namespace cards
         }
     }
 
-    /// Install a package list
+    /// Remove a package list
     void CClient::RemovePackages(const set<string>& pPackageList)
     {
         if (pPackageList.size()==0) return;
@@ -105,6 +105,16 @@ namespace cards
         getListOfPackageNames(m_root);
         // Retrieve info about all the packages
         buildCompleteDatabase(false);
+
+        CClient Cards;
+        set<string> basePackagesList;
+        Config config;
+        Pkgrepo::parseConfig(Cards.m_configFileName.c_str(),config);
+        for (auto it : config.baseDir)
+        {
+            findFile(basePackagesList,it);
+        }
+
         for (auto pack:pPackageList)
         {
 
@@ -113,7 +123,8 @@ namespace cards
                 m_actualError = PACKAGE_NOT_INSTALL;
                 treatErrors(pack);
             }
-
+            if (basePackagesList.find(pack)!=basePackagesList.end())
+		continue;
             // Remove metadata about the package removed
             removePackageFilesRefsFromDB(pack);
 
@@ -151,6 +162,13 @@ namespace cards
         int i;
         switch ( m_actualAction )
         {
+			case DB_OPEN_RUN:
+			{
+				i = j / ( getNumberOfPackages() / 100);
+				Value = i;
+				j++;
+				break;
+			}
             case PKG_INSTALL_RUN:
             {
                 if (getFilesNumber() > 100)

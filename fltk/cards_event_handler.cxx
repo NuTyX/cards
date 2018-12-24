@@ -23,6 +23,7 @@
 
 #include "cards_event_handler.h"
 
+
 namespace cards
 {
     /// Convert Reason Code Enum to human readable text
@@ -37,17 +38,20 @@ namespace cards
             }
             case CEH_RC::NO_ROOT:
             {
-                return "This application need root privileges, please restart it with super user rights!";
+                fl_alert("This application need root privileges.\nPlease restart it with super user rights !");
+                return "This application need root privileges, please restart it with super user rights !";
                 break;
             }
             case CEH_RC::EXCEPTION:
             {
-                return "An exception occured during cardslib operation. See messages above to know the reason";
+                fl_alert("An exception occured during cardslib operation.\nSee messages above to know the reason.");
+                return "An exception occured during cardslib operation. See messages above to know the reason.";
                 break;
             }
             default:
             {
-                return "Unknown reason... Please contact Nutyx team to signal this case";
+                fl_alert("Unknown reason...\nPlease report this case to https://bugs.nutyx.org.");
+                return "Unknown reason... Please report this case to https://bugs.nutyx.org.";
                 break;
             }
         }

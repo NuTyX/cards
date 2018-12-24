@@ -60,6 +60,7 @@ int arg_parser( int argc, char** argv, int &i )
 ///
 int main(int argc, char **argv)
 {
+    Fl::scheme("gtk+");
     // Enable Multithreading on Fltk
     Fl::lock();
     int i = 1;

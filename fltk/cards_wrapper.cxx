@@ -281,13 +281,6 @@ namespace cards
         m_ClearPackagesList();
         set<string> AvailablePackages = Cards.getBinaryPackageList();
         set<string> InstalledPackages = Cards.ListOfInstalledPackages();
-        set<string> basePackagesList;
-        Config config;
-        Pkgrepo::parseConfig(Cards.m_configFileName.c_str(),config);
-        for (auto it : config.baseDir)
-        {
-            findFile(basePackagesList,it);
-        }
         for (auto it : AvailablePackages)
         {
             CPackage* Pack=new CPackage();
@@ -328,7 +321,6 @@ namespace cards
                 }
                 i++;
             }
-            if (basePackagesList.find(Pack->_name)!=basePackagesList.end()) continue;
             if (InstalledPackages.find(Pack->_name)!=InstalledPackages.end()) Pack->setStatus(INSTALLED);
             _arrPackages.push_back(Pack);
             if (_arrCollections.find(Pack->_collection)==_arrCollections.end()) _arrCollections.insert(Pack->_collection);
