@@ -42,8 +42,8 @@
 
 //Project Includes
 #include "pixmaps/flcards.xpm"
-#include "tableau.h"
-#include "pack_list.h"
+#include "table_package.h"
+#include "table_collection.h"
 #include "cards_wrapper.h"
 #include "progressbox.h"
 #include "cards_log.h"
@@ -98,8 +98,9 @@ protected:
 
 private:
     void SaveConfig();
-    Tableau* _table;
-    PackList* _packList;
+    TableBase* _tablePackages;
+    TableBase* _tableCollections;
+    //PackList* _packList;
     Fl_Input* _search;
     Fl_Text_Display* _console;
     Fl_Text_Display* _info;
@@ -107,6 +108,8 @@ private:
     Fl_Text_Buffer * _infoBuff;
     Fl_Button* _btnSync;
     Fl_Button* _btnApply;
+    Fl_Group* _grpPackage;
+    Fl_Group* _grpCollection;
     Fl_Tabs* _tabs;
     CWrapper* _cards;
     Fl_Preferences* _config;

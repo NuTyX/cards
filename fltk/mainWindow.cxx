@@ -62,16 +62,16 @@ mainWindow::mainWindow(bool pInstaller) :
 
     _tabs = new Fl_Tabs(TabLeftCoord,MARGIN +50 , TabWidth,h()-325);
     {
-        Fl_Group* _grpPackage = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Packages");
+        _grpPackage = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Packages");
         {
-            _table = new Tableau(TabLeftCoord, MARGIN+80, TabWidth, h()-330);
-            resizable(_table);
+            _tablePackages = reinterpret_cast<TableBase*>(new TablePackage(TabLeftCoord, MARGIN+80, TabWidth, h()-330));
+            resizable(_tablePackages);
         }
         _grpPackage->end();
-        Fl_Group* _grpCollection = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Collections");
+        _grpCollection = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Collections");
         {
-            _packList = new PackList(TabLeftCoord,MARGIN +80 , TabWidth,h()-330);
-            resizable (_packList);
+            _tableCollections = reinterpret_cast<TableBase*>(new TableCollection(TabLeftCoord, MARGIN+80, TabWidth, h()-330));
+            resizable (_tableCollections);
         }
         _grpCollection->end();
         if (pInstaller) _tabs->value(_grpCollection);
@@ -150,7 +150,9 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
         }
         case SEARCH_CHANGE:
         {
-            win->_table->setFilter(string(win->_search->value()));
+            win->_tablePackages->setFilter(string(win->_search->value()));
+            if (win->_tabs->value() != win->_grpPackage)
+                win->_tabs->value(win->_grpPackage);
             break;
         }
         case EVT_EXIT:

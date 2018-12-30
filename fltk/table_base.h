@@ -1,8 +1,8 @@
 /*
- * tableau.h
+ * table_base.h
  *
- * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
- * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
+ * Copyright 2015-2018 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017-2018 Gianni Peschiutta <artemia@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef TABLEAU_H
-#define TABLEAU_H
+#ifndef TABLE_BASE_H
+#define TABLE_BASE_H
 
 #include <stdio.h>
 #include <string.h>
@@ -44,7 +44,6 @@
 #include "pixmaps/deleted.xpm"
 
 #define MARGIN 20
-#define COLHEADER { "","Collection", "Name", "Description"}
 
 using namespace std;
 using namespace cards;
@@ -53,9 +52,9 @@ using namespace cards;
 class Row
 {
 public:
-    Row(){pack=nullptr;}
-    CPackage* pack;
+    Row(){data=nullptr;}
     vector<string> cols;
+    void* data;
 };
 
 // Class for handling the sorting column using std::sort
@@ -75,7 +74,7 @@ public:
  * This class list and manage Card operation by adding , remove or upgrade package
  *
  */
-class Tableau : public Fl_Table_Row, public CEventHandler
+class TableBase : public Fl_Table_Row, public CEventHandler
 {
 public:
     /**
@@ -84,7 +83,7 @@ public:
      * Constructor of Tableau class
      *
      */
-    Tableau(int x, int y, int w, int h, const char *l=0);
+    TableBase(int x, int y, int w, int h, const char *l=0);
 
     /**
      * \brief Destructor
@@ -92,7 +91,7 @@ public:
      * Destructor of Tableau class
      *
      */
-    virtual ~Tableau(){}
+    virtual ~TableBase(){}
 
     /**
      * \brief Populate the tab with package installed
@@ -100,12 +99,14 @@ public:
      * Get installed package from cards and extract a list to be
      * displayed as a list sorted by package name, description, version
      */
-    void refresh_table(); // Load the packages list
+    virtual void refresh_table() = 0; // Load the packages list
     void autowidth(int pad); // Automatically set the columns widths to the longuest string
     void resize_window();	// Resize the parent window to size of table
     void setFilter(const string& pValue);
 
 protected:
+    vector<string> colTitle;
+
     // table cell drawing
     void draw_cell(TableContext context, int R=0, int C=0, int X=0, int Y=0, int W=0, int H=0);
     // sort the table by a column
@@ -116,14 +117,19 @@ protected:
     void OnJobListChange(const CEH_RC rc);
     void OnSyncFinished(const CEH_RC rc);
 
+    virtual void OnDrawCell(TableContext, int, int, int, int, int, int){}
+    virtual void OnEvent(TableContext, int, int){}
+
 private:
+    static void event_callback(Fl_Widget*,void*);
+    void event_callback2();
+protected:
     string _filter;
     vector<Row> _rowdata;
     int _sort_reverse;
     int _sort_lastcol;
     CWrapper* _cards;
-static void event_callback(Fl_Widget*,void*);
-    void event_callback2();
 };
 
 #endif
+
