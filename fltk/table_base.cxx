@@ -167,33 +167,6 @@ void TableBase::resize_window()
     window()->resize(window()->x(), window()->y(), width, window()->h()); // resize window to fit
 }
 
-/// Callback
-void TableBase::OnDoJobListFinished(const CEH_RC rc)
-{
-    Fl::lock();
-    cout << "Job list result : " << CEventHandler::getReasonCodeString(rc) << endl;
-    Fl::unlock();
-}
-
-void TableBase::OnRefreshPackageFinished (const CEH_RC rc)
-{
-    Fl::lock();
-    if (rc == CEH_RC::OK) refresh_table();
-    Fl::flush();
-    Fl::unlock();
-}
-
-// Event Callback when Sync Thread is finished
-void TableBase::OnSyncFinished(const CEH_RC rc)
-{
-    Fl::lock();
-    if (rc==CEH_RC::OK)
-    {
-        _cards->refreshPackageList();
-    }
-    Fl::unlock();
-}
-
 /// Callback whenever someone clicks on different parts of the table
 void TableBase::event_callback(Fl_Widget*, void *data)
 {
@@ -236,7 +209,21 @@ void TableBase::setFilter(const string& pValue)
     refresh_table();
 }
 
+/// Callback
+
 void TableBase::OnJobListChange(const CEH_RC rc)
+{
+    redraw();
+}
+
+void TableBase::OnRefreshPackageFinished (const CEH_RC rc)
+{
+    Fl::lock();
+    if (rc == CEH_RC::OK) refresh_table();
+    Fl::unlock();
+}
+
+void TableBase::OnDoJobListFinished(const CEH_RC rc)
 {
     redraw();
 }

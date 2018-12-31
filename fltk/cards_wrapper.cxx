@@ -337,6 +337,7 @@ namespace cards
     /** Broadcast to all suscribers the Sync Finished callback*/
     void CWrapper::m_OnSyncFinished_Callback(const CEH_RC rc=CEH_RC::OK)
     {
+        if (rc==OK) refreshPackageList();
         for (auto* it : _arrEventHandler)
         {
             it->OnSyncFinished(rc);
