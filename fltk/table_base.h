@@ -112,17 +112,17 @@ protected:
     // sort the table by a column
     void sort_column(int col, int reverse=0);
     void draw_sort_arrow(int X, int Y, int W, int H);
+
     void OnDoJobListFinished (const CEH_RC rc);
     void OnRefreshPackageFinished (const CEH_RC rc);
     void OnJobListChange(const CEH_RC rc);
-    void OnSyncFinished(const CEH_RC rc);
-
     virtual void OnDrawCell(TableContext, int, int, int, int, int, int){}
     virtual void OnEvent(TableContext, int, int){}
 
 private:
     static void event_callback(Fl_Widget*,void*);
     void event_callback2();
+
 protected:
     string _filter;
     vector<Row> _rowdata;

@@ -33,7 +33,6 @@ TableCollection::TableCollection(int x, int y, int w, int h, const char *l)
     colTitle.push_back("Collection");
     colTitle.push_back("Name");
     colTitle.push_back("Description");
-    _cards->refreshPackageList();
 }
 
 /// Refresh Table
