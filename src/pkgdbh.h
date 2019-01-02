@@ -200,6 +200,7 @@ public:
 	bool checkPackageNameExist(const std::string& name) const;
 	unsigned int getFilesNumber();
 	unsigned int getInstalledFilesNumber();
+	std::set<std::string> getFilesList();
 
 protected:
 	// Database

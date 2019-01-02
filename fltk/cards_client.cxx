@@ -158,7 +158,7 @@ namespace cards
     void CClient::progressInfo()
     {
         int Value=0;
-        static int j = 0;
+        static unsigned int j = 0;
         int i;
         switch ( m_actualAction )
         {
@@ -174,11 +174,31 @@ namespace cards
                 if (getFilesNumber() > 100)
                 {
                     i= getInstalledFilesNumber() / ( getFilesNumber() /100);
-                }
-                Value = i;
+                    Value = i;
+                } else {
+					Value = j;
+				}
                 j++;
                 break;
             }
+            case RM_PKG_FILES_START:
+            {
+                j = 0;
+                break;
+			}
+			case RM_PKG_FILES_RUN:
+			{
+				unsigned int l = getFilesList().size();
+				if ( l > 100 )
+				{
+					i = j / ( l / 100);
+					Value = i;
+				} else {
+					Value = j;
+				}
+				j++;
+				break;
+			}
         }
         for (CClientEvents* it : _arrCallback)
         {

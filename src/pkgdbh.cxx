@@ -1652,7 +1652,10 @@ unsigned int Pkgdbh::getInstalledFilesNumber()
 {
     return m_installedFilesNumber;
 }
-
+set<string> Pkgdbh::getFilesList()
+{
+	return m_filesList;
+}
 Db_lock::Db_lock(const string& m_root, bool exclusive)
 	: m_dir(0)
 {
