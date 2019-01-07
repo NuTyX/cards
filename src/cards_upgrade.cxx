@@ -100,8 +100,8 @@ void Cards_upgrade::upgrade()
 		dry();
 	else {
 		for (auto i : m_dependenciesList) {
-			m_packageArchiveName=getPackageFileName(i);
-			if (checkPackageNameExist(i)) {
+			m_packageArchiveName=getPackageFileName(i.first);
+			if (checkPackageNameExist(i.first)) {
 				m_upgrade=1;
 			} else {
 				m_upgrade=0;

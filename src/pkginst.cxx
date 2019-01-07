@@ -122,16 +122,16 @@ void Pkginst::generateDependencies()
 		++vrit) {
 		found = false ;
 		for (auto i : m_dependenciesList) {
-			if ( i == vrit->first) {
+			if ( i.first == vrit->first) {
 				found = true ;
 				break;
 			}
 		}
 		if (!found) {
 #ifndef NDEBUG
-			cerr << "m_dependenciesList.push_back " << vrit->first << endl;
+			cerr << "m_dependenciesList.push_back " << vrit->first << " " vrit->second << endl;
 #endif
-			m_dependenciesList.push_back(vrit->first);
+			m_dependenciesList.push_back(*vrit);
 		}
 #ifndef NDEBUG
 		else cerr << "no deps founds" << endl;

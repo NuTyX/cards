@@ -32,7 +32,7 @@ public:
 	void generateDependencies();
 
 protected:
-	std::vector<std::string> m_dependenciesList;
+	std::vector< std::pair<std::string,time_t> > m_dependenciesList;
 };
 #endif /* PKGINST_H */
 // vim:set ts=2 :

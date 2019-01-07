@@ -78,7 +78,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	}
 	getLocalePackagesList();
 	for ( auto i : m_dependenciesList ) {
-		m_packageArchiveName = getPackageFileName(i);
+		m_packageArchiveName = getPackageFileName(i.first);
 		ArchiveUtils packageArchive(m_packageArchiveName.c_str());
 		std::string name = packageArchive.name();
 		if ( checkPackageNameExist(name )) {
@@ -148,7 +148,7 @@ void Cards_install::getLocalePackagesList()
 	std::set<std::string> tmpList;
 	for ( auto i :  m_config.locale ) {
 		for ( auto j :m_dependenciesList ) {
-			std::string packageName  = j + "." + i;
+			std::string packageName  = j.first + "." + i;
 #ifndef NDEBUG
 			std::cerr << packageName << std::endl;
 #endif
@@ -161,7 +161,13 @@ void Cards_install::getLocalePackagesList()
 		}
 	}
 	if (tmpList.size() > 0 )
-		for (auto i : tmpList) m_dependenciesList.push_back(i);
+		for (auto i : tmpList) {
+			std::pair<std::string,time_t> PackageTime;
+			PackageTime.first=i;
+			PackageTime.second=0;
+
+			m_dependenciesList.push_back(PackageTime);
+		}
 #ifndef NDEBUG
 	for (auto i : m_dependenciesList ) std::cerr << i << std::endl;
 #endif
