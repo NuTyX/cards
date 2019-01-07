@@ -351,6 +351,13 @@ msgstr " fichier(s)"
 msgid "Arch           : "
 msgstr "Arch                : "
 
+msgid "Man. installed : Yes"
+msgstr "Install manu.       : Oui"
+
+msgid "Man. installed : No"
+msgstr "Install manu.       : Non"
+
+
 msgid "Dependencies   : "
 msgstr "Dépendances         : "
 

@@ -612,6 +612,13 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					string s = contentFile->items[li];
 					info.base = s.substr(1);
 				}
+				if ( contentFile->items[li][0] == 'd' ) {
+					string s = contentFile->items[li];
+					if ( s == "d0" )
+						info.dependencie = false;
+					else
+						info.dependencie = true;
+				}
 				if ( contentFile->items[li][0] == 'S' ) {
 					string s = contentFile->items[li];
 					info.size = atoi(s.substr(1).c_str());
@@ -674,6 +681,10 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 	m_actualAction = PKG_MOVE_META_START;
 	progressInfo();
 	string package_meta_dir = ".";
+
+	const string packagedir = m_root + PKG_DB_DIR ;
+	const string packagenamedir = m_root + PKG_DB_DIR + name ;
+
 	for (set<string>::const_iterator i = info.files.begin(); i != info.files.end(); ++i)
 	{
 		if ( strncmp(i->c_str(),package_meta_dir.c_str(),package_meta_dir.size()) == 0 )
@@ -686,33 +697,26 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 		}
 	}
 	removeFile ( m_root, "/.MTREE");
-	metaFilesList.insert(".META");
 	set<string> fileContent;
 	if ( parseFile(fileContent,".META") == -1 ) {
 		m_actualError = CANNOT_FIND_FILE;
 		treatErrors(".META");
 	}
-	for (set<string>::iterator i = fileContent.begin();i != fileContent.end();++i) {
-		string s = *i;
-		string::size_type pos = s.find('=');
-		if (pos != string::npos) {
-			s = stripWhiteSpace(s.substr(0,pos));
-		}
-		if ( s == "build" ) {
-			cout << s << endl;
-			m_build = stripWhiteSpace(s.substr(pos+2));
-			break;
-		}
-	}
-	const string packagedir = m_root + PKG_DB_DIR ;
-	const string packagenamedir = m_root + PKG_DB_DIR + name ;
+	removeFile ( m_root, "/.META");
+
+	/*
+	 * TODO add the builddate of the package if available
+	 */
+	fileContent.insert("d0"); // not a depencencie
 
 	mkdir(packagenamedir.c_str(),0755);
+
 	for (set<string>::const_iterator i = metaFilesList.begin(); i!=  metaFilesList.end(); ++i)
 	{
 		char * destFile = const_cast<char*>(i->c_str());
 		destFile++;
 		string file = packagenamedir + "/" + destFile;
+		cout << file << endl;
 		if (rename(i->c_str(), file.c_str()) == -1) {
 			m_actualError = CANNOT_RENAME_FILE;
 			treatErrors( *i + " to " + file);
@@ -724,6 +728,18 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 			}
 		}
 	}
+
+	string file = packagenamedir + "/META";
+	int fd_new = creat(file.c_str(),0644);
+	if (fd_new == -1)
+	{
+		m_actualError = CANNOT_CREATE_FILE;
+		treatErrors(file);
+	}
+	std::ofstream out(file);
+	for ( auto i: fileContent) out << i <<endl;
+	out.close();
+
 	m_actualAction = PKG_MOVE_META_END;
 	progressInfo();
 }

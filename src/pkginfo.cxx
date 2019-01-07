@@ -326,6 +326,11 @@ void Pkginfo::run()
 					<< _("Number of Files: ") << m_listOfInstPackages[arg].files.size()
 					<< _(" file(s)") << endl
 					<< _("Arch           : ") << m_listOfInstPackages[arg].arch << endl;
+				if ( m_listOfInstPackages[m_arg].dependencie == false )
+					cout << _("Man. installed : Yes");
+				else
+					cout << _("Man. installed : No");
+				cout << endl;
 				if ( m_listOfInstPackages[m_arg].dependencies.size() > 0 ) {
 					cout << _("Dependencies   : ");
 					for ( auto i : m_listOfInstPackages[arg].dependencies) cout << i.first << " ";

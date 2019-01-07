@@ -148,6 +148,7 @@ struct pkginfo_t {
 	time_t install; // date of last installation
 	std::string arch;
 	int size;
+	bool dependencie; // true it's a dependencie: automaticaly install
 	std::set< std::pair<std::string,time_t> > dependencies;
 	std::set<std::string> alias;
 	std::set<std::string> files;
