@@ -179,8 +179,7 @@ void Pkgdbh::treatErrors(const string& s) const
 }
 void Pkgdbh::progressInfo()
 {
-  static int j = 0;
-  int i;
+  static int j=0;
   switch ( m_actualAction )
   {
 		case PKG_DOWNLOAD_START:
@@ -194,88 +193,81 @@ void Pkgdbh::progressInfo()
 		case PKG_MOVE_META_END:
 			break;
     case DB_OPEN_START:
-			cout << _("Retrieve info about the ")
-			<< m_packageNamesList.size() << _(" packages: ");
-			break;
+		cout << _("Retrieve info about the ")
+		<< m_packageNamesList.size() << _(" packages: ");
+		break;
     case DB_OPEN_RUN:
-			if ( m_packageNamesList.size()>100) {
-				i = j / ( m_packageNamesList.size() / 100);
-				printf("%3d%%\b\b\b\b",i);
-			}
-      j++;
-      break;
+		printf("%3u%%\b\b\b\b",
+			( j * 100 ) / m_packageNamesList.size() );
+		j++;
+		break;
     case DB_OPEN_END:
-      printf("100 %%\n");
-      break;
-		case PKG_PREINSTALL_START:
-			cout << _("pre-install: start") << endl;
-			break;
-		case PKG_PREINSTALL_END:
-			cout << _("pre-install: finish") << endl;
-			break;
+		printf("100 %%\n");
+		j=0;
+		break;
+	case PKG_PREINSTALL_START:
+		cout << _("pre-install: start") << endl;
+		break;
+	case PKG_PREINSTALL_END:
+		cout << _("pre-install: finish") << endl;
+		break;
     case PKG_INSTALL_START:
-      j = 0;
-      cout << _("   ADD: (")
-				<< m_packageArchiveCollection
-				<< ") "
-				<< m_packageName
-				<< " "
-				<< m_packageArchiveVersion
-				<< "-"
-				<< m_packageArchiveRelease
-				<< ", "
-				<< m_filesNumber << _(" files: ");
-      break;
+		j=0;
+		cout << _("   ADD: (")
+			<< m_packageArchiveCollection
+			<< ") "
+			<< m_packageName
+			<< " "
+			<< m_packageArchiveVersion
+			<< "-"
+			<< m_packageArchiveRelease
+			<< ", "
+			<< m_filesNumber << _(" files: ");
+		break;
     case PKG_INSTALL_RUN:
-      if ( m_filesNumber > 100)
-      {
-        i = m_installedFilesNumber / ( m_filesNumber  / 100 );
-        printf("%3u%%\b\b\b\b",i);
-      }
-      j++;
-      break;
+		printf("%3u%%\b\b\b\b",
+			(m_installedFilesNumber * 100 ) /  m_filesNumber );
+		j++;
+		break;
     case PKG_INSTALL_END:
-      printf("100 %%\n");
-      break;
-		case PKG_POSTINSTALL_START:
-			cout << _("post-install: start") << endl;
-			break;
-		case PKG_POSTINSTALL_END:
-			cout << _("post-install: finish") << endl;
-			break;
-		case DB_ADD_PKG_START:
-			break;
-		case DB_ADD_PKG_END:
-			break;
-		case RM_PKG_FILES_START:
-			j=0;
-			cout << _("REMOVE: (")
-				<< m_packageCollection
-				<< ") "
-				<< m_packageName
-				<< " "
-				<< m_packageVersion
-				<< "-"
-				<< m_packageRelease
-				<< ", "
-				<< m_filesList.size()
-				<< _(" files: ");
-			break;
-		case RM_PKG_FILES_RUN:
-			if ( m_filesList.size()>100)
-			{
-				i = j / ( m_filesList.size() / 100);
-				printf("%3d%%\b\b\b\b",i);
-			}
-			j++;
-			break;
-		case RM_PKG_FILES_END:
-			printf("100 %%\n");
-			break;
-		case LDCONFIG_START:
-			break;
-		case LDCONFIG_END:
-			break;
+		printf("100 %%\n");
+		break;
+	case PKG_POSTINSTALL_START:
+		cout << _("post-install: start") << endl;
+		break;
+	case PKG_POSTINSTALL_END:
+		cout << _("post-install: finish") << endl;
+		break;
+	case DB_ADD_PKG_START:
+		break;
+	case DB_ADD_PKG_END:
+		break;
+	case RM_PKG_FILES_START:
+		j=0;
+		cout << _("REMOVE: (")
+			<< m_packageCollection
+			<< ") "
+			<< m_packageName
+			<< " "
+			<< m_packageVersion
+			<< "-"
+			<< m_packageRelease
+			<< ", "
+			<< m_filesList.size()
+			<< _(" files: ");
+		break;
+	case RM_PKG_FILES_RUN:
+		printf("%3u%%\b\b\b\b",
+			( j * 100 ) / m_filesList.size() );
+		j++;
+		break;
+	case RM_PKG_FILES_END:
+		printf("100 %%\n");
+		break;
+	case LDCONFIG_START:
+		break;
+	case LDCONFIG_END:
+		break;
   }
 }
 set<string> Pkgdbh::getListOfPackageName()
@@ -716,7 +708,6 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 		char * destFile = const_cast<char*>(i->c_str());
 		destFile++;
 		string file = packagenamedir + "/" + destFile;
-		cout << file << endl;
 		if (rename(i->c_str(), file.c_str()) == -1) {
 			m_actualError = CANNOT_RENAME_FILE;
 			treatErrors( *i + " to " + file);
