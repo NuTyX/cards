@@ -2,7 +2,7 @@
 //  pkgrepo.h
 //
 //  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
-//  Copyright (c) 2014-2017 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014-2019 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -241,8 +241,6 @@ protected:
 
 		std::vector<PortFilesList> m_portFilesList;
 
-		std::string m_packageFileName;
-		std::string m_packageFileNameSignature;
 		std::string m_configFileName;
 		Config m_config;
 
