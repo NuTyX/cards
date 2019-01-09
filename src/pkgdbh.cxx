@@ -192,82 +192,82 @@ void Pkgdbh::progressInfo()
 			break;
 		case PKG_MOVE_META_END:
 			break;
-    case DB_OPEN_START:
-		cout << _("Retrieve info about the ")
-		<< m_packageNamesList.size() << _(" packages: ");
-		break;
-    case DB_OPEN_RUN:
-		printf("%3u%%\b\b\b\b",
-			( j * 100 ) / m_packageNamesList.size() );
-		j++;
-		break;
-    case DB_OPEN_END:
-		printf("100 %%\n");
-		j=0;
-		break;
-	case PKG_PREINSTALL_START:
-		cout << _("pre-install: start") << endl;
-		break;
-	case PKG_PREINSTALL_END:
-		cout << _("pre-install: finish") << endl;
-		break;
-    case PKG_INSTALL_START:
-		j=0;
-		cout << _("   ADD: (")
-			<< m_packageArchiveCollection
-			<< ") "
-			<< m_packageName
-			<< " "
-			<< m_packageArchiveVersion
-			<< "-"
-			<< m_packageArchiveRelease
-			<< ", "
-			<< m_filesNumber << _(" files: ");
-		break;
-    case PKG_INSTALL_RUN:
-		printf("%3u%%\b\b\b\b",
-			(m_installedFilesNumber * 100 ) /  m_filesNumber );
-		j++;
-		break;
-    case PKG_INSTALL_END:
-		printf("100 %%\n");
-		break;
-	case PKG_POSTINSTALL_START:
-		cout << _("post-install: start") << endl;
-		break;
-	case PKG_POSTINSTALL_END:
-		cout << _("post-install: finish") << endl;
-		break;
-	case DB_ADD_PKG_START:
-		break;
-	case DB_ADD_PKG_END:
-		break;
-	case RM_PKG_FILES_START:
-		j=0;
-		cout << _("REMOVE: (")
-			<< m_packageCollection
-			<< ") "
-			<< m_packageName
-			<< " "
-			<< m_packageVersion
-			<< "-"
-			<< m_packageRelease
-			<< ", "
-			<< m_filesList.size()
-			<< _(" files: ");
-		break;
-	case RM_PKG_FILES_RUN:
-		printf("%3u%%\b\b\b\b",
-			( j * 100 ) / m_filesList.size() );
-		j++;
-		break;
-	case RM_PKG_FILES_END:
-		printf("100 %%\n");
-		break;
-	case LDCONFIG_START:
-		break;
-	case LDCONFIG_END:
-		break;
+		case DB_OPEN_START:
+			cout << _("Retrieve info about the ")
+			<< m_packageNamesList.size() << _(" packages: ");
+			break;
+		case DB_OPEN_RUN:
+			j++;
+			printf("%3u%%\b\b\b\b",
+				( j * 100 ) / m_packageNamesList.size() );
+			break;
+		case DB_OPEN_END:
+			printf("100 %%\n");
+			j=0;
+			break;
+		case PKG_PREINSTALL_START:
+			cout << _("pre-install: start") << endl;
+			break;
+		case PKG_PREINSTALL_END:
+			cout << _("pre-install: finish") << endl;
+			break;
+		case PKG_INSTALL_START:
+			j=0;
+			cout << _("   ADD: (")
+				<< m_packageArchiveCollection
+				<< ") "
+				<< m_packageName
+				<< " "
+				<< m_packageArchiveVersion
+				<< "-"
+				<< m_packageArchiveRelease
+				<< ", "
+				<< m_filesNumber << _(" files: ");
+			break;
+		case PKG_INSTALL_RUN:
+			j++;
+			printf("%3u%%\b\b\b\b",
+				(m_installedFilesNumber * 100 ) /  m_filesNumber );
+			break;
+		case PKG_INSTALL_END:
+			printf("100 %%\n");
+			break;
+		case PKG_POSTINSTALL_START:
+			cout << _("post-install: start") << endl;
+			break;
+		case PKG_POSTINSTALL_END:
+			cout << _("post-install: finish") << endl;
+			break;
+		case DB_ADD_PKG_START:
+			break;
+		case DB_ADD_PKG_END:
+			break;
+		case RM_PKG_FILES_START:
+			j=0;
+			cout << _("REMOVE: (")
+				<< m_packageCollection
+				<< ") "
+				<< m_packageName
+				<< " "
+				<< m_packageVersion
+				<< "-"
+				<< m_packageRelease
+				<< ", "
+				<< m_filesList.size()
+				<< _(" files: ");
+			break;
+		case RM_PKG_FILES_RUN:
+			j++;
+			printf("%3u%%\b\b\b\b",
+				( j * 100 ) / m_filesList.size() );
+			break;
+		case RM_PKG_FILES_END:
+			printf("100 %%\n");
+			break;
+		case LDCONFIG_START:
+			break;
+		case LDCONFIG_END:
+			break;
   }
 }
 set<string> Pkgdbh::getListOfPackageName()
@@ -373,8 +373,7 @@ void Pkgdbh::buildDatabase
 	for ( auto pkgName : m_packageNamesList) {
 		if (progress) {
 			m_actualAction = DB_OPEN_RUN;
-			if ( m_packageNamesList.size() > 100 )
-				progressInfo();
+			progressInfo();
 		}
 		const string metaFile = m_root
 		+ PKG_DB_DIR
@@ -410,8 +409,7 @@ void Pkgdbh::buildDatabase
 		for ( auto pkgName : m_packageNamesList) {
 			if (progress) {
 				m_actualAction = DB_OPEN_RUN;
-				if ( m_packageNamesList.size() > 100 )
-					progressInfo();
+				progressInfo();
 			}
 			const string metaFile = m_root
 			+ PKG_DB_DIR
@@ -544,8 +542,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 		for (auto i : m_packageNamesList) {
 			if (!silent) {
 				m_actualAction = DB_OPEN_RUN;
-				if ( m_packageNamesList.size() > 100 )
-					progressInfo();
+				progressInfo();
 			}
 			pkginfo_t info;
 			const string metaFileDir = m_root + PKG_DB_DIR + i;
