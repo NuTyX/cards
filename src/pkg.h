@@ -56,13 +56,13 @@ public:
 	void unSetStatus(CPSTATUS pstatus);
 	CPSTATUS getStatus();
 
-protected:
-	std::string _collection;
-	std::string _name;
-	std::string _version;
-	std::string _packager;
-	std::string _description;
-	CPSTATUS _status;
+private:
+	std::string m_collection;
+	std::string m_name;
+	std::string m_version;
+	std::string m_packager;
+	std::string m_description;
+	CPSTATUS m_status;
 };
 
 #endif /* PKG_H */

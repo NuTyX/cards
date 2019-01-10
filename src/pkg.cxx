@@ -28,7 +28,7 @@ using namespace std;
 /// Constructor
 Pkg::Pkg()
 {
-	_status = (CPSTATUS) 0;
+	m_status = (CPSTATUS) 0;
 }
 
 /// Destructor
@@ -39,76 +39,76 @@ Pkg::~Pkg()
 // Sets
 void Pkg::setName(string& name)
 {
-	_name = name;
+	m_name = name;
 }
 void Pkg::setDescription(string& description)
 {
-	_description = description;
+	m_description = description;
 }
 void Pkg::setVersion(string& version)
 {
-	_version = version;
+	m_version = version;
 }
 void Pkg::setCollection(string& collection)
 {
-	_collection = collection;
+	m_collection = collection;
 }
 void Pkg::setPackager(string& packager)
 {
-	_packager = packager;
+	m_packager = packager;
 }
 /// Return
 string Pkg::getCollection()
 {
-	return _collection;
+	return m_collection;
 }
 
 string Pkg::getName()
 {
-	return _name;
+	return m_name;
 }
 
 string Pkg::getVersion()
 {
-	return _version;
+	return m_version;
 }
 
 string Pkg::getPackager()
 {
-	return _packager;
+	return m_packager;
 }
 
 string Pkg::getDescription()
 {
-	return _description;
+	return m_description;
 }
 
 bool Pkg::isInstalled()
 {
-	return _status & CPSTATUS::INSTALLED;
+	return m_status & CPSTATUS::INSTALLED;
 }
 
 bool Pkg::isToBeInstalled()
 {
-	return _status & CPSTATUS::TO_INSTALL;
+	return m_status & CPSTATUS::TO_INSTALL;
 }
 
 bool Pkg::isToBeRemoved()
 {
-	return _status & CPSTATUS::TO_REMOVE;
+	return m_status & CPSTATUS::TO_REMOVE;
 }
 
 void Pkg::setStatus(CPSTATUS pstatus)
 {
-	_status = (CPSTATUS)(_status | pstatus);
+	m_status = (CPSTATUS)(m_status | pstatus);
 }
 
 void Pkg::unSetStatus(CPSTATUS pstatus)
 {
-	_status = (CPSTATUS)(_status & (~pstatus));
+	m_status = (CPSTATUS)(m_status & (~pstatus));
 }
 
 CPSTATUS Pkg::getStatus()
 {
-	return _status;
+	return m_status;
 }

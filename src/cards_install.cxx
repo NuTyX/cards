@@ -143,6 +143,7 @@ void Cards_install::parseArguments()
 }
 void Cards_install::getLocalePackagesList()
 {
+	std::string packageFileName;
 	if (m_config.locale.empty())
 		return;
 	std::set<std::string> tmpList;
@@ -153,8 +154,8 @@ void Cards_install::getLocalePackagesList()
 			std::cerr << packageName << std::endl;
 #endif
 			if (checkBinaryExist(packageName)) {
-				m_packageFileName = getPackageFileName(packageName);
-				if ( ! checkFileExist(m_packageFileName) )
+				packageFileName = getPackageFileName(packageName);
+				if ( ! checkFileExist(packageFileName) )
 					downloadPackageFileName(packageName);
 				tmpList.insert(packageName);
 			}

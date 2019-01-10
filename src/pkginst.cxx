@@ -42,46 +42,46 @@ void Pkginst::generateDependencies()
 	dependenciesWeMustAdd.push_back(PackageTime);
 	std::vector< pair<string,time_t> >::iterator vit;
 	std::set< pair<string,time_t> >::iterator sit;
-	std::string packageNameSignature;
+	std::string packageNameSignature, packageName, packageFileName;
 
 	while ( ! dependenciesWeMustAdd.empty() ) { // Main WHILE
 #ifndef NDEBUG
 		for (auto i : dependenciesWeMustAdd) cerr << i.first << " " << i.second << endl;
 #endif
 		vit = dependenciesWeMustAdd.begin();
-		m_packageName = vit->first;
+		packageName = vit->first;
 		PackageTime = *vit;
 		dependenciesWeMustAdd.erase(vit);   // Erase the current treated package name
 		set< pair<string,time_t> > directDependencies;
-		if ( m_listOfDepotPackages.find(m_packageName) != m_listOfDepotPackages.end() ) {
+		if ( m_listOfDepotPackages.find(packageName) != m_listOfDepotPackages.end() ) {
 #ifndef NDEBUG
-			cerr << m_packageName << " found in m_listOfDepotPackages" << endl;
+			cerr << packageName << " found in m_listOfDepotPackages" << endl;
 #endif
-			directDependencies = m_listOfDepotPackages[m_packageName].dependencies;
+			directDependencies = m_listOfDepotPackages[packageName].dependencies;
 #ifndef NDEBUG
 			for (auto i : directDependencies ) cerr << i.first << i.second << " ";
 #endif
 		} else {
 #ifndef NDEBUG
-			cerr << m_packageName << " not found in m_listOfDepotPackages" << endl;
+			cerr << packageName << " not found in m_listOfDepotPackages" << endl;
 #endif
-			if ( checkBinaryExist(m_packageName)) { // directs deps if not yet availables
+			if ( checkBinaryExist(packageName)) { // directs deps if not yet availables
 #ifndef NDEBUG
-				cerr << m_packageName << " binary found " << endl;
+				cerr << packageName << " binary found " << endl;
 #endif
-				m_packageFileName = getPackageFileName(m_packageName);
-				packageNameSignature = getPackageFileNameSignature(m_packageName);
+				packageFileName = getPackageFileName(packageName);
+				packageNameSignature = getPackageFileNameSignature(packageName);
 
 #ifndef NDEBUG
-				cerr << m_packageFileName << " archive found " << endl;
+				cerr << packageFileName << " archive found " << endl;
 #endif
 			}
-			if ( ! checkFileSignature(m_packageFileName, packageNameSignature)) // Binary Archive not yet downloaded or corrupted
-				downloadPackageFileName(m_packageName); // Get it
+			if ( ! checkFileSignature(packageFileName, packageNameSignature)) // Binary Archive not yet downloaded or corrupted
+				downloadPackageFileName(packageName); // Get it
 #ifndef NDEBUG
-			cerr << "getPackageDependencies(" << m_packageFileName << ")" << endl;
+			cerr << "getPackageDependencies(" << packageFileName << ")" << endl;
 #endif
-			directDependencies = getPackageDependencies(m_packageFileName);
+			directDependencies = getPackageDependencies(packageFileName);
 #ifndef NDEBUG
 			for (auto i : directDependencies ) cerr << i.first << " ";
 #endif

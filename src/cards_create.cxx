@@ -56,6 +56,7 @@ void Cards_create::createBinaries(const char *configFileName,
 	string timestamp;
 	string commandName = "cards create: ";
 	string message;
+	string packageFileName;
 	int fdlog = -1;
 
 	if ( config.logdir != "" ) {
@@ -155,8 +156,8 @@ void Cards_create::createBinaries(const char *configFileName,
 	for (auto i : listOfPackages) {
 		if (i.find("cards.tar")== std::string::npos )
 			continue;
-		m_packageFileName = pkgdir + "/" + i;
-		ArchiveUtils packageArchive(m_packageFileName.c_str());
+		packageFileName = pkgdir + "/" + i;
+		ArchiveUtils packageArchive(packageFileName.c_str());
 		string name = packageArchive.name();
 		string version = packageArchive.version();
 		message = "CREATED: " + name + " " + version;
