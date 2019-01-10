@@ -50,11 +50,14 @@ public:
  * add: The packageFileName from the mirror
  *
  */
-	void downloadPackageFileName(const std::string& packageFileName);
+	void downloadPackageFileName(const std::string& packageName);
 	bool checkBinaryExist(const std::string& packageName);
 	std::string getPackageFileName(const std::string& packageName);
 	std::string getPackageFileNameSignature(const std::string& packageName);
 
+	void setPackageFileName(const std::string& packageFileNmae);
+
+private:
 	std::string m_packageFileName;
 	std::string m_packageFileNameSignature;
 };

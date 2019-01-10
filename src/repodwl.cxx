@@ -175,5 +175,8 @@ string Repodwl::getPackageFileNameSignature(const string& packageName)
 	checkBinaryExist(packageName);
 	return m_packageFileNameSignature;
 }
-
+void Repodwl::setPackageFileName(const string& packageFileName)
+{
+		m_packageFileName=packageFileName;
+}
 // vim:set ts=2 :
