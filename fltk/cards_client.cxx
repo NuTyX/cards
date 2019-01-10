@@ -51,6 +51,7 @@ namespace cards
     {
         if (pPackageList.size()==0) return;
         string message = _("sudo cards install");
+        string packageArchiveName;
         for (auto pack:pPackageList)
         {
             message += _(" ") + pack;
@@ -71,8 +72,8 @@ namespace cards
         getLocalePackagesList();
         for ( auto i : m_dependenciesList )
         {
-            m_packageArchiveName = getPackageFileName(i);
-            ArchiveUtils packageArchive(m_packageArchiveName.c_str());
+            packageArchiveName = getPackageFileName(i.first);
+            ArchiveUtils packageArchive(packageArchiveName.c_str());
             string name = packageArchive.name();
             if ( checkPackageNameExist(name ))
             {
@@ -142,17 +143,23 @@ namespace cards
         {
             for ( auto j :m_dependenciesList )
             {
-                std::string packageName  = j + "." + i;
+                std::string packageName  = j.first + "." + i;
                 if (checkBinaryExist(packageName))
                 {
-                    m_packageFileName = getPackageFileName(packageName);
-                    if ( ! checkFileExist(m_packageFileName) ) downloadPackageFileName(packageName);
+                    setPackageFileName(packageName);
+                    if ( ! checkFileExist(getPackageFileName(packageName)) ) downloadPackageFileName(packageName);
                     tmpList.insert(packageName);
                 }
             }
         }
-        if (tmpList.size() > 0 )
-            for (auto i : tmpList) m_dependenciesList.push_back(i);
+        if (tmpList.size() > 0 ) {
+			for (auto i : tmpList) {
+               std::pair<std::string,time_t> PackageTime;
+               PackageTime.first=i;
+               PackageTime.second=0;
+               m_dependenciesList.push_back(PackageTime);
+            }
+        }
     }
 
     void CClient::progressInfo()
