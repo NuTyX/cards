@@ -477,6 +477,7 @@ void Pkgdbh::buildSimpleDatabase()
 			itemList * contentFile = initItemList();
 			readFile(contentFile,metaFile.c_str());
 			info.release = 1;
+			info.dependency = false;
 			m_listOfAlias[i] = i;
 			for (unsigned int li=0; li < contentFile->count ; ++li) {
 				if ( contentFile->items[li][0] == 'c' ) {
@@ -551,6 +552,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 			itemList * contentFile = initItemList();
 			readFile(contentFile,metaFile.c_str());
 			info.release = 1;
+			info.dependency = false;
 			m_listOfAlias[i] = i;
 			for (unsigned int li=0; li< contentFile->count ; ++li) {
 				if ( contentFile->items[li][0] == 'C' ) {
@@ -603,10 +605,8 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 				}
 				if ( contentFile->items[li][0] == 'd' ) {
 					string s = contentFile->items[li];
-					if ( s == "d0" )
-						info.dependencie = false;
-					else
-						info.dependencie = true;
+					if ( s == "d1" )
+						info.dependency = true;
 				}
 				if ( contentFile->items[li][0] == 'S' ) {
 					string s = contentFile->items[li];
@@ -696,8 +696,9 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 	/*
 	 * TODO add the builddate of the package if available
 	 */
-	fileContent.insert("d0"); // not a depencencie
-
+	if (m_dependency)
+		fileContent.insert("d1");
+	m_dependency=false;
 	mkdir(packagenamedir.c_str(),0755);
 
 	for (set<string>::const_iterator i = metaFilesList.begin(); i!=  metaFilesList.end(); ++i)
@@ -777,6 +778,20 @@ void Pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 bool Pkgdbh::checkPackageNameExist(const string& name) const
 {
 	return (m_listOfAlias.find(name) != m_listOfAlias.end());
+}
+bool Pkgdbh::checkDependency(const string& name)
+{
+	if  ( checkPackageNameExist(name) )
+		return m_listOfInstPackages[name].dependency;
+	return false;
+}
+void Pkgdbh::setDependency (const string& name)
+{
+	m_dependency=true;
+}
+void Pkgdbh::resetDependency( const string& name)
+{
+	m_dependency=false;
 }
 bool Pkgdbh::checkPackageNameUptodate(const pair<string, pkginfo_t>& archiveName)
 {

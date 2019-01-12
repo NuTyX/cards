@@ -148,7 +148,7 @@ struct pkginfo_t {
 	time_t install; // date of last installation
 	std::string arch;
 	int size;
-	bool dependencie; // true it's a dependencie: automaticaly install
+	bool dependency; // true it's a dependency: automaticaly install
 	std::set< std::pair<std::string,time_t> > dependencies;
 	std::set<std::string> alias;
 	std::set<std::string> files;
@@ -198,7 +198,12 @@ public:
 	void print_version() const;
 	int getNumberOfPackages();
 	std::set<std::string> getListOfPackageName();
+
 	bool checkPackageNameExist(const std::string& name) const;
+	bool checkDependency(const std::string& name);
+	void setDependency(const std::string& name);
+	void resetDependency(const std::string& name);
+
 	unsigned int getFilesNumber();
 	unsigned int getInstalledFilesNumber();
 	std::set<std::string> getFilesList();
@@ -295,6 +300,7 @@ private:
 	unsigned int m_filesNumber;
 	unsigned int m_installedFilesNumber;
 
+	bool m_dependency;
 
 	bool m_DB_Empty;
 	bool m_miniDB_Empty;
