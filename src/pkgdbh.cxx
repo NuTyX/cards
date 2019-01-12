@@ -457,6 +457,31 @@ void Pkgdbh::buildDatabase
 	}
 }
 /**
+ * Populate m_listOfInstalledPackagesWithDeps with:
+ * - Name of the package
+ * - Dependencies list of the package
+ * */
+void Pkgdbh::buildSimpleDependenciesDatabase()
+{
+	if (m_packageNamesList.empty() )
+			getListOfPackageNames (m_root);
+	for ( auto i : m_packageNamesList) {
+		pair < string, set<string> > packageWithDeps;
+		packageWithDeps.first=i;
+		const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
+		itemList * contentFile = initItemList();
+		readFile(contentFile,metaFile.c_str());
+		for (unsigned int li=0; li < contentFile->count ; ++li) {
+			if ( contentFile->items[li][0] == 'R' ) {
+				string s = contentFile->items[li];
+				string dependency = s.substr(1,s.size()-11);
+				packageWithDeps.second.insert(dependency);
+			}
+		}
+		m_listOfInstalledPackagesWithDeps.insert(packageWithDeps);
+	}
+}
+/**
  * Populate the database with:
  * - Name
  * - version
@@ -512,6 +537,12 @@ void Pkgdbh::buildSimpleDatabase()
 					string s = contentFile->items[li];
 					info.packager = s.substr(1);
 				}
+				if ( contentFile->items[li][0] == 'd' ) {
+					string s = contentFile->items[li];
+					if ( s == "d1" )
+						info.dependency = true;
+				}
+
 			}
 			m_listOfInstPackages[i] = info;
 			freeItemList(contentFile);

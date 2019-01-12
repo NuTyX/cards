@@ -1,7 +1,7 @@
 /*
  * cards_remove.cxx
  *
- * Copyright 2013-2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2013-2019 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,6 +114,29 @@ Cards_remove::Cards_remove(const string& commandName,
 			name += m_packageName;
 			syslog(LOG_INFO,"%s",name.c_str());
 		}
+	}
+
+	// Lets get read of obsolets dependencies
+	getListOfManInstalledPackages ();
+	bool found;
+	set<string> obsoletsDeps;
+	for ( auto i : m_listOfInstPackages  ) {
+		found = false;
+		for (  auto j : m_listofDependencies ) {
+			if ( i.first == j ) {
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+			obsoletsDeps.insert(i.first);
+	}
+	for ( auto i : obsoletsDeps ) {
+		m_packageName = i;
+		run();
+		string name = "(" +  m_packageCollection + ") ";
+		name += i;
+		syslog(LOG_INFO,"%s",name.c_str());
 	}
 }
 // vim:set ts=2 :

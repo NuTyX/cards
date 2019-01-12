@@ -215,6 +215,8 @@ protected:
 	int getListOfPackageNames(const std::string& path);
 	std::pair<std::string, pkginfo_t> getInfosPackage(const std::string& packageName);
 	void buildSimpleDatabase();
+	void buildSimpleDependenciesDatabase();
+
 	void buildCompleteDatabase(const bool& silent);
 	void buildDatabase(const bool& progress,
 	const bool& simple,
@@ -286,6 +288,8 @@ protected:
 
 	packages_t m_listOfInstPackages;
 	packages_t m_listOfDepotPackages;
+
+	std::set<std::pair<std::string,std::set<std::string> > > m_listOfInstalledPackagesWithDeps;
 
 	action m_actualAction;
 	error m_actualError;

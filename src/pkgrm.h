@@ -3,7 +3,7 @@
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2019 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,6 +36,14 @@ public:
 	void run();
 	void run(int argc, char** argv);
 	void printHelp() const;
+
+protected:
+	void getListOfManInstalledPackages ();
+	std::set<std::string> m_listOfManInstalledPackages;
+	std::set<std::string> m_listofDependencies;
+private:
+	void getDirectDependencies(std::string& name);
+
 };
 
 #endif /* PKGRM_H */

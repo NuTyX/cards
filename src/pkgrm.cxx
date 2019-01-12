@@ -3,7 +3,7 @@
 // 
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2019 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -36,6 +36,55 @@ void Pkgrm::run(int argc, char** argv)
 	parseArguments(argc, argv);
 	run();
 }
+void Pkgrm::getListOfManInstalledPackages ()
+{
+	// Get the list of installed packages
+	getListOfPackageNames(m_root);
+
+	buildSimpleDatabase();
+
+	for ( auto i : m_listOfInstPackages) {
+		if ( i.second.dependency == false )
+			m_listOfManInstalledPackages.insert(i.first);
+	}
+	buildSimpleDependenciesDatabase();
+	bool found;
+	for ( auto i : m_listOfManInstalledPackages ) {
+		found = false;
+		for ( auto j : m_listofDependencies ) {
+			if ( j == i )	{
+				found = true;
+				break;
+			}
+		}
+		if (! found)
+			getDirectDependencies(i);
+	}
+}
+void Pkgrm::getDirectDependencies(string& name)
+{
+	bool found = false;
+	for ( auto i : m_listofDependencies ) {
+		if ( name == i ) {
+			found = true;
+			break;
+		}
+	}
+	if ( ! found ) {
+		m_listofDependencies.insert(name);
+		for ( auto i : m_listOfInstalledPackagesWithDeps ) {
+			if ( i.first == name ) {
+				if ( i.second.size() > 0 ) {
+					for ( auto j : i.second) {
+						string s = j;
+						getDirectDependencies(s);
+					}
+				}
+				break;
+			}
+		}
+	}
+}
 void Pkgrm::run()
 {
 	// Check UID
@@ -63,6 +112,7 @@ void Pkgrm::run()
 
 	// Remove the files on hd
 	removePackageFiles(m_packageName);
+
 }
 void Pkgrm::printHelp() const
 {
