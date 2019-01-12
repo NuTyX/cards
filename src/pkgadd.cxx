@@ -155,6 +155,9 @@ void Pkgadd::run()
 #ifndef NDEBUG
 		cerr << "Run extractAndRunPREfromPackage with upgrade" << endl;
 #endif
+
+		if ( checkDependency(package.first) )
+			setDependency ();
 		if (m_runPrePost) preRun();
 		Db_lock lock(m_root, true);
 		// Remove metadata about the package removed

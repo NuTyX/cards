@@ -170,6 +170,11 @@ void Pkginfo::run()
 			// List installed packages
 			buildSimpleDatabase();
 			for (auto i : m_listOfInstPackages) {
+				if ( i.second.dependency == true)
+					cout << "AUTO ";
+				else
+					cout << " MAN ";
+
 				cout << "(" << i.second.collection << ")"
 				<< " " << i.first << " "
 				<< i.second.version << "-" << i.second.release << endl;

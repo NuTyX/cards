@@ -87,7 +87,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			m_upgrade=0;
 		}
 		if (i.second > 0)
-			setDependency(name);
+			setDependency();
 		name = "(" + packageArchive.collection()+") " + name;
 		run();
 		syslog(LOG_INFO,"%s",name.c_str());

@@ -816,11 +816,11 @@ bool Pkgdbh::checkDependency(const string& name)
 		return m_listOfInstPackages[name].dependency;
 	return false;
 }
-void Pkgdbh::setDependency (const string& name)
+void Pkgdbh::setDependency()
 {
 	m_dependency=true;
 }
-void Pkgdbh::resetDependency( const string& name)
+void Pkgdbh::resetDependency()
 {
 	m_dependency=false;
 }

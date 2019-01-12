@@ -201,8 +201,8 @@ public:
 
 	bool checkPackageNameExist(const std::string& name) const;
 	bool checkDependency(const std::string& name);
-	void setDependency(const std::string& name);
-	void resetDependency(const std::string& name);
+	void setDependency();
+	void resetDependency();
 
 	unsigned int getFilesNumber();
 	unsigned int getInstalledFilesNumber();
