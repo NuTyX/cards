@@ -51,7 +51,6 @@ namespace cards
     {
         if (pPackageList.size()==0) return;
         string message = _("sudo cards install");
-        string packageArchiveName;
         for (auto pack:pPackageList)
         {
             message += _(" ") + pack;
@@ -72,8 +71,8 @@ namespace cards
         getLocalePackagesList();
         for ( auto i : m_dependenciesList )
         {
-            packageArchiveName = getPackageFileName(i.first);
-            ArchiveUtils packageArchive(packageArchiveName.c_str());
+            m_packageArchiveName = getPackageFileName(i.first);
+            ArchiveUtils packageArchive(m_packageArchiveName.c_str());
             string name = packageArchive.name();
             if ( checkPackageNameExist(name ))
             {

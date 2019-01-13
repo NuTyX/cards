@@ -50,15 +50,7 @@ void Pkgrm::getListOfManInstalledPackages ()
 	buildSimpleDependenciesDatabase();
 	bool found;
 	for ( auto i : m_listOfManInstalledPackages ) {
-		found = false;
-		for ( auto j : m_listofDependencies ) {
-			if ( j == i )	{
-				found = true;
-				break;
-			}
-		}
-		if (! found)
-			getDirectDependencies(i);
+		getDirectDependencies(i);
 	}
 }
 void Pkgrm::getDirectDependencies(string& name)
@@ -76,8 +68,9 @@ void Pkgrm::getDirectDependencies(string& name)
 			if ( i.first == name ) {
 				if ( i.second.size() > 0 ) {
 					for ( auto j : i.second) {
-						string s = j;
-						getDirectDependencies(s);
+						if ( name == j )
+							continue;
+						getDirectDependencies(j);
 					}
 				}
 				break;
