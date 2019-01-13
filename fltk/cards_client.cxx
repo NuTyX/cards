@@ -83,6 +83,9 @@ namespace cards
             {
                 m_upgrade=0;
             }
+            if (i.second > 0)
+                setDependency();
+
             // We don't want to have trouble with conflict files,
             // lets flcards force the installation by default
             m_force=true;
