@@ -171,9 +171,9 @@ void Pkginfo::run()
 			buildSimpleDatabase();
 			for (auto i : m_listOfInstPackages) {
 				if ( i.second.dependency == true)
-					cout << "AUTO ";
+					cout << "AUTO: ";
 				else
-					cout << " MAN ";
+					cout << " MAN: ";
 
 				cout << "(" << i.second.collection << ")"
 				<< " " << i.first << " "
@@ -311,7 +311,7 @@ void Pkginfo::run()
 				string arg = m_listOfAlias[m_arg];
 				cout << _("Name           : ") << arg << endl;
 				if (m_listOfInstPackages[arg].alias.size() > 0 ) {
-					cout << "Alias          : ";
+					cout << _("Alias          : ");
 					for ( auto i : m_listOfInstPackages[arg].alias) cout << i << " ";
 						cout << endl;
 				}

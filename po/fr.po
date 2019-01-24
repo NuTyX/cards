@@ -300,6 +300,9 @@ msgstr "\t   Affiche cet aide"
 msgid "Name           : "
 msgstr "Nom                 : "
 
+msgid "Alias          : "
+msgstr "Aussi appelé        : "
+
 msgid "Series(base)   : "
 msgstr "Séries(base)        : "
 
@@ -352,10 +355,10 @@ msgid "Arch           : "
 msgstr "Arch                : "
 
 msgid "Man. installed : Yes"
-msgstr "Install manu.       : Oui"
+msgstr "Install. manuelle   : Oui"
 
 msgid "Man. installed : No"
-msgstr "Install manu.       : Non"
+msgstr "Install. manuelle   : Non"
 
 
 msgid "Dependencies   : "
