@@ -310,6 +310,18 @@ string ArchiveUtils::description()
 	}
 	return "";
 }
+string ArchiveUtils::group()
+{
+	string description;
+	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
+		description = *i;
+		if ( description[0] == 'g' ) {
+			return description.substr(1);
+			break;
+		}
+	}
+	return "";
+}
 string ArchiveUtils::maintainer()
 {
   string maintainer;

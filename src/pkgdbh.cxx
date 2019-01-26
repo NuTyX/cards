@@ -742,9 +742,6 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 			}
 		}
 	}
-	/*
-	 * TODO add the builddate of the package if available
-	 */
 	if (m_dependency) {
 		string file = packagenamedir + "/META";
 		fileContent.insert("d1");
@@ -1115,6 +1112,7 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 	result.second.release = packageArchive.release();
 	result.second.arch = packageArchive.arch();
 	result.second.build = packageArchive.buildn();
+	result.second.group = packageArchive.group();
 
 	set<string> fileList =  packageArchive.setofFiles();
 	for (set<string>::iterator i = fileList.begin();i != fileList.end();++i) {

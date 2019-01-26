@@ -96,6 +96,7 @@ class ArchiveUtils
 	std::string packager();   // return the Packager(s) of the package
 	std::string builddate();  // return the date like Mon Mar 24 10:16:00 2014
 	std::string name();				// return the name of the package
+	std::string group();  // return the group of the package
 	std::string namebuildn();	// return the name + epochvalue
 	std::string epochBuildDate();		// return the epochvalue in string format
 	time_t buildn();    // return the epoch value
