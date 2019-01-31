@@ -62,6 +62,11 @@ int arg_parser( int argc, char** argv, int &i )
     return 0;
 }
 
+void Idle(void*)
+{
+    Fl::wait(1);
+}
+
 ///
 /// Main Program
 ///
@@ -99,7 +104,7 @@ int main(int argc, char **argv)
     //Enable Log Manager
     if (Theme.length() > 0) Fl::scheme(Theme.c_str());
     // Enable Multithreading on Fltk
-    Fl::add_idle(CLogger::loopCallback);
+    Fl::add_idle(Idle);
     mainWindow win(isInstaller);
     win.resizable(win);
     win.show(argc, argv);

@@ -61,7 +61,6 @@ namespace cards
     ///
     void CLogger::loopCallback(void*)
     {
-        sleep(1);
         if (m_ptLogger!=nullptr)
         {
             m_ptLogger->m_ArrMutex.lock();
