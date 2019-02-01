@@ -66,7 +66,7 @@ namespace cards
         static void kill();
         void log ( const string& pMessage,
             CL_DEBUG_LEVEL pLevel=LEVEL_INFO);
-        static void loopCallback(void*);
+        static void loopCallback();
         void subscribe (CEventHandler* pSubscriber);
         void unSubscribe (CEventHandler* pSubscriber);
     };

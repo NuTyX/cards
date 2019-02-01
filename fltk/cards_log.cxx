@@ -59,7 +59,7 @@ namespace cards
     ///
     ///
     ///
-    void CLogger::loopCallback(void*)
+    void CLogger::loopCallback()
     {
         if (m_ptLogger!=nullptr)
         {

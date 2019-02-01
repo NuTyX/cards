@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include "mainWindow.h"
 #include "cards_log.h"
@@ -62,9 +63,13 @@ int arg_parser( int argc, char** argv, int &i )
     return 0;
 }
 
+///
+/// Main event loop
+///
 void Idle(void*)
 {
-    Fl::wait(1);
+    CLogger::loopCallback();
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 ///
