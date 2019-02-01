@@ -24,7 +24,6 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <chrono>
 
 #include "mainWindow.h"
 #include "cards_log.h"
@@ -66,10 +65,10 @@ int arg_parser( int argc, char** argv, int &i )
 ///
 /// Main event loop
 ///
-void Idle(void*)
+void MainLoop(void*)
 {
     CLogger::loopCallback();
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    Fl::add_timeout(0.2, MainLoop);
 }
 
 ///
@@ -77,7 +76,6 @@ void Idle(void*)
 ///
 int main(int argc, char **argv)
 {
-    Fl::lock();
     int i = 1;
     if (Fl::args(argc, argv, i, arg_parser) < argc)
         // note the concatenated strings to give a single format string!
@@ -108,11 +106,11 @@ int main(int argc, char **argv)
 
     //Enable Log Manager
     if (Theme.length() > 0) Fl::scheme(Theme.c_str());
-    // Enable Multithreading on Fltk
-    Fl::add_idle(Idle);
     mainWindow win(isInstaller);
     win.resizable(win);
     win.show(argc, argv);
     win.LoadConfig();
+    //Start Auto MainLoop
+    MainLoop(0);
     return Fl::run();
 }

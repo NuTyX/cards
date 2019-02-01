@@ -267,6 +267,7 @@ namespace cards
         }
         _arrJobList.clear();
         refreshJobList();
+        _log->log("Job list is finished");
         _job_running = false;
         m_OnDoJobListFinished_Callback(rc);
     }
