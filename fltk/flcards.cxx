@@ -76,6 +76,7 @@ void MainLoop(void*)
 ///
 int main(int argc, char **argv)
 {
+    Fl::lock();
     int i = 1;
     if (Fl::args(argc, argv, i, arg_parser) < argc)
         // note the concatenated strings to give a single format string!
