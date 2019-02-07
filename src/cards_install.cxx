@@ -146,10 +146,10 @@ void Cards_install::parseArguments()
 void Cards_install::getLocalePackagesList()
 {
 	std::string packageFileName;
-	if (m_config.locale.empty())
+	if (m_config.group.empty())
 		return;
 	std::set<std::string> tmpList;
-	for ( auto i :  m_config.locale ) {
+	for ( auto i :  m_config.group ) {
 		for ( auto j :m_dependenciesList ) {
 			std::string packageName  = j.first + "." + i;
 #ifndef NDEBUG

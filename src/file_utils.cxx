@@ -74,8 +74,8 @@ int getConfig(const char *fileName, Config& config)
       if ( config.arch== "" ) {
         return -1;
 			}
-			if (key == "locale") {
-				config.locale.push_back(val);
+			if ( (key == "locale") || (key == "group") ) {
+				config.group.push_back(val);
 			}
 			if (key == "base") {
 				config.baseDir.push_back(val);

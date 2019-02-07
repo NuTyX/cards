@@ -156,7 +156,7 @@ int main(int argc, char** argv)
 				cout << _("Base System list directory: ") << i << endl;
 			cout <<   _("Binaries : ")
 				<< config.arch << endl;
-			for ( auto i : config.locale ) cout << "Locale   : " << i << endl;
+			for ( auto i : config.group ) cout << "Group    : " << i << endl;
 			if ( config.logdir != "") {
 				cout << _("log directory: ")
 					<< config.logdir << endl;

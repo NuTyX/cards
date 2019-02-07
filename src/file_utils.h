@@ -78,7 +78,7 @@ struct Config {
 	std::string version;
 	std::string arch;
 	std::string logdir;
-	std::vector<std::string> locale;
+	std::vector<std::string> group;
 	std::vector<DirUrl> dirUrl;
 	std::vector<std::string> baseDir;
 	std::vector<std::string> archs;

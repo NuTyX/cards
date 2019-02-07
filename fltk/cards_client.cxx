@@ -139,9 +139,9 @@ namespace cards
     /// Fill m_dependenciesList with LocalPackageList
     void CClient::getLocalePackagesList()
     {
-        if (m_config.locale.empty()) return;
+        if (m_config.group.empty()) return;
         std::set<std::string> tmpList;
-        for ( auto i :  m_config.locale )
+        for ( auto i :  m_config.group )
         {
             for ( auto j :m_dependenciesList )
             {
