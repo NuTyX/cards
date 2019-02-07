@@ -309,11 +309,24 @@ msgstr "Séries(base)        : "
 msgid "Group          : "
 msgstr "Groupe              : "
 
+msgid "Groups         : "
+msgstr "Groupes             : "
+
 msgid "Collection     : "
 msgstr "Collection          : "
 
 msgid "URL            : "
 msgstr "URL                 : "
+
+msgid "Binary URL     : "
+msgstr "URL binaires        : "
+
+msgid "Date of Pkgfile: "
+msgstr "Date du Pkgfile     : "
+
+msgid "Local folder   : "
+msgstr "Dossier local       : "
+
 
 msgid "Contributor(s) : "
 msgstr "Contributeur(s)     : "
@@ -321,8 +334,8 @@ msgstr "Contributeur(s)     : "
 msgid "Maintainer(s)  : "
 msgstr "Mainteneur(s)       : "
 
-msgid "Packager(s)    : "
-msgstr "Empaqueteur(s)      : "
+msgid "Packager       : "
+msgstr "Empaqueteur         : "
 
 msgid "Description    : "
 msgstr "Description         : "

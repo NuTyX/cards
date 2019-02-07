@@ -518,16 +518,16 @@ bool Pkgrepo::getPortInfo(const string& portName)
 		for (auto j : i.basePackageList) {
 			if ( j.basePackageName == portName ) {
 				found = true;
-				cout << "Name           : " << portName << endl
-					<< "Description    : " << j.description << endl
-					<< "URL            : " << j.URL << endl
-					<< "Version        : " << j.version << endl
-					<< "Release        : " << j.release << endl
-					<< "Maintainer     : " << j.maintainer << endl
-					<< "Contributors   : " << j.contributors << endl
-					<< "Packager       : " << j.packager << endl
-					<< "Date of Pkgfile: " << j.fileDate << endl
-					<< "Local Directory: " << i.Dir << endl;
+				cout << _("Name           : ") << portName << endl
+					<< _("Description    : ") << j.description << endl
+					<< _("URL            : ") << j.URL << endl
+					<< _("Version        : ") << j.version << endl
+					<< _("Release        : ") << j.release << endl
+					<< _("Maintainer(s)  : ") << j.maintainer << endl
+					<< _("Contributor(s) : ") << j.contributors << endl
+					<< _("Packager       : ") << j.packager << endl
+					<< _("Date of Pkgfile: ") << j.fileDate << endl
+					<< _("Local folder   : ") << i.Dir << endl;
 			}
 		}
 	}
@@ -545,19 +545,19 @@ bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
 		for (auto j : i.basePackageList) {
 			if ( j.basePackageName == packageName ) {
 				found = true;
-				cout << "Name           : " << packageName << endl
-					<< "Alias          : " << j.alias << endl
-					<< "Description    : " << j.description << endl
-					<< "Group          : " << j.group << endl
-					<< "URL            : " << j.URL << endl
-					<< "Version        : " << j.version << endl
-					<< "Release        : " << j.release << endl
-					<< "Maintainer     : " << j.maintainer << endl
-					<< "Contributors   : " << j.contributors << endl
-					<< "Packager       : " << j.packager << endl
-					<< "Build date     : " << getDateFromEpoch(j.buildDate) << endl
-					<< "Binary Url     : " << i.Url << endl
-					<< "Local Directory: " << i.Dir << endl;
+				cout << _("Name           : ") << packageName << endl
+					<< _("Alias          : ") << j.alias << endl
+					<< _("Description    : ") << j.description << endl
+					<< _("Groups         : ") << j.group << endl
+					<< _("URL            : ") << j.URL << endl
+					<< _("Version        : ") << j.version << endl
+					<< _("Release        : ") << j.release << endl
+					<< _("Maintainer(s)  : ") << j.maintainer << endl
+					<< _("Contributor(s) : ") << j.contributors << endl
+					<< _("Packager       : ") << j.packager << endl
+					<< _("Build date     : ") << getDateFromEpoch(j.buildDate) << endl
+					<< _("Binary URL     : ") << i.Url << endl
+					<< _("Local folder   : ") << i.Dir << endl;
 				break;
 			}
 		}

@@ -321,7 +321,7 @@ void Pkginfo::run()
 					<< _("Collection     : ") << m_listOfInstPackages[arg].collection << endl
 					<< _("URL            : ") << m_listOfInstPackages[arg].url << endl
 					<< _("Contributor(s) : ") << m_listOfInstPackages[arg].contributors << endl
-					<< _("Packager(s)    : ") << m_listOfInstPackages[arg].packager << endl
+					<< _("Packager       : ") << m_listOfInstPackages[arg].packager << endl
 					<< _("Version        : ") << m_listOfInstPackages[arg].version << endl
 					<< _("Release        : ") << m_listOfInstPackages[arg].release << endl
 					<< _("Build date     : ") << getDateFromEpoch(m_listOfInstPackages[arg].build) << endl
