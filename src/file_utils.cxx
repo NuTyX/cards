@@ -86,6 +86,8 @@ int getConfig(const char *fileName, Config& config)
 			if (key == "version") {
 				config.version = val;
 			}
+			if (key == "url")
+				config.url = val;
 			if (key == "hostname")
 				config.hostname = val;
 			if (key == "username")
@@ -106,6 +108,20 @@ int getConfig(const char *fileName, Config& config)
 		}
 	}
 	fclose(fp);
+	if (config.url.size() > 0) {
+		vector<DirUrl> list;
+		DirUrl DU;
+		for ( auto i : config.dirUrl) {
+			DU.Dir=i.Dir;
+			if ( i.Url.size() == 0 ) {
+				DU.Url=config.url;
+			} else {
+				DU.Url=i.Url;
+			}
+			list.push_back(DU);
+		}
+		config.dirUrl.swap(list);
+	}
 	return 0;
 }
 
