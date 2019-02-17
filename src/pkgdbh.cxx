@@ -697,22 +697,20 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 }
 void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 {
-  set<string> metaFilesList;
+	set<string> metaFilesList;
 	m_actualAction = PKG_MOVE_META_START;
 	progressInfo();
-	string package_meta_dir = ".";
 
 	const string packagedir = m_root + PKG_DB_DIR ;
 	const string packagenamedir = m_root + PKG_DB_DIR + name ;
 
-	for (set<string>::const_iterator i = info.files.begin(); i != info.files.end(); ++i)
+	for (auto i: info.files)
 	{
-		if ( strncmp(i->c_str(),package_meta_dir.c_str(),package_meta_dir.size()) == 0 )
-		{
+		if ( i[0] == '.' ) {
 #ifndef NDEBUG
-			cout << "*I: " << *i << endl;
+			cout << "i: " << i << endl;
 #endif
-			metaFilesList.insert(metaFilesList.end(), *i );
+			metaFilesList.insert(metaFilesList.end(), i );
 			info.files.erase(i);
 		}
 	}
@@ -726,19 +724,19 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 
 	mkdir(packagenamedir.c_str(),0755);
 
-	for (set<string>::const_iterator i = metaFilesList.begin(); i!=  metaFilesList.end(); ++i)
+	for (auto i : metaFilesList)
 	{
-		char * destFile = const_cast<char*>(i->c_str());
+		char * destFile = const_cast<char*>(i.c_str());
 		destFile++;
 		string file = packagenamedir + "/" + destFile;
-		if (rename(i->c_str(), file.c_str()) == -1) {
+		if (rename(i.c_str(), file.c_str()) == -1) {
 			m_actualError = CANNOT_RENAME_FILE;
-			treatErrors( *i + " to " + file);
+			treatErrors( i + " to " + file);
 		}
-		if ( *i == ".POST" ) {
-			if (copyFile(i->c_str(), file.c_str()) == -1) {
+		if ( i == ".POST" ) {
+			if (copyFile(i.c_str(), file.c_str()) == -1) {
 				m_actualError = CANNOT_COPY_FILE;
-				treatErrors( file  + " to " + *i);
+				treatErrors( file  + " to " + i);
 			}
 		}
 	}
