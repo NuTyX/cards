@@ -700,7 +700,6 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 	set<string> metaFilesList;
 	m_actualAction = PKG_MOVE_META_START;
 	progressInfo();
-
 	const string packagedir = m_root + PKG_DB_DIR ;
 	const string packagenamedir = m_root + PKG_DB_DIR + name ;
 
@@ -711,9 +710,9 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 			cout << "i: " << i << endl;
 #endif
 			metaFilesList.insert(metaFilesList.end(), i );
-			info.files.erase(i);
 		}
 	}
+	for ( auto i : metaFilesList) info.files.erase(i);
 	removeFile ( m_root, "/.MTREE");
 	metaFilesList.insert(".META");
 	set<string> fileContent;

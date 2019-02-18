@@ -40,9 +40,11 @@ dir /var/lib/pkg/repo/base|http://downloads.nutyx.org
 
 logdir /var/log/pkgbuild
 
-# locales
+# group or locale
 
-locale fr
+group fr
+group man
+group devel
 
 # base system
 
