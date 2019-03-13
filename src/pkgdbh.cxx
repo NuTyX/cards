@@ -1123,6 +1123,7 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 {
 	pair<string, pkginfo_t> packageArchive;
 	set< pair<string,time_t> > packageNameDepsBuildTime;
+	set< pair<string,time_t> > packageNameDepsBuildTimeTemp;
 	packageArchive = openArchivePackage(filename);
 #ifndef NDEBUG
 	cerr << "----> Begin of Direct Dependencies of " << packageArchive.first << endl;
@@ -1140,29 +1141,27 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 #ifndef NDEBUG
 	cerr << "----> End of Direct Dependencies" << endl;
 #endif
-	packageNameDepsBuildTime = packageArchive.second.dependencies;
+	packageNameDepsBuildTimeTemp = packageArchive.second.dependencies;
 #ifndef NDEBUG
 	cerr << "----> Before cleanup: " << packageArchive.first << endl;
-	for (auto it : packageNameDepsBuildTime ) cerr << it.first << it.second<< " ";
+	for (auto it : packageNameDepsBuildTimeTemp ) cerr << it.first << it.second<< " ";
 	cerr << endl;
 	int i=1;
 #endif
-	for (std::set< pair<string,time_t> >::iterator it = packageNameDepsBuildTime.begin();it != packageNameDepsBuildTime.end();it++ ) {
+	for (auto it : packageNameDepsBuildTimeTemp ) {
 #ifndef NDEBUG
-		cerr << it->first << it->second << endl;
+		cerr << it.first << " " <<  it.second << endl;
 		cerr << "packageArchiveName:" <<packageArchive.first << endl;
 #endif
 		/*
-		 * If actual and already present erase the dep
+		 * If actual and already present don't add the dep
 		 */
-		if ( checkPackageNameBuildDateSame(*it)  ) {
-			packageNameDepsBuildTime.erase(it);
+		if ( checkPackageNameBuildDateSame(it)  )
+			continue;
+		packageNameDepsBuildTime.insert(it);
+			//packageNameDepsBuildTime.erase(it);
 #ifndef NDEBUG
-			cerr << "----> " << it->first << " deleted" << endl;
-#endif
-			it--;
-		}
-#ifndef NDEBUG
+		cerr << "----> " << it.first << " deleted" << endl;
 		cerr << i << endl;
 		i++;
 #endif

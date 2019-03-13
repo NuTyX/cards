@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (c) 2016 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2016-2019 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@ export CFLAGS="-O2 -pipe"
 export CXXFLAGS="${CFLAGS}"
 export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
 PKGMK_GROUPS=(devel man doc service)
-PKGMK_LOCALES=(ar fr de it es hi ja nl pt da nn sv fi tr ru pl zh_CN)
+PKGMK_LOCALES=(ar fi fr cs da de is it el es ga gl hi hr hu ja lt lv nl nn pt pl ro ru rw sq sk sl sr sv th tr uk vi zh)
 PKGMK_CLEAN="no"
 PKGMK_KEEP_SOURCES="yes"
 PKGMK_SOURCE_DIR="/sources"

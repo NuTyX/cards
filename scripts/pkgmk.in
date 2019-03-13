@@ -4,7 +4,7 @@
 # 
 #  Copyright (c) 2000-2005 Per Liden
 #  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013-2019 by NuTyX team (http://nutyx.org)
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -364,7 +364,7 @@ unpack_source() {
 	done
 }
 get_package_list() {
-	local i
+	local i ARCH
 	i=0
 	for ARCH in $PKGMK_ARCH any; do
 		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*$ARCH.$PKGMK_PACKAGE_EXT*"`; do
@@ -971,28 +971,29 @@ build_package() {
 			fi
 			j=0
 		done
-		if [ ! -z PKGMK_LOCALES ]; then
-			local DIR PKGMK_LOCALE LOC
-			for DIR in usr/share/locale opt/*/share/locale; do
-				if [ -d $DIR ]; then
-					for LOC in `cd $DIR && ls`; do
-						# Need to double check because glibc for example creates a file in this directory
-						if [ -d $DIR/$LOC ];then
-							for PKGMK_LOCALE in ${PKGMK_LOCALES[@]}; do
-								if [ "$PKGMK_LOCALE" == "$LOC" ]; then
-									if [ "$1" != "$TARGET" ]; then
-										bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${LOC}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
-										$DIR/$LOC || abort_on_build "${name}.${LOC}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT}"
-									fi
-									rm -rf $DIR/$LOC
-									break
-								fi
-							done
-						fi
-					done
+		for group in ${PKGMK_LOCALES[@]}; do
+			if [ "`type -t locale_${group}`" == "function" ]; then
+				BUILD_SUCCESSFUL="no"
+				(set -e -x ;locale_${group})
+				j=1
+				if [ $? = 0 ]; then
+					BUILD_SUCCESSFUL="yes"
+				else
+					error "Building '$TARGET' failed."
+					exit $E_BUILD
 				fi
-			done
-		fi
+			else
+				for DIR in usr/share/locale/${group}* opt/*/share/locale/${group}*; do
+					if [ -d $DIR ]; then
+						if [ "$1" != "$TARGET" ]; then
+							bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+										$DIR || abort_on_build "${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT}"
+						fi
+						rm -rf $DIR
+					fi
+				done
+			fi
+		done
 		for DIR in usr/share/locale opt/*/share/locale; do
 			if [ -d $DIR ]; then
 				rm -rf $DIR
