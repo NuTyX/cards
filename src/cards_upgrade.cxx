@@ -36,6 +36,29 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 
 	parsePkgRepoCollectionFile();
 	buildSimpleDatabase();
+	std::set<std::string> tmpList;
+	if (!m_config.group.empty()) {
+		for (auto i: m_listOfInstPackages) {
+			for ( auto j :  m_config.group ) {
+					std::string packageName  = getBasePackageName(i.first) + "." + j;
+					if ( i.first == packageName )
+						continue;
+					if (checkBinaryExist(packageName)) {
+						tmpList.insert(packageName);
+					}
+			}
+		}
+	}
+	if ( tmpList.size() > 0) {
+		for ( auto i : tmpList) {
+			pair<string,time_t> packageNameBuildDate;
+			packageNameBuildDate.first = i;
+			packageNameBuildDate.second = getBinaryBuildTime(i);
+			if (checkPackageNameBuildDateSame(packageNameBuildDate))
+				continue;
+			m_ListOfPackages.insert(packageNameBuildDate);
+		}
+	}
 	for (auto i : m_listOfInstPackages) {
 		if (!checkBinaryExist(i.first)) {
 			cerr << i.first << " not exist" << endl;
