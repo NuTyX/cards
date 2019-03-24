@@ -41,14 +41,11 @@ void Pkgrm::getListOfManInstalledPackages ()
 	// Get the list of installed packages
 	getListOfPackageNames(m_root);
 
-	buildSimpleDatabase();
-
 	for ( auto i : m_listOfInstPackages) {
 		if ( i.second.dependency == false )
 			m_listOfManInstalledPackages.insert(i.first);
 	}
 	buildSimpleDependenciesDatabase();
-	bool found;
 	for ( auto i : m_listOfManInstalledPackages ) {
 		getDirectDependencies(i);
 	}
