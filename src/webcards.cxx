@@ -175,7 +175,7 @@ string::size_type parseArguments(arguments_t &arguments)
 	if ( arguments.packageArch.size() == 0)
 		arguments.packageArch="x86_64";
 	if ( arguments.packageBranch.size() == 0)
-		arguments.packageBranch="stable";
+		arguments.packageBranch="rolling";
 	if ( arguments.type.size() == 0)
 		arguments.type="pkg";
 	return pos;
@@ -199,28 +199,26 @@ void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"type\" value=\"col\" /> COLLECTION" );
 	contentInfo.text.push_back( "    <tr class=\"even\">");
 	contentInfo.text.push_back( "     <td>");
-	contentInfo.text.push_back( "      <h4>Branch</h4>");
+	contentInfo.text.push_back( "      <h4>Release</h4>");
 	contentInfo.text.push_back( "     <td>");
+
+	if ( arguments.packageBranch == "rolling" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"rolling\" checked=\"checked\" /> Rolling");
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"rolling\" /> Rolling");
+	contentInfo.text.push_back( "     <br>");
+	if ( arguments.packageBranch == "fixed" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"fixed\" checked=\"checked\"/> Fixed");
+	else
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"fixed\" /> Fixed");
+	contentInfo.text.push_back( "     <br>");
 	if ( arguments.packageBranch == "all" )
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" checked=\"checked\"/> All" );
 	else
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" /> All");
-	contentInfo.text.push_back( "     <br>");
-	if ( arguments.packageBranch == "stable" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"stable\" checked=\"checked\"/> stable");
-	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"stable\" /> stable");
-	contentInfo.text.push_back( "     <br>");
-	if ( arguments.packageBranch == "current" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"current\" checked=\"checked\" /> current");
-	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"current\" /> current");
-	contentInfo.text.push_back( "     <br>");
-	if ( arguments.packageBranch == "development" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"development\" checked=\"checked\" /> development");
-	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"development\" /> development");
-	contentInfo.text.push_back( "    <tr class=\"odd\">");
+
+
+/*	contentInfo.text.push_back( "    <tr class=\"odd\">");
 	contentInfo.text.push_back( "     <td>");
 	contentInfo.text.push_back( "      <h4>Arch</h4>");
 	contentInfo.text.push_back( "     <td>");
@@ -237,8 +235,9 @@ void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
 	if ( arguments.packageArch == "x86_64" )
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" checked=\"checked\" /> x86_64");
 	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" /> x86_64");
-	contentInfo.text.push_back( "    <tr class=\"even\" valign=\"middle\">");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" /> x86_64"); */
+		
+	contentInfo.text.push_back( "    <tr class=\"odd\" valign=\"middle\">");
 	contentInfo.text.push_back( "     <td>");
 	contentInfo.text.push_back( "      <h4>Search ...</h4>");
 	contentInfo.text.push_back( "     <td>");
@@ -365,7 +364,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 	searchpkg(contentInfo,arguments);
 	contentInfo.text.push_back("<table>");
 	contentInfo.text.push_back("  <tr class=\"header\">");
-	contentInfo.text.push_back("  <td>ARCH</td><td>BRANCH</td>\
+	contentInfo.text.push_back("  <td>ARCH</td><td>RELEASE</td>\
 <td>COLLECTION</td>\
 <td>NAME</td>\
 <td>VERSION</td>\

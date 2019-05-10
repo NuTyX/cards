@@ -28,11 +28,10 @@
 + i.arch + "</td>" \
 + "<td>" + i.branch + "</td>"  \
 + "<td>" + i.collection + "</td>" \
-+ "<td> <a href=\"http://downloads.nutyx.org/" \
-+ i.arch + "/" + i.branch + "/" \
-+ i.collection + "/" + basename + "/Pkgfile\">" \
-+ name + "</a></td>" \
-+ "<td>" + j.version + "-" + itos(j.release) + "</td>" \
++ "<td> <a href=\"https://git.tuxfamily.org/nutyx/nutyx-packages.git/tree/" \
++ i.collection + "/" + basename + "\">" + name + "</a></td>" \
++ "<td> <a href=\"https://git.tuxfamily.org/nutyx/nutyx-packages.git/log/?qt=grep&q=^" \
++ basename + "+\">" + j.version + "-" + itos(j.release) + "</a></td>" \
 + "<td>" + j.description + "</td>" \
 + "<td>" + getDateFromEpoch(j.buildDate) + "</td>")
 
@@ -52,7 +51,7 @@ typedef std::map<std::string, contentInfo_t> content_t;
 
 /* populate a vector of string with delimed string from an html formated text */
 std::vector<std::string> parseHTMLDelimitedList
-(const std::vector<std::string>& text,
+(const std::vector<std::string>& text, 
 const std::string delimiter, const std::string contentTitle);
 
 
