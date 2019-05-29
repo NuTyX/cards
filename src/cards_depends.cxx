@@ -151,13 +151,13 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 						}
 					}
 				}
-				if ( line.substr( 0, 12 ) == "makedepends=(" ){
+				if ( line.substr( 0, 13 ) == "makedepends=(" ){
 					pos = line.find( ')' );
 					if ( pos != string::npos ) {
 #ifndef NDEBUG
 							cerr << line << endl;
 #endif
-							depends = line.substr(12, pos-12);
+							depends = line.substr(13, pos - 13);
 #ifndef NDEBUG
 							cerr << depends << endl;
 #endif
