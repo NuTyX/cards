@@ -176,7 +176,7 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 			}
 			if ( ! depends.empty() ) {
 				replaceAll( depends, "'", " " );
-				replaceAll( depends, "\"", " " );
+				replaceAll( depends, "\\", " " );
 				depends = stripWhiteSpace( depends );
 				replaceAll( depends, " ", "," );
 				replaceAll( depends, ",,", "," );
