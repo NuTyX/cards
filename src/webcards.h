@@ -28,10 +28,12 @@
 + i.arch + "</td>" \
 + "<td>" + i.branch + "</td>"  \
 + "<td>" + i.collection + "</td>" \
-+ "<td> <a href=\"https://git.tuxfamily.org/nutyx/nutyx-packages.git/tree/" \
++ "<td> <a href=\"https://github.com/NuTyX/packages-" + i.arch \
++ "/tree/" + i.branch + "/" \
 + i.collection + "/" + basename + "\">" + name + "</a></td>" \
-+ "<td> <a href=\"https://git.tuxfamily.org/nutyx/nutyx-packages.git/log/?qt=grep&q=^" \
-+ basename + "+\">" + j.version + "-" + itos(j.release) + "</a></td>" \
++ "<td> <a href=\"https://github.com/NuTyX/packages-" + i.arch \
++ "/commits/" + i.branch + "/" \
++ i.collection + "/" + basename + "\">" + j.version + "-" + itos(j.release) + "</a></td>" \
 + "<td>" + j.description + "</td>" \
 + "<td>" + getDateFromEpoch(j.buildDate) + "</td>")
 

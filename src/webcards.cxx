@@ -218,26 +218,26 @@ void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" /> All");
 
 
-/*	contentInfo.text.push_back( "    <tr class=\"odd\">");
+	contentInfo.text.push_back( "    <tr class=\"odd\">");
 	contentInfo.text.push_back( "     <td>");
-	contentInfo.text.push_back( "      <h4>Arch</h4>");
+	contentInfo.text.push_back( "      <h4>Architecture</h4>");
 	contentInfo.text.push_back( "     <td>");
-	if ( arguments.packageArch == "all" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" checked=\"checked\" /> All");
+	if ( arguments.packageArch == "x86_64" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" checked=\"checked\" /> x86_64");
 	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" /> All");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" /> x86_64");
 	contentInfo.text.push_back( "     <br>");
 	if ( arguments.packageArch == "i686" )
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"i686\" checked=\"checked\" /> i686");
 	else
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"i686\" /> i686");
 	contentInfo.text.push_back( "     <br>");
-	if ( arguments.packageArch == "x86_64" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" checked=\"checked\" /> x86_64");
+	if ( arguments.packageArch == "all" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" checked=\"checked\" /> All");
 	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" /> x86_64"); */
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" /> All");
 		
-	contentInfo.text.push_back( "    <tr class=\"odd\" valign=\"middle\">");
+	contentInfo.text.push_back( "    <tr class=\"even\" valign=\"middle\">");
 	contentInfo.text.push_back( "     <td>");
 	contentInfo.text.push_back( "      <h4>Search ...</h4>");
 	contentInfo.text.push_back( "     <td>");
