@@ -124,10 +124,11 @@ void Cards_upgrade::upgrade()
 	else {
 		for (auto i : m_dependenciesList) {
 			m_packageArchiveName=getPackageFileName(i.first);
+			m_force=true;
 			if (checkPackageNameExist(i.first)) {
-				m_upgrade=1;
+				m_upgrade=true;
 			} else {
-				m_upgrade=0;
+				m_upgrade=false;
 			}
 		run();
 		}

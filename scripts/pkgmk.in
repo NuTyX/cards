@@ -1377,8 +1377,6 @@ main() {
                 exit $E_GENERAL
         fi
 
-	PKGMK_ARCH=`uname -m`
-
         . $PKGMK_CONFFILE
 
 	if ! (`which pkginfo > /dev/null`); then
@@ -1673,6 +1671,8 @@ PKGMK_BUILDVER=`date +%s`
 PKGMK_PACKAGE_EXT="cards.tar"
 
 PKGMK_REPO=".PKGREPO"
+PKGMK_ARCH=`uname -m`
+
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
@@ -1703,6 +1703,8 @@ PKGMK_NO_STRIP="no"
 
 PKGMK_COMPRESSION_MODE="xz"
 PKGMK_COMPRESSION_OPTS="-9 --threads=$(getconf _NPROCESSORS_ONLN)"
+[ "$PKGMK_ARCH"=="i686" ] && PKGMK_COMPRESSION_OPTS="-9"
+
 PKGMK_COMPRESS_PACKAGE="no"
 
 PKGMK_INSTALL="no"
