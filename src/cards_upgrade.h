@@ -27,6 +27,7 @@
 
 class Cards_upgrade : public Pkginst {
 private:
+	std::set<std::string>                   m_ListOfPackagesToDelete;
 	std::set<std::pair<std::string,time_t>> m_ListOfPackages;
 	const CardsArgumentParser& m_argParser;
 public:

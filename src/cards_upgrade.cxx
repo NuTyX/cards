@@ -61,7 +61,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	}
 	for (auto i : m_listOfInstPackages) {
 		if (!checkBinaryExist(i.first)) {
-			cerr << i.first << " not exist" << endl;
+			m_ListOfPackagesToDelete.insert(i.first);
 			continue;
 		}
 		pair<string,time_t> packageNameBuildDate;
@@ -79,7 +79,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 			size();
 		if ( (! m_argParser.isSet(CardsArgumentParser::OPT_SIZE)) &&
 				(! m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) ) {
-			if ( m_ListOfPackages.size() == 0 ) {
+			if ( m_ListOfPackages.size() == 0  && ( m_ListOfPackagesToDelete.size() == 0 ) ) {
 				std::cout << _("Your system is up to date") << endl;
 			} else {
 				if (getuid()) {
@@ -91,7 +91,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		}
 	}
 	if ( m_argParser.command() == CardsArgumentParser::CMD_DIFF) {
-		if ( m_ListOfPackages.size() == 0 ) {
+		if ( ( m_ListOfPackages.size() == 0 ) && ( m_ListOfPackagesToDelete.size() == 0 ) ) {
 			std::cout << _("Your system is up to date") << endl;
 		} else {
 			dry();
@@ -111,9 +111,24 @@ void Cards_upgrade::Isuptodate()
 }
 void Cards_upgrade::dry()
 {
+	if (m_ListOfPackages.size() > 1 )
+				std::cout << _("Packages: ");
+	if (m_ListOfPackages.size() == 1 )
+				std::cout << _("Package : ");
 	for (auto i : m_ListOfPackages )
-		std::cout << i.first  << " ";
-	std::cout << std::endl;
+		std::cout << "'" << i.first  << "' ";
+	if (m_ListOfPackages.size() > 0 )
+				std::cout << _("will be replaced when you upgrade your NuTyX") << std::endl;
+
+	if (m_ListOfPackagesToDelete.size() > 1 )
+				std::cout << _("Packages: ");
+	if (m_ListOfPackagesToDelete.size() == 1 )
+				std::cout << _("Package : ");
+	for (auto i: m_ListOfPackagesToDelete)
+			std::cout << "'" << i << "' ";
+	if (m_ListOfPackagesToDelete.size() > 0 )
+				std::cout << _("will be removed when you upgrade your NuTyX") << std::endl;
+
 }
 void Cards_upgrade::upgrade()
 {
@@ -131,6 +146,13 @@ void Cards_upgrade::upgrade()
 				m_upgrade=false;
 			}
 		run();
+		}
+		for (auto i : m_ListOfPackagesToDelete) {
+			Db_lock lock(m_root,true);
+			getListOfPackageNames(m_root);
+			buildCompleteDatabase(false);
+			removePackageFilesRefsFromDB(i);
+			removePackageFiles(i);
 		}
 	}
 }
