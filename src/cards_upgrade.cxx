@@ -100,11 +100,11 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 }
 void Cards_upgrade::size()
 {
-	std::cout << m_ListOfPackages.size() << std::endl;
+	std::cout << m_ListOfPackages.size() + m_ListOfPackagesToDelete.size() << std::endl;
 }
 void Cards_upgrade::Isuptodate()
 {
-	if ( m_ListOfPackages.size() == 0)
+	if ( ( m_ListOfPackages.size() == 0 ) && ( m_ListOfPackagesToDelete.size() == 0 ) )
 		std::cout << "no" << std::endl;
 	else
 		std::cout << "yes" << std::endl;
@@ -112,18 +112,18 @@ void Cards_upgrade::Isuptodate()
 void Cards_upgrade::dry()
 {
 	if (m_ListOfPackages.size() > 1 )
-				std::cout << _("Packages: ");
+				std::cout << _("Packages") << ": ";
 	if (m_ListOfPackages.size() == 1 )
-				std::cout << _("Package : ");
+				std::cout << _("Package")<< " : ";
 	for (auto i : m_ListOfPackages )
 		std::cout << "'" << i.first  << "' ";
 	if (m_ListOfPackages.size() > 0 )
 				std::cout << _("will be replaced when you upgrade your NuTyX") << std::endl;
 
 	if (m_ListOfPackagesToDelete.size() > 1 )
-				std::cout << _("Packages: ");
+				std::cout << _("Packages") << ": ";
 	if (m_ListOfPackagesToDelete.size() == 1 )
-				std::cout << _("Package : ");
+				std::cout << _("Package") << " : ";
 	for (auto i: m_ListOfPackagesToDelete)
 			std::cout << "'" << i << "' ";
 	if (m_ListOfPackagesToDelete.size() > 0 )

@@ -216,6 +216,9 @@ msgstr "Paquet"
 msgid "<package>"
 msgstr "<paquet>"
 
+msgid "Packages"
+msgstr "Paquets"
+
 msgid "<package> | <collection>"
 msgstr "<paquet> | <collection>"
 
@@ -729,3 +732,9 @@ msgstr "\nSYSTEME DE BASE"
 
 msgid "Your system is up to date"
 msgstr "Votre système est à jour"
+
+msgid "will be replaced when you upgrade your NuTyX"
+msgstr "seront remplacés lorsque vous mettrez votre NuTyX à jour"
+
+msgid "will be removed when you upgrade your NuTyX"
+msgstr "seront supprimés lorsque vous mettrez votre NuTyX à jour"
