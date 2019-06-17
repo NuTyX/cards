@@ -166,9 +166,9 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 						// Check for comments lines and inline comments
 						pos = line.find( '#' );
 						if ( pos != string::npos ) {
-							depends += line.substr(12, pos-12) + " ";
+							depends += line.substr(13, pos - 13) + " ";
 						} else {
-							depends += line.substr(12) + " ";
+							depends += line.substr(13) + " ";
 						}
 						find_end=true;
 					}
