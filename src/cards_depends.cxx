@@ -55,189 +55,142 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	depList *dependancesList = initDepsList();
 	char fullPathfileName[255];
 	char name[255];
-	char depfile1[255];
-	char depfile2[255];
-
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
 	itemList *nameDeps = initItemList();
 
-	sprintf(depfile1,"%s.deps",name);
-	sprintf(depfile2,"%s.run",name);
 	string missingDep = "";
 	bool found = false;
-	sprintf(fullPathfileName,"%s/%s",filesList->items[nameIndex],depfile1);
+	// Last chance, check for dependencies in Pkgfile
+
+	sprintf(fullPathfileName,"%s/Pkgfile",filesList->items[nameIndex]);
 	found = checkFileExist(fullPathfileName);
-	if ( !found) {
-		sprintf(fullPathfileName,"%s/%s",filesList->items[nameIndex],depfile2);
-		found = checkFileExist(fullPathfileName);
+	if (! found) {
+		cerr << fullPathfileName << " Not found .." << endl;
+		return NULL;
 	}
-	if (found) {
-		if ( (readFileStripSpace(nameDeps,fullPathfileName)) != 0 ) {
-			missingDep = name;
-			missingDep += " not found ...";
-			m_missingDepsList.insert(missingDep);
-		} else {
-			for (unsigned int i = 0; i < nameDeps->count;i++) {
-				unsigned j = 0;
-				char name[255];
-				for(j = 0; j < filesList->count; j++) {
-					sprintf(name,"%s",basename(filesList->items[j]));
 #ifndef NDEBUG
-					cerr << "name: " << name << endl;
+	cerr << fullPathfileName << endl;
 #endif
-					char * dep = strdup ( nameDeps->items[i]);
-					if ( strchr(dep,'.') != NULL) {
-						dep[strchr(dep,'.') - dep ]= '\0';
+	list<string> deps;
+	FILE* fp = fopen(fullPathfileName, "r" );
+	if ( fp == NULL ) {
+		return NULL;
+	}
+	const int length = BUFSIZ;
+	char input[length];
+	string line;
+	string depends;
+	string::size_type pos;
+	bool find_end = false;
+	// makedepends=() array search
+	while ( fgets( input, length, fp ) ) {
+		line = stripWhiteSpace( input );
+		if ( find_end ) {
+			pos = line.find( ')' );
+			if ( pos != string::npos ) {
+#ifndef NDEBUG
+					cerr << line << endl;
+#endif
+					depends += line.substr(0, pos);
+#ifndef NDEBUG
+					cerr << depends << endl;
+#endif
+				break;
+			} else {
+				// Check for comment lines and inline comments
+				pos = line.find( '#' );
+				if ( pos != string::npos ) {
+					depends += line.substr(0, pos) + " ";
+				} else {
+					depends += line + " ";
+				}
+			}
+		}
+		if ( line.substr( 0, 13 ) == "makedepends=(" ){
+			pos = line.find( ')' );
+			if ( pos != string::npos ) {
+#ifndef NDEBUG
+					cerr << line << endl;
+#endif
+					depends = line.substr(13, pos - 13);
+#ifndef NDEBUG
+					cerr << depends << endl;
+#endif
+					break;
+			} else {
+				// Check for comments lines and inline comments
+				pos = line.find( '#' );
+				if ( pos != string::npos ) {
+					depends += line.substr(13, pos - 13) + " ";
+				} else {
+					depends += line.substr(13) + " ";
+				}
+				find_end=true;
+			}
+		}
+	}
+	if ( ! depends.empty() ) {
+		replaceAll( depends, "'", " " );
+		replaceAll( depends, "\\", " " );
+		depends = stripWhiteSpace( depends );
+		replaceAll( depends, " ", "," );
+		replaceAll( depends, ",,", "," );
+		split( depends, ',', deps, 0,true);
+	} else {
+		// Depends on comment line search
+		rewind (fp);
+		while ( fgets( input, length, fp ) ) {
+			line = stripWhiteSpace( input );
+			if ( line[0] == '#' ) {
+				while ( !line.empty() &&
+					( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
+						line = line.substr( 1 );
 					}
-					if ( strchr(dep,'@') != NULL) {
-						dep[strchr(dep,'@') - dep ]= '-';
-					}
-					if (strcmp(dep,name) == 0 ) {
-						addDepToDepList(dependancesList,j,0);
+				string::size_type pos = line.find( ':' );
+				if ( pos != string::npos ) {
+					if ( startsWithNoCase( line, "dep" ) ) {
+#ifndef NDEBUG
+						cerr << line << endl;
+#endif
+						string depends = stripWhiteSpace( getValue( line, ':' ) );
+#ifndef NDEBUG
+						cerr << depends << endl;
+#endif
+						replaceAll( depends, " ", "," );
+						replaceAll( depends, ",,", "," );
+						split( depends, ',', deps, 0,true);
 						break;
 					}
-					free(dep);
-				}
-				if ( j == filesList->count ) {
-					missingDep = "WARNING ";
-					missingDep += nameDeps->items[i];
-					missingDep += " from ";
-					missingDep += filesList->items[nameIndex];
-					missingDep += " NOT FOUND ...";
-					m_missingDepsList.insert(missingDep);
 				}
 			}
 		}
-	} else {
-  // Last chance, check for dependencies in Pkgfile
-		sprintf(fullPathfileName,"%s/Pkgfile",filesList->items[nameIndex]);
-		found = checkFileExist(fullPathfileName);
-		if (found) {
-#ifndef NDEBUG
-			cerr << fullPathfileName << endl;
-#endif
-			list<string> deps;
-			FILE* fp = fopen(fullPathfileName, "r" );
-			if ( fp == NULL ) {
-				return NULL;
-			}
-			const int length = BUFSIZ;
-			char input[length];
-			string line;
-			string depends;
-			string::size_type pos;
-			bool find_end = false;
-			// makedepends=() array search
-			while ( fgets( input, length, fp ) ) {
-				line = stripWhiteSpace( input );
-				if ( find_end ) {
-					pos = line.find( ')' );
-					if ( pos != string::npos ) {
-#ifndef NDEBUG
-							cerr << line << endl;
-#endif
-							depends += line.substr(0, pos);
-#ifndef NDEBUG
-							cerr << depends << endl;
-#endif
- 							break;
- 					} else {
-						// Check for comment lines and inline comments
-						pos = line.find( '#' );
-						if ( pos != string::npos ) {
-							depends += line.substr(0, pos) + " ";
-						} else {
-							depends += line + " ";
-						}
-					}
-				}
-				if ( line.substr( 0, 13 ) == "makedepends=(" ){
-					pos = line.find( ')' );
-					if ( pos != string::npos ) {
-#ifndef NDEBUG
-							cerr << line << endl;
-#endif
-							depends = line.substr(13, pos - 13);
-#ifndef NDEBUG
-							cerr << depends << endl;
-#endif
- 							break;
-					} else {
-						// Check for comments lines and inline comments
-						pos = line.find( '#' );
-						if ( pos != string::npos ) {
-							depends += line.substr(13, pos - 13) + " ";
-						} else {
-							depends += line.substr(13) + " ";
-						}
-						find_end=true;
-					}
-				}
-			}
-			if ( ! depends.empty() ) {
-				replaceAll( depends, "'", " " );
-				replaceAll( depends, "\\", " " );
-				depends = stripWhiteSpace( depends );
-				replaceAll( depends, " ", "," );
-				replaceAll( depends, ",,", "," );
-				split( depends, ',', deps, 0,true);
- 			} else {
-				// Depends on comment line search
-				rewind (fp);
-				while ( fgets( input, length, fp ) ) {
-					line = stripWhiteSpace( input );
-					if ( line[0] == '#' ) {
-						while ( !line.empty() &&
-							( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
-								line = line.substr( 1 );
-							}
-						string::size_type pos = line.find( ':' );
-						if ( pos != string::npos ) {
-							if ( startsWithNoCase( line, "dep" ) ) {
-#ifndef NDEBUG
-								cerr << line << endl;
-#endif
-								string depends = stripWhiteSpace( getValue( line, ':' ) );
-#ifndef NDEBUG
-								cerr << depends << endl;
-#endif
-								replaceAll( depends, " ", "," );
-								replaceAll( depends, ",,", "," );
-								split( depends, ',', deps, 0,true);
-								break;
-							}
-						}
-					}
-				}
-			}
+	}
 
-			fclose( fp );
-			if ( deps.size() >0 ) {
-				bool found=false;
-				unsigned j = 0;
-				char name[255];
-				for(list<string>::const_iterator i = deps.begin(); i != deps.end(); ++i) {
-					found=false;
-					for(j = 0; j < filesList->count; j++) {
-						sprintf(name,"%s",basename(filesList->items[j]));
-						if (strcmp(i->c_str(),name) == 0 ) {
-							addDepToDepList(dependancesList,j,0);
-							found=true;
-							break;
-						}
-					}
-					if(!found) {
-						missingDep = "WARNING ";
-						missingDep += *i;
-						missingDep += " from ";
-						missingDep += filesList->items[nameIndex];
-						missingDep += " NOT FOUND ...";
-						m_missingDepsList.insert(missingDep);
-					}
+	fclose( fp );
+	if ( deps.size() >0 ) {
+		bool found=false;
+		unsigned j = 0;
+		char name[255];
+		for(list<string>::const_iterator i = deps.begin(); i != deps.end(); ++i) {
+			found=false;
+			for(j = 0; j < filesList->count; j++) {
+				sprintf(name,"%s",basename(filesList->items[j]));
+				if (strcmp(i->c_str(),name) == 0 ) {
+					addDepToDepList(dependancesList,j,0);
+					found=true;
+					break;
 				}
 			}
+			if(!found) {
+				missingDep = "WARNING ";
+				missingDep += *i;
+				missingDep += " from ";
+				missingDep += filesList->items[nameIndex];
+				missingDep += " NOT FOUND ...";
+				m_missingDepsList.insert(missingDep);
+			}
 		}
-  }
+	}
 	freeItemList(nameDeps);
 	return dependancesList;
 }
@@ -375,7 +328,7 @@ int CardsDepends::level()
 	itemList *filesList = initItemList();
 	Config config;
 	Pkgrepo::parseConfig("/etc/cards.conf", config);
-  for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
+	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
 		if ( i->Url.size() > 0)
 			continue;
 		DirUrl DU  = *i ;
@@ -519,7 +472,7 @@ int CardsDepends::depends()
 //	freePkgInfo(package);
 	free(longPackageName);
 #ifndef NDEBUG
-  cerr << "depends() FINISH" << endl;
+	cerr << "depends() FINISH" << endl;
 #endif
 
 	return 0;
@@ -578,7 +531,7 @@ int CardsDepends::deptree()
 	string name = "";
 	set<string> localPackagesList, depsPackagesList;
 
-  for (auto DU : config.dirUrl ) {
+	for (auto DU : config.dirUrl ) {
 	if ( DU.Url == "")
 		continue;
 
