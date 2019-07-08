@@ -562,6 +562,67 @@ int parseFile(vector<string>& fileContent, const char* fileName)
 	fclose(fp);
 	return 0;
 }
+int parseFile(std::string& Depends, const char* key, const char* fileName)
+{
+	FILE* fp = fopen(fileName, "r" );
+	if (!fp)
+		return -1;
+	const int length = BUFSIZ;
+	char input[length];
+	string k = key;
+	string line;
+	string::size_type pos;
+	bool find_end = false;
+	while ( fgets( input, length, fp ) ) {
+		line = stripWhiteSpace( input );
+		if ( find_end ) {
+			pos = line.find( ')' );
+			if ( pos != string::npos ) {
+#ifndef NDEBUG
+				cerr << line << endl;
+#endif
+				Depends += line.substr(0, pos);
+#ifndef NDEBUG
+				cerr << Depends << endl;
+#endif
+				break;
+			} else {
+				// Check for comment lines and inline comments
+				pos = line.find( '#' );
+				if ( pos != string::npos ) {
+					Depends += line.substr(0, pos) + " ";
+				} else {
+					Depends += line + " ";
+				}
+			}
+		}
+		if ( line.substr( 0, k.size() ) == key ){
+			pos = line.find( ')' );
+			cout << line << endl;
+			if ( pos != string::npos ) {
+#ifndef NDEBUG
+				cout << line << endl;
+#endif
+				Depends += line.substr(k.size(), pos - k.size());
+#ifndef NDEBUG
+				cerr << Depends << endl;
+#endif
+				break;
+			} else {
+				// Check for comments lines and inline comments
+				pos = line.find( '#' );
+				if ( pos != string::npos ) {
+					Depends += line.substr(k.size(), pos - k.size()) + " ";
+				} else {
+					Depends += line.substr(k.size()) + " ";
+				}
+				find_end=true;
+			}
+		}
+	}
+	fclose(fp);
+	return 0;
+}
 bool findMD5sum(const string& fileName, unsigned char* result)
 {
 	struct md5_context ctx;

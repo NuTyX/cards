@@ -108,6 +108,7 @@ int readFileStripSpace(itemList *fileContent, const char *fileName);
 int readFile(itemList *fileContent, const char *fileName);
 int parseFile(std::set<std::string>& fileContent, const char* fileName);
 int parseFile(std::vector<std::string>& fileContent, const char* fileName);
+int parseFile(std::string& Depends, const char* key, const char* fileName);
 bool findMD5sum(const std::string& fileName, unsigned char* result);
 bool checkMD5sum(const char * fileName, const char * MD5Sum);
 /* read a file
