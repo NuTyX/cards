@@ -53,15 +53,12 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 		return NULL;
 	}
 	depList *dependancesList = initDepsList();
-	char fullPathfileName[255];
-	char name[255];
+	char fullPathfileName[PATH_MAX];
+	char name[PATH_MAX];
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
 	itemList *nameDeps = initItemList();
-
 	string missingDep = "";
 	bool found = false;
-	// Last chance, check for dependencies in Pkgfile
-
 	sprintf(fullPathfileName,"%s/Pkgfile",filesList->items[nameIndex]);
 	found = checkFileExist(fullPathfileName);
 	if (! found) {
@@ -72,63 +69,11 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	cerr << fullPathfileName << endl;
 #endif
 	list<string> deps;
-	FILE* fp = fopen(fullPathfileName, "r" );
-	if ( fp == NULL ) {
-		return NULL;
-	}
-	const int length = BUFSIZ;
-	char input[length];
-	string line;
 	string depends;
-	string::size_type pos;
-	bool find_end = false;
-	// makedepends=() array search
-	while ( fgets( input, length, fp ) ) {
-		line = stripWhiteSpace( input );
-		if ( find_end ) {
-			pos = line.find( ')' );
-			if ( pos != string::npos ) {
-#ifndef NDEBUG
-					cerr << line << endl;
-#endif
-					depends += line.substr(0, pos);
-#ifndef NDEBUG
-					cerr << depends << endl;
-#endif
-				break;
-			} else {
-				// Check for comment lines and inline comments
-				pos = line.find( '#' );
-				if ( pos != string::npos ) {
-					depends += line.substr(0, pos) + " ";
-				} else {
-					depends += line + " ";
-				}
-			}
-		}
-		if ( line.substr( 0, 13 ) == "makedepends=(" ){
-			pos = line.find( ')' );
-			if ( pos != string::npos ) {
-#ifndef NDEBUG
-					cerr << line << endl;
-#endif
-					depends = line.substr(13, pos - 13);
-#ifndef NDEBUG
-					cerr << depends << endl;
-#endif
-					break;
-			} else {
-				// Check for comments lines and inline comments
-				pos = line.find( '#' );
-				if ( pos != string::npos ) {
-					depends += line.substr(13, pos - 13) + " ";
-				} else {
-					depends += line.substr(13) + " ";
-				}
-				find_end=true;
-			}
-		}
-	}
+	if ( parseFile(depends, "depends=(", fullPathfileName) )
+		return NULL;
+	if ( parseFile(depends, "makedepends=(", fullPathfileName) )
+		return NULL;
 	if ( ! depends.empty() ) {
 		replaceAll( depends, "'", " " );
 		replaceAll( depends, "\\", " " );
@@ -137,8 +82,13 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 		replaceAll( depends, ",,", "," );
 		split( depends, ',', deps, 0,true);
 	} else {
+		FILE* fp = fopen(fullPathfileName, "r" );
+		if (!fp)
+			return NULL;
+		const int length = BUFSIZ;
+		char input[length];
+		string line;
 		// Depends on comment line search
-		rewind (fp);
 		while ( fgets( input, length, fp ) ) {
 			line = stripWhiteSpace( input );
 			if ( line[0] == '#' ) {
@@ -164,9 +114,8 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 				}
 			}
 		}
-	}
-
 	fclose( fp );
+	}
 	if ( deps.size() >0 ) {
 		bool found=false;
 		unsigned j = 0;
