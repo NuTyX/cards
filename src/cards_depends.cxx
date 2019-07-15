@@ -70,8 +70,12 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 #endif
 	list<string> deps;
 	string depends;
+	if ( parseFile(depends, "run=(", fullPathfileName) )
+		return NULL;
+	if ( ! depends.empty() ) depends += " ";
 	if ( parseFile(depends, "depends=(", fullPathfileName) )
 		return NULL;
+	if ( ! depends.empty() ) depends += " ";
 	if ( parseFile(depends, "makedepends=(", fullPathfileName) )
 		return NULL;
 	if ( ! depends.empty() ) {

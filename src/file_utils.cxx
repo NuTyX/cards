@@ -598,7 +598,6 @@ int parseFile(std::string& Depends, const char* key, const char* fileName)
 		}
 		if ( line.substr( 0, k.size() ) == key ){
 			pos = line.find( ')' );
-			cout << line << endl;
 			if ( pos != string::npos ) {
 #ifndef NDEBUG
 				cout << line << endl;
