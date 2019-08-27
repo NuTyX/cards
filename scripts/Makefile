@@ -23,7 +23,7 @@
 
 include ../Makefile.inc
 
-all: pkgmk pkgmk2 ports build-port build-collection
+all: pkgmk pkgmk2 ports build-port build-collection cards
 
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
@@ -37,6 +37,7 @@ install: all
 	install -D -m0755 pkgmk $(USRBINDIR)/pkgmk
 	install -D -m0755 pkgmk2 $(USRBINDIR)/pkgmk2
 	install -D -m0644 pkgmk.conf $(ETCDIR)/pkgmk.conf.example
+	install -D -m0644 cards $(ETCDIR)/profile.d/cards.sh
 	install -D -m0755 ports $(USRBINDIR)/ports
 	install -D -m0755 cards.driver $(VARDIR)/drivers/cards
 
@@ -47,6 +48,7 @@ clean:
 	rm -f ports
 	rm -f build-port
 	rm -f build-collection
+	rm -f cards
 
 distclean: clean
 
