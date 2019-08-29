@@ -130,32 +130,32 @@ check_diff()
 {
 	check_location
 	check_config_file
-	ports_list=`mktemp` || exit 1
-	binaries_list=`mktemp` || exit 1
-	output=`mktemp` || exit 1
-	output_sorted=`mktemp` || exit 1
+	ports_list=$(mktemp) || exit 1
+	binaries_list=$(mktemp) || exit 1
+	output=$(mktemp) || exit 1
+	output_sorted=$(mktemp) || exit 1
 	found="no"
 
 	cards list -p|grep $BINARY_BASE|sed "s@$BINARY_BASE/@@" >> $binaries_list
 	list_ports >> $ports_list
 
-	for binary_package in `cat $binaries_list | gawk '{ print $1 }'`; do
-		binary_package_version=`cat $binaries_list | grep "^$binary_package " | gawk '{ print $2 }'| cut -d "-" -f1`
-		binary_package_release=`cat $binaries_list | grep "^$binary_package " | gawk '{ print $2 }'| cut -d "-" -f2`
+	for binary_package in $(cat $binaries_list | gawk '{ print $1 }'); do
+		binary_package_version=$(cat $binaries_list | grep "^$binary_package " | gawk '{ print $2 }'| cut -d "-" -f1)
+		binary_package_release=$(cat $binaries_list | grep "^$binary_package " | gawk '{ print $2 }'| cut -d "-" -f2)
 		if [ "$binary_package_version" == "" ]; then
-			base_binary_package=`echo $binary_package | cut -d "-" -f1`
+			base_binary_package=$(echo $binary_package | cut -d "-" -f1)
 			if [ "$base_binary_package" != "$binary_package" ]; then
-				binary_package_version=`cat $binaries_list | grep "^$base_binary_package " | gawk '{ print $2 }'| cut -d "-" -f1`
-				binary_package_release=`cat $binaries_list | grep "^$base_binary_package " | gawk '{ print $2 }'| cut -d "-" -f2`
+				binary_package_version=$(cat $binaries_list | grep "^$base_binary_package " | gawk '{ print $2 }'| cut -d "-" -f1)
+				binary_package_release=$(cat $binaries_list | grep "^$base_binary_package " | gawk '{ print $2 }'| cut -d "-" -f2)
 			fi
 		fi
-		binary_version=`echo $binary_package_version-$binary_package_release`
+		binary_version=$(echo $binary_package_version-$binary_package_release)
 		package=$binary_package
 		if [ -f $PORT_BASE/$package/Pkgfile ]; then
-			base_package=`echo $package | cut -d "-" -f1`
+			base_package=$(echo $package | cut -d "-" -f1)
 			cd $PORT_BASE/$package
 			get_port_version
-			port_version=`echo $version-$release`
+			port_version=$(echo $version-$release)
 			if [ "$binary_version" != "$port_version" ]; then
 				echo "$package $port_version $binary_version" >> $output
 				found="yes"
@@ -253,19 +253,19 @@ PORT_BASE     : $PORT_BASE
 	done
 }
 check_tools () {
-	if ! (`which cards > /dev/null`); then
+	if ! ( $(which cards > /dev/null) ); then
 		echo "'cards' not available"
 		exit 1
 	fi
-	if ! (`which pkgmk > /dev/null`); then
+	if ! ( $(which pkgmk > /dev/null) ); then
 		echo "'cards.devel' not available"
 		exit 1
 	fi
-	if ! (`which rsync > /dev/null`); then
+	if ! ( $(which rsync > /dev/null) ); then
 		echo "'rsync' not available"
 		exit 1
 	fi
-	if ! (`which gawk > /dev/null`); then
+	if ! ( $(which gawk > /dev/null) ); then
 		echo "'gawk' not available"
 		exit 1
 	fi
@@ -296,7 +296,7 @@ fi
 }
 get_binary_directory() {
 	local DIR
-	DIR=`cards config|grep Directory| cut -d " " -f3|grep ${COLLECTION}$|sed "s/\/${COLLECTION}$//"|head -1`
+	DIR=$(cards config|grep Directory| cut -d " " -f3|grep ${COLLECTION}$|sed "s/\/${COLLECTION}$//"|head -1)
 	if [ ! -z ${DIR} ]; then
 		BINARY_DIR=${DIR}
 	else
@@ -306,15 +306,15 @@ get_binary_directory() {
 get_binary_version() {
 	local version release
 	cd $BINARY_BASE/$package
-	version=`head -1 .PKGREPO|cut -d "#" -f3`
-	release=`head -1 .PKGREPO|cut -d "#" -f4`
+	version=$(head -1 .PKGREPO|cut -d "#" -f3)
+	release=$(head -1 .PKGREPO|cut -d "#" -f4)
 	binary_version=$version-$release
 }
 get_port_version() {
 	local port base_port PORTS_DIR tmprel
 	port=/$PORT_BASE/$package
 	PORTS_DIR=$PORT_BASE
-	base_port=`echo $package | cut -d "-" -f1`
+	base_port=$(echo $package | cut -d "-" -f1)
 	cd $port
 	unset version
 	release=1
@@ -352,8 +352,8 @@ I quit for now
 		exit 1
 	fi
 	if [ -f /var/lib/pkg/nutyx-version ]; then
-		RSYNC_NUTYX_VERSION=`cat /var/lib/pkg/nutyx-version|grep version|sed "s/version //"| sed "s/ //g"`
-		RSYNC_NUTYX_NAME=`cat /var/lib/pkg/nutyx-version|grep name|sed "s/name //"| sed "s/ //g"`
+		RSYNC_NUTYX_VERSION=$(cat /var/lib/pkg/nutyx-version|grep version|sed "s/version //"| sed "s/ //g")
+		RSYNC_NUTYX_NAME=$(cat /var/lib/pkg/nutyx-version|grep name|sed "s/name //"| sed "s/ //g")
 	else
 		echo "/var/lib/pkg/nutyx-version file not exist
 I quit for now
@@ -391,7 +391,7 @@ sync_pkgmk_conf() {
 }
 remove_url () {
 	local URL
-	URL="`cat /etc/cards.conf|grep \"^dir[ ]*${BINARY_BASE}|\"| cut -d '|' -s -f2`"
+	URL="$(cat /etc/cards.conf|grep \"^dir[ ]*${BINARY_BASE}|\"| cut -d '|' -s -f2)"
 	if [ ! -z "$URL" ]; then
 		sed -i "s@${BINARY_BASE}|${URL}@${BINARY_BASE}@" /etc/cards.conf
 	fi
@@ -400,14 +400,14 @@ build_binaries () {
 	local package port_version binary_version currentdir
 	currentdir=$PWD
 	sync_pkgmk_conf
-	if [ -n "`cards level|grep WARNING|head -1`" ]; then
+	if [ -n "$(cards level|grep WARNING|head -1)" ]; then
 		cards level
 		exit 1;
 	fi
-	for i in `cards level | grep ${BINARY_BASE}/|cut -d " " -f2`
+	for i in $(cards level | grep ${BINARY_BASE}/|cut -d " " -f2)
 	do
-		package=`basename $i`
-		if [  -z "`ls ${BINARY_BASE}/$package/*$ARCH.cards.tar.xz 2>/dev/null `" ];then
+		package=$(basename $i)
+		if [  -z "$(ls ${BINARY_BASE}/$package/*$ARCH.cards.tar.xz 2>/dev/null )" ];then
 			cd $currentdir
 			[ "$DRY" == "yes" ] && continue
 			bash scripts/$COLLECTION $package|| exit 1
@@ -419,7 +419,7 @@ build_binaries () {
 			bash scripts/$COLLECTION $package|| exit 1
 			continue
 		fi
-		if [ ! -z "`diff ${BINARY_BASE}/$package/Pkgfile ${PORT_BASE}/$package/Pkgfile`" ]; then
+		if [ ! -z "$(diff ${BINARY_BASE}/$package/Pkgfile ${PORT_BASE}/$package/Pkgfile)" ]; then
 			echo " ${BINARY_BASE}/$package/Pkgfile AND ${PORT_BASE}/$package/Pkgfile are different ...WILL BUILD NEW.."
 			cd $currentdir
 			[ "$DRY" == "yes" ] && continue
@@ -465,10 +465,10 @@ main() {
 }
 BUILD_PORT_VERSION=#VERSION#
 DRY="no"
-ARCH=`uname -m`
+ARCH=$(uname -m)
 RSYNC_SERVER="rsync://downloads.nutyx.org/nutyx"
-COLLECTION="`basename $0`"
-GIT=`pwd`
-PROJECT="`basename $GIT`"
+COLLECTION="$(basename $0)"
+GIT="$(pwd)"
+PROJECT="$(basename $GIT)"
 PKGMK_CONFFILE=".pkgmk.conf"
 main "$@"

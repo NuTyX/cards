@@ -54,13 +54,13 @@ have_function() {
 }
 get_collection() {
 	local FILE DIR
-	for FILE in `find .. -name $PKGMK_PKGFILE | sort`; do
-               DIR="`dirname $FILE`/"
+	for FILE in $(find .. -name $PKGMK_PKGFILE | sort); do
+		DIR="$(dirname $FILE)/"
                 if [ -d $DIR ]; then
 			if [ -z "$PKGMK_COLLECTION" ]; then
-				PKGMK_COLLECTION="`basename $DIR`"
+				PKGMK_COLLECTION="$(basename $DIR)"
 			else
-				PKGMK_COLLECTION="$PKGMK_COLLECTION `basename $DIR`"
+				PKGMK_COLLECTION="$PKGMK_COLLECTION $(basename $DIR)"
 			fi
 		fi
 	done
@@ -73,27 +73,27 @@ get_filename() {
 	fi
 }
 get_basename() {
-	local FILE="`echo $1 | sed 's|^.*://.*/||g'`"
+	local FILE="$(echo $1 | sed 's|^.*://.*/||g')"
 	echo $FILE
 }
 get_variables() {
 	local STRING KEY VALUE
 	while read i;
 	do
-		STRING=`echo $i |grep \# | grep :|sed "s@^[ ,\t,#]*@@" `
-		KEY=`echo $STRING|cut -d ":" -f1|sed "s@^[ ,\t,#]*@@"`
-		VALUE=`echo $STRING|cut -d ":" -f1 --complement|sed "s@^[ ,\t,#]*@@"`
+		STRING=$(echo $i |grep \# | grep :|sed "s@^[ ,\t,#]*@@" )
+		KEY=$(echo $STRING|cut -d ":" -f1|sed "s@^[ ,\t,#]*@@")
+		VALUE=$(echo $STRING|cut -d ":" -f1 --complement|sed "s@^[ ,\t,#]*@@")
 		if [ -z "$description" ]; then
-			[ ! -z "`echo $KEY|grep -i desc`" ] && description=$VALUE
+			[ ! -z "$(echo $KEY|grep -i desc)" ] && description=$VALUE
 		fi
 		if [ -z "$url" ]; then
-			[ ! -z "`echo $KEY|grep -i url`" ] && url=$VALUE
+			[ ! -z "$(echo $KEY|grep -i url)" ] && url=$VALUE
 		fi
 		if [ -z "$packager" ]; then
-			[ ! -z "`echo $KEY|grep -i pack`" ] && packager=$VALUE
+			[ ! -z "$(echo $KEY|grep -i pack)" ] && packager=$VALUE
 		fi
 		if [ -z "$maintainer" ]; then
-			[ ! -z "`echo $KEY|grep -i main`" ] && maintainer=$VALUE
+			[ ! -z "$(echo $KEY|grep -i main)" ] && maintainer=$VALUE
 		fi
 	done < $PKGMK_ROOT/$PKGMK_PKGFILE
 }
@@ -103,11 +103,11 @@ check_pkgfile() {
 		error "Variable 'name' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	fi
-	if [ "`type -t build`" != "function" ] && [ "$PKGMK_PKGFILE" == "Pkgfile" ]; then
+	if [ "$(type -t build)" != "function" ] && [ "$PKGMK_PKGFILE" == "Pkgfile" ]; then
 		error "Function 'build' not specified in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	fi
-	NAME_TEST=`echo "${name}" | sed 's@[[a-z0-9]*[-_+]*]*@@g'`
+	NAME_TEST="$(echo "${name}" | sed 's@[[a-z0-9]*[-_+]*]*@@g')"
 	if [ "$NAME_TEST" != "" ]; then
 		error "Variable 'name' contains following illegal characters: $NAME_TEST"
 		exit $E_PKGFILE
@@ -124,7 +124,7 @@ check_pkgfile() {
 		error "Variable 'release' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	fi
-	RELEASE_TEST=`echo "${release}" | sed 's@[0-9]*@@g'`
+	RELEASE_TEST="$(echo "${release}" | sed 's@[0-9]*@@g')"
 	if [ "$RELEASE_TEST" != "" ]; then
 		error "Variable 'release' contains following illegal characters: $RELEASE_TEST"
 		exit $E_PKGFILE
@@ -133,7 +133,7 @@ check_pkgfile() {
 		error "Variable 'release' outside limit which is '99999999'"
 		exit $E_PKGFILE
 	fi
-	DESC_TEST=`echo "${description}" | grep '#'`
+	DESC_TEST="$(echo "${description}" | grep '#')"
 	if [ "$DESC_TEST" != "" ]; then
 		error "Variable 'description' contains the '#' illegal character"
 		exit $E_PKGFILE
@@ -184,7 +184,7 @@ get_package_name() {
 	else
 		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 	fi
-	NAME=`echo $1|sed "s/$PKGMK_ARCH.$EXT//"|sed "s/any.$EXT//"`
+	NAME="$(echo $1|sed "s/$PKGMK_ARCH.$EXT//"|sed "s/any.$EXT//")"
 
 	echo "${NAME:0:$((${#NAME} - 10 ))}"	
 }
@@ -195,8 +195,8 @@ get_package_builddate() {
 	else
 		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
 	fi
-	NAME="`get_package_name $1`"
-	BUILD_DATE=`echo $1|sed "s/$PKGMK_ARCH.$EXT//"|sed "s/any.$EXT//"`
+	NAME="$(get_package_name $1)"
+	BUILD_DATE="$(echo $1|sed "s/$PKGMK_ARCH.$EXT//"|sed "s/any.$EXT//")"
 	echo "${BUILD_DATE:$((${#NAME}))}"
 }
 get_package_extension() {
@@ -210,9 +210,9 @@ get_package_extension() {
 }
 get_package_arch() {
 	local NAME BUILD_DATE EXTENSION
-	NAME=`get_package_name $1`
-	BUILD_DATE=`get_package_builddate $1`
-	EXTENSION=`get_package_extension $1`
+	NAME="$(get_package_name $1)"
+	BUILD_DATE="$(get_package_builddate $1)"
+	EXTENSION="$(get_package_extension $1)"
 	echo $1|sed "s/$NAME$BUILD_DATE//"|sed "s/$EXTENSION//"
 }
 check_directory() {
@@ -234,7 +234,7 @@ check_file() {
 	fi
 }
 downloads_file_with_curl() {
-	if [ ! "`type -p curl`" ]; then
+	if [ ! "$(type -p curl)" ]; then
 		error "Command 'curl' not found."
 		exit $E_GENERAL
 	fi
@@ -253,9 +253,9 @@ downloads_file_with_curl() {
 download_file() {
 	info "Downloading '$1'."
 
-	LOCAL_FILENAME=`get_filename $1`
+	LOCAL_FILENAME="$(get_filename $FILE)"
 
-	if [ ! "`type -p wget`" ]; then
+	if [ ! "$(type -p wget)" ]; then
 		warning "Command 'wget' not found."
 		info "You should install 'wget' as soon as possible, trying with curl ..."
 		downloads_file_with_curl $LOCAL_FILENAME $1
@@ -272,9 +272,9 @@ download_file() {
 
 		error=1
 
-		BASENAME=`get_basename $1`
+		BASENAME="$(get_basename $1)"
 		for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
-			REPO="`echo $REPO | sed 's|/$||'`"
+			REPO="$(echo $REPO | sed 's|/$||')"
 			wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $REPO/$BASENAME
 			error=$?
 			if [ $error == 0 ]; then
@@ -308,7 +308,7 @@ download_source() {
 	local FILE LOCAL_FILENAME
 
 	for FILE in ${source[@]}; do
-		LOCAL_FILENAME=`get_filename $FILE`
+		LOCAL_FILENAME="$(get_filename $FILE)"
 		if [ ! -e $LOCAL_FILENAME ]; then
 			if [ "$LOCAL_FILENAME" = "$FILE" ]; then
 				error "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
@@ -327,7 +327,7 @@ download_source() {
 remove_source() {
 	local FILE LOCAL_FILENAME
 	for FILE in ${source[@]}; do
-		LOCAL_FILENAME=`get_filename $FILE`
+		LOCAL_FILENAME="$(get_filename $FILE)"
 		if [ -e $LOCAL_FILENAME ] && [ "$LOCAL_FILENAME" != "$FILE" ]; then
 			info "Removing $LOCAL_FILENAME"
 			rm -f $LOCAL_FILENAME
@@ -338,7 +338,7 @@ unpack_source() {
 	local FILE LOCAL_FILENAME COMMAND
 	
 	for FILE in ${source[@]}; do
-		LOCAL_FILENAME=`get_filename $FILE`
+		LOCAL_FILENAME="$(get_filename $FILE)"
 		case $LOCAL_FILENAME in
 			*.tar|*.tar.gz|*.tar.Z|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.lzma|*.zip|*.rpm|*.tar.lz|*.7z|*.deb)
 				if [ "$PKGMK_IGNORE_UNPACK" != "yes" ];then
@@ -367,8 +367,8 @@ get_package_list() {
 	local i ARCH
 	i=0
 	for ARCH in $PKGMK_ARCH any; do
-		for FILE in `find $PKGMK_PACKAGE_DIR -name "${name}*$ARCH.$PKGMK_PACKAGE_EXT*"`; do
-			TARGETS[i]=`basename $FILE`
+		for FILE in $(find $PKGMK_PACKAGE_DIR -name "${name}*$ARCH.$PKGMK_PACKAGE_EXT*"); do
+			TARGETS[i]="$(basename $FILE)"
 			i=$((i+1))
 		done
 	done
@@ -378,7 +378,7 @@ make_md5sum() {
 	
 	if [ "$source" ]; then
 		for FILE in ${source[@]}; do
-			LOCAL_FILENAMES="$LOCAL_FILENAMES `get_filename $FILE`"
+			LOCAL_FILENAMES="$LOCAL_FILENAMES $(get_filename $FILE)"
 		done
 		
 		md5sum $LOCAL_FILENAMES | sed -e 's|  .*/|  |' | sort -k 2
@@ -387,7 +387,7 @@ make_md5sum() {
 make_footprint() {
 if ! (echo $TARGET| grep "kernel" >/dev/null); then
 	pkginfo --footprint $TARGET | \
-		sed "s|\tlib/modules/`uname -r`/|\tlib/modules/<kernel-version>/|g" | \
+		sed "s|\tlib/modules/$(uname -r)/|\tlib/modules/<kernel-version>/|g" | \
 		sort -k 3
 else
 	pkginfo --footprint $TARGET | sort -k 3
@@ -480,12 +480,12 @@ compress_manpages() {
 	done
 	
 	find . -type l -path "*/share/man*/*" | while read FILE; do
-		TARGET=`readlink -n "$FILE"`
+	TARGET="$(readlink -n "$FILE")"
 		TARGET="${TARGET##*/}"
 		TARGET="${TARGET%%.gz}.gz"
 		rm -f "$FILE"
 		FILE="${FILE%%.gz}.gz"
-		DIR=`dirname "$FILE"`
+		DIR="$(dirname "$FILE")"
 
 		if [ -e "$DIR/$TARGET" ]; then
 			ln -sf "$TARGET" "$FILE"
@@ -497,12 +497,12 @@ compress_manpages() {
 		fi
 	done
 	find . -type l -path "*/share/info/*" | while read FILE; do
-		TARGET=`readlink -n "$FILE"`
+		TARGET="$(readlink -n "$FILE")"
 		TARGET="${TARGET##*/}"
 		TARGET="${TARGET%%.gz}.gz"
 		rm -f "$FILE"
 		FILE="${FILE%%.gz}.gz"
-		DIR=`dirname "$FILE"`
+		DIR="$(dirname "$FILE")"
 
 		if [ -e "$DIR/$TARGET" ]; then
 			ln -sf "$TARGET" "$FILE"
@@ -521,7 +521,7 @@ check_footprint() {
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $TARGET ]; then
-			PKGMK_FOOTPRINT="`get_package_name $TARGET`".footprint
+			PKGMK_FOOTPRINT="$(get_package_name $TARGET)".footprint
 			make_footprint > $FILE.footprint
 			if [ -f $PKGMK_FOOTPRINT ]; then
 				sort -k 3 $PKGMK_FOOTPRINT > $FILE.footprint.orig
@@ -739,14 +739,14 @@ build() {
 				make DESTDIR=$PKG install;;
 
 			*)
-				echo "`basename $PKGMK_COMMAND`: function build invalid build type"
+				echo "$(basename $PKGMK_COMMAND): function build invalid build type"
 				exit E_BUILD ;;
 		esac
 	fi
 }
 add_meta_files() {
 	local NAME
-	NAME="`get_package_name $1`"
+	NAME="$(get_package_name $1)"
 	cd $PKG
 	if [ -f $PKGMK_ROOT/${NAME}.README ]; then
 		cp $PKGMK_ROOT/${NAME}.README .README
@@ -767,9 +767,9 @@ add_meta_files() {
 }
 add_meta_to_archive() {
 	local NAME TAR SIZE_I DESC URL CONT PACK MAINT ARCH GROUP
-	NAME="`get_package_name $1`"
-	ARCH="`get_package_arch $1`"
-	GROUP="`echo $NAME|cut -d "." -f2`"
+	NAME="$(get_package_name $1)"
+	ARCH="$(get_package_arch $1)"
+	GROUP="$(echo $NAME|cut -d "." -f2)"
 	[ "$GROUP" == "$NAME" ] && unset GROUP
 	info  "Adding meta data to Archive $NAME"
 
@@ -790,7 +790,7 @@ add_meta_to_archive() {
 	[ ! -z "$contributors" ] && CONT=$contributors
 	[ ! -z "$url" ] && URL=$url
 
-	SIZE_I="`du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1`"
+	SIZE_I="$(du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1)"
 
 	echo "N$NAME" > .META
 	echo "D$DESC" >> .META
@@ -810,7 +810,7 @@ add_meta_to_archive() {
 
 	# TODO improve the pkginfo --runtimedepfiles functionnality
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
-		for dep in `pkginfo --runtimedepfiles $TAR|grep -v ^[A-Z]`; do
+		for dep in "$(pkginfo --runtimedepfiles $TAR|grep -v ^[A-Z])"; do
 			echo "R$dep" >> .META
 		done
 		# We don't want any .devel dependencies here
@@ -818,25 +818,25 @@ add_meta_to_archive() {
 		if [ ! -z $run ] && [ "$NAME" == "$name" ]; then
 			info "Adding runtime deps to Archive $NAME"
 			for rd in ${run[@]}; do
-				if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
+				if [ "$(pkginfo -b $rd)" == "0" ] || [ "$(pkginfo -b $rd)" == "" ]; then
 					error "Runtime dependency $rd not found, cannot continue"
 					clean
 					exit $E_DEPS;
 				fi
-				echo "R$rd`pkginfo -b $rd`" >> .META
+				echo "R$rd$(pkginfo -b $rd)" >> .META
 			done
 		fi
 		if [ ! -z "$GROUP" ]; then
 			rds=("run_$GROUP[@]")
-			if [ ! -z "`echo ${!rds}`" ]; then
+			if [ ! -z "$(echo ${!rds})" ]; then
 				info "Adding runtime deps to Archive $NAME"
-				for rd in `echo ${!rds}`; do
-					if [ "`pkginfo -b $rd`" == "0" ] || [ "`pkginfo -b $rd`" == "" ]; then
+				for rd in "$(echo ${!rds})"; do
+					if [ "$(pkginfo -b $rd)" == "0" ] || [ "$(pkginfo -b $rd)" == "" ]; then
 						error "Runtime dependency $rd not found, cannot continue"
 						clean
 						exit $E_DEPS;
 					fi
-					echo "R$rd`pkginfo -b $rd`" >> .META
+					echo "R$rd$(pkginfo -b $rd)" >> .META
 				done
 			fi
 		fi
@@ -938,7 +938,7 @@ build_package() {
 		i=0
 		j=0
 		for group in ${PKGMK_GROUPS[@]}; do
-			if [ "`type -t ${group}`" == "function" ]; then
+			if [ "$(type -t ${group})" == "function" ]; then
 				BUILD_SUCCESSFUL="no"
 				(set -e -x ;${group})
 				j=1
@@ -972,7 +972,7 @@ build_package() {
 			j=0
 		done
 		for group in ${PKGMK_LOCALES[@]}; do
-			if [ "`type -t locale_${group}`" == "function" ]; then
+			if [ "$(type -t locale_${group})" == "function" ]; then
 				BUILD_SUCCESSFUL="no"
 				(set -e -x ;locale_${group})
 				j=1
@@ -999,7 +999,7 @@ build_package() {
 				rm -rf $DIR
 			fi
 		done
-		if [ "`ls|wc -l`" != "0" ]; then
+		if [ "$(ls|wc -l)" != "0" ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} *
 		else
 			error "No files found in $PKG..."
@@ -1027,8 +1027,8 @@ build_package() {
 				add_meta_to_archive $TARGET
 			done
 		else
-			add_meta_files `basename $TARGET`
-			add_meta_to_archive `basename $TARGET`
+			add_meta_files "$(basename $TARGET)"
+			add_meta_to_archive "$(basename $TARGET)"
 		fi
 		check_build
 		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
@@ -1050,7 +1050,7 @@ install_package() {
 		exit $E_INSTALL
 	fi
 	for TARGET in ${TARGETS[@]}; do
-		if [ "`get_package_arch $TARGET`" = "$PKGMK_ARCH" ] || [ "`get_package_arch $TARGET`" = "any" ]; then
+		if [ "$(get_package_arch $TARGET)" = "$PKGMK_ARCH" ] || [ "$(get_package_arch $TARGET)" = "any" ]; then
 			info "Installing '$TARGET'."
 	
 			if [ "$PKGMK_INSTALL" = "install" ]; then
@@ -1076,10 +1076,10 @@ recursive() {
 	local ARGS FILE DIR
 	[ -f $PKGMK_REPO ] && rm -v $PKGMK_REPO
 	
-	ARGS=`echo "$@" | sed -e "s/--recursive//g" -e "s/-r//g"`
+	ARGS="$(echo "$@" | sed -e "s/--recursive//g" -e "s/-r//g")"
 
-	for FILE in `find $PKGMK_ROOT -name $PKGMK_PKGFILE | sort`; do
-		DIR="`dirname $FILE`/"
+	for FILE in $(find $PKGMK_ROOT -name $PKGMK_PKGFILE | sort); do
+		DIR="$(dirname $FILE)/"
 		if [ -d $DIR ]; then
 			[ "$PKGMK_QUIET" = "yes" ] || \
 			info "Entering directory '$DIR'."
@@ -1120,7 +1120,7 @@ update_footprint() {
 			error "Unable to update footprint. File '$TARGET' not found."
 			exit $E_FOOTPRINT
 		fi
-		PKGMK_FOOTPRINT="`get_package_name $TARGET`".footprint
+		PKGMK_FOOTPRINT="$(get_package_name $TARGET)".footprint
 		check_file "$PKGMK_FOOTPRINT"
 		make_footprint > $PKGMK_FOOTPRINT
 		touch $TARGET
@@ -1133,7 +1133,7 @@ build_needed() {
 	RESULT="yes"
 	if [ -f $TARGET ]; then 
 		RESULT="no"
-		FILE=`get_filename $PKGMK_PKGFILE`
+		FILE="$(get_filename $PKGMK_PKGFILE)"
 		if [ ! -e $FILE ] || [ ! $TARGET -nt $FILE ]; then
 			RESULT="yes"
 		fi
@@ -1143,23 +1143,23 @@ build_needed() {
 update_collection_repo() {
 	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION ALIAS GROUP CONTRIBUTORS
 	if [ -f $PKGMK_REPO ]; then
-		for i in `tail -n +2  $PKGMK_REPO`
+		for i in "$(tail -n +2  $PKGMK_REPO)"
 		do
-			if [ "`echo $i|cut -d "#" -f3`" != "" ];then
-				GROUP="`echo $i|cut -d "#" -f2|cut -d "." -f2` $GROUP"
+			if [ "$(echo $i|cut -d "#" -f3)" != "" ];then
+				GROUP="$(echo $i|cut -d "#" -f2|cut -d "." -f2) $GROUP"
 			fi
 		done
-		HEAD=`head -1 $PKGMK_REPO`
+		HEAD="$(head -1 $PKGMK_REPO)"
 		if [ "${HEAD:10:1}" = "#" ]; then
-			BUILD_DATE="`echo $HEAD|cut -d "#" -f1`"
-			EXTENSION="`echo $HEAD|cut -d "#" -f2`"
-			VERSION="`echo $HEAD|cut -d "#" -f3`"
-			RELEASE="`echo $HEAD|cut -d "#" -f4`"
-			DESCRIPTION="`echo $HEAD|cut -d "#" -f5`"
-			URL="`echo $HEAD|cut -d "#" -f6`"
-			MAINTAINER="`echo $HEAD|cut -d "#" -f7`"
-			PACKAGER="`echo $HEAD|cut -d "#" -f8`"
-			CONTRIBUTORS="`echo $HEAD|cut -d "#" -f9`"
+			BUILD_DATE="$(echo $HEAD|cut -d "#" -f1)"
+			EXTENSION="$(echo $HEAD|cut -d "#" -f2)"
+			VERSION="$(echo $HEAD|cut -d "#" -f3)"
+			RELEASE="$(echo $HEAD|cut -d "#" -f4)"
+			DESCRIPTION="$(echo $HEAD|cut -d "#" -f5)"
+			URL="$(echo $HEAD|cut -d "#" -f6)"
+			MAINTAINER="$(echo $HEAD|cut -d "#" -f7)"
+			PACKAGER="$(echo $HEAD|cut -d "#" -f8)"
+			CONTRIBUTORS="$(echo $HEAD|cut -d "#" -f9)"
 			if [ ! -z $alias ]; then
 				for i in ${alias[@]}
 				do
@@ -1169,7 +1169,7 @@ update_collection_repo() {
 				ALIAS=""
 			fi
 			[ -f ../$PKGMK_REPO ] && sed -i "/#$name#/d" ../$PKGMK_REPO
-			echo "`md5sum $PKGMK_REPO|cut -d " " -f1`#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP#$CONTRIBUTORS" \
+			echo "$(md5sum $PKGMK_REPO|cut -d " " -f1)#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP#$CONTRIBUTORS" \
 			>> ../$PKGMK_REPO
 		fi
 	fi
@@ -1181,7 +1181,7 @@ update_repo() {
 	if [ -z "$description"  ]; then
 		description="n.a."
 	else
-		if [ ! -z "`echo $description|grep \#`" ]; then
+		if [ ! -z "$(echo $description|grep \#)" ]; then
 			description=$(echo $description|sed "s@#@\\\#@g")
 		fi
 	fi
@@ -1190,26 +1190,26 @@ update_repo() {
 	[ -z "$packager"  ] && packager="n.a."
 	[ -z "$contributors" ] && contributors="none"
 	if [ ! -z $TARGETS ]; then
-		EXT="`get_package_extension $TARGETS`"
-		echo -n "`get_package_builddate $TARGETS`#$EXT#$version#$release" > $PKGMK_REPO
+		EXT="$(get_package_extension $TARGETS)"
+		echo -n "$(get_package_builddate $TARGETS)#$EXT#$version#$release" > $PKGMK_REPO
 		echo -n "#$description#$url#$maintainer#$packager#$contributors" >> .PKGREPO
 		printf "\n" >> .PKGREPO
 		for TARGET in ${TARGETS[@]}; do
-			FILE=`basename $TARGET`
-			MD5SUM=`md5sum $TARGET|cut -d " " -f1`
-			echo "$MD5SUM#`get_package_name $TARGET`#`get_package_arch $TARGET|sed "s/-//"`" >> $PKGMK_REPO
+			FILE="$(basename $TARGET)"
+			MD5SUM="$(md5sum $TARGET|cut -d " " -f1)"
+			echo "$MD5SUM#$(get_package_name $TARGET)#$(get_package_arch $TARGET|sed "s/-//")" >> $PKGMK_REPO
 		done
 		for FILE in  ${name}*
 		do
 			[ ! -f "$FILE" ] && break
 			if [ "${FILE:$((${#FILE} - ${#EXT} ))}" != "$EXT" ]; then
-				echo "`md5sum $FILE|cut -d " " -f1`#$FILE" >> $PKGMK_REPO
+				echo "$(md5sum $FILE|cut -d " " -f1)#$FILE" >> $PKGMK_REPO
 			fi
 		done
 	else
 		rm -f $PKGMK_REPO
 	fi
-	echo "`md5sum $PKGMK_PKGFILE|cut -d " " -f1`#$PKGMK_PKGFILE" >> $PKGMK_REPO
+	echo "$(md5sum $PKGMK_PKGFILE|cut -d " " -f1)#$PKGMK_PKGFILE" >> $PKGMK_REPO
 }
 clean_repo_files() {
 	cd $PKGMK_ROOT
@@ -1224,12 +1224,12 @@ clean_repo_files() {
 }
 check_sources_uptodate() {
 	local newversion
-	if ! (`which lynx > /dev/null`); then
+	if ! ( "$(which lynx > /dev/null)" ); then
 		error "lynx is not installed, cannot check sources"
 		exit 0
 	fi
-	if [ "`type -t uptodate`" == "function" ]; then
-		newversion="`uptodate`"
+	if [ "$(type -t uptodate)" == "function" ]; then
+		newversion="$(uptodate)"
 		if [ "$newversion" != "$version" ]; then
 			info "$name: $version -> $newversion"
 		fi
@@ -1237,7 +1237,7 @@ check_sources_uptodate() {
 }
 check_build() {
 	local LIST
-	LIST=`find $PKG ! -type d -name "*.la"`
+	LIST="$(find $PKG ! -type d -name "*.la")"
 	if [ ! -z "$LIST" ]; then
 		warning "following files should be removed:"
 		for i in $LIST
@@ -1257,7 +1257,7 @@ interrupted() {
 	exit $E_GENERAL
 }
 print_help() {
-	echo "usage: `basename $PKGMK_COMMAND` [options]"
+	echo "usage: $(basename $PKGMK_COMMAND) [options]"
 	echo "options:"
 	echo "   -i,  --install             build and install packages"
 	echo "   -u,  --upgrade             build and install packages (as upgrade)"
@@ -1347,19 +1347,19 @@ parse_options() {
 				PKGMK_PACK_ONLY="yes" ;;
 			-cf|--config-file)
 				if [ ! "$2" ]; then
-					echo "`basename $PKGMK_COMMAND`: option $1 requires an argument"
+					echo "$(basename $PKGMK_COMMAND): option $1 requires an argument"
 					exit 1
 				fi
 				PKGMK_CONFFILE="$2"
 				shift ;;
 			-v|--version)
-				echo "`basename $PKGMK_COMMAND` (cards) $PKGMK_VERSION"
+				echo "$(basename $PKGMK_COMMAND) (cards) $PKGMK_VERSION"
 				exit 0 ;;
 			-h|--help)
 				print_help
 				exit 0 ;;
 			*)
-				echo "`basename $PKGMK_COMMAND`: invalid option $1"
+				echo "$(basename $PKGMK_COMMAND): invalid option $1"
 				exit 1 ;;
 		esac
 		shift
@@ -1379,7 +1379,7 @@ main() {
 
         . $PKGMK_CONFFILE
 
-	if ! (`which pkginfo > /dev/null`); then
+	if ! ( $(which pkginfo > /dev/null) ); then
 		warning "pkginfo NOT FOUND, footprint ignored."
 		PKGMK_IGNORE_FOOTPRINT="yes"
 		warning "pkginfo NOT FOUND, runtime dependencies ignored."
@@ -1389,10 +1389,10 @@ main() {
 	local FILE TARGET DIR NAME
 
 	release=1
-	NAME=`basename $PKGMK_ROOT`
+	NAME="$(basename $PKGMK_ROOT)"
 
-	DIR=`dirname $PKGMK_ROOT`
-	collection=`basename $DIR`
+	DIR="$(dirname $PKGMK_ROOT)"
+	collection="$(basename $DIR)"
 
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
 		recursive "$@"
@@ -1426,13 +1426,13 @@ main() {
 		exit $E_PKGFILE
 	fi
 
-	[ "`type -t package_$pkgname`" == "function" ] && PKGMK_SPIT="yes"
+	[ "$(type -t package_$pkgname)" == "function" ] && PKGMK_SPIT="yes"
 	[ ! -z $pkgver ] && version=$pkgver
 	[ ! -z $pkgrel ] && release=$pkgrel
 	[ ! -z "$pkgdesc" ] && description=$pkgdesc
 
 	if [ -z $basename ]; then
-		basename="`echo $name | cut -d "-" -f1`"
+		basename="$(echo $name | cut -d "-" -f1)"
 	fi
 	if [ "$basename" == "$name" ]; then
 		unset basename
@@ -1454,10 +1454,10 @@ main() {
 		echo "$version"
 		exit 0
 	fi
-	PKGMK_MD5SUM="$name.`uname -m`.md5sum"
+	PKGMK_MD5SUM="$name.$(uname -m).md5sum"
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
-	check_directory "`dirname $PKGMK_WORK_DIR`"
+	check_directory "$(dirname $PKGMK_WORK_DIR)"
 
 	get_variables
 
@@ -1578,14 +1578,14 @@ main() {
 	if [ "$PKGMK_UP_TO_DATE" = "yes" ]; then
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
-				if [ "`build_needed`" = "yes" ]; then
+				if [ "$(build_needed)" = "yes" ]; then
 					info "Package '$TARGET' is not up to date."
 				else
 					info "Package '$TARGET' is up to date."
 				fi
 			done
 		else
-			if [ "`build_needed`" = "yes" ]; then
+			if [ "$(build_needed)" = "yes" ]; then
 				info "Package '$TARGET' is not up to date."
 			else
 				info "Package '$TARGET' is up to date."
@@ -1597,7 +1597,7 @@ main() {
 	# From here on check the base package not any group
 	if [ -z $TARGETS ]; then
 		TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
-		if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
+		if [ "$(build_needed)" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
 			info "Package '$TARGET' is up to date."
 		else
 			[ "$PKGMK_PACK_ONLY" == "yes" ] ||  download_source
@@ -1606,8 +1606,8 @@ main() {
 	else
 		FOUND=false
 		for TARGET in ${TARGETS[@]}; do
-			if [ "`build_needed`" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
-				if [ "`get_package_arch $TARGET`" = "$PKGMK_ARCH" ]; then
+			if [ "$(build_needed)" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
+				if [ "$(get_package_arch $TARGET)" = "$PKGMK_ARCH" ]; then
 					FOUND=true
 				fi
 				info "Package '$TARGET' is up to date."
@@ -1621,7 +1621,7 @@ main() {
 	if [ ! -z $FOUND ] ; then
 		if [ $FOUND != true ];  then
 			download_source
-			PKGMK_BUILDVER="`get_package_builddate $TARGET`"
+			PKGMK_BUILDVER="$(get_package_builddate $TARGET)"
 			TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT
 			build_package $TARGET
 		fi
@@ -1666,18 +1666,18 @@ readonly PKGMK_COMMAND="$0"
 readonly PKGMK_ROOT="$PWD"
 readonly PKGMK_PACKAGE_DIR="$PWD"
 
-PKGMK_BUILDVER=`date +%s`
+PKGMK_BUILDVER="$(date +%s)"
 
 PKGMK_PACKAGE_EXT="cards.tar"
 
 PKGMK_REPO=".PKGREPO"
-PKGMK_ARCH=`uname -m`
+PKGMK_ARCH="$(uname -m)"
 
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
 PKGMK_EXTRA_CONFFILE=".pkgmk.conf"
-PKGMK_MD5SUM="$name.`uname -m`.md5sum"
+PKGMK_MD5SUM="$name.$(uname -m).md5sum"
 PKGMK_NOSTRIP=".nostrip"
 PKGMK_SPIT="no"
 

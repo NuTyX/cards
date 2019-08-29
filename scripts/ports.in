@@ -32,7 +32,7 @@ check_ports_dir() {
 }
 get_ports_dir() {
 	local collection destination
-	collection=`basename $1|cut -d "." -f1`
+	collection=$(basename $1|cut -d "." -f1)
 	PORTS_DIR="/usr/ports/$collection"
 	if [ -f $1 ];then
 		source $file
@@ -41,7 +41,7 @@ get_ports_dir() {
 		PORTS_DIR="$destination"
 	else
 	# if destination not set in /etc/ports/xxx.xxx, we try in /etc/cards
-		destination=`cat /etc/cards.conf|grep ^dir|grep /$collection$|cut -d " " -f2`
+		destination=$(cat /etc/cards.conf|grep ^dir|grep /$collection$|cut -d " " -f2)
 		if [ ! -z $destination ];then
 			PORTS_DIR="$destination"
 		fi
@@ -49,7 +49,7 @@ get_ports_dir() {
 	check_ports_dir
 }
 update_ports() {
-	if [ "`id -u`" != "0" ]; then
+	if [ "$(id -u)" != "0" ]; then
 		echo "$COMMAND: only root can update ports"
 		exit 1
 	fi
@@ -67,7 +67,7 @@ update_ports() {
 			if [ "$collection_exists" = "yes" ]; then
 				for driver in $DRIVERS_DIR/*; do
 					if [ -x $driver ]; then
-						suffix=`basename $driver`
+						suffix=$(basename $driver)
 						file=/etc/ports/$collection.$suffix
 						if [ -f $file ]; then
 							$driver $file
@@ -82,7 +82,7 @@ update_ports() {
 		# Update all collections
 		for driver in $DRIVERS_DIR/*; do
 			if [ -x $driver ]; then
-				suffix=`basename $driver`
+				suffix=$(basename $driver)
 				for file in /etc/ports/*.$suffix; do
 					$driver $file
 				done
@@ -98,7 +98,7 @@ update_ports() {
 list_ports() {
 	for driver in $DRIVERS_DIR/*; do
 		if [ -x $driver ]; then
-			suffix=`basename $driver`
+			suffix=$(basename $driver)
 			for file in /etc/ports/*.$suffix; do
 				get_ports_dir $file
 				find $PORTS_DIR -name Pkgfile -follow -printf "%h\n" | sed 's|^./||g' | sort
@@ -112,10 +112,10 @@ list_differences_at_exit() {
 }
 
 list_differences() {
-	installed_list=`mktemp` || exit 1
-	ports_list=`mktemp` || exit 1
-	output=`mktemp` || exit 1
-	output_sorted=`mktemp` || exit 1
+	installed_list=$(mktemp) || exit 1
+	ports_list=$(mktemp) || exit 1
+	output=$(mktemp) || exit 1
+	output_sorted=$(mktemp) || exit 1
 	found_diff="no"
 	
 	trap list_differences_at_exit EXIT
@@ -123,9 +123,9 @@ list_differences() {
 	pkginfo -i >> $installed_list
 	list_ports >> $ports_list
 	
-	for package in `cat $installed_list | gawk '{ print $1 }'`; do
-		installed_version=`cat $installed_list | grep "^$package " | gawk '{ print $2 }'`
-		port_list=`cat $ports_list | grep "/$package\$"`
+	for package in $(cat $installed_list | gawk '{ print $1 }'); do
+		installed_version=$(cat $installed_list | grep "^$package " | gawk '{ print $2 }')
+		port_list=$(cat $ports_list | grep "/$package\$")
 		for port in $port_list; do
 			get_port_version			
 			if [ "$installed_version" != "$port_version" ]; then
@@ -145,9 +145,9 @@ list_differences() {
 }
 get_port_version() {
 	local base_port package PORTS_DIR
-	PORTS_DIR=`dirname $port`
-	package=`basename $port`
-	base_port=`echo $package | cut -d "-" -f1`
+	PORTS_DIR=$(dirname $port)
+	package=$(basename $port)
+	base_port=$(echo $package | cut -d "-" -f1)
 	cd $port
 	unset version
 	unset release
@@ -221,7 +221,7 @@ main() {
 	exit 0
 }
 
-COMMAND=`basename $0`
+COMMAND=$(basename $0)
 
 main "$@"
 
