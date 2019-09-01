@@ -32,19 +32,20 @@ echo '**************************************************************************
     Example: to compile the all cli-extra collection
     on the stable version, the syntax will be:
 
-    build-collection /stable/cli-extra
+    build-collection /rolling/cli-extra
     As simple as that :)
 
  b. You need about 10 Gbytes of free space for the mirror of NuTyX (/srv/www),
     Also be aware that /srv/www/sources will continuously grow.
 
- c. The installed NuTyX should ALWAYS be under /development, /current or /stable.
+ c. The installed NuTyX should ALWAYS be under /rolling or /<version>.
+    Where <version> is a valid version.
 
  2. HOW DOES THIS WORK ?
 
   The script will do following steps:
 
-  - install a development, current or stable NuTyX
+  - install a rolling or a <version> of NuTyX
     (define by the first part of the first argument)
     into a folder (define by the first argument as well)
   - install the devel packages
@@ -65,7 +66,7 @@ echo '**************************************************************************
  You can pass 1 or 2 arguments:
 
  Parameter 1 (mandatory):
-  Its specify the version we are going to use (currently it can be 'development' or 'stable'
+  Its specify the version we are going to use (currently it can be 'rolling' or '\<version\>'
   and its specify the collection which is one of following possible collection:
   base, cli, cli-extra, gui, gui-extra or your specific collection which can be named anything.
 
@@ -74,7 +75,7 @@ echo '**************************************************************************
   This parameter specify the port you want to build only.
   Example:
 
-   build-collection /development/cli-extra irssi
+   build-collection /rolling/cli-extra irssi
 
   This example will build (or rebuild) the irssi binaries only
 
@@ -90,13 +91,13 @@ echo '**************************************************************************
  variables (see http://www.nutyx.org/fr/build-bot).
  As we used predefined /DEPOT, /sources and /LGOS folders, they can be specify via variable or all in /etc/fstab file:
 
- Here an example for the cli-extra collection of the development version
+ Here an example for the cli-extra collection of the rolling version
  you should specify following lines, adapted to your needs:
 
-/srv/www/sources /development/cli-extra/sources none bind
-/srv/www/x86_64/development /development/cli-extra/DEPOT none bind
-/srv/www/logs/x86_64/development/cli-extra /development/cli-extra/LOGS none bind
-/home/thierry/git/extra /development/cli-extra/root/extra none bind
+/srv/www/sources /rolling/cli-extra/sources none bind
+/srv/www/x86_64/rolling /rolling/cli-extra/DEPOT none bind
+/srv/www/logs/x86_64/rolling/cli-extra /rolling/cli-extra/LOGS none bind
+/home/thierry/git/extra /rolling/cli-extra/root/extra none bind
   
 
  4. Setup all the needed folders and get the official depot into the
@@ -105,20 +106,45 @@ echo '**************************************************************************
   We create all the necessary folders (for our cli-extra collection example):
 
     mkdir -p /srv/www/sources
-    mkdir -p /srv/www/logs/x86_64/development/cli-extra
+    mkdir -p /srv/www/logs/x86_64/rolling/cli-extra
 
   To get all the binaries locally and used them (highly recommended) we need to rsync them:
   for DIR in base cli
   do
    rsync -av --delete  \
-   rsync://downloads.nutyx.org/nutyx/x86_64/development/$DIR/ \
-   /srv/remote/x86_64/development/$DIR/
+   rsync://downloads.nutyx.org/nutyx/x86_64/rolling/$DIR/ \
+   /srv/remote/x86_64/rolling/$DIR/
   done
 
  Enjoy NuTyX :)
 
 ******************************************************************************
 '|more
+}
+parse_arguments() {
+while [ "$1" ]; do
+	case $1 in
+		-c|--confirm)
+			CONFIRM="yes"
+			echo "====> you choose to confirm" ;;
+
+		-t|--test)
+			DRY="yes"
+			echo "====> you choose to test" ;;
+
+		-h|--help)
+			usage
+			exit 0 ;;
+		-*|--*)
+			echo " Only -t|--test or -c|--confirm are valid arguments"
+			exit 1;;
+
+		*)
+			PARAM+=($1)
+	esac
+
+	shift
+done
 }
 interrupted() {
 echo "Interrupted !!!"
@@ -142,7 +168,7 @@ do
 	rm -r $FOLDER || exit 1
 	echo "Folder $FOLDER deleted"
 done
-rm -d $1 || exit 1
+rm -d ${PARAM[0]} || exit 1
 }
 error() {
 	umount_all
@@ -168,72 +194,51 @@ PKGMK_IGNORE_RUNTIMEDEPS="no"
 EOF
 }
 setup_collection() {
-	local DIR
-	DIR="/$VERSION/$COLLECTION"
+case $COLLECTION in
+		base)
+			GIT="base"
+			PKGMK_CONF="dir /DEPOT/base";;
 
-	if [ "$COLLECTION" == "base" ]; then
-		GIT="base"
-		echo "dir /DEPOT/$COLLECTION
-base /DEPOT/base
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-		return
-	fi
-	if [ "$COLLECTION" == "cli" ]; then
-		GIT="core"
-		echo "dir /DEPOT/$COLLECTION
-dir /DEPOT/base
-base /DEPOT/base
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-		return
-	fi
-	if [ "$COLLECTION" == "gui" ]; then
-		GIT="core"
-		echo "dir /DEPOT/$COLLECTION
+		cli)
+			GIT="core"
+			PKGMK_CONF="dir /DEPOT/cli
+dir /DEPOT/base";;
+		gui)
+			GIT="core"
+			PKGMK_CONF="dir /DEPOT/gui
 dir /DEPOT/cli
-dir /DEPOT/base
-base /DEPOT/base
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-		return
-	fi
-	if [ "$COLLECTION" == "cli-extra" ]; then
-		GIT="extra"
-		echo "dir /DEPOT/$COLLECTION
+dir /DEPOT/base";;
+		cli-extra)
+			GIT="extra"
+			PKGMK_CONF="dir /DEPOT/cli-extra
 dir /DEPOT/cli
-dir /DEPOT/base
-base /DEPOT/base
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-		return
-	fi
-	if [ "$COLLECTION" == "gui-extra" ]; then
-		GIT="extra"
-		echo "dir /DEPOT/$COLLECTION
+dir /DEPOT/base";;
+		gui-extra)
+			GIT="extra"
+			PKGMK_CONF="dir /DEPOT/gui-extra
+dir /DEPOT/gui
+dir /DEPOT/cli
+dir /DEPOT/base";;
+		nos)
+			git="nos"
+			PKGMK_CONF="dir /DEPOT/nos
+dir /DEPOT/gui
+dir /DEPOT/cli
+dir /DEPOT/base";;
+		*)
+			PKGMK_CONF="dir /DEPOT/$1-extra
+dir /DEPOT/$1
 dir /DEPOT/gui
 dir /DEPOT/cli
 dir /DEPOT/base
-base /DEPOT/base
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-		return
-	fi
-	if [ "$COLLECTION" == "nos" ]; then
-		echo "dir /DEPOT/$COLLECTION
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base
-base /DEPOT/base
-base /DEPOT/cli
 base /DEPOT/gui
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
-		return
-	fi
-	echo "dir /DEPOT/$COLLECTION-extra
-dir /DEPOT/$COLLECTION
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base
+base /DEPOT/cli";;
+	
+
+esac
+PKGMK_CONF+="
 base /DEPOT/base
-base /DEPOT/cli
-base /DEPOT/gui
-logdir /LOGS" > $DIR/etc/cards.conf || exit 1
+logdir /LOGS"
 }
 #
 #
@@ -247,13 +252,9 @@ logdir /LOGS" > $DIR/etc/cards.conf || exit 1
 #
 [ -z "$ROOTMOUNT" ] && ROOTMOUNT="/srv/www"
 
-if [ "${1}" == "-h" ] || [ "${1}" == "--help" ];then
-	usage
-	exit 0
-fi
+parse_arguments "$@"
 
-
-if [ $# -lt 1 ]; then
+if [ -z "${PARAM[0]}" ]; then
 	usage
 	echo "
 >>>	Specify the collection
@@ -261,21 +262,23 @@ if [ $# -lt 1 ]; then
 	exit  1
 fi
 
-if [ -d $1 ]; then
-	mount | grep $1
+if [ -d "${PARAM[0]}" ]; then
+	mount | grep "${PARAM[0]}"
 	echo "
->>>	$1 exist ...
+>>>	${PARAM[0]} exist ...
 "
 	exit 1
 fi
 
-VERSION=$(basename $(dirname $1))
-COLLECTION=$(basename $1)
+VERSION=$(basename $(dirname "${PARAM[0]}"))
+COLLECTION=$(basename "${PARAM[0]}")
 GIT="$COLLECTION"
 
-mkdir -p $1/etc || exit 1
-
+if ! [ "$DRY" == "yes" ]; then
+	mkdir -p "${PARAM[0]}"/etc || exit 1
+fi
 setup_collection
+[ "$DRY" == "yes" ] || echo "$PKGMK_CONF" > /$VERSION/$COLLECTION/etc/cards.conf
 
 if [ "$GIT" == "base" ] \
 || [ "$GIT" == "core"  ] \
@@ -284,8 +287,8 @@ if [ "$GIT" == "base" ] \
 	DEVEL="cards.devel \
 && cd /root/$GIT \
 && bash scripts/$COLLECTION"
-	if [ $# -gt 1 ]; then
-		DEVEL="$DEVEL $2"
+	if ! [ -z "${PARAM[1]}" ]; then
+		DEVEL="$DEVEL ${PARAM[1]}"
 	else
 		DEVEL="$DEVEL -a"
 	fi
@@ -296,71 +299,76 @@ else
 && bash scripts/$COLLECTION-extra -a"
 fi
 
-setup_pkgmk_conf
+[ "$DRY" == "yes" ] || setup_pkgmk_conf
 
 export DEVEL VERSION
 
-GIT_PROJ=$(grep ^/home /etc/fstab |grep $1/|cut -d " " -f1)
+GIT_PROJ=$(grep ^/home /etc/fstab |grep ${PARAM[0]}/|cut -d " " -f1)
 if [ -z "$GIT_PROJ" ]; then
-	echo ">>> Cannot rsync, $1 not found in /etc/fstab"
-	error $1
+	echo ">>> Cannot rsync, ${PARAM[0]} not found in /etc/fstab"
+	error ${PARAM[0]}
 fi
 
 echo ""
-echo " cards.conf:"
-cat /$VERSION/$COLLECTION/etc/cards.conf
+echo " cards.conf:
+ ==========="
+echo "$PKGMK_CONF"
 echo ""
 echo " COLLECTION: $COLLECTION"
 echo "GIT Project: $GIT"
 echo "    VERSION: $VERSION"
-echo "The command: KERNEL="NONE" LFS="$1" DEPOT="/DEPOT" install-nutyx"
+echo "The command: KERNEL="NONE" LFS="${PARAM[0]}" DEPOT="/DEPOT" install-nutyx"
 echo "      DEVEL: $DEVEL "
 echo ""
-echo "The rsync  : rsync -a --exclude .git $GIT_PROJ/ $1/root/$GIT/"
+echo "The rsync  : rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT/"
 echo ""
-echo -n "  OK ? (y) : "
-read a
 
-if [ "$a" != "y" ]; then
-	echo "Answer should be 'y'"
-	rm -rv $1
-	exit 1
+[ "$DRY" == "yes" ] && exit 0
+
+if [ "$CONFIRM" == "yes" ]; then
+	echo -n "  OK ? (y) : "
+	read a
+	if [ "$a" != "y" ]; then
+		echo "Answer should be 'y'"
+		rm -rv ${PARAM[0]}
+		exit 1
+	fi
 fi
 
-mkdir -p $1/DEPOT || error $1
+mkdir -p ${PARAM[0]}/DEPOT || error ${PARAM[0]}
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
-	mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $1/DEPOT || error $1
+	mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} ${PARAM[0]}/DEPOT || error ${PARAM[0]}
 else
-	mount $1/DEPOT || error $1
+	mount ${PARAM[0]}/DEPOT || error ${PARAM[0]}
 fi
-MOUNT_POINTS="$1/DEPOT"
+MOUNT_POINTS="${PARAM[0]}/DEPOT"
 
-mkdir -p $1/LOGS
+mkdir -p ${PARAM[0]}/LOGS
 if [ -d ${ROOTMOUNT}/logs/$(uname -m)/${VERSION}/${COLLECTION} ];then
-	mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION}/${COLLECTION} $1/LOGS || error $1
+	mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION}/${COLLECTION} ${PARAM[0]}/LOGS || error ${PARAM[0]}
 else
-	mount $1/LOGS || error $1
+	mount ${PARAM[0]}/LOGS || error ${PARAM[0]}
 fi
-MOUNT_POINTS="$MOUNT_POINTS $1/LOGS"
+MOUNT_POINTS="$MOUNT_POINTS ${PARAM[0]}/LOGS"
 
 
-mkdir -p $1/sources || error $1
+mkdir -p ${PARAM[0]}/sources || error ${PARAM[0]}
 if [ -d ${ROOTMOUNT}/sources ]; then
-	mount --bind ${ROOTMOUNT}/sources $1/sources || error $1
+	mount --bind ${ROOTMOUNT}/sources ${PARAM[0]}/sources || error ${PARAM[0]}
 else
-	mount $1/sources || error $1
+	mount ${PARAM[0]}/sources || error ${PARAM[0]}
 fi
-MOUNT_POINTS="$MOUNT_POINTS $1/sources"
+MOUNT_POINTS="$MOUNT_POINTS ${PARAM[0]}/sources"
 
-mkdir -p $1/root/$GIT || error $1
-rsync -a --exclude .git $GIT_PROJ/ $1/root/$GIT/ || error "rsync"
-echo "chown -R 1000:1000 $1/root/$GIT"
-chown -R 1000:1000 $1/root/$GIT/
+mkdir -p ${PARAM[0]}/root/$GIT || error ${PARAM[0]}
+rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT/ || error "rsync"
+echo "chown -R 1000:1000 ${PARAM[0]}/root/$GIT"
+chown -R 1000:1000 ${PARAM[0]}/root/$GIT/
 
-KERNEL="NONE" LFS="$1" DEPOT="/DEPOT" install-nutyx || error $1
+KERNEL="NONE" LFS="${PARAM[0]}" DEPOT="/DEPOT" install-nutyx || error ${PARAM[0]}
 
 umount_all
-remove_all "$1"
+remove_all "${PARAM[0]}"
 
 unset VERSION DEVEL
 exit 0
