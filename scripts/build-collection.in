@@ -176,7 +176,7 @@ error() {
 	exit 1
 }
 setup_pkgmk_conf() {
-cat > /$VERSION/$COLLECTION/etc/pkgmk.conf << "EOF"
+PKGMK_CONF='
 export CFLAGS="-O2 -pipe"
 export CXXFLAGS="${CFLAGS}"
 export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
@@ -190,55 +190,43 @@ PKGMK_COMPRESS_PACKAGE="yes"
 PKGMK_COMPRESSION_MODE="xz"
 PKGMK_IGNORE_REPO="no"
 PKGMK_IGNORE_COLLECTION="no"
-PKGMK_IGNORE_RUNTIMEDEPS="no"
-EOF
+PKGMK_IGNORE_RUNTIMEDEPS="no"'
 }
-setup_collection() {
-case $COLLECTION in
-		base)
-			GIT="base"
-			PKGMK_CONF="dir /DEPOT/base";;
+setup_cards_conf() {
+CARDS_CONF=""
 
-		cli)
-			GIT="core"
-			PKGMK_CONF="dir /DEPOT/cli
-dir /DEPOT/base";;
-		gui)
-			GIT="core"
-			PKGMK_CONF="dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base";;
-		cli-extra)
-			GIT="extra"
-			PKGMK_CONF="dir /DEPOT/cli-extra
-dir /DEPOT/cli
-dir /DEPOT/base";;
-		gui-extra)
-			GIT="extra"
-			PKGMK_CONF="dir /DEPOT/gui-extra
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base";;
-		nos)
-			git="nos"
-			PKGMK_CONF="dir /DEPOT/nos
-dir /DEPOT/gui
-dir /DEPOT/cli
-dir /DEPOT/base";;
-		*)
-			PKGMK_CONF="dir /DEPOT/$1-extra
-dir /DEPOT/$1
-dir /DEPOT/gui
-dir /DEPOT/cli
+C="${COLLECTION}"
+
+[[ "${COLLECTION}" != "base" && "${COLLECTION}" != "cli" && "${COLLECTION}" != "gui" && \
+"${COLLECTION}" != "nos" && "${COLLECTION}" != "cli-extra" && "${COLLECTION}" != "gui-extra" ]] \
+&& C="${COLLECTION}-extra"
+if [ "${C}" == "${COLLECTION}-extra" ]; then
+	CARDS_CONF+="
+dir /DEPOT/${C}
+dir /DEPOT/${COLLECTION}"
+	C="gui"
+fi
+[ "${C}" == "gui-extra" ] && CARDS_CONF+="
+dir /DEPOT/gui-extra"
+
+[ "${C}" == "nos" ] && CARDS_CONF+="
+dir /DEPOT/nos"
+
+[[ "${C}" == "gui" || "${C}" == "gui-extra" || "${C}" == "nos" ]] \
+&& CARDS_CONF+="
+dir /DEPOT/gui"
+
+[ "${C}" == "cli-extra" ] && CARDS_CONF+="
+dir /DEPOT/cli-extra"
+
+[[ "${C}" == "cli" || "${C}" == "cli-extra" || "${C}" == "gui" || \
+"${C}" == "gui-extra" || "${C}" == "nos" ]] && CARDS_CONF+="
+dir /DEPOT/cli"
+
+CARDS_CONF+="
 dir /DEPOT/base
-base /DEPOT/gui
-base /DEPOT/cli";;
-	
-
-esac
-PKGMK_CONF+="
-base /DEPOT/base
-logdir /LOGS"
+logdir /LOGS
+base /DEPOT/base"
 }
 #
 #
@@ -277,8 +265,8 @@ GIT="$COLLECTION"
 if ! [ "$DRY" == "yes" ]; then
 	mkdir -p "${PARAM[0]}"/etc || exit 1
 fi
-setup_collection
-[ "$DRY" == "yes" ] || echo "$PKGMK_CONF" > /$VERSION/$COLLECTION/etc/cards.conf
+setup_cards_conf
+[ "$DRY" == "yes" ] || echo "$CARDS_CONF" > /$VERSION/$COLLECTION/etc/cards.conf
 
 if [ "$GIT" == "base" ] \
 || [ "$GIT" == "core"  ] \
@@ -299,7 +287,8 @@ else
 && bash scripts/$COLLECTION-extra -a"
 fi
 
-[ "$DRY" == "yes" ] || setup_pkgmk_conf
+setup_pkgmk_conf
+[ "$DRY" == "yes" ] || echo "$PKGMK_CONF" >/$VERSION/$COLLECTION/etc/pkgmk.conf
 
 export DEVEL VERSION
 
@@ -310,9 +299,13 @@ if [ -z "$GIT_PROJ" ]; then
 fi
 
 echo ""
-echo " cards.conf:
+echo " pkgmk.conf:
  ==========="
 echo "$PKGMK_CONF"
+echo ""
+echo " cards.conf:
+ ==========="
+echo "$CARDS_CONF"
 echo ""
 echo " COLLECTION: $COLLECTION"
 echo "GIT Project: $GIT"
@@ -344,8 +337,8 @@ fi
 MOUNT_POINTS="${PARAM[0]}/DEPOT"
 
 mkdir -p ${PARAM[0]}/LOGS
-if [ -d ${ROOTMOUNT}/logs/$(uname -m)/${VERSION}/${COLLECTION} ];then
-	mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION}/${COLLECTION} ${PARAM[0]}/LOGS || error ${PARAM[0]}
+if [ -d ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} ];then
+	mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} ${PARAM[0]}/LOGS || error ${PARAM[0]}
 else
 	mount ${PARAM[0]}/LOGS || error ${PARAM[0]}
 fi
