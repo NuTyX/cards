@@ -88,7 +88,7 @@ echo '**************************************************************************
  - /etc/fstab
 
  As explained above, we mount various folders.
- As we used predefined /DEPOT, /sources and /LOGS (/srv/www) paths folders, they don't have to be specified in /etc/fstab:
+ As we used predefined /DEPOT, /sources and /LOGS (/srv/www) paths folders, they do not have to be specified in /etc/fstab:
 
  Here an example for the cli-extra collection of the rolling version
  you should specify following lines, adapted to your needs:
