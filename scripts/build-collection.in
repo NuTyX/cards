@@ -71,7 +71,7 @@ echo '**************************************************************************
   base, cli, cli-extra, gui, gui-extra or your specific collection which can be named anything.
 
  Parameter 2 (optionnal):
-  This parameter works only with base, cli, cli-extra, gui, gui-extra collections.
+  This parameter works only with base, cli, cli-extra, gui, gui-extra and nos collections.
   This parameter specify the port you want to build only.
   Example:
 
@@ -87,26 +87,30 @@ echo '**************************************************************************
 
  - /etc/fstab
 
- As explained above, we mount a lot of folders, means they HAVE TO BE specified in the /etc/fstab or specified via
- variables (see http://www.nutyx.org/fr/build-bot).
- As we used predefined /DEPOT, /sources and /LGOS folders, they can be specify via variable or all in /etc/fstab file:
+ As explained above, we mount various folders.
+ As we used predefined /DEPOT, /sources and /LOGS (/srv/www) paths folders, they don't have to be specified in /etc/fstab:
 
  Here an example for the cli-extra collection of the rolling version
  you should specify following lines, adapted to your needs:
 
-/srv/www/sources /rolling/cli-extra/sources none bind
-/srv/www/x86_64/rolling /rolling/cli-extra/DEPOT none bind
-/srv/www/logs/x86_64/rolling/cli-extra /rolling/cli-extra/LOGS none bind
-/home/thierry/git/extra /rolling/cli-extra/root/extra none bind
+/home/thierry/git/packages-x86_64 /rolling/cli-extra/root/extra none bind
+
+In case you want to use your own path for /DEPOT, sources or /LOGS, they will need to be specified in /etc/fstab:
+
+Here an example:
+
+/home/thierry/sources /rolling/cli-extra/sources none bind
+/home/thierry/www/x86_64/rolling /rolling/cli-extra/DEPOT none bind
+/home/thierry/www/logs/x86_64/rolling /rolling/cli-extra/LOGS none bind
   
 
  4. Setup all the needed folders and get the official depot into the
  /srv/www location (adapt the folder to yours)
 
-  We create all the necessary folders (for our cli-extra collection example):
+  We create all the necessary folders:
 
     mkdir -p /srv/www/sources
-    mkdir -p /srv/www/logs/x86_64/rolling/cli-extra
+    mkdir -p /srv/www/logs/x86_64/rolling
 
   To get all the binaries locally and used them (highly recommended) we need to rsync them:
   for DIR in base cli
@@ -260,18 +264,27 @@ fi
 
 VERSION=$(basename $(dirname "${PARAM[0]}"))
 COLLECTION=$(basename "${PARAM[0]}")
-GIT="$COLLECTION"
+
+GIT_PROJ="$(grep ^/home /etc/fstab |grep ${PARAM[0]}/|cut -d " " -f1)"
+if [ -z "$GIT_PROJ" ]; then
+	echo ">>> Cannot rsync, ${PARAM[0]} not found in /etc/fstab"
+	error ${PARAM[0]}
+fi
+GIT=$(basename $GIT_PROJ)
 
 if ! [ "$DRY" == "yes" ]; then
 	mkdir -p "${PARAM[0]}"/etc || exit 1
 fi
+
 setup_cards_conf
 [ "$DRY" == "yes" ] || echo "$CARDS_CONF" > /$VERSION/$COLLECTION/etc/cards.conf
 
-if [ "$GIT" == "base" ] \
-|| [ "$GIT" == "core"  ] \
-|| [ "$GIT" == "extra" ] \
-|| [ "$GIT" == "nos" ]; then
+if [ "$COLLECTION" == "base" ] \
+|| [ "$COLLECTION" == "cli"  ] \
+|| [ "$COLLECTION" == "gui" ] \
+|| [ "$COLLECTION" == "cli-extra"  ] \
+|| [ "$COLLECTION" == "gui-extra" ] \
+|| [ "$COLLECTION" == "nos" ]; then
 	DEVEL="cards.devel \
 && cd /root/$GIT \
 && bash scripts/$COLLECTION"
@@ -292,12 +305,6 @@ setup_pkgmk_conf
 
 export DEVEL VERSION
 
-GIT_PROJ=$(grep ^/home /etc/fstab |grep ${PARAM[0]}/|cut -d " " -f1)
-if [ -z "$GIT_PROJ" ]; then
-	echo ">>> Cannot rsync, ${PARAM[0]} not found in /etc/fstab"
-	error ${PARAM[0]}
-fi
-
 echo ""
 echo " pkgmk.conf:
  ==========="
@@ -308,12 +315,12 @@ echo " cards.conf:
 echo "$CARDS_CONF"
 echo ""
 echo " COLLECTION: $COLLECTION"
-echo "GIT Project: $GIT"
+echo "GIT Project: $GIT_PROJ"
 echo "    VERSION: $VERSION"
 echo "The command: KERNEL="NONE" LFS="${PARAM[0]}" DEPOT="/DEPOT" install-nutyx"
 echo "      DEVEL: $DEVEL "
 echo ""
-echo "The rsync  : rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT/"
+echo "The rsync  : rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT_PROJ/"
 echo ""
 
 [ "$DRY" == "yes" ] && exit 0
@@ -355,7 +362,7 @@ MOUNT_POINTS="$MOUNT_POINTS ${PARAM[0]}/sources"
 
 mkdir -p ${PARAM[0]}/root/$GIT || error ${PARAM[0]}
 rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT/ || error "rsync"
-echo "chown -R 1000:1000 ${PARAM[0]}/root/$GIT"
+echo "chown -R 1000:1000 ${PARAM[0]}/root/$GIT/"
 chown -R 1000:1000 ${PARAM[0]}/root/$GIT/
 
 KERNEL="NONE" LFS="${PARAM[0]}" DEPOT="/DEPOT" install-nutyx || error ${PARAM[0]}
