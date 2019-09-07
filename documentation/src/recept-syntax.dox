@@ -66,10 +66,10 @@ rsync.service.README
 Dependencies are used to specify which other binaries packages needs to be installed before cards can
 compile the port without dependencies failures.
 
-The syntax of declaring dependencies is done via a comment line as a follow example:
+The syntax of declaring dependencies is done via the 'makedepends' and 'run' arrays variables:
 
 \code{.sh}
-# Depends on: glibc gtk2 glib libvorbis python
+makedepends=(glibc gtk2 glib libvorbis python)
 \endcode
 
 Dependencies are found by cards recursively, means you don't have to repeat dependencies
@@ -133,12 +133,12 @@ The name of all the peoples that has ones contribute to the construction
 of the package can be specify via the contributors variable.
 If it's a new package, they will be no contributors yet:
 \code{.sh}
-contributors="pierre at nutyx dot org, tnut at nutyx dot org"
+contributors="Pierre, Tnut"
 \endcode
 
 The name of the last packager who modify the recept can be specify via the packager variable:
 \code{.sh}
-packager="tnut at nutyx dot org"
+packager="tnut <tnut@nutyx.org>"
 \endcode
 
 The name of the upstream(s) maintainer(s) can be specify via the maintainer variable:
@@ -151,7 +151,7 @@ The name of a group can be provide if necessary via the group variable:
 group=kf5
 \endcode
 
-Dependencies not automaticaly detect by cards should be pass via the run array variable:
+Dependencies not automaticaly detect by cards should be pass via the 'run' array variable:
 \code{.sh}
 run=(python gawk)
 \endcode
@@ -247,20 +247,22 @@ lib() {
 To conclude, a full example with all the possible variables:
 
 \code{.sh}
-# Depends on: gtk-doc shared-mime-info,xorg-libxinerama,xorg-libxrandr,cairo,pango,pangox-compat,atk,libtiff,cups,gdk-pixbuf,xorg-libxi,xorg-libxcursor,hicolor-icon-theme,gtk-update-icon-cache
-
 description="GTK+ is a multi-platform toolkit (version 2)"
 url="http://www.gtk.org/"
+
 contributors="tyrry at nutyx dot org, pierre at nutyx dot org"
 packager="tnut at nutyx dot org"
+
+makedepends=(gtk-doc shared-mime-info xorg-libxinerama xorg-libxrandr
+             cairo pango pangox-compat atk libtiff cups gdk-pixbuf xorg-libxi
+             xorg-libxcursor)
+run=(python hicolor-icon-theme gtk-update-icon-cache)
 
 name=gtk2
 version=2.46.3
 release=1
 
 alias=(Gtk+ gtk+)
-
-run=(python)
 
 PKGMK_KEEP_SOURCES="no"
 

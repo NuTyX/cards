@@ -23,8 +23,6 @@ The minimum information required for producing a binary are:
  <li>
    <i><b>version:</b></i> the version of the sources of the package.
  <li>
-   <i><b>release:</b></i> the nth attempt at building the package. Its value will always start at <b><i>1</i></b>
- <li>
    <i><b>source:</b></i> the address of the sources of the package we want to build.
  <li>
    <i><b>build():</b></i> the function which contains the recipe if not the standard one.
@@ -39,8 +37,8 @@ name=gnome-terminal
 # Version of the package
 version=2.6.4
 
-# Release of the package
-release=1
+# Release of the package if not the first try, need to be specified
+release=2
 
 # Location of the sources of the package to be built
 source=(http://ftp.gnome.org/pub/gnome/sources/$name/${version%.*}/$name-$version.tar.bz2)
@@ -84,13 +82,14 @@ since the variable version=2.6.4
 
 \par Listing 1 - "The xfce4-libutil Pkgfile"
 \code
-# Depends on: glib intltool
-
 description="libxfce4util, base library for Xfce"
 url="http://docs.xfce.org/"
+
 maintainer="git.xfce.org/xfce/xfce4-libutils"
 contributors="tyrry at nutyx dot org"
 packager="tnut at nutyx dot org"
+
+makedepends=(glib intltool)
 
 name=xfce4-libutil
 version=4.8.2
@@ -112,13 +111,14 @@ build() {
 }
 \endcode
 
-If you want to make sure that the build bot is able to compile the package without any problems, it's important to specify all the dependencies needed for the compilation of the package.
+If you want to make sure that the build bot is able to compile the package without any problems,
+it's important to specify all the dependencies needed for the compilation of the package.
 Dependencies starting from the NuTyX base are always included.
-Indeed the bot will always build the package by starting from  the NuTyX base.
+Indeed the bot will always build the package by starting from a base NuTyX.
 
-The line <b># Depends on: </b> is used for this purpose.
+The array variable <b>makedepends</b> is used for this purpose.
 It defines all the needed dependencies for the <b>compilation</b> of the package.
-Dependencies are separated by a comma, a space or both.
+Dependencies are separated by a space.
 
 
 \section recept_conclusion Conclusion

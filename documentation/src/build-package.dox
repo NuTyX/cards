@@ -37,9 +37,10 @@ Create the recept:
 \code{.sh}
 echo '
 description="Text Editor"
+url="http://www.nano-editor.org/"
+
 maintainer="Nano team"
 packager="François Perrin francois dot perrin at myworld dot com"
-url="http://www.nano-editor.org/"
 
 name=nano
 version=2.7.2
