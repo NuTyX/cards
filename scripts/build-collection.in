@@ -265,7 +265,7 @@ fi
 VERSION=$(basename $(dirname "${PARAM[0]}"))
 COLLECTION=$(basename "${PARAM[0]}")
 
-GIT_PROJ="$(grep ^/home /etc/fstab |grep ${PARAM[0]}/|cut -d " " -f1)"
+GIT_PROJ="$(grep ^$HOME /etc/fstab |grep ${PARAM[0]}/|cut -d " " -f1)"
 if [ -z "$GIT_PROJ" ]; then
 	echo ">>> Cannot rsync, ${PARAM[0]} not found in /etc/fstab"
 	error ${PARAM[0]}
