@@ -27,10 +27,6 @@ Split them into 2 categories:
     * add info that PKGMK_ARCH variable exists: **currently I found 85 occurencies of `uname -m` in the official Pkgfiles.
 
 
-### Unify code style in `pkgmk.in`: backticks to parentheses style
-
-Change all backticks to parentheses style [see](http://mywiki.wooledge.org/BashFAQ/082)
-
 
 ### Unify code style in `pkgmk.in`: Quoting Variables
 
