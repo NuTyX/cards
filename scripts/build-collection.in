@@ -125,6 +125,12 @@ Here an example:
 ******************************************************************************
 '|more
 }
+check_root() {
+	if [ "$UID" == "0" ]; then
+		echo "'root' is not recommended for building packages"
+		exit 1
+	fi
+}
 parse_arguments() {
 while [ "$1" ]; do
 	case $1 in
@@ -157,19 +163,19 @@ trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
 umount_all() {
 for FOLDER in $MOUNT_POINTS
 do
-	umount -v $FOLDER || exit 1
+	sudo umount -v $FOLDER || exit 1
 done
 }
 remove_all() {
 for FOLDER in $MOUNT_POINTS
 do
-	rm -d $FOLDER || exit 1
+	sudo rm -d $FOLDER || exit 1
 done
 [ -z ${1} ] && exit 1
-umount ${1}/{run,sys,proc,dev/pts,dev}
+sudo umount ${1}/{run,sys,proc,dev/pts,dev}
 for FOLDER in ${1}/*
 do
-	rm -r $FOLDER || exit 1
+	sudo rm -r $FOLDER || exit 1
 	echo "Folder $FOLDER deleted"
 done
 rm -d ${PARAM[0]} || exit 1
@@ -242,6 +248,7 @@ base /DEPOT/base"
 # It make it easy to access files if http server is installed
 # and configured as default
 #
+check_root
 [ -z "$ROOTMOUNT" ] && ROOTMOUNT="/srv/www"
 
 parse_arguments "$@"
@@ -337,38 +344,44 @@ fi
 
 mkdir -p ${PARAM[0]}/DEPOT || error ${PARAM[0]}
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
-	mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} ${PARAM[0]}/DEPOT || error ${PARAM[0]}
+	sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} ${PARAM[0]}/DEPOT || error ${PARAM[0]}
 else
-	mount ${PARAM[0]}/DEPOT || error ${PARAM[0]}
+	sudo mount ${PARAM[0]}/DEPOT || error ${PARAM[0]}
 fi
 MOUNT_POINTS="${PARAM[0]}/DEPOT"
 
 mkdir -p ${PARAM[0]}/LOGS
 if [ -d ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} ];then
-	mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} ${PARAM[0]}/LOGS || error ${PARAM[0]}
+	sudo mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} ${PARAM[0]}/LOGS || error ${PARAM[0]}
 else
-	mount ${PARAM[0]}/LOGS || error ${PARAM[0]}
+	sudo mount ${PARAM[0]}/LOGS || error ${PARAM[0]}
 fi
 MOUNT_POINTS="$MOUNT_POINTS ${PARAM[0]}/LOGS"
 
 
 mkdir -p ${PARAM[0]}/sources || error ${PARAM[0]}
 if [ -d ${ROOTMOUNT}/sources ]; then
-	mount --bind ${ROOTMOUNT}/sources ${PARAM[0]}/sources || error ${PARAM[0]}
+	sudo mount --bind ${ROOTMOUNT}/sources ${PARAM[0]}/sources || error ${PARAM[0]}
 else
-	mount ${PARAM[0]}/sources || error ${PARAM[0]}
+	sudo mount ${PARAM[0]}/sources || error ${PARAM[0]}
 fi
 MOUNT_POINTS="$MOUNT_POINTS ${PARAM[0]}/sources"
 
 mkdir -p ${PARAM[0]}/root/$GIT || error ${PARAM[0]}
 rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT/ || error "rsync"
-echo "chown -R 1000:1000 ${PARAM[0]}/root/$GIT/"
-chown -R 1000:1000 ${PARAM[0]}/root/$GIT/
 
-KERNEL="NONE" LFS="${PARAM[0]}" DEPOT="/DEPOT" install-nutyx || error ${PARAM[0]}
+sudo KERNEL="NONE" LFS="${PARAM[0]}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error ${PARAM[0]}
 
 umount_all
 remove_all "${PARAM[0]}"
-
+echo -n "  Commit ? (y) : "
+read a
+if [ "$a" != "y" ]; then
+	unset VERSION DEVEL
+	exit 0
+fi
+cd "${GIT_PROJECT}"
+source /etc/profile.d/cards.sh
+commit "$COLLECTION/${PARAM[1]}"
 unset VERSION DEVEL
 exit 0
