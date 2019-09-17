@@ -1647,6 +1647,9 @@ main() {
 			build_package $TARGET
 		fi
 	fi
+	if [ "$PKGMK_KEEP_LA_LIBS" != "yes" ]; then
+		find $PKG ! -type d -name "*.la" -exec rm -fv -- '{}' +
+	fi
 	if [ "$PKGMK_INSTALL" != "no" ]; then
 		install_package
 	fi
@@ -1739,6 +1742,7 @@ PKGMK_UPDATE_FOOTPRINT="no"
 PKGMK_FORCE="no"
 PKGMK_KEEP_WORK="no"
 PKGMK_PACK_ONLY="no"
+PKGMK_KEEP_LA_LIBS="no"
 
 PKGMK_UPDATE_MD5SUM="no"
 PKGMK_CHECK_MD5SUM="no"

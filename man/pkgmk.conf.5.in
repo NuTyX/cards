@@ -98,6 +98,11 @@ If set to 'yes', pkgmk will keep the sources codes of the build. If 'no', they w
 .br
 Default: 'no'
 .TP
+\fBPKGMK_KEEP_LA_LIBS='STRING'\fP
+If set to 'yes', pkgmk will keep the generated .la libraries files. If 'no', they will be removed after a successfull build. This option need to be used with care, some packages realy needs the .la files to work properly.
+.br
+Default: 'no'
+.TP
 \fBPKGMK_CLEAN='STRING'\fP
 If set to 'yes', pkgmk will delete the package(s) after a successfull build and a successful install of them.
 .br

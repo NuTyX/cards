@@ -93,6 +93,11 @@ Si défini comme 'yes', pkgmk garde les sources du paquet dans tous les cas, si 
 .br
 Défaut: 'no'
 .TP
+\fBPKGMK_KEEP_LA_LIBS='STRING'\fP
+Si défini comme 'yes', pkgmk garde les bibliothèques .la produites lors de la construction du paquet, si 'no' ceux-ci sont supprimés après une construction réussie. A utiliser avec précaution, certain peuvent réclamer ces bibliothèques pour un bon fonctionnement
+.br
+Défaut: 'no'
+.TP
 \fBPKGMK_CLEAN='STRING'\fP
 Si défini comme 'yes', pkgmk supprime le(s) paquet(s) produit(s) après une construction ET une installation réussie de ce(s) dernier(s).
 .br
