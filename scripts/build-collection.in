@@ -269,13 +269,20 @@ if [ -d "${PARAM[0]}" ]; then
 	exit 1
 fi
 
-# check if /rolling is own by me
-if ! [ -O "${PARAM[0]}" ]; then
-	echo "${PARAM[0]} is not own by $(whoami)"
-	exit 1
-fi
 VERSION=$(basename $(dirname "${PARAM[0]}"))
 COLLECTION=$(basename "${PARAM[0]}")
+
+# check if VERSION folder exist
+if ! [ -d "$VERSION" ]; then
+	echo "$VERSION folder not exist."
+	exit 1
+fi
+
+# check if VERSION is own by me
+if ! [ -O "$VERSION" ]; then
+	echo "$VERSION is not own by $(whoami)"
+	exit 1
+fi
 
 GIT_PROJ="$(grep ^$HOME /etc/fstab |grep ${PARAM[0]}/|cut -d " " -f1)"
 if [ -z "$GIT_PROJ" ]; then
