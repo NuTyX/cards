@@ -269,6 +269,11 @@ if [ -d "${PARAM[0]}" ]; then
 	exit 1
 fi
 
+# check if /rolling is own by me
+if ! [ -O "${PARAM[0]}" ]; then
+	echo "${PARAM[0]} is not own by $(whoami)"
+	exit 1
+fi
 VERSION=$(basename $(dirname "${PARAM[0]}"))
 COLLECTION=$(basename "${PARAM[0]}")
 
@@ -374,14 +379,18 @@ sudo KERNEL="NONE" LFS="${PARAM[0]}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx
 
 umount_all
 remove_all "${PARAM[0]}"
+unset VERSION DEVEL
+
+# Don't try to commit if no specific package was build
+if [ -z "${PARAM[1]}" ]; then
+	exit 0
+fi
 echo -n "  Commit ? (y) : "
 read a
 if [ "$a" != "y" ]; then
-	unset VERSION DEVEL
 	exit 0
 fi
 cd "${GIT_PROJECT}"
 source /etc/profile.d/cards.sh
 commit "$COLLECTION/${PARAM[1]}"
-unset VERSION DEVEL
 exit 0
