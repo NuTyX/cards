@@ -273,14 +273,14 @@ VERSION=$(basename $(dirname "${PARAM[0]}"))
 COLLECTION=$(basename "${PARAM[0]}")
 
 # check if VERSION folder exist
-if ! [ -d "$VERSION" ]; then
-	echo "$VERSION folder not exist."
+if ! [ -d "/$VERSION" ]; then
+	echo "/$VERSION folder not exist."
 	exit 1
 fi
 
 # check if VERSION is own by me
-if ! [ -O "$VERSION" ]; then
-	echo "$VERSION is not own by $(whoami)"
+if ! [ -O "/$VERSION" ]; then
+	echo "/$VERSION is not own by $(whoami)"
 	exit 1
 fi
 
