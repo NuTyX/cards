@@ -306,6 +306,7 @@ if [ "$COLLECTION" == "base" ] \
 || [ "$COLLECTION" == "gui" ] \
 || [ "$COLLECTION" == "cli-extra"  ] \
 || [ "$COLLECTION" == "gui-extra" ] \
+|| [ "$COLLECTION" == "desktops" ] \
 || [ "$COLLECTION" == "nos" ]; then
 	DEVEL="cards.devel \
 && cd /root/$GIT \
