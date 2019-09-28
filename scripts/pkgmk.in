@@ -1258,6 +1258,9 @@ check_sources_uptodate() {
 }
 check_build() {
 	local LIST
+	if [ "$PKGMK_KEEP_LA_LIBS" != "yes" ]; then
+		find $PKG ! -type d -name "*.la" -exec rm -fv -- '{}' +
+	fi
 	LIST="$(find $PKG ! -type d -name "*.la")"
 	if [ ! -z "$LIST" ]; then
 		warning "following files should be removed:"
@@ -1646,9 +1649,6 @@ main() {
 			TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT
 			build_package $TARGET
 		fi
-	fi
-	if [ "$PKGMK_KEEP_LA_LIBS" != "yes" ]; then
-		find $PKG ! -type d -name "*.la" -exec rm -fv -- '{}' +
 	fi
 	if [ "$PKGMK_INSTALL" != "no" ]; then
 		install_package

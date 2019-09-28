@@ -23,7 +23,7 @@ echo '**************************************************************************
  This script is able to compile any port from any official collections that
  are one of:
 
- - base, cli ,cli-extra, gui, gui-extra or <yours>
+ - base, cli ,cli-extra, gui, gui-extra, desktops or <yours>
 
  IMPORTANTS NOTES:
 
@@ -208,8 +208,8 @@ CARDS_CONF=""
 C="${COLLECTION}"
 
 [[ "${COLLECTION}" != "base" && "${COLLECTION}" != "cli" && "${COLLECTION}" != "gui" && \
-"${COLLECTION}" != "nos" && "${COLLECTION}" != "cli-extra" && "${COLLECTION}" != "gui-extra" ]] \
-&& C="${COLLECTION}-extra"
+"${COLLECTION}" != "nos" && "${COLLECTION}" != "cli-extra" && "${COLLECTION}" != "gui-extra" && \
+"${COLLECTION}" != "desktops" ]] && C="${COLLECTION}-extra"
 if [ "${C}" == "${COLLECTION}-extra" ]; then
 	CARDS_CONF+="
 dir /DEPOT/${C}
@@ -222,7 +222,10 @@ dir /DEPOT/gui-extra"
 [ "${C}" == "nos" ] && CARDS_CONF+="
 dir /DEPOT/nos"
 
-[[ "${C}" == "gui" || "${C}" == "gui-extra" || "${C}" == "nos" ]] \
+[ "${C}" == "desktops" ] && CARDS_CONF+="
+dir /DEPOT/desktops"
+
+[[ "${C}" == "gui" || "${C}" == "gui-extra" || "${C}" == "nos" || "${C}" == "desktops" ]] \
 && CARDS_CONF+="
 dir /DEPOT/gui"
 
@@ -230,7 +233,7 @@ dir /DEPOT/gui"
 dir /DEPOT/cli-extra"
 
 [[ "${C}" == "cli" || "${C}" == "cli-extra" || "${C}" == "gui" || \
-"${C}" == "gui-extra" || "${C}" == "nos" ]] && CARDS_CONF+="
+"${C}" == "gui-extra" || "${C}" == "nos" || "${C}" == "desktops" ]] && CARDS_CONF+="
 dir /DEPOT/cli"
 
 CARDS_CONF+="
