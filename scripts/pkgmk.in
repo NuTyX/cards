@@ -1483,7 +1483,7 @@ main() {
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "$(dirname $PKGMK_WORK_DIR)"
 
-	get_variables
+	info "Comments are now ignored when building the package(s)."
 
 	check_pkgfile
 
@@ -1528,6 +1528,7 @@ main() {
 		info "url: $url"
 		info "packager: $packager"
 		info "maintainer: $maintainer"
+		info "contributors: $contributors"
 		exit 0
 	fi
 	
