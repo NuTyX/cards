@@ -345,7 +345,7 @@ std::set<std::string> Pkgdbh::getFilesOfPackage
  * - if nothing specify only get the List of PackageNames
  *   and populate the alias list.
  * - if simple then only with name, version, release, collection
- *   build date, set and group name
+ *   build date, set list and group name
  * - if all then all the availables attributes
  * - if files then all the files of the package(s)
  * - if packageName size() > 0 then we do just for the packageName
@@ -442,7 +442,7 @@ void Pkgdbh::buildDatabase
 				/* As a set is not always present we cannot
 				 * depen on a found one to break */
 				if ( attribute[0] == 's' ) {
-					info.set = attribute.substr(1);
+					info.set.insert(attribute.substr(1));
 				}
 				if ( attribute[0] == 'r' ) {
 					info.release = atoi(attribute.substr(1).c_str());
@@ -517,7 +517,7 @@ void Pkgdbh::buildSimpleDatabase()
 				}
 				if ( contentFile->items[li][0] == 's' ) {
 					string s = contentFile->items[li];
-					info.set = s.substr(1);
+					info.set.insert(s.substr(1));
 				}
 				if ( contentFile->items[li][0] == 'V' ) {
 					string s = contentFile->items[li];
@@ -538,10 +538,6 @@ void Pkgdbh::buildSimpleDatabase()
 				if ( contentFile->items[li][0] == 'A' ) {
 					string s = contentFile->items[li];
 					m_listOfAlias[s.substr(1)] = i;
-				}
-				if ( contentFile->items[li][0] == 'b' ) {
-					string s = contentFile->items[li];
-					info.base = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'P' ) {
 					string s = contentFile->items[li];
@@ -638,15 +634,11 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 				}
 				if ( contentFile->items[li][0] == 's' ) {
 					string s = contentFile->items[li];
-					info.set = s.substr(1);
+					info.set.insert(s.substr(1));
 				}
 				if ( contentFile->items[li][0] == 'g' ) {
 					string s = contentFile->items[li];
 					info.group = s.substr(1);
-				}
-				if ( contentFile->items[li][0] == 'b' ) {
-					string s = contentFile->items[li];
-					info.base = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'd' ) {
 					string s = contentFile->items[li];

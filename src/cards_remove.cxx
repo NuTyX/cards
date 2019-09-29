@@ -63,21 +63,12 @@ Cards_remove::Cards_remove(const string& commandName,
 			bool found = false;
 			for (auto j : m_listOfInstPackages) {
 				if  (( j.second.collection == i) ||
-				( j.second.group == i) || (j.second.base == i)) {
+				( j.second.group == i)) {
 				PackageToRemove.first=j.first;
 				PackageToRemove.second=j.second.collection;
 				listOfPackagesToRemove.insert(PackageToRemove);
 				}
 			}
-			if ( listOfPackagesToRemove.empty()) {
-				for (auto j : m_listOfInstPackages) {
-					if  (( j.second.base == i) ) {
-						PackageToRemove.first=j.first;
-						listOfPackagesToRemove.insert(PackageToRemove);
-					}
-				}
-			}
-
 			if ( listOfPackagesToRemove.empty()) {
 				// if it's an alias get the real name
 				string a = m_listOfAlias [i];

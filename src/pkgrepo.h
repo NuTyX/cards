@@ -58,6 +58,7 @@ struct BasePackageInfo {
 	std::string packager;
 	std::string fileDate;
 	std::string alias;
+	std::string set;
 	std::string group;
 	time_t buildDate;
 	std::vector<PortFilesList> portFilesList;
@@ -145,6 +146,11 @@ public:
  *  retun list of packages of the collection
  */
 		std::set<std::string> getListOfPackagesFromCollection(const std::string& collectionName);
+
+/**
+ *  retun list of packages of a set
+ */
+		std::set<std::string> getListOfPackagesFromSet(const std::string& collectionName);
 
 /**
  *	return the build time of the binary 

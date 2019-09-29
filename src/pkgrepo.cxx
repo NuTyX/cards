@@ -143,6 +143,11 @@ if (m_parsePkgRepoCollectionFile == false) {
 					basePkgInfo.contributors = infos[12];
 				}
 			}
+			if ( infos.size() > 13 ) {
+				if ( infos[13].size() > 0 ) {
+					basePkgInfo.set = infos[13];
+				}
+			}
 			portsDirectory.basePackageList.push_back(basePkgInfo);
 		}
 		m_portsDirectoryList.push_back(portsDirectory);
@@ -358,6 +363,24 @@ set<string> Pkgrepo::getListOfPackagesFromCollection(const string& collectionNam
 				listOfPackages.insert(j.basePackageName);
 			}
 			return listOfPackages;
+		}
+	}
+	return listOfPackages;
+}
+set<string> Pkgrepo::getListOfPackagesFromSet(const string& setName)
+{
+	if (!m_parsePkgRepoCollectionFile)
+		parsePkgRepoCollectionFile();
+
+	std::set<string> listOfPackages;
+
+	for (auto i : m_portsDirectoryList) {
+		for (auto j : i.basePackageList) {
+			std::set<string> set = parseDelimitedSetList(j.set, ' ');
+			for (auto k : set) {
+				if (k == setName)
+					listOfPackages.insert(j.basePackageName);
+				}
 		}
 	}
 	return listOfPackages;

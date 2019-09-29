@@ -34,7 +34,8 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			continue;
 		}
 		if ( getListOfPackagesFromCollection(i).empty() &&
-			(! checkBinaryExist(i) ) ) {
+			(! checkBinaryExist(i) )  && 
+			getListOfPackagesFromSet(i).empty() ){
 			m_actualError = PACKAGE_NOT_FOUND;
 			treatErrors(i);
 		}
@@ -42,10 +43,12 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	Pkgrepo::parseConfig(configFileName, m_config);
 	buildSimpleDatabase();
 	for( auto i : m_argParser.otherArguments() ) {
-		std::set<std::string> ListOfPackage = getListOfPackagesFromCollection(i);
+		std::set<std::string> ListOfPackage = getListOfPackagesFromSet(i);
+		if (ListOfPackage.empty() )
+			ListOfPackage = getListOfPackagesFromCollection(i);
 		if ( (!ListOfPackage.empty()) && (!checkBinaryExist(i)) ) {
 			/*
-			* It's a collection
+			* It's a collection or a set
 			*/
 			for (auto i : ListOfPackage ) {
 				if (checkPackageNameExist(i))

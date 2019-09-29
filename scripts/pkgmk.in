@@ -826,9 +826,6 @@ add_meta_to_archive() {
 	echo "a$ARCH" >> .META
 	[ ! -z "$collection" ] && echo "c$collection" >> .META
 	[ ! -z "$GROUP" ] && echo "g$GROUP" >> .META
-	[ ! -z "$basename" ] && echo "b$basename" >> .META
-	[ ! -z "$set" ] && echo "s$set" >> .META
-
 
 	# TODO improve the pkginfo --runtimedepfiles functionnality
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
@@ -871,6 +868,13 @@ add_meta_to_archive() {
 			else
 				echo "A$al.$GROUP" >> .META
 			fi
+		done
+	fi
+	if [ ! -z $set ]; then
+		info "Adding Sets to Archive $NAME"
+		for i in ${set[@]}; do
+			echo "s$i" >> .META
+
 		done
 	fi
 	bsdtar -tf $PKGMK_PACKAGE_DIR/$1 > .MTREE
@@ -1182,7 +1186,14 @@ update_collection_repo() {
 			MAINTAINER="$(echo $HEAD|cut -d "#" -f7)"
 			PACKAGER="$(echo $HEAD|cut -d "#" -f8)"
 			CONTRIBUTORS="$(echo $HEAD|cut -d "#" -f9)"
-			SET="$(echo $HEAD|cut -d "#" -f10)"
+			if [ ! -z $set ]; then
+				for i in ${set[@]}
+				do
+					SET="$i $SET"
+				done
+			else
+				SET=""
+			fi
 			if [ ! -z $alias ]; then
 				for i in ${alias[@]}
 				do
@@ -1458,24 +1469,8 @@ main() {
 	[ ! -z $pkgrel ] && release=$pkgrel
 	[ ! -z "$pkgdesc" ] && description=$pkgdesc
 
-	if [ -z $basename ]; then
-		basename="$(echo $name | cut -d "-" -f1)"
-	fi
-	if [ "$basename" == "$name" ]; then
-		unset basename
-	fi
 	if [ -z "$version" ]; then
-		if [ ! -z "$basename" ];then
-			if [ -f ../$basename/$PKGMK_PKGFILE ];then
-				. ../$basename/$PKGMK_PKGFILE
-				unset run
-				. $PKGMK_PKGFILE
-			else
-				warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
-			fi
-		else
-			warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
-		fi
+		warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
 	fi
 	if [ "$PKGMK_SHOW_VERSION" == "yes" ]; then
 		echo "$version"
@@ -1599,9 +1594,6 @@ main() {
 	fi
 	if [ ! -z "$release" ]; then
 		info "release: $release"
-	fi
-	if [ ! -z "$basename" ]; then
-		info "basename: $basename"
 	fi
 
 	if [ "$PKGMK_UP_TO_DATE" = "yes" ]; then

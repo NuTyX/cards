@@ -315,10 +315,13 @@ void Pkginfo::run()
 					for ( auto i : m_listOfInstPackages[arg].alias) cout << i << " ";
 						cout << endl;
 				}
+				if (m_listOfInstPackages[arg].set.size() > 0 ) {
+					cout << _("Set            : ");
+					for ( auto i : m_listOfInstPackages[arg].set) cout << i << " ";
+						cout << endl;
+				}
 				cout << _("Description    : ") << m_listOfInstPackages[arg].description << endl
-					<< _("Series(base)   : ") << m_listOfInstPackages[arg].base << endl
 					<< _("Group          : ") << m_listOfInstPackages[arg].group << endl
-					<< _("Set            : ") << m_listOfInstPackages[arg].set << endl
 					<< _("Collection     : ") << m_listOfInstPackages[arg].collection << endl
 					<< _("URL            : ") << m_listOfInstPackages[arg].url << endl
 					<< _("Contributor(s) : ") << m_listOfInstPackages[arg].contributors << endl

@@ -133,8 +133,6 @@ RM_PKG_FILES_END
 };
 
 struct pkginfo_t {
-	std::string base;
-	std::string set;
 	std::string group;
 	std::string collection;
 	std::string description;
@@ -152,6 +150,7 @@ struct pkginfo_t {
 	bool dependency; // true it's a dependency: automaticaly install
 	std::set< std::pair<std::string,time_t> > dependencies;
 	std::set<std::string> alias;
+	std::set<std::string> set;
 	std::set<std::string> files;
 };
 typedef std::map<std::string, pkginfo_t> packages_t;

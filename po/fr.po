@@ -306,8 +306,8 @@ msgstr "Nom                 : "
 msgid "Alias          : "
 msgstr "Aussi appelé        : "
 
-msgid "Series(base)   : "
-msgstr "Séries(base)        : "
+msgid "Set            : "
+msgstr "Jeux de paquets     : "
 
 msgid "Group          : "
 msgstr "Groupe              : "
