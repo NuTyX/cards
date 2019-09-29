@@ -827,6 +827,7 @@ add_meta_to_archive() {
 	[ ! -z "$collection" ] && echo "c$collection" >> .META
 	[ ! -z "$GROUP" ] && echo "g$GROUP" >> .META
 	[ ! -z "$basename" ] && echo "b$basename" >> .META
+	[ ! -z "$set" ] && echo "s$set" >> .META
 
 
 	# TODO improve the pkginfo --runtimedepfiles functionnality
@@ -1162,7 +1163,7 @@ build_needed() {
 	echo $RESULT
 }
 update_collection_repo() {
-	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION ALIAS GROUP CONTRIBUTORS
+	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION ALIAS GROUP CONTRIBUTORS SET
 	if [ -f $PKGMK_REPO ]; then
 		for i in "$(tail -n +2  $PKGMK_REPO)"
 		do
@@ -1181,6 +1182,7 @@ update_collection_repo() {
 			MAINTAINER="$(echo $HEAD|cut -d "#" -f7)"
 			PACKAGER="$(echo $HEAD|cut -d "#" -f8)"
 			CONTRIBUTORS="$(echo $HEAD|cut -d "#" -f9)"
+			SET="$(echo $HEAD|cut -d "#" -f10)"
 			if [ ! -z $alias ]; then
 				for i in ${alias[@]}
 				do
@@ -1190,7 +1192,7 @@ update_collection_repo() {
 				ALIAS=""
 			fi
 			[ -f ../$PKGMK_REPO ] && sed -i "/#$name#/d" ../$PKGMK_REPO
-			echo "$(md5sum $PKGMK_REPO|cut -d " " -f1)#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP#$CONTRIBUTORS" \
+			echo "$(md5sum $PKGMK_REPO|cut -d " " -f1)#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP#$CONTRIBUTORS#$SET" \
 			>> ../$PKGMK_REPO
 		fi
 	fi
@@ -1210,10 +1212,11 @@ update_repo() {
 	[ -z "$maintainer"  ] && maintainer="n.a."
 	[ -z "$packager"  ] && packager="n.a."
 	[ -z "$contributors" ] && contributors="none"
+	[ -z "$set" ] && set="none"
 	if [ ! -z $TARGETS ]; then
 		EXT="$(get_package_extension $TARGETS)"
 		echo -n "$(get_package_builddate $TARGETS)#$EXT#$version#$release" > $PKGMK_REPO
-		echo -n "#$description#$url#$maintainer#$packager#$contributors" >> .PKGREPO
+		echo -n "#$description#$url#$maintainer#$packager#$contributors#$set" >> .PKGREPO
 		printf "\n" >> .PKGREPO
 		for TARGET in ${TARGETS[@]}; do
 			FILE="$(basename $TARGET)"
@@ -1529,6 +1532,7 @@ main() {
 		info "packager: $packager"
 		info "maintainer: $maintainer"
 		info "contributors: $contributors"
+		info "set: $set"
 		exit 0
 	fi
 	
