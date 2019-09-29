@@ -345,7 +345,7 @@ std::set<std::string> Pkgdbh::getFilesOfPackage
  * - if nothing specify only get the List of PackageNames
  *   and populate the alias list.
  * - if simple then only with name, version, release, collection
- *   build date and group name
+ *   build date, set and group name
  * - if all then all the availables attributes
  * - if files then all the files of the package(s)
  * - if packageName size() > 0 then we do just for the packageName
@@ -434,10 +434,15 @@ void Pkgdbh::buildDatabase
 					info.collection = attribute.substr(1);
 					flags = flags + 4;
 				}
-				/* As a group in not always present we cannot
+				/* As a group is not always present we cannot
 				 * depend on a found one to break */
 				if ( attribute[0] == 'g' ) {
 					info.group = attribute.substr(1);
+				}
+				/* As a set is not always present we cannot
+				 * depen on a found one to break */
+				if ( attribute[0] == 's' ) {
+					info.set = attribute.substr(1);
 				}
 				if ( attribute[0] == 'r' ) {
 					info.release = atoi(attribute.substr(1).c_str());
@@ -486,6 +491,7 @@ void Pkgdbh::buildSimpleDependenciesDatabase()
  * - Name
  * - version
  * - release
+ * - set
  * - collection
  * - Build date
  * - Group name
@@ -508,6 +514,10 @@ void Pkgdbh::buildSimpleDatabase()
 				if ( contentFile->items[li][0] == 'c' ) {
 					string s = contentFile->items[li];
 					info.collection = s.substr(1);
+				}
+				if ( contentFile->items[li][0] == 's' ) {
+					string s = contentFile->items[li];
+					info.set = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'V' ) {
 					string s = contentFile->items[li];
@@ -625,6 +635,10 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 				if ( contentFile->items[li][0] == 'c' ) {
 					string s = contentFile->items[li];
 					info.collection = s.substr(1);
+				}
+				if ( contentFile->items[li][0] == 's' ) {
+					string s = contentFile->items[li];
+					info.set = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'g' ) {
 					string s = contentFile->items[li];

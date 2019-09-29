@@ -134,6 +134,7 @@ RM_PKG_FILES_END
 
 struct pkginfo_t {
 	std::string base;
+	std::string set;
 	std::string group;
 	std::string collection;
 	std::string description;
