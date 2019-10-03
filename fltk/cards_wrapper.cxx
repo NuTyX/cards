@@ -2,6 +2,7 @@
  * cards_wrapper.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artmia@nutyx.org>
+ * Copyright 2019 by NuTyX team (http://nutyx.org)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,9 +88,9 @@ namespace cards
         return _arrPackages;
     }
 
-    const set<string>& CWrapper::getCollectionList()
+    const set<string>& CWrapper::getSetList()
     {
-        return _arrCollections;
+        return m_arrSets;
     }
 
     ///
@@ -154,7 +155,7 @@ namespace cards
         if (m_IsThreadFree())
         {
             _job = new thread(&CWrapper::m_DoJobList_Thread, CWrapper::_ptCWrapper);
-            _job->detach();
+//            _job->detach();
         }
     }
 
@@ -292,9 +293,9 @@ namespace cards
             {
                 switch (i)
                 {
-                    case 0: //Base
+                    case 0: //Set
                     {
-                        Pack->_collection = token;
+                        Pack->m_set = token;
                         break;
                     }
                     case 1: //Name
@@ -324,7 +325,7 @@ namespace cards
             }
             if (InstalledPackages.find(Pack->_name)!=InstalledPackages.end()) Pack->setStatus(INSTALLED);
             _arrPackages.push_back(Pack);
-            if (_arrCollections.find(Pack->_collection)==_arrCollections.end()) _arrCollections.insert(Pack->_collection);
+            if (m_arrSets.find(Pack->m_set)==m_arrSets.end()) m_arrSets.insert(Pack->m_set);
         }
         m_OnRefreshPackageFinished_Callback(CEH_RC::OK);
         _job_running =false;

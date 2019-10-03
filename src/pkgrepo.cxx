@@ -2,7 +2,7 @@
 //  pkgrepo.cxx
 //
 //  Copyright (c) 2002-2005 by Johannes Winkelmann jw at tks6 dot net
-//  Copyright (c) 2014-2017 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014-2019 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -391,6 +391,7 @@ set<string> Pkgrepo::getBinaryPackageList()
 		parsePkgRepoCollectionFile();
 
 	string packageNameVersion;
+	string baseDir;
 	set<string>  binaryList;
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
@@ -407,7 +408,11 @@ set<string> Pkgrepo::getBinaryPackageList()
 					<< j.s_buildDate << " "
 					<< j.extention << endl ;
 #endif
-			string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
+			if ( ( j.set=="none ") || (j.set.size()==0 ) || 
+				 ( j.set=="none") )
+				baseDir = basename(const_cast<char*>(i.Dir.c_str()));
+			else
+				baseDir = j.set;
 			packageNameVersion= "(" + baseDir + ")\t"
 				+ j.basePackageName
 				+ "\t"
@@ -421,7 +426,7 @@ set<string> Pkgrepo::getBinaryPackageList()
 	}
 	return binaryList;
 }
-set<Pkg*> Pkgrepo::getListOfPackages()
+set<Pkg*> Pkgrepo::getBinaryPackageSet()
 {
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
@@ -444,7 +449,11 @@ set<Pkg*> Pkgrepo::getListOfPackages()
 			pkg->setName(j.basePackageName);
 			pkg->setVersion(j.version);
 			pkg->setDescription(j.description);
-			pkg->setCollection(baseDir);
+			if ( ( j.set=="none ") || (j.set.size()==0 ) || 
+				 ( j.set=="none") )
+				pkg->setCollection(baseDir);
+			else
+				pkg->setCollection(j.set);
 			pkg->setPackager(j.packager);
 
 			m_packagesList.insert(pkg);

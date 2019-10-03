@@ -70,6 +70,17 @@ Cards_remove::Cards_remove(const string& commandName,
 				}
 			}
 			if ( listOfPackagesToRemove.empty()) {
+				for (auto j : m_listOfInstPackages) {
+					for (auto k : j.second.set) {
+						if ( i == k ) {
+							PackageToRemove.first = j.first;
+							PackageToRemove.second=j.second.collection;
+							listOfPackagesToRemove.insert(PackageToRemove);
+						}
+					}
+				}
+			}
+			if ( listOfPackagesToRemove.empty()) {
 				// if it's an alias get the real name
 				string a = m_listOfAlias [i];
 				PackageToRemove.first = a ;

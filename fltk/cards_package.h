@@ -2,6 +2,7 @@
  * cards_package.h
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
+ * Copyright 2019 by NuTyX team (http://nutyx.org)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +43,7 @@ namespace cards
     public:
         CPackage();
         virtual ~CPackage(){}
-        string getCollection();
+        string getSetList();
         string getName();
         string getVersion();
         string getPackager();
@@ -56,7 +57,7 @@ namespace cards
         CPSTATUS getStatus();
 
     protected:
-        string _collection;
+        string m_set;
         string _name;
         string _version;
         string _packager;

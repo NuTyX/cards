@@ -1,7 +1,7 @@
 /*
  * cards_info.cxx
  * 
- * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2015-2019 Thierry Nuttens <tnut@nutyx.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 	if ((m_argParser.command() == CardsArgumentParser::CMD_LIST) ) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
 			set<string> sortedPackagesList;
-			set<Pkg*> binaryList = getListOfPackages();
+			set<Pkg*> binaryList = getBinaryPackageSet();
 			for ( auto i : binaryList) {
 				string s;
 				s =  "(" + i->getCollection() + ") ";

@@ -1,7 +1,7 @@
 /*
  * table_package.cxx
  *
- * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2015-2019 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ void TablePackage::refresh_table()
     {
         if (_filter.length()>0)
             if ((S->getName().find(_filter)==string::npos) &&
-                (S->getCollection().find(_filter)==string::npos) &&
+                (S->getSetList().find(_filter)==string::npos) &&
                 (S->getDescription().find(_filter)==string::npos) ) continue;
         // Add a new row
         Row newrow;
@@ -57,7 +57,7 @@ void TablePackage::refresh_table()
             newrow.cols.push_back("I");
         }
         else newrow.cols.push_back("U");
-        newrow.cols.push_back(S->getCollection());
+        newrow.cols.push_back(S->getSetList());
         newrow.cols.push_back(S->getName());
         newrow.cols.push_back(S->getDescription());
         _rowdata.push_back(newrow);

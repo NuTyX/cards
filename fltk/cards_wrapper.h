@@ -2,6 +2,7 @@
  * cards_wrapper.h
  *
  * Copyright 2017 Gianni Peschiutta <artmia@nutyx.org>
+ * Copyright 2019 by NuTyX team (http://nutyx.org)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,7 +121,7 @@ namespace cards
 
         const vector<CPackage*>& getJobList();
 
-        const set<string>& getCollectionList();
+        const set<string>& getSetList();
 
         bool isJobRunning();
 
@@ -149,7 +150,8 @@ namespace cards
         vector<CEventHandler*> _arrEventHandler; // Std array to store callback event clients
         vector<CPackage*> _arrPackages;
         vector<CPackage*> _arrJobList;
-        set<string> _arrCollections;
+        std::set<std::string> m_arrSets;
+//        set<string> _arrCollections;
 
         /// Threaded Tasks
         void m_Sync_Thread(); // Main Thread for Cards Sync Operation

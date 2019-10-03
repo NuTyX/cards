@@ -1,7 +1,7 @@
 /*
  * table_collection.cxx
  *
- * Copyright 2015-2017 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2015-2019 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -167,33 +167,31 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 set<string> Collec_List;
                 if (Collection=="LXDE")
                 {
-                    Collec_List.insert("(lxde)");
-                    Collec_List.insert("(lxde-extra)");
+                    Collec_List.insert("(lxde )");
                 }
                 else if (Collection=="XFCE")
                 {
-                    Collec_List.insert("(xfce4)");
-                    Collec_List.insert("(xfce4-extra)");
+                    Collec_List.insert("(xfce4 )");
+                    Collec_List.insert("(xfce4-extra )");
                 }
                 else if (Collection=="LXQT")
                 {
-                    Collec_List.insert("(lxqt)");
-                    Collec_List.insert("(lxqt-extra)");
+                    Collec_List.insert("(lxqt )");
+                    Collec_List.insert("(lxqt-extra )");
                 }
                 else if (Collection=="MATE")
                 {
-                    Collec_List.insert("(mate)");
-                    Collec_List.insert("(mate-extra)");
+                    Collec_List.insert("(mate )");
+                    Collec_List.insert("(mate-extra )");
                 }
                 else if (Collection=="KDE")
                 {
-                    Collec_List.insert("(kde5)");
-                    Collec_List.insert("(kde5-extra)");
+                    Collec_List.insert("(plasma5 kde5 )");
                 }
                 else if (Collection=="GNOME")
                 {
-                    Collec_List.insert("(gnome)");
-                    Collec_List.insert("(gnome-extra)");
+                    Collec_List.insert("(gnome )");
+                    Collec_List.insert("(gnome-extra )");
                 }
                 else break;
                 Fl_Menu_Item rclick_menu[] = {
@@ -213,7 +211,7 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                     vector<CPackage*> Packages = Cards->getPackageList();
                     for (CPackage* Package : Packages)
                     {
-                        if ((!Package->isInstalled()) && (Collec_List.count(Package->getCollection())))
+                        if ((!Package->isInstalled()) && (Collec_List.count(Package->getSetList())))
                         {
                             Package->setStatus(TO_INSTALL);
                         }
@@ -225,7 +223,7 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                     vector<CPackage*> Packages = Cards->getPackageList();
                     for (CPackage* Package : Packages)
                     {
-                        if (Package->isInstalled() && (Collec_List.count(Package->getCollection())))
+                        if (Package->isInstalled() && (Collec_List.count(Package->getSetList())))
                         {
                             Package->setStatus(TO_REMOVE);
                         }

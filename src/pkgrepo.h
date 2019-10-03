@@ -167,7 +167,7 @@ public:
  *  return a Pkg set List of available binaries packages
  *
  */
-		std::set<Pkg*> getListOfPackages();
+		std::set<Pkg*> getBinaryPackageSet();
 /**
  * populate RepoInfo List
  *

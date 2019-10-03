@@ -2,6 +2,7 @@
  * cards_package.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
+ * Copyright 2019 by NuTyX team (http://nutyx.org)
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +33,9 @@ namespace cards
     }
 
     /// Return
-    string CPackage::getCollection()
+    string CPackage::getSetList()
     {
-        return _collection;
+        return m_set;
     }
 
     string CPackage::getName()
