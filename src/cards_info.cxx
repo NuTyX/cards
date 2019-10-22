@@ -85,33 +85,19 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 			for (auto j : i.basePackageList) {
 				string::size_type pos;
 				pos = i.collection.find(convertToLowerCase(m_argParser.otherArguments()[0]));
-				if  ( pos != std::string::npos ) {
-					cout << "(" << i.collection << ") ";
-					if ( checkPackageNameExist(j.basePackageName) ) {
-						cout << GREEN;
-					}
-					cout << j.basePackageName
-						<< NORMAL
-						<< " " << j.version
-						<< " " << j.description
-						<< endl;
-					continue;
-				}
-				pos = j.basePackageName.find(convertToLowerCase(m_argParser.otherArguments()[0]));
-				if  ( pos != std::string::npos ) {
-					cout << "(" << i.collection << ") ";
-					if ( checkPackageNameExist(j.basePackageName) ) {
-						cout << GREEN;
-					}
-					cout << j.basePackageName
-						<< NORMAL
-						<< " " << j.version
-						<< " " << j.description
-						<< endl;
-					continue;
-				}
-				pos = convertToLowerCase(j.description).find(convertToLowerCase(m_argParser.otherArguments()[0]));
-				if (pos != std::string::npos) {
+				if  ( pos == std::string::npos )
+					pos = j.set.find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if  ( pos == std::string::npos )
+					pos = j.basePackageName.find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if  ( pos == std::string::npos )
+					pos = convertToLowerCase(j.description).find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if  ( pos == std::string::npos )
+					pos = convertToLowerCase(j.packager).find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if  ( pos == std::string::npos )
+					pos = convertToLowerCase(j.URL).find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if  ( pos == std::string::npos )
+					pos = convertToLowerCase(j.version).find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if ( pos != std::string::npos ) {
 					cout << "(" << i.collection << ") ";
 					if ( checkPackageNameExist(j.basePackageName) ) {
 						cout << GREEN;

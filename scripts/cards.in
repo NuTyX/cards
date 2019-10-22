@@ -13,7 +13,6 @@ commit() {
   [ ! -z "$2" ] && COMMENT+="
 $2"
   git commit -m "$COMMENT"
-  echo $COMMENT
 }
 match_Pkgfile() {
 	find . -name Pkgfile -exec grep -l $1 {} +
