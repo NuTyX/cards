@@ -115,7 +115,12 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 }
 vector<LevelName>& CardsDepends::getLevel()
 {
-	level();
+	if ( level() !=0 )
+	{
+		m_actualError = CANNOT_GENERATE_LEVEL;
+		treatErrors(" in level()");
+	}
+
 #ifndef NDEBUG
 	for ( auto i : m_levelList ) {
 		cerr << i.name<< endl;
@@ -175,7 +180,11 @@ void CardsDepends::showDependencies()
 }
 void CardsDepends::showLevel()
 {
-	level();
+	if ( level() != 0 )
+	{
+		m_actualError = CANNOT_GENERATE_LEVEL;
+		treatErrors(" in level()");
+	}
 
 	if ( (m_missingDepsList.size() == 0 ) || ( m_argParser.isSet(CardsArgumentParser::OPT_IGNORE))) {
 		for ( auto i : m_levelList) cout << i.l << ": " << i.name << endl;
@@ -270,6 +279,8 @@ int CardsDepends::level()
 		package = addInfoToPkgInfo(nInd);
 		addPkgToPkgList(packagesList,package);
 		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
+		if  (packagesList->pkgs[nInd]->dependences== NULL)
+			return -1;
 	}
 	unsigned int niveau = 0;
 	static unsigned  int *pNiveau = &niveau;
