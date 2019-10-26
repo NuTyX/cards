@@ -129,7 +129,7 @@ void Pkginst::generateDependencies()
 		}
 		if (!found) {
 #ifndef NDEBUG
-			cerr << "m_dependenciesList.push_back " << vrit->first << " " vrit->second << endl;
+			cerr << "m_dependenciesList.push_back " << vrit->first << " " << vrit->second << endl;
 #endif
 			m_dependenciesList.push_back(*vrit);
 		}
