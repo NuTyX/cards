@@ -85,40 +85,6 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 		replaceAll( depends, " ", "," );
 		replaceAll( depends, ",,", "," );
 		split( depends, ',', deps, 0,true);
-	} else {
-		FILE* fp = fopen(fullPathfileName, "r" );
-		if (!fp)
-			return NULL;
-		const int length = BUFSIZ;
-		char input[length];
-		string line;
-		// Depends on comment line search
-		while ( fgets( input, length, fp ) ) {
-			line = stripWhiteSpace( input );
-			if ( line[0] == '#' ) {
-				while ( !line.empty() &&
-					( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
-						line = line.substr( 1 );
-					}
-				string::size_type pos = line.find( ':' );
-				if ( pos != string::npos ) {
-					if ( startsWithNoCase( line, "dep" ) ) {
-#ifndef NDEBUG
-						cerr << line << endl;
-#endif
-						string depends = stripWhiteSpace( getValue( line, ':' ) );
-#ifndef NDEBUG
-						cerr << depends << endl;
-#endif
-						replaceAll( depends, " ", "," );
-						replaceAll( depends, ",,", "," );
-						split( depends, ',', deps, 0,true);
-						break;
-					}
-				}
-			}
-		}
-	fclose( fp );
 	}
 	if ( deps.size() >0 ) {
 		bool found=false;

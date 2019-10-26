@@ -1025,6 +1025,7 @@ build_package() {
 				rm -rf $DIR
 			fi
 		done
+		check_build
 		if [ "$(ls|wc -l)" != "0" ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} *
 		else
@@ -1056,7 +1057,6 @@ build_package() {
 			add_meta_files "$(basename $TARGET)"
 			add_meta_to_archive "$(basename $TARGET)"
 		fi
-		check_build
 		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
 			remove_work_dir
 		fi
