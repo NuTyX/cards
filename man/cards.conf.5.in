@@ -63,7 +63,7 @@ is
 The valid keys are
 .B dir
 The value for 
-.B prtdir 
+.B dir 
 is a directory, or a directory|an URL
 
 .LP
