@@ -58,12 +58,10 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	sprintf(name,"%s",basename(filesList->items[nameIndex]));
 	itemList *nameDeps = initItemList();
 	string missingDep = "";
-	bool found = false;
 	sprintf(fullPathfileName,"%s/Pkgfile",filesList->items[nameIndex]);
-	found = checkFileExist(fullPathfileName);
-	if (! found) {
-		cerr << fullPathfileName << " Not found .." << endl;
-		return NULL;
+	if ( ! checkFileExist(fullPathfileName) ) {
+		m_actualError = CANNOT_READ_FILE;
+		treatErrors(fullPathfileName);
 	}
 #ifndef NDEBUG
 	cerr << fullPathfileName << endl;
