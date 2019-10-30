@@ -343,7 +343,7 @@ echo "    VERSION: $VERSION"
 echo "The command: KERNEL="NONE" LFS="${PARAM[0]}" DEPOT="/DEPOT" install-nutyx"
 echo "      DEVEL: $DEVEL "
 echo ""
-echo "The rsync  : rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT_PROJ/"
+echo "The rsync  : rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT/"
 echo ""
 
 [ "$DRY" == "yes" ] && exit 0
