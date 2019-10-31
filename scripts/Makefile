@@ -35,7 +35,6 @@ install: all
 	install -D -m0755 build-port $(USRBINDIR)/build-port
 	install -D -m0755 build-collection $(BINDIR)/build-collection
 	install -D -m0755 pkgmk $(USRBINDIR)/pkgmk
-	install -D -m0755 pkgmk2 $(USRBINDIR)/pkgmk2
 	install -D -m0644 pkgmk.conf $(ETCDIR)/pkgmk.conf.example
 	install -D -m0644 cards $(ETCDIR)/profile.d/cards.sh
 	install -D -m0755 ports $(USRBINDIR)/ports
@@ -44,7 +43,6 @@ install: all
 
 clean:
 	rm -f pkgmk
-	rm -f pkgmk2
 	rm -f ports
 	rm -f build-port
 	rm -f build-collection
