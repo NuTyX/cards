@@ -76,48 +76,6 @@ get_basename() {
 	local FILE="$(echo $1 | sed 's|^.*://.*/||g')"
 	echo $FILE
 }
-get_variables() {
-	local STRING KEY VALUE
-	while read i;
-	do
-		STRING=$(echo $i |grep \# | grep :|sed "s@^[ ,\t,#]*@@" )
-		KEY=$(echo $STRING|cut -d ":" -f1|sed "s@^[ ,\t,#]*@@")
-		VALUE=$(echo $STRING|cut -d ":" -f1 --complement|sed "s@^[ ,\t,#]*@@")
-		[ ! -z "$(echo $KEY|grep -i dep)" ] && dependencies=$VALUE
-		if [ ! -z "$dependencies" ]; then
-			error "Dependencies should be defined via 'makedepends' variable instead of comment form"
-			exit $E_PKGFILE
-		fi
-		if [ -z "$description" ]; then
-			[ ! -z "$(echo $KEY|grep -i desc)" ] && description=$VALUE
-			if [ ! -z "$description" ]; then
-				error "Variable 'description' should be used instead of comment form"
-				exit $E_PKGFILE
-			fi
-		fi
-		if [ -z "$url" ]; then
-			[ ! -z "$(echo $KEY|grep -i url)" ] && url=$VALUE
-			if [ ! -z "$url" ]; then
-				error "Variable 'url' should be used instead of comment form"
-				exit $E_PKGFILE
-			fi
-		fi
-		if [ -z "$packager" ]; then
-			[ ! -z "$(echo $KEY|grep -i pack)" ] && packager=$VALUE
-			if [ ! -z "$packager" ]; then
-				error "Variable 'packager' should be used instead of comment form"
-				exit $E_PKGFILE
-			fi
-		fi
-		if [ -z "$maintainer" ]; then
-			[ ! -z "$(echo $KEY|grep -i main)" ] && maintainer=$VALUE
-			if [ ! -z "$maintainer" ]; then
-				error "Variable 'maintainer' should be used instead of comment form"
-				exit $E_PKGFILE
-			fi
-		fi
-	done < $PKGMK_ROOT/$PKGMK_PKGFILE
-}
 check_pkgfile() {
 	local SIZE NAME_TEST RELEASE_TEST DESC_TEST
 	if [ "${name}" == "" ]; then
