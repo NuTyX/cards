@@ -1,13 +1,15 @@
-_E() {
-	printf "$1 is not set\n"
-	return -1
-}
 commit() {
   [ ! -f $1/Pkgfile ] && return
   release=1
   . $1/Pkgfile
-  [ -z $name ] && _E "name"
-  [ -z $version ] && _E "version"
+  if [ -z $name ]; then
+     printf "name is not set\n"
+     return -1
+  fi
+  if [ -z $version ]; then
+     printf "version is not set\n"
+     return -1
+  fi
   git add $1
   COMMENT="$name $version-$release"
   [ ! -z "$2" ] && COMMENT+="
@@ -26,3 +28,4 @@ match_Pkgfile() {
 match_Anything() {
 	find . -name Pkgfile -exec grep -l $1 {} +
 }
+export -f commit match_Pkgfile match_Anything
