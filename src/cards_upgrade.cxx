@@ -34,6 +34,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	else
 		m_root=m_root+"/";
 
+	m_pkgsync.run();
 	parsePkgRepoCollectionFile();
 	buildSimpleDatabase();
 	std::set<std::string> tmpList;
@@ -154,6 +155,7 @@ void Cards_upgrade::upgrade()
 			removePackageFilesRefsFromDB(i);
 			removePackageFiles(i);
 		}
+		m_pkgsync.purge();
 	}
 }
 // vim:set ts=2 :

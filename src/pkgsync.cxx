@@ -180,8 +180,10 @@ void Pkgsync::deleteFolder(const std::string& folderName)
 	}
 	for (set<string>::const_iterator f = filesToDelete.begin(); f != filesToDelete.end(); f++) {
 		string fileName = folderName + "/" + *f;
+#ifndef NDEBUG
 		if (f->size() > 0)
-			cout << "Deleting " << fileName << endl; 
+			cerr << "Deleting " << fileName << endl;
+#endif
 		removeFile("/",fileName);
 	}	
 	removeFile("/",folderName);

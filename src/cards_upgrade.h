@@ -22,6 +22,7 @@
 #ifndef CARDS_UPGRADE_H
 #define CARDS_UPGRADE_H
 
+#include "pkgsync.h"
 #include "pkginst.h"
 #include "cards_argument_parser.h"
 
@@ -30,6 +31,7 @@ private:
 	std::set<std::string>                   m_ListOfPackagesToDelete;
 	std::set<std::pair<std::string,time_t>> m_ListOfPackages;
 	const CardsArgumentParser& m_argParser;
+	Pkgsync m_pkgsync;
 public:
 	Cards_upgrade(const CardsArgumentParser& argParser,
 		const char *configFileName);
