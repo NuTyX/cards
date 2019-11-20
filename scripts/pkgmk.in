@@ -674,16 +674,33 @@ build() {
 	else
 		case $build in
 			meson)
-				cd $name-$version
 				mkdir build
 				cd    build
-				meson --prefix=/usr
+				meson --prefix=/usr \
+                                      ../$name-$version
 				ninja
 				DESTDIR=$PKG ninja install;;
 
+			autogen)
+				cd $name-$version
+				./autogen.sh
+				./configure --prefix=/usr \
+                                            --disable-static
+                                make
+                                make DESTDIR=$PKG install;;
+
+			autoreconf)
+				cd $name-$version
+                                autoreconf -fiv
+                                ./configure --prefix=/usr \
+                                            --disable-static
+                                make
+                                make DESTDIR=$PKG install;;
+
 			autotools)
 				cd $name-$version
-				./configure --prefix=/usr --disable-static
+				./configure --prefix=/usr \
+                                            --disable-static
 				make
 				make DESTDIR=$PKG install;;
 
@@ -705,15 +722,15 @@ build() {
 				make
 				make DESTDIR=$PKG install;;
 
-			kde5)
-				cd $name-$version
+			kde5|cmake)
 				mkdir build
 				cd    build
 				cmake -DCMAKE_INSTALL_PREFIX=/usr  \
-						-DCMAKE_BUILD_TYPE=Release \
-						-DCMAKE_INSTALL_LIBDIR=lib   \
-						-DBUILD_TESTING=OFF        \
-						-Wno-dev ..
+					-DCMAKE_BUILD_TYPE=Release \
+					-DCMAKE_INSTALL_LIBDIR=lib   \
+					-DBUILD_TESTING=OFF        \
+					-Wno-dev \
+					../$name-$version
 				make
 				make DESTDIR=$PKG install;;
 
