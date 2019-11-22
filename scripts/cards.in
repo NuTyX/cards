@@ -17,11 +17,11 @@ $2"
   git commit -m "$COMMENT"
 }
 match_Pkgfile() {
-	unset makedepends
+	unset makedepends run
 	for PKGFILE in $(find . -name Pkgfile | sort ); do
 		DIR="$(dirname $PKGFILE)/"
 		(cd $DIR && source Pkgfile && \
-		for i in ${makedepends[@]}; do [ "$1" == "$i" ] && \
+		for i in ${makedepends[@]} ${run[@]}; do [ "$1" == "$i" ] && \
 		printf "($(basename $(dirname $DIR))) $name $version\n";done)
 	done
 }
