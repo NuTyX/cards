@@ -173,6 +173,9 @@ void Pkgdbh::treatErrors(const string& s) const
 			throw runtime_error(s + _(" is neither an installed package nor a package file"));
 			break;
 		case PACKAGE_NOT_FOUND:
+			throw runtime_error(_("The package ") + s + _(" is not found"));
+			break;
+		case PACKAGE_NOT_EXIST:
 			throw runtime_error(_("The package ") + s + _(" does not exist"));
 			break;
 	}

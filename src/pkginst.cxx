@@ -75,6 +75,10 @@ void Pkginst::generateDependencies()
 #ifndef NDEBUG
 				cerr << packageFileName << " archive found " << endl;
 #endif
+			} else {
+				m_actualError = PACKAGE_NOT_EXIST;
+				treatErrors (packageName);
+
 			}
 			if ( ! checkFileSignature(packageFileName, packageNameSignature)) // Binary Archive not yet downloaded or corrupted
 				downloadPackageFileName(packageName); // Get it

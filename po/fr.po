@@ -193,13 +193,16 @@ msgid " is neither an installed package nor a package file"
 msgstr " n'est pas un paquet installé ni une archive cards"
 
 msgid "The package "
-msgstr "Le paquet  "
+msgstr "Le paquet "
 
 msgid " is already installed"
 msgstr " est déjà installé"
 
 msgid " does not exist"
 msgstr " n'existe pas"
+
+msgid " is not found"
+msgstr " n'est pas trouvé"
 
 msgid "Retrieve info about the "
 msgstr "Obtenir les infos sur les "
