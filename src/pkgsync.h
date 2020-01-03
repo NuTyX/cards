@@ -48,9 +48,9 @@ public:
 		Pkgsync(const std::string& url,
 			const std::string& directory,
 			const std::string& repoFile);
-		
+
 		virtual void treatErrors(const std::string& s) const;
-		
+
 		virtual void run();
 		virtual void purge();
 		static const std::string DEFAULT_REPOFILE;

@@ -41,6 +41,14 @@ Pkgrepo::Pkgrepo(const std::string& fileName)
 	m_parsePackagePkgfileFile = false;
 
 }
+void Pkgrepo::throwError(const string& s) const{
+	switch ( m_ErrorCond )
+	{
+		case CANNOT_FIND_DEPOT:
+			throw RunTimeErrorWithErrno("could not find the Depot META " + s);
+			break;
+	}
+}
 void Pkgrepo::parsePkgRepoCollectionFile()
 {
 if (m_parsePkgRepoCollectionFile == false) {
@@ -53,14 +61,17 @@ if (m_parsePkgRepoCollectionFile == false) {
 		if ( ! checkFileExist(collectionPkgRepoFile)) {
 			if ( i->Url.size() > 0 ) {
 				cout << "You should use " << YELLOW << "cards sync" << NORMAL << " for " << i->Dir << endl;
+			} else {
+				m_ErrorCond = CANNOT_FIND_DEPOT;
+				throwError(collectionPkgRepoFile);
 			}
 			continue;
 		}
 		vector<string> PkgRepoFileContent;
 
 		if ( parseFile(PkgRepoFileContent,collectionPkgRepoFile.c_str()) != 0) {
-			cerr << "cannot read file .PKGREPO" << endl;
-			continue;
+			m_ErrorCond = CANNOT_FIND_DEPOT;
+			throwError(collectionPkgRepoFile);
 		}
 
 		for ( auto input : PkgRepoFileContent) {

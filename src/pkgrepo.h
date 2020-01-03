@@ -78,13 +78,18 @@ struct RepoInfo {
 	std::string collection;
 	std::vector<BasePackageInfo> basePackageList;
 };
-class Pkgrepo {
+
+class Pkgrepo
+{
 public:
 
 		Pkgrepo(const std::string& fileName);
 		virtual ~Pkgrepo() { clearPackagesList(); }
+
 		static int parseConfig(const char *fileName,
 			Config& config);
+
+		void throwError(const std::string& s) const;
 
 /**
  *
@@ -252,6 +257,7 @@ protected:
 
 		std::vector<PortsDirectory> m_portsDirectoryList;
 private:
+		error m_ErrorCond;
 		void clearPackagesList();
 		std::set<Pkg*> m_packagesList;
 };
