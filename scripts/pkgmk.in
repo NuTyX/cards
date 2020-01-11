@@ -852,6 +852,13 @@ add_meta_to_archive() {
 
 		done
 	fi
+	if [ ! -z $categories ]; then
+		info "Adding Categories to Archive $NAME"
+		for i in ${categories[@]}; do
+			echo "c$i" >> .META
+
+		done
+	fi
 	bsdtar -tf $PKGMK_PACKAGE_DIR/$1 > .MTREE
 
 	rm $PKGMK_PACKAGE_DIR/$1
@@ -1142,7 +1149,8 @@ build_needed() {
 	echo $RESULT
 }
 update_collection_repo() {
-	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION ALIAS GROUP CONTRIBUTORS SET
+	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION \
+ALIAS GROUP CONTRIBUTORS SET CATEGORY
 	if [ -f $PKGMK_REPO ]; then
 		for i in "$(tail -n +2  $PKGMK_REPO)"
 		do
@@ -1161,6 +1169,14 @@ update_collection_repo() {
 			MAINTAINER="$(echo $HEAD|cut -d "#" -f7)"
 			PACKAGER="$(echo $HEAD|cut -d "#" -f8)"
 			CONTRIBUTORS="$(echo $HEAD|cut -d "#" -f9)"
+			if [ ! -z $categories ]; then
+				for i in ${categories[@]}
+				do
+					CATEGORY="$i $CATEGORY"
+				done
+			else
+				CATEGORY=""
+			fi
 			if [ ! -z $set ]; then
 				for i in ${set[@]}
 				do
@@ -1177,8 +1193,10 @@ update_collection_repo() {
 			else
 				ALIAS=""
 			fi
+
 			[ -f ../$PKGMK_REPO ] && sed -i "/#$name#/d" ../$PKGMK_REPO
-			echo "$(md5sum $PKGMK_REPO|cut -d " " -f1)#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP#$CONTRIBUTORS#$SET" \
+			echo \
+"$(md5sum $PKGMK_REPO|cut -d " " -f1)#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP#$CONTRIBUTORS#$SET#$CATEGORY" \
 			>> ../$PKGMK_REPO
 		fi
 	fi
