@@ -312,6 +312,9 @@ msgstr "Aussi appelé        : "
 msgid "Set            : "
 msgstr "Jeux de paquets     : "
 
+msgid "Categories     : "
+msgstr "Catégories          : "
+
 msgid "Group          : "
 msgstr "Groupe              : "
 

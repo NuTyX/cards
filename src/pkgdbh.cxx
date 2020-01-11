@@ -657,6 +657,10 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					info.alias.insert(s.substr(1));
 					m_listOfAlias[s.substr(1)] = i;
 				}
+				if ( contentFile->items[li][0] == 'T' ) {
+					string s = contentFile->items[li];
+					info.categories.insert(s.substr(1));
+				}
 				if ( contentFile->items[li][0] == 'R' ) {
 					string s = contentFile->items[li];
 					std::pair<std::string,time_t > NameEpoch;

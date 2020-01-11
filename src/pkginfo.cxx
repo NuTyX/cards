@@ -309,10 +309,16 @@ void Pkginfo::run()
 			buildCompleteDatabase(false);
 			if (checkPackageNameExist(m_arg)) {
 				string arg = m_listOfAlias[m_arg];
-				cout << _("Name           : ") << arg << endl;
+				cout << _("Name           : ") << arg << endl
+					<< _("Description    : ") << m_listOfInstPackages[arg].description << endl;
 				if (m_listOfInstPackages[arg].alias.size() > 0 ) {
 					cout << _("Alias          : ");
 					for ( auto i : m_listOfInstPackages[arg].alias) cout << i << " ";
+						cout << endl;
+				}
+				if (m_listOfInstPackages[arg].categories.size() > 0 ) {
+					cout << _("Categories     : ");
+					for ( auto i : m_listOfInstPackages[arg].categories) cout << i << " ";
 						cout << endl;
 				}
 				if (m_listOfInstPackages[arg].set.size() > 0 ) {
@@ -320,8 +326,7 @@ void Pkginfo::run()
 					for ( auto i : m_listOfInstPackages[arg].set) cout << i << " ";
 						cout << endl;
 				}
-				cout << _("Description    : ") << m_listOfInstPackages[arg].description << endl
-					<< _("Group          : ") << m_listOfInstPackages[arg].group << endl
+				cout << _("Group          : ") << m_listOfInstPackages[arg].group << endl
 					<< _("Collection     : ") << m_listOfInstPackages[arg].collection << endl
 					<< _("URL            : ") << m_listOfInstPackages[arg].url << endl
 					<< _("Contributor(s) : ") << m_listOfInstPackages[arg].contributors << endl

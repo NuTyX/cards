@@ -151,6 +151,7 @@ struct pkginfo_t {
 	std::set< std::pair<std::string,time_t> > dependencies;
 	std::set<std::string> alias;
 	std::set<std::string> set;
+	std::set<std::string> categories;
 	std::set<std::string> files;
 };
 typedef std::map<std::string, pkginfo_t> packages_t;

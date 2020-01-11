@@ -855,7 +855,7 @@ add_meta_to_archive() {
 	if [ ! -z $categories ]; then
 		info "Adding Categories to Archive $NAME"
 		for i in ${categories[@]}; do
-			echo "c$i" >> .META
+			echo "T$i" >> .META
 
 		done
 	fi
