@@ -1443,11 +1443,7 @@ main() {
 	. $PKGMK_PKGFILE
 
 	if [ ! -z $pkgname ];then
-		if (( ${#pkgname[@]} > 1 )); then
-			PKGMK_SPIT="yes"
-		else
 			name=$pkgname
-		fi
 	fi
 
 	# If variable name still not define we take the directory name
@@ -1457,7 +1453,6 @@ main() {
 		exit $E_PKGFILE
 	fi
 
-	[ "$(type -t package_$pkgname)" == "function" ] && PKGMK_SPIT="yes"
 	[ ! -z $pkgver ] && version=$pkgver
 	[ ! -z $pkgrel ] && release=$pkgrel
 	[ ! -z "$pkgdesc" ] && description=$pkgdesc
@@ -1693,7 +1688,6 @@ PKGMK_PKGFILE="Pkgfile"
 PKGMK_EXTRA_CONFFILE=".pkgmk.conf"
 PKGMK_MD5SUM="$name.$(uname -m).md5sum"
 PKGMK_NOSTRIP=".nostrip"
-PKGMK_SPIT="no"
 
 PKGMK_KEEP_SOURCES="no"
 PKGMK_CLEAN="yes"
