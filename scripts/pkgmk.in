@@ -194,6 +194,19 @@ get_package_arch() {
 	EXTENSION="$(get_package_extension $1)"
 	echo $1|sed "s/$NAME$BUILD_DATE//"|sed "s/$EXTENSION//"
 }
+get_categories() {
+	local FILE CANDIDATS CATEGORIES OLDIFS
+	for FILE in $(find $PKG/usr/share/applications -type f 2>/dev/null);do
+		CANDIDATS+=$(grep ^Categories $FILE|cut -d "=" -f2)
+	done
+	if [ ! -z $CANDIDATS ];then
+		OLDIFS=$IFS
+		IFS=";"
+		CATEGORIES=$(for i in ${CANDIDATS[@]};do echo $i;done|sort|uniq)
+		IFS=$OLDIFS
+		categories=$(for i in ${CATEGORIES[@]};do echo -n "$i ";done)
+	fi
+}
 check_directory() {
 	if [ ! -d $1 ]; then
 		error "Directory '$1' does not exist."
@@ -852,7 +865,7 @@ add_meta_to_archive() {
 
 		done
 	fi
-	if [ ! -z $categories ]; then
+	if [ ! -z "$categories" ]; then
 		info "Adding Categories to Archive $NAME"
 		for i in ${categories[@]}; do
 			echo "T$i" >> .META
@@ -1026,6 +1039,10 @@ build_package() {
 	
 	if [ "$BUILD_SUCCESSFUL" = "yes" ]; then
 		if [ "$1" != "$TARGET" ]; then
+			if [ -z $categories ]; then
+				info "trying to get categories..."
+				get_categories
+			fi
 			get_package_list		
         		if [ -z $TARGETS ]; then
                 		error "Package(s) not found(s)..."
@@ -1169,7 +1186,7 @@ ALIAS GROUP CONTRIBUTORS SET CATEGORY
 			MAINTAINER="$(echo $HEAD|cut -d "#" -f7)"
 			PACKAGER="$(echo $HEAD|cut -d "#" -f8)"
 			CONTRIBUTORS="$(echo $HEAD|cut -d "#" -f9)"
-			if [ ! -z $categories ]; then
+			if [ ! -z "$categories" ]; then
 				for i in ${categories[@]}
 				do
 					CATEGORY="$i $CATEGORY"
@@ -1217,10 +1234,11 @@ update_repo() {
 	[ -z "$packager"  ] && packager="n.a."
 	[ -z "$contributors" ] && contributors="none"
 	[ -z "$set" ] && set="none"
+	[ -z "$categories" ] && categories="none"
 	if [ ! -z $TARGETS ]; then
 		EXT="$(get_package_extension $TARGETS)"
 		echo -n "$(get_package_builddate $TARGETS)#$EXT#$version#$release" > $PKGMK_REPO
-		echo -n "#$description#$url#$maintainer#$packager#$contributors#$set" >> .PKGREPO
+		echo -n "#$description#$url#$maintainer#$packager#$contributors#$set#$categories" >> .PKGREPO
 		printf "\n" >> .PKGREPO
 		for TARGET in ${TARGETS[@]}; do
 			FILE="$(basename $TARGET)"
@@ -1635,6 +1653,7 @@ main() {
 			build_package $TARGET
 		fi
 	fi
+
 	if [ "$PKGMK_INSTALL" != "no" ]; then
 		install_package
 	fi

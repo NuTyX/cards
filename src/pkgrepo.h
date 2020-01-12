@@ -52,6 +52,7 @@ struct BasePackageInfo {
 	std::string version;
 	int release;
 	std::string description;
+	std::string categories;
 	std::string URL;
 	std::string contributors;
 	std::string maintainer;

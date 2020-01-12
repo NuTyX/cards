@@ -159,6 +159,11 @@ if (m_parsePkgRepoCollectionFile == false) {
 					basePkgInfo.set = infos[13];
 				}
 			}
+				if ( infos.size() > 14 ) {
+				if ( infos[14].size() > 0 ) {
+					basePkgInfo.categories = infos[14];
+				}
+			}
 			portsDirectory.basePackageList.push_back(basePkgInfo);
 		}
 		m_portsDirectoryList.push_back(portsDirectory);
