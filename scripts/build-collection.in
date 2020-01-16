@@ -309,14 +309,14 @@ if [ ! -z "${PARAM[2]}" ]; then
 	fi
 	. "$COLLECTION"/"${PARAM[1]}"/Pkgfile
 	if [ "$version" == "${PARAM[2]}" ];then
-		echo "... version is the same !!!"
+		echo ">>> version is the same !!!"
 		exit 1
 	fi
 fi
 
 # check if VERSION folder exist
 if ! [ -d "/$VERSION" ]; then
-	echo "/$VERSION folder not exist."
+	echo ">>> /$VERSION folder not exist."
 	exit 1
 fi
 
