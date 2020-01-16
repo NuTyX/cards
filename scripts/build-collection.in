@@ -297,9 +297,22 @@ if [ -d "${PARAM[0]}" ]; then
 "
 	exit 1
 fi
-
 VERSION=$(basename $(dirname "${PARAM[0]}"))
 COLLECTION=$(basename "${PARAM[0]}")
+
+
+if [ ! -z "${PARAM[2]}" ]; then
+	CONFIRM="yes"
+	if [ ! -f "$COLLECTION/${PARAM[1]}/Pkgfile" ]; then
+		echo " $COLLECTION/${PARAM[1]}/Pkgfile not exist"
+		exit 1
+	fi
+	. "$COLLECTION"/"${PARAM[1]}"/Pkgfile
+	if [ "$version" == "${PARAM[2]}" ];then
+		echo "... version is the same !!!"
+		exit 1
+	fi
+fi
 
 # check if VERSION folder exist
 if ! [ -d "/$VERSION" ]; then
@@ -373,7 +386,9 @@ echo "The rsync  : rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT/"
 echo ""
 
 [ "$DRY" == "yes" ] && exit 0
-
+echo ""
+echo " Upgrading ${PARAM[1]}: $version -> ${PARAM[2]}"
+echo ""
 if [ "$CONFIRM" == "yes" ]; then
 	echo -n "  OK ? (y) : "
 	read a
@@ -382,6 +397,11 @@ if [ "$CONFIRM" == "yes" ]; then
 		rm -rv ${PARAM[0]}
 		exit 1
 	fi
+fi
+
+if [ ! -z "${PARAM[2]}" ]; then
+	sed -i "s@version=$version@version=${PARAM[2]}@" \
+	"$COLLECTION"/"${PARAM[1]}"/Pkgfile
 fi
 
 mkdir -p ${PARAM[0]}/DEPOT || error ${PARAM[0]}
