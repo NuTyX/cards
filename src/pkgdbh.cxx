@@ -64,6 +64,9 @@ void Pkgdbh::treatErrors(const string& s) const
 {
 	switch ( m_actualError )
 	{
+		case CANNOT_FIND_DEPOT:
+			throw runtime_error(_("cannot find any depot ") + s);
+			break;
 		case CANNOT_CREATE_DIRECTORY:
 		case CANNOT_GENERATE_LEVEL:
 			break;

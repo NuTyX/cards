@@ -32,6 +32,7 @@ private:
 	std::set<std::pair<std::string,time_t>> m_ListOfPackages;
 	const CardsArgumentParser& m_argParser;
 	Pkgsync m_pkgsync;
+
 public:
 	Cards_upgrade(const CardsArgumentParser& argParser,
 		const char *configFileName);

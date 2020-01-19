@@ -596,6 +596,8 @@ bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
 				cout << _("Name           : ") << packageName << endl
 					<< _("Alias          : ") << j.alias << endl
 					<< _("Description    : ") << j.description << endl
+					<< _("Categories     : ") << j.categories << endl
+					<< _("Set            : ") << j.set << endl
 					<< _("Groups         : ") << j.group << endl
 					<< _("URL            : ") << j.URL << endl
 					<< _("Version        : ") << j.version << endl

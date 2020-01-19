@@ -59,6 +59,9 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 				continue;
 			m_ListOfPackages.insert(packageNameBuildDate);
 		}
+	} else {
+		m_actualError = CANNOT_FIND_DEPOT;
+		treatErrors("");
 	}
 	for (auto i : m_listOfInstPackages) {
 		if (!checkBinaryExist(i.first)) {
