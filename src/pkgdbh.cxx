@@ -3,7 +3,7 @@
 //
 //  Copyright (c) 2000-2005 Per Liden
 //  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013-2019 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2020 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ void Pkgdbh::treatErrors(const string& s) const
 	switch ( m_actualError )
 	{
 		case CANNOT_FIND_DEPOT:
-			throw runtime_error(_("cannot find any depot ") + s);
+			throw runtime_error(_("cannot find any depot, check your /etc/cards.conf file") + s);
 			break;
 		case CANNOT_CREATE_DIRECTORY:
 		case CANNOT_GENERATE_LEVEL:

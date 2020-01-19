@@ -1,7 +1,7 @@
 //
 // cards_upgrade.cxx
 //
-//  Copyright (c) 2015-2017 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2015-2020 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -37,8 +37,18 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	m_pkgsync.run();
 	parsePkgRepoCollectionFile();
 	buildSimpleDatabase();
-	std::set<std::string> tmpList;
+	std::set<std::string> listOfExistPackages;
+	for (auto i:m_listOfInstPackages) {
+		if (checkBinaryExist(i.first)) {
+			listOfExistPackages.insert(i.first);
+		}
+	}
+	if ( listOfExistPackages.empty() ) {
+		m_actualError = CANNOT_FIND_DEPOT;
+		treatErrors("");
+	}
 	if (!m_config.group.empty()) {
+		std::set<std::string> tmpList;
 		for (auto i: m_listOfInstPackages) {
 			for ( auto j :  m_config.group ) {
 					std::string packageName  = getBasePackageName(i.first) + "." + j;
@@ -49,19 +59,16 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 					}
 			}
 		}
-	}
-	if ( tmpList.size() > 0) {
-		for ( auto i : tmpList) {
-			pair<string,time_t> packageNameBuildDate;
-			packageNameBuildDate.first = i;
-			packageNameBuildDate.second = getBinaryBuildTime(i);
-			if (checkPackageNameBuildDateSame(packageNameBuildDate))
-				continue;
-			m_ListOfPackages.insert(packageNameBuildDate);
+		if ( tmpList.size() > 0) {
+			for ( auto i : tmpList) {
+				pair<string,time_t> packageNameBuildDate;
+				packageNameBuildDate.first = i;
+				packageNameBuildDate.second = getBinaryBuildTime(i);
+				if (checkPackageNameBuildDateSame(packageNameBuildDate))
+					continue;
+				m_ListOfPackages.insert(packageNameBuildDate);
+			}
 		}
-	} else {
-		m_actualError = CANNOT_FIND_DEPOT;
-		treatErrors("");
 	}
 	for (auto i : m_listOfInstPackages) {
 		if (!checkBinaryExist(i.first)) {
