@@ -390,9 +390,11 @@ echo "The rsync  : rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT/"
 echo ""
 
 [ "$DRY" == "yes" ] && exit 0
-echo ""
-echo " Upgrading ${PARAM[1]}: $version -> ${PARAM[2]}"
-echo ""
+if [ ! -z "${PARAM[2]}" ]; then
+	echo ""
+	echo " Upgrading ${PARAM[1]}: $version -> ${PARAM[2]}"
+	echo ""
+fi
 if [ "$CONFIRM" == "yes" ]; then
 	echo -n "  OK ? (y) : "
 	read a
