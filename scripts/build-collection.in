@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (c) 2016-2019 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2016-2020 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -174,7 +174,10 @@ while [ "$1" ]; do
 		-*|--*)
 			echo " Only -t|--test or -c|--confirm are valid arguments"
 			exit 1;;
-
+		/*)
+			echo "===> you plan to build in ${1} folder"
+			VERSION=$(basename $(dirname "${1}"))
+			COLLECTION=$(basename "${1}");;
 		*)
 			PARAM+=($1)
 	esac
@@ -189,13 +192,13 @@ trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
 umount_all() {
 for FOLDER in $MOUNT_POINTS
 do
-	sudo umount -v $FOLDER || exit 1
+	sudo umount -v /${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 done
 }
 remove_all() {
 for FOLDER in $MOUNT_POINTS
 do
-	sudo rm -d $FOLDER || exit 1
+	sudo rm -d /${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 done
 [ -z ${1} ] && exit 1
 sudo umount ${1}/{run,sys,proc,dev/pts,dev}
@@ -204,7 +207,7 @@ do
 	sudo rm -r $FOLDER || exit 1
 	echo "Folder $FOLDER deleted"
 done
-rm -d ${PARAM[0]} || exit 1
+rm -d /${VERSION}/${COLLECTION} || exit 1
 }
 error() {
 	umount_all
@@ -282,37 +285,45 @@ check_root
 
 parse_arguments "$@"
 
+[ -z "$VERSION" ] && VERSION="rolling"
+[ -z "$COLLECTION" ] && COLLECTION="$(find desktops/ gui-extra/ gui/ cli-extra/ cli/ base/ -name ${PARAM[0]} -exec dirname {} +)"
+
 if [ -z "${PARAM[0]}" ]; then
 	usage
 	echo "
->>>	Specify the collection
+>>>	Specify the collection or the package
+"
+	exit  1
+fi
+if [ -z "${COLLECTION}" ]; then
+	usage
+	echo "
+>>>	package ${PARAM[0]} not found in any collection
 "
 	exit  1
 fi
 
-if [ -d "${PARAM[0]}" ]; then
-	mount | grep "${PARAM[0]}"
+
+if [ -d "/${VERSION}/${COLLECTION}" ]; then
+	mount | grep /"${VERSION}/${COLLECTION}"
 	echo "
->>>	${PARAM[0]} exist ...
+>>>	/${VERSION}/${COLLECTION} exist ...
 "
 	exit 1
 fi
-VERSION=$(basename $(dirname "${PARAM[0]}"))
-COLLECTION=$(basename "${PARAM[0]}")
 
-
-if [ ! -z "${PARAM[2]}" ]; then
+if [ ! -z "${PARAM[1]}" ]; then
 	CONFIRM="yes"
-	if [ ! -f "$COLLECTION/${PARAM[1]}/Pkgfile" ]; then
-		echo " $COLLECTION/${PARAM[1]}/Pkgfile not exist"
+	if [ ! -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
+		echo " $COLLECTION/${PARAM[0]}/Pkgfile not exist"
 		exit 1
 	fi
-	. "$COLLECTION"/"${PARAM[1]}"/Pkgfile
+	. "$COLLECTION"/"${PARAM[0]}"/Pkgfile
 	if [ -z "$version" ]; then
 		echo ">>> version variable not net !"
 		exit 1
 	fi
-	if [ "$version" == "${PARAM[2]}" ]; then
+	if [ "$version" == "${PARAM[1]}" ]; then
 		echo ">>> version is the same !!!"
 		exit 1
 	fi
@@ -330,15 +341,15 @@ if ! [ -O "/$VERSION" ]; then
 	exit 1
 fi
 
-GIT_PROJ="$(grep ^$HOME /etc/fstab |grep ${PARAM[0]}/|cut -d " " -f1)"
+GIT_PROJ="$(grep ^$HOME /etc/fstab |grep ${VERSION}/${COLLECTION}/|cut -d " " -f1)"
 if [ -z "$GIT_PROJ" ]; then
-	echo ">>> Cannot rsync, ${PARAM[0]} not found in /etc/fstab"
-	error ${PARAM[0]}
+	echo ">>> Cannot rsync, /${VERSION}/${COLLECTION} not found in /etc/fstab"
+	error /${VERSION}/${COLLECTION}
 fi
 GIT=$(basename $GIT_PROJ)
 
 if ! [ "$DRY" == "yes" ]; then
-	mkdir -p "${PARAM[0]}"/etc || exit 1
+	mkdir -p "/${VERSION}/${COLLECTION}/etc" || exit 1
 fi
 
 setup_cards_conf
@@ -354,8 +365,8 @@ if [ "$COLLECTION" == "base" ] \
 	DEVEL="cards.devel \
 && cd /root/$GIT \
 && bash scripts/$COLLECTION"
-	if ! [ -z "${PARAM[1]}" ]; then
-		DEVEL="$DEVEL ${PARAM[1]}"
+	if ! [ -z "${PARAM[0]}" ]; then
+		DEVEL="$DEVEL ${PARAM[0]}"
 	else
 		DEVEL="$DEVEL -a"
 	fi
@@ -383,16 +394,16 @@ echo ""
 echo " COLLECTION: $COLLECTION"
 echo "GIT Project: $GIT_PROJ"
 echo "    VERSION: $VERSION"
-echo "The command: KERNEL="NONE" LFS="${PARAM[0]}" DEPOT="/DEPOT" install-nutyx"
+echo "The command: KERNEL="NONE" LFS="/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" install-nutyx"
 echo "      DEVEL: $DEVEL "
 echo ""
-echo "The rsync  : rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT/"
+echo "The rsync  : rsync -a --exclude .git $GIT_PROJ/ /${VERSION}/${COLLECTION}/root/$GIT/"
 echo ""
 
 [ "$DRY" == "yes" ] && exit 0
-if [ ! -z "${PARAM[2]}" ]; then
+if [ ! -z "${PARAM[1]}" ]; then
 	echo ""
-	echo " Upgrading ${PARAM[1]}: $version -> ${PARAM[2]}"
+	echo " Upgrading ${PARAM[0]}: $version -> ${PARAM[1]}"
 	echo ""
 fi
 if [ "$CONFIRM" == "yes" ]; then
@@ -400,53 +411,54 @@ if [ "$CONFIRM" == "yes" ]; then
 	read a
 	if [ "$a" != "y" ]; then
 		echo "Answer should be 'y'"
-		rm -rv ${PARAM[0]}
+		rm -rv "/${VERSION}/${COLLECTION}"
 		exit 1
 	fi
 fi
 
-if [ ! -z "${PARAM[2]}" ]; then
-	sed -i "s@version=$version@version=${PARAM[2]}@" \
-	"$COLLECTION"/"${PARAM[1]}"/Pkgfile
-	sed -i "/release=/d" "$COLLECTION"/"${PARAM[1]}"/Pkgfile
+if [ ! -z "${PARAM[1]}" ]; then
+	sed -i "s@version=$version@version=${PARAM[1]}@" \
+	"$COLLECTION"/"${PARAM[0]}"/Pkgfile
+	sed -i "/release=/d" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
 fi
 
-mkdir -p ${PARAM[0]}/DEPOT || error ${PARAM[0]}
+mkdir -p /${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
-	sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} ${PARAM[0]}/DEPOT || error ${PARAM[0]}
+	sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} /${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
 else
-	sudo mount ${PARAM[0]}/DEPOT || error ${PARAM[0]}
+	sudo mount /${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
 fi
-MOUNT_POINTS="${PARAM[0]}/DEPOT"
+MOUNT_POINTS="DEPOT"
 
-mkdir -p ${PARAM[0]}/LOGS
+mkdir -p /${VERSION}/${COLLECTION}/LOGS
 if [ -d ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} ];then
-	sudo mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} ${PARAM[0]}/LOGS || error ${PARAM[0]}
+	sudo mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} /${VERSION}/${COLLECTION}/LOGS || error /${VERSION}/${COLLECTION}
 else
-	sudo mount ${PARAM[0]}/LOGS || error ${PARAM[0]}
+	sudo mount /${VERSION}/${COLLECTION}/LOGS || error /${VERSION}/${COLLECTION}
 fi
-MOUNT_POINTS="$MOUNT_POINTS ${PARAM[0]}/LOGS"
+MOUNT_POINTS="$MOUNT_POINTS LOGS"
 
 
-mkdir -p ${PARAM[0]}/sources || error ${PARAM[0]}
+mkdir -p /${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
 if [ -d ${ROOTMOUNT}/sources ]; then
-	sudo mount --bind ${ROOTMOUNT}/sources ${PARAM[0]}/sources || error ${PARAM[0]}
+	sudo mount --bind ${ROOTMOUNT}/sources /${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
 else
-	sudo mount ${PARAM[0]}/sources || error ${PARAM[0]}
+	sudo mount /${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
 fi
-MOUNT_POINTS="$MOUNT_POINTS ${PARAM[0]}/sources"
+MOUNT_POINTS="$MOUNT_POINTS sources"
 
-mkdir -p ${PARAM[0]}/root/$GIT || error ${PARAM[0]}
-rsync -a --exclude .git $GIT_PROJ/ ${PARAM[0]}/root/$GIT/ || error "rsync"
+mkdir -p /${VERSION}/${COLLECTION}/root/$GIT || error /${VERSION}/${COLLECTION}
+rsync -a --exclude .git $GIT_PROJ/ /${VERSION}/${COLLECTION}/root/$GIT/ || error "rsync"
 
-sudo KERNEL="NONE" LFS="${PARAM[0]}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error ${PARAM[0]}
+echo 'running the command: sudo KERNEL="NONE" LFS="/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
+sudo KERNEL="NONE" LFS="/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
 
 umount_all
-remove_all "${PARAM[0]}"
+remove_all "/${VERSION}/${COLLECTION}"
 unset VERSION DEVEL
 
 # Don't try to commit if no specific package was build
-if [ -z "${PARAM[1]}" ]; then
+if [ -z "${PARAM[0]}" ]; then
 	exit 0
 fi
 echo -n "  Commit ? (y) : "
@@ -456,5 +468,5 @@ if [ "$a" != "y" ]; then
 fi
 cd "${GIT_PROJECT}"
 source /etc/profile.d/cards.sh
-commit "$COLLECTION/${PARAM[1]}"
+commit "$COLLECTION/${PARAM[0]}"
 exit 0
