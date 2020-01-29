@@ -285,7 +285,7 @@ check_root
 
 parse_arguments "$@"
 
-[ -z "$VERSION" ] && VERSION="rolling"
+[ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
 if [ -z "$COLLECTION" ]; then
 	COLLECTION="$(find desktops/ gui-extra/ gui/ cli-extra/ cli/ base/ -name ${PARAM[0]} -exec dirname {} +)"
 	if [ "${COLLECTION}" == "." ]; then
