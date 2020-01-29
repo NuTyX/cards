@@ -286,17 +286,23 @@ check_root
 parse_arguments "$@"
 
 [ -z "$VERSION" ] && VERSION="rolling"
-[ -z "$COLLECTION" ] && COLLECTION="$(find desktops/ gui-extra/ gui/ cli-extra/ cli/ base/ -name ${PARAM[0]} -exec dirname {} +)"
+if [ -z "$COLLECTION" ]; then
+	COLLECTION="$(find desktops/ gui-extra/ gui/ cli-extra/ cli/ base/ -name ${PARAM[0]} -exec dirname {} +)"
+	if [ "${COLLECTION}" == "." ]; then
+		COLLECTION=${PARAM[0]}
+		unset PARAM
+	fi
+fi
 
 if [ -z "${PARAM[0]}" ]; then
-	usage
-	echo "
->>>	Specify the collection or the package
+	if [ -z "${COLLECTION}" ]; then
+		echo "
+>>>	Specify the collection
 "
-	exit  1
+		exit  1
+	fi
 fi
 if [ -z "${COLLECTION}" ]; then
-	usage
 	echo "
 >>>	package ${PARAM[0]} not found in any collection
 "
