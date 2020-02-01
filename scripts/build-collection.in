@@ -283,6 +283,14 @@ base /DEPOT/base"
 check_root
 [ -z "$ROOTMOUNT" ] && ROOTMOUNT="/srv/www"
 
+if [ -z "${1}" ]; then
+	usage
+	echo "
+>>> At least one argument is mandatory
+"
+	exit 1
+fi
+
 parse_arguments "$@"
 
 [ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
