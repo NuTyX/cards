@@ -30,7 +30,7 @@ echo '**************************************************************************
  a. As an example, to compile the all cli-extra collection
     on the rolling version, the syntax will be:
 
-    build-collection /rolling/cli-extra
+    build-collection cli-extra
     As simple as that :)
 
  b. You need about 5 Gbytes of free space to store the availables binaries
@@ -55,8 +55,7 @@ echo '**************************************************************************
   The script will do following steps:
 
   - install a rolling or a <version> of NuTyX
-    (define by the first part of the first argument)
-    into a folder (define by the first argument as well)
+    (define by the git branch name).
   - install the devel packages
   - mount the depot needed for the specific collection
     (define by the first argument)
@@ -74,12 +73,24 @@ echo '**************************************************************************
 
  You can pass 1, 2 or 3 arguments:
 
- Parameter 1 (mandatory):
+ Depreciate Parameter 1 (mandatory):
+
   Its specify the version we are going to use (currently it can be 'rolling' or '\<version\>'
   and its specify the collection which is one of following possible collection:
-  base, cli, cli-extra, gui, gui-extra or your specific collection which can be named anything.
+   base, cli, cli-extra, gui, gui-extra or your specific collection which can be named anything.
 
- Parameter 2 (optionnal):
+ Prefered Parameter 1 (mandatory):
+
+  The version is automaticaly found from the git branch name, which means
+  you need to launch the build-collection from the root folder of the git project.
+  It is normaly named 'rolling'. Here then parameter 1 will specify the
+  all collection or the specific package to build, as build-collection
+  automaticaly find the collection name the package belong to, no need to
+  specify the collection name anymore.
+
+
+ Depreciate Parameter 2 (optionnal):
+
   This parameter works only with base, cli, cli-extra, gui, gui-extra,
   desktops and nos collections.
   This parameter specify the port you want to build only.
@@ -89,7 +100,9 @@ echo '**************************************************************************
 
   This example will build (or rebuild) the irssi binaries only
 
- Parameter 3 (optionnal):
+
+ Depreciate Parameter 3 (optionnal):
+
   This parameter works only with base, cli, cli-extra, gui, gui-extra,
   desktops and nos collections.
 
@@ -104,24 +117,39 @@ echo '**************************************************************************
   Only possible to use this parameter if only version of the package
   change.
 
+ Prefered Paramater 2 (optionnal:
+
+  This parameter works only together with the prefered paramater 1.
+  It will replace the version of the port ( and then the binaries )
+  with the value specify by this prefered parameter 2.
+  Example:
+
+   build-collection irssi 1.2.2
+
+  This example will upgrade the irssi binaries to version 1.2.2.
+  Only possible to use this parameter if only version of the package
+  change.
 
  3. CONFIGURATION OF THE HOST NuTyX
 
- Its absolutly necessary to configure properly your NuTyX host machine otherwise nothing will work like expected.
+ Its absolutly necessary to configure properly your NuTyX host machine
+ otherwise nothing will work like expected.
 
  Configuration file that is involve in the configuration process:
 
  - /etc/fstab
 
  As explained above, we mount various folders.
- As we used predefined /DEPOT, /sources and /LOGS (/srv/www) paths folders, they do not have to be specified in /etc/fstab:
+ As we used predefined /DEPOT, /sources and /LOGS (/srv/www) paths folders,
+ they do not have to be specified in /etc/fstab:
 
  Here an example for the cli-extra collection of the rolling version
  you should specify following lines, adapted to your needs:
 
 /home/thierry/git/packages-x86_64 /rolling/cli-extra/root/extra none bind
 
-In case you want to use your own path for /DEPOT, sources or /LOGS, they will need to be specified in /etc/fstab:
+ In case you want to use your own path for /DEPOT, sources or /LOGS,
+ they will need to be specified in /etc/fstab:
 
 Here an example:
 
