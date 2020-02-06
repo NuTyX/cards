@@ -188,6 +188,14 @@ check_root() {
 parse_arguments() {
 while [ "$1" ]; do
 	case $1 in
+		-C|--cleanup)
+			CLEANUP="yes"
+			shift
+			if [ -z ${1} ]; then
+				echo "You need to specify a collection"
+				exit 1
+			fi
+			PARAM+=($1);;
 		-c|--confirm)
 			CONFIRM="yes"
 			echo "====> you choose to confirm" ;;
@@ -200,7 +208,7 @@ while [ "$1" ]; do
 			usage
 			exit 0 ;;
 		-*|--*)
-			echo " Only -t|--test or -c|--confirm are valid arguments"
+			echo " Only -C|--cleanup, -t|--test or -c|--confirm are valid arguments"
 			exit 1;;
 		/*)
 			echo "===> you plan to build in ${1} folder"
@@ -220,22 +228,36 @@ trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
 umount_all() {
 for FOLDER in $MOUNT_POINTS
 do
-	sudo umount -v /${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+	[ -d /${VERSION}/${COLLECTION}/${FOLDER} ] || continue
+	! mountpoint /${VERSION}/${COLLECTION}/${FOLDER} > /dev/null || \
+	sudo umount /${VERSION}/${COLLECTION}/${FOLDER}
 done
 }
 remove_all() {
 for FOLDER in $MOUNT_POINTS
 do
-	sudo rm -d /${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+	[ -d /${VERSION}/${COLLECTION}/${FOLDER} ] || continue
+	sudo rm -d /${VERSION}/${COLLECTION}/${FOLDER}
 done
 [ -z ${1} ] && exit 1
-sudo umount ${1}/{run,sys,proc,dev/pts,dev}
+[ ! -d ${1} ] && exit 0
+for i in run sys proc dev/pts dev
+do
+	[ -d ${1}/${i} ] || continue
+	mountpoint ${1}/${i} > /dev/null || continue
+	sudo umount ${1}/${i}
+done
 for FOLDER in ${1}/*
 do
-	sudo rm -r $FOLDER || exit 1
-	echo "Folder $FOLDER deleted"
+	[ -d ${FOLDER} ] || continue
+	! mountpoint ${FOLDER} > /dev/null || continue
+	sudo rm -r $FOLDER
 done
+find /${VERSION}/${COLLECTION} -type f -delete
 rm -d /${VERSION}/${COLLECTION} || exit 1
+echo "
+>>>   ${1} cleanup successfully ...
+"
 }
 error() {
 	umount_all
@@ -361,6 +383,7 @@ if [ -z "${PARAM[0]}" ]; then
 		exit  1
 	fi
 fi
+
 if [ -z "${COLLECTION}" ]; then
 	echo "
 >>>	package ${PARAM[0]} not found in any collection
@@ -368,6 +391,12 @@ if [ -z "${COLLECTION}" ]; then
 	exit  1
 fi
 
+if [ "$CLEANUP" == "yes" ]; then
+	MOUNT_POINTS="DEPOT LOGS sources"
+	umount_all
+	remove_all "/${VERSION}/${COLLECTION}"
+	exit 0
+fi
 
 if [ -d "/${VERSION}/${COLLECTION}" ]; then
 	mount | grep /"${VERSION}/${COLLECTION}"
