@@ -196,6 +196,23 @@ while [ "$1" ]; do
 				exit 1
 			fi
 			PARAM+=($1);;
+		-R|--runtime)
+			RUNTIME="yes"
+			shift
+			if [ -z ${1} ]; then
+				echo "You need to specify a runtime dependancy package name"
+				exit 1
+			fi
+			PARAM+=($1)
+			find_collection
+			if [ -z "${COLLECTION}" ]; then
+				echo "
+>>>	package '${PARAM[0]}' not found in any collection
+		"
+				exit  1
+			fi
+			find_runtime ${1}
+			exit 0;;
 		-c|--confirm)
 			CONFIRM="yes"
 			echo "====> you choose to confirm" ;;
@@ -208,7 +225,7 @@ while [ "$1" ]; do
 			usage
 			exit 0 ;;
 		-*|--*)
-			echo " Only -C|--cleanup, -t|--test or -c|--confirm are valid arguments"
+			echo " Only -C|--cleanup, -R|--runtime, -t|--test or -c|--confirm are valid arguments"
 			exit 1;;
 		/*)
 			echo "===> you plan to build in ${1} folder"
@@ -259,6 +276,15 @@ echo "
 >>>   ${1} cleanup successfully ...
 "
 }
+answer() {
+read a
+if [ "$a" != "y" ] && [ "$a" != "Y" ] && [ "$a" != "yes" ]; then
+	echo "
+Answer should be 'y, Y or yes'
+"
+	error "/${VERSION}/${COLLECTION}"
+fi
+}
 error() {
 	umount_all
 	remove_all ${1}
@@ -276,6 +302,11 @@ find_collection () {
 		[ "${PARAM[0]}" == "$(basename $i)" ] && return
 	done
 	unset COLLECTION
+}
+find_runtime () {
+for i in $(find ${ROOTMOUNT}/$(uname -m)/${VERSION}/ -name "*$(uname -m).cards*"); do
+	pkginfo -a $i|grep "${1}1"|grep "pendances"|cut -d ":" -f1
+done
 }
 setup_pkgmk_conf() {
 PKGMK_CONF='
@@ -507,12 +538,7 @@ if [ ! -z "${PARAM[1]}" ]; then
 fi
 if [ "$CONFIRM" == "yes" ]; then
 	echo -n "  OK ? (y) : "
-	read a
-	if [ "$a" != "y" ]; then
-		echo "Answer should be 'y'"
-		rm -rv "/${VERSION}/${COLLECTION}"
-		exit 1
-	fi
+	answer
 fi
 
 if [ ! -z "${PARAM[1]}" ]; then
@@ -569,10 +595,8 @@ if [ -z "${PARAM[0]}" ]; then
 	exit 0
 fi
 echo -n "  Commit ? (y) : "
-read a
-if [ "$a" != "y" ]; then
-	exit 0
-fi
+answer
+
 cd "${GIT_PROJECT}"
 source /etc/profile.d/cards.sh
 commit "$COLLECTION/${PARAM[0]}"
