@@ -327,7 +327,7 @@ fi
 	fi
 	if ! ( $(which vim > /dev/null) ); then
 		echo "
-'vim' not available
+>>>     'vim' not available
 "
 		exit 1
 	fi
