@@ -18,27 +18,29 @@
 #
 usage () {
 echo '
-	-C|--cleanup <collection>
+USAGE
+      build-collection <collection>|<packageName> [version]
 
-		Clean the /<version>/<collection> folder in a safety way
-
-
-	-R|--runtime <dependency name>
-
-		Return the list of package depending on the <dependency name>.
+OPTIONS
+      -C, --cleanup <collection>
+              Clean the /<version>/<collection> folder in a safety way.
 
 
-	-c|--confirm
+      -R, --runtime <dependency name>
+              Return the list of package depending on the <dependency name>.
 
-		Ask for confirmation
+      -c, --confirm
+              Ask for confirmation.
 
+      -d, --dry
+              Dry mode.
 
-	-d|--dry
+      -n, --new <collection>/<name>
+              Create a new <collection>/<name>/Pkgfile.
 
-		Dry mode
+MORE INFO
+       build-collection(8)
 
-
-man build-collection for more info
 '|more
 }
 check_root() {
@@ -46,6 +48,54 @@ if [ "$UID" == "0" ]; then
 	echo "The 'root' account is not allow to building packages"
 	exit 1
 fi
+}
+generate_Pkgfile() {
+if [ ! -d ${COLLECTION} ]; then
+	echo  "
+>>>     The collection '${COLLECTION}' does not exist
+"
+	exit 1
+fi
+if [ "$(git config user.name)" == "" ];then
+	echo "
+>>>     your username is not set in your $HOME/.gitconfig
+"
+fi
+if [ "$(git config user.email)" == "" ];then
+	echo "
+>>>     your email is  not set in your $HOME/.gitconfig
+"
+	exit 1
+fi
+if [ -f ${COLLECTION}/${NAME}/Pkgfile ];then
+	echo "
+>>>     ABORT: File '${COLLECTION}/${NAME}/Pkgfile' already exist !!!
+"
+	exit 1
+fi
+mkdir -p "${COLLECTION}/${NAME}"
+echo "description=\"\"
+url=\"\"
+
+packager=\"$(git config user.name) <$(git config user.email)>\"
+contributors=\"\"
+
+makedepends=()
+run=()
+set=()
+
+name=${NAME}
+version=
+
+source=()
+
+build() {
+cd \$name-\$version
+make
+make DESTDIR=\$PKG install
+}" \
+> ${COLLECTION}/${NAME}/Pkgfile
+vim ${COLLECTION}/${NAME}/Pkgfile
 }
 parse_arguments() {
 while [ "$1" ]; do
@@ -58,6 +108,21 @@ case $1 in
 			exit 1
 		fi
 		PARAM+=($1);;
+	-n|--new)
+		shift
+		COLLECTION="$(echo ${1}|cut -d '/' -f1)"
+		PARAM="$(echo ${1}|cut -d '/' -f2)"
+		find_collection
+		if [ -z "${COLLECTION}" ]; then
+			COLLECTION="$(echo ${1}|cut -d '/' -f1)"
+			generate_Pkgfile
+			exit 0
+		else
+			echo "
+>>>     The package '${PARAM}' already exist in the '${COLLECTION}' collection !!!
+"
+			exit 1
+		fi;;
 	-R|--runtime)
 		RUNTIME="yes"
 		shift
@@ -87,7 +152,7 @@ case $1 in
 			usage
 			exit 0 ;;
 		-*|--*)
-			echo " Only -C|--cleanup, -R|--runtime, -t|--test or -c|--confirm are valid arguments"
+			usage
 			exit 1;;
 		/*)
 			echo "===> you plan to build in ${1} folder"
@@ -110,8 +175,8 @@ do
 	[ -d /${VERSION}/${COLLECTION}/${FOLDER} ] || continue
 	if mountpoint /${VERSION}/${COLLECTION}/${FOLDER} > /dev/null;then
 		sudo umount /${VERSION}/${COLLECTION}/${FOLDER} || exit 1
-		rm -d /${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 	fi
+	rm -d /${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 done
 }
 remove_all() {
@@ -249,14 +314,23 @@ if [ -z "${1}" ]; then
 	exit 1
 fi
 	if ! ( $(which rsync > /dev/null) ); then
-		echo "'rsync' not available"
+		echo "
+>>>     'rsync' not available
+"
 		exit 1
 	fi
 	if ! ( $(which git > /dev/null) ); then
-		echo "'git' not available"
+		echo "
+>>>     'git' not available
+"
 		exit 1
 	fi
-
+	if ! ( $(which vim > /dev/null) ); then
+		echo "
+'vim' not available
+"
+		exit 1
+	fi
 if [ ! -d .git ]; then
 	echo "
 >>>	No Git project found in '"$(pwd)"', The '.git' folder not exist.
