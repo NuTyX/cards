@@ -74,7 +74,7 @@ if [ -f ${COLLECTION}/${PARAM}/Pkgfile ];then
 	exit 1
 fi
 mkdir -p "${COLLECTION}/${PARAM}"
-echo "description=\"\"
+echo "description=\"${3}\"
 url=\"\"
 
 packager=\"$(git config user.name) <$(git config user.email)>\"
@@ -85,7 +85,7 @@ run=()
 set=()
 
 name=${PARAM}
-version=
+version=${2}
 
 source=()
 
@@ -115,7 +115,7 @@ case $1 in
 		find_collection
 		if [ -z "${COLLECTION}" ]; then
 			COLLECTION="$(echo ${1}|cut -d '/' -f1)"
-			generate_Pkgfile
+			generate_Pkgfile "$@"
 			exit 0
 		else
 			echo "
