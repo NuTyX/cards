@@ -825,6 +825,10 @@ add_meta_to_archive() {
 		if [ ! -z $run ] && [ "$NAME" == "$name" ]; then
 			info "Adding runtime deps to Archive $NAME"
 			for rd in ${run[@]}; do
+				if [ "$(echo $rd|cut -d "." -f1)" == "$name" ]; then
+					echo "R$rd${PKGMK_BUILDVER}" >> .META
+					continue
+				fi
 				if [ "$(pkginfo -b $rd)" == "0" ] || [ "$(pkginfo -b $rd)" == "" ]; then
 					error "Runtime dependency $rd not found, cannot continue"
 					clean
