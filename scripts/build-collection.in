@@ -19,15 +19,15 @@
 usage () {
 echo '
 USAGE
-      build-collection <collection>|<packageName> [version]
+      build-collection <collection>|<package> [version]
 
 OPTIONS
       -C, --cleanup <collection>
               Clean the /<version>/<collection> folder in a safety way.
 
 
-      -R, --runtime <dependency name>
-              Return the list of package depending on the <dependency name>.
+      -R, --runtime <dependency package>
+              Return the list of package depending on the <dependency package>.
 
       -c, --confirm
               Ask for confirmation.
@@ -35,8 +35,11 @@ OPTIONS
       -d, --dry
               Dry mode.
 
-      -n, --new <collection>/<name>
-              Create a new <collection>/<name>/Pkgfile.
+      -n, --new <collection>/<package> [version] [description]
+              Create a new <collection>/<package>/Pkgfile.
+
+      -i, --increment <package>
+             Increment the release number and build the package.
 
 MORE INFO
        build-collection(8)
@@ -108,6 +111,7 @@ case $1 in
 			exit 1
 		fi
 		PARAM+=($1);;
+
 	-n|--new)
 		shift
 		COLLECTION="$(echo ${1}|cut -d '/' -f1)"
@@ -123,6 +127,7 @@ case $1 in
 "
 			exit 1
 		fi;;
+
 	-R|--runtime)
 		RUNTIME="yes"
 		shift
@@ -137,28 +142,35 @@ case $1 in
 >>>	package '${PARAM[0]}' not found in any collection
 		"
 				exit  1
-			fi
-			find_runtime ${1}
-			exit 0;;
-		-c|--confirm)
-			CONFIRM="yes"
-			echo "====> you choose to confirm" ;;
+		fi
+		find_runtime ${1}
+		exit 0;;
 
-		-t|--test)
-			DRY="yes"
-			echo "====> you choose to test" ;;
+	-i|--increment)
+		INCREMENT="yes"
+		shift
+		PARAM+=($1);;
 
-		-h|--help)
-			usage
-			exit 0 ;;
-		-*|--*)
-			usage
-			exit 1;;
-		/*)
-			echo "===> you plan to build in ${1} folder"
-			VERSION=$(basename $(dirname "${1}"))
-			COLLECTION=$(basename "${1}");;
-		*)
+	-c|--confirm)
+		CONFIRM="yes"
+		echo "====> you choose to confirm" ;;
+
+	-t|--test)
+		DRY="yes"
+		echo "====> you choose to test" ;;
+
+	-h|--help)
+		usage
+		exit 0 ;;
+
+	-*|--*)
+		usage
+		exit 1;;
+	/*)
+		echo "===> you plan to build in ${1} folder"
+		VERSION=$(basename $(dirname "${1}"))
+		COLLECTION=$(basename "${1}");;
+	*)
 			PARAM+=($1)
 	esac
 
@@ -382,7 +394,7 @@ if [ ! -z "${PARAM[1]}" ]; then
 	fi
 	. "$COLLECTION"/"${PARAM[0]}"/Pkgfile
 	if [ -z "$version" ]; then
-		echo ">>> version variable not net !"
+		echo ">>> version variable not set !"
 		exit 1
 	fi
 	if [ "$version" == "${PARAM[1]}" ]; then
@@ -390,7 +402,16 @@ if [ ! -z "${PARAM[1]}" ]; then
 		exit 1
 	fi
 fi
+if [ "$INCREMENT" == "yes" ]; then
+	CONFIRM="yes"
+	if [ ! -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
+		echo " $COLLECTION/${PARAM[0]}/Pkgfile not exist"
+		exit 1
+	fi
+	. "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+	[ -z "$release" ] && release=1
 
+fi
 # check if VERSION folder exist
 if ! [ -d "/$VERSION" ]; then
 	echo ">>> /$VERSION folder not exist."
@@ -473,6 +494,10 @@ if [ ! -z "${PARAM[1]}" ]; then
 	echo " Upgrading ${PARAM[0]}: $version -> ${PARAM[1]}"
 	echo ""
 fi
+if [ "$INCREMENT" == "yes" ]; then
+	echo " Upgrading ${PARAM[0]}: $version-$release -> $version-$((release+1))"
+	echo ""
+fi
 if [ "$CONFIRM" == "yes" ]; then
 	echo -n "  OK ? (y) : "
 	answer
@@ -482,6 +507,10 @@ if [ ! -z "${PARAM[1]}" ]; then
 	sed -i "s@version=$version@version=${PARAM[1]}@" \
 	"$COLLECTION"/"${PARAM[0]}"/Pkgfile
 	sed -i "/release=/d" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+fi
+if [ "$INCREMENT" == "yes" ]; then
+	sed -i "/release=/d" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+	sed -i "/^version=/ a release=$((release+1))" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
 fi
 
 mkdir -p /${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
