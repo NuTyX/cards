@@ -1,108 +1,100 @@
-.TH build-collection 8 "" "cards #VERSION#" ""
+.\" man page for build-collection
+.\"
+.\" .PU
+.TH "build-collection #VERSION#" "8" "" "" ""
 .SH NAME
-build-collection \- build one package or one collection with one command.
+build-collection \- build a package or a collection of packages.
+
 .SH SYNOPSIS
+\fBbuild-collection [options] <arguments>\fP
+.SH DESCRIPTION
+\fBbuild-collection\fP is a \fItool\fP utility, which compile packages from sources.
+The tool start with installing in a specific folder a base NuTyX. By default it's the rolling version installed.
+Onces installed, the tool will enter into this base NuTyX (chroot) and install all the base devel packages.
+They are 3 mounting point (DEPOT,Sources and LOGS folder) included in the chroot.
+All the sources code files, logs files and Binaries packages are then immediatly available in the chroot.
+The script located in /tmp/setup is executed and launch the necessary compilation. 
+Once the compilation of the packages done, the tool goes out of the chroot, umount the 3 mounting points and
+delete the chroot.
 
-This script is able to compile any port from any official collections that
-are one of:
+.SH OPTIONS:
+.TP
+.B "\-I, \-\-init"
+Create the 3 mounting points \fBsources\fP, \fBLOGS\fP and \fBDEPOT\fP folders and the root folder defined by the version.
+By default, the folder is named \fB/rolling\fP at the root of the filesystem.
+.TP
+.B "\-s, \-\-sync <collection>|<package>"
+Synchronise the packages \fBDEPOT\fP folders with the one from the default remote server.
+If a <collection> is specified, it will sync this <collection> only.
+If a <package> is specified, it will sync this <package> only.
+.TP
+.B "\-C, \-\-cleanup"
+Cleanup the folders created by the tool. It umount properly the 3 mountpoint and then delete all the files in a safety way.
+.TP
+.B "\-R, \-\-runtime <dependency package name>"
+Return the list of packages depending on the <dependency package name>.
+.TP
+.B "\-c, \-\-confirm"
+Ask for a confirmation and printout all the configuration.
+.B "\-d, \-\-dry"
+Same as confirm, ask for a confirmation and printout all the configuration.
+.TP
+.B "\-n, \-\-new <collection/<package> [version] [description]"
+Create a new <collection>/<package> and fillup the username, email, [version] [description]
+.B "\-i, \-\-increment <package>"
+Increment the release number of the <package> recept and build the package after a confirmation.
 
- - base, cli ,cli-extra, gui, gui-extra, desktops, nos  or <yours>
-
-.SH IMPORTANTS NOTES:
-
- a. As an example, to compile the all cli-extra collection on the rolling version, the syntax will be:
-
-    build-collection cli-extra
-    As simple as that :)
-
- b. You need about 5 Gbytes of free space to store the availables binaries from the NuTyX mirror. (/srv/www/<arch>/<version>), Also be aware that /srv/www/sources will continuously grow.
-
- c. The installed NuTyX should ALWAYS be under /rolling or /<version>. Where <version> is a valid version.
-
- d. In case of <yours> collections, it needs two collections:
-    <yours> and <yours>-extra. A link will be needed to exist in your scripts folder of your git project.
-    Example where <yours> is cinnamon:
-
-    Collections names: cinnamon and cinnamon-extra
-    Links in the git projects, at the root of your git project:
-      ln -sv /usr/bin/ports scripts/cinnamon
-      ln -sv /usr/bin/ports scripts/cinnamon-extra
-.SH HOW DOES THIS WORK ?
-
-  The script will:
-
-  - install a rolling or a <version> of NuTyX.
-    (define by the git branch name).
-  - install the devel packages.
-  - mount the depot needed for the specific collection.
-  - rsync the ports needed for the specific collection.
-  - mount the sources and logs folders.
-  - enter (chroot) in the installed NuTyX.
-  - run the script found in /tmp folder which is buildup by collecting info from arguments.
-  - will compile what has to be compile with or without success but in both cases it will...
-  - exit the installed NuTyX.
-  - umount the depot, the ports, the sources and logs folders or abort on timeout. 
 .SH ARGUMENTS:
+.TP
+.B "<Parameter 1>"
+Specify the all <collection> or the specific <package> to build,
+as build-collection automaticaly find the collection name the package belong to,
+no need to specify the collection name anymore.
 
- You can pass 1, 2 or 3 arguments:
+.TP
+.B "<Paramater 2 (optionnal)>"
+This parameter works only together with the paramater 1.
+It will replace the version of the port ( and then the binaries ) with the value specify by parameter 2.
 
- Depreciate Parameter 1 (mandatory):
+Example:
 
-  Its specify the version we are going to use (currently it can be rolling or <version> and its specify the collection which is one of following possible collection:
+  build-collection irssi 1.2.2
 
-   base, cli, cli-extra, gui, gui-extra or your specific collection which can be named anything.
-
- Prefered Parameter 1 (mandatory):
-
-  The version is automaticaly found from the git branch name, which means you need to launch the build-collection from the root folder of the git project. It's normaly named rolling. Here then parameter 1 will specify the all collection or the specific package to build, as build-collection automaticaly find the collection name the package belong to, no need to specify the collection name anymore.
-
-
- Depreciate Parameter 2 (optionnal):
-
-  This parameter works only with base, cli, cli-extra, gui, gui-extra, desktops and nos collections. It specify the port you want to build only.
-  Example:
-
-   build-collection /rolling/cli-extra irssi
-
-  This example will build (or rebuild) the irssi binaries only
-
-
- Depreciate Parameter 3 (optionnal):
-
-  This parameter works only with base, cli, cli-extra, gui, gui-extra, desktops and nos collections.
-
-  This parameter works only together with paramater 2. It will replace the version of the port ( and then the binaries ) with the value specify by this parameter 3.
-  Example:
-
-   build-collection /rolling/cli-extra irssi 1.2.2
-
-  This example will upgrade the irssi binaries to version 1.2.2. Only possible to use this parameter if only version of the package change.
-
- Prefered Paramater 2 (optionnal):
-
-  This parameter works only together with the prefered paramater 1. It will replace the version of the port ( and then the binaries ) with the value specify by this prefered parameter 2.
-  Example:
-
-   build-collection irssi 1.2.2
-
-  This example will upgrade the irssi binaries to version 1.2.2. Only possible to use this parameter if only version of the package change.
+  This example will upgrade the irssi binaries to version 1.2.2.
+  Only possible to use this parameter if only version of the package change.
 
 .SH CONFIGURATION OF THE HOST NuTyX
 
+.TP
  The script needs the 'git' and the 'rsync' commands.
  They are not install by default on your NuTyX.
 
     sudo cards install rsync git
 
- Setup all the needed folders and get the official depot into the /srv/www location (adapt the folder to yours).
+.TP
+Setup all the needed folders and get the official depot into the \fB/srv/www\fP default location
+and download all the binaries from the mirror.
 
- We need to create all the necessary folders:
+ We need to create all the necessary folders via the option \fB-i\fP:
 
-    mkdir -p /srv/www/sources
-    mkdir -p /srv/www/logs/x86_64/rolling
+    build-collection -i
 
-  To get all the binaries locally and used them, we need to rsync them:
+ To get all the binaries locally and used them, we need to rsync them via the option \fB-s\fP:
 
-   rsync -av --delete  \
-     rsync://downloads.nutyx.org/nutyx/x86_64/rolling/ \
-     /srv/www/x86_64/rolling/
+    build-collection -s
+
+.SH IMPORTANTS NOTES:
+
+.TP
+You need about 5 Gbytes of free space to store the availables binaries from the NuTyX mirror. (/srv/www/<arch>/<version>), Also be aware that /srv/www/sources will continuously grow.
+.TP
+The installed NuTyX should ALWAYS be under /rolling or /<version>. Where <version> is a valid version.
+.TP
+In case of <yours> collections, it needs two collections:
+    <yours> and <yours>-extra.
+
+.SH "AUTHORS"
+Thierry Nuttens <tnut@nutyx.org>
+.SH "SEE ALSO"
+cards.conf(5), pkgmk(8), pkgadd(8), pkginfo(8), ports(8), pkgmk.conf(5)
+
