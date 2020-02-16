@@ -349,36 +349,72 @@ C="${COLLECTION}"
 [[ "${COLLECTION}" != "base" && "${COLLECTION}" != "cli" && "${COLLECTION}" != "gui" && \
 "${COLLECTION}" != "nos" && "${COLLECTION}" != "cli-extra" && "${COLLECTION}" != "gui-extra" && \
 "${COLLECTION}" != "desktops" ]] && C="${COLLECTION}-extra"
+
 if [ "${C}" == "${COLLECTION}-extra" ]; then
 	CARDS_CONF+="
 dir /DEPOT/${C}
 dir /DEPOT/${COLLECTION}"
 	C="gui"
+	[ -z "$BASE" ] && CARDS_CONF+="
+base /DEPOT/${C}
+base /DEPOT/${COLLECTION}"
 fi
-[ "${C}" == "gui-extra" ] && CARDS_CONF+="
+
+if [ "${C}" == "gui-extra" ]; then
+	CARDS_CONF+="
 dir /DEPOT/gui-extra"
+	[ -z "$BASE" ] && CARDS_CONF+="
+base /DEPOT/gui-extra"
+fi
 
-[ "${C}" == "nos" ] && CARDS_CONF+="
+if [ "${C}" == "nos" ]; then
+	CARDS_CONF+="
 dir /DEPOT/nos"
+	[ -z "$BASE" ] && CARDS_CONF+="
+base /DEPOT/nos"
+fi
 
-[ "${C}" == "desktops" ] && CARDS_CONF+="
+if [ "${C}" == "desktops" ]; then
+	CARDS_CONF+="
 dir /DEPOT/desktops"
+	[ -z "$BASE" ] && CARDS_CONF+="
+base /DEPOT/desktops"
+fi
 
-[[ "${C}" == "gui" || "${C}" == "gui-extra" || "${C}" == "nos" || "${C}" == "desktops" ]] \
-&& CARDS_CONF+="
+if [[ "${C}" == "gui" || "${C}" == "gui-extra" || \
+"${C}" == "nos" || "${C}" == "desktops" ]]; then
+	CARDS_CONF+="
 dir /DEPOT/gui"
+	[ -z "$BASE" ] && CARDS_CONF+="
+base /DEPOT/gui"
+fi
 
-[ "${C}" == "cli-extra" ] && CARDS_CONF+="
+if [ "${C}" == "cli-extra" ]; then
+	CARDS_CONF+="
 dir /DEPOT/cli-extra"
+	[ -z "$BASE" ] && CARDS_CONF+="
+base /DEPOT/cli-extra"
+fi
 
-[[ "${C}" == "cli" || "${C}" == "cli-extra" || "${C}" == "gui" || \
-"${C}" == "gui-extra" || "${C}" == "nos" || "${C}" == "desktops" ]] && CARDS_CONF+="
+if [[ "${C}" == "cli" || "${C}" == "cli-extra" || "${C}" == "gui" || \
+"${C}" == "gui-extra" || "${C}" == "nos" || "${C}" == "desktops" ]]; then
+	CARDS_CONF+="
 dir /DEPOT/cli"
+	[ -z "$BASE" ] && CARDS_CONF+="
+base /DEPOT/cli"
+fi
 
 CARDS_CONF+="
 dir /DEPOT/base
-logdir /LOGS
+logdir /LOGS"
+[ -z "$BASE" ] && CARDS_CONF+="
 base /DEPOT/base"
+if [ ! -z "$BASE" ]; then
+	for i in ${BASE[@]}; do
+		CARDS_CONF+="
+base /DEPOT/$i"
+	done
+fi
 }
 #
 #
@@ -391,8 +427,10 @@ base /DEPOT/base"
 # and configured as default
 #
 check_root
+[ -f $HOME/.build-collection ] && source $HOME/.build-collection
 [ -z "$ROOTMOUNT" ] && ROOTMOUNT="/srv/www"
 [ -z "$URL" ] && URL="rsync://download.nutyx.org/nutyx"
+
 if [ -z "${1}" ]; then
 	echo "
 >>> At least one argument is mandatory
@@ -544,7 +582,15 @@ setup_pkgmk_conf
 [ "$DRY" == "yes" ] || echo "$PKGMK_CONF" >/$VERSION/$COLLECTION/etc/pkgmk.conf
 
 export DEVEL VERSION
-
+echo ""
+if [ -f $HOME/.build-collection ];then
+	echo " $HOME/.build-collection:
+ ================================="
+	echo ""
+	cat $HOME/.build-collection
+else
+	echo ">>>       $HOME/.build-collection not found"
+fi
 echo ""
 echo " pkgmk.conf:
  ==========="
