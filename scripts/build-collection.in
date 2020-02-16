@@ -115,6 +115,7 @@ if [ -z "$VERSION" ]; then
 	exit 1
 fi
 sudo mkdir -p /$VERSION
+sudo chown -R $(whoami):$(whoami) /$VERSION
 sudo mkdir -p /$ROOTMOUNT/{logs,sources,$(uname -m)/$VERSION}
 sudo chown -R $(whoami):$(whoami) /$ROOTMOUNT
 exit 0
@@ -134,7 +135,7 @@ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
 "
 	echo -n "  OK ? (y) : "
 	answer
-
+	mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
 	sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
 	rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
@@ -148,7 +149,7 @@ rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/ $ROOTMOUNT/$(uname -m)
 "
 	echo -n "  OK ? (y) : "
 	answer
-
+	mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 	sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 	rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 	exit 0
@@ -215,9 +216,7 @@ case $1 in
 		PARAM+=($1);;
 
 	-I|--init)
-		INIT="yes"
-		create_folders
-		exit 0;;
+		INIT="yes";;
 
 	-c|--confirm)
 		CONFIRM="yes"
@@ -466,6 +465,9 @@ parse_arguments "$@"
 [ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
 [ -z "$COLLECTION" ] && find_collection
 
+if [ "$INIT" == "yes" ]; then
+	create_folders
+fi
 if [ "$SYNC" == "yes" ]; then
 	rsync_binaries
 fi
