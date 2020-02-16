@@ -41,6 +41,12 @@ OPTIONS
       -i, --increment <package>
              Increment the release number and build the package.
 
+      -I, --init
+             Create all the necessary folder (sources, LOGS and depot).
+
+      -s, --sync [package|collection]
+             Synchronize all the binaries of the [package|collection].
+
 MORE INFO
        build-collection(8)
 
@@ -63,6 +69,7 @@ if [ "$(git config user.name)" == "" ];then
 	echo "
 >>>     your username is not set in your $HOME/.gitconfig
 "
+	exit 1
 fi
 if [ "$(git config user.email)" == "" ];then
 	echo "
@@ -99,6 +106,62 @@ make DESTDIR=\$PKG install
 }" \
 > ${COLLECTION}/${PARAM}/Pkgfile
 vim ${COLLECTION}/${PARAM}/Pkgfile
+}
+create_folders () {
+if [ -z "$VERSION" ]; then
+	echo "
+>>>     VERSION is not SET
+"
+	exit 1
+fi
+sudo mkdir -p /$VERSION
+sudo mkdir -p /$ROOTMOUNT/{logs,sources,$(uname -m)/$VERSION}
+sudo chown -R $(whoami):$(whoami) /$ROOTMOUNT
+exit 0
+}
+rsync_binaries () {
+if [ -z "$VERSION" ]; then
+	echo "
+>>>     VERSION is not SET
+"
+	exit 1
+fi
+if [ ! -z ${PARAM[0]} ]; then
+	echo "
+sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
+rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/  \\
+$ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
+"
+	echo -n "  OK ? (y) : "
+	answer
+
+	sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
+	rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/ \
+$ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
+	exit 0
+fi
+
+if [ ! -z $COLLECTION ]; then
+	echo "
+sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+"
+	echo -n "  OK ? (y) : "
+	answer
+
+	sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+	rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+	exit 0
+fi
+
+echo "
+rsync -av --delete $URL/$(uname -m)/$VERSION/ $ROOTMOUNT/$(uname -m)/$VERSION/
+"
+echo -n "  OK ? (y) : "
+answer
+
+rsync -av --delete $URL/$(uname -m)/$VERSION/ $ROOTMOUNT/$(uname -m)/$VERSION/
+exit 0
 }
 parse_arguments() {
 while [ "$1" ]; do
@@ -151,9 +214,20 @@ case $1 in
 		shift
 		PARAM+=($1);;
 
+	-I|--init)
+		INIT="yes"
+		create_folders
+		exit 0;;
+
 	-c|--confirm)
 		CONFIRM="yes"
 		echo "====> you choose to confirm" ;;
+	-s|--sync)
+		SYNC="yes"
+		if [ ! -z $2 ]; then
+			shift
+			PARAM+=($1)
+		fi;;
 
 	-t|--test)
 		DRY="yes"
@@ -318,7 +392,7 @@ base /DEPOT/base"
 #
 check_root
 [ -z "$ROOTMOUNT" ] && ROOTMOUNT="/srv/www"
-
+[ -z "$URL" ] && URL="rsync://download.nutyx.org/nutyx"
 if [ -z "${1}" ]; then
 	echo "
 >>> At least one argument is mandatory
@@ -354,6 +428,9 @@ parse_arguments "$@"
 [ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
 [ -z "$COLLECTION" ] && find_collection
 
+if [ "$SYNC" == "yes" ]; then
+	rsync_binaries
+fi
 
 if [ -z "${PARAM[0]}" ]; then
 	if [ -z "${COLLECTION}" ]; then
