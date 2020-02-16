@@ -116,7 +116,7 @@ if [ -z "$VERSION" ]; then
 fi
 sudo mkdir -p /$VERSION
 sudo chown -R $(whoami):$(whoami) /$VERSION
-sudo mkdir -p /$ROOTMOUNT/{logs,sources,$(uname -m)/$VERSION}
+sudo mkdir -p /$ROOTMOUNT/{logs/$(uname -m)/$VERSION,sources,$(uname -m)/$VERSION}
 sudo chown -R $(whoami):$(whoami) /$ROOTMOUNT
 exit 0
 }
