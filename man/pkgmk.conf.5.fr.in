@@ -117,6 +117,6 @@ Défaut: '(fr)'
 pkgmk(8)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2010 CRUX team (http://crux.nu).
-pkgmk (cards)  2013-2016 Thierry Nuttens NuTyX team (http://www.nutyx.org).
+pkgmk (cards)  2013-2020 Thierry Nuttens NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

@@ -1,9 +1,9 @@
 #
 #  cards
 #
-#  Copyright (c) 2000-2005 by Per Liden <per@fukt.bth.se>
-#  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2000 - 2005 by Per Liden <per@fukt.bth.se>
+#  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
+#  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 include ../Makefile.inc
 
-all: pkgmk pkgmk2 ports build-port build-collection cards
+all: pkgmk pkgmk2 ports build-port mybld cards
 
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
@@ -33,7 +33,7 @@ all: pkgmk pkgmk2 ports build-port build-collection cards
 
 install: all
 	install -D -m0755 build-port $(USRBINDIR)/build-port
-	install -D -m0755 build-collection $(BINDIR)/build-collection
+	install -D -m0755 mybld $(BINDIR)/mybld
 	install -D -m0755 pkgmk $(USRBINDIR)/pkgmk
 	install -D -m0644 pkgmk.conf $(ETCDIR)/pkgmk.conf.example
 	install -D -m0644 cards $(ETCDIR)/profile.d/cards.sh
@@ -45,7 +45,7 @@ clean:
 	rm -f pkgmk
 	rm -f ports
 	rm -f build-port
-	rm -f build-collection
+	rm -f mybld
 	rm -f cards
 
 distclean: clean

@@ -137,6 +137,6 @@ Une erreur s'est produite pendant la recherche des dépendances runtime via la c
 pkgmk.conf(5), pkgadd(8), pkgrm(8), pkginfo(8), rejmerge(8), wget(1)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2010 CRUX team (http://crux.nu).
-pkgmk (cards) is Copyright (c)  2013-2016 NuTyX and Copyright (c)  2013-2015 NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is Copyright (c)  2013-2020 NuTyX and Copyright (c)  2013-2020 NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

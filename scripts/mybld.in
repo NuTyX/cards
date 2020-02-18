@@ -19,21 +19,18 @@
 usage () {
 echo '
 USAGE
-      build-collection <collection>|<package> [version]
+      mybld <collection>|<package> [version]
 
 OPTIONS
-      -C, --cleanup <collection>
+      -c, --cleanup <collection>
               Clean the /<version>/<collection> folder in a safety way.
 
 
       -R, --runtime <dependency package>
               Return the list of package depending on the <dependency package>.
 
-      -c, --confirm
+      -A, --ask
               Ask for confirmation.
-
-      -d, --dry
-              Dry mode.
 
       -n, --new <collection>/<package> [version] [description]
               Create a new <collection>/<package>/Pkgfile.
@@ -48,7 +45,7 @@ OPTIONS
              Synchronize all the binaries of the [package|collection].
 
 MORE INFO
-       build-collection(8)
+       mybld(8)
 
 '|more
 }
@@ -114,8 +111,8 @@ if [ -z "$VERSION" ]; then
 "
 	exit 1
 fi
-sudo mkdir -p /$VERSION
-sudo chown -R $(whoami):$(whoami) /$VERSION
+sudo mkdir -p $ROOT/$VERSION
+sudo chown -R $(whoami):$(whoami) $ROOT/$VERSION
 sudo mkdir -p /$ROOTMOUNT/{logs/$(uname -m)/$VERSION,sources,$(uname -m)/$VERSION}
 sudo chown -R $(whoami):$(whoami) /$ROOTMOUNT
 exit 0
@@ -167,7 +164,7 @@ exit 0
 parse_arguments() {
 while [ "$1" ]; do
 case $1 in
-	-C|--cleanup)
+	-c|--cleanup)
 		CLEANUP="yes"
 		shift
 		if [ -z ${1} ]; then
@@ -218,9 +215,6 @@ case $1 in
 	-I|--init)
 		INIT="yes";;
 
-	-c|--confirm)
-		CONFIRM="yes"
-		echo "====> you choose to confirm" ;;
 	-s|--sync)
 		SYNC="yes"
 		if [ ! -z $2 ]; then
@@ -228,9 +222,9 @@ case $1 in
 			PARAM+=($1)
 		fi;;
 
-	-t|--test)
-		DRY="yes"
-		echo "====> you choose to test" ;;
+	-A|--ask)
+		CONFIRM="yes"
+		echo "====> you ask confirmation" ;;
 
 	-h|--help)
 		usage
@@ -239,10 +233,6 @@ case $1 in
 	-*|--*)
 		usage
 		exit 1;;
-	/*)
-		echo "===> you plan to build in ${1} folder"
-		VERSION=$(basename $(dirname "${1}"))
-		COLLECTION=$(basename "${1}");;
 	*)
 			PARAM+=($1)
 	esac
@@ -257,36 +247,36 @@ trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
 umount_all() {
 for FOLDER in $MOUNT_POINTS
 do
-	[ -d /${VERSION}/${COLLECTION}/${FOLDER} ] || continue
-	if mountpoint /${VERSION}/${COLLECTION}/${FOLDER} > /dev/null;then
-		sudo umount /${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+	[ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ] || continue
+	if mountpoint $ROOT/${VERSION}/${COLLECTION}/${FOLDER} > /dev/null;then
+		sudo umount $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 	fi
-	rm -d /${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+	rm -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 done
 }
 remove_all() {
 for FOLDER in $MOUNT_POINTS
 do
-	[ -d /${VERSION}/${COLLECTION}/${FOLDER} ] && exit 1
+	[ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ] && exit 1
 done
-[ -z ${1} ] && exit 1
-[ ! -d ${1} ] && exit 0
+[ -z $ROOT/${1} ] && exit 1
+[ ! -d $ROOT/${1} ] && exit 0
 for i in run sys proc dev/pts dev
 do
-	[ -d ${1}/${i} ] || continue
-	mountpoint ${1}/${i} > /dev/null || continue
-	sudo umount ${1}/${i} || exit 1
+	[ -d $ROOT/${1}/${i} ] || continue
+	mountpoint $ROOT/${1}/${i} > /dev/null || continue
+	sudo umount $ROOT/${1}/${i} || exit 1
 done
-for FOLDER in ${1}/*
+for FOLDER in $ROOT/${1}/*
 do
 	[ -d ${FOLDER} ] || continue
 	! mountpoint ${FOLDER} > /dev/null || continue
 	sudo rm -r $FOLDER || exit 1
 done
-find /${VERSION}/${COLLECTION} -maxdepth 1 -type f -delete
-rm -d /${VERSION}/${COLLECTION} || exit 1
+find $ROOT/${VERSION}/${COLLECTION} -maxdepth 1 -type f -delete
+rm -d $ROOT/${VERSION}/${COLLECTION} || exit 1
 echo "
->>>   ${1} cleanup successfully ...
+>>>   $ROOT/${1} cleanup successfully ...
 "
 }
 answer() {
@@ -295,7 +285,7 @@ if [ "$a" != "y" ] && [ "$a" != "Y" ] && [ "$a" != "yes" ]; then
 	echo "
 Answer should be 'y, Y or yes'
 "
-	error "/${VERSION}/${COLLECTION}"
+	error "$ROOT/${VERSION}/${COLLECTION}"
 fi
 }
 error() {
@@ -318,7 +308,7 @@ find_collection () {
 }
 find_runtime () {
 for i in $(find ${ROOTMOUNT}/$(uname -m)/${VERSION}/ -name "*$(uname -m).cards*"); do
-	pkginfo -a $i|grep "${1}1"|grep "pendances"|cut -d ":" -f1
+	LANG=C pkginfo -a $i|grep "${1}1"|grep "Dependencies"|cut -d ":" -f1
 done
 }
 setup_pkgmk_conf() {
@@ -420,15 +410,13 @@ fi
 ########################################################################
 # BEGIN HERE
 ########################################################################
-#
-# ROOTMOUNT is set to '/srv/www' by default
-# It make it easy to access files if http server is installed
-# and configured as default
-#
+
 check_root
-[ -f $HOME/.build-collection ] && source $HOME/.build-collection
-[ -z "$ROOTMOUNT" ] && ROOTMOUNT="/srv/www"
+[ -f $HOME/.mybld ] && source $HOME/.mybld
+[ -z "$ROOTMOUNT" ] && ROOTMOUNT="$HOME/www"
+[ -z "$ROOT" ] && ROOT="$HOME/mybld"
 [ -z "$URL" ] && URL="rsync://download.nutyx.org/nutyx"
+[ -z "$EDITOR" ] && EDITOR="vi"
 
 if [ -z "${1}" ]; then
 	echo "
@@ -448,9 +436,9 @@ fi
 "
 		exit 1
 	fi
-	if ! ( $(which vim > /dev/null) ); then
+	if ! ( $(which $EDITOR > /dev/null) ); then
 		echo "
->>>     'vim' not available
+>>>     '$EDITOR' not available
 "
 		exit 1
 	fi
@@ -495,10 +483,10 @@ if [ "$CLEANUP" == "yes" ]; then
 	exit 0
 fi
 
-if [ -d "/${VERSION}/${COLLECTION}" ]; then
+if [ -d "$ROOT/${VERSION}/${COLLECTION}" ]; then
 	mount | grep /"${VERSION}/${COLLECTION}"
 	echo "
->>>	/${VERSION}/${COLLECTION} exist ...
+>>>	$ROOT/${VERSION}/${COLLECTION} exist ...
 "
 	exit 1
 fi
@@ -530,14 +518,14 @@ if [ "$INCREMENT" == "yes" ]; then
 
 fi
 # check if VERSION folder exist
-if ! [ -d "/$VERSION" ]; then
-	echo ">>> /$VERSION folder not exist."
+if ! [ -d "$ROOT/$VERSION" ]; then
+	echo ">>>   $ROOT/$VERSION folder not exist."
 	exit 1
 fi
 
 # check if VERSION is own by me
-if ! [ -O "/$VERSION" ]; then
-	echo ">>> /$VERSION is not own by $(whoami)"
+if ! [ -O "$ROOT/$VERSION" ]; then
+	echo ">>> $ROOT/$VERSION is not own by $(whoami)"
 	exit 1
 fi
 
@@ -550,12 +538,10 @@ fi
 
 GIT=$(basename $GIT_PROJ)
 
-if ! [ "$DRY" == "yes" ]; then
-	mkdir -p "/${VERSION}/${COLLECTION}/etc" || exit 1
-fi
+mkdir -p "$ROOT/${VERSION}/${COLLECTION}/etc" || exit 1
 
 setup_cards_conf
-[ "$DRY" == "yes" ] || echo "$CARDS_CONF" > /$VERSION/$COLLECTION/etc/cards.conf
+echo "$CARDS_CONF" > $ROOT/$VERSION/$COLLECTION/etc/cards.conf
 
 if [ "$COLLECTION" == "base" ] \
 || [ "$COLLECTION" == "cli"  ] \
@@ -581,17 +567,17 @@ else
 fi
 
 setup_pkgmk_conf
-[ "$DRY" == "yes" ] || echo "$PKGMK_CONF" >/$VERSION/$COLLECTION/etc/pkgmk.conf
+echo "$PKGMK_CONF" > $ROOT/$VERSION/$COLLECTION/etc/pkgmk.conf
 
 export DEVEL VERSION
 echo ""
-if [ -f $HOME/.build-collection ];then
-	echo " $HOME/.build-collection:
+if [ -f $HOME/.mybld ];then
+	echo " $HOME/.mybld:
  ================================="
 	echo ""
-	cat $HOME/.build-collection
+	cat $HOME/.mybld
 else
-	echo ">>>       $HOME/.build-collection not found"
+	echo ">>>       $HOME/.mybld not found"
 fi
 echo ""
 echo " pkgmk.conf:
@@ -605,15 +591,14 @@ echo ""
 echo " COLLECTION: $COLLECTION"
 echo "GIT Project: $GIT_PROJ"
 echo "    VERSION: $VERSION"
-echo "The command: KERNEL="NONE" LFS="/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" install-nutyx"
+echo "The command: KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" install-nutyx"
 echo "      DEVEL: $DEVEL "
 echo ""
-echo "The rsync  : rsync -a $GIT_PROJ/${COLLECTION}/ /${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/"
+echo "The rsync  : rsync -a $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/"
 [ "$EXTRA" == "yes" ] && \
-echo "             rsync -a $GIT_PROJ/${COLLECTION}-extra/ /${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}-extra/"
+echo "             rsync -a $GIT_PROJ/${COLLECTION}-extra/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}-extra/"
 echo ""
 
-[ "$DRY" == "yes" ] && exit 0
 if [ ! -z "${PARAM[1]}" ]; then
 	echo ""
 	echo " Upgrading ${PARAM[0]}: $version -> ${PARAM[1]}"
@@ -638,44 +623,44 @@ if [ "$INCREMENT" == "yes" ]; then
 	sed -i "/^version=/ a release=$((release+1))" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
 fi
 
-mkdir -p /${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
-	sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} /${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
+	sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
 else
-	sudo mount /${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
+	error /${VERSION}/${COLLECTION}
 fi
 MOUNT_POINTS="DEPOT"
 
-mkdir -p /${VERSION}/${COLLECTION}/LOGS
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/LOGS
 if [ -d ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} ];then
-	sudo mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} /${VERSION}/${COLLECTION}/LOGS || error /${VERSION}/${COLLECTION}
+	sudo mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/LOGS || error /${VERSION}/${COLLECTION}
 else
-	sudo mount /${VERSION}/${COLLECTION}/LOGS || error /${VERSION}/${COLLECTION}
+	error /${VERSION}/${COLLECTION}
 fi
 MOUNT_POINTS="$MOUNT_POINTS LOGS"
 
 
-mkdir -p /${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
 if [ -d ${ROOTMOUNT}/sources ]; then
-	sudo mount --bind ${ROOTMOUNT}/sources /${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
+	sudo mount --bind ${ROOTMOUNT}/sources $ROOT/${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
 else
-	sudo mount /${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
+	error /${VERSION}/${COLLECTION}
 fi
 MOUNT_POINTS="$MOUNT_POINTS sources"
 
-mkdir -p /${VERSION}/${COLLECTION}/root/$GIT || error /${VERSION}/${COLLECTION}
-rsync -a $GIT_PROJ/${COLLECTION}/ /${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/ || error "rsync"
-mkdir /${VERSION}/${COLLECTION}/root/$GIT/scripts
-ln -sv /usr/bin/build-port /${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT || error /${VERSION}/${COLLECTION}
+rsync -a $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/ || error "rsync"
+mkdir $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts
+ln -sv /usr/bin/build-port $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
 if [ "$EXTRA" == "yes" ]; then
 	rsync -a $GIT_PROJ/${COLLECTION}-extra/ \
-		/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}-extra/ || error "rsync"
+		$ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}-extra/ || error "rsync"
 	ln -sv /usr/bin/build-port \
-		/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}-extra
+		$ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}-extra
 fi
 
-echo 'running the command: sudo KERNEL="NONE" LFS="/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
-sudo KERNEL="NONE" LFS="/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
+echo 'running the command: sudo KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
+sudo KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
 
 umount_all
 remove_all "/${VERSION}/${COLLECTION}"

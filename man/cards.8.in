@@ -328,4 +328,4 @@ show info about kdelibs port.
 .SH "AUTHORS"
 Thierry Nuttens <tnut@nutyx.org>
 .SH "SEE ALSO"
-cards.conf(5), pkgmk(8), pkgadd(8), pkginfo(8), ports(8), pkgmk.conf(5), build-collection(8)
+cards.conf(5), pkgmk(8), pkgadd(8), pkginfo(8), ports(8), pkgmk.conf(5), mybld(8)

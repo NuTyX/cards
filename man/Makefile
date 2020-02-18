@@ -1,9 +1,9 @@
 #
 #  cards
 #
-#  Copyright (c) 2000-2005 by Per Liden <per@fukt.bth.se>
-#  Copyright (c) 2006-2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013-2014 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2000 - 2005 by Per Liden <per@fukt.bth.se>
+#  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
+#  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 include ../Makefile.inc
 
-MANPAGES = build-collection.8 cards.8 ports.8 pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr cards.conf.5 pkgmk.conf.5 pkgmk.conf.5.fr
+MANPAGES = mybld.8 cards.8 ports.8 pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr cards.conf.5 pkgmk.conf.5 pkgmk.conf.5.fr
 
 all: man mantxt
 
@@ -46,7 +46,7 @@ mantxt: man $(MANPAGES:=.txt)
 
 install: all
 	install -D -m0644 cards.8 $(MANDIR)/man8/cards.8
-	install -D -m0644 build-collection.8 $(MANDIR)/man8/build-collection.8
+	install -D -m0644 mybld.8 $(MANDIR)/man8/mybld.8
 	install -D -m0644 cards.conf.5 $(MANDIR)/man5/cards.conf.5
 	install -D -m0644 ports.8 $(MANDIR)/man8/ports.8
 	install -D -m0644 pkgadd.8 $(MANDIR)/man8/pkgadd.8

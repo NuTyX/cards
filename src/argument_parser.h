@@ -1,7 +1,7 @@
 // argument_parser.h
 //
 //  Copyright (c) 2004 Johannes Winkelmann (jw at tks6 dot net)
-//  Copyright (c) 2014-2017 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014 - 2020 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by

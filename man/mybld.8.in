@@ -1,0 +1,132 @@
+.\" man page for mybld
+.\"
+.\" .PU
+.TH "mybld #VERSION#" "8" "" "" ""
+.SH NAME
+mybld \- build my package or my collection of packages.
+
+.SH SYNOPSIS
+\fBmybld [options] <arguments>\fP
+.SH DESCRIPTION
+\fBmybld\fP is a \fItool\fP utility, which compile \fImy\fP packages from sources.
+The tool start with installing in a specific folder a base NuTyX. By default it's the rolling version installed.
+Onces installed, the tool will enter into this base NuTyX (chroot) and install all the base devel packages.
+They are 3 mounting point (DEPOT,LOGS and sources folder) included in the chroot.
+All the sources code files, logs files and Binaries packages are then immediatly available in the chroot.
+The script located in /tmp/setup is executed and launch the necessary compilation. 
+Once the compilation of my package(s) done, the tool goes out of the chroot, umount the 3 mounting points and
+delete the chroot.
+
+.SH OPTIONS:
+.TP
+.B "\-I, \-\-init"
+Create the 3 mounting points \fBsources\fP, \fBLOGS\fP and \fBDEPOT\fP folders and the root folder defined by the version.
+By default, the folder is named \fB/rolling\fP in your $HOME.
+.TP
+.B "\-s, \-\-sync <collection>|<package>"
+Synchronise the packages \fBDEPOT\fP folders with the one from the default remote server.
+If a <collection> is specified, it will sync this <collection> only.
+If a <package> is specified, it will sync this <package> only.
+.TP
+.B "\-c, \-\-cleanup"
+Cleanup the folders created by the tool. It umount properly the 3 mountpoint and then delete all the files in a safety way.
+.TP
+.B "\-R, \-\-runtime <dependency package name>"
+Return the list of packages depending on the <dependency package name>.
+.TP
+.B "\-A, \-\-ask"
+Ask for a confirmation before proceed.
+.TP
+.B "\-n, \-\-new <collection/<package> [version] [description]"
+Create a new <collection>/<package> and fillup the username, email, [version] [description]
+.B "\-i, \-\-increment <package>"
+Increment the release number of the <package> recept and build the package after a confirmation.
+
+.SH ARGUMENTS:
+.TP
+.B "<Parameter 1>"
+Specify the all <collection> or the specific <package> to build,
+as mybld automaticaly find the collection name the package belong to,
+no need to specify the collection name anymore.
+
+.TP
+.B "<Paramater 2 (optionnal)>"
+This parameter works only together with the paramater 1.
+It will replace the version of the port ( and then the binaries ) with the value specify by parameter 2.
+
+Example:
+
+  mybld irssi 1.2.2
+
+  This example will upgrade the irssi binaries to version 1.2.2.
+  Only possible to use this parameter if only version of the package change.
+
+.SH CONFIGURATION VARIABLES
+.LP
+Some configuration variable can be redefined in your $HOME/.mybld
+.TP
+\fBEDITOR=vi\fP
+Set the editor you want to use.
+.br
+Default: vi
+.TP
+\fBROOT=$HOME/mybld\fP
+Set the ROOT directory of my chroot where package(s) are build.
+.br
+Default: $HOME/mybld
+.TP
+\fBROOTMOUNT=$HOME/www\fP
+Set the ROOT Mount LOGS, DEPOT and sources directories .
+.br
+Default: $HOME/www
+.TP
+\fBURL=rsync://download.nutyx.org/nutyx\fP
+Set the URL where all the binaries packages should be sync from. It's also possible to specify a folder as URL.
+.br
+Default: rsync://download.nutyx.org/nutyx
+.TP
+\fBBASE=()\fP
+Set the collections to keep after each successfully build. This variable is an array like BASE=(base cli gui)
+.br
+Default: not set
+
+.SH CONFIGURATION OF THE HOST NuTyX
+
+.TP
+The script needs the 'git' and the 'rsync' commands. They are not install by default on your NuTyX.
+
+    sudo cards install rsync git
+
+.TP
+We need to create all the necessary folders into your \fB$HOME/www\fP default directory via the option \fB-i\fP:
+
+    mybld -i
+.TP
+And we need to get all the binaries locally and used them, we need to rsync them via the option \fB-s\fP:
+
+    mybld -s
+
+.SH IMPORTANTS NOTES:
+
+.TP
+You need about 5 Gbytes of free space to store the availables binaries from the NuTyX mirror. ($ROOTMOUNT/<arch>/<version>), Also be aware that $ROOTMOUNT/sources will continuously grow.
+.TP
+The installed NuTyX should ALWAYS be under $ROOT/rolling or $ROOT/<version>. Where <version> is a valid version.
+.TP
+In case of <yours> collections, it needs two collections:
+    <yours> and <yours>-extra.
+
+.SH FILES
+.TP
+.B "$HOME/.mybld"
+It contains customise $EDITOR, $ROOT, ROOTMOUNT, $URL and $BASE variables. Please note that the $BASE variable is define as an array like:
+BASE=(base cli gui)
+
+.SH "AUTHORS"
+Thierry Nuttens <tnut@nutyx.org>
+.SH "SEE ALSO"
+cards.conf(5), pkgmk(8), pkgadd(8), pkginfo(8), ports(8), pkgmk.conf(5)
+.SH COPYRIGHT
+mybld (cards) is Copyright (c)  2020 NuTyX and Copyright (c)  2020 NuTyX team (http://www.nutyx.org).
+mybld (cards) is licensed through the GNU General Public License.
+Read the COPYING file for the complete license.
