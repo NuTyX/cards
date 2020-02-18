@@ -15,7 +15,7 @@ They are 3 mounting point (DEPOT,LOGS and sources folder) included in the chroot
 All the sources code files, logs files and Binaries packages are then immediatly available in the chroot.
 The script located in /tmp/setup is executed and launch the necessary compilation. 
 Once the compilation of my package(s) done, the tool goes out of the chroot, umount the 3 mounting points and
-delete the chroot.
+delete the chroot. All the commands should be issue from the root of your git project.
 
 .SH OPTIONS:
 .TP
@@ -65,6 +65,11 @@ Example:
 .LP
 Some configuration variable can be redefined in your $HOME/.mybld
 .TP
+\fBVERSION=rolling\fP
+Set the version of your binaries.
+.br
+Default: Active branch name of the git project
+TP
 \fBEDITOR=vi\fP
 Set the editor you want to use.
 .br
@@ -109,6 +114,8 @@ And we need to get all the binaries locally and used them, we need to rsync them
 .SH IMPORTANTS NOTES:
 
 .TP
+We assume you already clone the git project associate to the binaries
+.TP
 You need about 5 Gbytes of free space to store the availables binaries from the NuTyX mirror. ($ROOTMOUNT/<arch>/<version>), Also be aware that $ROOTMOUNT/sources will continuously grow.
 .TP
 The installed NuTyX should ALWAYS be under $ROOT/rolling or $ROOT/<version>. Where <version> is a valid version.
@@ -119,7 +126,7 @@ In case of <yours> collections, it needs two collections:
 .SH FILES
 .TP
 .B "$HOME/.mybld"
-It contains customise $EDITOR, $ROOT, ROOTMOUNT, $URL and $BASE variables. Please note that the $BASE variable is define as an array like:
+It contains customise $VERSION, $EDITOR, $ROOT, ROOTMOUNT, $URL and $BASE variables. Please note that the $BASE variable is define as an array like:
 BASE=(base cli gui)
 
 .SH "AUTHORS"
