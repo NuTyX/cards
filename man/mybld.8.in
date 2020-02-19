@@ -69,7 +69,7 @@ Some configuration variable can be redefined in your $HOME/.mybld
 Set the version of your binaries.
 .br
 Default: Active branch name of the git project
-TP
+.TP
 \fBEDITOR=vi\fP
 Set the editor you want to use.
 .br

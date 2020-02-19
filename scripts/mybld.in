@@ -102,7 +102,7 @@ make
 make DESTDIR=\$PKG install
 }" \
 > ${COLLECTION}/${PARAM}/Pkgfile
-vim ${COLLECTION}/${PARAM}/Pkgfile
+$EDITOR ${COLLECTION}/${PARAM}/Pkgfile
 }
 create_folders () {
 if [ -z "$VERSION" ]; then

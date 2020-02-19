@@ -88,11 +88,13 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 		bool found=false;
 		unsigned j = 0;
 		char name[255];
-		for(list<string>::const_iterator i = deps.begin(); i != deps.end(); ++i) {
+		string s;
+		for ( auto i : deps ) {
 			found=false;
+			s = getFirstValueOfKeyBeforeDelim( i, '.');
 			for(j = 0; j < filesList->count; j++) {
 				sprintf(name,"%s",basename(filesList->items[j]));
-				if (strcmp(i->c_str(),name) == 0 ) {
+				if (strcmp(s.c_str(),name) == 0 ) {
 					addDepToDepList(dependancesList,j,0);
 					found=true;
 					break;
@@ -100,7 +102,7 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 			}
 			if(!found) {
 				missingDep = "WARNING ";
-				missingDep += *i;
+				missingDep += s;
 				missingDep += " from ";
 				missingDep += filesList->items[nameIndex];
 				missingDep += " NOT FOUND ...";
