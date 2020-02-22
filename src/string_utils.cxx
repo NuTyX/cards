@@ -159,6 +159,14 @@ string getValueBefore( const string& s, char del )
 	}
 	return s;
 }
+string getValueBeforeLast(const string& s, char del)
+{
+	string::size_type pos = s.rfind( del );
+	if ( pos != string::npos )
+		return s.substr( 0, pos );
+	return s;
+}
+
 string itos(unsigned int value)
 {
   static char buf[20];
@@ -226,13 +234,6 @@ string getFirstValueOfKeyAfterDelim(const string& s, char delimiter)
 	if ( pos != string::npos && pos+1 < s.length() )
 		return s.substr( pos + 1 );
 	return "";
-}
-string getFirstValueOfKeyBeforeDelim(const string& s, char delimiter)
-{
-	string::size_type pos = s.find( delimiter );
-	if ( pos != string::npos )
-		return s.substr( 0, pos );
-	return s;
 }
 vector<string> parseDelimitedList(const string& s, const char delimiter)
 {

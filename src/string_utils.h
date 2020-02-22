@@ -85,6 +85,8 @@ std::string getValueOfKey
 
 std::string getValue(const std::string& s, char delimiter);
 std::string getValueBefore( const std::string& s, char del );
+std::string getValueBeforeLast( const std::string& s, char del );
+
 std::string itos(unsigned int value);
 std::string ultos(unsigned long int value);
 
@@ -95,10 +97,6 @@ std::string sizeHumanRead(int value);
 /*param s the string to be searched, param delimiter the delimiter char 
 return the value after the first occurance of a delimiter */
 std::string getFirstValueOfKeyAfterDelim(const std::string& s, char delimiter);
-
-/*param s the string to be searched param delimiter  the delimiter char
-return the value before the first occurance of a delimiter */
-std::string getFirstValueOfKeyBeforeDelim(const std::string& s, char delimiter);
 
 /* strip whitespace in the beginning and end of string, return a stripped string */
 std::string stripWhiteSpace(const std::string& s);

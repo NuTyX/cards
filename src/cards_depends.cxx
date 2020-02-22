@@ -91,7 +91,7 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 		string s;
 		for ( auto i : deps ) {
 			found=false;
-			s = getFirstValueOfKeyBeforeDelim( i, '.');
+			s = getValueBeforeLast( i, '.');
 			for(j = 0; j < filesList->count; j++) {
 				sprintf(name,"%s",basename(filesList->items[j]));
 				if (strcmp(s.c_str(),name) == 0 ) {
