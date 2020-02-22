@@ -32,7 +32,7 @@ OPTIONS
       -A, --ask
               Ask for confirmation.
 
-      -n, --new <collection>/<package> [version] [description]
+      -n, --new <collection>/<package> [version] [description] [source]
               Create a new <collection>/<package>/Pkgfile.
 
       -i, --increment <package>
@@ -94,7 +94,7 @@ set=()
 name=${PARAM}
 version=${2}
 
-source=()
+source=(${4})
 
 build() {
 cd \$name-\$version
