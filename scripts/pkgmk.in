@@ -71,10 +71,6 @@ get_filename() {
 		echo $1
 	fi
 }
-get_basename() {
-	local FILE="$(echo $1 | sed 's|^.*://.*/||g')"
-	echo $FILE
-}
 check_pkgfile() {
 	local SIZE NAME_TEST RELEASE_TEST DESC_TEST
 	if [ "${name}" == "" ]; then
@@ -263,7 +259,7 @@ download_file() {
 
 		error=1
 
-		BASENAME="$(get_basename $1)"
+		BASENAME="${1/*\//}"
 		for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
 			REPO="$(echo $REPO | sed 's|/$||')"
 			wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $REPO/$BASENAME
