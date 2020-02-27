@@ -87,14 +87,17 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	if ( deps.size() >0 ) {
 		bool found=false;
 		unsigned j = 0;
-		char name[255];
 		string s;
 		for ( auto i : deps ) {
 			found=false;
 			s = getValueBeforeLast( i, '.');
+			// Name of Dep = Name of Package then ignore it
+			if (strcmp(s.c_str(),name) == 0 )
+					continue;
+			char n[PATH_MAX];
 			for(j = 0; j < filesList->count; j++) {
-				sprintf(name,"%s",basename(filesList->items[j]));
-				if (strcmp(s.c_str(),name) == 0 ) {
+				sprintf(n,"%s",basename(filesList->items[j]));
+				if (strcmp(s.c_str(),n) == 0 ) {
 					addDepToDepList(dependancesList,j,0);
 					found=true;
 					break;
