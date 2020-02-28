@@ -191,7 +191,7 @@ get_package_arch() {
 }
 get_categories() {
 	local FILE CANDIDATS CATEGORIES OLDIFS
-	for FILE in $(find $PKG/usr/share/applications -type f 2>/dev/null);do
+	for FILE in $(find $PKG/usr/share/applications -type f,l 2>/dev/null);do
 		CANDIDATS+=$(grep ^Categories $FILE|cut -d "=" -f2)
 	done
 	if [ ! -z $CANDIDATS ];then
@@ -1712,7 +1712,7 @@ PKGMK_CLEAN="yes"
 
 
 PKGMK_GROUPS=()
-PKGMK_LOCALES=(fr)
+PKGMK_LOCALES=()
 
 PKGMK_SOURCE_MIRRORS=()
 PKGMK_SOURCE_DIR="$PWD"
