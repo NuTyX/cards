@@ -203,9 +203,8 @@ case $1 in
 		find_collection
 		if [ -z "${COLLECTION}" ]; then
 			echo "
->>>	package '${PARAM[0]}' not found in any collection
-		"
-				exit  1
+>>>	WARNING package '${PARAM[0]}' not found in any collection
+"
 		fi
 		find_runtime ${1}
 		exit 0;;
