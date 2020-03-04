@@ -479,6 +479,16 @@ if [ -z "${COLLECTION}" ]; then
 	exit  1
 fi
 
+if [ -d "$ROOT/${VERSION}/${COLLECTION}" ]; then
+	mount | grep /"${VERSION}/${COLLECTION}"
+	echo "
+>>>	$ROOT/${VERSION}/${COLLECTION} exist ...
+"
+	echo -n "Safety cleanup of $ROOT/${VERSION}/${COLLECTION} ? :"
+	answer
+	CLEANUP="yes"
+fi
+
 if [ "$CLEANUP" == "yes" ]; then
 	MOUNT_POINTS="DEPOT LOGS sources"
 	umount_all
@@ -486,13 +496,6 @@ if [ "$CLEANUP" == "yes" ]; then
 	exit 0
 fi
 
-if [ -d "$ROOT/${VERSION}/${COLLECTION}" ]; then
-	mount | grep /"${VERSION}/${COLLECTION}"
-	echo "
->>>	$ROOT/${VERSION}/${COLLECTION} exist ...
-"
-	exit 1
-fi
 
 if [ ! -z "${PARAM[1]}" ]; then
 	CONFIRM="yes"
