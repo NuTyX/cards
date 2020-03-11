@@ -961,8 +961,8 @@ build_package() {
 			if [ "$(type -t ${group})" == "function" ]; then
 				BUILD_SUCCESSFUL="no"
 				(set -e -x ;${group})
-				j=1
 				if [ $? = 0 ]; then
+					j=1
 					BUILD_SUCCESSFUL="yes"
 				else
 					error "Building '$TARGET' failed."
