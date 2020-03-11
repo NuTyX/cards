@@ -349,6 +349,7 @@ int CardsDepends::depends()
 #ifndef NDEBUG
 	cerr << longPackageName << " " << m_packageName << endl;
 #endif
+	// for all the Pkgfile files found
 	for (unsigned int nInd=0;nInd <filesList->count;nInd++){
 		package = addInfoToPkgInfo(nInd);
 		addPkgToPkgList(packagesList,package);
