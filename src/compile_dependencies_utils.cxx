@@ -127,7 +127,7 @@ int deps_tree (pkgList *packagesList, depList *dependenciesList,unsigned int nam
 	}
 	depList *localDependenciesList = initDepsList();
 	if ( dependenciesList->count > packagesList->count ) {
-		printf ("Dependencies List Bigger then Package List. \nDue to circular !!!\n");
+		printf ("Dependencies List Bigger than Package List. \nDue to circular !!!\n");
 		freePkgList(packagesList);
 		freeDepList(dependenciesList);
 		exit(EXIT_FAILURE);
