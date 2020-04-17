@@ -34,6 +34,7 @@
 	archive_read_support_filter_gzip((ar)); \
 	archive_read_support_filter_bzip2((ar)); \
 	archive_read_support_filter_xz((ar)); \
+	archive_read_support_filter_zstd((ar)); \
 	archive_read_support_format_tar((ar))
 #define FREE_ARCHIVE(ar) \
 	archive_read_free((ar))
