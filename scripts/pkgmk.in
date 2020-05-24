@@ -191,7 +191,7 @@ get_package_arch() {
 }
 get_categories() {
 	local FILE CANDIDATS CATEGORIES OLDIFS
-	for FILE in $(find $PKG/usr/share/applications -type f,l 2>/dev/null);do
+	for FILE in $(find $PKG/usr/share/applications -type f 2>/dev/null);do
 		CANDIDATS+=$(grep ^Categories $FILE|cut -d "=" -f2)
 	done
 	if [ ! -z $CANDIDATS ];then
@@ -1269,7 +1269,7 @@ clean_repo_files() {
 }
 check_sources_uptodate() {
 	local newversion
-	if ! ( "$(which lynx > /dev/null)" ); then
+	if  [ ! "$(which lynx)" ]; then
 		error "lynx is not installed, cannot check sources"
 		exit 0
 	fi
@@ -1485,8 +1485,6 @@ main() {
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "$(dirname $PKGMK_WORK_DIR)"
-
-	info "Comments are now ignored when building the package(s)."
 
 	check_pkgfile
 
