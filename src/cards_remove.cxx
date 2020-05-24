@@ -40,10 +40,11 @@ Cards_remove::Cards_remove(const string& commandName,
 	else
 		m_root=m_root+"/";
 
+	Config config;
+	Pkgrepo::parseConfig(configFileName, config);
+
 	if (!m_argParser.isSet(CardsArgumentParser::OPT_ALL)){
 		set<string> basePackagesList;
-		Config config;
-		Pkgrepo::parseConfig(configFileName, config);
 		for (auto i : config.baseDir) {
 			if ( findFile(basePackagesList, i) != 0 ) {
 				m_actualError = CANNOT_READ_DIRECTORY;
@@ -60,7 +61,6 @@ Cards_remove::Cards_remove(const string& commandName,
 		pair<string,string> PackageToRemove;
 
 		for ( auto i : m_argParser.otherArguments() ) {
-			bool found = false;
 			for (auto j : m_listOfInstPackages) {
 				if  (( j.second.collection == i) ||
 				( j.second.group == i)) {
@@ -86,6 +86,20 @@ Cards_remove::Cards_remove(const string& commandName,
 				PackageToRemove.first = a ;
 				listOfPackagesToRemove.insert(PackageToRemove);
 			}
+		}
+		set< pair<string,string> > groupSetPackagesToRemove;
+		for ( auto i :  config.group ) {
+			if ( i == "lib" )
+				continue;
+			for ( auto j : listOfPackagesToRemove ) {
+				PackageToRemove.first = j.first  + "." + i;
+				PackageToRemove.second = j.second;
+				groupSetPackagesToRemove.insert(PackageToRemove);
+			}
+		}
+		for ( auto i : groupSetPackagesToRemove ) {
+			if (checkPackageNameExist(i.first))
+				listOfPackagesToRemove.insert(i);
 		}
 		for ( auto i : listOfPackagesToRemove ) {
 			bool found = false;
@@ -122,6 +136,7 @@ Cards_remove::Cards_remove(const string& commandName,
 	getListOfManInstalledPackages ();
 	bool found;
 	set<string> obsoletsDeps;
+	set<string> obsoletsGroups;
 	for ( auto i : m_listOfInstPackages  ) {
 		found = false;
 		for (  auto j : m_listofDependencies ) {
@@ -132,6 +147,17 @@ Cards_remove::Cards_remove(const string& commandName,
 		}
 		if (!found)
 			obsoletsDeps.insert(i.first);
+	}
+	for ( auto i :  config.group ) {
+		if ( i == "lib" )
+			continue;
+		for ( auto j : obsoletsDeps ) {
+			obsoletsGroups.insert(j+"."+i);
+		}
+	}
+	for ( auto i : obsoletsGroups ) {
+		if (checkPackageNameExist(i))
+			obsoletsDeps.insert(i);
 	}
 	for ( auto i : obsoletsDeps ) {
 		m_packageName = i;
