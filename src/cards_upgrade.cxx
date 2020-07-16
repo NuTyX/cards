@@ -91,7 +91,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		if ( (! m_argParser.isSet(CardsArgumentParser::OPT_SIZE)) &&
 				(! m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) ) {
 			if ( m_ListOfPackages.size() == 0  && ( m_ListOfPackagesToDelete.size() == 0 ) ) {
-				std::cout << _("Your system is up to date") << endl;
+				std::cout << _("Your system is up to date.") << endl;
 			} else {
 				if (getuid()) {
 					m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
@@ -103,7 +103,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	}
 	if ( m_argParser.command() == CardsArgumentParser::CMD_DIFF) {
 		if ( ( m_ListOfPackages.size() == 0 ) && ( m_ListOfPackagesToDelete.size() == 0 ) ) {
-			std::cout << _("Your system is up to date") << endl;
+			std::cout << _("Your system is up to date.") << endl;
 		} else {
 			dry();
 		}
@@ -129,7 +129,7 @@ void Cards_upgrade::dry()
 	for (auto i : m_ListOfPackages )
 		std::cout << "'" << i.first  << "' ";
 	if (m_ListOfPackages.size() > 0 )
-				std::cout << _("will be replaced when you upgrade your NuTyX") << std::endl;
+				std::cout << _("will be replaced when you upgrade your NuTyX.") << std::endl;
 
 	if (m_ListOfPackagesToDelete.size() > 1 )
 				std::cout << _("Packages") << ": ";
@@ -138,7 +138,7 @@ void Cards_upgrade::dry()
 	for (auto i: m_ListOfPackagesToDelete)
 			std::cout << "'" << i << "' ";
 	if (m_ListOfPackagesToDelete.size() > 0 )
-				std::cout << _("will be removed when you upgrade your NuTyX") << std::endl;
+				std::cout << _("will be removed when you upgrade your NuTyX.") << std::endl;
 
 }
 void Cards_upgrade::upgrade()
@@ -166,6 +166,28 @@ void Cards_upgrade::upgrade()
 			removePackageFiles(i);
 		}
 		m_pkgsync.purge();
+		summary();
 	}
+}
+void Cards_upgrade::summary()
+{
+	if (m_ListOfPackages.size() > 1 )
+				std::cout << std::endl << _("Packages") << ": ";
+	if (m_ListOfPackages.size() == 1 )
+				std::cout << std::endl << _("Package")<< " : ";
+	for (auto i : m_ListOfPackages )
+		std::cout << "'" << i.first  << "' ";
+	if (m_ListOfPackages.size() > 0 )
+				std::cout << _("have been replaced on your NuTyX.") << std::endl;
+
+	if (m_ListOfPackagesToDelete.size() > 1 )
+				std::cout << _("Packages") << ": ";
+	if (m_ListOfPackagesToDelete.size() == 1 )
+				std::cout << _("Package") << " : ";
+	for (auto i: m_ListOfPackagesToDelete)
+			std::cout << "'" << i << "' ";
+	if (m_ListOfPackagesToDelete.size() > 0 )
+				std::cout << _("have been removed from your NuTyX.") << std::endl << std::endl ;
+
 }
 // vim:set ts=2 :

@@ -736,11 +736,17 @@ msgstr "\nINSTALLER, REMPLACER et SUPPRIMER"
 msgid "\nBASE SYSTEM"
 msgstr "\nSYSTEME DE BASE"
 
-msgid "Your system is up to date"
-msgstr "Votre système est à jour"
+msgid "Your system is up to date."
+msgstr "Votre système est à jour."
 
-msgid "will be replaced when you upgrade your NuTyX"
-msgstr "seront remplacés lorsque vous mettrez votre NuTyX à jour"
+msgid "will be replaced when you upgrade your NuTyX."
+msgstr "seront remplacés lorsque vous mettrez votre NuTyX à jour."
 
-msgid "will be removed when you upgrade your NuTyX"
-msgstr "seront supprimés lorsque vous mettrez votre NuTyX à jour"
+msgid "will be removed when you upgrade your NuTyX."
+msgstr "seront supprimés lorsque vous mettrez votre NuTyX à jour."
+
+msgid "have been replaced on your NuTyX."
+msgstr "ont été remplacés sur votre NuTyX."
+
+msgid "have been removed from your NuTyX."
+msgstr "ont été supprimés sur votre NuTyX."
