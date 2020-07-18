@@ -31,6 +31,8 @@
 
 #include "string_utils.h"
 #include "file_utils.h"
+#include "pkgdbh.h"
+
 
 /**
  * \brief File Download State class
