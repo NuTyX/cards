@@ -157,6 +157,7 @@ void Cards_upgrade::upgrade()
 				m_upgrade=false;
 			}
 		run();
+		syslog(LOG_INFO,"%s upgraded",i.first.c_str());
 		}
 		for (auto i : m_ListOfPackagesToDelete) {
 			Db_lock lock(m_root,true);
@@ -164,6 +165,7 @@ void Cards_upgrade::upgrade()
 			buildCompleteDatabase(false);
 			removePackageFilesRefsFromDB(i);
 			removePackageFiles(i);
+			syslog(LOG_INFO,"%s removed",i.c_str());
 		}
 		m_pkgsync.purge();
 		summary();
@@ -171,34 +173,20 @@ void Cards_upgrade::upgrade()
 }
 void Cards_upgrade::summary()
 {
-  if (m_ListOfPackages.size() > 0 )
+	if (m_ListOfPackages.size() > 1 ) {
 		std::cout << std::endl;
-	if (m_ListOfPackages.size() > 1 )
 		std::cout << _("Packages") << ": ";
-	if (m_ListOfPackages.size() == 1 )
-		std::cout << _("Package")<< " : ";
-
-	for (auto i : m_ListOfPackages ){
-		std::cout << "'" << i.first  << "' ";
-		syslog(LOG_INFO,"%s upgraded",i.first.c_str());
-	}
-	if (m_ListOfPackages.size() > 0 )
+		for (auto i : m_ListOfPackages )
+			std::cout << "'" << i.first  << "' ";
 		std::cout << _("have been replaced on your NuTyX.") << std::endl;
-
-	if (m_ListOfPackagesToDelete.size() > 1 )
-		std::cout << _("Packages") << ": ";
-
-	if (m_ListOfPackagesToDelete.size() == 1 )
-		std::cout << _("Package") << " : ";
-
-	for (auto i: m_ListOfPackagesToDelete) {
-		std::cout << "'" << i << "' ";
-		syslog(LOG_INFO,"%s removed",i.c_str());
 	}
-	if (m_ListOfPackagesToDelete.size() > 0 )
-				std::cout << _("have been removed from your NuTyX.") << std::endl;
-
-  if (m_ListOfPackages.size() > 0 )
+	if (m_ListOfPackagesToDelete.size() > 1 ) {
+		std::cout << _("Packages") << ": ";
+		for (auto i: m_ListOfPackagesToDelete)
+			std::cout << "'" << i << "' ";
+		std::cout << _("have been removed from your NuTyX.") << std::endl;
+	}
+	if (m_ListOfPackages.size() > 1 || m_ListOfPackagesToDelete.size() > 1 )
 		std::cout << std::endl;
 }
 // vim:set ts=2 :
