@@ -55,6 +55,7 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 		m_destinationFile.filename = i->filename;
 		m_destinationFile.dirname = i->dirname;
 		m_downloadFileName = i->dirname + i->filename;
+		m_downloadProgress.name = i->filename;
 		m_MD5Sum = i->md5sum;
 		createRecursiveDirs(i->dirname);
 		initFileToDownload(m_url,m_downloadFileName);
@@ -65,8 +66,9 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 }
 
 FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, bool progress)
-	: m_url(url),m_downloadFileName(dirName+"/"+fileName),m_progress(progress)
+	: m_packageName(fileName),m_url(url),m_downloadFileName(dirName+"/"+fileName),m_progress(progress)
 {
+
 	curl_global_init(CURL_GLOBAL_ALL);
 	m_curl = curl_easy_init();
 	if (! m_curl)
@@ -84,8 +86,8 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 	downloadFile();
 }
 
-FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, std::string MD5Sum, bool progress )
-  : m_url(url),m_downloadFileName(dirName+"/"+fileName),m_MD5Sum(MD5Sum),m_progress(progress)
+FileDownload::FileDownload(std::string packageName,std::string url, std::string dirName, std::string fileName, std::string MD5Sum, bool progress )
+  : m_packageName(packageName),m_url(url),m_downloadFileName(dirName+"/"+fileName),m_MD5Sum(MD5Sum),m_progress(progress)
 {
   curl_global_init(CURL_GLOBAL_ALL);
   m_curl = curl_easy_init();
@@ -109,12 +111,12 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 
 void FileDownload::downloadFile()
 {
-	if (m_progress)
-		cout << m_downloadFileName << endl ;
-	else
+	if (! m_progress)
 		rotatingCursor();
+
 	m_downloadProgress.lastruntime = 0;
 	m_downloadProgress.curl = m_curl;
+	m_downloadProgress.name = m_packageName;
 	/*
 	TODO Maybe there is a more efficient way to do this, but
 	for the moment we never want to use server side cache
@@ -153,7 +155,7 @@ void FileDownload::downloadFile()
 
 void FileDownload::initFileToDownload(std::string  _url, std::string  _file)
 {
-	m_destinationFile.url = _url;
+  m_destinationFile.url = _url;
   m_destinationFile.filename = _file;
   m_destinationFile.filetime = 0;
   m_destinationFile.stream = NULL;
@@ -188,13 +190,15 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 		( SpeedDownload == 0 ) || ( dlnow == 0 ) )
 			return 0;
 
-	fprintf(stderr,"\r    %sB  (%sB/s) %d %% - %d s   ",
-	(sizeHumanRead((int)dlnow)).c_str(), (sizeHumanRead((int)SpeedDownload)).c_str(), (int)((dlnow/dltotal) * 100 ), (int)((dltotal - dlnow)/SpeedDownload) );
+	fprintf(stderr,"\r %s: %sB (%sB/s) %d %% - %d s",
+	CurrentProgress->name.c_str(),
+	(sizeHumanRead((int)dlnow)).c_str(), (sizeHumanRead((int)SpeedDownload)).c_str(),
+	(int)((dlnow/dltotal) * 100 ), (int)((dltotal - dlnow)/SpeedDownload) );
 	FileDownloadState state;
 	state.dlnow = dlnow;
 	state.dltotal = dltotal;
 	state.dlspeed = SpeedDownload;
-	//state.filename = m_downloadFileName;
+	//state.filename = m_packageName;
 	SendProgressEvent(state);
 	return 0;
 }

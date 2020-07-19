@@ -1762,7 +1762,7 @@ void assertArgument(char** argv, int argc, int index)
 void rotatingCursor() {
   static int pos=0;
   char cursor[4]={'/','-','\\','|'};
-  printf("%c\b", cursor[pos]);
+  printf("\r [ %c ] ", cursor[pos]);
   fflush(stdout);
   pos = (pos+1) % 4;
 }

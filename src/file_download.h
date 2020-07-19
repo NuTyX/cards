@@ -109,7 +109,7 @@ class FileDownload
 	 * \param MD5Sum Signature to use for checking the download file
 	 * \param progress If true, show what's going on
 	 */
-	FileDownload(std::string url, std::string dirName, std::string fileName, std::string MD5Sum , bool progress);
+	FileDownload(std::string packageName, std::string url, std::string dirName, std::string fileName, std::string MD5Sum , bool progress);
 
 	/**
 	 * Download a list of InfoFile (a vector of InfoFile type)
@@ -132,6 +132,8 @@ class FileDownload
 
 	static void SuscribeToEvents(FileDownloadEvent* callback);
 	static void UnSuscribeFromEvents(FileDownloadEvent* callback);
+
+
 	private:
 
 	/**
@@ -157,20 +159,22 @@ class FileDownload
 	void SendProgressEvent(FileDownloadState event);
 	struct dwlProgress
 	{
+		std::string name;
 		double lastruntime;
 		CURL *curl;
 	};
 	struct curl_slist *m_slist;
 
-	CURL*       m_curl;
-	CURLcode    m_curlCode;
-	dwlProgress m_downloadProgress;
-	InfoFile    m_destinationFile;
-	std::string      m_url;
-	std::string      m_downloadFileName;
-	bool        m_checkMD5;
-	bool        m_progress;
-	std::string      m_MD5Sum;
+	CURL*		m_curl;
+	CURLcode	m_curlCode;
+	dwlProgress	m_downloadProgress;
+	InfoFile	m_destinationFile;
+	std::string	m_url;
+	std::string	m_downloadFileName;
+	std::string m_packageName;
+	bool		m_checkMD5;
+	bool		m_progress;
+	std::string	m_MD5Sum;
 	static std::set<FileDownloadEvent*> m_arrCallBacks;
 };
 
