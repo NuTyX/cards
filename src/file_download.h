@@ -109,7 +109,7 @@ class FileDownload
 	 * \param MD5Sum Signature to use for checking the download file
 	 * \param progress If true, show what's going on
 	 */
-	FileDownload(std::string packageName, std::string url, std::string dirName, std::string fileName, std::string MD5Sum , bool progress);
+	FileDownload(std::string fileInfo, std::string url, std::string dirName, std::string fileName, std::string MD5Sum , bool progress);
 
 	/**
 	 * Download a list of InfoFile (a vector of InfoFile type)
@@ -171,7 +171,7 @@ class FileDownload
 	InfoFile	m_destinationFile;
 	std::string	m_url;
 	std::string	m_downloadFileName;
-	std::string m_packageName;
+	std::string	m_fileInfo;
 	bool		m_checkMD5;
 	bool		m_progress;
 	std::string	m_MD5Sum;

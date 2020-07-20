@@ -66,7 +66,7 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 }
 
 FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, bool progress)
-	: m_packageName(fileName),m_url(url),m_downloadFileName(dirName+"/"+fileName),m_progress(progress)
+	: m_fileInfo(fileName),m_url(url),m_downloadFileName(dirName+"/"+fileName),m_progress(progress)
 {
 
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -86,8 +86,8 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 	downloadFile();
 }
 
-FileDownload::FileDownload(std::string packageName,std::string url, std::string dirName, std::string fileName, std::string MD5Sum, bool progress )
-  : m_packageName(packageName),m_url(url),m_downloadFileName(dirName+"/"+fileName),m_MD5Sum(MD5Sum),m_progress(progress)
+FileDownload::FileDownload(std::string fileInfo,std::string url, std::string dirName, std::string fileName, std::string MD5Sum, bool progress )
+  : m_fileInfo(fileInfo),m_url(url),m_downloadFileName(dirName+"/"+fileName),m_MD5Sum(MD5Sum),m_progress(progress)
 {
   curl_global_init(CURL_GLOBAL_ALL);
   m_curl = curl_easy_init();
@@ -116,7 +116,7 @@ void FileDownload::downloadFile()
 
 	m_downloadProgress.lastruntime = 0;
 	m_downloadProgress.curl = m_curl;
-	m_downloadProgress.name = m_packageName;
+	m_downloadProgress.name = m_fileInfo;
 	/*
 	TODO Maybe there is a more efficient way to do this, but
 	for the moment we never want to use server side cache
@@ -190,7 +190,7 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 		( SpeedDownload == 0 ) || ( dlnow == 0 ) )
 			return 0;
 
-	fprintf(stderr,"\r %s: %sB (%sB/s) %d %% - %d s",
+	fprintf(stderr,"\r  %s   %sB (%sB/s) %d %% - %d s ",
 	CurrentProgress->name.c_str(),
 	(sizeHumanRead((int)dlnow)).c_str(), (sizeHumanRead((int)SpeedDownload)).c_str(),
 	(int)((dlnow/dltotal) * 100 ), (int)((dltotal - dlnow)/SpeedDownload) );
