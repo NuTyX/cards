@@ -157,7 +157,9 @@ void Cards_upgrade::upgrade()
 				m_upgrade=false;
 			}
 		run();
-		syslog(LOG_INFO,"%s upgraded",i.first.c_str());
+		std::string p = i.first + " " + getBasePackageVersion(i.first) \
+    + "-" + itos(getBasePackageRelease(i.first));
+		syslog(LOG_INFO,"%s upgraded",p.c_str());
 		}
 		for (auto i : m_ListOfPackagesToDelete) {
 			Db_lock lock(m_root,true);
