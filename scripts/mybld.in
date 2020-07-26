@@ -156,11 +156,14 @@ rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/ $ROOTMOUNT/$(uname -m)
 fi
 
 echo "
+mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
+sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
 rsync -av --delete $URL/$(uname -m)/$VERSION/ $ROOTMOUNT/$(uname -m)/$VERSION/
 "
 echo -n "  OK ? (y) : "
 answer
-
+mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
+sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
 rsync -av --delete $URL/$(uname -m)/$VERSION/ $ROOTMOUNT/$(uname -m)/$VERSION/
 exit 0
 }
