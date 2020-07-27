@@ -157,8 +157,8 @@ void Cards_upgrade::upgrade()
 				m_upgrade=false;
 			}
 		run();
-		std::string p = i.first + " " + getBasePackageVersion(i.first) \
-    + "-" + itos(getBasePackageRelease(i.first));
+		std::string p = i.first + " " + getBasePackageVersion(getBasePackageName(i.first)) \
+    + "-" + itos(getBasePackageRelease(getBasePackageName(i.first)));
 		syslog(LOG_INFO,"%s upgraded",p.c_str());
 		}
 		for (auto i : m_ListOfPackagesToDelete) {

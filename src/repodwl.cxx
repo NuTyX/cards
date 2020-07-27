@@ -101,8 +101,8 @@ void Repodwl::downloadPackageFileName(const string& packageName)
 			<< m_PortFilesList_i->md5SUM << " "
 			<< endl;
 #endif
-		FileDownload FD(packageName + " " + getBasePackageVersion(packageName) \
-		+ "-" + itos(getBasePackageRelease(packageName)),
+		FileDownload FD(packageName + " " + getBasePackageVersion(getBasePackageName(packageName)) \
+		+ "-" + itos(getBasePackageRelease(getBasePackageName(packageName))),
 		url,dir,fileName,
 		m_PortFilesList_i->md5SUM,true);
 	}
