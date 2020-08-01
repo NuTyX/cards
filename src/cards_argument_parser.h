@@ -53,6 +53,7 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APOpt OPT_CHECK;
 		static ArgParser::APOpt OPT_SIZE;
 
+		static ArgParser::APOpt OPT_FULL;
 		static ArgParser::APOpt OPT_FORCE;
 		static ArgParser::APOpt OPT_UPDATE;
 

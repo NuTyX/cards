@@ -57,6 +57,7 @@ protected:
 	int m_libraries_mode;
 	int m_runtime_mode;
 	int m_epoc;
+	bool m_fulllist_mode;
 
 };
 

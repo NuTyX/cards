@@ -36,7 +36,8 @@ Pkginfo::Pkginfo(const std::string& commandName)
 	m_details_mode(0),
 	m_libraries_mode(0),
 	m_runtime_mode(0),
-	m_epoc(0)
+	m_epoc(0),
+	m_fulllist_mode(false)
 {
 }
 Pkginfo::Pkginfo()
@@ -50,7 +51,8 @@ Pkginfo::Pkginfo()
 	m_details_mode(0),
 	m_libraries_mode(0),
 	m_runtime_mode(0),
-	m_epoc(0)
+	m_epoc(0),
+	m_fulllist_mode(true)
 {
 }
 void Pkginfo::run(int argc, char** argv)
@@ -170,14 +172,22 @@ void Pkginfo::run()
 			// List installed packages
 			buildSimpleDatabase();
 			for (auto i : m_listOfInstPackages) {
-				if ( i.second.dependency == true)
-					cout << "AUTO: ";
-				else
-					cout << " MAN: ";
+				if (m_fulllist_mode) {
+					if ( i.second.dependency == true)
+						cout << "AUTO: ";
+					else
+						cout << " MAN: ";
 
-				cout << "(" << i.second.collection << ")"
-				<< " " << i.first << " "
-				<< i.second.version << "-" << i.second.release << endl;
+					cout << "(" << i.second.collection << ")"
+					<< " " << i.first << " "
+					<< i.second.version << "-" << i.second.release << endl;
+				} else  {
+					if ( i.second.dependency == true)
+						continue;
+					cout << "(" << i.second.collection << ")"
+					<< " " << i.first << " "
+					<< i.second.version << "-" << i.second.release << endl;
+				}
 			}
 		} else if (m_list_mode) {
 			// List package or file contents

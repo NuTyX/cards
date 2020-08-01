@@ -44,6 +44,7 @@ ArgParser::APCmd CardsArgumentParser::CMD_UPGRADE;
 ArgParser::APOpt CardsArgumentParser::OPT_CHECK;
 ArgParser::APOpt CardsArgumentParser::OPT_SIZE;
 
+ArgParser::APOpt CardsArgumentParser::OPT_FULL;
 ArgParser::APOpt CardsArgumentParser::OPT_FORCE;
 ArgParser::APOpt CardsArgumentParser::OPT_UPDATE;
 
@@ -181,6 +182,10 @@ It will delete all the downloads binaries which are located in the binaries sect
 _("This command can upgrade at onces alls your installed out of date packages."),
 		ArgParser::NONE, 0 , "");
 
+	OPT_FULL.init("full",
+		'F',
+		_("\t   Full list, including automatically installed packages."));
+
 	OPT_FORCE.init("force",
 		'f',
 		_("\t   Force install, overwrite conflicting files."));
@@ -251,6 +256,7 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 	addOption(CMD_UPGRADE, OPT_ROOT,false);
 	addOption(CMD_UPGRADE, OPT_CONFIG_FILE,false);
 
+	addOption(CMD_LIST, OPT_FULL, false);
 	addOption(CMD_LIST, OPT_BINARIES, false);
 	addOption(CMD_LIST, OPT_PORTS, false);
 	addOption(CMD_LIST, OPT_ROOT,false);
