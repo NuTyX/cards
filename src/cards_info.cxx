@@ -64,6 +64,8 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 			getPortsList();
 		} else {
 			m_installed_mode=1;
+			if (m_argParser.isSet(CardsArgumentParser::OPT_FULL))
+				m_fulllist_mode=true;
 			run();
 		}
 	}
@@ -84,7 +86,9 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 		for (auto i : List) {
 			for (auto j : i.basePackageList) {
 				string::size_type pos;
-				pos = i.collection.find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				pos = convertToLowerCase(j.categories).find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if  ( pos == std::string::npos )
+					pos = i.collection.find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if  ( pos == std::string::npos )
 					pos = j.set.find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if  ( pos == std::string::npos )
