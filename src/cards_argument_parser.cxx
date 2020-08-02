@@ -72,7 +72,9 @@ _("You can also check 'man cards', 'man cards.conf', 'man pkgmk', 'man pkgmk.con
 
 	addCommand(CMD_CONFIG, "config",
 		_("print info about cards configuration."),
-_("It can show the defined Directories where alls the packages are located. The locale which are going to be installed, the architecture of your machine, the base system directory and the logfile directory."),
+_("It can show the defined Directories where alls the packages are located.\n\
+The locale which are going to be installed, the architecture of your machine,\n\
+the base system directory and the logfile directory."),
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_BASE, "base",
@@ -102,7 +104,10 @@ _("If -p or -b are passed as optional arguments, it will be the info of a port o
 
 	addCommand(CMD_LIST, "list",
 		_("list installed packages."),
-_("If -p or -b are passed as optional arguments, It will respectively list the local available ports or the remote available binaries."),
+_("If -p is passed as optional argument, it will list the local available ports.\n\
+If -b is passed as optional argument, it will list the remote available binaries.\n\
+If -F is passed as optional argument, it will list the automatically installed \n\
+packages as well."),
 		ArgParser::NONE, 0 , "");
 
 	addCommand(CMD_INSTALL, "install",

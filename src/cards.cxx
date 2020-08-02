@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 			cout << GREEN << _("\nINFORMATION") << NORMAL << endl;
 			cout << BLUE << "  help                       "
 				<< NORMAL << _("show this help") << endl;
-			cout << BLUE << "  list [-b][-p]              "
+			cout << BLUE << "  list [-F][-b][-p]          "
 				<< NORMAL << _("list of installed packages") << endl
 				<< "                             "
 				<< _("Available binaries in depot.") << endl
