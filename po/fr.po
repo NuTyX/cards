@@ -557,11 +557,8 @@ msgstr "affiche les informations d'un paquet"
 msgid "If -p or -b are passed as optional arguments, it will be the info of a port or the info of a binary available in the depot."
 msgstr "Si un argument -p ou -b est utilisé, ce seront les informations d'un port ou les informations d'un binaire disponible sur le dépot."
 
-msgid "list installed packages."
-msgstr "Liste des paquets installés"
-
-msgid "If -p or -b are passed as optional arguments, It will respectively list the local available ports or the remote available binaries."
-msgstr "Si un argument -p ou -b est utilisé, ce sera la liste des ports diponibles ou la liste des paquets disponibles sur le serveur."
+msgid "list installed packages by the user."
+msgstr "Liste des paquets installés par l'utilisateur."
 
 msgid "install one or more <package>, a <file> or a <collection>."
 msgstr "installe un ou plusieurs <paquet>, <fichier> ou <collection>."
@@ -586,8 +583,14 @@ msgstr "Cette commmande est utilisée par l'empaqueteur.\n\
 Elle affiche la liste des dépendances du paquet.\n\
 Elle est utilisée pour la compilation d'un port."
 
-msgid "If -p is passed, the list is checked against founds Pkgfile ports."
-msgstr "Si l'argument -p est utilisé, la liste concerne les ports (Pkgfile) des paquets."
+msgid "If -p is passed as optional argument, it will list the local available ports.\n\
+If -b is passed as optional argument, it will list the remote available binaries.\n\
+If -F is passed as optional argument, it will list the automatically installed \n\
+packages as well."
+msgstr "Si l'argument -p est passé en argument optionel, la liste affichera les ports en local.\n\
+Si l'argument -b est passé en argument optionel, la liste affichera les paquets disponibles distants.\n\
+Si l'argument -F est passé en argument optionel, la liste affichera également \n\
+les paquets installés automatiquement."
 
 msgid "list the dependencies of the port."
 msgstr "liste les dépendances du port."
@@ -631,19 +634,19 @@ msgstr "supprime les archives des paquets qui ont été installés."
 msgid "upgrade you installation with a single command."
 msgstr "met à jour votre installation avec une seule commande."
 
-msgid "If the argument is a package name, it will first download the request package, \
-then analyse it and finally download it's dependencies, then analyse them and so on. \
-When all the dependencies are downloaded, they will be installed in the right order \
+msgid "If the argument is a package name, it will first download the request package, \n\
+then analyse it and finally download it's dependencies, then analyse them and so on. \n\
+When all the dependencies are downloaded, they will be installed in the right order \n\
 then finally the request package will be installed.\n\
-If the argument is a file, it will simply installed it. \
+If the argument is a file, it will simply installed it. \n\
 The file can have any name as long it's a valid package.\n\
 If -u is passed as optional argument, it will upgrade the package.\n\
 If -f is passed as optional argument, it will force the install means overwrite conflicting files."
-msgstr "Si l'argument est un nom de paquet, cards télécharge d'abord le paquet démandé, \
-puis analyse son contenu et finalement télécharge toutes ses dépendances, puis analyse celle-c, ainsi de suite. \
-Quand toutes les dépendances sont téléchargées, elles seront installées dans le bon ordre \
+msgstr "Si l'argument est un nom de paquet, cards télécharge d'abord le paquet démandé, \n\
+puis analyse son contenu et finalement télécharge toutes ses dépendances, puis analyse celle-c, ainsi de suite. \n\
+Quand toutes les dépendances sont téléchargées, elles seront installées dans le bon ordre \n\
 et enfin le paquet demandé sera installé. \n\
-Si l'argument est un fichier, il sera simplement installé. \
+Si l'argument est un fichier, il sera simplement installé. \n\
 Le fichier peut contenir n'importe quel nom pour autant que ce soit un paquet valide.\n\
 Si l'option -u est passée, le paquet sera mis à jour.\n\
 Si l'option -f est passée, l'installation sera forcée et les fichiers en conflits seront écrasés."
@@ -675,6 +678,9 @@ msgstr "  Met à jour le paquet avec le même nom."
 
 msgid "Included the allready installed packages in the list."
 msgstr "Inclus dans la liste, les paquets qui sont déjà installés."
+
+msgid "\t   Full list, including automatically installed packages."
+msgstr "\t   Liste complète, y compris les paquets installés automatiquements"
 
 msgid " Available binaries in depot server."
 msgstr " Binaires disponibles sur le serveur de dépot"

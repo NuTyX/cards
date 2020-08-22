@@ -103,7 +103,7 @@ _("If -p or -b are passed as optional arguments, it will be the info of a port o
 		ArgParser::EQ, 1 , _("<package>"));
 
 	addCommand(CMD_LIST, "list",
-		_("list installed packages."),
+		_("list installed packages by the user."),
 _("If -p is passed as optional argument, it will list the local available ports.\n\
 If -b is passed as optional argument, it will list the remote available binaries.\n\
 If -F is passed as optional argument, it will list the automatically installed \n\
@@ -112,11 +112,11 @@ packages as well."),
 
 	addCommand(CMD_INSTALL, "install",
 		_("install one or more <package>, a <file> or a <collection>."),
-_("If the argument is a package name, it will first download the request package, \
-then analyse it and finally download it's dependencies, then analyse them and so on. \
-When all the dependencies are downloaded, they will be installed in the right order \
+_("If the argument is a package name, it will first download the request package, \n\
+then analyse it and finally download it's dependencies, then analyse them and so on. \n\
+When all the dependencies are downloaded, they will be installed in the right order \n\
 then finally the request package will be installed.\n\
-If the argument is a file, it will simply installed it. \
+If the argument is a file, it will simply installed it. \n\
 The file can have any name as long it's a valid package.\n\
 If -u is passed as optional argument, it will upgrade the package.\n\
 If -f is passed as optional argument, it will force the install means overwrite conflicting files."),
