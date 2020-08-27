@@ -57,6 +57,8 @@ ArgParser::APOpt CardsArgumentParser::OPT_PORTS;
 
 ArgParser::APOpt CardsArgumentParser::OPT_DISABLE;
 ArgParser::APOpt CardsArgumentParser::OPT_IGNORE;
+ArgParser::APOpt CardsArgumentParser::OPT_NOLOGENTRY;
+
 
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
 
@@ -227,6 +229,11 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 		'I',
 		_("   Ignore WARNINGS and list the level anyway."));
 
+	OPT_NOLOGENTRY.init("nolog",
+		'n',
+		_("    don't add a log entry for this install set."));
+
+
 	OPT_DISABLE.init("disable",
 		'd',
 		_("  Ignore Pre and Post install scripts."));
@@ -282,6 +289,7 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 	addOption(CMD_INSTALL, OPT_UPDATE,false);
 	addOption(CMD_INSTALL, OPT_FORCE,false);
 	addOption(CMD_INSTALL, OPT_ROOT,false);
+	addOption(CMD_INSTALL, OPT_NOLOGENTRY,false);
 	addOption(CMD_INSTALL, OPT_CONFIG_FILE,false);
 
 	addOption(CMD_BASE, OPT_DRY,false);

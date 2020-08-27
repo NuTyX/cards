@@ -676,6 +676,9 @@ msgstr "\t   Force l'installation, écrase les fichiers en conflit."
 msgid "  Upgrade the package with the same name."
 msgstr "  Met à jour le paquet avec le même nom."
 
+msgid "    don't add a log entry for this install set."
+msgstr "    n'ajoute aucune entrée log pour ce jeu d'install."
+
 msgid "Included the allready installed packages in the list."
 msgstr "Inclus dans la liste, les paquets qui sont déjà installés."
 

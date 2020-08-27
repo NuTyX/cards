@@ -93,7 +93,8 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			setDependency();
 		name = "(" + packageArchive.collection()+") " + name;
 		run();
-		syslog(LOG_INFO,"%s",name.c_str());
+		if (!m_argParser.isSet(CardsArgumentParser::OPT_NOLOGENTRY))
+			syslog(LOG_INFO,"%s",name.c_str());
 
 	}
 }

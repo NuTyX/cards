@@ -62,6 +62,8 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APOpt OPT_PORTS;
 
 		static ArgParser::APOpt OPT_IGNORE;
+		static ArgParser::APOpt OPT_NOLOGENTRY;
+
 
 		static ArgParser::APOpt OPT_DISABLE;
 
