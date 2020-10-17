@@ -171,6 +171,9 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "    text-decoration: none;" << endl \
  << "    font-family: arial;" << endl \
  << "}" << endl \
+ << ".lien_article {" << endl \
+ << "    text-align: center;" << endl \
+ << "}" << endl \
  << " @media print { header, footer {display:none } }" << endl \
  << " </style>" << endl \
  << "</head>" << endl
