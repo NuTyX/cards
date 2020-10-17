@@ -177,14 +177,16 @@ void Pkgadd::run()
 		// Add the info about the files to the DB
 		addPackageFilesRefsToDB(package.first, package.second);
 	}
-	if (m_runPrePost)
-		postRun();
-
+	postRun();
 }
 void Pkgadd::postRun()
 {
 	if (checkFileExist(PKG_POST_INSTALL))
 	{
+		if ( ! m_runPrePost) {
+			removeFile(m_root,PKG_POST_INSTALL);
+			return;
+		}
 		m_actualAction = PKG_POSTINSTALL_START;
 		progressInfo();
 		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
