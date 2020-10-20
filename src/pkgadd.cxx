@@ -181,6 +181,8 @@ void Pkgadd::run()
 }
 void Pkgadd::postRun()
 {
+	if (checkFileExist(PKG_PRE_INSTALL))
+		removeFile(m_root,PKG_PRE_INSTALL);
 	if (checkFileExist(PKG_POST_INSTALL))
 	{
 		if ( ! m_runPrePost) {
