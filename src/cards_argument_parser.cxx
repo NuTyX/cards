@@ -159,7 +159,8 @@ _("It's mainly use to know if they are no duplicate call of any dependency."),
 
 	addCommand(CMD_SEARCH, "search",
 		_("search for <expr>."),
-_("It can be in ports names, in binaries names, in ports description or binaries description.\n\
+_("Search in your local depot. Searching sequence in categories, collections, set,\n\
+name, description, URL, packager and version.\n\
 The <expr> must be 2 characters minimum."),
 		ArgParser::EQ, 1, "<expr>");
 

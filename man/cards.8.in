@@ -147,7 +147,7 @@ and ports in the ports tree.
 .B search <expr>
 Search in the binaries for
 .B expr
-in their name and description
+in their categories, collections, set, name, description, URL, packager and version.
 
 .TP
 .B files <package>

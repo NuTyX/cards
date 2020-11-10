@@ -665,9 +665,11 @@ appartenant à cette collection seront supprimés."
 msgid "It's mainly use to know if they are no duplicate call of any dependency."
 msgstr "Principalement utilisé pour savoir si il n'y a pas certaines dépendances en double."
 
-msgid "It can be in ports names, in binaries names, in ports description or binaries description.\n\
+msgid "Search in your local depot. Searching sequence in categories, collections, set,\n\
+name, description, URL, packager and version.\n\
 The <expr> must be 2 characters minimum."
-msgstr "Elle peut être dans le nom des ports, le nom des binaires, la description des ports ou des binaires.\n\
+msgstr "Recherche dans votre dépot locale. La recherche se fait dans categories, collections, set,\n\
+nom, description, URL, packager et version.\n\
 L'<expr> doit contenir 2 caractères minimum."
 
 msgid "\t   Force install, overwrite conflicting files."

@@ -19,7 +19,7 @@
 usage () {
 echo '
 USAGE
-      mybld <collection>|<package> [version]
+      mybld [option] <collection>|<package> [version]
 
 OPTIONS
       -c, --cleanup <collection>
@@ -31,6 +31,9 @@ OPTIONS
 
       -A, --ask
               Ask for confirmation.
+
+      -p, --pause
+              Make a pause after enter in to the chroot.
 
       -n, --new <collection>/<package> [version] [description] [source]
               Create a new <collection>/<package>/Pkgfile.
@@ -550,7 +553,7 @@ mkdir -p "$ROOT/${VERSION}/${COLLECTION}/etc" || exit 1
 
 setup_cards_conf
 echo "$CARDS_CONF" > $ROOT/$VERSION/$COLLECTION/etc/cards.conf
-
+[ -z "${PARAM[0]}" ] && CHROOT="ncurses readline bash"
 if [ "$COLLECTION" == "base" ] \
 || [ "$COLLECTION" == "cli"  ] \
 || [ "$COLLECTION" == "gui" ] \
@@ -599,8 +602,9 @@ echo ""
 echo " COLLECTION: $COLLECTION"
 echo "GIT Project: $GIT_PROJ"
 echo "    VERSION: $VERSION"
-echo "The command: KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" install-nutyx"
 echo "      DEVEL: $DEVEL "
+echo "     CHROOT: $CHROOT"
+echo "The command: KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" install-nutyx"
 echo ""
 echo "The rsync  : rsync -a $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/"
 [ "$EXTRA" == "yes" ] && \
@@ -667,8 +671,8 @@ if [ "$EXTRA" == "yes" ]; then
 		$ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}-extra
 fi
 
-echo 'running the command: sudo KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
-sudo KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
+echo 'running the command: sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
+sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
 
 umount_all
 remove_all "/${VERSION}/${COLLECTION}"

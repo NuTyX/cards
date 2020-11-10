@@ -96,9 +96,9 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 				if  ( pos == std::string::npos )
 					pos = convertToLowerCase(j.description).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if  ( pos == std::string::npos )
-					pos = convertToLowerCase(j.packager).find(convertToLowerCase(m_argParser.otherArguments()[0]));
-				if  ( pos == std::string::npos )
 					pos = convertToLowerCase(j.URL).find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				if  ( pos == std::string::npos )
+					pos = convertToLowerCase(j.packager).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if  ( pos == std::string::npos )
 					pos = convertToLowerCase(j.version).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if ( pos != std::string::npos ) {

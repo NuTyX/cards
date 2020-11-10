@@ -34,6 +34,9 @@ Cleanup the folders created by the tool. It umount properly the 3 mountpoint and
 .B "\-R, \-\-runtime <dependency package name>"
 Return the list of packages depending on the <dependency package name>.
 .TP
+.B "\-p, \-\-pause
+Make a pause before starting compilation. Usefull for tracking down issues.
+.TP
 .B "\-A, \-\-ask"
 Ask for a confirmation before proceed.
 .TP
@@ -74,6 +77,11 @@ Default: Active branch name of the git project
 Set the editor you want to use.
 .br
 Default: vi
+.TP
+\fBCHROOT=()\fp
+Only relevant when install-nutyx script passing argument KERNEL=none. Set the list of packages to be install prior install-nutyx script enter into chroot. This list of packages will be added to the default ones.
+.br
+Default: not set
 .TP
 \fBROOT=$HOME/mybld\fP
 Set the ROOT directory of my chroot where package(s) are build.
