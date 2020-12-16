@@ -62,11 +62,13 @@ Cards_remove::Cards_remove(const string& commandName,
 
 		for ( auto i : m_argParser.otherArguments() ) {
 			for (auto j : m_listOfInstPackages) {
-				if  (( j.second.collection == i) ||
-				( j.second.group == i)) {
-				PackageToRemove.first=j.first;
-				PackageToRemove.second=j.second.collection;
-				listOfPackagesToRemove.insert(PackageToRemove);
+				for (auto k : j.second.set) {
+					if  ((j.second.collection == i) ||
+					(j.second.group == i) || (k == i)) {
+						PackageToRemove.first=j.first;
+						PackageToRemove.second=j.second.collection;
+						listOfPackagesToRemove.insert(PackageToRemove);
+					}
 				}
 			}
 			if ( listOfPackagesToRemove.empty()) {
