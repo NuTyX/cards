@@ -220,6 +220,10 @@ case $1 in
 		shift
 		PARAM+=($1);;
 
+	-p|--pause)
+		PAUSE=" && export PATH=/root/$VERSION/scripts:$PATH && printf \"You are now in the chroot.\n\
+Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
+
 	-I|--init)
 		INIT="yes";;
 
@@ -456,9 +460,11 @@ if [ ! -d .git ]; then
 "
 	exit 1
 fi
-parse_arguments "$@"
 
 [ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
+
+parse_arguments "$@"
+
 [ -z "$COLLECTION" ] && find_collection
 
 if [ "$INIT" == "yes" ]; then
@@ -552,6 +558,12 @@ GIT=$(basename $GIT_PROJ)
 mkdir -p "$ROOT/${VERSION}/${COLLECTION}/etc" || exit 1
 
 setup_cards_conf
+
+DEVEL="cards.devel \
+&& cd /root/$GIT \
+$PAUSE \
+&& bash scripts/$COLLECTION"
+
 echo "$CARDS_CONF" > $ROOT/$VERSION/$COLLECTION/etc/cards.conf
 [ -z "${PARAM[0]}" ] && CHROOT="ncurses readline bash"
 if [ "$COLLECTION" == "base" ] \
@@ -561,18 +573,13 @@ if [ "$COLLECTION" == "base" ] \
 || [ "$COLLECTION" == "gui-extra" ] \
 || [ "$COLLECTION" == "desktops" ] \
 || [ "$COLLECTION" == "nos" ]; then
-	DEVEL="cards.devel \
-&& cd /root/$GIT \
-&& bash scripts/$COLLECTION"
 	if ! [ -z "${PARAM[0]}" ]; then
 		DEVEL="$DEVEL ${PARAM[0]}"
 	else
 		DEVEL="$DEVEL -a"
 	fi
 else
-	DEVEL="cards.devel \
-&& cd /root/$GIT \
-&& bash scripts/$COLLECTION -a \
+	DEVEL="$DEVEL -a \
 && bash scripts/$COLLECTION-extra -a"
 	EXTRA="yes"
 fi

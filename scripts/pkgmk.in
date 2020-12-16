@@ -327,7 +327,7 @@ unpack_source() {
 	for FILE in ${source[@]}; do
 		LOCAL_FILENAME="$(get_filename $FILE)"
 		case $LOCAL_FILENAME in
-			*.tar|*.tar.gz|*.tar.Z|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.lzma|*.zip|*.rpm|*.tar.lz|*.7z|*.deb)
+			*.tar|*.tar.gz|*.tar.Z|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.lzma|*.zip|*.tar.zst|*.rpm|*.tar.lz|*.7z|*.deb)
 				if [ "$PKGMK_IGNORE_UNPACK" != "yes" ];then
 					COMMAND="bsdtar -p -o -C $SRC -xf $LOCAL_FILENAME"
 				else

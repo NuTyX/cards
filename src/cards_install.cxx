@@ -46,7 +46,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 		std::set<std::string> ListOfPackage = getListOfPackagesFromSet(i);
 		if (ListOfPackage.empty() )
 			ListOfPackage = getListOfPackagesFromCollection(i);
-		if ( (!ListOfPackage.empty()) && (!checkBinaryExist(i)) ) {
+		if ( !ListOfPackage.empty() )  {
 			/*
 			* It's a collection or a set
 			*/

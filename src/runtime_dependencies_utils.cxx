@@ -67,17 +67,8 @@ int get_64bit_elf_header_part(FILE *file)
 }
 int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fileName)
 {
-
 #ifndef NDEBUG
-	printf("sizeof unsigned char: %d\n",sizeof(unsigned char));
-	printf("sizeof unsigned short int: %d\n",sizeof(unsigned short int));
-	printf("sizeof short int: %d\n",sizeof(short int));
-	printf("sizeof int: %d\n",sizeof(int));
-	printf("sizeof unsigned int: %d\n",sizeof(unsigned int));
-	printf("sizeof int long: %d\n",sizeof(int long));
-	printf("sizeof double: %d\n",sizeof(double));
-	printf("sizeof unsigned long long: %u\n",sizeof( unsigned long long)); 
-	printf("sizeof unsigned long : %u\n",sizeof( unsigned long));
+	printf("\n==>File open: %s\n",fileName.c_str());
 #endif
 	unsigned long dynamic_addr = 0;
 	unsigned long dynamic_size_32bits = 0;
@@ -95,10 +86,6 @@ int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fil
 	file = fopen (file_name, "rb" );
 	if (file == NULL)
 		return error("Cannot open the file");
-#ifndef NDEBUG
- printf("File open: %s\n",file_name);
-#endif
-
 
 	/* Magic number */
 	buffer = (Elf_Ehdr_Begin *)malloc( sizeof(elf_header_begin));
@@ -141,6 +128,7 @@ int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fil
 
 	if (elf_header_end.e_shnum == 0)
 		return error ("There are no Sections in this file");
+
 #ifndef NDEBUG
   printf("\nNumber of Section header: %d 0x%x\n",
 	elf_header_end.e_shnum,elf_header_end.e_shnum);
@@ -151,6 +139,7 @@ int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fil
 	printf("Size of Program header entity: %d 0x%x\n\n",
 	elf_header_end.e_phentsize,elf_header_end.e_phentsize);
 #endif
+
 /* Main check if it's a 32 bits or 64 bits elf files */
 	if ( elf_header_begin.e_ident[EI_CLASS] == ELFCLASS32 )
 	{
@@ -165,7 +154,7 @@ int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fil
 				elf_header_end.e_shnum);
 
 		if (!section_headers_32bits)
-		  return error ("There are no Sections in this file\n");
+		  return error ("There are no 32bits Sections in this file\n");
 
 		for (int i = 0;i < elf_header_end.e_shnum;i++)
 		{
@@ -222,7 +211,7 @@ int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fil
 			1,dynamic_size_32bits);
 
 		if (!dynamics_section_32bits)
-			error("Out of mem");
+			return error("Out of mem");
 
 		if (fseek (file, 0, SEEK_END))
 			return error ("Error to seek to end of the file");
@@ -304,7 +293,7 @@ int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fil
 					dependencies_utils_end();
 #ifndef NDEBUG
 	printf("No dynamics found\n");
-		printf("offset : %u 0x%x\n",
+	printf("offset : %u 0x%x\n",
 	offset,offset);
 #endif
 					return 0;
@@ -316,9 +305,9 @@ int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fil
     {
       dependencies_utils_end();
 #ifndef NDEBUG
-  printf("No dynamics found\n");
-    printf("offset : %u 0x%x\n",
-  offset,offset);
+	printf("No dynamics found\n");
+	printf("offset : %u 0x%x\n",
+	offset,offset);
 #endif
       return 0;
     }
