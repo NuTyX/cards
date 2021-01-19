@@ -10,7 +10,7 @@ http://cards.nutyx.org
 **Cards** which stands for *Create, Add, Remove and Download System* is a set of utilities
 (pkgadd, pkgrm, pkginfo, pkgmk and cards), which are used for managing software packages in NuTyX-Linux.
 
-*cards* is based on a fork of the [CRUX-Linux](http://crux.nu) pkgutils and prt-get tools and is under active
+*Cards* is based on a fork of the [CRUX-Linux](http://crux.nu) pkgutils and prt-get tools and is under active
 development. [NuTyX-Linux Team](http://nutyx.org)
 
 
