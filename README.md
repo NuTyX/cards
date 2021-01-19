@@ -1,4 +1,4 @@
-## cards - Package Management Utilities for NuTyX-Linux
+## Cards - Package Management Utilities for NuTyX-Linux
 
 ### Online Documentation
 
