@@ -51,15 +51,33 @@ abort_on_build() {
 have_function() {
 	declare -f "$1" >/dev/null
 }
-get_collection() {
+get_dependencies(){
+	[ -z $PKGMK_DEPENDS ] && return
+	info "Get dependencies ..."
+	local NAME COLLECTION PKGNAME
+	i=0
+	for COLLECTION in ${PKGMK_COLLECTIONS[@]}; do
+		for NAME in ${PKGMK_DEPENDS[@]}; do
+			[ ! -d $(dirname $DIR)/$COLLECTION/${NAME%.*} ] && continue
+			for FILE in $(find $(dirname $DIR)/$COLLECTION/${NAME%.*}/ \
+				-name ${NAME}*.$PKGMK_PACKAGE_EXT*); do
+				PKGNAME=$(get_package_name $(basename $FILE))
+				[ "$(pkginfo -b $PKGNAME)"  != 0 ] && continue
+				DEPENDENCIES[i]="$PKGNAME:$FILE"
+				i=$((i+1))
+			done
+		done
+	done
+}
+get_collections() {
 	local FILE DIR
 	for FILE in $(find .. -name $PKGMK_PKGFILE | sort); do
 		DIR="$(dirname $FILE)/"
                 if [ -d $DIR ]; then
-			if [ -z "$PKGMK_COLLECTION" ]; then
-				PKGMK_COLLECTION="$(basename $DIR)"
+			if [ -z "$COLLECTIONS" ]; then
+				COLLECTIONS="$(basename $DIR)"
 			else
-				PKGMK_COLLECTION="$PKGMK_COLLECTION $(basename $DIR)"
+				COLLECTIONS="$COLLECTIONS $(basename $DIR)"
 			fi
 		fi
 	done
@@ -123,11 +141,11 @@ check_pkgfile() {
 		exit $E_PKGFILE
 	fi
 	if [ ! -z "$alias" ];then
-		get_collection
+		get_collections
 		# Check if any alias is already a port name
 		for a in ${alias}
 		do
-			for p in $PKGMK_COLLECTION
+			for p in $COLLECTIONS
 			do
 				[ "$p" == "${name}" ] && continue
 				if [ "$a" == "$p" ];then
@@ -744,7 +762,7 @@ build() {
 
 			*)
 				echo "$(basename $PKGMK_COMMAND): function build invalid build type"
-				exit E_BUILD ;;
+				exit $E_BUILD ;;
 		esac
 	fi
 }
@@ -807,7 +825,7 @@ add_meta_to_archive() {
 	echo "r$release" >> .META
 	echo "B$PKGMK_BUILDVER" >> .META
 	echo "a$ARCH" >> .META
-	[ ! -z "$collection" ] && echo "c$collection" >> .META
+	[ ! -z "$COLLECTION" ] && echo "c$COLLECTION" >> .META
 	[ ! -z "$GROUP" ] && echo "g$GROUP" >> .META
 
 	# TODO improve the pkginfo --runtimedepfiles functionnality
@@ -1042,7 +1060,7 @@ build_package() {
 				info "trying to get categories..."
 				get_categories
 			fi
-			get_package_list		
+			get_package_list
         		if [ -z $TARGETS ]; then
                 		error "Package(s) not found(s)..."
 				exit $E_BUILD
@@ -1440,8 +1458,23 @@ main() {
 	NAME="$(basename $PKGMK_ROOT)"
 
 	DIR="$(dirname $PKGMK_ROOT)"
-	collection="$(basename $DIR)"
-
+	COLLECTION="$(basename $DIR)"
+	if [ -z $PKGMK_COLLECTIONS ]; then
+		if [ $COLLECTION != "base" ]; then
+			case $COLLECTION in
+				cli)
+					PKGMK_COLLECTIONS="base cli";;
+				cli-extra)
+					PKGMK_COLLECTIONS="base cli cli-extra";;
+				gui)
+					PKGMK_COLLECTIONS="base cli gui";;
+				*)
+					PKGMK_COLLECTIONS="base cli gui $COLLECTION";;
+			esac
+		else
+			PKGMK_COLLECTIONS=($COLLECTION)
+		fi
+	fi
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
 		recursive "$@"
 		exit 0
@@ -1530,7 +1563,14 @@ main() {
 		info "packager: $packager"
 		info "maintainer: $maintainer"
 		info "contributors: $contributors"
-		info "set: $set"
+		info "collection: $COLLECTION"
+		info "collections: $PKGMK_COLLECTIONS"
+		get_dependencies
+		[ -z $DEPENDENCIES ] && exit
+		info "pkgmk dependencies:"
+		for i in ${DEPENDENCIES[@]};do
+			echo "$i"
+		done
 		exit 0
 	fi
 	
