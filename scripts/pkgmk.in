@@ -69,6 +69,13 @@ get_dependencies(){
 		done
 	done
 }
+remove_dependencies() {
+	if [ ! -z $DEPENDENCIES ];then
+		for i in ${DEPENDENCIES[@]}; do
+			pkgrm $(echo $i|cut -d ":" -f1)
+		done
+	fi
+}
 get_collections() {
 	local FILE DIR
 	for FILE in $(find .. -name $PKGMK_PKGFILE | sort); do
@@ -935,6 +942,15 @@ build_package() {
 	if [ "$PKGMK_PACK_ONLY" == "no" ];then
 		info "Building '$TARGET'."
 		unpack_source
+
+		get_dependencies
+
+		if [ ! -z $DEPENDENCIES ];then
+			for i in ${DEPENDENCIES[@]}; do
+				pkgadd $(echo $i|cut -d ":" -f2)
+			done
+		fi
+
 		cd $SRC
 
 		if have_function 'prepare'; then
@@ -966,6 +982,9 @@ build_package() {
 		BUILD_SUCCESSFUL="yes"
 	fi
 	if [ "$BUILD_SUCCESSFUL" == "yes" ]; then
+
+		remove_dependencies
+
 		if [ "$PKGMK_NO_STRIP" = "no" ]; then
 			strip_files
 		fi
@@ -983,6 +1002,7 @@ build_package() {
 					j=1
 					BUILD_SUCCESSFUL="yes"
 				else
+					remove_dependencies
 					error "Building '$TARGET' failed."
 					exit $E_BUILD
 				fi
@@ -995,13 +1015,15 @@ build_package() {
 				fi
 				remove_${group}
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
+					remove_dependencies
 					error "Building '$TARGET' failed."
-                			exit $E_BUILD
+					exit $E_BUILD
 				fi
 			fi
 			# Add the meta in each package
 			if [ $j == 1 ]; then
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
+					remove_dependencies
 					error "Building '$TARGET' failed."
 					exit $E_BUILD
 				fi
@@ -1017,6 +1039,7 @@ build_package() {
 				if [ $? = 0 ]; then
 					BUILD_SUCCESSFUL="yes"
 				else
+					remove_dependencies
 					error "Building '$TARGET' failed."
 					exit $E_BUILD
 				fi
@@ -1041,6 +1064,7 @@ build_package() {
 		if [ "$(ls|wc -l)" != "0" ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} *
 		else
+			remove_dependencies
 			error "No files found in $PKG..."
 			exit $E_BUILD
 		fi
@@ -1062,8 +1086,9 @@ build_package() {
 			fi
 			get_package_list
         		if [ -z $TARGETS ]; then
-                		error "Package(s) not found(s)..."
-				exit $E_BUILD
+					remove_dependencies
+					error "Package(s) not found(s)..."
+					exit $E_BUILD
         		fi
 			for TARGET in ${TARGETS[@]}; do
 				add_meta_files $TARGET
@@ -1080,6 +1105,7 @@ build_package() {
 		if [ -f $TARGET ]; then
 			touch -r $PKGMK_ROOT/$PKGMK_PKGFILE $TARGET &> /dev/null
 		fi
+		remove_dependencies
 		error "Building '$TARGET' failed."
 		exit $E_BUILD
 	fi
@@ -1566,7 +1592,7 @@ main() {
 		info "collection: $COLLECTION"
 		info "collections: $PKGMK_COLLECTIONS"
 		get_dependencies
-		[ -z $DEPENDENCIES ] && exit
+		[ -z $DEPENDENCIES ] && exit 0
 		info "pkgmk dependencies:"
 		for i in ${DEPENDENCIES[@]};do
 			echo "$i"
