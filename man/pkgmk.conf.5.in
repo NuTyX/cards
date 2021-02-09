@@ -108,6 +108,12 @@ If set to 'yes', pkgmk will delete the package(s) after a successfull build and 
 .br
 Default: 'yes'
 .TP
+\fBPKGMK_COLLECTIONS=('STRING1' .. 'STRINGN')
+If set, pkgmk will look into 'STRING1', .., 'STRINGN' directories for any dependencies. Each directory is define in this variable.
+.br
+Default: '()' pkgmk will find them automatically.
+Possible values: '(base cli cli-extra gui gui-extra desktops <your_collection>)'
+.TP
 \fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
 If set, pkgmk will try to split the produced package into groups. Each group is define in this variable. A default function is executed if this same function is not found in the Pkgfile. Supported default group functions are: lib() devel()  doc()  man()  service()
 .br
@@ -122,6 +128,6 @@ Default: '(fr)'
 pkgmk(8)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
-pkgmk (cards) is Copyright (c)  2013-2020 Thierry Nuttens NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is Copyright (c)  2013-2021 Thierry Nuttens NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.
