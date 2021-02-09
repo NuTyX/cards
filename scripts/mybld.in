@@ -618,13 +618,28 @@ echo "The rsync  : rsync -a $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTI
 echo "             rsync -a $GIT_PROJ/${COLLECTION}-extra/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}-extra/"
 echo ""
 
+newpackager="$(git config user.name) <$(git config user.email)>"
+if [ "$packager" != "$newpackager" ]; then
+	oldpackager="${packager%[ ,<]*}"
+	newcontributors="$contributors, ${oldpackager// /}"
+fi
 if [ ! -z "${PARAM[1]}" ]; then
 	echo ""
-	echo " Upgrading ${PARAM[0]}: $version -> ${PARAM[1]}"
+	echo " Upgrading ${PARAM[0]}:"
+	echo "       version: $version -> ${PARAM[1]}"
+	if [ "$packager" != "$newpackager" ]; then
+		echo "      packager: $packager -> $newpackager"
+		echo "  contributors: $contributors -> $newcontributors"
+	fi
 	echo ""
 fi
 if [ "$INCREMENT" == "yes" ]; then
-	echo " Upgrading ${PARAM[0]}: $version-$release -> $version-$((release+1))"
+	echo " Upgrading ${PARAM[0]}:"
+	echo "       version: $version-$release -> $version-$((release+1))"
+	if [ "$packager" != "$newpackager" ]; then
+		echo "      packager: $packager -> $newpackager"
+		echo "  contributors: $contributors -> $newcontributors"
+	fi
 	echo ""
 fi
 if [ "$CONFIRM" == "yes" ]; then
@@ -636,10 +651,26 @@ if [ ! -z "${PARAM[1]}" ]; then
 	sed -i "s@version=$version@version=${PARAM[1]}@" \
 	"$COLLECTION"/"${PARAM[0]}"/Pkgfile
 	sed -i "/release=/d" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+	if [ "$packager" != "$newpackager" ]; then
+		sed -e 's/^\(packager=\).*/\1/g' \
+		-e "s/packager=/packager=\"$newpackager\"/" \
+		-i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+		sed -e 's/^\(contributors=\).*/\1/g' \
+		-e "s/contributors=/contributors=\"$newcontributors\"/" \
+		-i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+	fi
 fi
 if [ "$INCREMENT" == "yes" ]; then
 	sed -i "/release=/d" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
 	sed -i "/^version=/ a release=$((release+1))" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+	if [ "$packager" != "$newpackager" ]; then
+		sed -e 's/^\(packager=\).*/\1/g' \
+		-e "s/packager=/packager=\"$newpackager\"/" \
+		-i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+		sed -e 's/^\(contributors=\).*/\1/g' \
+		-e "s/contributors=/contributors=\"$newcontributors\"/" \
+		-i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+	fi
 fi
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
