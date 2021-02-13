@@ -32,6 +32,7 @@
 #include "pixmaps/mate.xpm"
 #include "pixmaps/kde.xpm"
 #include "pixmaps/gnome.xpm"
+#include "pixmaps/E17.xpm"
 #include "table_base.h"
 
 /** \class TableCollection

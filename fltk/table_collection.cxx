@@ -66,10 +66,10 @@ void TableCollection::refresh_table()
             }
             case 2:
             {
-                newrow.cols.push_back("LXQT");
-                newrow.cols.push_back("Lxqt");
-                newrow.cols.push_back("Lightweight desktop environment based on Qt");
-                newrow.data = &lxqt_xpm;
+                newrow.cols.push_back("E17");
+                newrow.cols.push_back("Enlightenment");
+                newrow.cols.push_back("Lightweight desktop environment based on EFL");
+                newrow.data = &E17_xpm;
                 break;
             }
             case 3:
@@ -169,21 +169,23 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 if (Collection=="LXDE")
                 {
                     Collec_List.insert("(lxde )");
+                    Collec_List.insert("(lxdm)");
                 }
                 else if (Collection=="XFCE")
                 {
                     Collec_List.insert("(xfce4 )");
                     Collec_List.insert("(xfce4-extra )");
+                    Collec_List.insert("(lxdm)");
                 }
-                else if (Collection=="LXQT")
+                else if (Collection=="E17")
                 {
-                    Collec_List.insert("(lxqt )");
-                    Collec_List.insert("(lxqt-extra )");
+                    Collec_List.insert("(enlightenment )");
+                    Collec_List.insert("(lxdm)");
                 }
                 else if (Collection=="MATE")
                 {
                     Collec_List.insert("(mate )");
-                    Collec_List.insert("(mate-extra )");
+                    Collec_List.insert("(lightdm)");
                 }
                 else if (Collection=="KDE")
                 {
@@ -192,7 +194,6 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 else if (Collection=="GNOME")
                 {
                     Collec_List.insert("(gnome )");
-                    Collec_List.insert("(gnome-extra )");
                 }
                 else break;
                 Fl_Menu_Item rclick_menu[] = {
@@ -207,8 +208,6 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 }
                 else if ( strcmp(m->label(), "Install") == 0 )
                 {
-                    Collec_List.insert("(xorg)");
-                    Collec_List.insert("(lxdm)");
                     vector<CPackage*> Packages = Cards->getPackageList();
                     for (CPackage* Package : Packages)
                     {
