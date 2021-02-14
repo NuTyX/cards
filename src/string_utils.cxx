@@ -235,30 +235,41 @@ string getFirstValueOfKeyAfterDelim(const string& s, char delimiter)
 		return s.substr( pos + 1 );
 	return "";
 }
-vector<string> parseDelimitedList(const string& s, const char delimiter)
+vector<string> parseDelimitedVectorList
+	(const string& s, const char *delimiter)
 {
 	vector<string> list;
 	if ( s.empty() )
 		return list;
-	string::size_type start = 0, end = 0;
-	while ( ( end = s.find(delimiter,start)) < string::npos )
+
+	char * cstr = new char [ s.length() + 1 ];
+	std::strcpy (cstr, s.c_str());
+
+	char * pch = std::strtok (cstr,delimiter);
+	while (pch !=NULL)
 	{
-		list.push_back(s.substr( start, end - start ));
-		start = end +1;
+		list.push_back(pch);
+		pch = std::strtok (NULL, delimiter);
 	}
+	delete[] cstr;
 	return list;
 }
-set<string> parseDelimitedSetList(const string& s, const char delimiter)
+set<string> parseDelimitedSetList(const string& s, const char *delimiter)
 {
 	set<string> list;
 	if ( s.empty() )
 		return list;
-	string::size_type start = 0, end = 0;
-	while ( ( end = s.find(delimiter,start)) < string::npos )
+
+	char * cstr = new char [ s.length() + 1 ];
+	std::strcpy (cstr, s.c_str());
+
+	char * pch = std::strtok (cstr,delimiter);
+	while (pch !=NULL)
 	{
-		list.insert(s.substr( start, end - start ));
-		start = end + 1;
+		list.insert(pch);
+		pch = std::strtok (NULL, delimiter);
 	}
+	delete[] cstr;
 	return list;
 }
 string stripWhiteSpace(const string& s)

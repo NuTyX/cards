@@ -66,7 +66,7 @@ void TableCollection::refresh_table()
             }
             case 2:
             {
-                newrow.cols.push_back("E17");
+                newrow.cols.push_back("E24");
                 newrow.cols.push_back("Enlightenment");
                 newrow.cols.push_back("Lightweight desktop environment based on EFL");
                 newrow.data = &E17_xpm;

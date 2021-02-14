@@ -1,7 +1,7 @@
 /*
  * cards_info.cxx
  * 
- * Copyright 2015 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2015 - 2021 Thierry Nuttens <tnut@nutyx.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -118,7 +118,7 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 				}
 				bool found = false;
 				set<string> groupList;
-				groupList = parseDelimitedSetList(j.group,' ');
+				groupList = parseDelimitedSetList(j.group," ");
 				for ( auto k : groupList ) {
 					if ( k == j.basePackageName)
 						continue;
@@ -143,7 +143,7 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 				if (found)
 					continue;
 				set<string> aliasList;
-				aliasList = parseDelimitedSetList(j.alias,' ');
+				aliasList = parseDelimitedSetList(j.alias," ");
 				for ( auto k : aliasList ) {
 					if ( k == j.basePackageName)
 						continue;

@@ -1,6 +1,6 @@
 //  webcards.cxx
 //
-//  Copyright (c) 2017 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2017 - 2021 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -144,7 +144,7 @@ string::size_type parseArguments(arguments_t &arguments)
 	set<string> listOfArguments;
 	char * pArgument = getenv ("QUERY_STRING");
 	string::size_type pos;
-	listOfArguments = parseDelimitedSetList(pArgument,'&');
+	listOfArguments = parseDelimitedSetList(pArgument,"&");
 	arguments.docName="index";
 	for ( auto i : listOfArguments) {
 		pos = i.find("arch=");
@@ -330,7 +330,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 					continue;
 				}
 				set<string> groupList;
-				groupList = parseDelimitedSetList(j.group,' ');
+				groupList = parseDelimitedSetList(j.group," ");
 				for ( auto k : groupList ) {
 					if ( convertToLowerCase(search) == k ) {
 						string name = j.basePackageName
@@ -340,7 +340,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 					}
 				}
 				set<string> aliasList;
-				aliasList = parseDelimitedSetList(j.alias,' ');
+				aliasList = parseDelimitedSetList(j.alias," ");
 				for ( auto k : aliasList ) {
 					if ( convertToLowerCase(search) == k ) {
 						string name = j.basePackageName;

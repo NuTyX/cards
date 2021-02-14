@@ -107,7 +107,7 @@ vector<string> ArchiveUtils::extractFileContent(const char * fileName)
 {
 	vector<string> contentFile;
 	struct archive* ar;
-  struct archive_entry* ae;
+	struct archive_entry* ae;
 
 	ar = archive_read_new();
 	INIT_ARCHIVE(ar);
@@ -128,7 +128,7 @@ vector<string> ArchiveUtils::extractFileContent(const char * fileName)
 			fC[entry_size-1]='\0';
 			string s_contentFile = fC;
 			// free(fC); // TODO Find out why no need to free this char pointer...
-			contentFile = parseDelimitedList(s_contentFile, '\n');
+			contentFile = parseDelimitedVectorList(s_contentFile, "\n");
 			break;
 		}
 		++i;

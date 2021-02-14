@@ -396,7 +396,7 @@ std::set<string> Pkgrepo::getListOfPackagesFromSet
 
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
-			std::set<string> set = parseDelimitedSetList(j.set, ' ');
+			std::set<string> set = parseDelimitedSetList(j.set, " ");
 			for (auto k : set) {
 				if (k == setName)
 					listOfPackages.insert(j.basePackageName);

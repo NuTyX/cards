@@ -64,12 +64,12 @@ void Pkg::setPackager(std::string& packager)
 /// Return
 std::vector<std::string> Pkg::getSet()
 {
-	m_setList = parseDelimitedList (m_set, ' ');
+	m_setList = parseDelimitedVectorList (m_set, " ");
 	return m_setList;
 }
 std::string Pkg::getPrimarySet()
 {
-	m_setList = parseDelimitedList (m_set, ' ');
+	m_setList = parseDelimitedVectorList (m_set, " ");
 	return m_setList[0];
 }
 string Pkg::getCollection()
