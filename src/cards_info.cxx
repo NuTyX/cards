@@ -52,7 +52,10 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 			set<Pkg*> binaryList = getBinaryPackageSet();
 			for ( auto i : binaryList) {
 				string s;
-				s =  "(" + i->getCollection() + ") ";
+				if ( i->getSet().size()  > 0 )
+ 					s =  "(" + i->getPrimarySet() + ") ";
+				else
+					s = "(" + i->getCollection() + ") ";
 				s += i->getName() + " ";
 				s +=  i->getVersion() + " ";
 				s +=  i->getDescription();

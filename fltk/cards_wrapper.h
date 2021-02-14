@@ -2,7 +2,7 @@
  * cards_wrapper.h
  *
  * Copyright 2017 Gianni Peschiutta <artmia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2021 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -151,7 +151,6 @@ namespace cards
         vector<CPackage*> _arrPackages;
         vector<CPackage*> _arrJobList;
         std::set<std::string> m_arrSets;
-//        set<string> _arrCollections;
 
         /// Threaded Tasks
         void m_Sync_Thread(); // Main Thread for Cards Sync Operation

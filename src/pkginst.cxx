@@ -1,7 +1,7 @@
 //
 //  pkginst.cxx
 //
-//  Copyright (c) 2015 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2015 - 2021 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,11 +23,13 @@
 
 using namespace std;
 
-Pkginst::Pkginst(const string& commandName,const char *configFileName)
+Pkginst::Pkginst
+	(const std::string& commandName,const char *configFileName)
 	: Pkgadd(commandName), Repodwl(configFileName)
 {
 }
-void Pkginst::generateDependencies(const std::pair<std::string,time_t>& packageName)
+void Pkginst::generateDependencies
+	(const std::pair<std::string,time_t>& packageName)
 {
 	m_packageName=packageName.first;
 	generateDependencies();

@@ -3,7 +3,7 @@
 //
 //  Copyright (c) 2000 - 2005 Per Liden
 //  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2021 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ using namespace std;
 
 using __gnu_cxx::stdio_filebuf;
 
-Pkgdbh::Pkgdbh(const string& name)
+Pkgdbh::Pkgdbh(const std::string& name)
 	: m_utilName(name), m_DB_Empty(true), m_miniDB_Empty(true)
 {
 	openlog(m_utilName.c_str(),LOG_CONS,LOG_LOCAL7);
@@ -60,7 +60,7 @@ void Pkgdbh::parseArguments(int argc, char** argv)
 	else
 		m_root=m_root+"/";
 }
-void Pkgdbh::treatErrors(const string& s) const
+void Pkgdbh::treatErrors(const std::string& s) const
 {
 	switch ( m_actualError )
 	{
@@ -287,7 +287,7 @@ int Pkgdbh::getNumberOfPackages()
 /* Append to the "DB" the number of packages founds
  * (directory containg a file named files
  * */
-int Pkgdbh::getListOfPackageNames (const string& path)
+int Pkgdbh::getListOfPackageNames (const std::string& path)
 {
 	if (! m_packageNamesList.empty())
 		return m_packageNamesList.size();
@@ -308,8 +308,8 @@ int Pkgdbh::getListOfPackageNames (const string& path)
 	return m_packageNamesList.size();
 }
 /* get details infos of a package */
-pair<string, pkginfo_t> Pkgdbh::getInfosPackage
-	(const string& packageName)
+std::pair<std::string, pkginfo_t> Pkgdbh::getInfosPackage
+	(const std::string& packageName)
 {
 	pair<string, pkginfo_t> result;
 
@@ -711,7 +711,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 		m_DB_Empty=false;
 	}
 }
-void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
+void Pkgdbh::moveMetaFilesPackage(const std::string& name, pkginfo_t& info)
 {
 	set<string> metaFilesList;
 	m_actualAction = PKG_MOVE_META_START;
@@ -766,7 +766,7 @@ void Pkgdbh::moveMetaFilesPackage(const string& name, pkginfo_t& info)
 	m_actualAction = PKG_MOVE_META_END;
 	progressInfo();
 }
-void Pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
+void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& info)
 {
 
 	m_listOfInstPackages[name] = info;
@@ -809,11 +809,11 @@ void Pkgdbh::addPackageFilesRefsToDB(const string& name, const pkginfo_t& info)
 		treatErrors(fileslist_new + " to " + fileslist);
 	}
 }
-bool Pkgdbh::checkPackageNameExist(const string& name) const
+bool Pkgdbh::checkPackageNameExist(const std::string& name) const
 {
 	return (m_listOfAlias.find(name) != m_listOfAlias.end());
 }
-bool Pkgdbh::checkDependency(const string& name)
+bool Pkgdbh::checkDependency(const std::string& name)
 {
 	if  ( checkPackageNameExist(name) )
 		return m_listOfInstPackages[name].dependency;
@@ -827,7 +827,7 @@ void Pkgdbh::resetDependency()
 {
 	m_dependency=false;
 }
-bool Pkgdbh::checkPackageNameUptodate(const pair<string, pkginfo_t>& archiveName)
+bool Pkgdbh::checkPackageNameUptodate(const std::pair<std::string, pkginfo_t>& archiveName)
 {
 	set<string>::iterator it = m_packageNamesList.find(archiveName.first);
 	if (it == m_packageNamesList.end())
@@ -1023,7 +1023,8 @@ void Pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std
 	}
 }
 
-set<string> Pkgdbh::getConflictsFilesList(const string& name, const pkginfo_t& info)
+std::set<std::string> Pkgdbh::getConflictsFilesList
+	(const std::string& name, const pkginfo_t& info)
 {
 	set<string> files;
 
@@ -1082,7 +1083,7 @@ set<string> Pkgdbh::getConflictsFilesList(const string& name, const pkginfo_t& i
 
 	return files;
 }
-pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
+std::pair<std::string, pkginfo_t> Pkgdbh::openArchivePackage(const std::string& filename)
 {
 	string packageArchiveName;
 	pair<string, pkginfo_t> result;
@@ -1135,7 +1136,8 @@ pair<string, pkginfo_t> Pkgdbh::openArchivePackage(const string& filename)
 	m_packageName = packageArchiveName;
 	return result;
 }
-set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename)
+std::set< std::pair<std::string,time_t> > Pkgdbh::getPackageDependencies
+	(const std::string& filename)
 {
 	pair<string, pkginfo_t> packageArchive;
 	set< pair<string,time_t> > packageNameDepsBuildTime;
@@ -1191,7 +1193,7 @@ set< pair<string,time_t> > Pkgdbh::getPackageDependencies(const string& filename
 #endif
 	return packageNameDepsBuildTime;
 }
-void Pkgdbh::extractAndRunPREfromPackage(const string& filename)
+void Pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 {
 	char buf[PATH_MAX];
 	struct archive* archive;
@@ -1242,7 +1244,9 @@ void Pkgdbh::extractAndRunPREfromPackage(const string& filename)
 	}
 	chdir(buf);
 }
-void Pkgdbh::installArchivePackage(const string& filename, const set<string>& keep_list, const set<string>& non_install_list)
+void Pkgdbh::installArchivePackage
+	(const std::string& filename, const std::set<std::string>& keep_list,
+	const std::set<std::string>& non_install_list)
 {
 	struct archive* archive;
 	struct archive_entry* entry;
@@ -1536,7 +1540,8 @@ void Pkgdbh::runLastPostInstall()
 		progressInfo();
 	}
 }
-bool Pkgdbh::checkRuleAppliesToFile(const rule_t& rule, const string& file)
+bool Pkgdbh::checkRuleAppliesToFile
+	(const rule_t& rule, const std::string& file)
 {
 	regex_t preg;
 	bool ret;
@@ -1550,7 +1555,7 @@ bool Pkgdbh::checkRuleAppliesToFile(const rule_t& rule, const string& file)
 
 	return ret;
 }
-void Pkgdbh::getFootprintPackage(string& filename)
+void Pkgdbh::getFootprintPackage(std::string& filename)
 {
 	unsigned int i;
 	struct archive* archive;
@@ -1709,7 +1714,7 @@ set<string> Pkgdbh::getFilesList()
 {
 	return m_filesList;
 }
-Db_lock::Db_lock(const string& m_root, bool exclusive)
+Db_lock::Db_lock(const std::string& m_root, bool exclusive)
 	: m_dir(0)
 {
   // Ignore signals

@@ -1,7 +1,7 @@
 //
 //  repodwl.cxx
 //
-//  Copyright (c) 2016 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2016 - 2021 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ Repodwl::Repodwl(const char *fileName)
 	: Pkgrepo(fileName)
 {
 }
-void Repodwl::downloadPortsPkgRepo(const string& packageName)
+void Repodwl::downloadPortsPkgRepo(const std::string& packageName)
 {
 	InfoFile downloadFile;
 	vector<InfoFile> downloadFilesList;
@@ -59,7 +59,7 @@ void Repodwl::downloadPortsPkgRepo(const string& packageName)
 		FileDownload FD(downloadFilesList,false);
 	}
 }
-void Repodwl::downloadPackageFileName(const string& packageName)
+void Repodwl::downloadPackageFileName(const std::string& packageName)
 {
 	string basePackageName = packageName;
 	string::size_type pos = packageName.find('.');
@@ -107,7 +107,7 @@ void Repodwl::downloadPackageFileName(const string& packageName)
 		m_PortFilesList_i->md5SUM,true);
 	}
 }
-bool Repodwl::checkBinaryExist(const string& packageName)
+bool Repodwl::checkBinaryExist(const std::string& packageName)
 {
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
@@ -166,19 +166,19 @@ bool Repodwl::checkBinaryExist(const string& packageName)
 	}
 	return Binaryfound;
 }
-string Repodwl::getPackageFileName(const string& packageName)
+std::string Repodwl::getPackageFileName(const std::string& packageName)
 {
 	m_packageFileName = packageName;
 	checkBinaryExist(packageName);
 	return m_packageFileName;
 }
-string Repodwl::getPackageFileNameSignature(const string& packageName)
+std::string Repodwl::getPackageFileNameSignature(const std::string& packageName)
 {
 	m_packageFileName = packageName;
 	checkBinaryExist(packageName);
 	return m_packageFileNameSignature;
 }
-void Repodwl::setPackageFileName(const string& packageFileName)
+void Repodwl::setPackageFileName(const std::string& packageFileName)
 {
 		m_packageFileName=packageFileName;
 }

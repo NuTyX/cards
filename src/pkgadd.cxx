@@ -3,7 +3,7 @@
 //
 //  Copyright (c) 2000 - 2005 Per Liden
 //  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2021 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -224,8 +224,8 @@ void Pkgadd::printHelp() const
 	<< endl;
 }
 
-set<string> Pkgadd::getKeepFileList(const set<string>& files,
-	const vector<rule_t>& rules)
+std::set<string> Pkgadd::getKeepFileList(const std::set< std::string>& files,
+	const std::vector<rule_t>& rules)
 {
 	set<string> keep_list;
 	vector<rule_t> found;
@@ -253,7 +253,7 @@ set<string> Pkgadd::getKeepFileList(const set<string>& files,
 	return keep_list;
 }
 
-set<string> Pkgadd::applyInstallRules(const string& name,
+std::set<string> Pkgadd::applyInstallRules(const std::string& name,
 	pkginfo_t& info,
 	const vector<rule_t>& rules)
 {
@@ -310,7 +310,8 @@ set<string> Pkgadd::applyInstallRules(const string& name,
 
 #ifndef NDEBUG
 	cerr << "PostInstall set:" << endl;
-	for (auto i : m_postInstallList) cerr << "  " << i.first << " " << i.second << endl;
+	for (auto i : m_postInstallList) cerr << "  " \
+	<< i.first << " " << i.second << endl;
 	cerr << "Install set:" << endl;
 	for  (auto i : info.files) cerr << "   " << i << endl;
 	cerr << endl;
@@ -321,9 +322,9 @@ set<string> Pkgadd::applyInstallRules(const string& name,
 
 	return non_install_set;
 }
-void Pkgadd::applyPostInstallRules(const string& name,
+void Pkgadd::applyPostInstallRules(const std::string& name,
 	pkginfo_t& info,
-	const vector<rule_t>& rules)
+	const std::vector<rule_t>& rules)
 {
 	vector<rule_t> found;
 
@@ -353,17 +354,17 @@ void Pkgadd::applyPostInstallRules(const string& name,
 		}
 	}
 }
-void Pkgadd::getInstallRulesList(const vector<rule_t>& rules,
+void Pkgadd::getInstallRulesList(const std::vector<rule_t>& rules,
 	rule_event_t event, 
-	vector<rule_t>& found) const
+	std::vector<rule_t>& found) const
 {
 	for (auto i : rules ) {
 		if (i.event == event)
 			found.push_back(i);
 	}
 }
-void Pkgadd::getPostInstallRulesList(const vector<rule_t>& rules,
-	vector<rule_t>& found) const
+void Pkgadd::getPostInstallRulesList(const std::vector<rule_t>& rules,
+	std::vector<rule_t>& found) const
 {
 	for (auto i : rules ) {
 		if ( (i.event != INSTALL) && (i.event != UPGRADE))

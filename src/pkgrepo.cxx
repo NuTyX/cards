@@ -2,7 +2,7 @@
 //  pkgrepo.cxx
 //
 //  Copyright (c) 2002 - 2005 by Johannes Winkelmann jw at tks6 dot net
-//  Copyright (c) 2014 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014 - 2021 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -41,7 +41,9 @@ Pkgrepo::Pkgrepo(const std::string& fileName)
 	m_parsePackagePkgfileFile = false;
 
 }
-void Pkgrepo::throwError(const string& s) const{
+void Pkgrepo::throwError
+	(const std::string& s) const
+{
 	switch ( m_ErrorCond )
 	{
 		case CANNOT_FIND_DEPOT:
@@ -365,7 +367,8 @@ void Pkgrepo::parsePackagePkgfileFile()
 	}
 	m_parsePackagePkgfileFile = true;
 }
-set<string> Pkgrepo::getListOfPackagesFromCollection(const string& collectionName)
+std::set<string> Pkgrepo::getListOfPackagesFromCollection
+	(const std::string& collectionName)
 {
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
@@ -383,7 +386,8 @@ set<string> Pkgrepo::getListOfPackagesFromCollection(const string& collectionNam
 	}
 	return listOfPackages;
 }
-set<string> Pkgrepo::getListOfPackagesFromSet(const string& setName)
+std::set<string> Pkgrepo::getListOfPackagesFromSet
+	(const std::string& setName)
 {
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
@@ -401,7 +405,7 @@ set<string> Pkgrepo::getListOfPackagesFromSet(const string& setName)
 	}
 	return listOfPackages;
 }
-set<string> Pkgrepo::getBinaryPackageList()
+std::set<string> Pkgrepo::getBinaryPackageList()
 {
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
@@ -442,7 +446,7 @@ set<string> Pkgrepo::getBinaryPackageList()
 	}
 	return binaryList;
 }
-set<Pkg*> Pkgrepo::getBinaryPackageSet()
+std::set<Pkg*> Pkgrepo::getBinaryPackageSet()
 {
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
@@ -469,7 +473,8 @@ set<Pkg*> Pkgrepo::getBinaryPackageSet()
 				 ( j.set=="none") )
 				pkg->setCollection(baseDir);
 			else
-				pkg->setCollection(j.set);
+				pkg->setSet(j.set);
+
 			pkg->setPackager(j.packager);
 
 			m_packagesList.insert(pkg);
@@ -477,7 +482,7 @@ set<Pkg*> Pkgrepo::getBinaryPackageSet()
 	}
 	return m_packagesList;
 }
-vector<RepoInfo> Pkgrepo::getRepoInfo()
+std::vector<RepoInfo> Pkgrepo::getRepoInfo()
 {
 	string::size_type pos;
 	std::vector<RepoInfo> List;
@@ -548,7 +553,7 @@ unsigned int Pkgrepo::getPortsList()
 	}
 	return numberOfPorts;
 }
-bool Pkgrepo::getPortInfo(const string& portName)
+bool Pkgrepo::getPortInfo(const std::string& portName)
 {
 
 	if (!m_parseCollectionDirectory)
@@ -581,7 +586,7 @@ bool Pkgrepo::getPortInfo(const string& portName)
 	}
 	return found;
 }
-bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
+bool Pkgrepo::getBinaryPackageInfo(const std::string& packageName)
 {
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
@@ -616,7 +621,7 @@ bool Pkgrepo::getBinaryPackageInfo(const string& packageName)
 	}
 	return found;
 }
-string Pkgrepo::getPortDir (const std::string& portName)
+std::string Pkgrepo::getPortDir (const std::string& portName)
 {
 	if (!m_parseCollectionDirectory)
 		parseCollectionDirectory();
@@ -636,7 +641,7 @@ string Pkgrepo::getPortDir (const std::string& portName)
 	}
 	return portDir;
 }
-string Pkgrepo::getBasePackageName(const string& packageName)
+std::string Pkgrepo::getBasePackageName(const std::string& packageName)
 {
 
 	if (!m_parsePkgRepoCollectionFile)
@@ -656,7 +661,7 @@ string Pkgrepo::getBasePackageName(const string& packageName)
 	}
 	return "";
 }
-string Pkgrepo::getBasePackageVersion(const string& packageName)
+std::string Pkgrepo::getBasePackageVersion(const string& packageName)
 {
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
@@ -670,7 +675,7 @@ string Pkgrepo::getBasePackageVersion(const string& packageName)
 	}
 	return "";
 }
-string Pkgrepo::getBasePortName (const string& portName)
+std::string Pkgrepo::getBasePortName (const std::string& portName)
 {
 	if (!m_parseCollectionDirectory)
 		parseCollectionDirectory();
@@ -690,7 +695,7 @@ string Pkgrepo::getBasePortName (const string& portName)
 	}
 	return "";
 }
-string Pkgrepo::getPortVersion (const string& portName)
+std::string Pkgrepo::getPortVersion (const std::string& portName)
 {
 	if (!m_parseCollectionDirectory)
 		parseCollectionDirectory();
@@ -706,7 +711,7 @@ string Pkgrepo::getPortVersion (const string& portName)
 	}
 	return "";
 }
-int Pkgrepo::getBasePackageRelease (const string& packageName)
+int Pkgrepo::getBasePackageRelease (const std::string& packageName)
 {
 	if (!m_parsePkgRepoCollectionFile)
 		 parsePkgRepoCollectionFile();
@@ -721,7 +726,7 @@ int Pkgrepo::getBasePackageRelease (const string& packageName)
 	}
 	return release;
 }
-int Pkgrepo::getPortRelease (const string& portName)
+int Pkgrepo::getPortRelease (const std::string& portName)
 {
 
 	if (!m_parseCollectionDirectory)
@@ -739,7 +744,7 @@ int Pkgrepo::getPortRelease (const string& portName)
 	}
 	return release;
 }
-bool Pkgrepo::checkPortExist(const string& portName)
+bool Pkgrepo::checkPortExist(const std::string& portName)
 {
 	if (!m_parseCollectionDirectory)
 		parseCollectionDirectory();
@@ -761,7 +766,7 @@ bool Pkgrepo::checkPortExist(const string& portName)
 	}
 	return false;
 }
-time_t Pkgrepo::getBinaryBuildTime (const string& packageName)
+time_t Pkgrepo::getBinaryBuildTime (const std::string& packageName)
 {
 	if (! m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();

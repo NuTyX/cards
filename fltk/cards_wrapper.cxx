@@ -2,7 +2,7 @@
  * cards_wrapper.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artmia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2021 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -155,7 +155,7 @@ namespace cards
         if (m_IsThreadFree())
         {
             _job = new thread(&CWrapper::m_DoJobList_Thread, CWrapper::_ptCWrapper);
-//            _job->detach();
+            _job->detach();
         }
     }
 
@@ -281,7 +281,19 @@ namespace cards
         CClient Cards;
         // First pass get all package available
         m_ClearPackagesList();
-        set<string> AvailablePackages = Cards.getBinaryPackageList();
+		set<Pkg*> binaryList = Cards.getBinaryPackageSet();
+		set<string> AvailablePackages;
+		for ( auto i : binaryList) {
+			string s;
+			if ( i->getSet().size()  > 0 )
+				s =  i->getPrimarySet() + "\t";
+			else
+				s =  i->getCollection() + "\t";
+				s += i->getName() + "\t";
+				s +=  i->getVersion() + "\t";
+				s +=  i->getDescription();
+				AvailablePackages.insert(s);
+		}
         set<string> InstalledPackages = Cards.ListOfInstalledPackages();
         for (auto it : AvailablePackages)
         {
@@ -295,7 +307,7 @@ namespace cards
                 {
                     case 0: //Set
                     {
-                        Pack->m_set = token;
+                        Pack->_set = token;
                         break;
                     }
                     case 1: //Name
@@ -325,7 +337,7 @@ namespace cards
             }
             if (InstalledPackages.find(Pack->_name)!=InstalledPackages.end()) Pack->setStatus(INSTALLED);
             _arrPackages.push_back(Pack);
-            if (m_arrSets.find(Pack->m_set)==m_arrSets.end()) m_arrSets.insert(Pack->m_set);
+            if (m_arrSets.find(Pack->_set)==m_arrSets.end()) m_arrSets.insert(Pack->_set);
         }
         m_OnRefreshPackageFinished_Callback(CEH_RC::OK);
         _job_running =false;

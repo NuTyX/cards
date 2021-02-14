@@ -3,7 +3,7 @@
  *
  * Copyright 2015 - 2019 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2021 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -168,32 +168,28 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 set<string> Collec_List;
                 if (Collection=="LXDE")
                 {
-                    Collec_List.insert("(lxde )");
-                    Collec_List.insert("(lxdm)");
+                    Collec_List.insert("(lxde)");
                 }
                 else if (Collection=="XFCE")
                 {
-                    Collec_List.insert("(xfce4 )");
-                    Collec_List.insert("(xfce4-extra )");
-                    Collec_List.insert("(lxdm)");
-                }
+                    Collec_List.insert("xfce4");
+                    Collec_List.insert("xfce4-extra");
+               }
                 else if (Collection=="E17")
                 {
-                    Collec_List.insert("(enlightenment )");
-                    Collec_List.insert("(lxdm)");
+                    Collec_List.insert("enlightenment");
                 }
                 else if (Collection=="MATE")
                 {
-                    Collec_List.insert("(mate )");
-                    Collec_List.insert("(lightdm)");
+                    Collec_List.insert("(mate)");
                 }
                 else if (Collection=="KDE")
                 {
-                    Collec_List.insert("(plasma5 kde5 )");
+                    Collec_List.insert("plasma5");
                 }
                 else if (Collection=="GNOME")
                 {
-                    Collec_List.insert("(gnome )");
+                    Collec_List.insert("gnome");
                 }
                 else break;
                 Fl_Menu_Item rclick_menu[] = {
@@ -208,10 +204,12 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 }
                 else if ( strcmp(m->label(), "Install") == 0 )
                 {
+                    Collec_List.insert("xorg");
+                    Collec_List.insert("lxdm");
                     vector<CPackage*> Packages = Cards->getPackageList();
                     for (CPackage* Package : Packages)
                     {
-                        if ((!Package->isInstalled()) && (Collec_List.count(Package->getSetList())))
+                        if ((!Package->isInstalled()) && (Collec_List.count(Package->getSet())))
                         {
                             Package->setStatus(TO_INSTALL);
                         }
@@ -223,7 +221,7 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                     vector<CPackage*> Packages = Cards->getPackageList();
                     for (CPackage* Package : Packages)
                     {
-                        if (Package->isInstalled() && (Collec_List.count(Package->getSetList())))
+                        if (Package->isInstalled() && (Collec_List.count(Package->getSet())))
                         {
                             Package->setStatus(TO_REMOVE);
                         }

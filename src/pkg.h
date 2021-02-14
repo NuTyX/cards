@@ -1,7 +1,7 @@
 /*
  * pkg.h
  *
- * Copyright 2017 - 2020 NuTyX <tnut@nutyx.org>
+ * Copyright 2017 - 2021 NuTyX <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 #ifndef  PKG_H
 #define  PKG_H
 
+#include "string_utils.h"
+
 #include <string>
 
 enum CPSTATUS
@@ -39,15 +41,18 @@ class Pkg
 public:
 	Pkg();
 	~Pkg();
-	std::string getCollection();
 	std::string getName();
 	std::string getVersion();
 	std::string getPackager();
 	std::string getDescription();
+	std::string getCollection();
+	std::vector<std::string> getSet();
+	std::string getPrimarySet();
 	void setName(std::string& name);
 	void setDescription(std::string& description);
 	void setVersion(std::string& version);
 	void setCollection(std::string& collection);
+	void setSet(std::string& set);
 	void setPackager(std::string& packager);
 	bool isInstalled();
 	bool isToBeInstalled();
@@ -58,6 +63,8 @@ public:
 
 private:
 	std::string m_collection;
+	std::string m_set;
+	std::vector<std::string> m_setList;
 	std::string m_name;
 	std::string m_version;
 	std::string m_packager;

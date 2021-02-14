@@ -1,7 +1,7 @@
 //
 // archive_utils.cxx
 //
-// Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+// Copyright (c) 2013 - 2021 by NuTyX team (http://nutyx.org)
 //
 // This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 using namespace std;
 
-ArchiveUtils::ArchiveUtils(const string& fileName)
+ArchiveUtils::ArchiveUtils(const std::string& fileName)
 	: m_fileName(fileName)
 {
 #ifndef NDEBUG

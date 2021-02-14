@@ -1,7 +1,7 @@
 /*
  * cards_package.cxx
  *
- * Copyright 2017 - 2020 NuTyX <tnut@nutyx.org>
+ * Copyright 2017 - 2021 NuTyX <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,27 +37,41 @@ Pkg::~Pkg()
 // Nothing for moment
 }
 // Sets
-void Pkg::setName(string& name)
+void Pkg::setName(std::string& name)
 {
 	m_name = name;
 }
-void Pkg::setDescription(string& description)
+void Pkg::setDescription(std::string& description)
 {
 	m_description = description;
 }
-void Pkg::setVersion(string& version)
+void Pkg::setVersion(std::string& version)
 {
 	m_version = version;
 }
-void Pkg::setCollection(string& collection)
+void Pkg::setCollection(std::string& collection)
 {
 	m_collection = collection;
 }
-void Pkg::setPackager(string& packager)
+void Pkg::setSet(std::string& set)
+{
+	m_set = set;
+}
+void Pkg::setPackager(std::string& packager)
 {
 	m_packager = packager;
 }
 /// Return
+std::vector<std::string> Pkg::getSet()
+{
+	m_setList = parseDelimitedList (m_set, ' ');
+	return m_setList;
+}
+std::string Pkg::getPrimarySet()
+{
+	m_setList = parseDelimitedList (m_set, ' ');
+	return m_setList[0];
+}
 string Pkg::getCollection()
 {
 	return m_collection;

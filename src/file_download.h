@@ -1,7 +1,7 @@
 //
 //  file_download.h
 //
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2021 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -103,6 +103,7 @@ class FileDownload
 	/**
 	 * Download a file with the possibility of checking the signature of the file
 	 *
+	 * \param fileInfo Destination file
 	 * \param url Complete downloading address including the file
 	 * \param dirName Destination folder
 	 * \param fileName file where to store the downloaded datas
