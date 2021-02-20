@@ -1306,10 +1306,6 @@ clean_repo_files() {
 		rm $PKGMK_REPO
 		info "Removing $PKGMK_REPO"
 	fi
-	if [ -f MD5SUM ]; then
-		rm MD5SUM
-		info "Removing MD5SUM"
-	fi
 }
 check_sources_uptodate() {
 	local newversion
@@ -1636,22 +1632,18 @@ main() {
 		info "PKGMK_KEEP_SOURCES: $PKGMK_KEEP_SOURCES"
 		info "PKGMK_CLEAN: $PKGMK_CLEAN"
 	fi
-	if [ "$PKGMK_CLEAN" != "no" ]; then
-		PKGMK_IGNORE_FOOTPRINT="yes"
-		PKGMK_IGNORE_MD5SUM="yes"
-		warning "FOOTPRINT AND MD5SUM IGNORED"
+
+	if [ "$PKGMK_IGNORE_REPO" != "yes" ]; then
+		info "PKGMK_IGNORE_REPO: $PKGMK_IGNORE_REPO"
 	else
-		if [ "$PKGMK_UPDATE_REPO" != "yes" ]; then
-			info "PKGMK_IGNORE_REPO: $PKGMK_IGNORE_REPO"
-		else
-			info "PKGMK_UPDATE_REPO: $PKGMK_UPDATE_REPO"
-		fi
-		info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
-		info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"
-	fi
-	if [ "$PKGMK_IGNORE_REPO"  == "yes" ]; then
 		info "$PKGMK_REPO file will be deleted"
 	fi
+	if [ "$PKGMK_UPDATE_REPO" != "yes" ]; then
+		info "PKGMK_UPDATE_REPO: $PKGMK_UPDATE_REPO"
+	fi
+
+	info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
+	info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"
 
 	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
 	if [ "$PKGMK_COMPRESS_PACKAGE" != "no" ]; then
@@ -1732,18 +1724,18 @@ main() {
 	if [ "$PKGMK_KEEP_SOURCES" != "yes" ]; then
 		remove_source
 	fi
+	if [ "$PKGMK_IGNORE_REPO" != "yes" ]; then
+		update_repo
+	fi
+	if [ "$PKGMK_IGNORE_COLLECTION" != "yes" ]; then
+		update_collection_repo
+	fi
 	if [ "$PKGMK_CLEAN" != "no" ]; then
 		clean
 		unset TARGETS
 		if [ "$PKGMK_IGNORE_REPO" == "yes" ];then
 			clean_repo_files
 		fi
-	fi
-	if [ "$PKGMK_IGNORE_REPO" != "yes" ] && [ "$PKGMK_CLEAN" != "yes" ]; then
-		update_repo
-	fi
-	if [ "$PKGMK_IGNORE_COLLECTION" != "yes" ]; then
-		update_collection_repo
 	fi
 	exit 0
 }
@@ -1786,8 +1778,8 @@ PKGMK_IGNORE_FOOTPRINT="yes"
 PKGMK_IGNORE_NEW="yes"
 PKGMK_IGNORE_MD5SUM="yes"
 PKGMK_IGNORE_REPO="yes"
-PKGMK_IGNORE_COLLECTION="yes"
-PKGMK_IGNORE_RUNTIMEDEPS="yes"
+PKGMK_IGNORE_COLLECTION="no"
+PKGMK_IGNORE_RUNTIMEDEPS="no"
 
 PKGMK_NO_STRIP="no"
 
