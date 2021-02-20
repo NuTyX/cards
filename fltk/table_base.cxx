@@ -59,11 +59,11 @@ TableBase::TableBase(int x, int y, int w, int h, const char *l)
     callback(event_callback, reinterpret_cast<void*>(this));
     selection_color(FL_YELLOW);
     when(FL_WHEN_RELEASE|FL_WHEN_CHANGED);
-    cols(4);
+    cols(6);
     col_header(1);
     col_header_height(25);
     col_resize(1);
-    col_width_all(30);
+    col_width_all(20);
     row_height_all(18);
     tooltip("Click on the header of the column to sort it");
     color(FL_WHITE);
@@ -121,7 +121,7 @@ void TableBase::draw_cell(TableContext context, int R, int C, int X, int Y, int 
                 {
                     fl_font(FL_HELVETICA_BOLD, 16);
                     fl_color(FL_BLACK);
-                    fl_draw(colTitle[C].c_str(), X+2,Y,W,H, FL_ALIGN_LEFT, 0, 0); // +2=pad left
+                    fl_draw(colTitle[C].c_str(), X+2,Y,W,H, FL_ALIGN_CENTER, 0, 0); // +2=pad left
                     if ( C == _sort_lastcol )
                     {
                         draw_sort_arrow(X,Y,W,H);
@@ -137,24 +137,63 @@ void TableBase::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 /// Automatically set columns widths to the longuest string.
 void TableBase::autowidth(int pad)
 {
-    fl_font(FL_COURIER, 16);
-    // initialize all column widhths to lower value
+    fl_font(FL_HELVETICA, 17);
+    // initialize all column widths to pad value
     int c;
-    for (c = 0;c<cols();c++) col_width(c,pad);
-    col_width(c-1,500);
+//    for (c = 0;c<cols();c++)
+//		col_width(c,pad);
+	int n=0;
+	int w1 = 70;
+	int w2 = 80;
+	int w3 = 100;
+	int w4 = 80;
+	int w5 = 80;
     for (auto r : _rowdata)
     {
+		n++;
         int w,h;
-        for  ( c=0; c<r.cols.size();c++)
+        for  ( c=1; c<r.cols.size();c++)
         {
-            fl_measure(r.cols[c].c_str(), w, h, 0);// get pixel width of the text
-            if ( (w) > col_width(c) )
-            {
-                col_width(c, w);
-            }
+			// get pixel width of the text
+			w=fl_width(r.cols[c].c_str(),r.cols[c].size() );
+//			cout << n << " " << c << " " << w << endl;
+			switch (c)
+			{
+				case 1:  // name
+					if ( w > w1 )
+						w1=w;
+					continue;
+
+				case 2: //  version
+					if ( w2 < w )
+						w2=w;
+					continue;
+
+				case 3: //description
+					if ( w3 < w )
+						w3=w;
+					continue;
+
+				case 4: //set
+					if ( w4 < w )
+						w4=w;
+					continue;
+
+				case 5: //packager
+					if ( w5 < w )
+						w5=w;
+				continue;
+			}
         }
     }
-    table_resized();
+    col_width(0, 25);
+    col_width(1, w1);
+    col_width(2, w2);
+    col_width(3, w3);
+    col_width(4, w4);
+    col_width(5, w5);
+
+ //   table_resized();
 }
 
 /// Resize parent widows to size of tableau

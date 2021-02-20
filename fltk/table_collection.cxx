@@ -31,7 +31,7 @@ TableCollection::TableCollection(int x, int y, int w, int h, const char *l)
     : TableBase(x,y,w,h,l)
 {
     colTitle.push_back("");
-    colTitle.push_back("Collection");
+    colTitle.push_back("Set");
     colTitle.push_back("Name");
     colTitle.push_back("Description");
 }
@@ -52,7 +52,7 @@ void TableCollection::refresh_table()
             {
                 newrow.cols.push_back("LXDE");
                 newrow.cols.push_back("Lxde");
-                newrow.cols.push_back("Lightweight desktop environment based on X11");
+                newrow.cols.push_back("Lightweight desktop environment based on GTK+");
                 newrow.data = &lxde_xpm;
                 break;
             }
@@ -60,7 +60,7 @@ void TableCollection::refresh_table()
             {
                 newrow.cols.push_back("XFCE");
                 newrow.cols.push_back("Xfce");
-                newrow.cols.push_back("Lightweight desktop environment based on GTK+");
+                newrow.cols.push_back("Another lightweight desktop environment based on GTK+");
                 newrow.data = &xfce_xpm;
                 break;
             }
@@ -76,7 +76,7 @@ void TableCollection::refresh_table()
             {
                 newrow.cols.push_back("MATE");
                 newrow.cols.push_back("Mate");
-                newrow.cols.push_back("Gnome 2 based desktop environment fork, light and functional");
+                newrow.cols.push_back("Gnome 2 fork desktop environment based on GTK+");
                 newrow.data = &mate_xpm;
                 break;
             }
@@ -84,7 +84,7 @@ void TableCollection::refresh_table()
             {
                 newrow.cols.push_back("KDE");
                 newrow.cols.push_back("Kde");
-                newrow.cols.push_back("Heavy powerfull Desktop Environment");
+                newrow.cols.push_back("Heavy powerfull Desktop Environment based on Qt");
                 newrow.data = &kde_xpm;
                 break;
             }
@@ -92,7 +92,7 @@ void TableCollection::refresh_table()
             {
                 newrow.cols.push_back("GNOME");
                 newrow.cols.push_back("Gnome");
-                newrow.cols.push_back("Famous linux desktop environment");
+                newrow.cols.push_back("Famous linux desktop environment based on GTK+");
                 newrow.data = &gnome_xpm;
                 break;
             }
@@ -168,20 +168,24 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 set<string> Collec_List;
                 if (Collection=="LXDE")
                 {
-                    Collec_List.insert("(lxde)");
+                    Collec_List.insert("lxde");
+                    Collec_List.insert("lxdm");
                 }
                 else if (Collection=="XFCE")
                 {
                     Collec_List.insert("xfce4");
                     Collec_List.insert("xfce4-extra");
+                    Collec_List.insert("lxdm");
                }
-                else if (Collection=="E17")
+                else if (Collection=="E24")
                 {
                     Collec_List.insert("enlightenment");
+                    Collec_List.insert("lxdm");
                 }
                 else if (Collection=="MATE")
                 {
-                    Collec_List.insert("(mate)");
+                    Collec_List.insert("mate");
+                    Collec_List.insert("lightdm");
                 }
                 else if (Collection=="KDE")
                 {
@@ -204,14 +208,15 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 }
                 else if ( strcmp(m->label(), "Install") == 0 )
                 {
-                    Collec_List.insert("xorg");
-                    Collec_List.insert("lxdm");
                     vector<CPackage*> Packages = Cards->getPackageList();
                     for (CPackage* Package : Packages)
                     {
-                        if ((!Package->isInstalled()) && (Collec_List.count(Package->getSet())))
+                        if ((!Package->isInstalled()))
                         {
-                            Package->setStatus(TO_INSTALL);
+							if (Collec_List.count(Package->getSet()))
+								Package->setStatus(TO_INSTALL);
+							if (Collec_List.count(Package->getName()))
+								Package->setStatus(TO_INSTALL);
                         }
                     }
                     Cards->refreshJobList();

@@ -31,9 +31,11 @@ TablePackage::TablePackage(int x, int y, int w, int h, const char *l)
     : TableBase(x,y,w,h,l)
 {
     colTitle.push_back("");
-    colTitle.push_back("Collection");
     colTitle.push_back("Name");
+    colTitle.push_back("Version");
     colTitle.push_back("Description");
+    colTitle.push_back("Set");
+    colTitle.push_back("Packager");
     _cards->refreshPackageList();
 }
 
@@ -49,7 +51,8 @@ void TablePackage::refresh_table()
         if (_filter.length()>0)
             if ((S->getName().find(_filter)==string::npos) &&
                 (S->getSet().find(_filter)==string::npos) &&
-                (S->getDescription().find(_filter)==string::npos) ) continue;
+                (S->getDescription().find(_filter)==string::npos) &&
+                (S->getVersion().find(_filter)==string::npos) ) continue;
         // Add a new row
         Row newrow;
         newrow.data=S;
@@ -58,15 +61,18 @@ void TablePackage::refresh_table()
             newrow.cols.push_back("I");
         }
         else newrow.cols.push_back("U");
-        newrow.cols.push_back(S->getSet());
         newrow.cols.push_back(S->getName());
+        newrow.cols.push_back(S->getVersion());
         newrow.cols.push_back(S->getDescription());
+        newrow.cols.push_back(S->getSet());
+        newrow.cols.push_back(S->getPackager());
+
         _rowdata.push_back(newrow);
     }
     // How many rows we loaded
     rows((int)_rowdata.size());
-    // Auto-calculate widths, with 20 pixel padding
-    autowidth(40);
+    // Auto-calculate widths, with 50 pixel as a start
+    autowidth(50);
 }
 
 void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)

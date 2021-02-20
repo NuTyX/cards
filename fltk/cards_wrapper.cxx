@@ -290,8 +290,9 @@ namespace cards
 			else
 				s =  i->getCollection() + "\t";
 				s += i->getName() + "\t";
-				s +=  i->getVersion() + "\t";
-				s +=  i->getDescription();
+				s += i->getDescription() + "\t";
+				s += i->getVersion() + "\t";
+				s += i->getPackager()+ "\t";
 				AvailablePackages.insert(s);
 		}
         set<string> InstalledPackages = Cards.ListOfInstalledPackages();
@@ -315,19 +316,19 @@ namespace cards
                         Pack->_name = token;
                         break;
                     }
-                    case 2: //Version
+                    case 2: //Description
+                    {
+                        Pack->_description = token;
+                        break;
+                    }
+                    case 3: //Version
                     {
                         Pack->_version = token;
                         break;
                     }
-                    case 3: //Packager
+                    case 4: //Packager
                     {
                         Pack->_packager = token;
-                        break;
-                    }
-                    case 4: //Description
-                    {
-                        Pack->_description = token;
                         break;
                     }
                     default:

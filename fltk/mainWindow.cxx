@@ -63,13 +63,13 @@ mainWindow::mainWindow(bool pInstaller) :
 
     _tabs = new Fl_Tabs(TabLeftCoord,MARGIN +50 , TabWidth,h()-325);
     {
-        _grpPackage = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Packages");
+        _grpPackage = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"All Packages");
         {
             _tablePackages = reinterpret_cast<TableBase*>(new TablePackage(TabLeftCoord, MARGIN+80, TabWidth, h()-330));
             resizable(_tablePackages);
         }
         _grpPackage->end();
-        _grpCollection = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Collections");
+        _grpCollection = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Set of Packages");
         {
             _tableCollections = reinterpret_cast<TableBase*>(new TableCollection(TabLeftCoord, MARGIN+80, TabWidth, h()-330));
             resizable (_tableCollections);
@@ -223,11 +223,11 @@ void mainWindow::OnPackageInfo(CPackage& pPackage)
             _infoBuff->append("No information available for this package");
         else
         {
-            _infoBuff->append(string("Name : " + pPackage.getName()+"\n").c_str());
-            _infoBuff->append(string("Description : " + pPackage.getDescription()+"\n").c_str());
-            _infoBuff->append(string("Version : " + pPackage.getVersion()+"\n").c_str());
-            _infoBuff->append(string("Packager : " + pPackage.getPackager()+"\n").c_str());
-            _infoBuff->append(string("Collection : " + pPackage.getSet()+"\n").c_str());
+            _infoBuff->append(string(pPackage.getName()).c_str());
+            _infoBuff->append(string(" " + pPackage.getVersion()+"\n").c_str());
+            _infoBuff->append(string(pPackage.getDescription()+"\n").c_str());
+            _infoBuff->append(string("build by: " + pPackage.getPackager()+"\n").c_str());
+            _infoBuff->append(string("from     : " + pPackage.getSet()+" collection/set of packages").c_str());
         }
 
     }
