@@ -127,7 +127,10 @@ vector<string> ArchiveUtils::extractFileContent(const char * fileName)
 			archive_read_data(ar,fC,entry_size);
 			fC[entry_size-1]='\0';
 			string s_contentFile = fC;
-			// free(fC); // TODO Find out why no need to free this char pointer...
+			if ( fC != nullptr ) {
+				free(fC);
+				fC = nullptr;
+			}
 			contentFile = parseDelimitedVectorList(s_contentFile, "\n");
 			break;
 		}

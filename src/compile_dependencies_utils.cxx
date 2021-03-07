@@ -55,10 +55,19 @@ void addDepToDepList(depList *list, unsigned int nameIndex, int niveau)
 void freeDepList(depList *list)
 {
 	for (unsigned int i = 0 ; i < list->count;i++) {
-		free(list->niveau);
-		free(list->depsIndex);
+		if  (list->niveau != nullptr) {
+			free(list->niveau);
+			list->niveau = nullptr;
+		}
+		if (list->depsIndex != nullptr) {
+			free(list->depsIndex);
+			list->depsIndex = nullptr;
+		}
 	}
-	free(list);
+	if (list != nullptr) {
+		free(list);
+		list = nullptr;
+	}
 }
 pkgInfo *initPkgInfo(void)
 {
@@ -81,7 +90,10 @@ pkgInfo *addInfoToPkgInfo(unsigned int nameIndex)
 
 void freePkgInfo(pkgInfo *package)
 {
-	free(package);
+	if (package != nullptr) {
+		free(package);
+		package = nullptr;
+	}
 }
 
 pkgList *initPkgList(void)
@@ -112,10 +124,19 @@ void addPkgToPkgList(pkgList *list, pkgInfo *package)
 void freePkgList(pkgList *packagesList)
 {
 	for (unsigned int i = 0 ; i < packagesList->count;i++) {
-		free(packagesList->pkgs[i]);
+		if (packagesList->pkgs[i] != nullptr) {
+			free(packagesList->pkgs[i]);
+			packagesList->pkgs[i] = nullptr;
+		}
 	}
-	free( packagesList->pkgs);
-	free(packagesList);
+	if (packagesList->pkgs != nullptr) {
+		free( packagesList->pkgs);
+		packagesList = nullptr;
+	}
+	if (packagesList != nullptr) {
+		free(packagesList);
+		packagesList = nullptr;
+	}
 }
 
 /* Get the tree dependencies of the dependencies recursively */
@@ -126,12 +147,6 @@ int deps_tree (pkgList *packagesList, depList *dependenciesList,unsigned int nam
 		return 0;
 	}
 	depList *localDependenciesList = initDepsList();
-	if ( dependenciesList->count > packagesList->count ) {
-		printf ("Dependencies List Bigger than Package List. \nDue to circular !!!\n");
-		freePkgList(packagesList);
-		freeDepList(dependenciesList);
-		exit(EXIT_FAILURE);
-	}
 	for ( unsigned int dInd=0; dInd < packagesList->pkgs[nameIndex]->dependences->count; dInd++) {
 		addDepToDepList(localDependenciesList,packagesList->pkgs[nameIndex]->dependences->depsIndex[dInd],0);
 	}

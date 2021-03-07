@@ -61,10 +61,19 @@ void addItemToItemList(itemList *list, const char *item)
 void freeItemList(itemList *list)
 {
 	for (unsigned int i=0; i < list->count;i++) {
-		free(list->items[i]);
+		if (list->items[i] != nullptr) {
+			free(list->items[i]);
+			list->items[i] = nullptr;
+		}
 	}
-	free(list->items);
-	free(list);
+	if (list->items != nullptr) {
+		free(list->items);
+		list->items = nullptr;
+	}
+	if (list != nullptr) {
+		free(list);
+		list = nullptr;
+	}
 }
 
 keyValue splitKeyValue(string s, char delimiter)
