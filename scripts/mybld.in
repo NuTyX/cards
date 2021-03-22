@@ -333,6 +333,7 @@ PKGMK_LOCALES=(af an ar as az be bg bs ca cs cy da de el es fi fr ga gl \
 gn he hi hr hu ia id is it ja ka kk km kn ko lt lv mk ml mr ms my nl nn \
 oc or pa pt pl rm ro ru rw si sq sk sl sr sv ta te th tr uk ur uz vi xh zh)
 PKGMK_CLEAN="no"
+PKGMK_WGET_OPTS="--quiet"
 PKGMK_KEEP_SOURCES="yes"
 PKGMK_SOURCE_DIR="/sources"
 PKGMK_WORK_DIR="/tmp/work"
