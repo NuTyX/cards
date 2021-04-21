@@ -23,7 +23,7 @@
 
 include ../Makefile.inc
 
-all: pkgmk pkgmk2 ports build-port mybld cards
+all: pkgmk ports build-port mybld cards
 
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
