@@ -17,7 +17,7 @@
 #  USA.
 #
 usage () {
-echo '
+	echo '
 USAGE
       mybld [option] <collection>|<package> [version]
 
@@ -52,39 +52,41 @@ MORE INFO
 
 '|more
 }
+
 check_root() {
-if [ "$UID" == "0" ]; then
-	echo "The 'root' account is not allow to building packages"
-	exit 1
-fi
+	if [ "$UID" == "0" ]; then
+		echo "The 'root' account is not allow to building packages"
+		exit 1
+	fi
 }
+
 generate_Pkgfile() {
-if [ ! -d ${COLLECTION} ]; then
-	echo  "
+	if [ ! -d ${COLLECTION} ]; then
+		echo  "
 >>>     The collection '${COLLECTION}' does not exist
 "
-	exit 1
-fi
-if [ "$(git config user.name)" == "" ];then
-	echo "
+		exit 1
+	fi
+	if [ "$(git config user.name)" == "" ];then
+		echo "
 >>>     your username is not set in your $HOME/.gitconfig
 "
-	exit 1
-fi
-if [ "$(git config user.email)" == "" ];then
-	echo "
+		exit 1
+	fi
+	if [ "$(git config user.email)" == "" ];then
+		echo "
 >>>     your email is  not set in your $HOME/.gitconfig
 "
-	exit 1
-fi
-if [ -f ${COLLECTION}/${PARAM}/Pkgfile ];then
-	echo "
+		exit 1
+	fi
+	if [ -f ${COLLECTION}/${PARAM}/Pkgfile ];then
+		echo "
 >>>     ABORT: File '${COLLECTION}/${PARAM}/Pkgfile' already exist !!!
 "
-	exit 1
-fi
-mkdir -p "${COLLECTION}/${PARAM}"
-echo "description=\"${3}\"
+		exit 1
+	fi
+	mkdir -p "${COLLECTION}/${PARAM}"
+	echo "description=\"${3}\"
 url=\"\"
 
 packager=\"$(git config user.name) <$(git config user.email)>\"
@@ -104,207 +106,212 @@ cd \$name-\$version
 ./configure --prefix=/usr
 make
 make DESTDIR=\$PKG install
-}" \
-> ${COLLECTION}/${PARAM}/Pkgfile
-$EDITOR ${COLLECTION}/${PARAM}/Pkgfile
+}" > ${COLLECTION}/${PARAM}/Pkgfile
+	$EDITOR ${COLLECTION}/${PARAM}/Pkgfile
 }
+
 create_folders () {
-if [ -z "$VERSION" ]; then
-	echo "
+	if [ -z "$VERSION" ]; then
+		echo "
 >>>     VERSION is not SET
 "
-	exit 1
-fi
-sudo mkdir -p $ROOT/$VERSION
-sudo chown -R $(whoami):$(whoami) $ROOT/$VERSION
-sudo mkdir -p /$ROOTMOUNT/{logs/$(uname -m)/$VERSION,sources,$(uname -m)/$VERSION}
-sudo chown -R $(whoami):$(whoami) /$ROOTMOUNT
-exit 0
+		exit 1
+	fi
+	sudo mkdir -p $ROOT/$VERSION
+	sudo chown -R $(whoami):$(whoami) $ROOT/$VERSION
+	sudo mkdir -p /$ROOTMOUNT/{logs/$(uname -m)/$VERSION,sources,$(uname -m)/$VERSION}
+	sudo chown -R $(whoami):$(whoami) /$ROOTMOUNT
+	exit 0
 }
+
 rsync_binaries () {
-if [ -z "$VERSION" ]; then
-	echo "
+	if [ -z "$VERSION" ]; then
+		echo "
 >>>     VERSION is not SET
 "
-	exit 1
-fi
-if [ ! -z ${PARAM[0]} ]; then
-	echo "
+		exit 1
+	fi
+	if [ ! -z ${PARAM[0]} ]; then
+		echo "
 sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
 sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
 rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/  \\
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
 "
-	echo -n "  OK ? (y) : "
-	answer
-	sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
-	sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
-	rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/ \
+		echo -n "  OK ? (y) : "
+		answer
+		sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
+		sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
+		rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
-	exit 0
-fi
+		exit 0
+	fi
 
-if [ ! -z $COLLECTION ]; then
-	echo "
+	if [ ! -z $COLLECTION ]; then
+		echo "
 sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 "
+		echo -n "  OK ? (y) : "
+		answer
+		sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+		sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+		rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+		exit 0
+	fi
+
+	echo "
+mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
+sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
+rsync -av --delete $URL/$(uname -m)/$VERSION/ $ROOTMOUNT/$(uname -m)/$VERSION/
+"
 	echo -n "  OK ? (y) : "
 	answer
-	sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
-	sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
-	rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+	mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
+	sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
+	rsync -av --delete $URL/$(uname -m)/$VERSION/ $ROOTMOUNT/$(uname -m)/$VERSION/
 	exit 0
-fi
-
-echo "
-mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
-sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
-rsync -av --delete $URL/$(uname -m)/$VERSION/ $ROOTMOUNT/$(uname -m)/$VERSION/
-"
-echo -n "  OK ? (y) : "
-answer
-mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
-sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
-rsync -av --delete $URL/$(uname -m)/$VERSION/ $ROOTMOUNT/$(uname -m)/$VERSION/
-exit 0
 }
+
 parse_arguments() {
-while [ "$1" ]; do
-case $1 in
-	-c|--cleanup)
-		CLEANUP="yes"
-		shift
-		if [ -z ${1} ]; then
-			echo "You need to specify a collection"
-			exit 1
-		fi
-		PARAM+=($1);;
+	while [ "$1" ]; do
+		case $1 in
+		-c|--cleanup)
+			CLEANUP="yes"
+			shift
+			if [ -z ${1} ]; then
+				echo "You need to specify a collection"
+				exit 1
+			fi
+			PARAM+=($1);;
 
-	-n|--new)
-		shift
-		COLLECTION="$(echo ${1}|cut -d '/' -f1)"
-		PARAM="$(echo ${1}|cut -d '/' -f2)"
-		find_collection
-		if [ -z "${COLLECTION}" ]; then
+		-n|--new)
+			shift
 			COLLECTION="$(echo ${1}|cut -d '/' -f1)"
-			generate_Pkgfile "$@"
-			exit 0
-		else
-			echo "
->>>     The package '${PARAM}' already exist in the '${COLLECTION}' collection !!!
-"
-			exit 1
-		fi;;
+			PARAM="$(echo ${1}|cut -d '/' -f2)"
+			find_collection
+			if [ -z "${COLLECTION}" ]; then
+				COLLECTION="$(echo ${1}|cut -d '/' -f1)"
+				generate_Pkgfile "$@"
+				exit 0
+			else
+				echo "
+	>>>     The package '${PARAM}' already exist in the '${COLLECTION}' collection !!!
+	"
+				exit 1
+			fi;;
 
-	-R|--runtime)
-		RUNTIME="yes"
-		shift
-		if [ -z ${1} ]; then
-			echo "You need to specify a runtime dependancy package name"
-			exit 1
-		fi
-		PARAM+=($1)
-		find_collection
-		if [ -z "${COLLECTION}" ]; then
-			echo "
+		-R|--runtime)
+			RUNTIME="yes"
+			shift
+			if [ -z ${1} ]; then
+				echo "You need to specify a runtime dependancy package name"
+				exit 1
+			fi
+			PARAM+=($1)
+			find_collection
+			if [ -z "${COLLECTION}" ]; then
+				echo "
 >>>	WARNING package '${PARAM[0]}' not found in any collection
 "
-		fi
-		find_runtime ${1}
-		exit 0;;
+			fi
+			find_runtime ${1}
+			exit 0;;
 
-	-i|--increment)
-		INCREMENT="yes"
-		shift
-		PARAM+=($1);;
+		-i|--increment)
+			INCREMENT="yes"
+			shift
+			PARAM+=($1);;
 
-	-p|--pause)
-		PAUSE=" && export PATH=/root/$GIT/scripts:$PATH && printf \"You are now in the chroot.\n\
+		-p|--pause)
+			PAUSE=" && export PATH=/root/$GIT/scripts:$PATH && printf \"You are now in the chroot.\n\
 Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
 
-	-I|--init)
-		INIT="yes";;
+		-I|--init)
+			INIT="yes";;
 
-	-s|--sync)
-		SYNC="yes"
-		if [ ! -z $2 ]; then
-			shift
-			PARAM+=($1)
-		fi;;
+		-s|--sync)
+			SYNC="yes"
+			if [ ! -z $2 ]; then
+				shift
+				PARAM+=($1)
+			fi;;
 
-	-A|--ask)
-		CONFIRM="yes"
-		echo "====> you ask confirmation" ;;
+		-A|--ask)
+			CONFIRM="yes"
+			echo "====> you ask confirmation" ;;
 
-	-h|--help)
-		usage
-		exit 0 ;;
+		-h|--help)
+			usage
+			exit 0 ;;
 
-	-*|--*)
-		usage
-		exit 1;;
-	*)
-			PARAM+=($1)
-	esac
+		-*|--*)
+			usage
+			exit 1;;
+		*)
+				PARAM+=($1)
+		esac
 
-	shift
-done
+		shift
+	done
 }
+
 interrupted() {
-echo "Interrupted !!!"
+	echo "Interrupted !!!"
 }
+
 trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
+
 umount_all() {
-for FOLDER in $MOUNT_POINTS
-do
-	[ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ] || continue
-	if mountpoint $ROOT/${VERSION}/${COLLECTION}/${FOLDER} > /dev/null;then
-		sudo umount $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
-	fi
-	rm -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
-done
+	for FOLDER in $MOUNT_POINTS ; do
+		[ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ] || continue
+		if mountpoint $ROOT/${VERSION}/${COLLECTION}/${FOLDER} > /dev/null;then
+			sudo umount $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+		fi
+		rm -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+	done
 }
+
 remove_all() {
-for FOLDER in $MOUNT_POINTS
-do
-	[ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ] && exit 1
-done
-[ -z $ROOT/${1} ] && exit 1
-[ ! -d $ROOT/${1} ] && exit 0
-for i in run sys proc dev/pts dev
-do
-	[ -d $ROOT/${1}/${i} ] || continue
-	mountpoint $ROOT/${1}/${i} > /dev/null || continue
-	sudo umount $ROOT/${1}/${i} || exit 1
-done
-for FOLDER in $ROOT/${1}/*
-do
-	[ -d ${FOLDER} ] || continue
-	! mountpoint ${FOLDER} > /dev/null || continue
-	sudo rm -r $FOLDER || exit 1
-done
-find $ROOT/${VERSION}/${COLLECTION} -maxdepth 1 -type f -delete
-rm -d $ROOT/${VERSION}/${COLLECTION} || exit 1
-echo "
+	for FOLDER in $MOUNT_POINTS ; do
+		[ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ] && exit 1
+	done
+	[ -z $ROOT/${1} ] && exit 1
+	[ ! -d $ROOT/${1} ] && exit 0
+	for i in run sys proc dev/pts dev; do
+		[ -d $ROOT/${1}/${i} ] || continue
+		mountpoint $ROOT/${1}/${i} > /dev/null || continue
+		sudo umount $ROOT/${1}/${i} || exit 1
+	done
+	for FOLDER in $ROOT/${1}/* ; do
+		[ -d ${FOLDER} ] || continue
+		! mountpoint ${FOLDER} > /dev/null || continue
+		sudo rm -r $FOLDER || exit 1
+	done
+	find $ROOT/${VERSION}/${COLLECTION} -maxdepth 1 -type f -delete
+	rm -d $ROOT/${VERSION}/${COLLECTION} || exit 1
+	echo "
 >>>   $ROOT/${1} cleanup successfully ...
 "
 }
+
 answer() {
-read a
-if [ "$a" != "y" ] && [ "$a" != "Y" ] && [ "$a" != "yes" ]; then
-	echo "
+	read a
+	if [ "$a" != "y" ] && [ "$a" != "Y" ] && [ "$a" != "yes" ]; then
+		echo "
 Answer should be 'y, Y or yes'
 "
-	error "$ROOT/${VERSION}/${COLLECTION}"
-fi
+		error "$ROOT/${VERSION}/${COLLECTION}"
+	fi
 }
+
 error() {
 	umount_all
 	remove_all ${1}
 	exit 1
 }
+
 find_collection () {
 	for i in $(find . -name Pkgfile -exec dirname {} +) ; do
 		unset COLLECTION
@@ -318,105 +325,106 @@ find_collection () {
 	done
 	unset COLLECTION
 }
+
 find_runtime () {
-for i in $(find ${ROOTMOUNT}/$(uname -m)/${VERSION}/ -name "*$(uname -m).cards*"); do
-	LANG=C pkginfo -a $i|grep "${1}1"|grep "Dependencies"|cut -d ":" -f1
-done
+	for i in $(find ${ROOTMOUNT}/$(uname -m)/${VERSION}/ -name "*$(uname -m).cards*"); do
+		LANG=C pkginfo -a $i|grep "${1}1"|grep "Dependencies"|cut -d ":" -f1
+	done
 }
 setup_pkgmk_conf() {
-PKGMK_CONF='
-export CFLAGS="-O2 -pipe"
-export CXXFLAGS="${CFLAGS}"
-export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
-PKGMK_GROUPS=(devel man doc service)
-PKGMK_LOCALES=(af an ar as az be bg bs ca cs cy da de el es fi fr ga gl \
-gn he hi hr hu ia id is it ja ka kk km kn ko lt lv mk ml mr ms my nl nn \
-oc or pa pt pl rm ro ru rw si sq sk sl sr sv ta te th tr uk ur uz vi xh zh)
-PKGMK_CLEAN="no"
-PKGMK_WGET_OPTS="--quiet"
-PKGMK_KEEP_SOURCES="yes"
-PKGMK_SOURCE_DIR="/sources"
-PKGMK_WORK_DIR="/tmp/work"
-PKGMK_COMPRESS_PACKAGE="yes"
-PKGMK_COMPRESSION_MODE="xz"
-PKGMK_IGNORE_REPO="no"
-PKGMK_IGNORE_COLLECTION="no"
-PKGMK_IGNORE_RUNTIMEDEPS="no"'
+	PKGMK_CONF='
+	export CFLAGS="-O2 -pipe"
+	export CXXFLAGS="${CFLAGS}"
+	export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
+	PKGMK_GROUPS=(devel man doc service)
+	PKGMK_LOCALES=(af an ar as az be bg bs ca cs cy da de el es fi fr ga gl \
+	gn he hi hr hu ia id is it ja ka kk km kn ko lt lv mk ml mr ms my nl nn \
+	oc or pa pt pl rm ro ru rw si sq sk sl sr sv ta te th tr uk ur uz vi xh zh)
+	PKGMK_CLEAN="no"
+	PKGMK_WGET_OPTS="--quiet"
+	PKGMK_KEEP_SOURCES="yes"
+	PKGMK_SOURCE_DIR="/sources"
+	PKGMK_WORK_DIR="/tmp/work"
+	PKGMK_COMPRESS_PACKAGE="yes"
+	PKGMK_COMPRESSION_MODE="xz"
+	PKGMK_IGNORE_REPO="no"
+	PKGMK_IGNORE_COLLECTION="no"
+	PKGMK_IGNORE_RUNTIMEDEPS="no"'
 }
 setup_cards_conf() {
-CARDS_CONF=""
+	CARDS_CONF=""
 
-C="${COLLECTION}"
+	C="${COLLECTION}"
 
-[[ "${COLLECTION}" != "base" && "${COLLECTION}" != "cli" && "${COLLECTION}" != "gui" && \
-"${COLLECTION}" != "nos" && "${COLLECTION}" != "cli-extra" && "${COLLECTION}" != "gui-extra" && \
-"${COLLECTION}" != "desktops" ]] && C="${COLLECTION}-extra"
+	[[ "${COLLECTION}" != "base" && "${COLLECTION}" != "cli" && "${COLLECTION}" != "gui" && \
+	"${COLLECTION}" != "nos" && "${COLLECTION}" != "cli-extra" && "${COLLECTION}" != "gui-extra" && \
+	"${COLLECTION}" != "desktops" ]] && C="${COLLECTION}-extra"
 
-if [ "${C}" == "${COLLECTION}-extra" ]; then
-	CARDS_CONF+="
-dir /DEPOT/${C}
-dir /DEPOT/${COLLECTION}"
-	C="gui"
-	[ -z "$BASE" ] && CARDS_CONF+="
-base /DEPOT/${C}
-base /DEPOT/${COLLECTION}"
-fi
-
-if [ "${C}" == "gui-extra" ]; then
-	CARDS_CONF+="
-dir /DEPOT/gui-extra"
-	[ -z "$BASE" ] && CARDS_CONF+="
-base /DEPOT/gui-extra"
-fi
-
-if [ "${C}" == "nos" ]; then
-	CARDS_CONF+="
-dir /DEPOT/nos"
-	[ -z "$BASE" ] && CARDS_CONF+="
-base /DEPOT/nos"
-fi
-
-if [ "${C}" == "desktops" ]; then
-	CARDS_CONF+="
-dir /DEPOT/desktops"
-	[ -z "$BASE" ] && CARDS_CONF+="
-base /DEPOT/desktops"
-fi
-
-if [[ "${C}" == "gui" || "${C}" == "gui-extra" || \
-"${C}" == "nos" || "${C}" == "desktops" ]]; then
-	CARDS_CONF+="
-dir /DEPOT/gui"
-	[ -z "$BASE" ] && CARDS_CONF+="
-base /DEPOT/gui"
-fi
-
-if [ "${C}" == "cli-extra" ]; then
-	CARDS_CONF+="
-dir /DEPOT/cli-extra"
-	[ -z "$BASE" ] && CARDS_CONF+="
-base /DEPOT/cli-extra"
-fi
-
-if [[ "${C}" == "cli" || "${C}" == "cli-extra" || "${C}" == "gui" || \
-"${C}" == "gui-extra" || "${C}" == "nos" || "${C}" == "desktops" ]]; then
-	CARDS_CONF+="
-dir /DEPOT/cli"
-	[ -z "$BASE" ] && CARDS_CONF+="
-base /DEPOT/cli"
-fi
-
-CARDS_CONF+="
-dir /DEPOT/base
-logdir /LOGS"
-[ -z "$BASE" ] && CARDS_CONF+="
-base /DEPOT/base"
-if [ ! -z "$BASE" ]; then
-	for i in ${BASE[@]}; do
+	if [ "${C}" == "${COLLECTION}-extra" ]; then
 		CARDS_CONF+="
-base /DEPOT/$i"
-	done
-fi
+	dir /DEPOT/${C}
+	dir /DEPOT/${COLLECTION}"
+		C="gui"
+		[ -z "$BASE" ] && CARDS_CONF+="
+	base /DEPOT/${C}
+	base /DEPOT/${COLLECTION}"
+	fi
+
+	if [ "${C}" == "gui-extra" ]; then
+		CARDS_CONF+="
+	dir /DEPOT/gui-extra"
+		[ -z "$BASE" ] && CARDS_CONF+="
+	base /DEPOT/gui-extra"
+	fi
+
+	if [ "${C}" == "nos" ]; then
+		CARDS_CONF+="
+	dir /DEPOT/nos"
+		[ -z "$BASE" ] && CARDS_CONF+="
+	base /DEPOT/nos"
+	fi
+
+	if [ "${C}" == "desktops" ]; then
+		CARDS_CONF+="
+	dir /DEPOT/desktops"
+		[ -z "$BASE" ] && CARDS_CONF+="
+	base /DEPOT/desktops"
+	fi
+
+	if [[ "${C}" == "gui" || "${C}" == "gui-extra" || \
+	"${C}" == "nos" || "${C}" == "desktops" ]]; then
+		CARDS_CONF+="
+	dir /DEPOT/gui"
+		[ -z "$BASE" ] && CARDS_CONF+="
+	base /DEPOT/gui"
+	fi
+
+	if [ "${C}" == "cli-extra" ]; then
+		CARDS_CONF+="
+	dir /DEPOT/cli-extra"
+		[ -z "$BASE" ] && CARDS_CONF+="
+	base /DEPOT/cli-extra"
+	fi
+
+	if [[ "${C}" == "cli" || "${C}" == "cli-extra" || "${C}" == "gui" || \
+	"${C}" == "gui-extra" || "${C}" == "nos" || "${C}" == "desktops" ]]; then
+		CARDS_CONF+="
+	dir /DEPOT/cli"
+		[ -z "$BASE" ] && CARDS_CONF+="
+	base /DEPOT/cli"
+	fi
+
+	CARDS_CONF+="
+	dir /DEPOT/base
+	logdir /LOGS"
+	[ -z "$BASE" ] && CARDS_CONF+="
+	base /DEPOT/base"
+	if [ ! -z "$BASE" ]; then
+		for i in ${BASE[@]}; do
+			CARDS_CONF+="
+	base /DEPOT/$i"
+		done
+	fi
 }
 #
 #
@@ -437,24 +445,24 @@ if [ -z "${1}" ]; then
 "
 	exit 1
 fi
-	if ! ( $(which rsync > /dev/null) ); then
-		echo "
+if ! ( $(which rsync > /dev/null) ); then
+	echo "
 >>>     'rsync' not available
 "
-		exit 1
-	fi
-	if ! ( $(which git > /dev/null) ); then
-		echo "
+	exit 1
+fi
+if ! ( $(which git > /dev/null) ); then
+	echo "
 >>>     'git' not available
 "
-		exit 1
-	fi
-	if ! ( $(which $EDITOR > /dev/null) ); then
-		echo "
+	exit 1
+fi
+if ! ( $(which $EDITOR > /dev/null) ); then
+	echo "
 >>>     '$EDITOR' not available
 "
-		exit 1
-	fi
+	exit 1
+fi
 if [ ! -d .git ]; then
 	echo "
 >>>	No Git project found in '"$(pwd)"', The '.git' folder not exist.
@@ -476,6 +484,21 @@ GIT=$(basename $GIT_PROJ)
 parse_arguments "$@"
 
 [ -z "$COLLECTION" ] && find_collection
+
+if [ "${PARAM[1]}" = "" ]; then
+    if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
+        . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+        if [ -z "$version" ]; then
+            echo ">>> version variable not set !"
+            exit 1
+        fi
+        curl --head --silent --output /dev/null --fail $source
+        if [ $? -ne 0 ]; then
+            echo ">>> source not available !!!"
+            exit 1
+        fi
+    fi
+fi
 
 if [ "$INIT" == "yes" ]; then
 	create_folders
@@ -568,12 +591,10 @@ $PAUSE \
 echo "$CARDS_CONF" > $ROOT/$VERSION/$COLLECTION/etc/cards.conf
 [ -z "${PARAM[0]}" ] && CHROOT="ncurses readline bash"
 if [ "$COLLECTION" == "base" ] \
-|| [ "$COLLECTION" == "cli"  ] \
-|| [ "$COLLECTION" == "gui" ] \
-|| [ "$COLLECTION" == "cli-extra"  ] \
-|| [ "$COLLECTION" == "gui-extra" ] \
-|| [ "$COLLECTION" == "desktops" ] \
-|| [ "$COLLECTION" == "nos" ]; then
+	|| [ "$COLLECTION" == "cli"  ] \
+	|| [ "$COLLECTION" == "gui" ] \
+	|| [ "$COLLECTION" == "cli-extra"  ] \
+	|| [ "$COLLECTION" == "gui-extra" ]; then
 	if ! [ -z "${PARAM[0]}" ]; then
 		DEVEL="$DEVEL ${PARAM[0]}"
 	else
@@ -592,8 +613,9 @@ export DEVEL VERSION
 echo ""
 if [ -f $HOME/.mybld ];then
 	echo " $HOME/.mybld:
- ================================="
-	echo ""
+ =================================
+"
+
 	cat $HOME/.mybld
 else
 	echo ">>>       $HOME/.mybld not found"
