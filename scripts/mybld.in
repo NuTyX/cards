@@ -357,8 +357,8 @@ setup_cards_conf() {
 	C="${COLLECTION}"
 
 	[[ "${COLLECTION}" != "base" && "${COLLECTION}" != "cli" && "${COLLECTION}" != "gui" && \
-	"${COLLECTION}" != "nos" && "${COLLECTION}" != "cli-extra" && "${COLLECTION}" != "gui-extra" && \
-	"${COLLECTION}" != "desktops" ]] && C="${COLLECTION}-extra"
+	"${COLLECTION}" != "nos" && "${COLLECTION}" != "cli-extra" && \
+	"${COLLECTION}" != "gui-extra" ]] && C="${COLLECTION}-extra"
 
 	if [ "${C}" == "${COLLECTION}-extra" ]; then
 		CARDS_CONF+="
@@ -384,15 +384,8 @@ setup_cards_conf() {
 	base /DEPOT/nos"
 	fi
 
-	if [ "${C}" == "desktops" ]; then
-		CARDS_CONF+="
-	dir /DEPOT/desktops"
-		[ -z "$BASE" ] && CARDS_CONF+="
-	base /DEPOT/desktops"
-	fi
-
 	if [[ "${C}" == "gui" || "${C}" == "gui-extra" || \
-	"${C}" == "nos" || "${C}" == "desktops" ]]; then
+	"${C}" == "nos" ]]; then
 		CARDS_CONF+="
 	dir /DEPOT/gui"
 		[ -z "$BASE" ] && CARDS_CONF+="
@@ -407,7 +400,7 @@ setup_cards_conf() {
 	fi
 
 	if [[ "${C}" == "cli" || "${C}" == "cli-extra" || "${C}" == "gui" || \
-	"${C}" == "gui-extra" || "${C}" == "nos" || "${C}" == "desktops" ]]; then
+	"${C}" == "gui-extra" || "${C}" == "nos" ]]; then
 		CARDS_CONF+="
 	dir /DEPOT/cli"
 		[ -z "$BASE" ] && CARDS_CONF+="
@@ -593,8 +586,7 @@ echo "$CARDS_CONF" > $ROOT/$VERSION/$COLLECTION/etc/cards.conf
 if [ "$COLLECTION" == "base" ] \
 	|| [ "$COLLECTION" == "cli"  ] \
 	|| [ "$COLLECTION" == "gui" ] \
-	|| [ "$COLLECTION" == "cli-extra"  ] \
-	|| [ "$COLLECTION" == "gui-extra" ]; then
+	|| [ "$COLLECTION" == "cli-extra" ]; then
 	if ! [ -z "${PARAM[0]}" ]; then
 		DEVEL="$DEVEL ${PARAM[0]}"
 	else
