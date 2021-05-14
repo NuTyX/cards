@@ -478,21 +478,6 @@ parse_arguments "$@"
 
 [ -z "$COLLECTION" ] && find_collection
 
-if [ "${PARAM[1]}" = "" ]; then
-    if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
-        . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-        if [ -z "$version" ]; then
-            echo ">>> version variable not set !"
-            exit 1
-        fi
-        curl --head --silent --output /dev/null --fail $source
-        if [ $? -ne 0 ]; then
-            echo ">>> source not available !!!"
-            exit 1
-        fi
-    fi
-fi
-
 if [ "$INIT" == "yes" ]; then
 	create_folders
 fi
@@ -675,6 +660,26 @@ if [ ! -z "${PARAM[1]}" ]; then
 		-i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
 	fi
 fi
+	
+if [ "${PARAM[1]}" = "" ]; then
+    if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
+        . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+        if [ -z "$version" ]; then
+            echo ">>> version variable not set !"
+            exit 1
+        fi
+		for FILE in ${source[@]}; do
+			curl --head --silent --output /dev/null --fail $FILE
+			if [ $? -ne 0 ]; then
+				echo ">>> source $FILE not available for package $COLLECTION/${PARAM[0]} !!!
+"
+				exit 1
+			fi
+		done
+
+    fi
+fi
+
 if [ "$INCREMENT" == "yes" ]; then
 	sed -i "/release=/d" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
 	sed -i "/^version=/ a release=$((release+1))" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
