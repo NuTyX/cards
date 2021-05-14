@@ -107,7 +107,7 @@ Défaut: 'yes'
 Si défini, pkgmk cherchera dans les dossiers 'STRING1', .., 'STRINGN' pour y trouver d'eventuelles dépendances. Chaque dossier étant défini dans cette variable.
 .br
 Default: '()' pkgmk trouvera les dépendances de manière automatique.
-Possible values: '(base cli cli-extra gui gui-extra desktops <votre_collection>)'
+Possible values: '(base cli cli-extra gui gui-extra <votre_collection>)'
 .TP
 \fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
 Si défini, pkgmk fera une tentative de séparation du paquet produit en sous groupes. Chaque groupe étant défini dans cette variable. Une fonction par défaut est exécutée si cette même fonction n'est pas trouvée dans le Pkgfile. Les groupes de fonction suivantes sont disponibles: lib() devel()  doc()  man()  service()

@@ -112,7 +112,7 @@ Default: 'yes'
 If set, pkgmk will look into 'STRING1', .., 'STRINGN' directories for any dependencies. Each directory is define in this variable.
 .br
 Default: '()' pkgmk will find them automatically.
-Possible values: '(base cli cli-extra gui gui-extra desktops <your_collection>)'
+Possible values: '(base cli cli-extra gui gui-extra <your_collection>)'
 .TP
 \fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
 If set, pkgmk will try to split the produced package into groups. Each group is define in this variable. A default function is executed if this same function is not found in the Pkgfile. Supported default group functions are: lib() devel()  doc()  man()  service()

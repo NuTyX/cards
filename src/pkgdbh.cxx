@@ -285,7 +285,7 @@ int Pkgdbh::getNumberOfPackages()
   return getListOfPackageNames("");
 }
 /* Append to the "DB" the number of packages founds
- * (directory containg a file named files
+ * (directory containing a file named files
  * */
 int Pkgdbh::getListOfPackageNames (const std::string& path)
 {
@@ -307,7 +307,7 @@ int Pkgdbh::getListOfPackageNames (const std::string& path)
 #endif
 	return m_packageNamesList.size();
 }
-/* get details infos of a package */
+/* get details info of a package */
 std::pair<std::string, pkginfo_t> Pkgdbh::getInfosPackage
 	(const std::string& packageName)
 {
