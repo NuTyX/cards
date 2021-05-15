@@ -333,23 +333,23 @@ find_runtime () {
 }
 setup_pkgmk_conf() {
 	PKGMK_CONF='
-	export CFLAGS="-O2 -pipe"
-	export CXXFLAGS="${CFLAGS}"
-	export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
-	PKGMK_GROUPS=(devel man doc service)
-	PKGMK_LOCALES=(af an ar as az be bg bs ca cs cy da de el es fi fr ga gl \
-	gn he hi hr hu ia id is it ja ka kk km kn ko lt lv mk ml mr ms my nl nn \
-	oc or pa pt pl rm ro ru rw si sq sk sl sr sv ta te th tr uk ur uz vi xh zh)
-	PKGMK_CLEAN="no"
-	PKGMK_WGET_OPTS="--quiet"
-	PKGMK_KEEP_SOURCES="yes"
-	PKGMK_SOURCE_DIR="/sources"
-	PKGMK_WORK_DIR="/tmp/work"
-	PKGMK_COMPRESS_PACKAGE="yes"
-	PKGMK_COMPRESSION_MODE="xz"
-	PKGMK_IGNORE_REPO="no"
-	PKGMK_IGNORE_COLLECTION="no"
-	PKGMK_IGNORE_RUNTIMEDEPS="no"'
+export CFLAGS="-O2 -pipe"
+export CXXFLAGS="${CFLAGS}"
+export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
+PKGMK_GROUPS=(devel man doc service)
+PKGMK_LOCALES=(af an ar as az be bg bs ca cs cy da de el es fi fr ga gl \
+gn he hi hr hu ia id is it ja ka kk km kn ko lt lv mk ml mr ms my nl nn \
+oc or pa pt pl rm ro ru rw si sq sk sl sr sv ta te th tr uk ur uz vi xh zh)
+PKGMK_CLEAN="no"
+PKGMK_WGET_OPTS="--quiet"
+PKGMK_KEEP_SOURCES="yes"
+PKGMK_SOURCE_DIR="/sources"
+PKGMK_WORK_DIR="/tmp/work"
+PKGMK_COMPRESS_PACKAGE="yes"
+PKGMK_COMPRESSION_MODE="xz"
+PKGMK_IGNORE_REPO="no"
+PKGMK_IGNORE_COLLECTION="no"
+PKGMK_IGNORE_RUNTIMEDEPS="no"'
 }
 setup_cards_conf() {
 	CARDS_CONF=""
@@ -362,60 +362,60 @@ setup_cards_conf() {
 
 	if [ "${C}" == "${COLLECTION}-extra" ]; then
 		CARDS_CONF+="
-	dir /DEPOT/${C}
-	dir /DEPOT/${COLLECTION}"
+dir /DEPOT/${C}
+dir /DEPOT/${COLLECTION}"
 		C="gui"
 		[ -z "$BASE" ] && CARDS_CONF+="
-	base /DEPOT/${C}
-	base /DEPOT/${COLLECTION}"
+base /DEPOT/${C}
+base /DEPOT/${COLLECTION}"
 	fi
 
 	if [ "${C}" == "gui-extra" ]; then
 		CARDS_CONF+="
-	dir /DEPOT/gui-extra"
+dir /DEPOT/gui-extra"
 		[ -z "$BASE" ] && CARDS_CONF+="
-	base /DEPOT/gui-extra"
+base /DEPOT/gui-extra"
 	fi
 
 	if [ "${C}" == "nos" ]; then
 		CARDS_CONF+="
-	dir /DEPOT/nos"
+dir /DEPOT/nos"
 		[ -z "$BASE" ] && CARDS_CONF+="
-	base /DEPOT/nos"
+base /DEPOT/nos"
 	fi
 
 	if [[ "${C}" == "gui" || "${C}" == "gui-extra" || \
 	"${C}" == "nos" ]]; then
 		CARDS_CONF+="
-	dir /DEPOT/gui"
+dir /DEPOT/gui"
 		[ -z "$BASE" ] && CARDS_CONF+="
-	base /DEPOT/gui"
+base /DEPOT/gui"
 	fi
 
 	if [ "${C}" == "cli-extra" ]; then
 		CARDS_CONF+="
-	dir /DEPOT/cli-extra"
+dir /DEPOT/cli-extra"
 		[ -z "$BASE" ] && CARDS_CONF+="
-	base /DEPOT/cli-extra"
+base /DEPOT/cli-extra"
 	fi
 
 	if [[ "${C}" == "cli" || "${C}" == "cli-extra" || "${C}" == "gui" || \
 	"${C}" == "gui-extra" || "${C}" == "nos" ]]; then
 		CARDS_CONF+="
-	dir /DEPOT/cli"
+dir /DEPOT/cli"
 		[ -z "$BASE" ] && CARDS_CONF+="
-	base /DEPOT/cli"
+base /DEPOT/cli"
 	fi
 
 	CARDS_CONF+="
-	dir /DEPOT/base
-	logdir /LOGS"
+dir /DEPOT/base
+logdir /LOGS"
 	[ -z "$BASE" ] && CARDS_CONF+="
-	base /DEPOT/base"
+base /DEPOT/base"
 	if [ ! -z "$BASE" ]; then
 		for i in ${BASE[@]}; do
 			CARDS_CONF+="
-	base /DEPOT/$i"
+base /DEPOT/$i"
 		done
 	fi
 }
