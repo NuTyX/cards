@@ -571,7 +571,8 @@ echo "$CARDS_CONF" > $ROOT/$VERSION/$COLLECTION/etc/cards.conf
 if [ "$COLLECTION" == "base" ] \
 	|| [ "$COLLECTION" == "cli"  ] \
 	|| [ "$COLLECTION" == "gui" ] \
-	|| [ "$COLLECTION" == "cli-extra" ]; then
+	|| [ "$COLLECTION" == "cli-extra" ] \
+	|| [ "$COLLECTION" == "gui-extra" ]; then
 	if ! [ -z "${PARAM[0]}" ]; then
 		DEVEL="$DEVEL ${PARAM[0]}"
 	else
@@ -730,6 +731,7 @@ if [ "$EXTRA" == "yes" ]; then
 fi
 
 echo 'running the command: sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
+read a
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
 
 umount_all
