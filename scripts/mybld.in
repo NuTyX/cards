@@ -731,7 +731,6 @@ if [ "$EXTRA" == "yes" ]; then
 fi
 
 echo 'running the command: sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
-read a
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
 
 umount_all
