@@ -669,15 +669,13 @@ if [ "${PARAM[1]}" = "" ]; then
             echo ">>> version variable not set !"
             exit 1
         fi
-		for FILE in ${source[@]}; do
-			curl --head --silent --output /dev/null --fail $FILE
-			if [ $? -ne 0 ]; then
-				echo ">>> source $FILE not available for package $COLLECTION/${PARAM[0]} !!!
-"
-				exit 1
-			fi
-		done
-
+        cd "$COLLECTION/${PARAM[0]}/"
+        pkgmk -td
+        rc=$?
+        cd -
+        if [ $rc -ne 0 ]; then
+            exit 1
+        fi
     fi
 fi
 
