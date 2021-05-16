@@ -671,8 +671,9 @@ if [ "${PARAM[1]}" = "" ]; then
         fi
         cd "$COLLECTION/${PARAM[0]}/"
         pkgmk -td
+	echo ""
         rc=$?
-        cd -
+        cd - > /dev/null
         if [ $rc -ne 0 ]; then
             exit 1
         fi
