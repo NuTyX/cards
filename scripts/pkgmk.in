@@ -35,6 +35,11 @@ E_INSTALL=9    # error while installing the package via 'pkgadd'
 E_DEPS=10      # error while searching runtime deps via 'pkginfo -b'
 E_ALIAS=11     # error duplicate alias
 
+debug() {
+	if [[ "$PKGMK_DEBUG" == "yes" ]]; then
+		echo "=== DEBUG: $1"
+	fi
+}
 info() {
 	echo "=======> $1"
 }
@@ -51,7 +56,7 @@ abort_on_build() {
 have_function() {
 	declare -f "$1" >/dev/null
 }
-get_dependencies(){
+get_dependencies() {
 	[ -z $PKGMK_DEPENDS ] && return
 	info "Get dependencies ..."
 	local NAME COLLECTION PKGNAME
@@ -185,7 +190,7 @@ get_package_name() {
 	fi
 	NAME="$(echo $1|sed "s/$PKGMK_ARCH.$EXT//"|sed "s/any.$EXT//")"
 
-	echo "${NAME:0:$((${#NAME} - 10 ))}"	
+	echo "${NAME:0:$((${#NAME} - 10 ))}"
 }
 get_package_builddate() {
 	local NAME BUILD_DATE EXT
@@ -245,7 +250,25 @@ check_file() {
 		exit $E_GENERAL
 	fi
 }
-downloads_file_with_curl() {
+test_download_file_with_curl() {
+	if [ ! "$(type -p curl)" ]; then
+		error "Command 'curl' not found."
+		exit $E_GENERAL
+	fi
+	DOWNLOAD_OPTS="--ftp-pasv --retry 3 --retry-delay 3 \
+	-R --head --silent --output /dev/null --fail"
+
+	error=$E_DOWNLOAD
+
+	curl $DOWNLOAD_OPTS $2
+	error=$?
+	if [ $error != 0 ]; then
+		error "Downloading '$2' failed."
+		return $E_DOWNLOAD
+	fi
+	return 0
+}
+download_file_with_curl() {
 	if [ ! "$(type -p curl)" ]; then
 		error "Command 'curl' not found."
 		exit $E_GENERAL
@@ -262,6 +285,52 @@ downloads_file_with_curl() {
 		exit $E_DOWNLOAD
 	fi
 }
+test_download_file() {
+	tdf_error=$E_DOWNLOAD
+	all_good=$E_DOWNLOAD
+	LOCAL_FILENAME="$(get_filename $FILE)"
+
+	if [ ! "$(type -p wget)" ]; then
+		test_download_file_with_curl $LOCAL_FILENAME $1
+		tdf_error=$?
+		if [ $tdf_error == 0 ]; then
+			all_good=0
+			break
+		fi
+	else
+		DOWNLOAD_OPTS="-q --spider --no-check-certificate"
+	
+		BASENAME="${1/*\//}"
+		for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
+			REPO="$(echo $REPO | sed 's|/$||')"
+			wget $DOWNLOAD_OPTS $REPO/$BASENAME
+			tdf_error=$?
+			debug "test_download_file: 1 tdf_error: $tdf_error while retrieving: $REPO/$BASENAME"
+			if [ $tdf_error == 0 ]; then
+				all_good=0
+				break
+			fi
+		done
+
+		debug "test_download_file: 2 tdf_error: $tdf_error"
+		if [ $tdf_error != 0 ]; then
+			while true; do
+				wget $DOWNLOAD_OPTS $FILE
+				tdf_error=$?
+				debug "test_download_file: 3 tdf_error: $tdf_error"
+				if [ $tdf_error == 0 ]; then
+					all_good=0
+					break
+				fi
+			done
+		fi
+		
+		debug "test_download_file: 4 all_good: $all_good"
+	
+		return $all_good
+	
+	fi
+}
 download_file() {
 	info "Downloading '$1'."
 
@@ -270,7 +339,7 @@ download_file() {
 	if [ ! "$(type -p wget)" ]; then
 		warning "Command 'wget' not found."
 		info "You should install 'wget' as soon as possible, trying with curl ..."
-		downloads_file_with_curl $LOCAL_FILENAME $1
+		download_file_with_curl $LOCAL_FILENAME $1
 	else
 		LOCAL_FILENAME_PARTIAL="$LOCAL_FILENAME.partial"
 		DOWNLOAD_OPTS="--passive-ftp --no-directories --tries=3 --waitretry=3 \
@@ -315,6 +384,33 @@ download_file() {
 	
 		mv -f "$LOCAL_FILENAME_PARTIAL" "$LOCAL_FILENAME"
 	fi
+}
+test_download_sources() {
+	local FILE LOCAL_FILENAME
+	nb_err=0
+	for FILE in ${source[@]}; do
+		LOCAL_FILENAME="$(get_filename $FILE)"
+		debug "test_download_sources: $FILE => $LOCAL_FILENAME"
+		if [ ! -e $LOCAL_FILENAME ]; then
+			if [ "$LOCAL_FILENAME" = "$FILE" ]; then
+				error "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
+				nb_err+=1
+			else
+				test_download_file $FILE
+				tds_error=$?
+				debug "test_download_sources: $FILE => tds_error=$tds_error"
+				if [ "$tds_error" == "$E_DOWNLOAD" ]; then
+					error "Source file '$FILE' not found (can not be downloaded, URL not specified)."
+					nb_err+=1
+				fi
+			fi
+		fi
+	done
+	if [ $nb_err == 0 ]; then
+		info "All sources are correct"
+		exit 0
+	fi
+	exit $E_DOWNLOAD
 }
 download_source() {
 	local FILE LOCAL_FILENAME
@@ -1355,6 +1451,7 @@ print_help() {
 	echo "   -q,  --quiet               do not printout messages, usefull for -itd option"
 	echo "  -cs,  --check-syntax        do not build, only check package syntax"
 	echo "  -cv,  --show-version-only   do not build, only show the version of the port and exit"
+	echo "  -td,  --test-download       do not build, do not download, but test source file(s)"
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
 	echo " -itd,  --is-up-to-date       check if the version is the same as upstream sources"
@@ -1387,6 +1484,8 @@ parse_options() {
 				PKGMK_RECURSIVE="yes" ;;
 			-q|--quiet)
 				PKGMK_QUIET="yes" ;;
+			-td|--test-download)
+				PKGMK_TEST_DOWNLOAD_ONLY="yes" ;;
 			-d|--download)
 				PKGMK_DOWNLOAD="yes" ;;
 			-cs|--check-syntax)
@@ -1394,6 +1493,8 @@ parse_options() {
 			-do|--download-only)
 				PKGMK_DOWNLOAD="yes"
 				PKGMK_DOWNLOAD_ONLY="yes" ;;
+			--debug)
+				PKGMK_DEBUG="yes" ;;
 			-eo|--extract-only)
 				PKGMK_EXTRACT_ONLY="yes" ;;
 			-cv|--show-version-only)
@@ -1608,6 +1709,11 @@ main() {
 		download_source
 		exit 0
 	fi
+	
+	if [ "$PKGMK_TEST_DOWNLOAD_ONLY" = "yes" ]; then
+		test_download_sources
+		exit 0
+	fi
 
 	if [ "$PKGMK_EXTRACT_ONLY" = "yes" ]; then
 		download_source
@@ -1792,12 +1898,14 @@ PKGMK_COMPRESS_PACKAGE="no"
 PKGMK_INSTALL="no"
 PKGMK_RECURSIVE="no"
 
+PKGMK_TEST_DOWNLOAD_ONLY="no"
 PKGMK_DOWNLOAD_ONLY="no"
 PKGMK_EXTRACT_ONLY="no"
 PKGMK_IGNORE_UNPACK="no"
 PKGMK_UP_TO_DATE="no"
 PKGMK_UPDATE_FOOTPRINT="no"
 PKGMK_FORCE="no"
+PKGMK_DEBUG="no"
 PKGMK_KEEP_WORK="no"
 PKGMK_PACK_ONLY="no"
 PKGMK_KEEP_LA_LIBS="no"
