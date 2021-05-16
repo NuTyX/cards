@@ -314,15 +314,12 @@ test_download_file() {
 
 		debug "test_download_file: 2 tdf_error: $tdf_error"
 		if [ $tdf_error != 0 ]; then
-			while true; do
-				wget $DOWNLOAD_OPTS $FILE
-				tdf_error=$?
-				debug "test_download_file: 3 tdf_error: $tdf_error"
-				if [ $tdf_error == 0 ]; then
-					all_good=0
-					break
-				fi
-			done
+			wget $DOWNLOAD_OPTS $FILE
+			tdf_error=$?
+			debug "test_download_file: 3 tdf_error: $tdf_error"
+			if [ $tdf_error == 0 ]; then
+				all_good=0
+			fi
 		fi
 		
 		debug "test_download_file: 4 all_good: $all_good"
