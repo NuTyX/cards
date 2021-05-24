@@ -351,7 +351,54 @@ PKGMK_IGNORE_REPO="no"
 PKGMK_IGNORE_COLLECTION="no"
 PKGMK_IGNORE_RUNTIMEDEPS="no"'
 }
+setup_base_config() {
+	[ -z "$BASE" ] && CARDS_CONF+="
+base /DEPOT/$1"
+}
 setup_cards_conf() {
+	CARDS_CONF=""
+	FOUND="no"
+	MYCOLLECTION="${COLLECTION%-*}"
+	for i in "${COLLECTIONS[@]}"
+	do
+		 [ $i == $MYCOLLECTION ] && FOUND="yes"
+	done
+	if [ $FOUND == "yes" ]; then
+		unset MYCOLLECTION
+	fi
+	FOUND="no"
+	for i in "$MYCOLLECTION" "${COLLECTIONS[@]}"
+	do
+		[ -z $i ] && continue
+		if [ $FOUND == "yes" ];then
+			CARDS_CONF+="
+dir /DEPOT/$i"
+			setup_base_config "$i"
+			continue
+		fi
+		if [ $COLLECTION == $i-extra ]; then
+			CARDS_CONF+="
+dir /DEPOT/$i-extra
+dir /DEPOT/$i"
+			setup_base_config "$i-extra"
+			setup_base_config "$i"
+			FOUND="yes"
+		fi
+		if  [ $COLLECTION == $i ]; then
+			CARDS_CONF+="
+dir /DEPOT/$i"
+			setup_base_config "$i"
+			FOUND="yes"
+		fi
+	done
+	if [ ! -z "$BASE" ]; then
+		for i in ${BASE[@]}; do
+			CARDS_CONF+="
+base /DEPOT/$i"
+		done
+	fi
+}
+setup_cards_conf_old() {
 	CARDS_CONF=""
 
 	C="${COLLECTION}"
@@ -431,6 +478,7 @@ check_root
 [ -z "$ROOT" ] && ROOT="$HOME/mybld"
 [ -z "$URL" ] && URL="rsync://download.nutyx.org/nutyx"
 [ -z "$EDITOR" ] && EDITOR="vi"
+[ -z "$COLLECTIONS" ] && COLLECTIONS=(gui cli base)
 
 if [ -z "${1}" ]; then
 	echo "
@@ -572,16 +620,14 @@ if [ "$COLLECTION" == "base" ] \
 	|| [ "$COLLECTION" == "cli"  ] \
 	|| [ "$COLLECTION" == "gui" ] \
 	|| [ "$COLLECTION" == "cli-extra" ] \
-	|| [ "$COLLECTION" == "gui-extra" ]; then
+	|| [ "$COLLECTION" == "gui-extra" ] \
+	|| [ "$COLLECTION" == "$MYCOLLECTION" ] \
+	|| [ "$COLLECTION" == "$MYCOLLECTION-extra" ]; then
 	if ! [ -z "${PARAM[0]}" ]; then
 		DEVEL="$DEVEL ${PARAM[0]}"
 	else
 		DEVEL="$DEVEL -a"
 	fi
-else
-	DEVEL="$DEVEL -a \
-&& bash scripts/$COLLECTION-extra -a"
-	EXTRA="yes"
 fi
 
 setup_pkgmk_conf
@@ -615,8 +661,6 @@ echo "     CHROOT: $CHROOT"
 echo "The command: KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" install-nutyx"
 echo ""
 echo "The rsync  : rsync -a $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/"
-[ "$EXTRA" == "yes" ] && \
-echo "             rsync -a $GIT_PROJ/${COLLECTION}-extra/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}-extra/"
 echo ""
 
 newpackager="$(git config user.name) <$(git config user.email)>"
@@ -722,12 +766,6 @@ mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT || error /${VERSION}/${COLLECT
 rsync -a $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/ || error "rsync"
 mkdir $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts
 ln -sv /usr/bin/build-port $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
-if [ "$EXTRA" == "yes" ]; then
-	rsync -a $GIT_PROJ/${COLLECTION}-extra/ \
-		$ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}-extra/ || error "rsync"
-	ln -sv /usr/bin/build-port \
-		$ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}-extra
-fi
 
 echo 'running the command: sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
