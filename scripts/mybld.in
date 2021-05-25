@@ -616,18 +616,11 @@ $PAUSE \
 
 echo "$CARDS_CONF" > $ROOT/$VERSION/$COLLECTION/etc/cards.conf
 [ -z "${PARAM[0]}" ] && CHROOT="ncurses readline bash"
-if [ "$COLLECTION" == "base" ] \
-	|| [ "$COLLECTION" == "cli"  ] \
-	|| [ "$COLLECTION" == "gui" ] \
-	|| [ "$COLLECTION" == "cli-extra" ] \
-	|| [ "$COLLECTION" == "gui-extra" ] \
-	|| [ "$COLLECTION" == "$MYCOLLECTION" ] \
-	|| [ "$COLLECTION" == "$MYCOLLECTION-extra" ]; then
-	if ! [ -z "${PARAM[0]}" ]; then
-		DEVEL="$DEVEL ${PARAM[0]}"
-	else
-		DEVEL="$DEVEL -a"
-	fi
+
+if [ -z "${PARAM[0]}" ]; then
+	DEVEL="$DEVEL -a"
+else
+	DEVEL="$DEVEL ${PARAM[0]}"
 fi
 
 setup_pkgmk_conf
