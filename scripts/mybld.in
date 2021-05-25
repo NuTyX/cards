@@ -591,9 +591,17 @@ echo "The rsync  : rsync -a $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTI
 echo ""
 
 newpackager="$(git config user.name) <$(git config user.email)>"
+newpackagername="$(git config user.name)"
 if [ "$packager" != "$newpackager" ]; then
-	oldpackager="${packager%[ ,<]*}"
-	newcontributors="$contributors, ${oldpackager// /}"
+	oldpackager="$(echo ${packager%[ ,<]*}|sed "s/\b\(.\)/\l\1/g")"
+	newcontributors="$(echo $contributors|sed -e "s/Pierre B/Pierre/g" \
+	-e "s/\b\(.\)/\l\1/g" \
+	-e "s/$oldpackager//")"
+	newcontributors+=",$oldpackager"
+	newcontributors="$(echo $newcontributors|sed -e "s/\b\(.\)/\l\1/g" \
+	-e "s/$newpackagername//g" -e "s/ /,/g" -e "s/\(,\)\1\+/\1/g" \
+	-e "s/\b\(.\)/\u\1/g" -e "s/^,//g" -e "s/,$//g")"
+
 fi
 if [ ! -z "${PARAM[1]}" ]; then
 	echo ""
