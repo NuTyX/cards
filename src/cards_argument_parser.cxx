@@ -264,7 +264,6 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 
 	addOption(CMD_UPGRADE, OPT_SIZE, false);
 	addOption(CMD_UPGRADE, OPT_CHECK, false);
-	addOption(CMD_UPGRADE, OPT_FORCE,false);
 	addOption(CMD_UPGRADE, OPT_DRY,false);
 	addOption(CMD_UPGRADE, OPT_ROOT,false);
 	addOption(CMD_UPGRADE, OPT_CONFIG_FILE,false);
