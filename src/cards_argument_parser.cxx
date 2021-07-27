@@ -215,8 +215,8 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 		_("    Local available ports."));
 
 	OPT_DRY.init("dry",
-		'n',
-		_("\t   Not doing the action. Only show (if possible) what will be done."));
+		0,
+		_("\t   Not doing the action. Only simulate (if possible) what will be done."));
 
 	OPT_REMOVE.init("remove",
 		'r',

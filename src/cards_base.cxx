@@ -83,8 +83,7 @@ void Cards_base::run(int argc, char** argv)
 			installPackageName = installFullPackageName;
 		}
 		bool found = false;
-		for(set<string>::const_iterator bP = basePackagesList.begin();bP != basePackagesList.end();bP++) {
-			string val = *bP;
+		for ( auto val : basePackagesList) {
 			string::size_type pos = val.find('@');
 			if (pos != string::npos) {
 				basePackageName = val.substr(0,pos);
@@ -123,7 +122,7 @@ void Cards_base::run(int argc, char** argv)
 				removePackageFiles(i);
 			}
 		} else {
-			for (auto i : removePackagesList) cout << i << endl;
+			for (auto i : removePackagesList) cout << " SIM: " <<  i << endl;
 		}
 	}
 }

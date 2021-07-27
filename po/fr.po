@@ -693,8 +693,8 @@ msgstr " Binaires disponibles sur le serveur de dépot"
 msgid "    Local available ports."
 msgstr "    Ports disponibles en local."
 
-msgid "\t   Not doing the action. Only show (if possible) what will be done."
-msgstr "\t   Ne pas faire l'action. Seulement afficher (si possible) ce qui sera fait."
+msgid "\t   Not doing the action. Only simulate (if possible) what will be done."
+msgstr "\t   Ne pas faire l'action. Seulement simuler (si possible) ce qui sera fait."
 
 msgid "   Remove the packages founds, use with care."
 msgstr "   Supprime les paquets trouvés, utiliser avec précaution."
