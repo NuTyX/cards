@@ -33,7 +33,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		m_root="/";
 	else
 		m_root=m_root+"/";
-
+	m_pkgsync.setConfigFile(configFileName);
 	m_pkgsync.run();
 	parsePkgRepoCollectionFile();
 	buildSimpleDatabase();
