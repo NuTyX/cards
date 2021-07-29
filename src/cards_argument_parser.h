@@ -50,6 +50,8 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APCmd CMD_PURGE;
 		static ArgParser::APCmd CMD_UPGRADE;
 
+		static ArgParser::APOpt OPT_DOWNLOAD_ONLY;
+
 		static ArgParser::APOpt OPT_CHECK;
 		static ArgParser::APOpt OPT_SIZE;
 

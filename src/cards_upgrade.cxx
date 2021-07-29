@@ -93,9 +93,11 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 			if ( m_ListOfPackages.size() == 0  && ( m_ListOfPackagesToDelete.size() == 0 ) ) {
 				std::cout << _("Your system is up to date.") << endl;
 			} else {
-				if (getuid()) {
-					m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-					treatErrors("");
+				if (! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
+					if (getuid()) {
+						m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+						treatErrors("");
+					}
 				}
 				upgrade();
 			}
@@ -147,7 +149,7 @@ void Cards_upgrade::upgrade()
 
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
 		dry();
-	else {
+	else if (! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
 		for (auto i : m_dependenciesList) {
 			m_packageArchiveName=getPackageFileName(i.first);
 			m_force=true;
