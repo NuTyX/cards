@@ -127,10 +127,10 @@ unsigned int Pkgsync::getRemotePackages(const std::string& pkgrepoFile)
 void Pkgsync::run()
 {
 	using namespace std;
-	if (getuid()) {
+/*	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
-	}
+	} */
 	string configFile = m_root + m_configFile;
 	Config config;
 	Pkgrepo::parseConfig(configFile.c_str(), config);
