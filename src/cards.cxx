@@ -44,12 +44,13 @@ int main(int argc, char** argv)
 	setlocale(LC_ALL,"");
 	bindtextdomain(GETTEXT_PACKAGE,PACKAGE_LOCALE_DIR);
 	textdomain(GETTEXT_PACKAGE);
-
 	string configFile = "/etc/cards.conf";
 	try {
 		CardsArgumentParser cardsArgPars;
 		cardsArgPars.parse(argc, argv);
-
+#ifndef NDEBUG
+		cout << cardsArgPars.getIdValue(cardsArgPars.command())
+#endif
 		if (cardsArgPars.isSet(CardsArgumentParser::OPT_CONFIG_FILE))
 			configFile=cardsArgPars.getOptionValue(CardsArgumentParser::OPT_CONFIG_FILE);
 

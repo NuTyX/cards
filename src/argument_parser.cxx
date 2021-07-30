@@ -319,6 +319,10 @@ void ArgParser::parseError(const string& error, const string& cmd) const
     exit(-1);
 }
 
+int ArgParser::getIdValue( const APCmd& command)
+{
+	return command.id;
+}
 ArgParser::APCmd ArgParser::command() const
 {
     return m_command;

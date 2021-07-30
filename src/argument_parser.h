@@ -211,6 +211,11 @@ public:
 	std::string getOptionValue(const APOpt& key) const;
 
 	/**
+	 * \return the id value of the command
+	 */
+	int getIdValue( const APCmd& command);
+
+	/**
 	 * the remaining arguments
 	 */
 	const std::vector<std::string>& otherArguments() const;
