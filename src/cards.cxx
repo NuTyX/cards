@@ -18,7 +18,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
 //  USA.
 //
-
 #include "file_download.h"
 #include "cards_base.h"
 #include "cards_sync.h"
@@ -187,6 +186,10 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 
 			case 5:	//CMD_SYNC
+			if (getuid()) {
+				string s="";
+				throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
+			}
 			{
 				unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
 				i->run();
