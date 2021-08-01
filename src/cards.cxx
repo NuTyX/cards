@@ -49,12 +49,14 @@ int main(int argc, char** argv)
 		CardsArgumentParser cardsArgPars;
 		cardsArgPars.parse(argc, argv);
 #ifndef NDEBUG
-		cout << cardsArgPars.getIdValue(cardsArgPars.command())
+		cout << cardsArgPars.getIdValue(cardsArgPars.command()) << endl;
 #endif
 		if (cardsArgPars.isSet(CardsArgumentParser::OPT_CONFIG_FILE))
 			configFile=cardsArgPars.getOptionValue(CardsArgumentParser::OPT_CONFIG_FILE);
 
-		if (cardsArgPars.command() == CardsArgumentParser::CMD_HELP) {
+		switch(cardsArgPars.getIdValue(cardsArgPars.command()))
+		{
+			case 1:
 			cout << _("Usage: ") << BLUE << cardsArgPars.appName()  << _(" command ") << NORMAL << "[options]"<< endl;
 
 			cout << _("Where possible") << BLUE << _(" command ") << NORMAL<< _("is:") << endl;
@@ -138,115 +140,183 @@ int main(int argc, char** argv)
 				<< "                             "
 				<< _("configured in the /etc/cards.conf file otherwise the command will abort.") << endl;
 			return EXIT_SUCCESS;
-		}
-		if (cardsArgPars.command() == CardsArgumentParser::CMD_CONFIG) {
-			Config config;
-			Pkgrepo::parseConfig(configFile.c_str(), config);
-			unsigned int index = 0;
-			string prtDir, url ;
 
-			for ( auto i : config.dirUrl ) {
-				index++;
-				cout << index << _(" Directory: ") << i.Dir ;
-				if ( i.Url != "" )
-					cout << _(" from ")
-					<< i.Url ;
-				cout << endl;
-			}
-			for ( auto i : config.baseDir )
-				cout << _("Base System list directory: ") << i << endl;
-			cout <<   _("Binaries : ")
-				<< config.arch << endl;
-			for ( auto i : config.group ) cout << "Group    : " << i << endl;
-			if ( config.logdir != "") {
-				cout << _("log directory: ")
-					<< config.logdir << endl;
+			case 2:	//CMD_CONFIG
+			{
+				Config config;
+				Pkgrepo::parseConfig(configFile.c_str(), config);
+				unsigned int index = 0;
+				string prtDir, url ;
+
+				for ( auto i : config.dirUrl ) {
+					index++;
+					cout << index << _(" Directory: ") << i.Dir ;
+					if ( i.Url != "" )
+						cout << _(" from ")
+						<< i.Url ;
+					cout << endl;
+				}
+				for ( auto i : config.baseDir )
+					cout << _("Base System list directory: ") << i << endl;
+				cout <<   _("Binaries : ")
+					<< config.arch << endl;
+				for ( auto i : config.group ) cout << "Group    : " << i << endl;
+				if ( config.logdir != "") {
+					cout << _("log directory: ")
+						<< config.logdir << endl;
+				}
 			}
 			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPCREATE) {
-			// get the list of the dependencies
-			CardsDepends CD(cardsArgPars);
-			vector<string> listOfPackages = CD.getNeededDependencies();
-			if ( listOfPackages.empty() ) {
-				cout << _("The package ")
-				<< cardsArgPars.otherArguments()[0]
-				<< _(" is already installed") << endl;
-				return EXIT_SUCCESS;
-			}
-			// create (compile and install) the List of deps (including the final package)
-			unique_ptr<Cards_create> i(new Cards_create(cardsArgPars,
-				configFile.c_str(),listOfPackages));
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_CREATE) {
 
-			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
-				cardsArgPars.printHelp("create");
-				return EXIT_SUCCESS;
-			}
-			if  ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
-				// go back to a base system
+			case 3:	//CMD_BASE
+			{
+				if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
+				( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
+					cardsArgPars.printHelp("base");
+					return EXIT_SUCCESS;
+				}
 				unique_ptr<Cards_base> i(new Cards_base(cardsArgPars));
 				i->run(argc, argv);
 			}
-			// get the list of the dependencies"
-			CardsDepends CD(cardsArgPars);
-			vector<string> listOfDeps = CD.getDependencies();
-
-			if (!listOfDeps.empty())
-				unique_ptr<Cards_install> i(new Cards_install(cardsArgPars,configFile.c_str(),listOfDeps));
-
-			// compilation of the final port"
-			unique_ptr<Cards_create> i(new Cards_create( cardsArgPars,
-				configFile.c_str(),
-				cardsArgPars.otherArguments()[0]));
 			return EXIT_SUCCESS;
 
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_BASE) {
-			if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
-			( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
-				cardsArgPars.printHelp("base");
-				return EXIT_SUCCESS;
-			}
-			unique_ptr<Cards_base> i(new Cards_base(cardsArgPars));
-			i->run(argc, argv);
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_SYNC) {
-			unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
-			i->run();
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_PURGE) {
-			unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
-			i->purge();
-			return EXIT_SUCCESS;
-		} else if ( (cardsArgPars.command() == CardsArgumentParser::CMD_UPGRADE) ||
-					(cardsArgPars.command() == CardsArgumentParser::CMD_DIFF) ) {
-			unique_ptr<Cards_upgrade> i(new Cards_upgrade(cardsArgPars,configFile.c_str()));
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_INSTALL) {
-			unique_ptr<Cards_install> i(new Cards_install(cardsArgPars,configFile.c_str()));
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_REMOVE) {
-			unique_ptr<Cards_remove> i(new Cards_remove("cards remove",cardsArgPars, configFile.c_str()));
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_LEVEL) {
-			unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
-			i->showLevel();
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPENDS) {
-			unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
-			i->showDependencies();
-			return EXIT_SUCCESS;
-		} else if (cardsArgPars.command() == CardsArgumentParser::CMD_DEPTREE) {
-			unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
-			return i->deptree();
-		} else if ( (cardsArgPars.command() == CardsArgumentParser::CMD_INFO) ||
-				(cardsArgPars.command() == CardsArgumentParser::CMD_LIST)   ||
-				(cardsArgPars.command() == CardsArgumentParser::CMD_SEARCH) ||
-				(cardsArgPars.command() == CardsArgumentParser::CMD_FILES)  ||
-				(cardsArgPars.command() == CardsArgumentParser::CMD_QUERY)) {
+			case 4:	//CMD_FILES
+			{
 				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+			}
 			return EXIT_SUCCESS;
+
+			case 5:	//CMD_SYNC
+			{
+				unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
+				i->run();
+			}
+			return EXIT_SUCCESS;
+
+			case 6:	//CMD_QUERY
+			{
+				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+			}
+			return EXIT_SUCCESS;
+
+			case 7:	//CMD_INFO
+			{
+				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+			}
+			return EXIT_SUCCESS;
+
+			case 8: //CMD_LIST
+			{
+				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+			}
+			return EXIT_SUCCESS;
+
+			case 9:	//CMD_INSTALL
+			{
+				unique_ptr<Cards_install> i(new Cards_install(cardsArgPars,configFile.c_str()));
+			}
+			return EXIT_SUCCESS;
+
+			case 10://CMD_REMOVE
+			{
+				unique_ptr<Cards_remove> i(new Cards_remove("cards remove",cardsArgPars, configFile.c_str()));
+			}
+			return EXIT_SUCCESS;
+
+			case 11://CMD_LEVEL
+			{
+				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+				i->showLevel();
+			}
+			return EXIT_SUCCESS;
+
+			case 12://CMD_DIFF
+			{
+				unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
+				i->run();
+			}
+			return EXIT_SUCCESS;
+
+			case 13://CMD_DEPENDS
+			{
+				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+				i->showDependencies();
+			}
+			return EXIT_SUCCESS;
+
+			case 14://CMD_DEPTREE
+			{
+				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+				return i->deptree();
+			}
+			return EXIT_SUCCESS;
+
+			case 15://CMD_SEARCH
+			{
+				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+			}
+			return EXIT_SUCCESS;
+
+			case 16://CMD_DEPCREATE
+			{
+				// get the list of the dependencies
+				CardsDepends CD(cardsArgPars);
+				vector<string> listOfPackages = CD.getNeededDependencies();
+				if ( listOfPackages.empty() ) {
+					cout << _("The package ")
+					<< cardsArgPars.otherArguments()[0]
+					<< _(" is already installed") << endl;
+					return EXIT_SUCCESS;
+				}
+
+				// create (compile and install) the List of deps (including the final package)
+				unique_ptr<Cards_create> i(new Cards_create(cardsArgPars,
+					configFile.c_str(),listOfPackages));
+			}
+			return EXIT_SUCCESS;
+
+			case 17://CMD_CREATE
+			{
+				if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
+				( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
+					cardsArgPars.printHelp("create");
+					return EXIT_SUCCESS;
+				}
+				if  ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
+					// go back to a base system
+					unique_ptr<Cards_base> i111(new Cards_base(cardsArgPars));
+					i111->run(argc, argv);
+				}
+				// get the list of the dependencies"
+				CardsDepends CD(cardsArgPars);
+				vector<string> listOfDeps = CD.getDependencies();
+
+				if (!listOfDeps.empty())
+					unique_ptr<Cards_install> i112(new Cards_install(cardsArgPars,configFile.c_str(),listOfDeps));
+
+				// compilation of the final port"
+				unique_ptr<Cards_create> i113(new Cards_create( cardsArgPars,
+					configFile.c_str(),
+					cardsArgPars.otherArguments()[0]));
+			}
+			return EXIT_SUCCESS;
+
+			case 18://CMD_PURGE
+			{
+				unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
+				i->purge();
+			}
+			return EXIT_SUCCESS;
+
+			case 19://CMD_UPGRADE
+			{
+				unique_ptr<Cards_upgrade> i(new Cards_upgrade(cardsArgPars,configFile.c_str()));
+			}
+			return EXIT_SUCCESS;
+
+			default:
+				cout << "not found" << endl;
+				cout << cardsArgPars.getIdValue(cardsArgPars.command());
 		}
 	} catch (runtime_error& e) {
 			cerr << "cards " << VERSION << " "<< command << ": " << e.what() << endl;
