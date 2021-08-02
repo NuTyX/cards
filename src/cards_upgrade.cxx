@@ -99,7 +99,8 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 						treatErrors("");
 					}
 				}
-				upgrade();
+				if ( ! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
+					upgrade();
 			}
 		}
 	}
@@ -121,6 +122,18 @@ void Cards_upgrade::Isuptodate()
 		std::cout << "no" << std::endl;
 	else
 		std::cout << "yes" << std::endl;
+}
+int Cards_upgrade::Isdownload()
+{
+	std::string packageNameSignature, packageName, packageFileName;
+	for (auto i : m_ListOfPackages) {
+		packageFileName = getPackageFileName(i.first);
+		packageNameSignature = getPackageFileNameSignature(packageName);
+		if ( ! checkFileSignature(packageFileName, packageNameSignature))
+			return EXIT_FAILURE;
+	}
+
+return EXIT_SUCCESS;
 }
 void Cards_upgrade::dry()
 {

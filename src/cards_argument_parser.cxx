@@ -42,6 +42,7 @@ ArgParser::APCmd CardsArgumentParser::CMD_PURGE;
 ArgParser::APCmd CardsArgumentParser::CMD_UPGRADE;
 
 ArgParser::APOpt CardsArgumentParser::OPT_DOWNLOAD_ONLY;
+ArgParser::APOpt CardsArgumentParser::OPT_DOWNLOAD_READY;
 ArgParser::APOpt CardsArgumentParser::OPT_CHECK;
 ArgParser::APOpt CardsArgumentParser::OPT_SIZE;
 
@@ -191,9 +192,13 @@ It will delete all the downloads binaries which are located in the binaries sect
 _("This command can upgrade at onces alls your installed out of date packages."),
 		ArgParser::NONE, 0 , "");
 
+	OPT_DOWNLOAD_READY.init("ready",
+		0,
+		_("\t   Only check if all binaries that are needed are downloaded."));
+
 	OPT_DOWNLOAD_ONLY.init("download-only",
 		0,
-		_("Only download the binaries that needs to be upgrade."));
+		_("Only download the binaries that are needed to be upgraded."));
 
 	OPT_FULL.init("full",
 		'F',
@@ -246,11 +251,11 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 
 	OPT_SIZE.init("size",
 		's',
-		_("\t   Just return the number of updates."));
+		_("\t   Return the number of updates."));
 
 	OPT_CHECK.init("check",
 		'c',
-		_("\t   Just check if they are some updates."));
+		_("\t   Check if they are some updates."));
 
 	OPT_ROOT.init("root",
 		0,
@@ -267,6 +272,7 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 	addOption(CMD_CONFIG, OPT_CONFIG_FILE,false);
 
 
+	addOption(CMD_UPGRADE, OPT_DOWNLOAD_READY, false);
 	addOption(CMD_UPGRADE, OPT_DOWNLOAD_ONLY, false);
 	addOption(CMD_UPGRADE, OPT_SIZE, false);
 	addOption(CMD_UPGRADE, OPT_CHECK, false);

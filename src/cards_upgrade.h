@@ -45,6 +45,7 @@ public:
 	
 	// True if some updates availables
 	void Isuptodate();
+	int Isdownload();
 	void upgrade();
 	void summary();
 };

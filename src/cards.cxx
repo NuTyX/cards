@@ -235,8 +235,7 @@ int main(int argc, char** argv)
 
 			case 12://CMD_DIFF
 			{
-				unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
-				i->run();
+				unique_ptr<Cards_upgrade> i(new Cards_upgrade(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
@@ -287,18 +286,18 @@ int main(int argc, char** argv)
 				}
 				if  ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
 					// go back to a base system
-					unique_ptr<Cards_base> i111(new Cards_base(cardsArgPars));
-					i111->run(argc, argv);
+					unique_ptr<Cards_base> i(new Cards_base(cardsArgPars));
+					i->run(argc, argv);
 				}
 				// get the list of the dependencies"
 				CardsDepends CD(cardsArgPars);
 				vector<string> listOfDeps = CD.getDependencies();
 
 				if (!listOfDeps.empty())
-					unique_ptr<Cards_install> i112(new Cards_install(cardsArgPars,configFile.c_str(),listOfDeps));
+					unique_ptr<Cards_install> i(new Cards_install(cardsArgPars,configFile.c_str(),listOfDeps));
 
 				// compilation of the final port"
-				unique_ptr<Cards_create> i113(new Cards_create( cardsArgPars,
+				unique_ptr<Cards_create> i(new Cards_create( cardsArgPars,
 					configFile.c_str(),
 					cardsArgPars.otherArguments()[0]));
 			}
@@ -314,6 +313,8 @@ int main(int argc, char** argv)
 			case 19://CMD_UPGRADE
 			{
 				unique_ptr<Cards_upgrade> i(new Cards_upgrade(cardsArgPars,configFile.c_str()));
+				if (cardsArgPars.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
+					return i->Isdownload();
 			}
 			return EXIT_SUCCESS;
 

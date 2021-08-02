@@ -708,12 +708,18 @@ msgstr "   Ignore les WARNINGS et affiche malgré tout la liste des niveaux."
 msgid "  Ignore Pre and Post install scripts."
 msgstr "  Ignore les scripts de Pré et Post installation."
 
-msgid "\t   Just return the number of updates."
-msgstr "\t   Affiche juste le nombre de mise à jour disponible."
+msgid "\t   Return the number of updates."
+msgstr "\t   Affiche le nombre de mise à jour disponible."
 
-msgid "\t   Just check if they are some updates."
+msgid "\t   Check if they are some updates."
 msgstr "\t   Vérifie si il y a des mise à jour disponible."
  
+msgid "\t   Only check if all binaries that are needed are downloaded."
+msgstr "\t   Vérifie uniquement si tous les binaires nécessaires sont téléchargés."
+
+msgid "Only download the binaries that are needed to be upgraded."
+msgstr "Télécharge uniquement les binaires nécessaires pour la mise à jour."
+
 msgid "  Specify alternative installation root"
 msgstr "Spécifie une racine d'installation alternative (autre que '/')."
 
