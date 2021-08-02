@@ -1767,8 +1767,8 @@ void assertArgument(char** argv, int argc, int index)
 void rotatingCursor() {
   static int pos=0;
   char cursor[4]={'/','-','\\','|'};
-  printf("\r [ %c ] ", cursor[pos]);
-  fflush(stdout);
+  fprintf(stderr,"\r [ %c ] ", cursor[pos]);
+  fflush(stderr);
   pos = (pos+1) % 4;
 }
 // vim:set ts=2 :
