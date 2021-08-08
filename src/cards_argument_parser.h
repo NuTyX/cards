@@ -52,7 +52,7 @@ class CardsArgumentParser : public ArgParser
 
 		static ArgParser::APOpt OPT_DOWNLOAD_ONLY;
 		static ArgParser::APOpt OPT_DOWNLOAD_READY;
-
+		static ArgParser::APOpt OPT_NO_SYNC;
 
 		static ArgParser::APOpt OPT_CHECK;
 		static ArgParser::APOpt OPT_SIZE;

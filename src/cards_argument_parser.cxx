@@ -45,6 +45,7 @@ ArgParser::APOpt CardsArgumentParser::OPT_DOWNLOAD_ONLY;
 ArgParser::APOpt CardsArgumentParser::OPT_DOWNLOAD_READY;
 ArgParser::APOpt CardsArgumentParser::OPT_CHECK;
 ArgParser::APOpt CardsArgumentParser::OPT_SIZE;
+ArgParser::APOpt CardsArgumentParser::OPT_NO_SYNC;
 
 ArgParser::APOpt CardsArgumentParser::OPT_FULL;
 ArgParser::APOpt CardsArgumentParser::OPT_FORCE;
@@ -192,6 +193,10 @@ It will delete all the downloads binaries which are located in the binaries sect
 _("This command can upgrade at onces alls your installed out of date packages."),
 		ArgParser::NONE, 0 , "");
 
+	OPT_NO_SYNC.init("no-sync",
+		0,
+		_("\t   Only upgrade what's possible."));
+
 	OPT_DOWNLOAD_READY.init("ready",
 		0,
 		_("\t   Only check if all binaries that are needed are downloaded."));
@@ -274,6 +279,8 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 
 	addOption(CMD_UPGRADE, OPT_DOWNLOAD_READY, false);
 	addOption(CMD_UPGRADE, OPT_DOWNLOAD_ONLY, false);
+	addOption(CMD_UPGRADE, OPT_NO_SYNC, false);
+
 	addOption(CMD_UPGRADE, OPT_SIZE, false);
 	addOption(CMD_UPGRADE, OPT_CHECK, false);
 	addOption(CMD_UPGRADE, OPT_DRY,false);
