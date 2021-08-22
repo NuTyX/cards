@@ -3,7 +3,7 @@
 // 
 //  Copyright (c) 2000 - 2005 Per Liden
 //  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2021 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -161,15 +161,22 @@ void Pkginfo::run()
 			cout << endl;
 		}
 	}
-	// Make footprint
+	/*
+	 *  Make footprint
+	 */
 	if (m_footprint_mode) {
 		getFootprintPackage(m_arg);
 	} else {
-		// Modes that require the database to be opened
+		/*
+		 *  Modes that require the database to be opened
+		 *
+		 */
 		Db_lock lock(m_root, false);
 		getListOfPackageNames(m_root);
 		if (m_installed_mode) {
-			// List installed packages
+			/*
+			 *  List installed packages
+			 */
 			buildSimpleDatabase();
 			for (auto i : m_listOfInstPackages) {
 				if (m_fulllist_mode) {
@@ -190,8 +197,9 @@ void Pkginfo::run()
 				}
 			}
 		} else if (m_list_mode) {
-			// List package or file contents
-//			buildCompleteDatabase(false);
+			/*
+			 *  List package or file contents
+			 */
 			buildDatabase(true,false,false,false,"");
 			if ( (! checkPackageNameExist(m_arg)) &&
 					(! checkPackageNameExist(m_arg)) ) {
@@ -213,21 +221,25 @@ void Pkginfo::run()
 			int Result;
 			set<string>filenameList;
 			Result = findRecursiveFile (filenameList, m_arg.c_str(), WS_DEFAULT);
-			// get the list of libraries for all the possible files 
+			/*
+			 * get the list of libraries for all the possible files
+			 */
 			set<string> librariesList;
 			for (auto i : filenameList) Result = getRuntimeLibrariesList(librariesList,i);
-			// get the own package for all the elf files dependencies libraries
+			/*
+			 * Get the own package for all the elf files dependencies libraries
+			 */
 #ifndef NDEBUG
 			for (auto i : librariesList) cerr << i <<endl;
 #endif
 			if ( (librariesList.size() > 0 ) && (Result > -1) ) {
 				set<string> runtimeList;
-				for (set<string>::const_iterator i = librariesList.begin();i != librariesList.end();++i) {
-					for (packages_t::const_iterator j = m_listOfInstPackages.begin(); j != m_listOfInstPackages.end();++j) {
+				for (auto i : librariesList) {
+					for (auto j : m_listOfInstPackages) {
 						bool found = false;
-						for (set<string>::const_iterator k = j->second.files.begin(); k != j->second.files.end(); ++k) {
-							if ( k->find('/' + *i) != string::npos) {
-								string dependency = j->first + static_cast<ostringstream*>( &(ostringstream() <<  j->second.build ))->str();
+						for (auto k : j.second.files) {
+							if ( k.find('/' + i) != string::npos) {
+								string dependency = j.first + ultos(j.second.build);
 								runtimeList.insert(dependency);
 								break;
 								found = true;
@@ -252,7 +264,10 @@ void Pkginfo::run()
 				}
 			}	
 		} else if (m_libraries_mode + m_runtime_mode > 0) {
-			// get the list of installed packages silently
+			/*
+			 * Get the list of installed packages silently
+			 *
+			 */
 			buildCompleteDatabase(true);
 			set<string> librariesList;
 			int Result = -1;
@@ -307,7 +322,9 @@ void Pkginfo::run()
 				}
 			}	
 		} else if (m_epoc) {
-			// get the buildtime of the package: return 0 if not found
+			/*
+			 *  get the buildtime of the package: return 0 if not found
+			 */
 			buildCompleteDatabase(true);
 			if (checkPackageNameExist(m_arg)) {
 				cout << m_listOfInstPackages[m_arg].build << endl;
@@ -315,7 +332,9 @@ void Pkginfo::run()
 				cout << "0" << endl;
 			}
 		} else if (m_details_mode) {
-			// get all details of a package
+			/*
+			 *  get all details of a package
+			 */
 			buildCompleteDatabase(false);
 			if (checkPackageNameExist(m_arg)) {
 				string arg = m_listOfAlias[m_arg];
@@ -362,7 +381,9 @@ void Pkginfo::run()
 				}
 			}
 		} else if (m_owner_mode) {
-			// List owner(s) of file or directory
+			/*
+			 * List owner(s) of file or directory
+			 */
 			buildCompleteDatabase(false);
 			regex_t preg;
 			if (regcomp(&preg, m_arg.c_str(), REG_EXTENDED | REG_NOSUB)) {
