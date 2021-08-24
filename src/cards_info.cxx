@@ -114,6 +114,24 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 						<< " " << j.version
 						<< " " << j.description
 						<< endl;
+					set<string> groupList;
+					groupList = parseDelimitedSetList(j.group," ");
+					for ( auto k : groupList ) {
+						if ( k == j.basePackageName)
+							continue;
+						string name = j.basePackageName
+						+ "."
+						+ k;
+						cout << "(" << i.collection << ") ";
+						if ( checkPackageNameExist(name ))
+							cout << GREEN;
+						cout << name
+							<< NORMAL
+							<< " " << j.version
+							<< " " << j.description
+							<< endl;
+						name="";
+					}
 					continue;
 				}
 				bool found = false;
