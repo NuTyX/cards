@@ -279,7 +279,7 @@ remove_all() {
   done
   [ -z $ROOT/${1} ] && exit 1
   [ ! -d $ROOT/${1} ] && exit 0
-  for i in run sys proc dev/pts dev; do
+  for i in run sys proc dev/pts dev/shm dev; do
     [ -d $ROOT/${1}/${i} ] || continue
     mountpoint $ROOT/${1}/${i} > /dev/null || continue
     sudo umount $ROOT/${1}/${i} || exit 1
@@ -648,12 +648,15 @@ if [ "${PARAM[1]}" = "" ]; then
             echo ">>> version variable not set !"
             exit 1
         fi
-        cd "$COLLECTION/${PARAM[0]}/"
-        pkgmk -td
-        rc=$?
-        cd - > /dev/null
-        if [ $rc -ne 0 ]; then
-            exit 1
+	if [ $(which pkgmk > /dev/null) ]; then
+		cd "$COLLECTION/${PARAM[0]}/"
+		pkgmk -td
+		rc=$?
+		cd - > /dev/null
+		[ $rc -ne 0 ] && exit 1
+	else
+		echo "=====> cards.devel is not install !
+====> Cannot check if URL source(s) is valid"
         fi
     fi
 fi
