@@ -648,7 +648,7 @@ if [ "${PARAM[1]}" = "" ]; then
             echo ">>> version variable not set !"
             exit 1
         fi
-	if [ $(which pkgmk > /dev/null) ]; then
+	if ( $(which pkgmk > /dev/null) ); then
 		cd "$COLLECTION/${PARAM[0]}/"
 		pkgmk -td
 		rc=$?
