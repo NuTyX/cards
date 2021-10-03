@@ -468,9 +468,10 @@ unpack_source() {
 		fi
 	done
 }
-get_package_list() {
+get_packages_list() {
 	local i ARCH
 	i=0
+	unset TARGETS
 	for ARCH in $PKGMK_ARCH any; do
 		for FILE in $(find $PKGMK_PACKAGE_DIR -name "${name}*$ARCH.$PKGMK_PACKAGE_EXT*"); do
 			TARGETS[i]="$(basename $FILE)"
@@ -619,7 +620,7 @@ check_footprint() {
 	
 	cd $PKGMK_PACKAGE_DIR
 	if [ -z $TARGETS ]; then
-		get_package_list
+		get_packages_list
 		if [ -z $TARGETS ]; then
 			error "Unable to update footprint"
 		fi
@@ -1020,10 +1021,8 @@ build_package() {
 	if [ "$1" != "$TARGET" ]; then
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
-				error "$TARGET should be remove"
+				warning "$TARGET already exist"
 			done
-			error "Remove the binaries first..."
-			exit $E_BUILD
 		fi
 	fi
 	check_file "$TARGET"
@@ -1087,6 +1086,12 @@ build_package() {
 		cd $PKG
 		i=0
 		j=0
+
+		PKGMK_BUILDVER="$(date +%s)"
+		info "PKGMK_BUILDVER=$(date +%s)"
+
+		clean_old_binaries
+
 		for group in ${PKGMK_GROUPS[@]}; do
 			if [ "$(type -t ${group})" == "function" ]; then
 				BUILD_SUCCESSFUL="no"
@@ -1170,14 +1175,16 @@ build_package() {
 			fi
 		fi
 	fi
-	
+
+	get_packages_list
+
 	if [ "$BUILD_SUCCESSFUL" = "yes" ]; then
 		if [ "$1" != "$TARGET" ]; then
 			if [ -z $categories ]; then
 				info "trying to get categories..."
 				get_categories
 			fi
-			get_package_list
+			get_packages_list
         		if [ -z $TARGETS ]; then
 					remove_dependencies
 					error "Package(s) not found(s)..."
@@ -1205,7 +1212,7 @@ build_package() {
 }
 install_package() {
 	local COMMAND
-	get_package_list
+	get_packages_list
 	if [ -z $TARGETS ]; then
 		error "Package(s) not found(s) nothing to install..."
 		exit $E_INSTALL
@@ -1252,7 +1259,7 @@ recursive() {
 }
 clean() {
 	unset TARGETS
-	get_package_list
+	get_packages_list
 	if [ ! -z $TARGETS ]; then
 		for TARGET in ${TARGETS[@]}; do
 			if [ -f $PKGMK_PACKAGE_DIR/$TARGET ]; then
@@ -1270,7 +1277,7 @@ clean() {
 update_footprint() {
 	cd $PKGMK_PACKAGE_DIR
 	if [ -z $TARGETS ]; then
-		get_package_list
+		get_packages_list
 		if [ -z $TARGETS ]; then		
 			error "Package(s) not found(s), unable to update footprint."
 			exit $E_FOOTPRINT
@@ -1361,7 +1368,7 @@ ALIAS GROUP CONTRIBUTORS SET CATEGORY
 update_repo() {
 	local FILE MD5SUM EXT
 	cd $PKGMK_ROOT
-	get_package_list
+	get_packages_list
 	if [ -z "$description"  ]; then
 		description="n.a."
 	else
@@ -1430,6 +1437,14 @@ check_build() {
 			echo $i
 		done
 	fi
+}
+clean_old_binaries() {
+
+	local TARGET
+	get_packages_list
+	for TARGET in ${TARGETS[@]}; do
+		rm $PKGMK_PACKAGE_DIR/$TARGET
+	done
 }
 interrupted() {
 	echo ""
@@ -1645,13 +1660,10 @@ main() {
 
 	check_pkgfile
 
-	get_package_list
-
 	case $PKGMK_COMPRESSION_MODE in
 		gz|bz2|xz)
-			if [ -z $TARGETS ]; then
-				TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
-			fi;;
+			TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
+			;;
 		*)
 			error "Compression mode '$PKGMK_COMPRESSION_MODE' not supported"
 			exit $E_GENERAL
@@ -1764,7 +1776,9 @@ main() {
 		info "release: $release"
 	fi
 
+
 	if [ "$PKGMK_UP_TO_DATE" = "yes" ]; then
+		get_packages_list
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
 				if [ "$(build_needed)" = "yes" ]; then
@@ -1781,11 +1795,11 @@ main() {
 			fi
 		fi
 		exit 0
-
 	fi
 	# From here on check the base package not any group
+	get_packages_list
 	if [ -z $TARGETS ]; then
-		TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
+		TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
 		if [ "$(build_needed)" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
 			info "Package '$TARGET' is up to date."
 		else
@@ -1810,18 +1824,16 @@ main() {
 	if [ ! -z $FOUND ] ; then
 		if [ $FOUND != true ];  then
 			download_source
-			PKGMK_BUILDVER="$(get_package_builddate $TARGET)"
 			TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT
-			build_package $TARGET
+			build_package
 		fi
 	fi
-
 	if [ "$PKGMK_INSTALL" != "no" ]; then
 		install_package
 	fi
 	if [ "$PKGMK_COMPRESS_PACKAGE" = "yes" ]; then
 		cd $PKGMK_PACKAGE_DIR
-		get_package_list
+		get_packages_list
 		for TARGET in ${TARGETS[@]}; do
 			if [  "${TARGET:$((${#TARGET} - ${#PKGMK_PACKAGE_EXT} ))}" == "$PKGMK_PACKAGE_EXT" ]; then
 				compress_archive $TARGET

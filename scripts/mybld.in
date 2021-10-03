@@ -589,6 +589,10 @@ echo "The command: KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLEC
 echo ""
 echo "The rsync  : rsync -a $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/"
 echo ""
+echo " install-nutyx:
+ =============="
+KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t
+echo ""
 
 newpackager="$(git config user.name) <$(git config user.email)>"
 newpackagername="$(git config user.name)"
@@ -656,7 +660,7 @@ if [ "${PARAM[1]}" = "" ]; then
 		[ $rc -ne 0 ] && exit 1
 	else
 		echo "=====> cards.devel is not install !
-====> Cannot check if URL source(s) is valid"
+=====> Cannot check if URL source(s) is valid"
         fi
     fi
 fi
@@ -699,9 +703,9 @@ else
 fi
 MOUNT_POINTS="$MOUNT_POINTS sources"
 
-mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT || error /${VERSION}/${COLLECTION}
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts || error /${VERSION}/${COLLECTION}
 rsync -a $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/ || error "rsync"
-mkdir $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts
+
 ln -sv /usr/bin/build-port $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
 
 echo 'running the command: sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
