@@ -1810,7 +1810,6 @@ main() {
 	else
 		FOUND=false
 		for TARGET in ${TARGETS[@]}; do
-			info $TARGET
 			if [ "$(build_needed)" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
 				if [ "$(get_package_arch $TARGET)" = "$PKGMK_ARCH" ]; then
 					FOUND=true
