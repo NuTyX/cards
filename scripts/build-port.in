@@ -455,6 +455,7 @@ main() {
 	fi
 	sync_pkgmk_conf
 	rsync -av --exclude '.*.swp'  --exclude '*~' \
+	--exclude '*cards.tar*' --exclude '.PKGREPO' \
 	--delete-after ${PORT_BASE}/$1/ \
 	${BINARY_BASE}/$1/
 
