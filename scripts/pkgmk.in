@@ -1031,7 +1031,7 @@ build_package() {
 		warning "Packages should be built as root."
 	fi
 	if [ "$PKGMK_PACK_ONLY" == "no" ];then
-		info "Building '$TARGET'."
+		info "Building starting..."
 		unpack_source
 
 		get_dependencies
