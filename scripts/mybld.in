@@ -358,7 +358,7 @@ base /DEPOT/$1"
 setup_cards_conf() {
   CARDS_CONF=""
   FOUND="no"
-  MYCOLLECTION="${COLLECTION%-*}"
+  MYCOLLECTION="${COLLECTION%-extra}"
   for i in "${COLLECTIONS[@]}"
   do
      [ $i == $MYCOLLECTION ] && FOUND="yes"
