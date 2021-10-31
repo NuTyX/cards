@@ -463,6 +463,10 @@ main() {
 
 	cards create -r $1
 
+	eval $(grep PKGMK_WORK_DIR $(which mybld))
+	[ ! -d ${PKGMK_WORK_DIR} ] && return
+	cd ${PKGMK_WORK_DIR}/src
+	bash
 }
 BUILD_PORT_VERSION=#VERSION#
 DRY="no"
