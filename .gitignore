@@ -25,4 +25,5 @@ documentation/latex
 *.mo
 *.save
 *.layout
+*.cbp
 build/
