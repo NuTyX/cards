@@ -113,7 +113,7 @@ The script needs the 'git' and the 'rsync' commands. They are not install by def
 .TP
 We need to create all the necessary folders into your \fB$HOME/www\fP default directory via the option \fB-i\fP:
 
-    mybld -i
+    mybld -I
 .TP
 And we need to get all the binaries locally and used them, we need to rsync them via the option \fB-s\fP:
 
