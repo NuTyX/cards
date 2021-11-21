@@ -332,24 +332,38 @@ find_runtime () {
   done
 }
 setup_pkgmk_conf() {
+
+[ -z  $PKGMK_WGET_OPTS ] && PKGMK_WGET_OPTS="--quiet"
+[ -z  $PKGMK_KEEP_SOURCES ] && PKGMK_KEEP_SOURCES="yes"
+[ -z  $PKGMK_WORK_DIR ] && PKGMK_WORK_DIR="/tmp/work"
+[ -z  $PKGMK_COMPRESS_PACKAGE ] && PKGMK_COMPRESS_PACKAGE="yes"
+[ -z  $PKGMK_COMPRESS_MODE ] && PKGMK_COMPRESS_MODE="xz"
+[ -z  $PKGMK_LOCALES ] && PKGMK_LOCALES="af an ar as az be bg \
+bs ca cs cy da de el es fi fr ga gl gn he hi hr hu ia id is it \
+ja ka kk km kn ko lt lv mk ml mr ms my nl nn oc or pa pt pl rm \
+ro ru rw si sq sk sl sr sv ta te th tr uk ur uz vi xh zh"
+
+
+
   PKGMK_CONF='
 export CFLAGS="-O2 -pipe"
 export CXXFLAGS="${CFLAGS}"
 export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
-PKGMK_GROUPS=(devel man doc service)
-PKGMK_LOCALES=(af an ar as az be bg bs ca cs cy da de el es fi fr ga gl \
-gn he hi hr hu ia id is it ja ka kk km kn ko lt lv mk ml mr ms my nl nn \
-oc or pa pt pl rm ro ru rw si sq sk sl sr sv ta te th tr uk ur uz vi xh zh)
 PKGMK_CLEAN="no"
-PKGMK_WGET_OPTS="--quiet"
-PKGMK_KEEP_SOURCES="yes"
 PKGMK_SOURCE_DIR="/sources"
-PKGMK_WORK_DIR="/tmp/work"
-PKGMK_COMPRESS_PACKAGE="yes"
-PKGMK_COMPRESSION_MODE="xz"
 PKGMK_IGNORE_REPO="no"
 PKGMK_IGNORE_COLLECTION="no"
-PKGMK_IGNORE_RUNTIMEDEPS="no"'
+PKGMK_IGNORE_RUNTIMEDEPS="no"
+PKGMK_GROUPS=(devel man doc service)'
+
+
+  PKGMK_CONF+="
+PKGMK_LOCALES=($PKGMK_LOCALES)
+PKGMK_WGET_OPTS=$PKGMK_WGET_OPTS
+PKGMK_KEEP_SOURCES=$PKGMK_KEEP_SOURCES
+PKGMK_WORK_DIR=$PKGMK_WORK_DIR
+PKGMK_COMPRESS_PACKAGE=$PKGMK_COMPRESS_PACKAGE
+PKGMK_COMPRESS_MODE=$PKGMK_COMPRESS_MODE"
 }
 setup_base_config() {
   [ -z "$BASE" ] && CARDS_CONF+="
