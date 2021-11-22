@@ -695,6 +695,12 @@ fi
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
   sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
+  if [ -z "${PARAM[0]}" ]; then
+     if [ ! -f $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.PKGREPO ]; then
+        sudo mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}
+        sudo touch $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.PKGREPO
+     fi
+  fi
 else
   error /${VERSION}/${COLLECTION}
 fi
