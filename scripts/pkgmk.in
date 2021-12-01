@@ -1012,6 +1012,7 @@ compress_archive() {
 		gz) gzip -9 $1;;
 		bz2) bzip2 -9  $1;;
 		xz)  xz -z $PKGMK_COMPRESSION_OPTS $1;;
+		zst) zstd $PKGMK_COMPRESSION_OPTS $1;;
 	esac
 }
 build_package() {
@@ -1659,7 +1660,7 @@ main() {
 	check_pkgfile
 
 	case $PKGMK_COMPRESSION_MODE in
-		gz|bz2|xz)
+		gz|bz2|xz|zst)
 			TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
 			;;
 		*)
@@ -1671,6 +1672,7 @@ main() {
 		gz)  COMPRESSION="-z" ;;
 		bz2) export COMPRESSION="-j" ;;
 		xz)  export COMPRESSION="-J" ;;
+		zst) export COMPRESSION="--zstd" ;;
 	esac
 
 	if [ "$PKGMK_CLEAN_ONLY" = "yes" ]; then
