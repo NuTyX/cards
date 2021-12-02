@@ -155,7 +155,6 @@ struct pkginfo_t {
 	std::set<std::string> files;
 };
 typedef std::map<std::string, pkginfo_t> packages_t;
-typedef std::map<std::string, std::string> alias_t;
 
 enum rule_event_t {
 	LDCONF,

@@ -38,6 +38,8 @@
 #define PACKAGE_LOCALE_DIR "/usr/share/locale"
 #define GETTEXT_PACKAGE "cards"
 
+typedef std::map<std::string, std::string> alias_t;
+
 void *Malloc(size_t s);
 
 struct keyValue 

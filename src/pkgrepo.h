@@ -62,6 +62,7 @@ struct BasePackageInfo {
 	std::string set;
 	std::string group;
 	time_t buildDate;
+	alias_t aliasList;
 	std::vector<PortFilesList> portFilesList;
 };
 
