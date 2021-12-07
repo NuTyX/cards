@@ -181,6 +181,9 @@ void Pkgdbh::treatErrors(const std::string& s) const
 		case PACKAGE_NOT_EXIST:
 			throw runtime_error(_("The package ") + s + _(" does not exist"));
 			break;
+		case PACKAGE_IN_USE:
+			throw runtime_error(_("The package ") + s + _(" is in use"));
+			break;
 	}
 }
 void Pkgdbh::progressInfo()

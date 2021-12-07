@@ -62,6 +62,12 @@ Cards_remove::Cards_remove(const string& commandName,
 
 		for ( auto i : m_argParser.otherArguments() ) {
 			for (auto j : m_listOfInstPackages) {
+				if ( j.first == i) {
+					if ( j.second.dependency == true ) {
+						m_actualError = PACKAGE_IN_USE;
+						treatErrors(i);
+					}
+				}
 				for (auto k : j.second.set) {
 					if  ((j.second.collection == i) ||
 					(j.second.group == i) || (k == i)) {

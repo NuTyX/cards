@@ -201,6 +201,9 @@ msgstr " est déjà installé"
 msgid " does not exist"
 msgstr " n'existe pas"
 
+msgid " is in use"
+msgstr " est utilisé"
+
 msgid " is not found"
 msgstr " n'est pas trouvé"
 
