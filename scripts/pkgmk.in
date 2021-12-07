@@ -706,6 +706,26 @@ remove_lib() {
 		done
 	done
 }
+pack_sources() {
+	mkdir -p $PKG/${PKGMK_PACK_SOURCE_DIR}/${name}
+	local FILE LOCAL_FILENAME LOCAL_PACK_SOURCE_DIR
+
+	LOCAL_PACK_SOURCE_DIR="$(echo $PKGMK_PACK_SOURCE_DIR|sed 's@^/@@')"
+	for FILE in ${source[@]}; do
+		LOCAL_FILENAME="$(get_filename $FILE)"
+		if [[ -f "$LOCAL_FILENAME" ]]; then
+			cp $LOCAL_FILENAME ${PKG}/${PKGMK_PACK_SOURCE_DIR}/${name}/
+		else
+			cp $SRC/$LOCAL_FILENAME ${PKG}/${PKGMK_PACK_SOURCE_DIR}/${name}/
+		fi
+	done
+	bsdtar -r -f \
+	$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+	${LOCAL_PACK_SOURCE_DIR} || BUILD_SUCCESSFUL="no"
+}
+remove_sources() {
+	rm -r $PKG/${PKGMK_PACK_SOURCE_DIR}
+}
 pack_devel() {
 	local DIR SUBDIR
 	for DIR in usr opt/*; do
@@ -1897,6 +1917,7 @@ PKGMK_LOCALES=()
 
 PKGMK_SOURCE_MIRRORS=()
 PKGMK_SOURCE_DIR="$PWD"
+PKGMK_PACK_SOURCE_DIR="/var/lib/pkg/src"
 PKGMK_WORK_DIR="$PWD/work"
 PKGMK_DOWNLOAD="no"
 PKGMK_IGNORE_FOOTPRINT="yes"
