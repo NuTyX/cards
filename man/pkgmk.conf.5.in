@@ -115,10 +115,16 @@ Default: '()' pkgmk will find them automatically.
 Possible values: '(base cli cli-extra gui gui-extra <your_collection>)'
 .TP
 \fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
-If set, pkgmk will try to split the produced package into groups. Each group is define in this variable. A default function is executed if this same function is not found in the Pkgfile. Supported default group functions are: lib() devel()  doc()  man()  service()
+If set, pkgmk will try to split the produced package into groups. Each group is define in this variable. A default function is executed if this same function is not found in the Pkgfile. Supported default group functions are: lib() devel()  doc()  man()  service() sources()
 .br
 Default: '()' No sub package will be produced except if define in the Pkgfile
 Possible values: '(lib devel man doc service)'
+.TP
+\fBPKGMK_PACK_SOURCE_DIR='STRING'\fP
+Set directory for the sources files group package.
+.br
+Default: '/var/lib/pkg/src/\fBfoo\fP', where \fBfoo\fP is the directory name of the base package.
+
 .TP
 \fBPKGMK_LOCALES=('STRING1' .. 'STRINGN')
 If set, pkgmk will try to produced the specified locales. Each locale is define in this variable.

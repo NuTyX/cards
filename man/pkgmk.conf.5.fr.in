@@ -110,10 +110,15 @@ Default: '()' pkgmk trouvera les dépendances de manière automatique.
 Possible values: '(base cli cli-extra gui gui-extra <votre_collection>)'
 .TP
 \fBPKGMK_GROUPS=('STRING1' .. 'STRINGN')
-Si défini, pkgmk fera une tentative de séparation du paquet produit en sous groupes. Chaque groupe étant défini dans cette variable. Une fonction par défaut est exécutée si cette même fonction n'est pas trouvée dans le Pkgfile. Les groupes de fonction suivantes sont disponibles: lib() devel()  doc()  man()  service()
+Si défini, pkgmk fera une tentative de séparation du paquet produit en sous groupes. Chaque groupe étant défini dans cette variable. Une fonction par défaut est exécutée si cette même fonction n'est pas trouvée dans le Pkgfile. Les groupes de fonction suivantes sont disponibles: lib() devel()  doc()  man()  service() sources()
 .br
 Défaut: '()' Aucun sous paquet ne sera produit, sauf si défini dans le Pkgfile
 Valeurs possibles: '(lib devel man doc service)'
+.TP
+\fBPKGMK_PACK_SOURCE_DIR='STRING'\fP
+Défini le dossier pour l'emplacement des sources dans le sous-paquet sources.
+.br
+Défaut: '/var/lib/pkg/src/\fBfoo\fP', où \fBfoo\fP est le dossier du nom du paquet de base.
 .TP
 \fBPKGMK_LOCALES=('STRING1' .. 'STRINGN')
 Si défini, pkgmk fera une tentative de produire les locales définies. Chaque locale est définie dans cette variable.
