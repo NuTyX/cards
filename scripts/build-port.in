@@ -410,20 +410,20 @@ build_binaries () {
 		if [  -z "$(ls ${BINARY_BASE}/$package/*$ARCH.cards.tar.xz 2>/dev/null )" ];then
 			cd $currentdir
 			[ "$DRY" == "yes" ] && continue
-			bash scripts/$COLLECTION $package || manual_fix
+			bash scripts/$COLLECTION $package || exit 1
 			continue
 		fi
 		if [ ! -f ${BINARY_BASE}/$package/.PKGREPO ]; then
 			cd $currentdir
 			[ "$DRY" == "yes" ] && continue
-			bash scripts/$COLLECTION $package || manual_fix
+			bash scripts/$COLLECTION $package || exit 1
 			continue
 		fi
 		if [ ! -z "$(diff ${BINARY_BASE}/$package/Pkgfile ${PORT_BASE}/$package/Pkgfile)" ]; then
 			echo " ${BINARY_BASE}/$package/Pkgfile AND ${PORT_BASE}/$package/Pkgfile are different ...WILL BUILD NEW.."
 			cd $currentdir
 			[ "$DRY" == "yes" ] && continue
-			bash scripts/$COLLECTION $package || manual_fix
+			bash scripts/$COLLECTION $package || exit 1
 			continue
 		fi
 		get_port_version
@@ -432,7 +432,7 @@ build_binaries () {
 			echo "$package: Port: $port_version, Binary: $binary_version"
 			cd $currentdir
 			[ "$DRY" == "yes" ] && continue
-			bash scripts/$COLLECTION $package || manual_fix
+			bash scripts/$COLLECTION $package || exit 1
 			continue
 		fi
 		[ "$DRY" == "yes" ] || echo "WILL NOT BUILD '$package' AGAIN.."
@@ -441,11 +441,6 @@ build_binaries () {
 list_binaries () {
 	cards level -I |grep ${BINARY_BASE}
 
-}
-manual_fix () {
-	cd $currentdir
-	bash
-	bash scripts/$COLLECTION $package || exit 1
 }
 main() {
 	parse_options "$@"

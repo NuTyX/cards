@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (c) 2016 - 2020 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2016 - 2021 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -121,7 +121,6 @@ create_folders () {
   sudo chown -R $(whoami):$(whoami) $ROOT/$VERSION
   sudo mkdir -p /$ROOTMOUNT/{logs/$(uname -m)/$VERSION,sources,$(uname -m)/$VERSION}
   sudo chown -R $(whoami):$(whoami) /$ROOTMOUNT
-  exit 0
 }
 
 rsync_binaries () {
@@ -311,19 +310,55 @@ error() {
   remove_all ${1}
   exit 1
 }
+find_new_packager () {
+  newpackager="$(git config user.name) <$(git config user.email)>"
+  newpackagername="$(git config user.name)"
+  [ "$packager" == "$newpackager" ] && return
+  oldpackager="$(echo ${packager%[ ,<]*}|sed "s/\b\(.\)/\l\1/g")"
+  newcontributors="$(echo $contributors|sed -e "s/Pierre B/Pierre/g" \
+   -e "s/\b\(.\)/\l\1/g" -e "s/$oldpackager//")"
 
-find_collection () {
-  for i in $(find . -name Pkgfile -exec dirname {} +) ; do
-    unset COLLECTION
-    COLLECTION="$(dirname $i|cut -d '/' -f2)"
-    [ "$COLLECTION" == "chroot" ] && continue
-    if [ "${PARAM[0]}" == "${COLLECTION}" ]; then
-      unset PARAM
-      return
-    fi
-    [ "${PARAM[0]}" == "$(basename $i)" ] && return
+  newcontributors+=",$oldpackager"
+  newcontributors="$(echo $newcontributors|sed -e "s/\b\(.\)/\l\1/g" \
+  -e "s/$newpackagername//g" -e "s/ /,/g" -e "s/\(,\)\1\+/\1/g" \
+  -e "s/\b\(.\)/\u\1/g" -e "s/^,//g" -e "s/,$//g")"
+}
+find_version () {
+  local i=0 p c n
+  #TODO consider 'mycollection' 'mycollection-extra' if exists
+  for c in base cli cli-extra gui gui-extra
+  do
+     #FIXME version="1.2.4" or version='1.2.3' doesn't work
+     for n in $(grep -wl version="${PARAM[0]}"$ $c/*/Pkgfile)
+     do
+        PACKAGES_LIST[i]="$(dirname $n)"
+        i=$((i+1))
+     done
+     [ -z $PACKAGES_LIST ] || COLLECTION=$c
+     [ -z  $COLLECTION ] || return
   done
-  unset COLLECTION
+  i=0
+  for n in ${PACKAGES_LIST[@]}
+  do
+    [ "$p" == "$(dirname $n)" ] && continue
+    COLLECTION[i]="$(dirname $n)"
+    p="$(dirname $n)"
+    i=$((i+1))
+  done
+}
+find_collection () {
+  #FIXME name="mypackage", name='mypackage' doesn't work
+  for n in $(grep -wl name="${PARAM[0]}"$ */*/Pkgfile)
+  do
+    unset COLLECTION
+    COLLECTION="$(dirname $(dirname $n))"
+    [ -z $COLLECTION ] || break
+  done
+  [ -z $COLLECTION ] || return
+
+  COLLECTION="$(find . -type d -name ${PARAM[0]})"
+  [ -z $COLLECTION ] || COLLECTION=$(basename $COLLECTION)
+  [ -z $COLLECTION ] || unset PARAM
 }
 
 find_runtime () {
@@ -334,7 +369,6 @@ find_runtime () {
 setup_pkgmk_conf() {
 [ -z  $PKGMK_PACK_SOURCE_DIR ] && PKGMK_PACK_SOURCE_DIR="/var/lib/pkg/src"
 [ -z  $PKGMK_GROUPS ] && PKGMK_GROUPS="devel man doc service"
-[ -z  $PKGMK_PACK_SOURCE_DIR ] PKGMK_PACK_SOURCE_DIR="/var/lib/pkg/src"
 [ -z  $PKGMK_WGET_OPTS ] && PKGMK_WGET_OPTS="--quiet"
 [ -z  $PKGMK_KEEP_SOURCES ] && PKGMK_KEEP_SOURCES="yes"
 [ -z  $PKGMK_WORK_DIR ] && PKGMK_WORK_DIR="/tmp/work"
@@ -477,11 +511,14 @@ fi
 GIT=$(basename $GIT_PROJ)
 
 parse_arguments "$@"
+find_version
+[ -z "$PACKAGES_LIST" ] || CONFIRM="yes"
 
 [ -z "$COLLECTION" ] && find_collection
 
 if [ "$INIT" == "yes" ]; then
   create_folders
+  exit 0
 fi
 if [ "$SYNC" == "yes" ]; then
   rsync_binaries
@@ -498,7 +535,7 @@ fi
 
 if [ -z "${COLLECTION}" ]; then
   echo "
->>> package ${PARAM[0]} not found in any collection
+>>> package '${PARAM[0]}' not found in any collection
 "
   exit  1
 fi
@@ -520,24 +557,24 @@ if [ "$CLEANUP" == "yes" ]; then
   exit 0
 fi
 
-
-if [ ! -z "${PARAM[1]}" ]; then
+if [ -z ${PACKAGES_LIST} ]; then
+ if [ ! -z "${PARAM[1]}" ]; then
   CONFIRM="yes"
-  if [ ! -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
-    echo " $COLLECTION/${PARAM[0]}/Pkgfile not exist"
-    exit 1
-  fi
-  . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-  if [ -z "$version" ]; then
-    echo ">>> version variable not set !"
-    exit 1
-  fi
-  if [ "$version" == "${PARAM[1]}" ]; then
-    echo ">>> version is the same !!!"
-    exit 1
-  fi
-fi
-if [ "$INCREMENT" == "yes" ]; then
+    if [ ! -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
+      echo " $COLLECTION/${PARAM[0]}/Pkgfile not exist"
+      exit 1
+    fi
+    . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+    if [ -z "$version" ]; then
+      echo ">>> version variable not set !"
+      exit 1
+    fi
+    if [ "$version" == "${PARAM[1]}" ]; then
+      echo ">>> version is the same !!!"
+      exit 1
+    fi
+ fi
+ if [ "$INCREMENT" == "yes" ]; then
   CONFIRM="yes"
   if [ ! -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
     echo " $COLLECTION/${PARAM[0]}/Pkgfile not exist"
@@ -546,6 +583,7 @@ if [ "$INCREMENT" == "yes" ]; then
   . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
   [ -z "$release" ] && release=1
 
+ fi
 fi
 # check if VERSION folder exist
 if ! [ -d "$ROOT/$VERSION" ]; then
@@ -559,7 +597,6 @@ if ! [ -O "$ROOT/$VERSION" ]; then
   exit 1
 fi
 
-mkdir -p "$ROOT/${VERSION}/${COLLECTION}/etc" || exit 1
 
 setup_cards_conf
 
@@ -568,17 +605,20 @@ DEVEL="cards.devel \
 $PAUSE \
 && bash scripts/$COLLECTION"
 
-echo "$CARDS_CONF" > $ROOT/$VERSION/$COLLECTION/etc/cards.conf
 [ -z "${PARAM[0]}" ] && CHROOT="ncurses readline bash"
+[ -z "$PACKAGES_LIST" ] || CHROOT="ncurses readline bash"
 
-if [ -z "${PARAM[0]}" ]; then
-  DEVEL="$DEVEL -a"
+if [ ! -z ${PACKAGES_LIST} ]; then
+   DEVEL="$DEVEL -a"
 else
-  DEVEL="$DEVEL ${PARAM[0]}"
+  if [ -z "${PARAM[0]}" ]; then
+    DEVEL="$DEVEL -a"
+  else
+    DEVEL="$DEVEL ${PARAM[0]}"
+  fi
 fi
 
 setup_pkgmk_conf
-echo "$PKGMK_CONF" > $ROOT/$VERSION/$COLLECTION/etc/pkgmk.conf
 
 export DEVEL VERSION
 echo ""
@@ -614,30 +654,35 @@ echo " install-nutyx:
 KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t
 echo ""
 
-newpackager="$(git config user.name) <$(git config user.email)>"
-newpackagername="$(git config user.name)"
-if [ "$packager" != "$newpackager" ]; then
-  oldpackager="$(echo ${packager%[ ,<]*}|sed "s/\b\(.\)/\l\1/g")"
-  newcontributors="$(echo $contributors|sed -e "s/Pierre B/Pierre/g" \
-  -e "s/\b\(.\)/\l\1/g" \
-  -e "s/$oldpackager//")"
-  newcontributors+=",$oldpackager"
-  newcontributors="$(echo $newcontributors|sed -e "s/\b\(.\)/\l\1/g" \
-  -e "s/$newpackagername//g" -e "s/ /,/g" -e "s/\(,\)\1\+/\1/g" \
-  -e "s/\b\(.\)/\u\1/g" -e "s/^,//g" -e "s/,$//g")"
-
-fi
-if [ ! -z "${PARAM[1]}" ]; then
-  echo ""
-  echo " Upgrading ${PARAM[0]}:"
-  echo "       version: $version -> ${PARAM[1]}"
-  if [ "$packager" != "$newpackager" ]; then
-    echo "      packager: $packager -> $newpackager"
-    echo "  contributors: $contributors -> $newcontributors"
+if [ -z "$PACKAGES_LIST" ]; then
+  if [ ! -z "${PARAM[1]}" ]; then
+    find_new_packager
+    echo ""
+    echo " Upgrading ${PARAM[0]}:"
+    echo "       version: $version -> ${PARAM[1]}"
+    if [ "$packager" != "$newpackager" ]; then
+      echo "      packager: $packager -> $newpackager"
+      echo "  contributors: $contributors -> $newcontributors"
+    fi
+    echo ""
   fi
+else
+  for i in ${PACKAGES_LIST[@]}
+  do
+    . $i/Pkgfile
+    find_new_packager
+    echo " Upgrading $(basename $i): $version -> ${PARAM[1]}"
+    if [ "$packager" != "$newpackager" ]; then
+       echo "      packager: $packager -> $newpackager"
+       echo "  contributors: $contributors -> $newcontributors"
+       echo ""
+    fi
+  done
   echo ""
 fi
+
 if [ "$INCREMENT" == "yes" ]; then
+  find_new_packager
   echo " Upgrading ${PARAM[0]}:"
   echo "       version: $version-$release -> $version-$((release+1))"
   if [ "$packager" != "$newpackager" ]; then
@@ -651,36 +696,51 @@ if [ "$CONFIRM" == "yes" ]; then
   answer
 fi
 
-if [ ! -z "${PARAM[1]}" ]; then
-  sed -i "s@version=$version@version=${PARAM[1]}@" \
-  "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-  sed -i "/release=/d" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-  if [ "$packager" != "$newpackager" ]; then
-    sed -e 's/^\(packager=\).*/\1/g' \
-    -e "s/packager=/packager=\"$newpackager\"/" \
-    -i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-    sed -e 's/^\(contributors=\).*/\1/g' \
-    -e "s/contributors=/contributors=\"$newcontributors\"/" \
-    -i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-  fi
+#
+##### Main Config files ######
+mkdir -p "$ROOT/${VERSION}/${COLLECTION}/etc" || exit 1
+echo "$PKGMK_CONF" > $ROOT/$VERSION/$COLLECTION/etc/pkgmk.conf
+echo "$CARDS_CONF" > $ROOT/$VERSION/$COLLECTION/etc/cards.conf
+##############################
+
+if [ -z "$PACKAGES_LIST" ]; then
+   if [ ! -z "${PARAM[1]}" ]; then
+     sed -i "s@version=$version@version=${PARAM[1]}@" \
+      "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+     sed -i "/release=/d" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+     if [ "$packager" != "$newpackager" ]; then
+      sed -e 's/^\(packager=\).*/\1/g' \
+       -e "s/packager=/packager=\"$newpackager\"/" \
+       -i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+      sed -e 's/^\(contributors=\).*/\1/g' \
+       -e "s/contributors=/contributors=\"$newcontributors\"/" \
+       -i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+     fi
+   fi
+else
+  for i in ${PACKAGES_LIST[@]}
+  do
+    . $i/Pkgfile
+    find_new_packager
+    sed -i "s@version=$version@version=${PARAM[1]}@" \
+      "${i}"/Pkgfile
+     sed -i "/release=/d" "${i}"/Pkgfile
+     if [ "$packager" != "$newpackager" ]; then
+      sed -e 's/^\(packager=\).*/\1/g' \
+       -e "s/packager=/packager=\"$newpackager\"/" \
+       -i "${i}"/Pkgfile
+      sed -e 's/^\(contributors=\).*/\1/g' \
+       -e "s/contributors=/contributors=\"$newcontributors\"/" \
+       -i "${i}"/Pkgfile
+     fi
+  done
 fi
-  
 if [ "${PARAM[1]}" = "" ]; then
     if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
         . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
         if [ -z "$version" ]; then
             echo ">>> version variable not set !"
             exit 1
-        fi
-	if ( $(which pkgmk > /dev/null) ); then
-		cd "$COLLECTION/${PARAM[0]}/"
-		pkgmk -td
-		rc=$?
-		cd - > /dev/null
-		[ $rc -ne 0 ] && exit 1
-	else
-		echo "=====> cards.devel is not install !
-=====> Cannot check if URL source(s) is valid"
         fi
     fi
 fi
@@ -696,6 +756,22 @@ if [ "$INCREMENT" == "yes" ]; then
     -e "s/contributors=/contributors=\"$newcontributors\"/" \
     -i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
   fi
+fi
+
+if [ "${PARAM[1]}" = "" ]; then
+    if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
+        . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+	if ( $(which pkgmk > /dev/null) ); then
+		cd "$COLLECTION/${PARAM[0]}/"
+		pkgmk -td
+		rc=$?
+		cd - > /dev/null
+		[ $rc -ne 0 ] && exit 1
+	else
+		echo "=====> cards.devel is not install !
+=====> Cannot check if URL source(s) is valid"
+        fi
+    fi
 fi
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
