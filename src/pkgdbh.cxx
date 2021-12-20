@@ -283,10 +283,6 @@ set<string> Pkgdbh::getListOfPackageName()
 {
 	return m_packageNamesList;
 }
-int Pkgdbh::getNumberOfPackages()
-{
-  return getListOfPackageNames("");
-}
 /* Append to the "DB" the number of packages founds
  * (directory containing a file named files
  * */

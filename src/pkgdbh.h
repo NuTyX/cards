@@ -196,7 +196,6 @@ public:
 
 
 	void print_version() const;
-	int getNumberOfPackages();
 	std::set<std::string> getListOfPackageName();
 
 	bool checkPackageNameExist(const std::string& name) const;
