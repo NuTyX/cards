@@ -55,15 +55,15 @@ Cards_remove::Cards_remove(const string& commandName,
 			throw runtime_error(_("No package found for the base System") );
 
 		// Retrieve info about all the packages
-		buildSimpleDatabase();
+		buildCompleteDatabase(false);
 
 		set< pair<string,string> > listOfPackagesToRemove;
 		pair<string,string> PackageToRemove;
 
 		for ( auto i : m_argParser.otherArguments() ) {
 			for (auto j : m_listOfInstPackages) {
-				if ( j.first == i) {
-					if ( j.second.dependency == true ) {
+				for (auto k : j.second.dependencies ){
+					if ( i == k.first) {
 						m_actualError = PACKAGE_IN_USE;
 						treatErrors(i);
 					}
