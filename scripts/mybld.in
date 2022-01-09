@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (c) 2016 - 2021 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2016 - 2022 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -510,14 +510,16 @@ GIT=$(basename $GIT_PROJ)
 
 parse_arguments "$@"
 find_version
-[ -z "$PACKAGES_LIST" ] || CONFIRM="yes"
-
-[ -z "$COLLECTION" ] && find_collection
 
 if [ "$INIT" == "yes" ]; then
   create_folders
   exit 0
 fi
+
+[ -z "$PACKAGES_LIST" ] || CONFIRM="yes"
+
+[ -z "$COLLECTION" ] && find_collection
+
 if [ "$SYNC" == "yes" ]; then
   rsync_binaries
 fi
