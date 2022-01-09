@@ -174,7 +174,7 @@ namespace cards
         {
 			case DB_OPEN_RUN:
 			{
-				i = j / ( getNumberOfPackages() / 100);
+				i = j / ( getListOfPackageNames("") / 100);
 				Value = i;
 				j++;
 				break;

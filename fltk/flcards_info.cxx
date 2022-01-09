@@ -35,7 +35,7 @@ void Flcards_info::progressInfo()
 
 	static int j = 0;
 	int i,n;
-	n = getNumberOfPackages();
+	n = getListOfPackageNames("");
 	switch ( m_actualAction )
 	{
 		case DB_OPEN_START:
