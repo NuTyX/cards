@@ -189,17 +189,15 @@ parse_arguments() {
       shift
       COLLECTION="$(echo ${1}|cut -d '/' -f1)"
       PARAM="$(echo ${1}|cut -d '/' -f2)"
-      find_collection
-      if [ -z "${COLLECTION}" ]; then
+      if [ ! -f "${COLLECTION}/${PARAM}/Pkgfile" ]; then
         COLLECTION="$(echo ${1}|cut -d '/' -f1)"
         generate_Pkgfile "$@"
         exit 0
-      else
-        echo "
+      fi
+      echo "
   >>>     The package '${PARAM}' already exist in the '${COLLECTION}' collection !!!
   "
-        exit 1
-      fi;;
+      exit 1;;
 
     -R|--runtime)
       RUNTIME="yes"
@@ -827,5 +825,13 @@ answer
 
 cd "${GIT_PROJECT}"
 source /etc/profile.d/cards.sh
-commit "$COLLECTION/${PARAM[0]}"
+
+if [ -z ${PACKAGES_LIST} ]; then
+   commit "$COLLECTION/${PARAM[0]}"
+else
+   for i in ${PACKAGES_LIST[@]}
+   do
+       commit "$i"
+   done
+fi
 exit 0
