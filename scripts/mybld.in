@@ -372,7 +372,7 @@ setup_pkgmk_conf() {
 [ -z  $PKGMK_WORK_DIR ] && PKGMK_WORK_DIR="/tmp/work"
 [ -z  $PKGMK_COMPRESSION_OPTS ] && PKGMK_COMPRESSION_OPTS="-9 --threads=$(getconf _NPROCESSORS_ONLN)"
 [ -z  $PKGMK_COMPRESS_PACKAGE ] && PKGMK_COMPRESS_PACKAGE="yes"
-[ -z  $PKGMK_COMPRESS_MODE ] && PKGMK_COMPRESS_MODE="xz"
+[ -z  $PKGMK_COMPRESSION_MODE ] && PKGMK_COMPRESSION_MODE="xz"
 [ -z  $PKGMK_LOCALES ] && PKGMK_LOCALES="af an ar as az be bg \
 bs ca cs cy da de el es fi fr ga gl gn he hi hr hu ia id is it \
 ja ka kk km kn ko lt lv mk ml mr ms my nl nn oc or pa pt pl rm \
@@ -401,7 +401,7 @@ PKGMK_WORK_DIR=\"$PKGMK_WORK_DIR\"
 PKGMK_GROUPS=($PKGMK_GROUPS)
 PKGMK_COMPRESSION_OPTS=\"$PKGMK_COMPRESSION_OPTS\"
 PKGMK_COMPRESS_PACKAGE=\"$PKGMK_COMPRESS_PACKAGE\"
-PKGMK_COMPRESS_MODE=\"$PKGMK_COMPRESS_MODE\""
+PKGMK_COMPRESSION_MODE=\"$PKGMK_COMPRESSION_MODE\""
 }
 setup_base_config() {
   [ -z "$BASE" ] && CARDS_CONF+="
@@ -508,6 +508,8 @@ fi
 
 GIT=$(basename $GIT_PROJ)
 
+CLEANUP="no"
+
 parse_arguments "$@"
 find_version
 
@@ -547,14 +549,14 @@ if [[ -d "$ROOT/${VERSION}/${COLLECTION}" && "$CLEANUP" != "yes" ]]; then
 "
   echo -n "Safety cleanup of $ROOT/${VERSION}/${COLLECTION} ? : "
   answer
-  CLEANUP="yes"
+  CLEANUP="auto"
 fi
 
-if [ "$CLEANUP" == "yes" ]; then
+if [ "$CLEANUP" != "no" ]; then
   MOUNT_POINTS="DEPOT LOGS sources"
   umount_all
   remove_all "/${VERSION}/${COLLECTION}"
-  exit 0
+  [ "$CLEANUP" == "yes" ] && exit 0
 fi
 
 if [ -z ${PACKAGES_LIST} ]; then
