@@ -572,6 +572,9 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 {
 	cleanupMetaFiles(m_root);
 	if (m_DB_Empty) {
+		if (m_packageNamesList.empty() )
+			getListOfPackageNames (m_root);
+
 		if (!silent) {
 			m_actualAction = DB_OPEN_START;
 			progressInfo();
@@ -579,8 +582,6 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 #ifndef NDEBUG
 		cerr << "m_root: " << m_root<< endl;
 #endif
-		if (m_packageNamesList.empty() )
-			getListOfPackageNames (m_root);
 
 		for (auto i : m_packageNamesList) {
 			if (!silent) {
