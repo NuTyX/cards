@@ -91,11 +91,13 @@ LIBOBJECTS =  system_utils.o \
 	pkgsync.o
 
 WEBOBJECTS =  system_utils.o \
+	error_treat.o \
 	md5.o \
 	file_utils.o \
 	string_utils.o \
 	pkgrepo.o \
 	mysql.o \
+	pkg.o \
 	webcards.o
 
 HEADERS = system_utils.h \
