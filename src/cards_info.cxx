@@ -65,6 +65,14 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 
 		} else if (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) {
 			getPortsList();
+		} else if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
+			set<string> sortedSetList;
+			set<Pkg*> binaryList = getBinaryPackageSet();
+			for ( auto i : binaryList )
+				if ( i->getSet().size() > 0 )
+					sortedSetList.insert(i->getPrimarySet());
+			for ( auto i : sortedSetList )
+				cout << i << endl;
 		} else {
 			m_installed_mode=1;
 			if (m_argParser.isSet(CardsArgumentParser::OPT_FULL))

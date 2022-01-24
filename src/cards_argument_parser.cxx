@@ -57,6 +57,8 @@ ArgParser::APOpt CardsArgumentParser::OPT_ALL;
 ArgParser::APOpt CardsArgumentParser::OPT_INSTALLED;
 ArgParser::APOpt CardsArgumentParser::OPT_BINARIES;
 ArgParser::APOpt CardsArgumentParser::OPT_PORTS;
+ArgParser::APOpt CardsArgumentParser::OPT_SETS;
+
 
 ArgParser::APOpt CardsArgumentParser::OPT_DISABLE;
 ArgParser::APOpt CardsArgumentParser::OPT_IGNORE;
@@ -229,6 +231,10 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 		'p',
 		_("    Local available ports."));
 
+	OPT_SETS.init("sets",
+		'S',
+		_("     Available sets of packages in depot server."));
+
 	OPT_DRY.init("dry",
 		0,
 		_("\t   Not doing the action. Only simulate (if possible) what will be done."));
@@ -290,6 +296,7 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 	addOption(CMD_LIST, OPT_FULL, false);
 	addOption(CMD_LIST, OPT_BINARIES, false);
 	addOption(CMD_LIST, OPT_PORTS, false);
+	addOption(CMD_LIST, OPT_SETS, false);
 	addOption(CMD_LIST, OPT_ROOT,false);
 	addOption(CMD_LIST, OPT_CONFIG_FILE,false);
 
