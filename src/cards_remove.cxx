@@ -125,6 +125,8 @@ Cards_remove::Cards_remove(const string& commandName,
 			}
 
 			m_packageName = i.first;
+			if (m_packageName.size() == 0 )
+				continue;
 			run();
 			string name = "(" +  m_packageCollection + ") ";
 			name += i.first;
