@@ -68,13 +68,11 @@ Cards_remove::Cards_remove(const string& commandName,
 						treatErrors(i);
 					}
 				}
-				for (auto k : j.second.set) {
-					if  ((j.second.collection == i) ||
-					(j.second.group == i) || (k == i)) {
-						PackageToRemove.first=j.first;
-						PackageToRemove.second=j.second.collection;
-						listOfPackagesToRemove.insert(PackageToRemove);
-					}
+				if  ((j.second.collection == i) ||
+					(j.second.group == i)) {
+					PackageToRemove.first=j.first;
+					PackageToRemove.second=j.second.collection;
+					listOfPackagesToRemove.insert(PackageToRemove);
 				}
 			}
 			if ( listOfPackagesToRemove.empty()) {
