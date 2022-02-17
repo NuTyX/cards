@@ -814,10 +814,15 @@ remove_service() {
 }
 build() {
 	if [ -z $build ]; then
-		cd $name-$version
-		./configure --prefix=/usr
-		make
-		make DESTDIR=$PKG install
+		# debian package is standard
+		if [ -f data.tar.xz ]; then
+			bsdtar -xf data.tar.xz -C $PKG
+		else
+			cd $name-$version
+			./configure --prefix=/usr
+			make
+			make DESTDIR=$PKG install
+		fi
 	else
 		case $build in
 			meson)
