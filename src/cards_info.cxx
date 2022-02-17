@@ -40,6 +40,15 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 			getBinaryPackageInfo(m_argParser.otherArguments()[0]);
 		} else if (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) {
 			getPortInfo(m_argParser.otherArguments()[0]);
+		} else if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
+			set<string> sortedPackagesList = getListOfPackagesFromSet(m_argParser.otherArguments()[0]);;
+			if (sortedPackagesList.size() == 0)
+				sortedPackagesList = getListOfPackagesFromCollection(m_argParser.otherArguments()[0]);;
+			for ( auto i : sortedPackagesList )
+				cout << "("
+				<< m_argParser.otherArguments()[0]
+				<< ") "
+				<< i << endl;
 		} else {
 			m_details_mode=1;
 			m_arg=m_argParser.otherArguments()[0];

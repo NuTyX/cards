@@ -302,6 +302,7 @@ _("This command can upgrade at onces alls your installed out of date packages.")
 
 	addOption(CMD_INFO, OPT_BINARIES, false);
 	addOption(CMD_INFO, OPT_PORTS, false);
+	addOption(CMD_INFO, OPT_SETS, false);
 	addOption(CMD_INFO, OPT_ROOT,false);
 	addOption(CMD_INFO, OPT_CONFIG_FILE,false);
 
