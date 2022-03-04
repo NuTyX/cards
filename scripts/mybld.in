@@ -122,7 +122,15 @@ create_folders () {
   sudo mkdir -p /$ROOTMOUNT/{logs/$(uname -m)/$VERSION,sources,$(uname -m)/$VERSION}
   sudo chown -R $(whoami):$(whoami) /$ROOTMOUNT
 }
-
+ding() {
+PLAY="$(which paplay)"
+if [ -z $PLAY ]; then
+  echo " ====> Install pulseaudio, cannot play sound
+"
+  return
+fi
+$PLAY /usr/share/sounds/cards/ding.wav &
+}
 rsync_binaries () {
   if [ -z "$VERSION" ]; then
     echo "
@@ -816,6 +824,7 @@ echo 'running the command:
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
 
+ding
 umount_all
 remove_all "/${VERSION}/${COLLECTION}"
 unset VERSION DEVEL

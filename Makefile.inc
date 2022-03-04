@@ -27,6 +27,7 @@ USRBINDIR = ${DESTDIR}/usr/bin
 BINDIR = ${DESTDIR}/bin
 SBINDIR = ${DESTDIR}/sbin
 MANDIR = ${DESTDIR}/usr/share/man
+SOUNDDIR = ${DESTDIR}/usr/share/sounds/cards
 LIBDIR = ${DESTDIR}/usr/lib
 ETCDIR = ${DESTDIR}/etc
 VARDIR = ${DESTDIR}/var/lib/pkg
@@ -45,7 +46,7 @@ INSTALL_DATA = $(INSTALL) -m 644
 INSTALL_DIR  = $(INSTALL) -d
 
 
-VERSION = 2.4.146
+VERSION = 2.4.147
 
 NAME = cards-$(VERSION)
 

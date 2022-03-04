@@ -32,6 +32,7 @@ all: pkgmk ports build-port mybld cards
 .PHONY:	install clean distclean dist
 
 install: all
+	install -D -m0644 ding.wav ${SOUNDDIR}/ding.wav
 	install -D -m0755 build-port $(USRBINDIR)/build-port
 	install -D -m0755 mybld $(BINDIR)/mybld
 	install -D -m0755 pkgmk $(USRBINDIR)/pkgmk
