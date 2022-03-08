@@ -3,7 +3,7 @@
 #
 #  Copyright (c) 2000 - 2005 by Per Liden <per@fukt.bth.se>
 #  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013 - 2022 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ INSTALL_DATA = $(INSTALL) -m 644
 INSTALL_DIR  = $(INSTALL) -d
 
 
-VERSION = 2.4.147
+VERSION = 2.5.0
 
 NAME = cards-$(VERSION)
 
