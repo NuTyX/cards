@@ -144,7 +144,7 @@ libs:	.libs_depend $(LIBOBJECTS)
 	-@echo "#endif" >> libcards.h
 	-@echo "// vim:set ts=2 :" >> libcards.h
 
-all: setup-nutyx-log pkgadd cards conf
+all: setup-nutyx-log pkgadd cards conf libs
 
 webcards: .web_depend $(WEBOBJECTS)
 	$(CXX) $(WEBOBJECTS) -o index.cgi $(LIBMYSQLCLIENT)
@@ -192,7 +192,7 @@ endif
 
 .PHONY:	install clean distclean dist
 
-install: all
+install: all install-libs
 	install -v -D -m0755 pkgadd $(BINDIR)/pkgadd
 	install -v -D -m0755 cards $(BINDIR)/cards
 	install -v -D -m0755 setup-nutyx-log $(SBINDIR)/setup-nutyx-log
