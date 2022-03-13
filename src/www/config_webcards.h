@@ -1,6 +1,6 @@
 // config_webcards.h
 //
-//  Copyright (c) 2016 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2016 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -148,6 +148,8 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
  << "    vertical-align:middle;" << endl \
  << "    text-align:center;" << endl \
  << "    height:60px;" << endl \
+ << "    width:25%;" << endl \
+ << "    cursor: pointer;" << endl \
  << "}" << endl \
  << "td.menu:hover {" << endl \
  << "    text-decoration: none;" << endl \
