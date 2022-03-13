@@ -1,6 +1,6 @@
 // menu_webcards.h
 //
-//  Copyright (c) 2016 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2016 - 2022 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #define MENUFR cout << "<body>" << endl \
   << "    <table>" << endl \
   << "     <tr>" << endl \
-  << "      <td>" << endl \
+  << "      <td style=\"text-align: center; width: 20%;\">" << endl \
   << "       <a href=\".\"><img id=\"logo\" src=\"../graphics/logo_nutyx_120.png\" alt=\"logo nutyx\" /></a>" << endl \
   << "      </td>" << endl \
   << "      <td>" << endl \
@@ -49,7 +49,7 @@
 #define MENUTR cout << "<body>" << endl \
   << "    <table>" << endl \
   << "     <tr>" << endl \
-  << "      <td>" << endl \
+  << "      <td style=\"text-align: center; width: 20%;\">" << endl \
   << "       <a href=\".\"><img id=\"logo\" src=\"../graphics/logo_nutyx_120.png\" alt=\"logo nutyx\" /></a>" << endl \
   << "      </td>" << endl \
   << "      <td>" << endl \
@@ -57,6 +57,7 @@
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><br><a href=\"news\">Haberler</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"downloads\">Indirmeler</a><br><br>"  << endl \
+  << "            <td class=\"menu\"><br><a href=\"information\">Bilgilendirme</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"documentation\">Dökümantasyon</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"packages\">Paketler</a><br><br>" << endl \
   << "        </tr>" << endl \
@@ -76,7 +77,7 @@
 #define MENUEN cout << "<body>" << endl \
   << "    <table>" << endl \
   << "     <tr>" << endl \
-  << "      <td>" << endl \
+  << "      <td style=\"text-align: center; width: 20%\">" << endl \
   << "       <a href=\".\"><img id=\"logo\" src=\"../graphics/logo_nutyx_120.png\" alt=\"logo nutyx\" /></a>" << endl \
   << "      </td>" << endl \
   << "      <td>" << endl \
@@ -91,7 +92,7 @@
   << "            <td class=\"menu\"><br><a href=\"faq\">FAQ</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"information\">Information</a><br><br>" << endl \
   << "            <td class=\"menu\"><br><a href=\"screenshots\">Screenshots</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"../fr\" title=\"Acceuil\"> <img src=\"../graphics/fr.gif\" alt=\"Accueil\" height=\"12\" width=\"35\"></a><br><br>" << endl \
+  << "            <td class=\"menu\"><br><a href=\"../fr\" title=\"Accueil\"> <img src=\"../graphics/fr.gif\" alt=\"Accueil\" height=\"12\" width=\"35\"></a><br><br>" << endl \
   << "        </tr>" << endl \
   << "       </table>" << endl \
   << "      </td>" << endl \
