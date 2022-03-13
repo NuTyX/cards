@@ -1,6 +1,6 @@
 //  webcards.cxx
 //
-//  Copyright (c) 2017 - 2021 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2017 - 2022 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -144,7 +144,7 @@ string::size_type parseArguments(arguments_t &arguments)
 	set<string> listOfArguments;
 	char * pArgument = getenv ("QUERY_STRING");
 	string::size_type pos;
-	listOfArguments = parseDelimitedSetList(pArgument,"&");
+	listOfArguments = parseDelimitedSetList(pArgument,'&');
 	arguments.docName="index";
 	for ( auto i : listOfArguments) {
 		pos = i.find("arch=");
@@ -207,16 +207,15 @@ void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
 	else
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"rolling\" /> Rolling");
 	contentInfo.text.push_back( "     <br>");
-	if ( arguments.packageBranch == "fixed" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"fixed\" checked=\"checked\"/> Fixed");
+	if ( arguments.packageBranch == "testing" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"testing\" checked=\"checked\"/> Testing");
 	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"fixed\" /> Fixed");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"testing\" /> Testing");
 	contentInfo.text.push_back( "     <br>");
 	if ( arguments.packageBranch == "all" )
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" checked=\"checked\"/> All" );
 	else
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" /> All");
-
 
 	contentInfo.text.push_back( "    <tr class=\"odd\">");
 	contentInfo.text.push_back( "     <td>");
@@ -236,7 +235,7 @@ void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" checked=\"checked\" /> All");
 	else
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" /> All");
-		
+
 	contentInfo.text.push_back( "    <tr class=\"even\" valign=\"middle\">");
 	contentInfo.text.push_back( "     <td>");
 	contentInfo.text.push_back( "      <h4>Search ...</h4>");
@@ -280,6 +279,20 @@ content_t getContent(std::set<string>& list)
 contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 {
 	string search = arguments.packageSearch;
+	vector<string> v_search = parseDelimitedList(search, '%');
+	for (auto i : v_search ) {
+		if ( i.size() > 0) {
+			search = i;
+			break;
+		}
+	}
+	v_search = parseDelimitedList(search, '+');
+	for (auto i : v_search ) {
+		if ( i.size() > 0) {
+			search = i;
+			break;
+		}
+	}
 	time_t timer;
 	time(&timer);
 	string row = "odd";
@@ -330,7 +343,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 					continue;
 				}
 				set<string> groupList;
-				groupList = parseDelimitedSetList(j.group," ");
+				groupList = parseDelimitedSetList(j.group,' ');
 				for ( auto k : groupList ) {
 					if ( convertToLowerCase(search) == k ) {
 						string name = j.basePackageName
@@ -340,7 +353,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 					}
 				}
 				set<string> aliasList;
-				aliasList = parseDelimitedSetList(j.alias," ");
+				aliasList = parseDelimitedSetList(j.alias,' ');
 				for ( auto k : aliasList ) {
 					if ( convertToLowerCase(search) == k ) {
 						string name = j.basePackageName;
