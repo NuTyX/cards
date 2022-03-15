@@ -86,8 +86,8 @@ generate_Pkgfile() {
     exit 1
   fi
   mkdir -p "${COLLECTION}/${PARAM}"
-  echo "description=\'${3}\'
-url=\'${4}\'
+  echo "description='${3}'
+url='${4}'
 
 packager=\"$(git config user.name) <$(git config user.email)>\"
 contributors=\"\"
