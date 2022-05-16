@@ -38,16 +38,12 @@ install: all
 	install -D -m0755 pkgmk $(USRBINDIR)/pkgmk
 	install -D -m0644 pkgmk.conf $(ETCDIR)/pkgmk.conf.example
 	install -D -m0644 cards $(ETCDIR)/profile.d/cards.sh
-	install -D -m0755 ports $(USRBINDIR)/ports
-	install -D -m0755 cards.driver $(VARDIR)/drivers/cards
 
 
 clean:
 	rm -f pkgmk
-	rm -f ports
 	rm -f build-port
 	rm -f mybld
-	rm -f cards
 
 distclean: clean
 
