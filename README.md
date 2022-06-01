@@ -68,7 +68,7 @@ $ cards help
 
 ### Copyright
 
-**Cards** Copyright (c) 2013-2016 [NuTyX-Linux Team](http://nutyx.org) licensed under the GNU General Public License 2
+**Cards** Copyright (c) 2013-2022 [NuTyX-Linux Team](http://nutyx.org) licensed under the GNU General Public License 2
 or later.
 
 Read the COPYING file for the complete license.
