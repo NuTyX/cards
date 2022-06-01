@@ -23,7 +23,7 @@
 
 include ../Makefile.inc
 
-MANPAGES = mybld.8 cards.8 ports.8 pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr cards.conf.5 pkgmk.conf.5 pkgmk.conf.5.fr
+MANPAGES = mybld.8 cards.8 pkgadd.8 pkgrm.8 pkginfo.8 pkgmk.8 pkgmk.8.fr cards.conf.5 pkgmk.conf.5 pkgmk.conf.5.fr
 
 all: man mantxt
 
@@ -48,7 +48,6 @@ install: all
 	install -D -m0644 cards.8 $(MANDIR)/man8/cards.8
 	install -D -m0644 mybld.8 $(MANDIR)/man8/mybld.8
 	install -D -m0644 cards.conf.5 $(MANDIR)/man5/cards.conf.5
-	install -D -m0644 ports.8 $(MANDIR)/man8/ports.8
 	install -D -m0644 pkgadd.8 $(MANDIR)/man8/pkgadd.8
 	install -D -m0644 pkgrm.8 $(MANDIR)/man8/pkgrm.8
 	install -D -m0644 pkginfo.8 $(MANDIR)/man8/pkginfo.8
