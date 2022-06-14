@@ -189,7 +189,7 @@ parse_options() {
 				list_binaries
 				exit 0
 				;;
-			-a|-all)
+			-a|--all)
 				check_ports
 				check_binaries
 				build_binaries
