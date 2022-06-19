@@ -172,7 +172,8 @@ void Cards_install::getLocalePackagesList()
 			std::pair<std::string,time_t> PackageTime;
 			PackageTime.first=i;
 			PackageTime.second=0;
-
+			m_packageName = i;
+			generateDependencies();
 			m_dependenciesList.push_back(PackageTime);
 		}
 #ifndef NDEBUG
