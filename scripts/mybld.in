@@ -416,7 +416,7 @@ setup_base_config() {
 base /DEPOT/$1"
 }
 setup_cards_conf() {
-  CARDS_CONF=""
+  CARDS_CONF="group devel"
   FOUND="no"
   MYCOLLECTION="${COLLECTION%-extra}"
   for i in "${COLLECTIONS[@]}"
@@ -655,7 +655,7 @@ echo "GIT Project: $GIT_PROJ"
 echo "    VERSION: $VERSION"
 echo "      DEVEL: $DEVEL "
 echo "     CHROOT: $CHROOT"
-echo "The command: KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" install-nutyx"
+echo "The command: KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t"
 echo ""
 echo "The rsync  : rsync -a $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/"
 echo ""
