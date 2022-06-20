@@ -416,7 +416,8 @@ setup_base_config() {
 base /DEPOT/$1"
 }
 setup_cards_conf() {
-  CARDS_CONF="group devel"
+  CARDS_CONF="group devel
+group lib"
   FOUND="no"
   MYCOLLECTION="${COLLECTION%-extra}"
   for i in "${COLLECTIONS[@]}"

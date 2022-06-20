@@ -3,7 +3,7 @@
 // 
 //  Copyright (c) 2000 - 2005 Per Liden
 //  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013 - 2021 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2022 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -147,7 +147,8 @@ void Pkginfo::run()
 		pair<string, pkginfo_t> packageArchive = openArchivePackage(m_packageArchiveName) ;
 		string name = packageArchive.first + " : ";
 		cout
-      << name << _("Description    : ") << packageArchive.second.description << endl
+			<< name << _("Description    : ") << packageArchive.second.description << endl
+			<< name << _("Group          : ") << packageArchive.second.group << endl
 			<< name << _("URL            : ") << packageArchive.second.url << endl
 			<< name << _("Contributor(s) : ") << packageArchive.second.contributors << endl
 			<< name << _("Packager(s)    : ") << packageArchive.second.packager << endl
