@@ -106,6 +106,8 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	parseArguments();
 	Pkgrepo::parseConfig(configFileName, m_config);
 	buildCompleteDatabase(false);
+	m_upgrade=0;
+	m_force=0;
 	for (auto i : listOfPackages) {
 		std::string packageName = basename(const_cast<char*>(i.c_str()));
 		if ( packageName == m_argParser.otherArguments()[0])
@@ -118,30 +120,21 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 		for (auto j : listofBinaries ) {
 			if ( j.find("cards.tar") == std::string::npos )
 				continue;
-
 			m_packageArchiveName = i + "/" + j;
 			ArchiveUtils packageArchive(m_packageArchiveName.c_str());
 			std::string name = packageArchive.name();
 			if ( checkPackageNameExist(name) )
 				continue;
-
 			if ( m_config.group.empty() ) {
-				m_upgrade=0;
-				m_force=0;
 				run();
 				continue;
-
 			}
 			if ( packageArchive.group() == "" ) {
-				m_upgrade=0;
-				m_force=0;
 				run();
 				continue;
 			}
 			for (auto k : m_config.group) {
 				if ( packageArchive.group() == k ) {
-					m_upgrade=0;
-					m_force=0;
 					run();
 					continue;
 				}

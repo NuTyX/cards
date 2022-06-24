@@ -17,8 +17,6 @@
 #  USA.
 #
 ##
-
-
 usage() {
 echo "
 Recommended use:
@@ -83,7 +81,7 @@ check_binaries()
 		echo "Variable 'BINARY_BASE'"
 		exit 1
 	fi
-	cd ${BINARY_BASE}
+	pushd ${BINARY_BASE} > /dev/null
 	for DIR in *
 	do
 		if [ -d $DIR ]; then
@@ -110,7 +108,7 @@ check_ports()
 		exit 1
 	fi
 	sync_pkgmk_conf
-	cd ${PORT_BASE}
+	pushd ${PORT_BASE} > /dev/null
 	for DIR in *
 	do
 		if [ ! -d ${BINARY_BASE}/$DIR ] || [ ! -f ${BINARY_BASE}/$DIR/Pkgfile ]; then
@@ -155,7 +153,7 @@ check_diff()
 			base_package=$(echo $package | cut -d "-" -f1)
 			cd $PORT_BASE/$package
 			get_port_version
-			port_version=$(echo $version-$release)
+			port_version=$version-$release
 			if [ "$binary_version" != "$port_version" ]; then
 				echo "$package $port_version $binary_version" >> $output
 				found="yes"
@@ -182,6 +180,11 @@ check_collection_exist() {
 	fi
 }
 parse_options() {
+	if [ $# -lt 1 ]; then
+		print_help
+		usage
+		exit 0
+	fi
 	while [ "$1" ]; do
 		case $1 in
 			-l|--list)
@@ -318,7 +321,6 @@ get_port_version() {
 	cd $port
 	unset version
 	release=1
-	[ -f ../${PKGMK_CONFFILE} ] && . ../${PKGMK_CONFFILE}
 	. Pkgfile
 	[ ! -z $release ] && tmprel=$release
 	if [ -z $version ] && [ "$base_port" != "$package" ] ; then
@@ -380,15 +382,6 @@ sync_binaries () {
 	rsync -av --delete ${RSYNC_SERVER}/${ARCH}/${RSYNC_NUTYX_VERSION}/$COLLECTION/ \
 	$BINARY_BASE/
 }
-sync_pkgmk_conf() {
-	if [ -f ${PORT_BASE}/${PKGMK_CONFFILE} ]; then
-		rsync -a ${PORT_BASE}/${PKGMK_CONFFILE} \
-		${BINARY_BASE}/${PKGMK_CONFFILE}
-	else
-		rm -f ${BINARY_BASE}/${PKGMK_CONFFILE}
-	fi
-
-}
 remove_url () {
 	local URL
 	URL="$(cat /etc/cards.conf|grep \"^dir[ ]*${BINARY_BASE}|\"| cut -d '|' -s -f2)"
@@ -397,8 +390,7 @@ remove_url () {
 	fi
 }
 build_binaries () {
-	local package port_version binary_version currentdir
-	currentdir=$PWD
+	local package port_version binary_version
 	sync_pkgmk_conf
 	if [ -n "$(cards level|grep WARNING|head -1)" ]; then
 		cards level
@@ -408,20 +400,20 @@ build_binaries () {
 	do
 		package=$(basename $i)
 		if [  -z "$(ls ${BINARY_BASE}/$package/*$ARCH.cards.tar.xz 2>/dev/null )" ];then
-			cd $currentdir
+			cd $GIT
 			[ "$DRY" == "yes" ] && continue
 			bash scripts/$COLLECTION $package || exit 1
 			continue
 		fi
 		if [ ! -f ${BINARY_BASE}/$package/.PKGREPO ]; then
-			cd $currentdir
+			cd $GIT
 			[ "$DRY" == "yes" ] && continue
 			bash scripts/$COLLECTION $package || exit 1
 			continue
 		fi
 		if [ ! -z "$(diff ${BINARY_BASE}/$package/Pkgfile ${PORT_BASE}/$package/Pkgfile)" ]; then
 			echo " ${BINARY_BASE}/$package/Pkgfile AND ${PORT_BASE}/$package/Pkgfile are different ...WILL BUILD NEW.."
-			cd $currentdir
+			cd $GIT
 			[ "$DRY" == "yes" ] && continue
 			bash scripts/$COLLECTION $package || exit 1
 			continue
@@ -430,7 +422,7 @@ build_binaries () {
 		get_binary_version
 		if [ "$port_version" != "$binary_version" ]; then
 			echo "$package: Port: $port_version, Binary: $binary_version"
-			cd $currentdir
+			cd $GIT
 			[ "$DRY" == "yes" ] && continue
 			bash scripts/$COLLECTION $package || exit 1
 			continue
@@ -443,25 +435,17 @@ list_binaries () {
 
 }
 main() {
-	parse_options "$@"
 	check_tools
 	check_location
 	check_user
 	check_config_file
 	check_collection_exist
-	if [ $# -lt 1 ]; then
-		print_help
-		usage
-		exit 0
-	fi
-	sync_pkgmk_conf
+	parse_options "$@"
 	rsync -av --exclude '.*.swp'  --exclude '*~' \
 	--exclude '*cards.tar*' --exclude '.PKGREPO' \
 	--delete-after ${PORT_BASE}/$1/ \
 	${BINARY_BASE}/$1/
-
 	chown -R 0:0 ${BINARY_BASE}/$1/
-
 	cards create -r $1
 }
 BUILD_PORT_VERSION=#VERSION#
@@ -469,7 +453,6 @@ DRY="no"
 ARCH=$(uname -m)
 RSYNC_SERVER="rsync://downloads.nutyx.org/nutyx"
 COLLECTION="$(basename $0)"
-GIT="$(pwd)"
+GIT="$PWD"
 PROJECT="$(basename $GIT)"
-PKGMK_CONFFILE=".pkgmk.conf"
 main "$@"
