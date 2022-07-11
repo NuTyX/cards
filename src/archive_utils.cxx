@@ -1,7 +1,7 @@
 //
 // archive_utils.cxx
 //
-// Copyright (c) 2013 - 2021 by NuTyX team (http://nutyx.org)
+// Copyright (c) 2013 - 2022 by NuTyX team (http://nutyx.org)
 //
 // This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -49,8 +49,7 @@ ArchiveUtils::ArchiveUtils(const std::string& fileName)
 	}
 	m_packageName  = getPackageName();
 	m_packageArch  = getPackageArch();
-	for (vector<string>::const_iterator i = m_contentMtree.begin(); i != m_contentMtree.end(); i++) {
-		string fileName = *i;
+	for ( auto fileName : m_contentMtree) {
 		m_filesList.insert(fileName);
 	}		
 }
@@ -98,8 +97,8 @@ void ArchiveUtils::list()
 	if ( m_contentMtree.size() == 0) {
 		cout << gettext("Not found") << endl;
 	} else {
-		for (vector<string>::const_iterator i = m_contentMtree.begin(); i != m_contentMtree.end(); i++) {
-			cout << *i << endl;
+		for (auto i : m_contentMtree) {
+			cout << i << endl;
 		}
 	}
 }
@@ -148,8 +147,7 @@ vector<string> ArchiveUtils::extractFileContent(const char * fileName)
 void ArchiveUtils::getRunTimeDependenciesEpoch()
 {
 	std::pair<std::string,time_t > NameEpoch;
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		string dependency = *i;
+	for (auto dependency : m_contentMeta) {
 		if ( dependency[0] == 'R' ) {
 			NameEpoch.first=dependency.substr(1,dependency.size()-11);
 			NameEpoch.second=strtoul((dependency.substr(dependency.size()-10)).c_str(),NULL,0);
@@ -159,8 +157,7 @@ void ArchiveUtils::getRunTimeDependenciesEpoch()
 }
 void ArchiveUtils::getRunTimeDependencies()
 {
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		string dependency = *i;
+	for (auto dependency : m_contentMeta) {
 		if ( dependency[0] == 'R' ) {
 			m_rtDependenciesList.insert(dependency.substr(1));
 		}
@@ -177,35 +174,30 @@ void ArchiveUtils::getAliasList()
 void ArchiveUtils::printDeps()
 {
 	getRunTimeDependencies();
-	for (set<string>::const_iterator i = m_rtDependenciesList.begin();i!= m_rtDependenciesList.end();++i) {
-		cout << *i << endl;
-	}
+	for ( auto i : m_rtDependenciesList)
+		cout << i << endl;
 }
 
 void ArchiveUtils::printMeta()
 {
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		cout << *i << endl;
-	}
+	for ( auto i : m_contentMeta)
+		cout << i << endl;
 }
 void ArchiveUtils::printInfo()
 {
 	if ( m_contentInfo.size() != 0) {
-		for (vector<string>::const_iterator i = m_contentInfo.begin(); i != m_contentInfo.end(); i++) {
-			cout << *i << endl;
-		}
+		for (auto i : m_contentInfo)
+			cout << i << endl;
 	}
 }
 string ArchiveUtils::getPackageName()
 {
-	string name;
 	if  ( m_contentMeta.size() == 0 ) {
 		m_actualError = CANNOT_FIND_NAME;
 		treatErrors(m_fileName);
 		return "";
 	}
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		name = *i;
+	for (auto name : m_contentMeta) {
 		if ( name[0] == 'N' ) {
 			return name.substr(1);
 			break;
@@ -217,14 +209,12 @@ string ArchiveUtils::getPackageName()
 }
 string ArchiveUtils::getPackageArch()
 {
-	string arch;
 	if ( m_contentMeta.size() == 0 ) {
 		m_actualError = CANNOT_FIND_ARCH;
 		treatErrors(m_fileName);
 		return "";
 	}
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		arch = *i;
+	for (auto arch : m_contentMeta) {
 		if ( arch[0] == 'a' ) {
 			return arch.substr(1);
 			break;
@@ -267,9 +257,7 @@ string ArchiveUtils::arch()
 }
 string ArchiveUtils::version()
 {
-	string version;
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		version = *i;
+	for (auto version : m_contentMeta) {
 		if ( version[0] == 'V' ) {
 			return version.substr(1);
 			break;
@@ -279,9 +267,7 @@ string ArchiveUtils::version()
 }
 int ArchiveUtils::release()
 {
-	string release;
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		release=*i;
+	for (auto release : m_contentMeta) {
 		if ( release[0] == 'r' ) {
 			return stoi(release.substr(1));
 			break;
@@ -291,9 +277,7 @@ int ArchiveUtils::release()
 }
 string ArchiveUtils::url()
 {
-	string url;
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		url = *i;
+	for (auto url : m_contentMeta) {
 		if ( url[0] == 'U' ) {
 			return url.substr(1);
 			break;
@@ -303,9 +287,7 @@ string ArchiveUtils::url()
 }
 string ArchiveUtils::description()
 {
-	string description;
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		description = *i;
+	for (auto description : m_contentMeta) {
 		if ( description[0] == 'D' ) {
 			return description.substr(1);
 			break;
@@ -315,11 +297,9 @@ string ArchiveUtils::description()
 }
 string ArchiveUtils::group()
 {
-	string description;
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		description = *i;
-		if ( description[0] == 'g' ) {
-			return description.substr(1);
+	for (auto group : m_contentMeta) {
+		if ( group[0] == 'g' ) {
+			return group.substr(1);
 			break;
 		}
 	}
@@ -327,9 +307,7 @@ string ArchiveUtils::group()
 }
 string ArchiveUtils::maintainer()
 {
-  string maintainer;
-  for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-    maintainer = *i;
+  for (auto maintainer : m_contentMeta) {
     if ( maintainer[0] == 'M' ) {
       return maintainer.substr(1);
       break;
@@ -339,9 +317,7 @@ string ArchiveUtils::maintainer()
 }
 string ArchiveUtils::contributors()
 {
-  string contributors;
-  for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-    contributors = *i;
+  for (auto contributors : m_contentMeta) {
     if ( contributors[0] == 'C' ) {
       return contributors.substr(1);
       break;
@@ -351,9 +327,7 @@ string ArchiveUtils::contributors()
 }
 string ArchiveUtils::packager()
 {
-  string maintainer;
-  for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-    maintainer = *i;
+  for (auto maintainer : m_contentMeta) {
     if ( maintainer[0] == 'P' ) {
       return maintainer.substr(1);
       break;
@@ -363,9 +337,7 @@ string ArchiveUtils::packager()
 }
 string ArchiveUtils::collection()
 {
-	string collection;
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		collection = *i;
+	for (auto collection : m_contentMeta) {
 		if ( collection[0] == 'c' ) {
 			return collection.substr(1);
 			break;
@@ -376,9 +348,8 @@ string ArchiveUtils::collection()
 string ArchiveUtils::builddate()
 {
 	char * c_time_s;
-	string bt,buildtime;
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++) {
-		bt = *i;
+	string buildtime;
+	for (auto bt : m_contentMeta) {
 		if ( buildtime[0] == 'B' ) {
 			buildtime=bt.substr(1);
 			break;
@@ -391,9 +362,7 @@ string ArchiveUtils::builddate()
 }
 string ArchiveUtils::epochBuildDate()
 {
-	string epochSVal;
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++ ) {
-		epochSVal = *i;
+	for (auto epochSVal : m_contentMeta) {
 		if ( epochSVal[0] == 'B' ) {
 			return epochSVal.substr(1);
 			break;
@@ -404,9 +373,7 @@ string ArchiveUtils::epochBuildDate()
 time_t ArchiveUtils::buildn()
 {
 	time_t epochVal = 0;
-	string epochSVal;
-	for (vector<string>::const_iterator i = m_contentMeta.begin(); i != m_contentMeta.end(); i++ ) {
-		epochSVal = *i;
+	for (auto epochSVal : m_contentMeta) {
 		if ( epochSVal[0] == 'B' ) {
 			epochVal = strtoul((epochSVal.substr(1)).c_str(),NULL,0);
 			return epochVal;
