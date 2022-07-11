@@ -107,7 +107,6 @@ check_ports()
 		echo "Variable 'PORT_BASE'"
 		exit 1
 	fi
-	sync_pkgmk_conf
 	pushd ${PORT_BASE} > /dev/null
 	for DIR in *
 	do
@@ -391,7 +390,6 @@ remove_url () {
 }
 build_binaries () {
 	local package port_version binary_version
-	sync_pkgmk_conf
 	if [ -n "$(cards level|grep WARNING|head -1)" ]; then
 		cards level
 		exit 1;
