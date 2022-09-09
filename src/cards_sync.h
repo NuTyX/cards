@@ -25,9 +25,6 @@
 #include "pkgsync.h"
 #include "cards_argument_parser.h"
 
-
-using namespace std;
-
 /**
  * \brief cards_sync class
  *
