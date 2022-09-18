@@ -1,7 +1,7 @@
 //
 // cards_upgrade.cxx
 //
-//  Copyright (c) 2015 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2015 - 2022 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		}
 		m_ListOfPackages.insert(packageNameBuildDate);
 	}
-	if ( m_argParser.command() == CardsArgumentParser::CMD_UPGRADE) {
+	if ( m_argParser.getCmdValue() == ArgParser::CMD_UPGRADE) {
 		if ( m_argParser.isSet(CardsArgumentParser::OPT_CHECK))
 			Isuptodate();
 		if ( m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
@@ -105,7 +105,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 			}
 		}
 	}
-	if ( m_argParser.command() == CardsArgumentParser::CMD_DIFF) {
+	if ( m_argParser.getCmdValue() == ArgParser::CMD_DIFF) {
 		if ( ( m_ListOfPackages.size() == 0 ) && ( m_ListOfPackagesToDelete.size() == 0 ) ) {
 			std::cout << _("Your system is up to date.") << endl;
 		} else {

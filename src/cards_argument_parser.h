@@ -1,7 +1,7 @@
 //
 // cards_argument_parser.h
 // 
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2022 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,26 +29,6 @@ class CardsArgumentParser : public ArgParser
 	public:
 		CardsArgumentParser();
 		virtual ~CardsArgumentParser() {};
-
-		static ArgParser::APCmd CMD_HELP;
-		static ArgParser::APCmd CMD_CONFIG;
-		static ArgParser::APCmd CMD_BASE;
-		static ArgParser::APCmd CMD_FILES;
-		static ArgParser::APCmd CMD_SYNC;
-		static ArgParser::APCmd CMD_INFO;
-		static ArgParser::APCmd CMD_QUERY;
-		static ArgParser::APCmd CMD_LIST;
-		static ArgParser::APCmd CMD_INSTALL;
-		static ArgParser::APCmd CMD_DEPCREATE;
-		static ArgParser::APCmd CMD_CREATE;
-		static ArgParser::APCmd CMD_REMOVE;
-		static ArgParser::APCmd CMD_DIFF;
-		static ArgParser::APCmd CMD_LEVEL;
-		static ArgParser::APCmd CMD_DEPENDS;
-		static ArgParser::APCmd CMD_DEPTREE;
-		static ArgParser::APCmd CMD_SEARCH;
-		static ArgParser::APCmd CMD_PURGE;
-		static ArgParser::APCmd CMD_UPGRADE;
 
 		static ArgParser::APOpt OPT_DOWNLOAD_ONLY;
 		static ArgParser::APOpt OPT_DOWNLOAD_READY;

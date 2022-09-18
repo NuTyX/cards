@@ -1,7 +1,7 @@
 // argument_parser.cxx
 //
 //  Copyright (c) 2004 by Johannes Winkelmann (jw at tks6 dot net)
-//  Copyright (c) 2013-2016 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2022 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ ArgParser::~ArgParser()
     }
 }
 
-int ArgParser::addCommand(APCmd& cmd,
+int ArgParser::addCommand(CMD cmd,
                           const std::string& name,
                           const std::string& shortInfo,
                           const std::string& description,
@@ -61,9 +61,8 @@ int ArgParser::addCommand(APCmd& cmd,
     Command* command = new Command;
 
     ++m_cmdIdCounter;
-    cmd.id = m_cmdIdCounter;
 
-    command->apCmd = &cmd;
+    command->cmd = cmd;
     command->id = m_cmdIdCounter;
     command->name = name;
     command->argNumber = argNumber;
@@ -74,26 +73,22 @@ int ArgParser::addCommand(APCmd& cmd,
     command->otherArguments = otherArguments;
 
     m_commands[name] = command;
-    m_commandIdMap[cmd.id] = command;
-
-
-    APCmd apcmd;
-    apcmd.id = m_cmdIdCounter;
+    m_commandIdMap[cmd] = command;
 
     PREDEFINED_CMD_HELP.init("help", 'h', _("\t   Print this help message"));
 
-    // add predefined commands
+    // add predefined option
     addOption(cmd, PREDEFINED_CMD_HELP, false);
 
     return 0;
 }
 
-int ArgParser::addOption(const APCmd& commandKey,
+int ArgParser::addOption(CMD commandKey,
                          APOpt& key,
                          bool required)
 {
     // TODO: check for null cmd
-    if (m_commandIdMap.find(commandKey.id) == m_commandIdMap.end()) {
+    if (m_commandIdMap.find(commandKey) == m_commandIdMap.end()) {
         return -1;
     }
 
@@ -129,7 +124,7 @@ int ArgParser::addOption(const APCmd& commandKey,
     }
 
 
-    Command* cmd = m_commandIdMap[commandKey.id];
+    Command* cmd = m_commandIdMap[commandKey];
     if (required) {
         cmd->mandatoryOptions[key.id] = o;
     } else {
@@ -157,9 +152,9 @@ void ArgParser::parse(int argc, char** argv)
                     parseError("Non option / Non command argument \033[1;31m" +
                                string(argv[i]) + NORMAL);
                 }
-
                 cmd = m_commands[argv[i]];
-                m_command.id = cmd->apCmd->id;
+                m_command.id = cmd->id;
+                m_cmd = cmd->cmd;
                 commandFound = true;
                 cmdPos = i;
                 break;
@@ -318,10 +313,17 @@ void ArgParser::parseError(const string& error, const string& cmd) const
     }
     exit(-1);
 }
-
+ArgParser::CMD ArgParser::getCmdValue() const
+{
+	return m_cmd;
+}
 int ArgParser::getIdValue( const APCmd& command)
 {
 	return command.id;
+}
+int ArgParser::getIdValue()
+{
+	return m_command.id;
 }
 ArgParser::APCmd ArgParser::command() const
 {

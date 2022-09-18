@@ -1,7 +1,7 @@
 // argument_parser.h
 //
 //  Copyright (c) 2004 Johannes Winkelmann (jw at tks6 dot net)
-//  Copyright (c) 2014 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014 - 2022 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -62,6 +62,41 @@ public:
 	enum ArgNumberCheck { NONE, MIN, EQ, MAX };
 
 	/**
+	 * Command passed
+	 */
+	enum CMD {
+		CMD_HELP=1,
+		CMD_CONFIG,
+		CMD_INSTALL,
+		CMD_REMOVE,
+		CMD_FILES,
+		CMD_LIST,
+		CMD_SYNC,
+		CMD_INFO,
+		CMD_QUERY,
+		CMD_SEARCH,
+		CMD_PURGE,
+		CMD_BASE,
+		CMD_DIFF,
+		CMD_UPGRADE,
+		CMD_CREATE,
+		CMD_DEPCREATE,
+		CMD_DEPENDS,
+		CMD_DEPTREE,
+		CMD_LEVEL
+	};
+
+	/**
+	 * Option passed
+	 */
+	enum OPT {
+		OPT_NONE,
+		OPT_ALL,
+		OPT_BINARIES,
+		OPT_PORTS,
+		OPT_CHECK
+	};
+	/**
 	 * APOpt and APCmd are the classes used in client code, to make
 	 * efficient comparison of the selected command.
 	 *
@@ -72,7 +107,7 @@ public:
 	{
 	public:
 		friend class ArgParser;
-		APOpt() : id(-1), m_initialized(false) {}
+		APOpt() : id(-1), opt(OPT_NONE), m_initialized(false) {}
 		bool operator ==(const APOpt& other) const { return other.id == id; }
 
 		void init(const std::string& longName,
@@ -91,6 +126,7 @@ public:
 
 	private:
 		int id;
+		OPT opt;
 		std::string m_longName;
 		char m_shortName;
 		std::string m_shortInfo;
@@ -132,6 +168,7 @@ private:
 	{
 	public:
 		int id;
+		CMD cmd;
 		std::string name;
 		std::string description;
 		std::string shortInfo;
@@ -151,7 +188,26 @@ public:
 	ArgParser();
 	virtual ~ArgParser();
 
+	/**
+	 * add a command
+	 * 
+	 * \param cmd a possible enumerate CMD
+	 * \param name the name of the command to be parserd from the command line
+	 * \param shortInfo a short description, used for general help screen
+	 * \param description a description, used for the help screens
+	 * \param argNumberCheck what kind of argument number checking
+	 * \param argNumber optional number of arguments
+	 * \param otherArguments value to display in the help screen for following (non option) arguments
+	 */
+	int addCommand(CMD cmd,
+			const std::string& name,
+			const std::string& shortInfo,
+			const std::string& description,
+			ArgNumberCheck argNumberCheck,
+			const int argNumber=-1,
+			const std::string& otherArguments="");
 
+  
 	/**
 	 * add a command
 	 *
@@ -164,14 +220,24 @@ public:
 	 * \param otherArguments value to display in the help screen for following (non option) arguments
 	 */
 	int addCommand(APCmd& cmd,
-				   const std::string& name,
-           const std::string& shortInfo,
-				   const std::string& description,
-				   ArgNumberCheck argNumberCheck,
-				   const int argNumber=-1,
-				   const std::string& otherArguments="");
+			const std::string& name,
+			const std::string& shortInfo,
+			const std::string& description,
+			ArgNumberCheck argNumberCheck,
+			const int argNumber=-1,
+			const std::string& otherArguments="");
 
-
+	/**
+	 * add an option to a command - this will fail with an assertion
+	 * of \a key has not been initialized using init()
+	 *
+	 * \param cmd a possible enumerate CMD, the command to add an option to
+	 * \param key the option reference; use it to check for certain options after parsing
+	 * \param required whether this option is required
+	 */
+	int addOption(const CMD commandKey,
+                         APOpt& key,
+                         bool required);
 	/**
 	 * add an option to a command - this will fail with an assertion
 	 * of \a key has not been initialized using init()
@@ -209,6 +275,16 @@ public:
 	 * \return the value attached to the option \param key if any
 	 */
 	std::string getOptionValue(const APOpt& key) const;
+
+	/**
+	 * \return the CMD value of the command
+	 */
+	CMD getCmdValue() const;
+
+	/**
+	 * \return the id value of the command
+	 */
+	int getIdValue();
 
 	/**
 	 * \return the id value of the command
@@ -252,6 +328,7 @@ private:
 
 	std::vector<std::string> m_otherArguments;
 	APCmd m_command;
+	CMD m_cmd;
 	std::string m_appName;
 
 

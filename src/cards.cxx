@@ -1,7 +1,7 @@
 //
 // cards.cxx
 //
-//  Copyright (c) 2014-2017 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014-2022 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -49,13 +49,15 @@ int main(int argc, char** argv)
 		cardsArgPars.parse(argc, argv);
 #ifndef NDEBUG
 		cout << cardsArgPars.getIdValue(cardsArgPars.command()) << endl;
+		cout << cardsArgPars.getIdValue() << endl;
+		cout << cardsArgPars.getCmdValue() << endl;
 #endif
 		if (cardsArgPars.isSet(CardsArgumentParser::OPT_CONFIG_FILE))
 			configFile=cardsArgPars.getOptionValue(CardsArgumentParser::OPT_CONFIG_FILE);
 
-		switch(cardsArgPars.getIdValue(cardsArgPars.command()))
+		switch(cardsArgPars.getCmdValue())
 		{
-			case 1:
+			case ArgParser::CMD_HELP:
 			cout << _("Usage: ") << BLUE << cardsArgPars.appName()  << _(" command ") << NORMAL << "[options]"<< endl;
 
 			cout << _("Where possible") << BLUE << _(" command ") << NORMAL<< _("is:") << endl;
@@ -140,7 +142,7 @@ int main(int argc, char** argv)
 				<< _("configured in the /etc/cards.conf file otherwise the command will abort.") << endl;
 			return EXIT_SUCCESS;
 
-			case 2:	//CMD_CONFIG
+			case ArgParser::CMD_CONFIG:
 			{
 				Config config;
 				Pkgrepo::parseConfig(configFile.c_str(), config);
@@ -167,7 +169,7 @@ int main(int argc, char** argv)
 			}
 			return EXIT_SUCCESS;
 
-			case 3:	//CMD_BASE
+			case ArgParser::CMD_BASE:
 			{
 				if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
 				( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
@@ -179,13 +181,19 @@ int main(int argc, char** argv)
 			}
 			return EXIT_SUCCESS;
 
-			case 4:	//CMD_FILES
+			case ArgParser::CMD_FILES:
 			{
 				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
-			case 5:	//CMD_SYNC
+			case ArgParser::CMD_SEARCH:
+			{
+				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+			}
+			return EXIT_SUCCESS;
+
+			case ArgParser::CMD_SYNC:
 			if (getuid()) {
 				string s="";
 				throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
@@ -196,88 +204,61 @@ int main(int argc, char** argv)
 			}
 			return EXIT_SUCCESS;
 
-			case 6:	//CMD_QUERY
+			case ArgParser::CMD_LIST:
 			{
 				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
-			case 7:	//CMD_INFO
+			case ArgParser::CMD_QUERY:
 			{
 				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
-			case 8: //CMD_LIST
+			case ArgParser::CMD_INFO:
 			{
 				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
-			case 9:	//CMD_INSTALL
-			{
-				unique_ptr<Cards_install> i(new Cards_install(cardsArgPars,configFile.c_str()));
-			}
-			return EXIT_SUCCESS;
 
-			case 10://CMD_REMOVE
-			{
-				unique_ptr<Cards_remove> i(new Cards_remove("cards remove",cardsArgPars, configFile.c_str()));
-			}
-			return EXIT_SUCCESS;
-
-			case 11://CMD_LEVEL
-			{
-				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
-				i->showLevel();
-			}
-			return EXIT_SUCCESS;
-
-			case 12://CMD_DIFF
+			case ArgParser::CMD_DIFF:
 			{
 				unique_ptr<Cards_upgrade> i(new Cards_upgrade(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
-			case 13://CMD_DEPENDS
+
+			case ArgParser::CMD_INSTALL:
 			{
-				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
-				i->showDependencies();
+				unique_ptr<Cards_install> i(new Cards_install(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
-			case 14://CMD_DEPTREE
+			case ArgParser::CMD_REMOVE:
 			{
-				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
-				return i->deptree();
+				unique_ptr<Cards_remove> i(new Cards_remove("cards remove",cardsArgPars, configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
-			case 15://CMD_SEARCH
+			case ArgParser::CMD_UPGRADE:
 			{
-				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+				unique_ptr<Cards_upgrade> i(new Cards_upgrade(cardsArgPars,configFile.c_str()));
+				if (cardsArgPars.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
+					return i->Isdownload();
 			}
 			return EXIT_SUCCESS;
 
-			case 16://CMD_DEPCREATE
+			case ArgParser::CMD_PURGE:
 			{
-				// get the list of the dependencies
-				CardsDepends CD(cardsArgPars);
-				vector<string> listOfPackages = CD.getNeededDependencies();
-				if ( listOfPackages.empty() ) {
-					cout << _("The package ")
-					<< cardsArgPars.otherArguments()[0]
-					<< _(" is already installed") << endl;
-					return EXIT_SUCCESS;
-				}
-
-				// create (compile and install) the List of deps (including the final package)
-				unique_ptr<Cards_create> i(new Cards_create(cardsArgPars,
-					configFile.c_str(),listOfPackages));
+				unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
+				i->purge();
 			}
 			return EXIT_SUCCESS;
 
-			case 17://CMD_CREATE
+
+			case ArgParser::CMD_CREATE:
 			{
 				if ( ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) &&
 				( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) ) {
@@ -303,24 +284,48 @@ int main(int argc, char** argv)
 			}
 			return EXIT_SUCCESS;
 
-			case 18://CMD_PURGE
+			case ArgParser::CMD_LEVEL:
 			{
-				unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
-				i->purge();
+				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+				i->showLevel();
+			}
+			return EXIT_SUCCESS;
+			case ArgParser::CMD_DEPENDS:
+			{
+				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+				i->showDependencies();
 			}
 			return EXIT_SUCCESS;
 
-			case 19://CMD_UPGRADE
+			case ArgParser::CMD_DEPTREE:
 			{
-				unique_ptr<Cards_upgrade> i(new Cards_upgrade(cardsArgPars,configFile.c_str()));
-				if (cardsArgPars.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
-					return i->Isdownload();
+				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+				return i->deptree();
 			}
 			return EXIT_SUCCESS;
+
+			case ArgParser::CMD_DEPCREATE:
+			{
+				// get the list of the dependencies
+				CardsDepends CD(cardsArgPars);
+				vector<string> listOfPackages = CD.getNeededDependencies();
+				if ( listOfPackages.empty() ) {
+					cout << _("The package ")
+					<< cardsArgPars.otherArguments()[0]
+					<< _(" is already installed") << endl;
+					return EXIT_SUCCESS;
+				}
+
+				// create (compile and install) the List of deps (including the final package)
+				unique_ptr<Cards_create> i(new Cards_create(cardsArgPars,
+					configFile.c_str(),listOfPackages));
+			}
+			return EXIT_SUCCESS;
+
 
 			default:
 				cout << "not found" << endl;
-				cout << cardsArgPars.getIdValue(cardsArgPars.command());
+				cout << cardsArgPars.getIdValue(cardsArgPars.command())<< endl;
 		}
 	} catch (runtime_error& e) {
 			cerr << "cards " << VERSION << " "<< command << ": " << e.what() << endl;

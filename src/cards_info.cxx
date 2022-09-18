@@ -1,7 +1,7 @@
 /*
  * cards_info.cxx
  * 
- * Copyright 2015 - 2021 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2015 - 2022 Thierry Nuttens <tnut@nutyx.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 		m_root="/";
 	else
 		m_root=m_root+"/";
-	if ((m_argParser.command() == CardsArgumentParser::CMD_INFO) ) {
+	if ((m_argParser.getCmdValue() == ArgParser::CMD_INFO) ) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
 			getBinaryPackageInfo(m_argParser.otherArguments()[0]);
 		} else if (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) {
@@ -55,7 +55,7 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 			run();
 		}
 	}
-	if ((m_argParser.command() == CardsArgumentParser::CMD_LIST) ) {
+	if ((m_argParser.getCmdValue() == ArgParser::CMD_LIST) ) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
 			set<string> sortedPackagesList;
 			set<Pkg*> binaryList = getBinaryPackageSet();
@@ -89,17 +89,17 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 			run();
 		}
 	}
-	if ((m_argParser.command() == CardsArgumentParser::CMD_QUERY) ) {
+	if ((m_argParser.getCmdValue() == ArgParser::CMD_QUERY) ) {
 		m_owner_mode=1;
 		m_arg=m_argParser.otherArguments()[0];
 		run();
 	}
-	if ((m_argParser.command() == CardsArgumentParser::CMD_FILES) ) {
+	if ((m_argParser.getCmdValue() == ArgParser::CMD_FILES) ) {
 		m_list_mode=1;
 		m_arg=m_argParser.otherArguments()[0];
 		run();		
 	}
-	if ((m_argParser.command() == CardsArgumentParser::CMD_SEARCH) ) {
+	if ((m_argParser.getCmdValue() == ArgParser::CMD_SEARCH) ) {
 		std::vector<RepoInfo> List;
 		List = getRepoInfo();
 		buildSimpleDatabase();
