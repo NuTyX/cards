@@ -26,10 +26,7 @@
 #ifndef TABLE_BASE_H
 #define TABLE_BASE_H
 
-#include <stdio.h>
-#include <string.h>
-#include <vector>
-#include <algorithm>
+#include "cards_wrapper.h"
 
 #include <ctype.h>
 
@@ -39,14 +36,13 @@
 #include <FL/fl_draw.H>
 #include <FL/Fl_Table_Row.H>
 #include <FL/Fl_Menu.H>
-#include "cards_wrapper.h"
+
 #include "pixmaps/checked.xpm"
 #include "pixmaps/download.xpm"
 #include "pixmaps/deleted.xpm"
 
 #define MARGIN 20
 
-using namespace std;
 using namespace cards;
 
 // A single row of columns
@@ -54,7 +50,7 @@ class Row
 {
 public:
     Row(){data=nullptr;}
-    vector<string> cols;
+    std::vector<std::string> cols;
     void* data;
 };
 
@@ -103,10 +99,10 @@ public:
     virtual void refresh_table() = 0; // Load the packages list
     void autowidth(int pad); // Automatically set the columns widths to the longuest string
     void resize_window();	// Resize the parent window to size of table
-    void setFilter(const string& pValue);
+    void setFilter(const std::string& pValue);
 
 protected:
-    vector<string> colTitle;
+    std::vector<std::string> colTitle;
 
     // table cell drawing
     void draw_cell(TableContext context, int R=0, int C=0, int X=0, int Y=0, int W=0, int H=0);
@@ -125,8 +121,8 @@ private:
     void event_callback2();
 
 protected:
-    string m_filter;
-    vector<Row> m_rowdata;
+    std::string m_filter;
+    std::vector<Row> m_rowdata;
     int m_sort_reverse;
     int m_sort_lastcol;
     CWrapper* m_cards;

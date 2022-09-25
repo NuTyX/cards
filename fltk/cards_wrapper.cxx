@@ -22,10 +22,9 @@
  *
  */
 
-#include "cards_wrapper.h"
-#include <sstream>
-
 #include "version.h"
+#include "cards_wrapper.h"
+
 
 namespace cards
 {
@@ -75,7 +74,7 @@ namespace cards
     /// Remove an event suscriber from event callback list
     void CWrapper::unsubscribeFromEvents(CEventHandler* pCallBack)
     {
-        vector<CEventHandler*>::iterator it;
+        std::vector<CEventHandler*>::iterator it;
         it=find(m_arrEventHandler.begin(),m_arrEventHandler.end(),pCallBack);
         if (it!=m_arrEventHandler.end())
         {
@@ -83,12 +82,12 @@ namespace cards
         }
     }
 
-    const vector<CPackage*>& CWrapper::getPackageList()
+    const std::vector<CPackage*>& CWrapper::getPackageList()
     {
         return m_arrPackages;
     }
 
-    const set<string>& CWrapper::getSetList()
+    const std::set<std::string>& CWrapper::getSetList()
     {
         return m_arrSets;
     }
@@ -96,12 +95,12 @@ namespace cards
     ///
     ///
     ///
-    CPackage* CWrapper::getPackage(const string& pName)
+    CPackage* CWrapper::getPackage(const std::string& pName)
     {
         CPackage* ptr=nullptr;
         for (CPackage* it : m_arrPackages)
         {
-            if (it->getName()==pName)
+            if (it->getName() == pName)
             {
                 ptr=it;
                 break;
@@ -129,7 +128,7 @@ namespace cards
     }
 
     /** Return the current job list */
-    const vector<CPackage*>& CWrapper::getJobList()
+    const std::vector<CPackage*>& CWrapper::getJobList()
     {
         return m_arrJobList;
     }
@@ -143,7 +142,7 @@ namespace cards
     {
         if (m_IsThreadFree())
         {
-            m_job = new thread(&CWrapper::m_Sync_Thread, CWrapper::m_ptCWrapper);
+            m_job = new std::thread(&CWrapper::m_Sync_Thread, CWrapper::m_ptCWrapper);
             m_job->detach();
             m_log->log(_("Synchronization started ..."));
         }
@@ -154,7 +153,7 @@ namespace cards
     {
         if (m_IsThreadFree())
         {
-            m_job = new thread(&CWrapper::m_DoJobList_Thread, CWrapper::m_ptCWrapper);
+            m_job = new std::thread(&CWrapper::m_DoJobList_Thread, CWrapper::m_ptCWrapper);
             m_job->detach();
         }
     }
@@ -164,7 +163,7 @@ namespace cards
     {
         if (m_IsThreadFree())
         {
-            m_job = new thread(&CWrapper::m_RefreshPackageList_Thread, CWrapper::m_ptCWrapper);
+            m_job = new std::thread(&CWrapper::m_RefreshPackageList_Thread, CWrapper::m_ptCWrapper);
             m_job->detach();
         }
     }
@@ -173,7 +172,7 @@ namespace cards
     {
         if (m_IsThreadFree())
         {
-            m_job = new thread(&CWrapper::m_GetPackageInfo_Thread, CWrapper::m_ptCWrapper,pName);
+            m_job = new std::thread(&CWrapper::m_GetPackageInfo_Thread, CWrapper::m_ptCWrapper,pName);
             m_job->detach();
         }
     }
@@ -184,7 +183,7 @@ namespace cards
         CPackage Package;
         CPackage* Pack = getPackage(pName);
         if (Pack != nullptr) Package = *Pack;
-        for (auto* it : m_arrEventHandler)
+        for (auto it : m_arrEventHandler)
         {
             it->OnPackageInfo(Package);
         }
@@ -207,9 +206,9 @@ namespace cards
                 Pkgsync Sync;
                 Sync.run();
             }
-            catch (exception& e)
+            catch (std::exception& e)
             {
-                m_log->log(_("Exception occured during Sync thread : ") + string(e.what()), LEVEL_ERROR);
+                m_log->log(_("Exception occured during Sync thread : ") + std::string(e.what()), LEVEL_ERROR);
             }
         }
         else
@@ -232,15 +231,15 @@ namespace cards
             try
             {
                 m_log->log(_("Determine Packages Install and Remove List..."));
-                set<string> Removelist;
-                set<string> InstallList;
+                std::set<std::string> Removelist;
+                std::set<std::string> InstallList;
                 for (CPackage* it:m_arrJobList)
                 {
                     if (it->isToBeInstalled()) InstallList.insert(it->getName());
                     if (it->isToBeRemoved()) Removelist.insert(it->getName());
                 }
-                m_log->log(_("Ok, ") + to_string(Removelist.size()) + _(" Package(s) will be removed and ") +
-                    to_string(InstallList.size()) + _(" Package(s) will be installed... "));
+                m_log->log(_("Ok, ") + std::to_string(Removelist.size()) + _(" Package(s) will be removed and ") +
+                    std::to_string(InstallList.size()) + _(" Package(s) will be installed... "));
                 if (Removelist.size() > 0)
                 {
                     CClient Cards;
@@ -255,9 +254,9 @@ namespace cards
                 }
                 rc= CEH_RC::OK;
             }
-            catch (exception& e)
+            catch (std::exception& e)
             {
-                m_log->log("Exception occured during processing job list Thread : " + string(e.what()), LEVEL_ERROR);
+                m_log->log("Exception occured during processing job list Thread : " + std::string(e.what()), LEVEL_ERROR);
                 rc= CEH_RC::EXCEPTION;
             }
             m_RefreshPackageList_Thread();
@@ -281,8 +280,8 @@ namespace cards
         CClient Cards;
         // First pass get all package available
         m_ClearPackagesList();
-		std::set<Pkg*> binaryList = Cards.getBinaryPackageSet();
-		std:set<std::string> AvailablePackages;
+		std::set<Pkg*> AvailablePackages = Cards.getBinaryPackageSet();
+/*		std::set<std::string> AvailablePackages;
 		for ( auto i : binaryList) {
 			std::string s;
 			if ( i->getSet().size()  > 0 )
@@ -295,12 +294,31 @@ namespace cards
 				s += i->getPackager()+ "\t";
 				AvailablePackages.insert(s);
 		}
-        std::set<string> InstalledPackages = Cards.ListOfInstalledPackages();
-        for (auto it : AvailablePackages)
+*/
+        std::set<std::string> InstalledPackages = Cards.ListOfInstalledPackages();
+		for (auto i : AvailablePackages)
+		{
+			CPackage* Pack = new CPackage();
+			if ( i->getSet().size()  > 0 )
+				Pack->setCollection(i->getPrimarySet());
+			else
+				Pack->setCollection(i->getCollection());
+
+			Pack->setName(i->getName());
+			Pack->setDescription(i->getDescription());
+			Pack->setVersion(i->getVersion());
+			Pack->setPackager(i->getPackager());
+            if (InstalledPackages.find(Pack->getName()) != InstalledPackages.end())
+				Pack->setStatus(INSTALLED);
+            m_arrPackages.push_back(Pack);
+            if (m_arrSets.find(Pack->getCollection()) == m_arrSets.end())
+				m_arrSets.insert(Pack->getCollection());
+		}
+/*        for (auto it : AvailablePackages)
         {
             CPackage* Pack = new CPackage();
             std::string token;
-            istringstream tokenStream(it);
+            std::istringstream tokenStream(it);
             int i=0;
             while (getline(tokenStream, token, '\t'))
             {
@@ -336,10 +354,14 @@ namespace cards
                 }
                 i++;
             }
-            if (InstalledPackages.find(Pack->getName())!=InstalledPackages.end()) Pack->setStatus(INSTALLED);
+
+            if (InstalledPackages.find(Pack->getName()) != InstalledPackages.end())
+				Pack->setStatus(INSTALLED);
             m_arrPackages.push_back(Pack);
-            if (m_arrSets.find(Pack->getCollection())==m_arrSets.end()) m_arrSets.insert(Pack->getCollection());
+            if (m_arrSets.find(Pack->getCollection()) == m_arrSets.end())
+				m_arrSets.insert(Pack->getCollection());
         }
+		*/
         m_OnRefreshPackageFinished_Callback(CEH_RC::OK);
         m_job_running =false;
     }

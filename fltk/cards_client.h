@@ -25,16 +25,12 @@
 #ifndef  CARDS_CLIENT_H
 #define  CARDS_CLIENT_H
 
-#include <cstddef>
+#include "cards_log.h"
 
 #include <libcards.h>
 
-#include "cards_log.h"
-
 namespace cards
 {
-    using namespace std;
-
     // Define Cards_wrapper singleton for friendship
     class CWrapper;
     class CClient;

@@ -151,7 +151,7 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
         }
         case SEARCH_CHANGE:
         {
-            win->m_tablePackages->setFilter(string(win->m_search->value()));
+            win->m_tablePackages->setFilter(std::string(win->m_search->value()));
             if (win->m_tabs->value() != win->m_grpPackage)
                 win->m_tabs->value(win->m_grpPackage);
             break;
@@ -168,13 +168,13 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
         }
         default:
         {
-            win->m_log->log(_("Unkown Event : ") + to_string(pID));
+            win->m_log->log(_("Unkown Event : ") + std::to_string(pID));
         }
     }
 }
 
 // Callback on receive text to log
-void mainWindow::OnLogMessage(const string& pMessage)
+void mainWindow::OnLogMessage(const std::string& pMessage)
 {
     Fl::lock();
     if (m_consoleBuff!=nullptr) m_consoleBuff->append(pMessage.c_str());
@@ -200,7 +200,7 @@ void mainWindow::OnSyncFinished(const CEH_RC rc)
 void mainWindow::OnJobListChange(const CEH_RC rc)
 {
     Fl::lock();
-    vector<CPackage*> jobList = m_cards->getJobList();
+    std::vector<CPackage*> jobList = m_cards->getJobList();
     if (jobList.size() > 0)
     {
         m_btnApply->activate();
@@ -223,11 +223,11 @@ void mainWindow::OnPackageInfo(CPackage& pPackage)
             m_infoBuff->append("No information available for this package");
         else
         {
-            m_infoBuff->append(string(pPackage.getName()).c_str());
-            m_infoBuff->append(string(" " + pPackage.getVersion()+"\n").c_str());
-            m_infoBuff->append(string(pPackage.getDescription()+"\n").c_str());
-            m_infoBuff->append(string("build by: " + pPackage.getPackager()+"\n").c_str());
-            m_infoBuff->append(string("from     : " + pPackage.getCollection()+" collection/set of packages").c_str());
+            m_infoBuff->append(std::string(pPackage.getName()).c_str());
+            m_infoBuff->append(std::string(" " + pPackage.getVersion()+"\n").c_str());
+            m_infoBuff->append(std::string(pPackage.getDescription()+"\n").c_str());
+            m_infoBuff->append(std::string("build by: " + pPackage.getPackager()+"\n").c_str());
+            m_infoBuff->append(std::string("from     : " + pPackage.getCollection()+" collection/set of packages").c_str());
         }
 
     }

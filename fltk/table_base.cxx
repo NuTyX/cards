@@ -243,7 +243,7 @@ void TableBase::event_callback2()
 }
 
 /// Redefine filter and refresh the tab
-void TableBase::setFilter(const string& pValue)
+void TableBase::setFilter(const std::string& pValue)
 {
     m_filter=pValue;
     refresh_table();

@@ -23,9 +23,7 @@
 
 #include "flcards_info.h"
 
-using namespace std;
-
-Flcards_info::Flcards_info(const string& configFileName)
+Flcards_info::Flcards_info(const std::string& configFileName)
 	: Pkgdbh(""),Pkgrepo(configFileName)
 {
 	m_root="/";
@@ -76,8 +74,8 @@ set<string> Flcards_info::getListOfInstalledPackages()
 	delete m_progressBar;
 	delete m_window;
 
-	set<string> ListOfInstalledPackages;
-	string packageDetails;
+	std::set<std::string> ListOfInstalledPackages;
+	std::string packageDetails;
 	for (auto i : m_listOfInstPackages) {
 #ifndef NDEBUG
 		cerr << i.first << endl;
@@ -109,7 +107,7 @@ set<string> Flcards_info::getListOfAvailablePackages()
 
 	parsePkgRepoCollectionFile();
 
-	set<string> ListOfAvailablePackages;
+	std::set<std::string> ListOfAvailablePackages;
 	std::string packageNameVersion;
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {

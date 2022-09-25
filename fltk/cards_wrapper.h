@@ -25,19 +25,17 @@
 #ifndef  CARDS_WRAPPER_H
 #define  CARDS_WRAPPER_H
 
-#include <cstddef>
-#include <thread>
-#include <vector>
-#include <algorithm>
-
-#include <libcards.h>
 #include "console_forwarder.h"
 #include "cards_client.h"
 #include "cards_event_handler.h"
 #include "cards_package.h"
 #include "cards_log.h"
 
-using namespace std;
+#include <libcards.h>
+
+#include <thread>
+#include <algorithm>
+
 
 namespace cards
 {
@@ -101,7 +99,7 @@ namespace cards
          *
          * Return CARDS Library version
          */
-        string getCardsVersion();
+        std::string getCardsVersion();
 
         /**
          * \brief Sync CARDS database
@@ -113,19 +111,19 @@ namespace cards
 
         void doJobList();
 
-        const vector<CPackage*>& getPackageList();
+        const std::vector<CPackage*>& getPackageList();
 
-        CPackage* getPackage(const string& pName);
+        CPackage* getPackage(const std::string& pName);
 
         void refreshJobList();
 
-        const vector<CPackage*>& getJobList();
+        const std::vector<CPackage*>& getJobList();
 
-        const set<string>& getSetList();
+        const std::set<std::string>& getSetList();
 
         bool isJobRunning();
 
-        void getPackageInfo(const string& pName);
+        void getPackageInfo(const std::string& pName);
 
     protected:
         void OnProgressInfo(int percent);
@@ -147,16 +145,16 @@ namespace cards
         static	CWrapper*	m_ptCWrapper; //Static pointer of the singleton
 
         /// Containers
-        vector<CEventHandler*> m_arrEventHandler; // Std array to store callback event clients
-        vector<CPackage*> m_arrPackages;
-        vector<CPackage*> m_arrJobList;
+        std::vector<CEventHandler*> m_arrEventHandler; // Std array to store callback event clients
+        std::vector<CPackage*> m_arrPackages;
+        std::vector<CPackage*> m_arrJobList;
         std::set<std::string> m_arrSets;
 
         /// Threaded Tasks
         void m_Sync_Thread(); // Main Thread for Cards Sync Operation
         void m_DoJobList_Thread(); // Thread to install package
         void m_RefreshPackageList_Thread();
-        void m_GetPackageInfo_Thread(string pName);
+        void m_GetPackageInfo_Thread(std::string pName);
 
         /// Utils
         CLogger* m_log;
@@ -168,7 +166,7 @@ namespace cards
         void m_OnJobListChanged_Callback(const CEH_RC rc);
 
         bool m_job_running; //Flag to know if a thread is currently running
-        thread* m_job; // Thread handler pointer
+        std::thread* m_job; // Thread handler pointer
 
         bool m_checkRootAccess(); // Just check if we have root accessing
         bool m_IsThreadFree();

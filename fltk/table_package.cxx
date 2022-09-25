@@ -3,7 +3,7 @@
  *
  * Copyright 2015 - 2017 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2021 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,14 +45,14 @@ void TablePackage::refresh_table()
     clear();
     m_rowdata.clear();
     cols(4);
-    vector<CPackage*> pkgList = m_cards->getPackageList();
+    std::vector<CPackage*> pkgList = m_cards->getPackageList();
     for (auto S : pkgList)
     {
         if (m_filter.length()>0)
-            if ((S->getName().find(m_filter)==string::npos) &&
-                (S->getCollection().find(m_filter)==string::npos) &&
-                (S->getDescription().find(m_filter)==string::npos) &&
-                (S->getVersion().find(m_filter)==string::npos) ) continue;
+            if ((S->getName().find(m_filter) == std::string::npos) &&
+                (S->getCollection().find(m_filter) == std::string::npos) &&
+                (S->getDescription().find(m_filter) == std::string::npos) &&
+                (S->getVersion().find(m_filter) == std::string::npos) ) continue;
         // Add a new row
         Row newrow;
         newrow.data=S;
@@ -77,7 +77,7 @@ void TablePackage::refresh_table()
 
 void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
-    string s = "";
+    std::string s = "";
     if ( (R < (int)m_rowdata.size()) && (C < (int)m_rowdata[R].cols.size()) )
         s = m_rowdata[R].cols[C];
     switch (context)

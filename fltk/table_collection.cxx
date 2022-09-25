@@ -108,7 +108,7 @@ void TableCollection::refresh_table()
 
 void TableCollection::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
-    string s = "";
+    std::string s = "";
     if ( (R < (int)m_rowdata.size()) && (C < (int)m_rowdata[R].cols.size()) )
         s = m_rowdata[R].cols[C];
     switch (context)
@@ -163,9 +163,9 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
         {
             if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
             {
-                string Collection = m_rowdata[pRow].cols[1];
+                std::string Collection = m_rowdata[pRow].cols[1];
                 CWrapper* Cards = CWrapper::instance();
-                set<string> Collec_List;
+                std::set<std::string> Collec_List;
                 if (Collection=="LXDE")
                 {
                     Collec_List.insert("lxde");
@@ -208,7 +208,7 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 }
                 else if ( strcmp(m->label(), "Install") == 0 )
                 {
-                    vector<CPackage*> Packages = Cards->getPackageList();
+                    std::vector<CPackage*> Packages = Cards->getPackageList();
                     for (CPackage* Package : Packages)
                     {
                         if ((!Package->isInstalled()))
@@ -223,7 +223,7 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 }
                 else if ( strcmp(m->label(), "Remove") == 0 )
                 {
-                    vector<CPackage*> Packages = Cards->getPackageList();
+                    std::vector<CPackage*> Packages = Cards->getPackageList();
                     for (CPackage* Package : Packages)
                     {
                         if (Package->isInstalled() && (Collec_List.count(Package->getCollection())))

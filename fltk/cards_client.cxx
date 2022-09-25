@@ -35,11 +35,11 @@ namespace cards
     }
 
     /// Get a string list of installed packages
-    set<string> CClient::ListOfInstalledPackages()
+    std::set<std::string> CClient::ListOfInstalledPackages()
     {
         getListOfPackageNames (m_root);
         buildCompleteDatabase(true);
-        set<string> ListOfInstalledPackages;
+        std::set<std::string> ListOfInstalledPackages;
         for (auto i : m_listOfInstPackages)
         {
             ListOfInstalledPackages.insert(i.first);
@@ -48,10 +48,10 @@ namespace cards
     }
 
     /// Install a package list
-    void CClient::InstallPackages(const set<string>& pPackageList)
+    void CClient::InstallPackages(const std::set<std::string>& pPackageList)
     {
-        if (pPackageList.size()==0) return;
-        string message = _("sudo cards install");
+        if (pPackageList.size() == 0) return;
+        std::string message = _("sudo cards install");
         for (auto pack:pPackageList)
         {
             message += _(" ") + pack;
@@ -74,7 +74,7 @@ namespace cards
         {
             m_packageArchiveName = getPackageFileName(i.first);
             ArchiveUtils packageArchive(m_packageArchiveName.c_str());
-            string name = packageArchive.name();
+            std::string name = packageArchive.name();
             if ( checkPackageNameExist(name ))
             {
                 m_upgrade=1;
@@ -94,10 +94,10 @@ namespace cards
     }
 
     /// Remove a package list
-    void CClient::RemovePackages(const set<string>& pPackageList)
+    void CClient::RemovePackages(const std::set<std::string>& pPackageList)
     {
-        if (pPackageList.size()==0) return;
-        string message = _("sudo cards remove");
+        if (pPackageList.size() == 0) return;
+        std::string message = _("sudo cards remove");
         for (auto pack:pPackageList)
         {
             message += _(" ") + pack;
@@ -111,7 +111,7 @@ namespace cards
         buildCompleteDatabase(false);
 
         CClient Cards;
-        set<string> basePackagesList;
+        std::set<std::string> basePackagesList;
         Config config;
         Pkgrepo::parseConfig(Cards.m_configFileName.c_str(),config);
         for (auto it : config.baseDir)
@@ -127,7 +127,7 @@ namespace cards
                 m_actualError = PACKAGE_NOT_INSTALL;
                 treatErrors(pack);
             }
-            if (basePackagesList.find(pack)!=basePackagesList.end())
+            if (basePackagesList.find(pack) != basePackagesList.end())
 		continue;
             // Remove metadata about the package removed
             removePackageFilesRefsFromDB(pack);
@@ -226,7 +226,7 @@ namespace cards
     /// Remove an event suscriber from event callback list
     void CClient::unsubscribeFromEvents(CClientEvents* pCallBack)
     {
-        vector<CClientEvents*>::iterator it;
+        std::vector<CClientEvents*>::iterator it;
         it=find(m_arrCallback.begin(),m_arrCallback.end(),pCallBack);
         if (it != m_arrCallback.end())
         {

@@ -30,40 +30,35 @@
 
 namespace cards
 {
-    class CWrapper;
-    class CClient;
-
     class CPackage
     {
-        friend CWrapper;
-        friend CClient;
     public:
-        CPackage();
-        virtual ~CPackage(){}
-        std::string getCollection();
-        std::string getName();
-        std::string getVersion();
-        std::string getPackager();
-        std::string getDescription();
+		CPackage();
+		virtual ~CPackage(){}
+
+		std::string getCollection();
+		std::string getName();
+		std::string getVersion();
+		std::string getPackager();
+		std::string getDescription();
 
 		void setCollection(std::string t);
-        void setName(std::string t);
-        void setVersion(std::string t);
-        void setPackager(std::string t);
-        void setDescription(std::string t);
+		void setName(std::string t);
+		void setVersion(std::string t);
+		void setPackager(std::string t);
+		void setDescription(std::string t);
 
+		bool isInstalled();
+		bool isToBeInstalled();
+		bool isToBeRemoved();
+		void setStatus(CPSTATUS pstatus);
+		void unSetStatus(CPSTATUS pstatus);
+		CPSTATUS getStatus();
 
-        bool isInstalled();
-        bool isToBeInstalled();
-        bool isToBeRemoved();
-        void setStatus(CPSTATUS pstatus);
-        void unSetStatus(CPSTATUS pstatus);
-        CPSTATUS getStatus();
-
-    protected:
+    private:
 		pkginfo_t m_package;
-        std::string m_name;
-        CPSTATUS m_status;
+		std::string m_name;
+		CPSTATUS m_status;
     };
 }
 #endif

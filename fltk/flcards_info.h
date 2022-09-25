@@ -26,18 +26,17 @@
 #define FLCARDS_INFO_H_ 1
 
 #include <libcards.h>
+
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Progress.H>
 
-using namespace std;
-
 class Flcards_info : public Pkgdbh, public Pkgrepo {
 public:
-	Flcards_info (const string& configFile);
+	Flcards_info (const std::string& configFile);
 	~Flcards_info() {}
-	set<string> getListOfInstalledPackages();
-	set<string> getListOfAvailablePackages();
+	std::set<std::string> getListOfInstalledPackages();
+	std::set<std::string> getListOfAvailablePackages();
 
 protected:
 	void progressInfo();

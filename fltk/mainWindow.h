@@ -25,7 +25,16 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-//Global Includes
+// Project Includes
+#include "pixmaps/flcards.xpm"
+#include "table_package.h"
+#include "table_collection.h"
+#include "cards_wrapper.h"
+#include "progressbox.h"
+#include "cards_log.h"
+
+
+// Global Includes
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/fl_ask.H>
@@ -38,18 +47,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Check_Button.H>
-#include <string>
-#include <vector>
 
-//Project Includes
-#include "pixmaps/flcards.xpm"
-#include "table_package.h"
-#include "table_collection.h"
-#include "cards_wrapper.h"
-#include "progressbox.h"
-#include "cards_log.h"
-
-using namespace std;
 using namespace cards;
 
 
@@ -94,7 +92,7 @@ protected:
 //Cards Wrapper callbacks
     void OnSyncFinished(const CEH_RC rc);
     void OnJobListChange(const CEH_RC rc);
-    void OnLogMessage(const string& pMessage);
+    void OnLogMessage(const std::string& pMessage);
     void OnPackageInfo(CPackage& pPackage);
 
 private:
