@@ -2,7 +2,7 @@
  * cards_log.cxx
  *
  * Copyright 2018 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2018 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2018 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ namespace cards
 
     CLogger::CLogger()
     {
-        m_ThreadId = this_thread::get_id();
+        m_ThreadId = std::this_thread::get_id();
     }
 
     ///
@@ -65,7 +65,7 @@ namespace cards
         if (m_ptLogger!=nullptr)
         {
             m_ptLogger->m_ArrMutex.lock();
-            for (string str : m_ptLogger->m_ArrMessages)
+            for (std::string str : m_ptLogger->m_ArrMessages)
             {
                 m_ptLogger->sendToSubscribers(str);
             }
@@ -77,9 +77,9 @@ namespace cards
     ///
     /// Thread Safe Logging Message with Critical Level
     ///
-    void CLogger::log(const string& pMessage, CL_DEBUG_LEVEL pLevel)
+    void CLogger::log(const std::string& pMessage, CL_DEBUG_LEVEL pLevel)
     {
-        string PostMess;
+        std::string PostMess;
         switch (pLevel)
         {
             case LEVEL_DEBUG:
@@ -104,7 +104,7 @@ namespace cards
             }
         }
         PostMess += pMessage + '\n';
-        if (m_ThreadId == this_thread::get_id())
+        if (m_ThreadId == std::this_thread::get_id())
         {
             sendToSubscribers(PostMess);
         }
@@ -146,7 +146,7 @@ namespace cards
     ///
     ///
     ///
-    void CLogger::sendToSubscribers(const string& pMessage)
+    void CLogger::sendToSubscribers(const std::string& pMessage)
     {
         for (CEventHandler* it : m_ArrSubscribers)
         {

@@ -2,7 +2,7 @@
  * cards_log.h
  *
  * Copyright 2018 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2018 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2018 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,14 +25,13 @@
 #ifndef  CARDS_LOG_H
 #define  CARDS_LOG_H
 
-#include <string>
+#include "cards_event_handler.h"
+
 #include <algorithm>
 #include <sstream>
-#include <vector>
 #include <mutex>
 #include <thread>
 
-#include "cards_event_handler.h"
 
 #ifndef _
     #define _(T) std::string(T)
@@ -41,7 +40,6 @@
 
 namespace cards
 {
-    using namespace std;
     enum CL_DEBUG_LEVEL
     {
         LEVEL_INFO,
@@ -56,16 +54,16 @@ namespace cards
         CLogger();
         virtual ~CLogger(){}
         static CLogger* m_ptLogger;
-        vector<string> m_ArrMessages;
-        vector<CEventHandler*> m_ArrSubscribers;
-        mutex m_ArrMutex;
-        thread::id m_ThreadId;
-        void sendToSubscribers(const string& pMessage);
+        std::vector<std::string> m_ArrMessages;
+        std::vector<CEventHandler*> m_ArrSubscribers;
+        std::mutex m_ArrMutex;
+        std::thread::id m_ThreadId;
+        void sendToSubscribers(const std::string& pMessage);
 
     public:
         static CLogger* instance();
         static void kill();
-        void log ( const string& pMessage,
+        void log ( const std::string& pMessage,
             CL_DEBUG_LEVEL pLevel=LEVEL_INFO);
         static void loopCallback();
         void subscribe (CEventHandler* pSubscriber);

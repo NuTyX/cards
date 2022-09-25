@@ -2,7 +2,7 @@
  * cards_client.h
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,21 +83,21 @@ namespace cards
          *
          * \return string array contain installed package list
          */
-        set<string> ListOfInstalledPackages();
+        std::set<std::string> ListOfInstalledPackages();
 
         /**
          * \brief Install a package list
          *
          * Launch Cards Install process
          */
-        void InstallPackages(const set<string>& pPackageList);
+        void InstallPackages(const std::set<std::string>& pPackageList);
 
         /**
          * \brief Remove a package list
          *
          * Launch Cards Remove process
          */
-        void RemovePackages(const set<string>& pPackageList);
+        void RemovePackages(const std::set<std::string>& pPackageList);
             /**
          * \brief Suscribe to CARDS events
          *
@@ -116,9 +116,9 @@ namespace cards
         void progressInfo();
 
     private:
-        CLogger* _log;
+        CLogger* m_log;
         void getLocalePackagesList();
-        vector<CClientEvents*> _arrCallback;
+        std::vector<CClientEvents*> m_arrCallback;
     };
 }
 #endif // CARDS_WRAPPER_H

@@ -2,7 +2,7 @@
  * cards_client.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ namespace cards
         : Pkginst("","/etc/cards.conf")
     {
         m_root="/";
-        _log = CLogger::instance();
+        m_log = CLogger::instance();
     }
 
     /// Get a string list of installed packages
@@ -56,14 +56,14 @@ namespace cards
         {
             message += _(" ") + pack;
         }
-        _log->log(message);
+        m_log->log(message);
         // Get the list of installed packages
         getListOfPackageNames(m_root);
 
         // Retrieve info about all the packages
         buildCompleteDatabase(false);
 
-        _log->log(_("Resolve package dependencies..."));
+        m_log->log(_("Resolve package dependencies..."));
         for (auto pack:pPackageList)
         {
             m_packageName = pack;
@@ -102,7 +102,7 @@ namespace cards
         {
             message += _(" ") + pack;
         }
-        _log->log(message);
+        m_log->log(message);
 
         Db_lock lock(m_root, true);
         // Get the list of installed packages
@@ -210,7 +210,7 @@ namespace cards
 				break;
 			}
         }
-        for (CClientEvents* it : _arrCallback)
+        for (CClientEvents* it : m_arrCallback)
         {
             it->OnProgressInfo(Value);
         }
@@ -220,17 +220,17 @@ namespace cards
     void CClient::subscribeToEvents(CClientEvents* pCallBack)
     {
         // Todo : Check if the new susciber is already in the container
-        _arrCallback.push_back(pCallBack);
+        m_arrCallback.push_back(pCallBack);
     }
 
     /// Remove an event suscriber from event callback list
     void CClient::unsubscribeFromEvents(CClientEvents* pCallBack)
     {
         vector<CClientEvents*>::iterator it;
-        it=find(_arrCallback.begin(),_arrCallback.end(),pCallBack);
-        if (it!=_arrCallback.end())
+        it=find(m_arrCallback.begin(),m_arrCallback.end(),pCallBack);
+        if (it != m_arrCallback.end())
         {
-            _arrCallback.erase(it);
+            m_arrCallback.erase(it);
         }
     }
 }

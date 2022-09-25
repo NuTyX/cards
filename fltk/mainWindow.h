@@ -2,7 +2,7 @@
  * mainWindow.h
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -99,22 +99,22 @@ protected:
 
 private:
     void SaveConfig();
-    TableBase* _tablePackages;
-    TableBase* _tableCollections;
+    TableBase* m_tablePackages;
+    TableBase* m_tableCollections;
     //PackList* _packList;
-    Fl_Input* _search;
-    Fl_Text_Display* _console;
-    Fl_Text_Display* _info;
-    Fl_Text_Buffer * _consoleBuff;
-    Fl_Text_Buffer * _infoBuff;
-    Fl_Button* _btnSync;
-    Fl_Button* _btnApply;
-    Fl_Group* _grpPackage;
-    Fl_Group* _grpCollection;
-    Fl_Tabs* _tabs;
-    CWrapper* _cards;
-    Fl_Preferences* _config;
-    CLogger* _log;
+    Fl_Input* m_search;
+    Fl_Text_Display* m_console;
+    Fl_Text_Display* m_info;
+    Fl_Text_Buffer * m_consoleBuff;
+    Fl_Text_Buffer * m_infoBuff;
+    Fl_Button* m_btnSync;
+    Fl_Button* m_btnApply;
+    Fl_Group* m_grpPackage;
+    Fl_Group* m_grpCollection;
+    Fl_Tabs* m_tabs;
+    CWrapper* m_cards;
+    Fl_Preferences* m_config;
+    CLogger* m_log;
 };
 
 #endif // MAINWINDOW_H

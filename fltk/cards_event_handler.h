@@ -2,7 +2,7 @@
  * cards_event_handler.h
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,19 +25,15 @@
 #ifndef  CARDS_EVENT_HANDLER_H
 #define  CARDS_EVENT_HANDLER_H
 
-#include <cstddef>
-#include <string>
-#include <set>
+#include "cards_package.h"
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/fl_ask.H>
 
-#include "cards_package.h"
 
 namespace cards
 {
-    using namespace std;
 
     enum CEH_RC
     {
@@ -66,7 +62,7 @@ namespace cards
         friend CLogger;
     protected:
 
-        virtual void OnLogMessage (const string& Message){} //NOP method like
+        virtual void OnLogMessage (const std::string& Message){} //NOP method like
         virtual void OnSyncFinished (const CEH_RC rc){}
         virtual void OnDoJobListFinished (const CEH_RC rc){}
         virtual void OnRefreshPackageFinished (const CEH_RC rc){}
@@ -75,7 +71,7 @@ namespace cards
         virtual void OnPackageInfo (CPackage& package){}
 
     public:
-        static	const string getReasonCodeString(const CEH_RC rc);
+        static	const std::string getReasonCodeString(const CEH_RC rc);
     };
 }
 #endif

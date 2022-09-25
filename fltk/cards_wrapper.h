@@ -2,7 +2,7 @@
  * cards_wrapper.h
  *
  * Copyright 2017 Gianni Peschiutta <artmia@nutyx.org>
- * Copyright 2017 - 2021 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,12 +144,12 @@ namespace cards
      */
         ~CWrapper();
 
-        static	CWrapper*	_ptCWrapper; //Static pointer of the singleton
+        static	CWrapper*	m_ptCWrapper; //Static pointer of the singleton
 
         /// Containers
-        vector<CEventHandler*> _arrEventHandler; // Std array to store callback event clients
-        vector<CPackage*> _arrPackages;
-        vector<CPackage*> _arrJobList;
+        vector<CEventHandler*> m_arrEventHandler; // Std array to store callback event clients
+        vector<CPackage*> m_arrPackages;
+        vector<CPackage*> m_arrJobList;
         std::set<std::string> m_arrSets;
 
         /// Threaded Tasks
@@ -159,7 +159,7 @@ namespace cards
         void m_GetPackageInfo_Thread(string pName);
 
         /// Utils
-        CLogger* _log;
+        CLogger* m_log;
 
         /// CallBack
         void m_OnSyncFinished_Callback(const CEH_RC rc); // Callback broadcast for Sync Cards operation
@@ -167,8 +167,8 @@ namespace cards
         void m_OnRefreshPackageFinished_Callback(const CEH_RC rc);
         void m_OnJobListChanged_Callback(const CEH_RC rc);
 
-        bool _job_running; //Flag to know if a thread is currently running
-        thread* _job; // Thread handler pointer
+        bool m_job_running; //Flag to know if a thread is currently running
+        thread* m_job; // Thread handler pointer
 
         bool m_checkRootAccess(); // Just check if we have root accessing
         bool m_IsThreadFree();

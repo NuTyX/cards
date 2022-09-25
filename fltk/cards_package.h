@@ -2,7 +2,7 @@
  * cards_package.h
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2021 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +25,8 @@
 #ifndef  CARDS_PACKAGE_H
 #define  CARDS_PACKAGE_H
 
-#include <cstddef>
-#include <string>
 #include <libcards.h>
 
-using namespace std;
 
 namespace cards
 {
@@ -43,11 +40,18 @@ namespace cards
     public:
         CPackage();
         virtual ~CPackage(){}
-        string getSet();
-        string getName();
-        string getVersion();
-        string getPackager();
-        string getDescription();
+        std::string getCollection();
+        std::string getName();
+        std::string getVersion();
+        std::string getPackager();
+        std::string getDescription();
+
+		void setCollection(std::string t);
+        void setName(std::string t);
+        void setVersion(std::string t);
+        void setPackager(std::string t);
+        void setDescription(std::string t);
+
 
         bool isInstalled();
         bool isToBeInstalled();
@@ -57,13 +61,9 @@ namespace cards
         CPSTATUS getStatus();
 
     protected:
-        string _set;
-        string _name;
-        string _version;
-        string _packager;
-        string _description;
-
-        CPSTATUS _status;
+		pkginfo_t m_package;
+        std::string m_name;
+        CPSTATUS m_status;
     };
 }
 #endif

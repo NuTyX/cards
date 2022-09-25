@@ -3,7 +3,7 @@
  *
  * Copyright 2015 - 2018 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 - 2018 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2018 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2018 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,23 +27,23 @@
 
 SortColumn::SortColumn (int col, int reverse)
 {
-    _col = col;
-    _reverse= reverse;
+    m_col = col;
+    m_reverse= reverse;
 }
 
 bool SortColumn::operator() (const Row &a, const Row &b)
 {
-    const char *ap = ( _col < (int)a.cols.size() ) ? a.cols[_col].c_str() : "",
-    *bp = ( _col < (int)b.cols.size() ) ? b.cols[_col].c_str() : "";
+    const char *ap = ( m_col < (int)a.cols.size() ) ? a.cols[m_col].c_str() : "",
+    *bp = ( m_col < (int)b.cols.size() ) ? b.cols[m_col].c_str() : "";
     if ( isdigit(*ap) && isdigit(*bp) )
     {
         int av=0; sscanf(ap, "%d", &av);
         int bv=0; sscanf(bp, "%d", &bv);
-        return( _reverse ? av < bv : bv < av );
+        return( m_reverse ? av < bv : bv < av );
     }
     else
     {
-        return( _reverse ? strcmp(ap, bp) > 0 : strcmp(ap, bp) < 0 );
+        return( m_reverse ? strcmp(ap, bp) > 0 : strcmp(ap, bp) < 0 );
     }
 }
 
@@ -53,8 +53,8 @@ TableBase::TableBase(int x, int y, int w, int h, const char *l)
     : Fl_Table_Row(x,y,w,h,l)
 {
     type(SELECT_SINGLE);
-    _sort_reverse = 0;
-    _sort_lastcol = -1;
+    m_sort_reverse = 0;
+    m_sort_lastcol = -1;
     end();
     callback(event_callback, reinterpret_cast<void*>(this));
     selection_color(FL_YELLOW);
@@ -68,15 +68,15 @@ TableBase::TableBase(int x, int y, int w, int h, const char *l)
     tooltip("Click on the header of the column to sort it");
     color(FL_WHITE);
     selection_color(FL_YELLOW);
-    _cards=CWrapper::instance();
-    _cards->subscribeToEvents(this);
+    m_cards=CWrapper::instance();
+    m_cards->subscribeToEvents(this);
     resizable (this);
 }
 
 /// Sort a column up or down
 void TableBase::sort_column(int col, int reverse)
 {
-    sort(_rowdata.begin(), _rowdata.end(), SortColumn(col, reverse));
+    sort(m_rowdata.begin(), m_rowdata.end(), SortColumn(col, reverse));
     redraw();
 }
 
@@ -88,7 +88,7 @@ void TableBase::draw_sort_arrow(int X, int Y, int W, int H)
     int xrit = X+(W-6)-0;
     int ytop = Y+(H/2)-4;
     int ybot = Y+(H/2)+4;
-    if ( _sort_reverse )
+    if ( m_sort_reverse )
     {
         // Engraved down arrow
         fl_color(FL_WHITE);
@@ -122,7 +122,7 @@ void TableBase::draw_cell(TableContext context, int R, int C, int X, int Y, int 
                     fl_font(FL_HELVETICA_BOLD, 16);
                     fl_color(FL_BLACK);
                     fl_draw(colTitle[C].c_str(), X+2,Y,W,H, FL_ALIGN_CENTER, 0, 0); // +2=pad left
-                    if ( C == _sort_lastcol )
+                    if ( C == m_sort_lastcol )
                     {
                         draw_sort_arrow(X,Y,W,H);
                     }
@@ -148,7 +148,7 @@ void TableBase::autowidth(int pad)
 	int w3 = 100;
 	int w4 = 80;
 	int w5 = 80;
-    for (auto r : _rowdata)
+    for (auto r : m_rowdata)
     {
 		n++;
         int w,h;
@@ -225,16 +225,16 @@ void TableBase::event_callback2()
         {              // someone clicked on column header
             if ( Fl::event() == FL_RELEASE && Fl::event_button() == 1 )
             {
-                        if ( _sort_lastcol == COL )
+                        if ( m_sort_lastcol == COL )
                 {// Click same column? Toggle sort
-                    _sort_reverse ^= 1;
+                    m_sort_reverse ^= 1;
                         }
                 else
                 {// Click diff column? Up sort
-                    _sort_reverse = 0;
+                    m_sort_reverse = 0;
                 }
-                sort_column(COL, _sort_reverse);
-                _sort_lastcol = COL;
+                sort_column(COL, m_sort_reverse);
+                m_sort_lastcol = COL;
             }
             break;
         }
@@ -245,7 +245,7 @@ void TableBase::event_callback2()
 /// Redefine filter and refresh the tab
 void TableBase::setFilter(const string& pValue)
 {
-    _filter=pValue;
+    m_filter=pValue;
     refresh_table();
 }
 

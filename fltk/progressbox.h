@@ -2,7 +2,7 @@
  * progressbox.h
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,11 @@
 #ifndef PROGRESSBOX_H
 #define PROGRESSBOX_H
 
+#include "cards_wrapper.h"
+
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Progress.H>
-#include "cards_wrapper.h"
 
 using namespace cards;
 
@@ -44,9 +45,9 @@ protected:
     void OnFileDownloadProgressInfo(FileDownloadState state);
 static void Callback(Fl_Widget*,void* pInstance);
 private:
-    Fl_Progress* _jobProgress;
-    Fl_Progress* _fileProgress;
-    CWrapper* _cards;
+    Fl_Progress* m_jobProgress;
+    Fl_Progress* m_fileProgress;
+    CWrapper* m_cards;
 };
 
 #endif

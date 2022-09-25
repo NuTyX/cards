@@ -2,7 +2,7 @@
  * cards_package.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2021  Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022  Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,62 +29,82 @@ namespace cards
     /// Constructor
     CPackage::CPackage()
     {
-        _status = (CPSTATUS) 0;
+        m_status = (CPSTATUS) 0;
     }
+    void CPackage::setCollection(std::string t)
+    {
+		m_package.collection=t;
+	}
+    void CPackage::setName(std::string t)
+    {
+		m_name=t;
+	}
+    void CPackage::setDescription(std::string t)
+    {
+		m_package.description=t;
+	}
+    void CPackage::setVersion(std::string t)
+    {
+		m_package.version=t;
+	}
+    void CPackage::setPackager(std::string t)
+    {
+		m_package.packager=t;
+	}
 
     /// Return
-    string CPackage::getSet()
+    std::string CPackage::getCollection()
     {
-        return _set;
+        return m_package.collection;
     }
 
-    string CPackage::getName()
+    std::string CPackage::getName()
     {
-        return _name;
+        return m_name;
     }
 
-    string CPackage::getVersion()
+    std::string CPackage::getVersion()
     {
-        return _version;
+        return m_package.version;
     }
 
-    string CPackage::getPackager()
+    std::string CPackage::getPackager()
     {
-        return _packager;
+        return m_package.packager;
     }
 
-    string CPackage::getDescription()
+    std::string CPackage::getDescription()
     {
-        return _description;
+        return m_package.description;
     }
 
     bool CPackage::isInstalled()
     {
-        return _status & CPSTATUS::INSTALLED;
+        return m_status & CPSTATUS::INSTALLED;
     }
 
     bool CPackage::isToBeInstalled()
     {
-        return _status & CPSTATUS::TO_INSTALL;
+        return m_status & CPSTATUS::TO_INSTALL;
     }
 
     bool CPackage::isToBeRemoved()
     {
-        return _status & CPSTATUS::TO_REMOVE;
+        return m_status & CPSTATUS::TO_REMOVE;
     }
 
     void CPackage::setStatus(CPSTATUS pstatus)
     {
-        _status = (CPSTATUS)(_status | pstatus);
+        m_status = (CPSTATUS)(m_status | pstatus);
     }
 
     void CPackage::unSetStatus(CPSTATUS pstatus)
     {
-        _status = (CPSTATUS)(_status & (~pstatus));
+        m_status = (CPSTATUS)(m_status & (~pstatus));
     }
 
     CPSTATUS CPackage::getStatus()
     {
-        return _status;
+        return m_status;
     }
 }

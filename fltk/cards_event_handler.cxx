@@ -2,7 +2,7 @@
  * cards_event_handler.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 namespace cards
 {
     /// Convert Reason Code Enum to human readable text
-    const string CEventHandler::getReasonCodeString(const CEH_RC rc)
+    const std::string CEventHandler::getReasonCodeString(const CEH_RC rc)
     {
         switch (rc)
         {

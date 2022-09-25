@@ -2,7 +2,7 @@
  * mainWindow.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2021 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,60 +29,60 @@
 mainWindow::mainWindow(bool pInstaller) :
     Fl_Double_Window(900,900,APP_NAME_VERSION_STR)
 {
-    _log = CLogger::instance();
-    _log->subscribe(this);
+    m_log = CLogger::instance();
+    m_log->subscribe(this);
     icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
     size_range(700,500,0,0);
-    _config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
-    _search = new Fl_Input(MARGIN+560, MARGIN+5, 300, 30, "Search...");
-    _search->labelfont(2);
-    _search->color(FL_WHITE);
-    _search->callback(&onWindowEvent,SEARCH_CHANGE);
-    _search->when(FL_WHEN_CHANGED);
+    m_config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
+    m_search = new Fl_Input(MARGIN+560, MARGIN+5, 300, 30, "Search...");
+    m_search->labelfont(2);
+    m_search->color(FL_WHITE);
+    m_search->callback(&onWindowEvent,SEARCH_CHANGE);
+    m_search->when(FL_WHEN_CHANGED);
 
-    _console = new Fl_Text_Display(MARGIN, 700, w()-MARGIN*2, 200-MARGIN, "Cards operation");
-    _consoleBuff = new Fl_Text_Buffer();
-    _console->buffer(_consoleBuff);
-    _console->color(FL_GRAY);
-    _console->textcolor(FL_BLACK);
-    _console->labeltype(FL_NO_LABEL );
+    m_console = new Fl_Text_Display(MARGIN, 700, w()-MARGIN*2, 200-MARGIN, "Cards operation");
+    m_consoleBuff = new Fl_Text_Buffer();
+    m_console->buffer(m_consoleBuff);
+    m_console->color(FL_GRAY);
+    m_console->textcolor(FL_BLACK);
+    m_console->labeltype(FL_NO_LABEL );
 
     //Creation of the Sync Button
-    _btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
-    _btnSync->callback(&onWindowEvent,BTN_SYNC);
+    m_btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
+    m_btnSync->callback(&onWindowEvent,BTN_SYNC);
 
     //Creation of the Apply Button
-    _btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
-    _btnApply->deactivate(); // Disabled by default until a modification is pending
-    _btnApply->callback(&onWindowEvent,BTN_APPLY);
+    m_btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Apply");
+    m_btnApply->deactivate(); // Disabled by default until a modification is pending
+    m_btnApply->callback(&onWindowEvent,BTN_APPLY);
 
 
     //Default Tab size and position
     int TabLeftCoord = MARGIN;
     int TabWidth = w()-300-MARGIN*3;
 
-    _tabs = new Fl_Tabs(TabLeftCoord,MARGIN +50 , TabWidth,h()-325);
+    m_tabs = new Fl_Tabs(TabLeftCoord,MARGIN +50 , TabWidth,h()-325);
     {
-        _grpPackage = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"All Packages");
+        m_grpPackage = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"All Packages");
         {
-            _tablePackages = reinterpret_cast<TableBase*>(new TablePackage(TabLeftCoord, MARGIN+80, TabWidth, h()-330));
-            resizable(_tablePackages);
+            m_tablePackages = reinterpret_cast<TableBase*>(new TablePackage(TabLeftCoord, MARGIN+80, TabWidth, h()-330));
+            resizable(m_tablePackages);
         }
-        _grpPackage->end();
-        _grpCollection = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Set of Packages");
+        m_grpPackage->end();
+        m_grpCollection = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Set of Packages");
         {
-            _tableCollections = reinterpret_cast<TableBase*>(new TableCollection(TabLeftCoord, MARGIN+80, TabWidth, h()-330));
-            resizable (_tableCollections);
+            m_tableCollections = reinterpret_cast<TableBase*>(new TableCollection(TabLeftCoord, MARGIN+80, TabWidth, h()-330));
+            resizable (m_tableCollections);
         }
-        _grpCollection->end();
-        if (pInstaller) _tabs->value(_grpCollection);
+        m_grpCollection->end();
+        if (pInstaller) m_tabs->value(m_grpCollection);
     }
-    _tabs->end();
-    _info = new Fl_Text_Display (TabLeftCoord + TabWidth+MARGIN,MARGIN +80 , 300,h()-325,"Package Information");
-    _infoBuff = new Fl_Text_Buffer();
-    _info->buffer(_infoBuff);
-    _cards = CWrapper::instance();
-    _cards->subscribeToEvents(this);
+    m_tabs->end();
+    m_info = new Fl_Text_Display (TabLeftCoord + TabWidth+MARGIN,MARGIN +80 , 300,h()-325,"Package Information");
+    m_infoBuff = new Fl_Text_Buffer();
+    m_info->buffer(m_infoBuff);
+    m_cards = CWrapper::instance();
+    m_cards->subscribeToEvents(this);
     //_log->log(_("FlCards use ") + _cards->getCardsVersion());
     this->callback(&onWindowEvent,EVT_EXIT);
 }
@@ -90,20 +90,20 @@ mainWindow::mainWindow(bool pInstaller) :
 // Main window destructor
 mainWindow::~mainWindow()
 {
-    _cards->unsubscribeFromEvents(this);
-    _cards->kill();
+    m_cards->unsubscribeFromEvents(this);
+    m_cards->kill();
 }
 
 // Preference File Loading and apply
 void mainWindow::LoadConfig()
 {
-    if (_config != nullptr)
+    if (m_config != nullptr)
     {
         int X,Y,H,W;
-        _config->get("MainWindowX",X,100);
-        _config->get("MainWindowY",Y,100);
-        _config->get("MainWindowH",H,700);
-        _config->get("MainWindowW",W,700);
+        m_config->get("MainWindowX",X,100);
+        m_config->get("MainWindowY",Y,100);
+        m_config->get("MainWindowH",H,700);
+        m_config->get("MainWindowW",W,700);
         resize(X,Y,W,H);
     }
 }
@@ -111,13 +111,13 @@ void mainWindow::LoadConfig()
 // Preference File Save and flush
 void mainWindow::SaveConfig()
 {
-    if (_config != nullptr)
+    if (m_config != nullptr)
     {
-        _config->set("MainWindowX",x_root());
-        _config->set("MainWindowY",y_root());
-        _config->set("MainWindowH",h());
-        _config->set("MainWindowW",w());
-        _config->flush();
+        m_config->set("MainWindowX",x_root());
+        m_config->set("MainWindowY",y_root());
+        m_config->set("MainWindowH",h());
+        m_config->set("MainWindowW",w());
+        m_config->flush();
     }
 }
 
@@ -151,9 +151,9 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
         }
         case SEARCH_CHANGE:
         {
-            win->_tablePackages->setFilter(string(win->_search->value()));
-            if (win->_tabs->value() != win->_grpPackage)
-                win->_tabs->value(win->_grpPackage);
+            win->m_tablePackages->setFilter(string(win->m_search->value()));
+            if (win->m_tabs->value() != win->m_grpPackage)
+                win->m_tabs->value(win->m_grpPackage);
             break;
         }
         case EVT_EXIT:
@@ -168,7 +168,7 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
         }
         default:
         {
-            win->_log->log(_("Unkown Event : ") + to_string(pID));
+            win->m_log->log(_("Unkown Event : ") + to_string(pID));
         }
     }
 }
@@ -177,9 +177,9 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 void mainWindow::OnLogMessage(const string& pMessage)
 {
     Fl::lock();
-    if (_consoleBuff!=nullptr) _consoleBuff->append(pMessage.c_str());
-    _console->insert_position(_console->buffer()->length());
-    _console->scroll(_console->count_lines(0,_console->buffer()->length(),1),0);
+    if (m_consoleBuff!=nullptr) m_consoleBuff->append(pMessage.c_str());
+    m_console->insert_position(m_console->buffer()->length());
+    m_console->scroll(m_console->count_lines(0,m_console->buffer()->length(),1),0);
     Fl::flush();
     Fl::unlock();
 }
@@ -188,7 +188,7 @@ void mainWindow::OnLogMessage(const string& pMessage)
 void mainWindow::OnSyncFinished(const CEH_RC rc)
 {
     Fl::lock();
-    _log->log( "Sync : " + CEventHandler::getReasonCodeString(rc));
+    m_log->log( "Sync : " + CEventHandler::getReasonCodeString(rc));
     if (rc==NO_ROOT)
     {
         fl_alert("Please launch this application with root privileges");
@@ -200,14 +200,14 @@ void mainWindow::OnSyncFinished(const CEH_RC rc)
 void mainWindow::OnJobListChange(const CEH_RC rc)
 {
     Fl::lock();
-    vector<CPackage*> jobList = _cards->getJobList();
+    vector<CPackage*> jobList = m_cards->getJobList();
     if (jobList.size() > 0)
     {
-        _btnApply->activate();
+        m_btnApply->activate();
     }
     else
     {
-        _btnApply->deactivate();
+        m_btnApply->deactivate();
     }
     Fl::flush();
     Fl::unlock();
@@ -216,18 +216,18 @@ void mainWindow::OnJobListChange(const CEH_RC rc)
 void mainWindow::OnPackageInfo(CPackage& pPackage)
 {
     Fl::lock();
-    if (_infoBuff!=nullptr)
+    if (m_infoBuff!=nullptr)
     {
-        _infoBuff->remove(0,_infoBuff->length());
+        m_infoBuff->remove(0,m_infoBuff->length());
         if (pPackage.getName()=="")
-            _infoBuff->append("No information available for this package");
+            m_infoBuff->append("No information available for this package");
         else
         {
-            _infoBuff->append(string(pPackage.getName()).c_str());
-            _infoBuff->append(string(" " + pPackage.getVersion()+"\n").c_str());
-            _infoBuff->append(string(pPackage.getDescription()+"\n").c_str());
-            _infoBuff->append(string("build by: " + pPackage.getPackager()+"\n").c_str());
-            _infoBuff->append(string("from     : " + pPackage.getSet()+" collection/set of packages").c_str());
+            m_infoBuff->append(string(pPackage.getName()).c_str());
+            m_infoBuff->append(string(" " + pPackage.getVersion()+"\n").c_str());
+            m_infoBuff->append(string(pPackage.getDescription()+"\n").c_str());
+            m_infoBuff->append(string("build by: " + pPackage.getPackager()+"\n").c_str());
+            m_infoBuff->append(string("from     : " + pPackage.getCollection()+" collection/set of packages").c_str());
         }
 
     }

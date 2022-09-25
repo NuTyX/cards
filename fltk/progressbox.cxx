@@ -2,7 +2,7 @@
  * progressbox.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,16 +23,17 @@
  */
 
 #include "progressbox.h"
+
 #include <FL/Fl_Output.H>
 
 ProgressBox::ProgressBox(CW_ACTIONS action) :
     Fl_Double_Window(300,100)
 {
     begin();
-    _jobProgress = nullptr;
-    _fileProgress = nullptr;
-    _cards = CWrapper::instance();
-    _cards->subscribeToEvents(this);
+    m_jobProgress = nullptr;
+    m_fileProgress = nullptr;
+    m_cards = CWrapper::instance();
+    m_cards->subscribeToEvents(this);
     switch (action)
     {
         case SYNC:
@@ -46,18 +47,18 @@ ProgressBox::ProgressBox(CW_ACTIONS action) :
         case DOJOB:
         {
             label("Package Install/Remove Job ...");
-            /*_jobProgress = new Fl_Progress(50,60,200,30);
-            _jobProgress->maximum(100.0);
-            _jobProgress->minimum(0.0);
-            _jobProgress->value(0.0);
-            _jobProgress->label("Job Progression");*/
-            _fileProgress = new Fl_Progress(50,35,200,30);
-            _fileProgress->maximum(100.0);
-            _fileProgress->minimum(0.0);
-            _fileProgress->value(0.0);
-            _fileProgress->label("Job Progression");
-            _fileProgress->align(FL_ALIGN_BOTTOM);
-            _fileProgress->color(FL_BLUE);
+            /*m_jobProgress = new Fl_Progress(50,60,200,30);
+            m_jobProgress->maximum(100.0);
+            m_jobProgress->minimum(0.0);
+            m_jobProgress->value(0.0);
+            m_jobProgress->label("Job Progression");*/
+            m_fileProgress = new Fl_Progress(50,35,200,30);
+            m_fileProgress->maximum(100.0);
+            m_fileProgress->minimum(0.0);
+            m_fileProgress->value(0.0);
+            m_fileProgress->label("Job Progression");
+            m_fileProgress->align(FL_ALIGN_BOTTOM);
+            m_fileProgress->color(FL_BLUE);
         }
     }
     this->callback(&Callback,(void*)this);
@@ -66,9 +67,9 @@ ProgressBox::ProgressBox(CW_ACTIONS action) :
 
 ProgressBox::~ProgressBox()
 {
-    _cards->unsubscribeFromEvents(this);
-    if (_fileProgress!= nullptr) delete _fileProgress;
-    //if (_jobProgress!= nullptr) delete _jobProgress;
+    m_cards->unsubscribeFromEvents(this);
+    if (m_fileProgress!= nullptr) delete m_fileProgress;
+    //if (m_jobProgress!= nullptr) delete m_jobProgress;
 }
 
 void ProgressBox::OnSyncFinished(const CEH_RC rc)
@@ -89,7 +90,7 @@ void ProgressBox::OnDoJobListFinished(const CEH_RC rc)
 void ProgressBox::OnProgressInfo(int percent)
 {
     Fl::lock();
-    _fileProgress->value((float)percent);
+    m_fileProgress->value((float)percent);
     Fl::flush();
     Fl::unlock();
 }
@@ -97,9 +98,9 @@ void ProgressBox::OnProgressInfo(int percent)
 void ProgressBox::OnFileDownloadProgressInfo(FileDownloadState state)
 {
     Fl::lock();
-    if (_fileProgress!=nullptr)
+    if (m_fileProgress!=nullptr)
     {
-        _fileProgress->value(state.dlnow/state.dltotal*100);
+        m_fileProgress->value(state.dlnow/state.dltotal*100);
     }
     Fl::flush();
     Fl::unlock();

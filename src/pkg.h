@@ -1,7 +1,7 @@
 /*
  * pkg.h
  *
- * Copyright 2017 - 2021 NuTyX <tnut@nutyx.org>
+ * Copyright 2017 - 2022 NuTyX <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@
 #define  PKG_H
 
 #include "string_utils.h"
-
-#include <string>
 
 enum CPSTATUS
 {

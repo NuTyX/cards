@@ -36,23 +36,23 @@ TablePackage::TablePackage(int x, int y, int w, int h, const char *l)
     colTitle.push_back("Description");
     colTitle.push_back("Set");
     colTitle.push_back("Packager");
-    _cards->refreshPackageList();
+    m_cards->refreshPackageList();
 }
 
 /// Refresh Table
 void TablePackage::refresh_table()
 {
     clear();
-    _rowdata.clear();
+    m_rowdata.clear();
     cols(4);
-    vector<CPackage*> pkgList = _cards->getPackageList();
+    vector<CPackage*> pkgList = m_cards->getPackageList();
     for (auto S : pkgList)
     {
-        if (_filter.length()>0)
-            if ((S->getName().find(_filter)==string::npos) &&
-                (S->getSet().find(_filter)==string::npos) &&
-                (S->getDescription().find(_filter)==string::npos) &&
-                (S->getVersion().find(_filter)==string::npos) ) continue;
+        if (m_filter.length()>0)
+            if ((S->getName().find(m_filter)==string::npos) &&
+                (S->getCollection().find(m_filter)==string::npos) &&
+                (S->getDescription().find(m_filter)==string::npos) &&
+                (S->getVersion().find(m_filter)==string::npos) ) continue;
         // Add a new row
         Row newrow;
         newrow.data=S;
@@ -64,13 +64,13 @@ void TablePackage::refresh_table()
         newrow.cols.push_back(S->getName());
         newrow.cols.push_back(S->getVersion());
         newrow.cols.push_back(S->getDescription());
-        newrow.cols.push_back(S->getSet());
+        newrow.cols.push_back(S->getCollection());
         newrow.cols.push_back(S->getPackager());
 
-        _rowdata.push_back(newrow);
+        m_rowdata.push_back(newrow);
     }
     // How many rows we loaded
-    rows((int)_rowdata.size());
+    rows((int)m_rowdata.size());
     // Auto-calculate widths, with 50 pixel as a start
     autowidth(50);
 }
@@ -78,8 +78,8 @@ void TablePackage::refresh_table()
 void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
     string s = "";
-    if ( (R < (int)_rowdata.size()) && (C < (int)_rowdata[R].cols.size()) )
-        s = _rowdata[R].cols[C];
+    if ( (R < (int)m_rowdata.size()) && (C < (int)m_rowdata[R].cols.size()) )
+        s = m_rowdata[R].cols[C];
     switch (context)
     {
         case CONTEXT_CELL:
@@ -96,9 +96,9 @@ void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, 
                     fl_color(FL_BLACK);
                     fl_draw(s.c_str(), X+2,Y,W,H, FL_ALIGN_LEFT);  //  +2= pad left
                 }
-                else if (_rowdata[R].data!=nullptr)
+                else if (m_rowdata[R].data!=nullptr)
                 {
-                    CPackage* pack=reinterpret_cast<CPackage*>(_rowdata[R].data);
+                    CPackage* pack=reinterpret_cast<CPackage*>(m_rowdata[R].data);
                     if (pack->isToBeInstalled())
                     {
                         fl_draw_pixmap(download_xpm,X+5,Y);
@@ -128,9 +128,9 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
     {
         case CONTEXT_CELL:
         {
-            if (_rowdata[pRow].data!=nullptr)
+            if (m_rowdata[pRow].data!=nullptr)
             {
-                CPackage* pack = reinterpret_cast<CPackage*>(_rowdata[pRow].data);
+                CPackage* pack = reinterpret_cast<CPackage*>(m_rowdata[pRow].data);
                 if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
                 {
                     Fl_Menu_Item rclick_menu[] = {
@@ -169,7 +169,7 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
                     else if ( strcmp(m->label(), "Install") == 0 )
                     {
                         pack->setStatus(TO_INSTALL);
-                        _cards->refreshJobList();
+                        m_cards->refreshJobList();
 #ifndef NDEBUG
                         cout << pack->getName() << " : " << (pack->isToBeInstalled() ? "To install" : "Nothing" ) << endl;
 #endif // NDEBUG
@@ -179,7 +179,7 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
                         if (pack->isInstalled())
                         {
                             pack->setStatus(TO_REMOVE);
-                            _cards->refreshJobList();
+                            m_cards->refreshJobList();
 #ifndef NDEBUG
                             cout << pack->getName() << " : " << (pack->isToBeRemoved() ? "To remove" : "Nothing" ) << endl;
 #endif // NDEBUG
@@ -189,10 +189,10 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
                     {
                         if (pack->isToBeInstalled()) pack->unSetStatus(TO_INSTALL);
                         if (pack->isToBeRemoved()) pack->unSetStatus(TO_REMOVE);
-                        _cards->refreshJobList();
+                        m_cards->refreshJobList();
                     }
                 }
-                _cards->getPackageInfo(pack->getName());
+                m_cards->getPackageInfo(pack->getName());
             }
             select_row(pRow);
             break;

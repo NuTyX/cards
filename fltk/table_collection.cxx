@@ -3,7 +3,7 @@
  *
  * Copyright 2015 - 2019 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2021 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ TableCollection::TableCollection(int x, int y, int w, int h, const char *l)
 void TableCollection::refresh_table()
 {
     clear();
-    _rowdata.clear();
+    m_rowdata.clear();
     cols(4);
     for (int i=0; i<6 ; i++)
     {
@@ -97,10 +97,10 @@ void TableCollection::refresh_table()
                 break;
             }
         }
-        _rowdata.push_back(newrow);
+        m_rowdata.push_back(newrow);
     }
     // How many rows we loaded
-    rows((int)_rowdata.size());
+    rows((int)m_rowdata.size());
     row_height_all(50);
     // Auto-calculate widths, with 20 pixel padding
     autowidth(20);
@@ -109,8 +109,8 @@ void TableCollection::refresh_table()
 void TableCollection::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
     string s = "";
-    if ( (R < (int)_rowdata.size()) && (C < (int)_rowdata[R].cols.size()) )
-        s = _rowdata[R].cols[C];
+    if ( (R < (int)m_rowdata.size()) && (C < (int)m_rowdata[R].cols.size()) )
+        s = m_rowdata[R].cols[C];
     switch (context)
     {
         case CONTEXT_CELL:
@@ -131,9 +131,9 @@ void TableCollection::OnDrawCell(TableContext context, int R, int C, int X, int 
                     case 1:
                     {
                         //Collection Icon
-                        if (_rowdata[R].data!=nullptr)
+                        if (m_rowdata[R].data!=nullptr)
                         {
-                            char* const* Icon = reinterpret_cast<char* const*>(_rowdata[R].data);
+                            char* const* Icon = reinterpret_cast<char* const*>(m_rowdata[R].data);
                             fl_draw_pixmap(Icon,X+5,Y);
                         }
                         break;
@@ -163,7 +163,7 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
         {
             if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
             {
-                string Collection = _rowdata[pRow].cols[1];
+                string Collection = m_rowdata[pRow].cols[1];
                 CWrapper* Cards = CWrapper::instance();
                 set<string> Collec_List;
                 if (Collection=="LXDE")
@@ -213,7 +213,7 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                     {
                         if ((!Package->isInstalled()))
                         {
-							if (Collec_List.count(Package->getSet()))
+							if (Collec_List.count(Package->getCollection()))
 								Package->setStatus(TO_INSTALL);
 							if (Collec_List.count(Package->getName()))
 								Package->setStatus(TO_INSTALL);
@@ -226,7 +226,7 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                     vector<CPackage*> Packages = Cards->getPackageList();
                     for (CPackage* Package : Packages)
                     {
-                        if (Package->isInstalled() && (Collec_List.count(Package->getSet())))
+                        if (Package->isInstalled() && (Collec_List.count(Package->getCollection())))
                         {
                             Package->setStatus(TO_REMOVE);
                         }

@@ -3,7 +3,7 @@
  *
  * Copyright 2015 - 2018 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 - 2018 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2018 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2018 - 2022 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ public:
 class SortColumn
 {
 private:
-    int _col, _reverse;
+    int m_col, m_reverse;
 
 public:
     SortColumn (int col, int reverse);
@@ -125,11 +125,11 @@ private:
     void event_callback2();
 
 protected:
-    string _filter;
-    vector<Row> _rowdata;
-    int _sort_reverse;
-    int _sort_lastcol;
-    CWrapper* _cards;
+    string m_filter;
+    vector<Row> m_rowdata;
+    int m_sort_reverse;
+    int m_sort_lastcol;
+    CWrapper* m_cards;
 };
 
 #endif
