@@ -272,7 +272,7 @@ umount_all() {
   for FOLDER in $MOUNT_POINTS ; do
     [ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ] || continue
     if mountpoint $ROOT/${VERSION}/${COLLECTION}/${FOLDER} > /dev/null;then
-      sudo umount $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+      sudo umount -R $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
     fi
     rm -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
   done
@@ -287,7 +287,7 @@ remove_all() {
   for i in run sys proc dev/pts dev/shm dev; do
     [ -d $ROOT/${1}/${i} ] || continue
     mountpoint $ROOT/${1}/${i} > /dev/null || continue
-    sudo umount $ROOT/${1}/${i} || exit 1
+    sudo umount -R $ROOT/${1}/${i} || exit 1
   done
   for FOLDER in $ROOT/${1}/* ; do
     [ -d ${FOLDER} ] || continue
