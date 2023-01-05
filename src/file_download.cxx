@@ -124,7 +124,7 @@ void FileDownload::downloadFile()
 	curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, m_slist);
 	curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, &FileDownload::writeToStreamHandle);
 	curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &m_destinationFile);
-	curl_easy_setopt(m_curl, CURLOPT_PROGRESSFUNCTION, &FileDownload::updateProgressHandle);
+	curl_easy_setopt(m_curl, CURLOPT_XFERINFOFUNCTION, &FileDownload::updateProgressHandle);
 	curl_easy_setopt(m_curl, CURLOPT_URL,m_url.c_str());
 	curl_easy_setopt(m_curl, CURLOPT_FOLLOWLOCATION,1L);
 	curl_easy_setopt(m_curl, CURLOPT_FAILONERROR,1L);
@@ -183,7 +183,7 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 	double TotalTime = 0;
 	double SpeedDownload = 0;
 
-	curl_easy_getinfo(curl,CURLINFO_SPEED_DOWNLOAD,&SpeedDownload);
+	curl_easy_getinfo(curl,CURLINFO_SPEED_DOWNLOAD_T,&SpeedDownload);
 	curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &TotalTime);
 
 	if ( ( dltotal == 0 ) ||
