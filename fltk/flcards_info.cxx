@@ -52,7 +52,7 @@ void Flcards_info::progressInfo()
 	}
 	Fl::check();
 }
-set<string> Flcards_info::getListOfInstalledPackages()
+std::set<std::string> Flcards_info::getListOfInstalledPackages()
 {
 	m_window = new Fl_Window(300,40,"Get List of Installed Packages");
 	m_progressBar = new Fl_Progress(10,10,280,20);
@@ -89,7 +89,7 @@ set<string> Flcards_info::getListOfInstalledPackages()
 return ListOfInstalledPackages;
 }
 
-set<string> Flcards_info::getListOfAvailablePackages()
+std::set<std::string> Flcards_info::getListOfAvailablePackages()
 {
 	m_window = new Fl_Window(300,40,"Get List of Available Packages");
 	m_progressBar = new Fl_Progress(10,10,280,20);
