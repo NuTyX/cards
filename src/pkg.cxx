@@ -37,27 +37,27 @@ Pkg::~Pkg()
 // Nothing for moment
 }
 // Sets
-void Pkg::setName(std::string& name)
+void Pkg::setName(const std::string& name)
 {
 	m_name = name;
 }
-void Pkg::setDescription(std::string& description)
+void Pkg::setDescription(const std::string& description)
 {
 	m_description = description;
 }
-void Pkg::setVersion(std::string& version)
+void Pkg::setVersion(const std::string& version)
 {
 	m_version = version;
 }
-void Pkg::setCollection(std::string& collection)
+void Pkg::setCollection(const std::string& collection)
 {
 	m_collection = collection;
 }
-void Pkg::setSet(std::string& set)
+void Pkg::setSet(const std::string& set)
 {
 	m_set = set;
 }
-void Pkg::setPackager(std::string& packager)
+void Pkg::setPackager(const std::string& packager)
 {
 	m_packager = packager;
 }

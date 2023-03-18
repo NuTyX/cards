@@ -147,9 +147,9 @@ class FileDownload
 	 */
 	void downloadFile();
 
-	static int updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
+	static int updateProgressHandle(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 	static size_t writeToStreamHandle(void *buffer, size_t size, size_t nmemb, void *stream);
-	int updateProgress(void *p, double dltotal, double dlnow, double ultotal, double ulnow);
+	int updateProgress(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
 	size_t writeToStream(void *buffer, size_t size, size_t nmemb, void *stream);
 	void initFileToDownload(std::string _url, std::string _file);
 

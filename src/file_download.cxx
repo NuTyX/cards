@@ -176,12 +176,12 @@ size_t FileDownload::writeToStream(void *buffer, size_t size, size_t nmemb, void
 	}
 	return fwrite(buffer,size,nmemb,outputf->stream);
 }
-int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
+int FileDownload::updateProgress(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
 {
 	struct dwlProgress *CurrentProgress = (struct dwlProgress *)p;
 	CURL *curl = CurrentProgress->curl;
 	double TotalTime = 0;
-	double SpeedDownload = 0;
+	curl_off_t SpeedDownload = 0;
 
 	curl_easy_getinfo(curl,CURLINFO_SPEED_DOWNLOAD_T,&SpeedDownload);
 	curl_easy_getinfo(curl, CURLINFO_TOTAL_TIME, &TotalTime);
@@ -192,17 +192,19 @@ int FileDownload::updateProgress(void *p, double dltotal, double dlnow, double u
 
 	fprintf(stderr,"\r  %s   %sB (%sB/s) %d %% - %d s ",
 	CurrentProgress->name.c_str(),
-	(sizeHumanRead((int)dlnow)).c_str(), (sizeHumanRead((int)SpeedDownload)).c_str(),
-	(int)((dlnow/dltotal) * 100 ), (int)((dltotal - dlnow)/SpeedDownload) );
+	sizeHumanRead(static_cast<int>(dlnow)).c_str(),
+	sizeHumanRead(static_cast<int>(SpeedDownload)).c_str(),
+	static_cast<int>(static_cast<double>(dlnow)/static_cast<double>(dltotal) * 100 ),
+	static_cast<int>((dltotal - dlnow)/SpeedDownload));
 	FileDownloadState state;
-	state.dlnow = dlnow;
-	state.dltotal = dltotal;
-	state.dlspeed = SpeedDownload;
+	state.dlnow = static_cast<double>(dlnow);
+	state.dltotal = static_cast<double>(dltotal);
+	state.dlspeed = static_cast<double>(SpeedDownload);
 	//state.filename = m_packageName;
 	SendProgressEvent(state);
 	return 0;
 }
-int FileDownload::updateProgressHandle(void *p, double dltotal, double dlnow, double ultotal, double ulnow)
+int FileDownload::updateProgressHandle(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
 {
 	return static_cast<FileDownload*>(p)->updateProgress(p,dltotal,dlnow,ultotal,ulnow);
 }

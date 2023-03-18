@@ -46,12 +46,12 @@ public:
 	std::string getCollection();
 	std::vector<std::string> getSet();
 	std::string getPrimarySet();
-	void setName(std::string& name);
-	void setDescription(std::string& description);
-	void setVersion(std::string& version);
-	void setCollection(std::string& collection);
-	void setSet(std::string& set);
-	void setPackager(std::string& packager);
+	void setName(const std::string& name);
+	void setDescription(const std::string& description);
+	void setVersion(const std::string& version);
+	void setCollection(const std::string& collection);
+	void setSet(const std::string& set);
+	void setPackager(const std::string& packager);
 	bool isInstalled();
 	bool isToBeInstalled();
 	bool isToBeRemoved();
