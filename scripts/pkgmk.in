@@ -1,25 +1,7 @@
 #!/bin/bash
-#
-#  cards
-# 
 #  Copyright (c) 2000 - 2005 Per Liden
 #  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
-#  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
-#  USA.
-#
+#  Copyright (c) 2013 - 2023 by NuTyX team (http://nutyx.org)
 
 ##
 # error codes
@@ -250,164 +232,69 @@ check_file() {
 		exit $E_GENERAL
 	fi
 }
-test_download_file_with_curl() {
-	if [ ! "$(type -p curl)" ]; then
-		error "Command 'curl' not found."
-		exit $E_GENERAL
-	fi
-	DOWNLOAD_OPTS="--ftp-pasv --retry 3 --retry-delay 3 \
-	-R --head --silent --output /dev/null --fail"
-
-	error=$E_DOWNLOAD
-
-	curl $DOWNLOAD_OPTS $2
-	error=$?
-	if [ $error != 0 ]; then
-		error "Downloading '$2' failed."
-		return $E_DOWNLOAD
-	fi
-	return 0
-}
-download_file_with_curl() {
-	if [ ! "$(type -p curl)" ]; then
-		error "Command 'curl' not found."
-		exit $E_GENERAL
-	fi
-	DOWNLOAD_OPTS="--ftp-pasv --retry 3 --retry-delay 3 \
-	-R -o $1 --fail -#"
-
-	error=1
-
-	curl $DOWNLOAD_OPTS $2
-	error=$?
-	if [ $error != 0 ]; then
-		error "Downloading '$2' failed."
-		exit $E_DOWNLOAD
-	fi
-}
-test_download_file() {
-	tdf_error=$E_DOWNLOAD
-	all_good=$E_DOWNLOAD
-	LOCAL_FILENAME="$(get_filename $FILE)"
-
-	if [ ! "$(type -p wget)" ]; then
-		test_download_file_with_curl $LOCAL_FILENAME $1
-		tdf_error=$?
-		if [ $tdf_error == 0 ]; then
-			all_good=0
-			break
-		fi
-	else
-		DOWNLOAD_OPTS="-q --spider --no-check-certificate"
-	
-		BASENAME="${1/*\//}"
-		for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
-			REPO="$(echo $REPO | sed 's|/$||')"
-			wget $DOWNLOAD_OPTS $REPO/$BASENAME
-			tdf_error=$?
-			debug "test_download_file: 1 tdf_error: $tdf_error while retrieving: $REPO/$BASENAME"
-			if [ $tdf_error == 0 ]; then
-				all_good=0
-				break
-			fi
-		done
-
-		debug "test_download_file: 2 tdf_error: $tdf_error"
-		if [ $tdf_error != 0 ]; then
-			wget $DOWNLOAD_OPTS $FILE
-			tdf_error=$?
-			debug "test_download_file: 3 tdf_error: $tdf_error"
-			if [ $tdf_error == 0 ]; then
-				all_good=0
-			fi
-		fi
-		
-		debug "test_download_file: 4 all_good: $all_good"
-	
-		return $all_good
-	
-	fi
-}
 download_file() {
 	info "Downloading '$1'."
 
+	PKGMK_DOWNLOAD_PROG=${PKGMK_DOWNLOAD_PROG:-curl}
+	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then
+		error "Command '${PKGMK_DOWNLOAD_PROG}' not found."
+		exit $E_GENERAL
+	fi
+
 	LOCAL_FILENAME="$(get_filename $FILE)"
+	LOCAL_FILENAME_PARTIAL="$LOCAL_FILENAME.partial"
 
-	if [ ! "$(type -p wget)" ]; then
-		warning "Command 'wget' not found."
-		info "You should install 'wget' as soon as possible, trying with curl ..."
-		download_file_with_curl $LOCAL_FILENAME $1
-	else
-		LOCAL_FILENAME_PARTIAL="$LOCAL_FILENAME.partial"
-		DOWNLOAD_OPTS="--passive-ftp --no-directories --tries=3 --waitretry=3 \
-		--directory-prefix=$PKGMK_SOURCE_DIR \
-		--output-document=$LOCAL_FILENAME_PARTIAL --no-check-certificate"
-
-		if [ -f "$LOCAL_FILENAME_PARTIAL" ]; then
-			info "Partial download found, trying to resume"
+	case ${PKGMK_DOWNLOAD_PROG} in
+		curl)
+			RESUME_CMD="-C -"
+			DOWNLOAD_OPTS="-L --fail --ftp-pasv --retry 3 --retry-delay 3 \
+			-o $LOCAL_FILENAME_PARTIAL $PKGMK_CURL_OPTS"
+			;;
+		wget)
 			RESUME_CMD="-c"
+			DOWNLOAD_OPTS="--compression=none --passive-ftp --no-directories --tries=3 --waitretry=3 \
+			--directory-prefix=$PKGMK_SOURCE_DIR \
+			--output-document=$LOCAL_FILENAME_PARTIAL $PKGMK_WGET_OPTS"
+			;;
+	esac
+
+	if [ -f "$LOCAL_FILENAME_PARTIAL" ]; then
+		info "Partial download found, trying to resume"
+		RESUME_CMD="-c"
+	fi
+
+	error=1
+
+	BASENAME="${1/*\//}"
+	for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
+		REPO="$(echo $REPO | sed 's|/$||')"
+		$PKGMK_DOWNLOAD_PROG $DOWNLOAD_OPTS $RESUME_OPTS $REPO/$BASENAME
+		error=$?
+		if [ $error == 0 ]; then
+			break
 		fi
+	done
 
-		error=1
-
-		BASENAME="${1/*\//}"
-		for REPO in ${PKGMK_SOURCE_MIRRORS[@]}; do
-			REPO="$(echo $REPO | sed 's|/$||')"
-			wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $REPO/$BASENAME
+	if [ $error != 0 ]; then
+		while true; do
+			$PKGMK_DOWNLOAD_PROG $DOWNLOAD_OPTS $RESUME_OPTS $1
 			error=$?
-			if [ $error == 0 ]; then
+			if [ $error != 0 ] && [ "$RESUME_OPTS" ]; then
+				info "Partial download failed, restarting"
+				rm -f "$LOCAL_FILENAME_PARTIAL"
+				RESUME_OPTS=""
+			else
 				break
 			fi
 		done
+	fi
 
-		if [ $error != 0 ]; then
-			while true; do
-				wget $RESUME_CMD $DOWNLOAD_OPTS $PKGMK_WGET_OPTS $1
-				error=$?
-				if [ $error != 0 ] && [ "$RESUME_CMD" ]; then
-					info "Partial download failed, restarting"
-					rm -f "$LOCAL_FILENAME_PARTIAL"
-					RESUME_CMD=""
-				else
-					break
-				fi
-			done
-		fi
-	
-		if [ $error != 0 ]; then
-			error "Downloading '$1' failed."
-			exit $E_DOWNLOAD
-		fi
-	
-		mv -f "$LOCAL_FILENAME_PARTIAL" "$LOCAL_FILENAME"
+	if [ $error != 0 ]; then
+		error "Downloading '$1' failed."
+		exit $E_DOWNLOAD
 	fi
-}
-test_download_sources() {
-	local FILE LOCAL_FILENAME
-	nb_err=0
-	for FILE in ${source[@]}; do
-		LOCAL_FILENAME="$(get_filename $FILE)"
-		debug "test_download_sources: $FILE => $LOCAL_FILENAME"
-		if [ ! -e $LOCAL_FILENAME ]; then
-			if [ "$LOCAL_FILENAME" = "$FILE" ]; then
-				error "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
-				nb_err+=1
-			else
-				test_download_file $FILE
-				tds_error=$?
-				debug "test_download_sources: $FILE => tds_error=$tds_error"
-				if [ "$tds_error" == "$E_DOWNLOAD" ]; then
-					error "Source file '$FILE' not found (can not be downloaded, URL not specified)."
-					nb_err+=1
-				fi
-			fi
-		fi
-	done
-	if [ $nb_err == 0 ]; then
-		info "All sources are correct"
-		exit 0
-	fi
-	exit $E_DOWNLOAD
+
+	mv -f "$LOCAL_FILENAME_PARTIAL" "$LOCAL_FILENAME"
 }
 download_source() {
 	local FILE LOCAL_FILENAME
@@ -1524,8 +1411,6 @@ parse_options() {
 				PKGMK_RECURSIVE="yes" ;;
 			-q|--quiet)
 				PKGMK_QUIET="yes" ;;
-			-td|--test-download)
-				PKGMK_TEST_DOWNLOAD_ONLY="yes" ;;
 			-d|--download)
 				PKGMK_DOWNLOAD="yes" ;;
 			-cs|--check-syntax)
@@ -1747,11 +1632,6 @@ main() {
 		download_source
 		exit 0
 	fi
-	
-	if [ "$PKGMK_TEST_DOWNLOAD_ONLY" = "yes" ]; then
-		test_download_sources
-		exit 0
-	fi
 
 	if [ "$PKGMK_EXTRACT_ONLY" = "yes" ]; then
 		download_source
@@ -1910,7 +1790,7 @@ PKGMK_ARCH="$(uname -m)"
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
 PKGMK_EXTRA_CONFFILE=".pkgmk.conf"
-PKGMK_MD5SUM="$name.$(uname -m).md5sum"
+PKGMK_MD5SUM=".md5sum"
 PKGMK_NOSTRIP=".nostrip"
 
 PKGMK_KEEP_SOURCES="no"

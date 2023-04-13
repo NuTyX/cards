@@ -1,21 +1,6 @@
 #!/bin/bash
-#  Copyright (c) 2016 - 2022 by NuTyX team (http://nutyx.org)
-#
-#  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
-#  USA.
-#
+#  Copyright (c) 2016 - 2023 by NuTyX team (http://nutyx.org)
+
 usage () {
   echo '
 USAGE
@@ -52,7 +37,37 @@ MORE INFO
 
 '|more
 }
+get_filename() {
+	if [[ $1 =~ ^(http|https|ftp|file)://.*/(.+) ]]; then
+		echo "$PKGMK_SOURCE_DIR/${BASH_REMATCH[2]}"
+	else
+		echo $1
+	fi
+}
+test_download_sources() {
+	local FILE LOCAL_FILENAME
+	DOWNLOAD_OPTS="--ftp-pasv --retry 3 --retry-delay 3 \
+	-R -o $1 --fail -#"
+	nb_err=0
+	for FILE in ${source[@]}; do
+		LOCAL_FILENAME="$(get_filename $FILE)"
 
+		if [ ! -e $LOCAL_FILENAME ]; then
+			if [ "$LOCAL_FILENAME" = "$FILE" ]; then
+				echo "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
+				exit 1
+			else
+					curl $DOWNLOAD_OPTS $FILE
+					error=$?
+					if [ $error != 0 ]; then
+					error "Downloading '$FILE' failed."
+					exit 1
+			fi
+		fi
+
+	done
+	echo "All sources are correct"
+}
 check_root() {
   if [ "$UID" == "0" ]; then
     echo "The 'root' account is not allow to building packages"
@@ -772,17 +787,11 @@ fi
 if [ "${PARAM[1]}" = "" ]; then
     if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
         . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-	if ( $(which pkgmk > /dev/null) ); then
 		cd "$COLLECTION/${PARAM[0]}/"
-		pkgmk -td
+		test_download_sources
 		rc=$?
 		cd - > /dev/null
 		[ $rc -ne 0 ] && exit 1
-	else
-		echo "=====> cards.devel is not install !
-=====> Cannot check if URL source(s) is valid"
-        fi
-    fi
 fi
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
