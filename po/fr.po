@@ -204,7 +204,7 @@ msgstr " n'existe pas"
 msgid " is in use"
 msgstr " est utilisé"
 
-msgid " is a runtime uependency for "
+msgid " is a runtime dependency for "
 msgstr " est une dépendance de fonctionnement pour "
 
 msgid " is not found"

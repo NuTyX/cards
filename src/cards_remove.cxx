@@ -65,7 +65,7 @@ Cards_remove::Cards_remove(const string& commandName,
 				for (auto k : j.second.dependencies ){
 					if ( i == k.first) {
 						m_actualError = PACKAGE_IN_USE;
-						cout << endl << i << _(" is a runtime uependency for ") << j.first << " !!!" << endl << endl;
+						cout << endl << i << _(" is a runtime dependency for ") << j.first << " !!!" << endl << endl;
 						treatErrors(i);
 					}
 				}
