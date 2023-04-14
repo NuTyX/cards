@@ -23,6 +23,9 @@ OPTIONS
       -n, --new <collection>/<package> [version] [description] [url] [sources]
               Create a new <collection>/<package>/Pkgfile.
 
+      -C, --check <package>
+             Check if sourcefile(s) exist(s).
+
       -i, --increment <package>
              Increment the release number and build the package.
 
@@ -44,24 +47,21 @@ get_filename() {
 		echo $1
 	fi
 }
-test_download_sources() {
+check_download_sources() {
 	local FILE LOCAL_FILENAME
-	DOWNLOAD_OPTS="--ftp-pasv --retry 3 --retry-delay 3 \
-	-R -o $1 --fail -#"
-	nb_err=0
+	DOWNLOAD_OPTS="-sfLo/dev/null -r0-0"
 	for FILE in ${source[@]}; do
 		LOCAL_FILENAME="$(get_filename $FILE)"
-
 		if [ ! -e $LOCAL_FILENAME ]; then
 			if [ "$LOCAL_FILENAME" = "$FILE" ]; then
 				echo "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
 				exit 1
 			else
 					curl $DOWNLOAD_OPTS $FILE
-					error=$?
-					if [ $error != 0 ]; then
-					error "Downloading '$FILE' failed."
-					exit 1
+					if [ $? != 0 ]; then
+						echo "$FILE' not found, check URL !!!"
+						exit 1
+					fi
 			fi
 		fi
 
@@ -221,6 +221,15 @@ parse_arguments() {
   >>>     The package '${PARAM}' already exist in the '${COLLECTION}' collection !!!
   "
       exit 1;;
+
+	-C|--check)
+      CHECK="yes"
+      shift
+      if [ -z ${1} ]; then
+        echo "You need to specify a package name"
+        exit 1
+      fi
+      PARAM+=($1);;
 
     -R|--runtime)
       RUNTIME="yes"
@@ -759,6 +768,10 @@ else
        -e "s/contributors=/contributors=\"$newcontributors\"/" \
        -i "${i}"/Pkgfile
      fi
+     . $i/Pkgfile
+     cd $i
+     check_download_sources
+     cd -
   done
 fi
 if [ "${PARAM[1]}" = "" ]; then
@@ -784,15 +797,12 @@ if [ "$INCREMENT" == "yes" ]; then
   fi
 fi
 
-if [ "${PARAM[1]}" = "" ]; then
-    if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
-        . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-		cd "$COLLECTION/${PARAM[0]}/"
-		test_download_sources
-		rc=$?
-		cd - > /dev/null
-		[ $rc -ne 0 ] && exit 1
+if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
+   . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+   cd "$COLLECTION/${PARAM[0]}/"
+   check_download_sources
 fi
+[ "$CHECK" == "yes" ] && exit 0
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
