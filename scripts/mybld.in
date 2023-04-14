@@ -10,7 +10,6 @@ OPTIONS
       -c, --cleanup <collection>
               Clean the /<version>/<collection> folder in a safety way.
 
-
       -R, --runtime <dependency package>
               Return the list of package depending on the <dependency package>.
 
@@ -24,7 +23,7 @@ OPTIONS
               Create a new <collection>/<package>/Pkgfile.
 
       -C, --check <package>
-             Check if sourcefile(s) exist(s).
+             Check if all the source files can be downloaded.
 
       -i, --increment <package>
              Increment the release number and build the package.
@@ -66,7 +65,6 @@ check_download_sources() {
 		fi
 
 	done
-	echo "All sources are correct"
 }
 check_root() {
   if [ "$UID" == "0" ]; then
@@ -203,7 +201,9 @@ parse_arguments() {
       CLEANUP="yes"
       shift
       if [ -z ${1} ]; then
-        echo "You need to specify a collection"
+        echo "
+>>> Specify the collection
+"
         exit 1
       fi
       PARAM+=($1);;
@@ -218,15 +218,17 @@ parse_arguments() {
         exit 0
       fi
       echo "
-  >>>     The package '${PARAM}' already exist in the '${COLLECTION}' collection !!!
-  "
+>>> The package '${PARAM}' already exist in the '${COLLECTION}' collection !!!
+"
       exit 1;;
 
 	-C|--check)
       CHECK="yes"
       shift
       if [ -z ${1} ]; then
-        echo "You need to specify a package name"
+        echo "
+>>> Specify the name
+"
         exit 1
       fi
       PARAM+=($1);;
@@ -235,7 +237,9 @@ parse_arguments() {
       RUNTIME="yes"
       shift
       if [ -z ${1} ]; then
-        echo "You need to specify a runtime dependancy package name"
+        echo "
+>>> You need to specify a runtime dependancy package name
+"
         exit 1
       fi
       PARAM+=($1)
@@ -251,6 +255,12 @@ parse_arguments() {
     -i|--increment)
       INCREMENT="yes"
       shift
+      if [ -z ${1} ]; then
+        echo "
+>>> Specify the name
+"
+        exit 1
+      fi
       PARAM+=($1);;
 
     -p|--pause)
@@ -802,8 +812,11 @@ if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
    cd "$COLLECTION/${PARAM[0]}/"
    check_download_sources
 fi
-[ "$CHECK" == "yes" ] && exit 0
-
+if [ "$CHECK" == "yes" ]; then
+   echo "====> Found all the source files
+"
+   exit 0
+fi
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
   sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
