@@ -58,7 +58,8 @@ check_download_sources() {
 			else
 					curl $DOWNLOAD_OPTS $FILE
 					if [ $? != 0 ]; then
-						echo "$FILE' not found, check URL !!!"
+						echo ">>>    $FILE' not found, check URL !!!
+"
 						exit 1
 					fi
 			fi
@@ -763,6 +764,7 @@ if [ -z "$PACKAGES_LIST" ]; then
      fi
    fi
 else
+  echo ""
   for i in ${PACKAGES_LIST[@]}
   do
     . $i/Pkgfile
@@ -781,8 +783,10 @@ else
      . $i/Pkgfile
      cd $i
      check_download_sources
-     cd -
+     echo "====> sources of $i [ OK ]"
+     cd - > /dev/null
   done
+  echo ""
 fi
 if [ "${PARAM[1]}" = "" ]; then
     if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
