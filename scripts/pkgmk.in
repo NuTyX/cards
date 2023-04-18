@@ -557,6 +557,29 @@ make_work_dir() {
 remove_work_dir() {
 	rm -rf $PKGMK_WORK_DIR
 }
+lib32() {
+	CFLAGS="${CFLAGS} -m32"
+	CXXFLAGS="${CXXFLAGS} -m32"
+	LDFLAGS="${LDFLAGS} -m32"
+	PKG_CONFIG_LIBDIR="/usr/lib32/pkgconfig"
+
+	cd $name-$version
+	./configure  --prefix=/usr \
+		--libdir=/usr/lib32
+	make
+	make DESTDIR=$PKG install
+}
+pack_lib32() {
+	local DIR
+	for DIR in usr/lib32 lib32; do
+		if [ -d $DIR ]; then
+			bsdtar -r -f \
+			$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} \
+			$DIR || BUILD_SUCCESSFUL="no"
+			j=1
+		fi
+	done
+}
 pack_lib() {
 	local DIR SUBDIR
 	for DIR in usr opt/*; do
@@ -918,6 +941,12 @@ build_package() {
 	if [ "$UID" != "0" ]; then
 		warning "Packages should be built as root."
 	fi
+	for group in ${PKGMK_GROUPS[@]}; do
+		if [ "$group" == "lib32" ]
+			PKGMK_IGNORE_LIB32="no"
+			break
+		fi
+	done
 	if [ "$PKGMK_PACK_ONLY" == "no" ];then
 		info "Building starting..."
 		unpack_source
@@ -940,7 +969,35 @@ build_package() {
 		else
 			BUILD_SUCCESSFUL="yes"
 		fi
+		if [ "$PKGMK_IGNORE_LIB32" == "no" ]; then
+			group="lib32"
+			BUILD_SUCCESSFUL="no"
+			(set -e -x ; $group)
+			if [ $? = 0 ]; then
+				j=1
+				BUILD_SUCCESSFUL="yes"
+			else
+				remove_dependencies
+				error "Building '$TARGET' failed."
+				exit $E_BUILD
+			fi
 
+			if [ "$1" != "$TARGET" ]; then
+				if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}* ]; then
+					rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}*
+				fi
+				pack_${group}
+			fi
+
+			if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
+				remove_dependencies
+				error "Building '$TARGET' failed."
+				exit $E_BUILD
+			fi
+		fi
+		# $PKG should be empty here
+		rm -rf $PKG
+		mkdir -p $PKG
 		if [ "$BUILD_SUCCESSFUL" == "yes" ]; then
 			BUILD_SUCCESSFUL="no"
 			(set -e -x ; build)
@@ -979,6 +1036,7 @@ build_package() {
 		clean_old_binaries
 
 		for group in ${PKGMK_GROUPS[@]}; do
+			"$group" == "lib32" && continue
 			if [ "$(type -t ${group})" == "function" ]; then
 				BUILD_SUCCESSFUL="no"
 				(set -e -x ;${group})
