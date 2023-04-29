@@ -547,15 +547,12 @@ make_work_dir() {
 	umask 022
 	
 	cd $PKGMK_ROOT
-	[ "$PKGMK_PACK_ONLY" == "yes" ] ||  remove_work_dir
+	[ "$PKGMK_PACK_ONLY" == "yes" ] ||  rm -rf $PKGMK_WORK_DIR
 	mkdir -p $SRC $PKG
 
 	if [ "$PKGMK_IGNORE_MD5SUM" = "no" ]; then
 		check_md5sum
 	fi
-}
-remove_work_dir() {
-	rm -rf $PKGMK_WORK_DIR
 }
 lib32() {
 	CFLAGS="${CFLAGS} -m32"
@@ -1147,7 +1144,7 @@ build_package() {
 			add_meta_to_archive "$(basename $TARGET)"
 		fi
 		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-			remove_work_dir
+			rm -rf $PKGMK_WORK_DIR
 		fi
 	else
 		if [ -f $TARGET ]; then
@@ -1521,12 +1518,12 @@ main() {
 
 	parse_options "$@"
 
-        if [ ! -f $PKGMK_CONFFILE ]; then
-                error "File '$PKGMK_CONFFILE' not found."
-                exit $E_GENERAL
-        fi
+	if [ ! -f $PKGMK_CONFFILE ]; then
+		error "File '$PKGMK_CONFFILE' not found."
+		exit $E_GENERAL
+	fi
 
-        . $PKGMK_CONFFILE
+	. $PKGMK_CONFFILE
 
 	if ! ( $(which pkginfo > /dev/null) ); then
 		warning "pkginfo NOT FOUND, footprint ignored."
@@ -1815,12 +1812,9 @@ readonly PKGMK_ROOT="$PWD"
 readonly PKGMK_PACKAGE_DIR="$PWD"
 
 PKGMK_BUILDVER="$(date +%s)"
-
 PKGMK_PACKAGE_EXT="cards.tar"
-
 PKGMK_REPO=".PKGREPO"
 PKGMK_ARCH="$(uname -m)"
-
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
@@ -1830,7 +1824,6 @@ PKGMK_NOSTRIP=".nostrip"
 
 PKGMK_KEEP_SOURCES="no"
 PKGMK_CLEAN="yes"
-
 
 PKGMK_GROUPS=()
 PKGMK_LOCALES=()
