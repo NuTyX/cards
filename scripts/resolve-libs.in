@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+#
+# Copyright (c) 2018 by Emmett1  (emmett1.2miligrams@gmail.com)
+# Copyright (c) 2023 by NuTyX team (http://nutyx.org)
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+PKGDB_DIR=/var/lib/pkg/DB
+SEARCH_DIRS="/bin /usr/bin /sbin /usr/sbin /lib /usr/lib /usr/libexec /opt"
+FILE_LIST=$(mktemp /tmp/resolv.XXXX)
+count=0
+
+echo "Find all files... "
+find ${SEARCH_DIRS} -type f \( -perm /+u+x -o -name '*.so' -o -name '*.so.*' \) -print 2> /dev/null | sort -u > $FILE_LIST
+
+total=$(cat $FILE_LIST|wc -l)
+echo "Number of files: $total
+Checking for broken linkage..."
+
+while read -r line; do
+	count=$(( count + 1 ))
+	libname=$(basename "$line")
+	printf " $(( 100*count/total ))%% $libname\033[0K\r"
+	case "$(file -bi "$line")" in
+		*application/x-sharedlib* | *application/x-executable* | *application/x-pie-executable*)
+			if ldd $line 2>/dev/null | grep -q "not found"; then
+				LIB_NAME=$(ldd $line 2>/dev/null | grep "not found" | sort | uniq | awk '{print $1}')
+				for l in $LIB_NAME; do
+					NEW_LIB_NAME="$NEW_LIB_NAME $l"
+				done
+				LIB_NAME=$NEW_LIB_NAME
+				[ "$LIB_NAME" ] || continue
+				PKG_NAME=$(grep -Rx ${line/\//} "$PKGDB_DIR"/*/files | cut -d : -f1)
+				[ "$PKG_NAME" ] || continue
+				PKG_NAME=$(basename $(dirname $PKG_NAME))
+				REQ_LIB=$(objdump -p $line 2>/dev/null | grep NEEDED | awk '{print $2}' | tr '\n' ' ')
+				for i in $LIB_NAME; do
+					[ "$PRINTALL" = 1 ] && echo " $PKG_NAME -> $line (requires $i)"
+					if echo $REQ_LIB | tr ' ' '\n' | grep -qx $i; then
+						[ "$PRINTALL" = 1 ] || echo " $PKG_NAME -> $line (requires $i)"
+						if echo "$ALLPKG" | tr ' ' '\n' | grep -qx "$PKG_NAME"; then
+							continue
+						else
+							ALLPKG="$ALLPKG $PKG_NAME"
+						fi
+					fi
+				done
+			fi
+			;;
+	esac
+	unset NEW_LIB_NAME
+done < $FILE_LIST
