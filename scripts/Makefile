@@ -23,7 +23,7 @@
 
 include ../Makefile.inc
 
-all: pkgmk build-port mybld cards
+all: pkgmk build-port mybld cards resolve-libs
 
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
@@ -35,6 +35,7 @@ install: all
 	install -D -m0644 ding.wav ${SOUNDDIR}/ding.wav
 	install -D -m0755 build-port $(USRBINDIR)/build-port
 	install -D -m0755 mybld $(BINDIR)/mybld
+	install -D -m0755 resolve-libs $(BINDIR)/resolve-libs
 	install -D -m0755 pkgmk $(USRBINDIR)/pkgmk
 	install -D -m0644 pkgmk.conf $(ETCDIR)/pkgmk.conf.example
 	install -D -m0644 cards $(ETCDIR)/profile.d/cards.sh
@@ -44,6 +45,8 @@ clean:
 	rm -f pkgmk
 	rm -f build-port
 	rm -f mybld
+	rm -f resolve-libs
+	rm -f cards
 
 distclean: clean
 

@@ -16,7 +16,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-
+if [ "$1" ];then
+	echo "$(basename $0) (cards) #VERSION#"
+	exit 0
+fi
 PKGDB_DIR=/var/lib/pkg/DB
 SEARCH_DIRS="/bin /usr/bin /sbin /usr/sbin /lib /usr/lib /usr/libexec /opt"
 FILE_LIST=$(mktemp /tmp/resolv.XXXX)
