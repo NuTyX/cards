@@ -32,6 +32,11 @@ Pkgdbh::Pkgdbh(const std::string& name)
 {
 	openlog(m_utilName.c_str(),LOG_CONS,LOG_LOCAL7);
 }
+Pkgdbh::Pkgdbh()
+	: m_utilName("pkgdbh"), m_DB_Empty(true), m_miniDB_Empty(true)
+{
+	m_root="/";
+}
 Pkgdbh::~Pkgdbh()
 {
 #ifndef NDEBUG
@@ -279,8 +284,11 @@ void Pkgdbh::progressInfo()
 			break;
   }
 }
+
 set<string> Pkgdbh::getListOfPackageName()
 {
+	if (m_packageNamesList.empty())
+		getListOfPackageNames(m_root);
 	return m_packageNamesList;
 }
 /* Append to the "DB" the number of packages founds

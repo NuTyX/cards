@@ -182,6 +182,7 @@ class Pkgdbh {
 public:
 
 	explicit Pkgdbh(const std::string& name);
+	explicit Pkgdbh();
 	virtual ~Pkgdbh();
 
 	/* Following methods can be redefined in derivated class */
