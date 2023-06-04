@@ -108,28 +108,28 @@
 
 enum action
 {
-PKG_DOWNLOAD_START,
-PKG_DOWNLOAD_RUN,
-PKG_DOWNLOAD_END,
-DB_OPEN_START,
-DB_OPEN_RUN,
-DB_OPEN_END,
-PKG_PREINSTALL_START,
-PKG_PREINSTALL_END,
-PKG_INSTALL_START,
-PKG_INSTALL_END,
-PKG_INSTALL_RUN,
-PKG_POSTINSTALL_START,
-PKG_POSTINSTALL_END,
-PKG_MOVE_META_START,
-PKG_MOVE_META_END,
-DB_ADD_PKG_START,
-DB_ADD_PKG_END,
-LDCONFIG_START,
-LDCONFIG_END,
-RM_PKG_FILES_START,
-RM_PKG_FILES_RUN,
-RM_PKG_FILES_END
+	PKG_DOWNLOAD_START,
+	PKG_DOWNLOAD_RUN,
+	PKG_DOWNLOAD_END,
+	DB_OPEN_START,
+	DB_OPEN_RUN,
+	DB_OPEN_END,
+	PKG_PREINSTALL_START,
+	PKG_PREINSTALL_END,
+	PKG_INSTALL_START,
+	PKG_INSTALL_END,
+	PKG_INSTALL_RUN,
+	PKG_POSTINSTALL_START,
+	PKG_POSTINSTALL_END,
+	PKG_MOVE_META_START,
+	PKG_MOVE_META_END,
+	DB_ADD_PKG_START,
+	DB_ADD_PKG_END,
+	LDCONFIG_START,
+	LDCONFIG_END,
+	RM_PKG_FILES_START,
+	RM_PKG_FILES_RUN,
+	RM_PKG_FILES_END
 };
 
 struct pkginfo_t {
@@ -198,6 +198,9 @@ public:
 
 	void print_version() const;
 	std::set<std::string> getListOfPackageName();
+	std::string getDescription(const std::string& Packagename) const;
+	std::string getVersion(const std::string& Packagename) const;
+	int getRelease(const std::string& Packagename) const;
 
 	bool checkPackageNameExist(const std::string& name) const;
 	bool checkDependency(const std::string& name);
@@ -297,6 +300,7 @@ protected:
 private:
 
 	void runLastPostInstall();
+	std::string getSingleItem(const std::string& PackageName, const char i) const;
 
 	std::set<std::string> m_runtimeLibrariesList;
 	std::set<std::string> m_filesList;

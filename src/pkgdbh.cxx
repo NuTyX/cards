@@ -291,6 +291,33 @@ set<string> Pkgdbh::getListOfPackageName()
 		getListOfPackageNames(m_root);
 	return m_packageNamesList;
 }
+std::string Pkgdbh::getSingleItem(const std::string& PackageName, const char i) const
+{
+	const string metaFile = m_root + PKG_DB_DIR + PackageName + '/' + PKG_META;
+	std::set<std::string> fileContent;
+	parseFile(fileContent,metaFile.c_str());
+	std::string item;
+	for ( auto a : fileContent) {
+		if ( a[0] == i ) {
+			item = a.substr(1);
+			break;
+		}
+	}
+	return item;
+}
+std::string Pkgdbh::getDescription(const std::string& PackageName) const
+{
+	return getSingleItem(PackageName,'D');
+}
+std::string Pkgdbh::getVersion(const std::string& PackageName) const
+{
+	return getSingleItem(PackageName,'V');
+}
+int Pkgdbh::getRelease(const std::string& PackageName) const
+{
+	string r = getSingleItem(PackageName,'r');
+	return atoi(r.c_str());
+}
 /* Append to the "DB" the number of packages founds
  * (directory containing a file named files
  * */
@@ -314,6 +341,7 @@ int Pkgdbh::getListOfPackageNames (const std::string& path)
 #endif
 	return m_packageNamesList.size();
 }
+
 /* get details info of a package */
 std::pair<std::string, pkginfo_t> Pkgdbh::getInfosPackage
 	(const std::string& packageName)
