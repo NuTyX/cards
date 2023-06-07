@@ -41,7 +41,7 @@ MORE INFO
 }
 get_filename() {
 	if [[ $1 =~ ^(http|https|ftp|file)://.*/(.+) ]]; then
-		echo "$PKGMK_SOURCE_DIR/${BASH_REMATCH[2]}"
+		echo "${ROOTMOUNT}/$PKGMK_SOURCE_DIR/${BASH_REMATCH[2]}"
 	else
 		echo $1
 	fi
@@ -748,6 +748,7 @@ mkdir -p "$ROOT/${VERSION}/${COLLECTION}/etc" || exit 1
 echo "$PKGMK_CONF" > $ROOT/$VERSION/$COLLECTION/etc/pkgmk.conf
 echo "$CARDS_CONF" > $ROOT/$VERSION/$COLLECTION/etc/cards.conf
 ##############################
+. $ROOT/$VERSION/$COLLECTION/etc/pkgmk.conf
 
 if [ -z "$PACKAGES_LIST" ]; then
    if [ ! -z "${PARAM[1]}" ]; then

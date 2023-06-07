@@ -53,7 +53,6 @@ public:
 	void preRun();
 	void postRun();
 	virtual void run();
-	virtual void run(int argc, char** argv);
 	virtual void printHelp() const;
 
 protected:

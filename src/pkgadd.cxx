@@ -45,11 +45,6 @@ Pkgadd::Pkgadd(const std::string& commandName)
 	readRulesFile();
 
 }
-void Pkgadd::run(int argc, char** argv)
-{
-	parseArguments(argc, argv);
-	run();
-}
 void Pkgadd::parseArguments(int argc, char** argv)
 {
 	for (int i = 1; i < argc; i++) {
@@ -101,7 +96,7 @@ void Pkgadd::preRun()
 void Pkgadd::run()
 {
 	// Get the list of installed packages
-	getListOfPackageNames(m_root);
+	getListOfPackagesNames(m_root);
 
 	// Retrieving info about all the packages
 	buildCompleteDatabase(false);

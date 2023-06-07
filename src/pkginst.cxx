@@ -55,17 +55,17 @@ void Pkginst::generateDependencies()
 		PackageTime = *vit;
 		dependenciesWeMustAdd.erase(vit);   // Erase the current treated package name
 		set< pair<string,time_t> > directDependencies;
-		if ( m_listOfDepotPackages.find(packageName) != m_listOfDepotPackages.end() ) {
+		if ( m_listOfRepoPackages.find(packageName) != m_listOfRepoPackages.end() ) {
 #ifndef NDEBUG
-			cerr << packageName << " found in m_listOfDepotPackages" << endl;
+			cerr << packageName << " found in m_listOfRepoPackages" << endl;
 #endif
-			directDependencies = m_listOfDepotPackages[packageName].dependencies;
+			directDependencies = m_listOfRepoPackages[packageName].dependencies;
 #ifndef NDEBUG
 			for (auto i : directDependencies ) cerr << i.first << i.second << " ";
 #endif
 		} else {
 #ifndef NDEBUG
-			cerr << packageName << " not found in m_listOfDepotPackages" << endl;
+			cerr << packageName << " not found in m_listOfRepoPackages" << endl;
 #endif
 			if ( checkBinaryExist(packageName)) { // directs deps if not yet availables
 #ifndef NDEBUG

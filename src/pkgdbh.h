@@ -187,7 +187,7 @@ public:
 
 	/* Following methods can be redefined in derivated class */
 	virtual void parseArguments(int argc, char** argv);
-	virtual void run(int argc, char** argv) {};
+	virtual void run(int argc, char** argv);
 	virtual void run() {};
 
 	virtual void printHelp() const {};
@@ -197,10 +197,12 @@ public:
 
 
 	void print_version() const;
-	std::set<std::string> getListOfPackageName();
-	std::string getDescription(const std::string& Packagename) const;
-	std::string getVersion(const std::string& Packagename) const;
-	int getRelease(const std::string& Packagename) const;
+	std::set<std::string> getListOfPackagesNames();
+	std::string getDescription(const std::string& name) const;
+	std::string getVersion(const std::string& name) const;
+	std::string getCollection(const std::string& name) const;
+	std::string getSet(const std::string& name) const;
+	int getRelease(const std::string& name) const;
 
 	bool checkPackageNameExist(const std::string& name) const;
 	bool checkDependency(const std::string& name);
@@ -215,7 +217,7 @@ protected:
 	// Database
 
 	std::set<std::string> getFilesOfPackage(const std::string& packageName);
-	int getListOfPackageNames(const std::string& path);
+	int getListOfPackagesNames(const std::string& path);
 	std::pair<std::string, pkginfo_t> getInfosPackage(const std::string& packageName);
 	void buildSimpleDatabase();
 	void buildSimpleDependenciesDatabase();
@@ -289,10 +291,10 @@ protected:
 	std::set< std::pair<std::string, int> > m_postInstallList;
 	alias_t	m_listOfAlias;
 
-	packages_t m_listOfInstPackages;
-	packages_t m_listOfDepotPackages;
+	packages_t m_listOfPackages;
+	packages_t m_listOfRepoPackages;
 
-	std::set<std::pair<std::string,std::set<std::string> > > m_listOfInstalledPackagesWithDeps;
+	std::set<std::pair<std::string,std::set<std::string> > > m_listOfPackagesWithDeps;
 
 	action m_actualAction;
 	error m_actualError;
@@ -304,7 +306,7 @@ private:
 
 	std::set<std::string> m_runtimeLibrariesList;
 	std::set<std::string> m_filesList;
-	std::set<std::string> m_packageNamesList;
+	std::set<std::string> m_listOfPackagesNames;
 	unsigned int m_filesNumber;
 	unsigned int m_installedFilesNumber;
 

@@ -55,11 +55,6 @@ Pkginfo::Pkginfo()
 	m_fulllist_mode(true)
 {
 }
-void Pkginfo::run(int argc, char** argv)
-{
-	parseArguments(argc,argv);
-	run();
-}
 void Pkginfo::parseArguments(int argc, char** argv)
 {
 	for (int i = 1; i < argc; ++i) {
@@ -173,13 +168,13 @@ void Pkginfo::run()
 		 *
 		 */
 		Db_lock lock(m_root, false);
-		getListOfPackageNames(m_root);
+		getListOfPackagesNames(m_root);
 		if (m_installed_mode) {
 			/*
 			 *  List installed packages
 			 */
 			buildSimpleDatabase();
-			for (auto i : m_listOfInstPackages) {
+			for (auto i : m_listOfPackages) {
 				if (m_fulllist_mode) {
 					if ( i.second.dependency == true)
 						cout << "AUTO: ";
@@ -210,7 +205,7 @@ void Pkginfo::run()
 			buildDatabase(true,false,false,false,m_arg);
 			if (checkPackageNameExist(m_arg)) {
 				string arg = m_listOfAlias[m_arg];
-				copy(m_listOfInstPackages[arg].files.begin(), m_listOfInstPackages[arg].files.end(), ostream_iterator<string>(cout, "\n"));
+				copy(m_listOfPackages[arg].files.begin(), m_listOfPackages[arg].files.end(), ostream_iterator<string>(cout, "\n"));
 			} else if (checkFileExist(m_arg)) {
 				pair<string, pkginfo_t> package = openArchivePackage(m_arg);
 				copy(package.second.files.begin(), package.second.files.end(), ostream_iterator<string>(cout, "\n"));
@@ -236,7 +231,7 @@ void Pkginfo::run()
 			if ( (librariesList.size() > 0 ) && (Result > -1) ) {
 				set<string> runtimeList;
 				for (auto i : librariesList) {
-					for (auto j : m_listOfInstPackages) {
+					for (auto j : m_listOfPackages) {
 						bool found = false;
 						for (auto k : j.second.files) {
 							if ( k.find('/' + i) != string::npos) {
@@ -273,8 +268,8 @@ void Pkginfo::run()
 			set<string> librariesList;
 			int Result = -1;
 			if (checkPackageNameExist(m_arg)) {
-				for (set<string>::const_iterator i = m_listOfInstPackages[m_arg].files.begin();
-					i != m_listOfInstPackages[m_arg].files.end();
+				for (set<string>::const_iterator i = m_listOfPackages[m_arg].files.begin();
+					i != m_listOfPackages[m_arg].files.end();
 					++i){
 					string filename('/' + *i);
 					Result = getRuntimeLibrariesList(librariesList,filename);
@@ -285,8 +280,8 @@ void Pkginfo::run()
 						for (set<string>::const_iterator i = librariesList.begin();
 						i != librariesList.end();
 						++i) {
-							for (packages_t::const_iterator j = m_listOfInstPackages.begin();
-								j != m_listOfInstPackages.end();
+							for (packages_t::const_iterator j = m_listOfPackages.begin();
+								j != m_listOfPackages.end();
 								++j){
 								bool found = false;
 								for (set<string>::const_iterator k = j->second.files.begin();
@@ -328,7 +323,7 @@ void Pkginfo::run()
 			 */
 			buildCompleteDatabase(true);
 			if (checkPackageNameExist(m_arg)) {
-				cout << m_listOfInstPackages[m_arg].build << endl;
+				cout << m_listOfPackages[m_arg].build << endl;
 			} else {
 				cout << "0" << endl;
 			}
@@ -340,44 +335,44 @@ void Pkginfo::run()
 			if (checkPackageNameExist(m_arg)) {
 				string arg = m_listOfAlias[m_arg];
 				cout << _("Name           : ") << arg << endl
-					<< _("Description    : ") << m_listOfInstPackages[arg].description << endl;
-				if (m_listOfInstPackages[arg].alias.size() > 0 ) {
+					<< _("Description    : ") << m_listOfPackages[arg].description << endl;
+				if (m_listOfPackages[arg].alias.size() > 0 ) {
 					cout << _("Alias          : ");
-					for ( auto i : m_listOfInstPackages[arg].alias) cout << i << " ";
+					for ( auto i : m_listOfPackages[arg].alias) cout << i << " ";
 						cout << endl;
 				}
-				if (m_listOfInstPackages[arg].categories.size() > 0 ) {
+				if (m_listOfPackages[arg].categories.size() > 0 ) {
 					cout << _("Categories     : ");
-					for ( auto i : m_listOfInstPackages[arg].categories) cout << i << " ";
+					for ( auto i : m_listOfPackages[arg].categories) cout << i << " ";
 						cout << endl;
 				}
-				if (m_listOfInstPackages[arg].set.size() > 0 ) {
+				if (m_listOfPackages[arg].set.size() > 0 ) {
 					cout << _("Set            : ");
-					for ( auto i : m_listOfInstPackages[arg].set) cout << i << " ";
+					for ( auto i : m_listOfPackages[arg].set) cout << i << " ";
 						cout << endl;
 				}
-				cout << _("Group          : ") << m_listOfInstPackages[arg].group << endl
-					<< _("Collection     : ") << m_listOfInstPackages[arg].collection << endl
-					<< _("URL            : ") << m_listOfInstPackages[arg].url << endl
-					<< _("Contributor(s) : ") << m_listOfInstPackages[arg].contributors << endl
-					<< _("Packager       : ") << m_listOfInstPackages[arg].packager << endl
-					<< _("Version        : ") << m_listOfInstPackages[arg].version << endl
-					<< _("Release        : ") << m_listOfInstPackages[arg].release << endl
-					<< _("Build date     : ") << getDateFromEpoch(m_listOfInstPackages[arg].build) << endl
-					<< _("Installed date : ") << getDateFromEpoch(m_listOfInstPackages[arg].install) << endl
-					<< _("Installed Size : ") << sizeHumanRead(m_listOfInstPackages[arg].size)
+				cout << _("Group          : ") << m_listOfPackages[arg].group << endl
+					<< _("Collection     : ") << m_listOfPackages[arg].collection << endl
+					<< _("URL            : ") << m_listOfPackages[arg].url << endl
+					<< _("Contributor(s) : ") << m_listOfPackages[arg].contributors << endl
+					<< _("Packager       : ") << m_listOfPackages[arg].packager << endl
+					<< _("Version        : ") << m_listOfPackages[arg].version << endl
+					<< _("Release        : ") << m_listOfPackages[arg].release << endl
+					<< _("Build date     : ") << getDateFromEpoch(m_listOfPackages[arg].build) << endl
+					<< _("Installed date : ") << getDateFromEpoch(m_listOfPackages[arg].install) << endl
+					<< _("Installed Size : ") << sizeHumanRead(m_listOfPackages[arg].size)
 					<< _("bytes") << endl
-					<< _("Number of Files: ") << m_listOfInstPackages[arg].files.size()
+					<< _("Number of Files: ") << m_listOfPackages[arg].files.size()
 					<< _(" file(s)") << endl
-					<< _("Arch           : ") << m_listOfInstPackages[arg].arch << endl;
-				if ( m_listOfInstPackages[m_arg].dependency == false )
+					<< _("Arch           : ") << m_listOfPackages[arg].arch << endl;
+				if ( m_listOfPackages[m_arg].dependency == false )
 					cout << _("Man. installed : Yes");
 				else
 					cout << _("Man. installed : No");
 				cout << endl;
-				if ( m_listOfInstPackages[m_arg].dependencies.size() > 0 ) {
+				if ( m_listOfPackages[m_arg].dependencies.size() > 0 ) {
 					cout << _("Dependencies   : ");
-					for ( auto i : m_listOfInstPackages[arg].dependencies) cout << i.first << " ";
+					for ( auto i : m_listOfPackages[arg].dependencies) cout << i.first << " ";
 					cout << endl;
 				}
 			}
@@ -397,7 +392,7 @@ void Pkginfo::run()
 #ifndef NDEBUG
 			cerr << m_arg << endl;
 #endif
-			for (auto i : m_listOfInstPackages) {
+			for (auto i : m_listOfPackages) {
 				for (auto j : i.second.files) {
 					const string file('/' + j);
 					if (!regexec(&preg, file.c_str(), 0, 0, 0)) {

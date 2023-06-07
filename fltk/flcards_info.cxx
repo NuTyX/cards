@@ -33,7 +33,7 @@ void Flcards_info::progressInfo()
 
 	static int j = 0;
 	int i,n;
-	n = getListOfPackageNames("");
+	n = getListOfPackagesNames("");
 	switch ( m_actualAction )
 	{
 		case DB_OPEN_START:
@@ -68,7 +68,7 @@ std::set<std::string> Flcards_info::getListOfInstalledPackages()
 	m_window->show();
 	m_progressBar->value(0);
 
-	getListOfPackageNames (m_root);
+	getListOfPackagesNames (m_root);
 	buildDatabase(false,true,false,false,"");
 
 	delete m_progressBar;
@@ -76,7 +76,7 @@ std::set<std::string> Flcards_info::getListOfInstalledPackages()
 
 	std::set<std::string> ListOfInstalledPackages;
 	std::string packageDetails;
-	for (auto i : m_listOfInstPackages) {
+	for (auto i : m_listOfPackages) {
 #ifndef NDEBUG
 		cerr << i.first << endl;
 #endif

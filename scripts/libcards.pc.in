@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libcards
+URL: https://github.com/NuTyX/cards/
+Description: Library for cards package manager
+Version: #VERSION#
+Libs: -L${libdir} -lcards
+Libs.private:  -lcards
+Cflags: -I${includedir}

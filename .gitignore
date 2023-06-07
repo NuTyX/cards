@@ -14,7 +14,7 @@ pkgadd
 pkgrm
 pkginfo
 pkgtest
-libcards*
+a.out
 *.gch
 ChangeLog
 archives

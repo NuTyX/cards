@@ -39,7 +39,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	parsePkgRepoCollectionFile();
 	buildSimpleDatabase();
 	std::set<std::string> listOfExistPackages;
-	for (auto i:m_listOfInstPackages) {
+	for (auto i:m_listOfPackages) {
 		if (checkBinaryExist(i.first)) {
 			listOfExistPackages.insert(i.first);
 		}
@@ -50,7 +50,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	}
 	if (!m_config.group.empty()) {
 		std::set<std::string> tmpList;
-		for (auto i: m_listOfInstPackages) {
+		for (auto i: m_listOfPackages) {
 			for ( auto j :  m_config.group ) {
 					std::string packageName  = getBasePackageName(i.first) + "." + j;
 					if ( i.first == packageName )
@@ -71,7 +71,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 			}
 		}
 	}
-	for (auto i : m_listOfInstPackages) {
+	for (auto i : m_listOfPackages) {
 		if (!checkBinaryExist(i.first)) {
 			m_ListOfPackagesToDelete.insert(i.first);
 			continue;
@@ -179,7 +179,7 @@ void Cards_upgrade::upgrade()
 		}
 		for (auto i : m_ListOfPackagesToDelete) {
 			Db_lock lock(m_root,true);
-			getListOfPackageNames(m_root);
+			getListOfPackagesNames(m_root);
 			buildCompleteDatabase(false);
 			removePackageFilesRefsFromDB(i);
 			removePackageFiles(i);

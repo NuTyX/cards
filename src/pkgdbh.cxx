@@ -65,6 +65,12 @@ void Pkgdbh::parseArguments(int argc, char** argv)
 	else
 		m_root=m_root+"/";
 }
+void Pkgdbh::run(int argc, char** argv)
+{
+	parseArguments(argc,argv);
+	run();
+}
+
 void Pkgdbh::treatErrors(const std::string& s) const
 {
 	switch ( m_actualError )
@@ -208,12 +214,12 @@ void Pkgdbh::progressInfo()
 			break;
 		case DB_OPEN_START:
 			cout << _("Retrieve info about the ")
-			<< m_packageNamesList.size() << _(" packages: ");
+			<< m_listOfPackagesNames.size() << _(" packages: ");
 			break;
 		case DB_OPEN_RUN:
 			j++;
 			printf("%3u%%\b\b\b\b",
-				( j * 100 ) / m_packageNamesList.size() );
+				( j * 100 ) / m_listOfPackagesNames.size() );
 			break;
 		case DB_OPEN_END:
 			printf("100 %%\n");
@@ -285,11 +291,11 @@ void Pkgdbh::progressInfo()
   }
 }
 
-set<string> Pkgdbh::getListOfPackageName()
+set<string> Pkgdbh::getListOfPackagesNames()
 {
-	if (m_packageNamesList.empty())
-		getListOfPackageNames(m_root);
-	return m_packageNamesList;
+	if (m_listOfPackagesNames.empty())
+		getListOfPackagesNames(m_root);
+	return m_listOfPackagesNames;
 }
 std::string Pkgdbh::getSingleItem(const std::string& PackageName, const char i) const
 {
@@ -305,41 +311,49 @@ std::string Pkgdbh::getSingleItem(const std::string& PackageName, const char i) 
 	}
 	return item;
 }
-std::string Pkgdbh::getDescription(const std::string& PackageName) const
+std::string Pkgdbh::getDescription(const std::string& name) const
 {
-	return getSingleItem(PackageName,'D');
+	return getSingleItem(name,'D');
 }
-std::string Pkgdbh::getVersion(const std::string& PackageName) const
+std::string Pkgdbh::getVersion(const std::string& name) const
 {
-	return getSingleItem(PackageName,'V');
+	return getSingleItem(name,'V');
 }
-int Pkgdbh::getRelease(const std::string& PackageName) const
+std::string Pkgdbh::getCollection(const std::string& name) const
 {
-	string r = getSingleItem(PackageName,'r');
+	return getSingleItem(name,'c');
+}
+std::string Pkgdbh::getSet(const std::string& name) const
+{
+	return getSingleItem(name,'s');
+}
+int Pkgdbh::getRelease(const std::string& name) const
+{
+	string r = getSingleItem(name,'r');
 	return atoi(r.c_str());
 }
 /* Append to the "DB" the number of packages founds
  * (directory containing a file named files
  * */
-int Pkgdbh::getListOfPackageNames (const std::string& path)
+int Pkgdbh::getListOfPackagesNames (const std::string& path)
 {
-	if (! m_packageNamesList.empty())
-		return m_packageNamesList.size();
+	if (! m_listOfPackagesNames.empty())
+		return m_listOfPackagesNames.size();
 
 	const string pathdb =  m_root + PKG_DB_DIR;
 #ifndef NDEBUG
 	cerr << "pathdb: " << pathdb << endl;
 #endif
-	if ( findFile(m_packageNamesList, pathdb) != 0 ) {
+	if ( findFile(m_listOfPackagesNames, pathdb) != 0 ) {
 		m_actualError = CANNOT_READ_FILE;
 		treatErrors(pathdb);
 	}
 #ifndef NDEBUG
 	cerr << "Number of Packages: "
-		<< m_packageNamesList.size()
+		<< m_listOfPackagesNames.size()
 		<< endl;
 #endif
-	return m_packageNamesList.size();
+	return m_listOfPackagesNames.size();
 }
 
 /* get details info of a package */
@@ -408,10 +422,10 @@ void Pkgdbh::buildDatabase
 #ifndef NDEBUG
 	cerr << "m_root: " << m_root << endl;
 #endif
-	if (m_packageNamesList.empty() )
-		getListOfPackageNames (m_root);
+	if (m_listOfPackagesNames.empty() )
+		getListOfPackagesNames (m_root);
 
-	for ( auto pkgName : m_packageNamesList) {
+	for ( auto pkgName : m_listOfPackagesNames) {
 		if (progress) {
 			m_actualAction = DB_OPEN_RUN;
 			progressInfo();
@@ -436,7 +450,7 @@ void Pkgdbh::buildDatabase
 		string pkgName = m_listOfAlias[packageName];
 		pkginfo_t info;
 		info.files = getFilesOfPackage(pkgName);
-		m_listOfInstPackages[pkgName] = info;
+		m_listOfPackages[pkgName] = info;
 	}
 	if ( !simple && !all && !files ) {
 		if (progress) {
@@ -447,7 +461,7 @@ void Pkgdbh::buildDatabase
 	}
 	if (simple) {
 		pkginfo_t info;
-		for ( auto pkgName : m_packageNamesList) {
+		for ( auto pkgName : m_listOfPackagesNames) {
 			if (progress) {
 				m_actualAction = DB_OPEN_RUN;
 				progressInfo();
@@ -490,7 +504,7 @@ void Pkgdbh::buildDatabase
 					flags = flags + 8;
 				}
 				if ( flags == 15 ) {
-					m_listOfInstPackages[pkgName] = info;
+					m_listOfPackages[pkgName] = info;
 					break;
 				}
 			}
@@ -503,15 +517,15 @@ void Pkgdbh::buildDatabase
 	}
 }
 /**
- * Populate m_listOfInstalledPackagesWithDeps with:
+ * Populate m_listOfPackagesWithDeps with:
  * - Name of the package
  * - Dependencies list of the package
  * */
 void Pkgdbh::buildSimpleDependenciesDatabase()
 {
-	if (m_packageNamesList.empty() )
-			getListOfPackageNames (m_root);
-	for ( auto i : m_packageNamesList) {
+	if (m_listOfPackagesNames.empty() )
+			getListOfPackagesNames (m_root);
+	for ( auto i : m_listOfPackagesNames) {
 		pair < string, set<string> > packageWithDeps;
 		packageWithDeps.first=i;
 		const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
@@ -524,7 +538,7 @@ void Pkgdbh::buildSimpleDependenciesDatabase()
 				packageWithDeps.second.insert(dependency);
 			}
 		}
-		m_listOfInstalledPackagesWithDeps.insert(packageWithDeps);
+		m_listOfPackagesWithDeps.insert(packageWithDeps);
 	}
 }
 /**
@@ -541,9 +555,9 @@ void Pkgdbh::buildSimpleDependenciesDatabase()
 void Pkgdbh::buildSimpleDatabase()
 {
 	if (m_miniDB_Empty) {
-		if (m_packageNamesList.empty() )
-			getListOfPackageNames (m_root);
-		for ( auto i : m_packageNamesList) {
+		if (m_listOfPackagesNames.empty() )
+			getListOfPackagesNames (m_root);
+		for ( auto i : m_listOfPackagesNames) {
 			pkginfo_t info;
 			const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
 			itemList * contentFile = initItemList();
@@ -591,7 +605,7 @@ void Pkgdbh::buildSimpleDatabase()
 				}
 
 			}
-			m_listOfInstPackages[i] = info;
+			m_listOfPackages[i] = info;
 			freeItemList(contentFile);
 		}
 		m_miniDB_Empty=false;
@@ -608,8 +622,8 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 {
 	cleanupMetaFiles(m_root);
 	if (m_DB_Empty) {
-		if (m_packageNamesList.empty() )
-			getListOfPackageNames (m_root);
+		if (m_listOfPackagesNames.empty() )
+			getListOfPackagesNames (m_root);
 
 		if (!silent) {
 			m_actualAction = DB_OPEN_START;
@@ -619,7 +633,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 		cerr << "m_root: " << m_root<< endl;
 #endif
 
-		for (auto i : m_packageNamesList) {
+		for (auto i : m_listOfPackagesNames) {
 			if (!silent) {
 				m_actualAction = DB_OPEN_RUN;
 				progressInfo();
@@ -731,12 +745,12 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					info.files.insert(info.files.end(), file);
 				}
 				if (!info.files.empty())
-					m_listOfInstPackages[i] = info;
+					m_listOfPackages[i] = info;
 			}
 		}
 #ifndef NDEBUG
 		cerr << endl;
-		cerr << m_listOfInstPackages.size()
+		cerr << m_listOfPackages.size()
 		<< " packages found in database " << endl;
 #endif
 		if (!silent)
@@ -805,7 +819,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, pkginfo_t& info)
 void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& info)
 {
 
-	m_listOfInstPackages[name] = info;
+	m_listOfPackages[name] = info;
 	const string packagedir = m_root + PKG_DB_DIR ;
 	const string packagenamedir = m_root + PKG_DB_DIR + name ;
 	mkdir(packagenamedir.c_str(),0755);
@@ -852,7 +866,7 @@ bool Pkgdbh::checkPackageNameExist(const std::string& name) const
 bool Pkgdbh::checkDependency(const std::string& name)
 {
 	if  ( checkPackageNameExist(name) )
-		return m_listOfInstPackages[name].dependency;
+		return m_listOfPackages[name].dependency;
 	return false;
 }
 void Pkgdbh::setDependency()
@@ -865,20 +879,20 @@ void Pkgdbh::resetDependency()
 }
 bool Pkgdbh::checkPackageNameUptodate(const std::pair<std::string, pkginfo_t>& archiveName)
 {
-	set<string>::iterator it = m_packageNamesList.find(archiveName.first);
-	if (it == m_packageNamesList.end())
+	set<string>::iterator it = m_listOfPackagesNames.find(archiveName.first);
+	if (it == m_listOfPackagesNames.end())
 		return false;
-	if (m_listOfInstPackages[archiveName.first].version !=  archiveName.second.version)
+	if (m_listOfPackages[archiveName.first].version !=  archiveName.second.version)
 		return false;
-	if (m_listOfInstPackages[archiveName.first].release !=  archiveName.second.release)
+	if (m_listOfPackages[archiveName.first].release !=  archiveName.second.release)
 		return false;
-	if (m_listOfInstPackages[archiveName.first].build < archiveName.second.build)
+	if (m_listOfPackages[archiveName.first].build < archiveName.second.build)
 		return false;
-	if (m_listOfInstPackages[archiveName.first].collection == "")
+	if (m_listOfPackages[archiveName.first].collection == "")
 		return true;
 	if (archiveName.second.collection == "" )
 		return true;
-	if (m_listOfInstPackages[archiveName.first].collection != archiveName.second.collection)
+	if (m_listOfPackages[archiveName.first].collection != archiveName.second.collection)
 		return false;
 	return true;
 }
@@ -886,10 +900,10 @@ bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 {
 	if (dependencieNameBuild.second == 0)
 		return false;
-	set<string>::iterator it = m_packageNamesList.find(dependencieNameBuild.first);
-	if (it == m_packageNamesList.end())
+	set<string>::iterator it = m_listOfPackagesNames.find(dependencieNameBuild.first);
+	if (it == m_listOfPackagesNames.end())
 		return false;
-	if (m_listOfInstPackages[dependencieNameBuild.first].build < dependencieNameBuild.second)
+	if (m_listOfPackages[dependencieNameBuild.first].build < dependencieNameBuild.second)
 		return false;
 	return true;
 }
@@ -897,13 +911,13 @@ bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 void Pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 {
 	if ( checkPackageNameExist(name)){
-		m_packageVersion = m_listOfInstPackages[name].version;
-		m_packageRelease = itos(m_listOfInstPackages[name].release);
-		m_packageCollection = m_listOfInstPackages[name].collection;
+		m_packageVersion = m_listOfPackages[name].version;
+		m_packageRelease = itos(m_listOfPackages[name].release);
+		m_packageCollection = m_listOfPackages[name].collection;
 	}
 	set<string> metaFilesList;
 	const string packagedir = m_root + PKG_DB_DIR ;
-	const string arch = m_listOfInstPackages[name].arch;
+	const string arch = m_listOfPackages[name].arch;
 	const string packagenamedir = m_root + PKG_DB_DIR + name;
 
 	if ( findFile(metaFilesList, packagenamedir) != 0 ) {
@@ -934,8 +948,8 @@ void Pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 /* Remove the physical files after followings some rules */
 void Pkgdbh::removePackageFiles(const std::string& name)
 {
-	m_filesList = m_listOfInstPackages[name].files;
-	m_listOfInstPackages.erase(name);
+	m_filesList = m_listOfPackages[name].files;
+	m_listOfPackages.erase(name);
 	m_packageName =  name ;
 
 #ifndef NDEBUG
@@ -945,7 +959,7 @@ void Pkgdbh::removePackageFiles(const std::string& name)
 #endif
 
 	// Don't delete files that still have references
-	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i)
+	for (packages_t::const_iterator i = m_listOfPackages.begin(); i != m_listOfPackages.end(); ++i)
 		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j)
 			m_filesList.erase(*j);
 
@@ -973,8 +987,8 @@ void Pkgdbh::removePackageFiles(const std::string& name)
 
 void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::string>& keep_list)
 {
-	m_filesList = m_listOfInstPackages[name].files;
-	m_listOfInstPackages.erase(name);
+	m_filesList = m_listOfPackages[name].files;
+	m_listOfPackages.erase(name);
 	m_packageName =  name ;
 #ifndef NDEBUG
 	cerr << "Removing package phase 1 (all files in package):" << endl;
@@ -992,7 +1006,7 @@ void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 #endif
 
 	// Don't delete files that still have references
-	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i)
+	for (packages_t::const_iterator i = m_listOfPackages.begin(); i != m_listOfPackages.end(); ++i)
 		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j)
 			m_filesList.erase(*j);
 
@@ -1023,12 +1037,12 @@ void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 void Pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list)
 {
 	if ( checkPackageNameExist(m_packageName)){
-		m_packageVersion = m_listOfInstPackages[m_packageName].version;
-		m_packageRelease = itos(m_listOfInstPackages[m_packageName].release);
-		m_packageCollection = m_listOfInstPackages[m_packageName].collection;
+		m_packageVersion = m_listOfPackages[m_packageName].version;
+		m_packageRelease = itos(m_listOfPackages[m_packageName].release);
+		m_packageCollection = m_listOfPackages[m_packageName].collection;
 	}
 	// Remove all references
-	for (packages_t::iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
+	for (packages_t::iterator i = m_listOfPackages.begin(); i != m_listOfPackages.end(); ++i) {
 		for ( auto j : files ) {
 			size_t s = i->second.files.size();
 			i->second.files.erase(j);
@@ -1065,7 +1079,7 @@ std::set<std::string> Pkgdbh::getConflictsFilesList
 	set<string> files;
 
 	// Find conflicting files in database
-	for (packages_t::const_iterator i = m_listOfInstPackages.begin(); i != m_listOfInstPackages.end(); ++i) {
+	for (packages_t::const_iterator i = m_listOfPackages.begin(); i != m_listOfPackages.end(); ++i) {
 		if (i->first != name) {
 			set_intersection(info.files.begin(), info.files.end(),
 					 i->second.files.begin(), i->second.files.end(),
@@ -1106,8 +1120,8 @@ std::set<std::string> Pkgdbh::getConflictsFilesList
 #endif
 
 	// If this is an upgrade, remove files already owned by this package
-	if (m_listOfInstPackages.find(name) != m_listOfInstPackages.end()) {
-		for (set<string>::const_iterator i = m_listOfInstPackages[name].files.begin(); i != m_listOfInstPackages[name].files.end(); ++i)
+	if (m_listOfPackages.find(name) != m_listOfPackages.end()) {
+		for (set<string>::const_iterator i = m_listOfPackages[name].files.begin(); i != m_listOfPackages[name].files.end(); ++i)
 			files.erase(*i);
 
 #ifndef NDEBUG
@@ -1191,7 +1205,7 @@ std::set< std::pair<std::string,time_t> > Pkgdbh::getPackageDependencies
 		return packageNameDepsBuildTime;
 	}
 	if (! packageArchive.second.dependencies.empty() )
-		m_listOfDepotPackages[packageArchive.first] = packageArchive.second;
+		m_listOfRepoPackages[packageArchive.first] = packageArchive.second;
 #ifndef NDEBUG
 	cerr << "----> End of Direct Dependencies" << endl;
 #endif
@@ -1221,7 +1235,7 @@ std::set< std::pair<std::string,time_t> > Pkgdbh::getPackageDependencies
 #endif
 	}
 	if (! packageNameDepsBuildTime.empty() )
-		m_listOfDepotPackages[packageArchive.first].dependencies = packageNameDepsBuildTime;
+		m_listOfRepoPackages[packageArchive.first].dependencies = packageNameDepsBuildTime;
 #ifndef NDEBUG
 	cerr << "----> Number of remains direct deps: " << packageArchive.first << ": " << packageNameDepsBuildTime.size() << "/" << packageArchive.second.dependencies.size() << endl;
 	for ( auto it : packageNameDepsBuildTime ) cerr << it.first << " " ;

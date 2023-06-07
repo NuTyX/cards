@@ -37,10 +37,10 @@ namespace cards
     /// Get a string list of installed packages
     std::set<std::string> CClient::ListOfInstalledPackages()
     {
-        getListOfPackageNames (m_root);
+        getListOfPackagesNames (m_root);
         buildCompleteDatabase(true);
         std::set<std::string> ListOfInstalledPackages;
-        for (auto i : m_listOfInstPackages)
+        for (auto i : m_listOfPackages)
         {
             ListOfInstalledPackages.insert(i.first);
         }
@@ -58,7 +58,7 @@ namespace cards
         }
         m_log->log(message);
         // Get the list of installed packages
-        getListOfPackageNames(m_root);
+        getListOfPackagesNames(m_root);
 
         // Retrieve info about all the packages
         buildCompleteDatabase(false);
@@ -106,7 +106,7 @@ namespace cards
 
         Db_lock lock(m_root, true);
         // Get the list of installed packages
-        getListOfPackageNames(m_root);
+        getListOfPackagesNames(m_root);
         // Retrieve info about all the packages
         buildCompleteDatabase(false);
 
@@ -174,7 +174,7 @@ namespace cards
         {
 			case DB_OPEN_RUN:
 			{
-				i = j / ( getListOfPackageNames("") / 100);
+				i = j / ( getListOfPackagesNames("") / 100);
 				Value = i;
 				j++;
 				break;

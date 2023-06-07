@@ -31,17 +31,12 @@ Pkgrm::Pkgrm ()
 	// Checking the rules
 	readRulesFile();
 }
-void Pkgrm::run(int argc, char** argv)
-{
-	parseArguments(argc, argv);
-	run();
-}
 void Pkgrm::getListOfManInstalledPackages ()
 {
 	// Get the list of installed packages
-	getListOfPackageNames(m_root);
+	getListOfPackagesNames(m_root);
 
-	for ( auto i : m_listOfInstPackages) {
+	for ( auto i : m_listOfPackages) {
 		if ( i.second.dependency == false )
 			m_listOfManInstalledPackages.insert(i.first);
 	}
@@ -61,7 +56,7 @@ void Pkgrm::getDirectDependencies(std::string& name)
 	}
 	if ( ! found ) {
 		m_listofDependencies.insert(name);
-		for ( auto i : m_listOfInstalledPackagesWithDeps ) {
+		for ( auto i : m_listOfPackagesWithDeps ) {
 			if ( i.first == name ) {
 				if ( i.second.size() > 0 ) {
 					for ( auto j : i.second) {
@@ -87,7 +82,7 @@ void Pkgrm::run()
 	Db_lock lock(m_root, true);
 
 	// Get the list of installed packages
-	getListOfPackageNames(m_root);
+	getListOfPackagesNames(m_root);
 
 	// Retrieve info about all the packages
 	buildCompleteDatabase(false);

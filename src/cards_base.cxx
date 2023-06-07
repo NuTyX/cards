@@ -43,7 +43,7 @@ Cards_base::Cards_base(const CardsArgumentParser& argParser)
 	else
 		m_root="/";
 
-	getListOfPackageNames(m_root); // Get the list of installed packages
+	getListOfPackagesNames(m_root); // Get the list of installed packages
 }
 void Cards_base::run(int argc, char** argv)
 {
@@ -72,7 +72,7 @@ void Cards_base::run(int argc, char** argv)
 	if (basePackagesList.size() == 0) {
 		throw runtime_error("No package found for the base System" );
 	}
-	set<string> installedList = getListOfPackageName();
+	set<string> installedList = getListOfPackagesNames();
 	// For all the installed packages
 	for ( auto installFullPackageName : installedList) {
 		// We need to compare the base part if it not one
@@ -107,7 +107,7 @@ void Cards_base::run(int argc, char** argv)
 	if (removePackagesList.size() > 0) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {
 
-			getListOfPackageNames(m_root);
+			getListOfPackagesNames(m_root);
 
 			// Retrieve info about all the packages
 			buildCompleteDatabase(false);

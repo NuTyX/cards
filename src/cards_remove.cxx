@@ -61,7 +61,7 @@ Cards_remove::Cards_remove(const string& commandName,
 		pair<string,string> PackageToRemove;
 
 		for ( auto i : m_argParser.otherArguments() ) {
-			for (auto j : m_listOfInstPackages) {
+			for (auto j : m_listOfPackages) {
 				for (auto k : j.second.dependencies ){
 					if ( i == k.first) {
 						m_actualError = PACKAGE_IN_USE;
@@ -77,7 +77,7 @@ Cards_remove::Cards_remove(const string& commandName,
 				}
 			}
 			if ( listOfPackagesToRemove.empty()) {
-				for (auto j : m_listOfInstPackages) {
+				for (auto j : m_listOfPackages) {
 					for (auto k : j.second.set) {
 						if ( i == k ) {
 							PackageToRemove.first = j.first;
@@ -146,7 +146,7 @@ Cards_remove::Cards_remove(const string& commandName,
 	bool found;
 	set<string> obsoletsDeps;
 	set<string> obsoletsGroups;
-	for ( auto i : m_listOfInstPackages  ) {
+	for ( auto i : m_listOfPackages  ) {
 		found = false;
 		for (  auto j : m_listofDependencies ) {
 			if ( i.first == j ) {
