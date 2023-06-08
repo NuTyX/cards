@@ -327,6 +327,10 @@ std::string Pkgdbh::getSet(const std::string& name) const
 {
 	return getSingleItem(name,'s');
 }
+std::string Pkgdbh::getArch(const std::string& name) const
+{
+	return getSingleItem(name,'A');
+}
 int Pkgdbh::getRelease(const std::string& name) const
 {
 	string r = getSingleItem(name,'r');

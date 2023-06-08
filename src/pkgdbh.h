@@ -202,6 +202,8 @@ public:
 	std::string getVersion(const std::string& name) const;
 	std::string getCollection(const std::string& name) const;
 	std::string getSet(const std::string& name) const;
+	std::string getArch(const std::string& name) const;
+
 	int getRelease(const std::string& name) const;
 
 	bool checkPackageNameExist(const std::string& name) const;
