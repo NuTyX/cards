@@ -611,7 +611,7 @@ remove_lib() {
 pack_devel() {
 	local DIR SUBDIR
 	for DIR in usr opt/*; do
-		for SUBDIR in include lib/pkgconfig lib64/pkgconfig; do
+		for SUBDIR in include lib/pkgconfig lib64/pkgconfig share/pkgconfig; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
 				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
@@ -626,7 +626,7 @@ pack_devel() {
 remove_devel() {
 	local DIR SUBDIR
 	for DIR in usr opt/*; do
-		for SUBDIR in include lib/pkgconfig lib64/pkgconfig; do
+		for SUBDIR in include lib/pkgconfig lib64/pkgconfig share/pkgconfig; do
 			if [ -d $DIR/$SUBDIR ]; then
 				rm -r $DIR/$SUBDIR
 			fi
@@ -796,7 +796,7 @@ add_meta_files() {
 	done
 }
 add_meta_to_archive() {
-	local NAME TAR SIZE_I DESC URL CONT PACK MAINT ARCH GROUP
+	local NAME TAR SIZE_I DESC URL CONT PACK MAINT ARCH GROUP LICENSE
 	NAME="$(get_package_name $1)"
 	ARCH="$(get_package_arch $1)"
 	GROUP="$(echo $NAME|cut -d "." -f2)"
@@ -811,6 +811,7 @@ add_meta_to_archive() {
 	PACK="none"
 	MAINT="none"
 	CONT="none"
+	LICENSE="GPL"
 
 	bsdtar xf $PKGMK_PACKAGE_DIR/$1
 
@@ -819,6 +820,7 @@ add_meta_to_archive() {
 	[ ! -z "$maintainer" ] && MAINT=$maintainer
 	[ ! -z "$contributors" ] && CONT=$contributors
 	[ ! -z "$url" ] && URL=$url
+	[ ! -z "$license" ]  && LICENSE=$license
 
 	SIZE_I="$(du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1)"
 
@@ -833,6 +835,7 @@ add_meta_to_archive() {
 	echo "r$release" >> .META
 	echo "B$PKGMK_BUILDVER" >> .META
 	echo "a$ARCH" >> .META
+	echo "L$LICENSE" >> .META
 	[ ! -z "$COLLECTION" ] && echo "c$COLLECTION" >> .META
 	[ ! -z "$GROUP" ] && echo "g$GROUP" >> .META
 

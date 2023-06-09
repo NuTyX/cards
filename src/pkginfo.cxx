@@ -145,6 +145,7 @@ void Pkginfo::run()
 			<< name << _("Description    : ") << packageArchive.second.description << endl
 			<< name << _("Group          : ") << packageArchive.second.group << endl
 			<< name << _("URL            : ") << packageArchive.second.url << endl
+			<< name << _("License        : ") << packageArchive.second.license << endl
 			<< name << _("Contributor(s) : ") << packageArchive.second.contributors << endl
 			<< name << _("Packager(s)    : ") << packageArchive.second.packager << endl
 			<< name << _("Version        : ") << packageArchive.second.version << endl
@@ -354,6 +355,7 @@ void Pkginfo::run()
 				cout << _("Group          : ") << m_listOfPackages[arg].group << endl
 					<< _("Collection     : ") << m_listOfPackages[arg].collection << endl
 					<< _("URL            : ") << m_listOfPackages[arg].url << endl
+					<< _("License        : ") << m_listOfPackages[arg].license << endl
 					<< _("Contributor(s) : ") << m_listOfPackages[arg].contributors << endl
 					<< _("Packager       : ") << m_listOfPackages[arg].packager << endl
 					<< _("Version        : ") << m_listOfPackages[arg].version << endl

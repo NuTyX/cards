@@ -333,6 +333,9 @@ msgstr "Collection          : "
 msgid "URL            : "
 msgstr "URL                 : "
 
+msgid "License        : "
+msgstr "License             : "
+
 msgid "Binary URL     : "
 msgstr "URL binaires        : "
 

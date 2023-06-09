@@ -331,6 +331,15 @@ std::string Pkgdbh::getArch(const std::string& name) const
 {
 	return getSingleItem(name,'A');
 }
+std::string Pkgdbh::getLicense(const std::string& name) const
+{
+	return getSingleItem(name,'L');
+}
+int Pkgdbh::getSize(const std::string& name) const
+{
+	string r = getSingleItem(name,'S');
+	return atoi(r.c_str());
+}
 int Pkgdbh::getRelease(const std::string& name) const
 {
 	string r = getSingleItem(name,'r');
@@ -667,6 +676,10 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 				if ( contentFile->items[li][0] == 'U' ) {
 					string s = contentFile->items[li];
 					info.url = s.substr(1);
+				}
+				if ( contentFile->items[li][0] == 'L' ) {
+					string s = contentFile->items[li];
+					info.license = s.substr(1);
 				}
 				if ( contentFile->items[li][0] == 'M' ) {
 					string s = contentFile->items[li];

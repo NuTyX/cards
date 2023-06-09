@@ -146,6 +146,7 @@ struct pkginfo_t {
 	std::string maintainer;
 	time_t install; // date of last installation
 	std::string arch;
+	std::string license;
 	int size;
 	bool dependency; // true it's a dependency: automaticaly install
 	std::set< std::pair<std::string,time_t> > dependencies;
@@ -203,7 +204,9 @@ public:
 	std::string getCollection(const std::string& name) const;
 	std::string getSet(const std::string& name) const;
 	std::string getArch(const std::string& name) const;
+	std::string getLicense(const std::string& name) const;
 
+	int getSize(const std::string& name) const;
 	int getRelease(const std::string& name) const;
 
 	bool checkPackageNameExist(const std::string& name) const;
