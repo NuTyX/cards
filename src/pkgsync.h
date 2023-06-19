@@ -40,23 +40,26 @@
 class Pkgsync
 {
 public:
-		/**
-		 * Default constructor
-		 * 
-		 */
-		Pkgsync();
-		Pkgsync(const std::string& url,
+	/**
+	 * constructors
+	 *
+	 */
+	Pkgsync();
+	Pkgsync(const std::string& url,
 			const std::string& directory,
 			const std::string& repoFile);
 
-		virtual void treatErrors(const std::string& s) const;
+	virtual void treatErrors(const std::string& s) const;
 
-		virtual void run();
-		virtual void purge();
-		static const std::string DEFAULT_REPOFILE;
+	virtual void run();
+	virtual void purge();
+	static const std::string DEFAULT_REPOFILE;
 
-		void setRootPath(const std::string& path);
-		void setConfigFile(const std::string& file);
+	void setRootPath(const std::string& path);
+	void setConfigFile(const std::string& file);
+
+	std::set<std::string> getListOfLocalPackages(const std::string& path);
+	std::set<std::string> getListOfRemotePackages(const std::string& pkgrepoFile);
 
 private:
 
@@ -71,7 +74,7 @@ private:
 	const std::string m_remoteUrl;
 	std::string m_repoFile;
 	std::string m_root;
-  std::string m_configFile;
+	std::string m_configFile;
 	error m_actualError;
 
 	

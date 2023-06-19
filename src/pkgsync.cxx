@@ -115,6 +115,20 @@ unsigned int Pkgsync::getLocalPackages(const std::string& path)
 	}
 	return m_localPackagesList.size();	
 }
+std::set<std::string> Pkgsync::getListOfLocalPackages(const std::string& path) {
+	if (m_localPackagesList.size() == 0 ) {
+		getLocalPackages(path);
+		return m_localPackagesList;
+	}
+	return m_localPackagesList;
+}
+std::set<std::string> Pkgsync::getListOfRemotePackages(const std::string& pkgrepoFile) {
+	if (m_remotePackagesList.size() == 0 ) {
+		getRemotePackages(pkgrepoFile);
+		return m_remotePackagesList;
+	}
+	return m_remotePackagesList;
+}
 unsigned int Pkgsync::getRemotePackages(const std::string& pkgrepoFile)
 {
 	m_remotePackagesList.clear();
