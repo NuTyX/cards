@@ -31,8 +31,8 @@ OPTIONS
       -I, --init
              Create all the necessary folder (sources, LOGS and depot).
 
-      -s, --sync [package|collection]
-             Synchronize all the binaries of the [package|collection].
+      -s, --sync <package|collection>
+             Synchronize all the binaries of the <package|collection>.
 
 MORE INFO
        mybld(8)
@@ -273,10 +273,14 @@ Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
 
     -s|--sync)
       SYNC="yes"
-      if [ ! -z $2 ]; then
-        shift
-        PARAM+=($1)
-      fi;;
+      shift
+      if [ -z ${1} ]; then
+        echo "
+>>> Specify a collection/name
+"
+        exit 1
+      fi
+      PARAM+=($1);;
 
     -A|--ask)
       CONFIRM="yes"
