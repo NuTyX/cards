@@ -2,7 +2,7 @@
 //  pkgrepo.cxx
 //
 //  Copyright (c) 2002 - 2005 by Johannes Winkelmann jw at tks6 dot net
-//  Copyright (c) 2014 - 2021 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014 - 2023 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -55,14 +55,14 @@ void Pkgrepo::parsePkgRepoCollectionFile()
 {
 if (m_parsePkgRepoCollectionFile == false) {
 	parseConfig(m_configFileName.c_str());
-	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
+	for (auto i : m_config.dirUrl) {
 		PortsDirectory portsDirectory;
-		portsDirectory.Dir = i->Dir;
-		portsDirectory.Url = i->Url;
-		string collectionPkgRepoFile = i->Dir + "/.PKGREPO" ;
+		portsDirectory.Dir = i.Dir;
+		portsDirectory.Url = i.Url;
+		string collectionPkgRepoFile = i.Dir + "/.PKGREPO" ;
 		if ( ! checkFileExist(collectionPkgRepoFile)) {
-			if ( i->Url.size() > 0 ) {
-				cout << "You should use " << YELLOW << "cards sync" << NORMAL << " for " << i->Dir << endl;
+			if ( i.Url.size() > 0 ) {
+				cout << "You should use " << YELLOW << "cards sync" << NORMAL << " for " << i.Dir << endl;
 			} else {
 				m_ErrorCond = CANNOT_FIND_DEPOT;
 				throwError(collectionPkgRepoFile);
@@ -187,13 +187,13 @@ if (m_parsePkgRepoCollectionFile == false) {
 void Pkgrepo::parseCollectionDirectory()
 {
 	parseConfig(m_configFileName.c_str());
-	for (vector<DirUrl>::iterator i = m_config.dirUrl.begin();i != m_config.dirUrl.end(); ++i) {
+	for (auto i : m_config.dirUrl) {
 		// We don't want to check the folders which cannot sync with any mirror
-		if ( i->Url.size() > 0 )
+		if ( i.Url.size() > 0 )
 			continue;
 		PortsDirectory portsDirectory;
 		BasePackageInfo basePkgInfo;
-		portsDirectory.Dir = i->Dir;
+		portsDirectory.Dir = i.Dir;
 		set<string> localPackagesList;
 		string::size_type pos;
 		if ( findFile( localPackagesList, portsDirectory.Dir) != 0 ) {
