@@ -2,7 +2,7 @@
 //  repodwl.h
 //
 //  Copyright (c) 2002 - 2005 by Johannes Winkelmann jw at tks6 dot net
-//  Copyright (c) 2014 - 2021 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014 - 2023 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,13 @@
 
 class Repodwl: public Pkgrepo {
 public:
+
+/**
+ * Constructor
+ *
+ */
 	Repodwl(const char *fileName);
+
 /**
  * download the .PKGREPO of packageName
  *
@@ -51,6 +57,7 @@ public:
  *
  */
 	void downloadPackageFileName(const std::string& packageName);
+
 	bool checkBinaryExist(const std::string& packageName);
 	std::string getPackageFileName(const std::string& packageName);
 	std::string getPackageFileNameSignature(const std::string& packageName);
