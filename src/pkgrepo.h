@@ -86,7 +86,8 @@ class Pkgrepo
 public:
 
 	Pkgrepo(const std::string& fileName);
-		virtual ~Pkgrepo() { clearPackagesList(); }
+
+	virtual ~Pkgrepo() { clearPackagesList(); }
 
 	static int parseConfig(const char *fileName,
 		Config& config);
@@ -187,6 +188,24 @@ public:
  *
  */
 	std::vector<RepoInfo> getRepoInfo();
+
+/**
+ * return the list of Ports Directory datas
+ *
+ */
+std::vector<PortsDirectory> getListOfPortsDirectory();
+
+/**
+ * return the list of Collection Directory datas
+ *
+ */
+std::vector<PortsDirectory> getListOfCollectionDirectory();
+
+/**
+ * return the list of files found in the founded PKGREPO file
+ *
+ */
+std::vector<PortFilesList> getCurrentPackagePkgRepoFile(const std::string& portName);
 
 /**
  * printout the list of available ports which are compiled

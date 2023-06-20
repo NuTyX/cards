@@ -182,6 +182,12 @@ void Pkgrepo::parsePkgRepoCollectionFile()
 #endif
 	m_parsePkgRepoCollectionFile = true;
 }
+std::vector<PortsDirectory> Pkgrepo::getListOfPortsDirectory()
+{
+	parsePkgRepoCollectionFile();
+	return m_portsDirectoryList;
+
+}
 void Pkgrepo::parseCollectionDirectory()
 {
 	if (m_parseCollectionDirectory)
@@ -211,16 +217,22 @@ void Pkgrepo::parseCollectionDirectory()
 	if (m_portsDirectoryList.size() > 0)
 		m_parseCollectionDirectory = true;
 }
+std::vector<PortsDirectory> Pkgrepo::getListOfCollectionDirectory()
+{
+	parseCollectionDirectory();
+	return m_portsDirectoryList;
+
+}
 
 void Pkgrepo::parseCurrentPackagePkgRepoFile()
 {
 /*
- From here we can check whats is available in the port directory,
- It means from here the concerned VALID .PKGREPO file MUST be available.
- It can be the Pkgfile, the binary, the post-install, etc
- We have to parse the file
- /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
- .PKGREPO file = /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
+ *
+ * From here we can check whats is available in the port directory,
+ * It means from here the concerned VALID .PKGREPO file MUST be available.
+ * It can be the Pkgfile, the binary, the post-install, etc
+ * We have to parse the file /var/lib/pkg/depot/cli/alsa-lib/.PKGREPO
+ *
 */
 
 	std::string PkgRepoFile = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName  + "/.PKGREPO";
@@ -288,6 +300,13 @@ void Pkgrepo::parseCurrentPackagePkgRepoFile()
 		}
 		m_portFilesList.push_back(portFilesList);
 	}
+}
+std::vector<PortFilesList> Pkgrepo::getCurrentPackagePkgRepoFile(const std::string& portName)
+{
+	if (checkPortExist(portName))
+		parseCurrentPackagePkgRepoFile();
+
+	return m_portFilesList;
 }
 std::set<std::string> Pkgrepo::getListOutOfDate()
 {

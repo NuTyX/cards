@@ -1,0 +1,4 @@
+- PkgRepoCollectionFile: xxx#yyy#x## fill m_portsDirectoryList type of vector of PortsDirectory
+- CollectionDirectory: fill m_portsDirectoryList  type of vector of PortsDirectory
+- CurrentPackagePkgRepoFile: fill m_portsFilesList type of  vector of PortFilesList type of string,string,string
+- PackagePkgfileFile: fill basePackageList type of vector of basePackageList type of BasePackageInfo
