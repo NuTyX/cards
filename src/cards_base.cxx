@@ -1,6 +1,6 @@
 // cards_base.cxx
 //
-//  Copyright (c) 2014 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014 - 2023 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ void Cards_base::run(int argc, char** argv)
 	// For all the base packages list Directories
 	for ( auto i : config.baseDir) {
 		// we get all the packages from the basePackageList directory
-		if ( findFile(basePackagesList, i) != 0 ) {
+		if ( findDir(basePackagesList, i) != 0 ) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(i);
 		}

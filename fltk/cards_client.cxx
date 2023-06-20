@@ -2,7 +2,7 @@
  * cards_client.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ namespace cards
         Pkgrepo::parseConfig(Cards.m_configFileName.c_str(),config);
         for (auto it : config.baseDir)
         {
-            findFile(basePackagesList,it);
+            findDir(basePackagesList,it);
         }
 
         for (auto pack:pPackageList)

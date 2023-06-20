@@ -1,7 +1,7 @@
 /*
  * cards_create.cxx
  * 
- * Copyright 2016 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2016 - 2023 Thierry Nuttens <tnut@nutyx.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -147,7 +147,7 @@ void Cards_create::createBinaries(const char *configFileName,
 	}
 
 	set<string> listOfPackages;
-	if (findFile(listOfPackages, pkgdir) != 0) {
+	if (findDir(listOfPackages, pkgdir) != 0) {
 		m_actualError = CANNOT_READ_DIRECTORY;
 		treatErrors(pkgdir);
 	}

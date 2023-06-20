@@ -3,7 +3,7 @@
 //
 //  Copyright (c) 2000 - 2005 Per Liden
 //  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013 - 2021 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2023 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -357,7 +357,7 @@ int Pkgdbh::getListOfPackagesNames (const std::string& path)
 #ifndef NDEBUG
 	cerr << "pathdb: " << pathdb << endl;
 #endif
-	if ( findFile(m_listOfPackagesNames, pathdb) != 0 ) {
+	if ( findDir(m_listOfPackagesNames, pathdb) != 0 ) {
 		m_actualError = CANNOT_READ_FILE;
 		treatErrors(pathdb);
 	}
@@ -937,7 +937,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 	const string arch = m_listOfPackages[name].arch;
 	const string packagenamedir = m_root + PKG_DB_DIR + name;
 
-	if ( findFile(metaFilesList, packagenamedir) != 0 ) {
+	if ( findDir(metaFilesList, packagenamedir) != 0 ) {
 		m_actualError = CANNOT_READ_FILE;
 		treatErrors(packagenamedir);
 	}

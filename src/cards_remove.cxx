@@ -1,7 +1,7 @@
 /*
  * cards_remove.cxx
  *
- * Copyright 2013 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2013 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ Cards_remove::Cards_remove(const string& commandName,
 	if (!m_argParser.isSet(CardsArgumentParser::OPT_ALL)){
 		set<string> basePackagesList;
 		for (auto i : config.baseDir) {
-			if ( findFile(basePackagesList, i) != 0 ) {
+			if ( findDir(basePackagesList, i) != 0 ) {
 				m_actualError = CANNOT_READ_DIRECTORY;
 				treatErrors(i);
 			}

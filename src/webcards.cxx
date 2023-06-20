@@ -1,6 +1,6 @@
 //  webcards.cxx
 //
-//  Copyright (c) 2017 - 2022 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2017 - 2023 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -404,7 +404,7 @@ int main (int argc, char** argv)
 {
 	set<string> ArticleNamesList;
 
-	findFile(ArticleNamesList, "content/");
+	findDir(ArticleNamesList, "content/");
 	/* All the contents */
 	content_t Content;
 	Content = getContent(ArticleNamesList);

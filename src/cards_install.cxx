@@ -1,7 +1,7 @@
 /*
  * cards_install.cxx
  *
- * Copyright 2015 - 2022 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2015 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -113,7 +113,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 		if ( packageName == m_argParser.otherArguments()[0])
 			break;
 		std::set<std::string> listofBinaries;
-		if (findFile(listofBinaries, i) != 0) {
+		if (findDir(listofBinaries, i) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(i);
 		}

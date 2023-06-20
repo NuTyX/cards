@@ -196,7 +196,7 @@ void Pkgrepo::parseCollectionDirectory()
 		portsDirectory.Dir = i.Dir;
 		std::set<std::string> localPackagesList;
 		std::string::size_type pos;
-		if ( findFile( localPackagesList, portsDirectory.Dir) != 0 ) {
+		if ( findDir( localPackagesList, portsDirectory.Dir) != 0 ) {
 			std::cerr << YELLOW << "continue with the next entry" << NORMAL << std::endl;
 			continue;
 		}

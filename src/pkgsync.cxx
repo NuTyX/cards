@@ -1,7 +1,7 @@
 //
 // pkgsync.cxx
 //
-//  Copyright (c) 2017 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2017 - 2023 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -109,7 +109,7 @@ void Pkgsync::treatErrors(const std::string& s) const
 unsigned int Pkgsync::getLocalPackages(const std::string& path)
 {
 	m_localPackagesList.clear();
-	if ( findFile( m_localPackagesList, path) != 0 ) {
+	if ( findDir( m_localPackagesList, path) != 0 ) {
 		m_actualError = CANNOT_READ_DIRECTORY;
 		treatErrors(path);
 	}
@@ -188,7 +188,7 @@ void Pkgsync::deleteFolder(const std::string& folderName)
 {
 	using namespace std;
 	set<string> filesToDelete;
-	if ( findFile(filesToDelete, folderName) != 0 ){
+	if ( findDir(filesToDelete, folderName) != 0 ){
 			m_actualError = CANNOT_READ_FILE;
 			treatErrors(folderName);
 	}
