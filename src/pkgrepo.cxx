@@ -23,17 +23,15 @@
 
 #include "pkgrepo.h"
 
-using namespace std;
-
 Pkgrepo::Pkgrepo(const std::string& fileName)
 	: m_configFileName(fileName)
 {
 	if (!checkFileExist(m_configFileName)) {
-		cerr << WHITE << "Warning: " << NORMAL << "No configuration file: " << YELLOW
+		std::cerr << WHITE << "Warning: " << NORMAL << "No configuration file: " << YELLOW
 			<<  m_configFileName  << NORMAL
-			<< " found..." << endl
+			<< " found..." << std::endl
 			<< WHITE << "You should create a new one based on the " << YELLOW
-			<< m_configFileName << ".example" << NORMAL << " file" << endl;
+			<< m_configFileName << ".example" << NORMAL << " file" << std::endl;
 	}
 
 	m_parsePkgRepoCollectionFile = false;
@@ -53,23 +51,24 @@ void Pkgrepo::throwError
 }
 void Pkgrepo::parsePkgRepoCollectionFile()
 {
-if (m_parsePkgRepoCollectionFile == false) {
+	if (m_parsePkgRepoCollectionFile)
+		return;
 	parseConfig(m_configFileName.c_str());
 	for (auto i : m_config.dirUrl) {
 		PortsDirectory portsDirectory;
 		portsDirectory.Dir = i.Dir;
 		portsDirectory.Url = i.Url;
-		string collectionPkgRepoFile = i.Dir + "/.PKGREPO" ;
+		std::string collectionPkgRepoFile = i.Dir + "/.PKGREPO" ;
 		if ( ! checkFileExist(collectionPkgRepoFile)) {
 			if ( i.Url.size() > 0 ) {
-				cout << "You should use " << YELLOW << "cards sync" << NORMAL << " for " << i.Dir << endl;
+				std::cout << "You should use " << YELLOW << "cards sync" << NORMAL << " for " << i.Dir << std::endl;
 			} else {
 				m_ErrorCond = CANNOT_FIND_DEPOT;
 				throwError(collectionPkgRepoFile);
 			}
 			continue;
 		}
-		vector<string> PkgRepoFileContent;
+		std::vector<std::string> PkgRepoFileContent;
 
 		if ( parseFile(PkgRepoFileContent,collectionPkgRepoFile.c_str()) != 0) {
 			m_ErrorCond = CANNOT_FIND_DEPOT;
@@ -81,14 +80,14 @@ if (m_parsePkgRepoCollectionFile == false) {
 			basePkgInfo.release = 1;
 			basePkgInfo.buildDate = 0;
 			if ( input.size() <  34 ) {
-				cerr << "missing info" << endl;
+				std::cerr << "missing info" << std::endl;
 				continue;
 			}
 			if ( ( input[32] != '#' ) || ( input[43] != '#' ) ) {
-				cerr << "wrong  info" << endl;
+				std::cerr << "wrong  info" << std::endl;
 				continue;
 			}
-			vector<string> infos;
+			std::vector<std::string> infos;
 			split( input, '#', infos, 0,true);
 			if ( infos.size() > 0 ) {
 				if ( infos[0].size() > 0 ) {
@@ -173,19 +172,20 @@ if (m_parsePkgRepoCollectionFile == false) {
 #ifndef NDEBUG
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
-			cerr << i.Url << " "<< i.Dir << " "
+			std::cerr << i.Url << " "<< i.Dir << " "
 			<< j.basePackageName  << " "
 			<< j.version << " "
 			<< j.md5SUM <<  " "
-			<< j.s_buildDate << endl;
+			<< j.s_buildDate << std::endl;
 		}
 	}
 #endif
 	m_parsePkgRepoCollectionFile = true;
-	}
 }
 void Pkgrepo::parseCollectionDirectory()
 {
+	if (m_parseCollectionDirectory)
+		return;
 	parseConfig(m_configFileName.c_str());
 	for (auto i : m_config.dirUrl) {
 		// We don't want to check the folders which cannot sync with any mirror
@@ -194,14 +194,14 @@ void Pkgrepo::parseCollectionDirectory()
 		PortsDirectory portsDirectory;
 		BasePackageInfo basePkgInfo;
 		portsDirectory.Dir = i.Dir;
-		set<string> localPackagesList;
-		string::size_type pos;
+		std::set<std::string> localPackagesList;
+		std::string::size_type pos;
 		if ( findFile( localPackagesList, portsDirectory.Dir) != 0 ) {
-			cerr << YELLOW << "continue with the next entry" << NORMAL << endl;
+			std::cerr << YELLOW << "continue with the next entry" << NORMAL << std::endl;
 			continue;
 		}
 
-		for (set<string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); ++li) {
+		for (std::set<std::string>::const_iterator li = localPackagesList.begin(); li != localPackagesList.end(); ++li) {
 			basePkgInfo.basePackageName = *li;
 			portsDirectory.basePackageList.push_back(basePkgInfo);
 		}
@@ -223,20 +223,20 @@ void Pkgrepo::parseCurrentPackagePkgRepoFile()
  .PKGREPO file = /var/lib/pkg/saravane/server/alsa-lib/.PKGREPO
 */
 
-	string PkgRepoFile = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName  + "/.PKGREPO";
+	std::string PkgRepoFile = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName  + "/.PKGREPO";
 #ifndef NDEBUG
-	cerr << PkgRepoFile << endl;
+	std::cerr << PkgRepoFile << std::endl;
 #endif
-	vector<string> PkgRepoFileContent;
+	std::vector<std::string> PkgRepoFileContent;
 	parseFile(PkgRepoFileContent,PkgRepoFile.c_str());
 	PortFilesList portFilesList;
 	for (auto input : PkgRepoFileContent) {
 		if (input.size() < 11) {
-			cerr << "[" << input << "]: Wrong format field to small" << endl;
+			std::cerr << "[" << input << "]: Wrong format field to small" << std::endl;
 			continue;
 		}
 		if ( input[10] != '#' ) {	// It's not the first line, then it can be one of our files
-			vector<string> infos;
+			std::vector<std::string> infos;
 			split( input, '#', infos, 0,true);
 			portFilesList.md5SUM = infos[0];
 			portFilesList.name = infos[1];
@@ -253,7 +253,8 @@ void Pkgrepo::parseCurrentPackagePkgRepoFile()
 				continue;
 			}
 #ifndef NDEBUG
-			cerr << m_BasePackageInfo_i->basePackageName << ": " << portFilesList.md5SUM << " " << portFilesList.name << " " << portFilesList.arch << endl;
+			std::cerr << m_BasePackageInfo_i->basePackageName << ": " << portFilesList.md5SUM
+			<< " " << portFilesList.name << " " << portFilesList.arch << std::endl;
 #endif
 		} else {
 		/*
@@ -261,31 +262,38 @@ void Pkgrepo::parseCurrentPackagePkgRepoFile()
 		 * 1401638336#.cards.tar.xz#4.14.1#..#..#..
 		 * We already have this info let's make sure it's still ok
 		*/
-			vector<string> infos;
+			std::vector<std::string> infos;
 			split( input, '#', infos, 0,true);
-			if ( (m_BasePackageInfo_i->s_buildDate != infos[0] ) && ( m_BasePackageInfo_i->s_buildDate.size() > 0 ) ) {
-				cerr << m_BasePackageInfo_i->basePackageName << ": " << m_BasePackageInfo_i->s_buildDate << " != " << infos[0] << endl;
+			if ( (m_BasePackageInfo_i->s_buildDate != infos[0] )
+				&& ( m_BasePackageInfo_i->s_buildDate.size() > 0 ) ) {
+					std::cerr << m_BasePackageInfo_i->basePackageName << ": "
+						<< m_BasePackageInfo_i->s_buildDate << " != " << infos[0] << std::endl;
 			}
-			if ( (m_BasePackageInfo_i->extention != infos[1]) && ( m_BasePackageInfo_i->extention.size() > 0 ) ) {
-				cerr << m_BasePackageInfo_i->basePackageName << ": " << m_BasePackageInfo_i->extention << " != " << infos[1] << endl;
+			if ( (m_BasePackageInfo_i->extention != infos[1])
+				&& ( m_BasePackageInfo_i->extention.size() > 0 ) ) {
+					std::cerr << m_BasePackageInfo_i->basePackageName << ": "
+						<< m_BasePackageInfo_i->extention << " != " << infos[1] << std::endl;
 			}
-			if ( (m_BasePackageInfo_i->version != infos[2] ) && ( m_BasePackageInfo_i->version.size() > 0 )) {
-				cerr << m_BasePackageInfo_i->basePackageName << ": " << m_BasePackageInfo_i->version << " != " << infos[2] << endl;
+			if ( (m_BasePackageInfo_i->version != infos[2] )
+				&& ( m_BasePackageInfo_i->version.size() > 0 )) {
+					std::cerr << m_BasePackageInfo_i->basePackageName << ": "
+						<< m_BasePackageInfo_i->version << " != " << infos[2] << std::endl;
 			}
 #ifndef NDEBUG
-			cerr << m_BasePackageInfo_i->basePackageName << ": " << m_BasePackageInfo_i->buildDate << " " << m_BasePackageInfo_i->extention << endl;
+			std::cerr << m_BasePackageInfo_i->basePackageName << ": "
+				<< m_BasePackageInfo_i->buildDate << " "
+				<< m_BasePackageInfo_i->extention << std::endl;
 #endif
 			continue;
 		}
 		m_portFilesList.push_back(portFilesList);
 	}
 }
-set<string> Pkgrepo::getListOutOfDate()
+std::set<std::string> Pkgrepo::getListOutOfDate()
 {
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
+	parseCollectionDirectory();
 
-	set<string> listOfPackages;
+	std::set<std::string> listOfPackages;
 	// For each collection activate in cards.conf
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
@@ -299,29 +307,30 @@ set<string> Pkgrepo::getListOutOfDate()
 }
 void Pkgrepo::parsePackagePkgfileFile()
 {
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
+	if (m_parsePackagePkgfileFile)
+		return;
+	parseCollectionDirectory();
 
 	std::string::size_type pos;
 	for (std::vector<PortsDirectory>::iterator i = m_portsDirectoryList.begin();i !=  m_portsDirectoryList.end();++i) {
 		for (std::vector<BasePackageInfo>::iterator j = i->basePackageList.begin(); j != i->basePackageList.end();++j) {
-			string pkgFile = i->Dir + "/" + j->basePackageName  + "/Pkgfile";
+			std::string pkgFile = i->Dir + "/" + j->basePackageName  + "/Pkgfile";
 			if ( ! checkFileExist (pkgFile) ) {
 				j->basePackageName = "";
 				continue;
 			}
 			j->fileDate = getModifyTimeFile(pkgFile);
-			vector<string> pkgFileContent;
+			std::vector<std::string> pkgFileContent;
 			if ( parseFile(pkgFileContent,pkgFile.c_str()) != 0) {
-				cout << "You should use " << YELLOW << "ports -u" << NORMAL << " for " << i->Dir << endl;
-				cerr << "Cannot read the file: " << pkgFile << endl
-					<< " ... continue with next" << endl;
+				std::cout << "You should use " << YELLOW << "ports -u" << NORMAL << " for " << i->Dir << std::endl;
+				std::cerr << "Cannot read the file: " << pkgFile << std::endl
+					<< " ... continue with next" << std::endl;
 				j->basePackageName = "";
 				continue;
 			}
 			j->release = 1;
-			for (vector<string>::const_iterator p = pkgFileContent.begin();p != pkgFileContent.end();++p) {
-				string line = stripWhiteSpace(*p);
+			for (std::vector<std::string>::const_iterator p = pkgFileContent.begin();p != pkgFileContent.end();++p) {
+				std::string line = stripWhiteSpace(*p);
 				if ( line.substr( 0, 12 ) == "description=" ){
 					j->description = getValueBefore( getValue( line, '=' ), '#' );
 					j->description = stripWhiteSpace( j->description );
@@ -341,7 +350,7 @@ void Pkgrepo::parsePackagePkgfileFile()
 					j->version = getValueBefore( getValue( line, '=' ), '#' );
 					j->version = stripWhiteSpace( j->version );
 				} else if ( line.substr( 0, 8 ) == "release=" ){
-					string release = getValueBefore( getValue( line, '=' ), '#' );
+					std::string release = getValueBefore( getValue( line, '=' ), '#' );
 					release = stripWhiteSpace(release );
 					j->release = atoi(release.c_str());
 				} else if ( line[0] == '#' ) {
@@ -350,7 +359,7 @@ void Pkgrepo::parsePackagePkgfileFile()
 						line = line.substr( 1 );
 					}
 					pos = line.find(':');
-					if ( pos != string::npos ) {
+					if ( pos != std::string::npos ) {
 						if ( startsWithNoCase( line, "desc" ) ) {
 							j->description = stripWhiteSpace( getValue( line, ':' ) );
 						} else if ( startsWithNoCase( line, "url" ) ) {
@@ -367,16 +376,15 @@ void Pkgrepo::parsePackagePkgfileFile()
 	}
 	m_parsePackagePkgfileFile = true;
 }
-std::set<string> Pkgrepo::getListOfPackagesFromCollection
+std::set<std::string> Pkgrepo::getListOfPackagesFromCollection
 	(const std::string& collectionName)
 {
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
+	parsePkgRepoCollectionFile();
 
-	std::set<string> listOfPackages;
+	std::set<std::string> listOfPackages;
 
 	for (auto i : m_portsDirectoryList) {
-		string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
+		std::string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
 		if ( baseDir == collectionName) {
 			for (auto j : i.basePackageList) {
 				listOfPackages.insert(j.basePackageName);
@@ -386,17 +394,16 @@ std::set<string> Pkgrepo::getListOfPackagesFromCollection
 	}
 	return listOfPackages;
 }
-std::set<string> Pkgrepo::getListOfPackagesFromSet
+std::set<std::string> Pkgrepo::getListOfPackagesFromSet
 	(const std::string& setName)
 {
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
+	parsePkgRepoCollectionFile();
 
-	std::set<string> listOfPackages;
+	std::set<std::string> listOfPackages;
 
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
-			std::set<string> set = parseDelimitedSetList(j.set, " ");
+			std::set<std::string> set = parseDelimitedSetList(j.set, " ");
 			for (auto k : set) {
 				if (k == setName)
 					listOfPackages.insert(j.basePackageName);
@@ -405,28 +412,27 @@ std::set<string> Pkgrepo::getListOfPackagesFromSet
 	}
 	return listOfPackages;
 }
-std::set<string> Pkgrepo::getBinaryPackageList()
+std::set<std::string> Pkgrepo::getBinaryPackageList()
 {
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
+	parsePkgRepoCollectionFile();
 
-	string packageNameVersion;
-	string baseDir;
-	set<string>  binaryList;
+	std::string packageNameVersion;
+	std::string baseDir;
+	std::set<std::string>  binaryList;
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
 #ifndef NDEBUG
-		cerr << i.Dir << " " << i.Url << endl;
+		std::cerr << i.Dir << " " << i.Url << std::endl;
 #endif
 		for (auto j : i.basePackageList) {
 #ifndef NDEBUG
-			cerr << j.basePackageName << " "
+			std::cerr << j.basePackageName << " "
 					<< j.description << " "
 					<< j.md5SUM << " "
 					<< j.version << " "
 					<< j.s_buildDate << " "
-					<< j.extention << endl ;
+					<< j.extention << std::endl ;
 #endif
 			if ( ( j.set=="none ") || (j.set.size()==0 ) || 
 				 ( j.set=="none") )
@@ -448,24 +454,23 @@ std::set<string> Pkgrepo::getBinaryPackageList()
 }
 std::set<Pkg*> Pkgrepo::getBinaryPackageSet()
 {
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
+	parsePkgRepoCollectionFile();
 
 	// set<Pkg*> pkgList;
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
 #ifndef NDEBUG
-		cerr << i.Dir << " " << i.Url << endl;
+		std::cerr << i.Dir << " " << i.Url << std::endl;
 #endif
 		for (auto j : i.basePackageList) {
 #ifndef NDEBUG
-			cerr << j.basePackageName << " "
+			std::cerr << j.basePackageName << " "
 				<< j.description << " "
-				<< j.version << endl;
+				<< j.version << std::endl;
 #endif
 			Pkg* pkg = new Pkg();
-			string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
+			std::string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
 			pkg->setName(j.basePackageName);
 			pkg->setVersion(j.version);
 			pkg->setDescription(j.description);
@@ -484,23 +489,22 @@ std::set<Pkg*> Pkgrepo::getBinaryPackageSet()
 }
 std::vector<RepoInfo> Pkgrepo::getRepoInfo()
 {
-	string::size_type pos;
+	std::string::size_type pos;
 	std::vector<RepoInfo> List;
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
+	parsePkgRepoCollectionFile();
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
 		RepoInfo ArchCollectionBasePackageList;
 		pos = i.Dir.find_last_of("/\\");
-		if ( pos != string::npos ) {
+		if ( pos != std::string::npos ) {
 			ArchCollectionBasePackageList.collection=i.Dir.substr(pos+1);
-			string s = i.Dir.substr(0, pos );
+			std::string s = i.Dir.substr(0, pos );
 			pos = s.rfind("/");
-			if ( pos != string::npos ) {
+			if ( pos != std::string::npos ) {
 				ArchCollectionBasePackageList.branch = s.substr(pos+1);
 				s = i.Dir.substr(0,pos);
 				pos = s.rfind("/");
-				if ( pos != string::npos )
+				if ( pos != std::string::npos )
 					ArchCollectionBasePackageList.arch = s.substr(pos+1);
 			}
 		} else {
@@ -514,10 +518,8 @@ std::vector<RepoInfo> Pkgrepo::getRepoInfo()
 }
 unsigned int Pkgrepo::getPortsList()
 {
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
-	if (!m_parsePackagePkgfileFile)
-		parsePackagePkgfileFile();
+	parseCollectionDirectory();
+	parsePackagePkgfileFile();
 
 
 	unsigned int numberOfPorts = 0;
@@ -525,28 +527,28 @@ unsigned int Pkgrepo::getPortsList()
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
 #ifndef NDEBUG
-		cerr << i.Dir << " " << i.Url << endl;
+		std::cerr << i.Dir << " " << i.Url << std::endl;
 #endif
 		for (auto j : i.basePackageList) {
 #ifndef NDEBUG
-			cerr << j.basePackageName << " "
+			std::cerr << j.basePackageName << " "
 				<< j.description << " "
 				<< j.md5SUM << " "
 				<< j.version << " "
 				<< j.release << " "
 				<< j.s_buildDate << " "
-				<< j.extention << endl ;
+				<< j.extention << std::endl ;
 #endif
 			if (j.basePackageName.size() > 0) {
-				string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
-				cout <<  i.Dir + "/"
+				std::string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
+				std::cout <<  i.Dir + "/"
 					+ j.basePackageName
 					<< " "
 					<< j.version
 					<< "-"
 					<< j.release
 					<< " "
-					<< j.packager << endl;
+					<< j.packager << std::endl;
 				numberOfPorts++;
 			}
 		}
@@ -556,11 +558,8 @@ unsigned int Pkgrepo::getPortsList()
 bool Pkgrepo::getPortInfo(const std::string& portName)
 {
 
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
-
-	if (!m_parsePackagePkgfileFile)
-		parsePackagePkgfileFile();
+	parseCollectionDirectory();
+	parsePackagePkgfileFile();
 
 	bool found = false;
 	// For each defined collection
@@ -571,16 +570,16 @@ bool Pkgrepo::getPortInfo(const std::string& portName)
 		for (auto j : i.basePackageList) {
 			if ( j.basePackageName == portName ) {
 				found = true;
-				cout << _("Name           : ") << portName << endl
-					<< _("Description    : ") << j.description << endl
-					<< _("URL            : ") << j.URL << endl
-					<< _("Version        : ") << j.version << endl
-					<< _("Release        : ") << j.release << endl
-					<< _("Maintainer(s)  : ") << j.maintainer << endl
-					<< _("Contributor(s) : ") << j.contributors << endl
-					<< _("Packager       : ") << j.packager << endl
-					<< _("Date of Pkgfile: ") << j.fileDate << endl
-					<< _("Local folder   : ") << i.Dir << endl;
+				std::cout << _("Name           : ") << portName << std::endl
+					<< _("Description    : ") << j.description << std::endl
+					<< _("URL            : ") << j.URL << std::endl
+					<< _("Version        : ") << j.version << std::endl
+					<< _("Release        : ") << j.release << std::endl
+					<< _("Maintainer(s)  : ") << j.maintainer << std::endl
+					<< _("Contributor(s) : ") << j.contributors << std::endl
+					<< _("Packager       : ") << j.packager << std::endl
+					<< _("Date of Pkgfile: ") << j.fileDate << std::endl
+					<< _("Local folder   : ") << i.Dir << std::endl;
 			}
 		}
 	}
@@ -598,21 +597,21 @@ bool Pkgrepo::getBinaryPackageInfo(const std::string& packageName)
 		for (auto j : i.basePackageList) {
 			if ( j.basePackageName == packageName ) {
 				found = true;
-				cout << _("Name           : ") << packageName << endl
-					<< _("Alias          : ") << j.alias << endl
-					<< _("Description    : ") << j.description << endl
-					<< _("Categories     : ") << j.categories << endl
-					<< _("Set            : ") << j.set << endl
-					<< _("Groups         : ") << j.group << endl
-					<< _("URL            : ") << j.URL << endl
-					<< _("Version        : ") << j.version << endl
-					<< _("Release        : ") << j.release << endl
-					<< _("Maintainer(s)  : ") << j.maintainer << endl
-					<< _("Contributor(s) : ") << j.contributors << endl
-					<< _("Packager       : ") << j.packager << endl
-					<< _("Build date     : ") << getDateFromEpoch(j.buildDate) << endl
-					<< _("Binary URL     : ") << i.Url << endl
-					<< _("Local folder   : ") << i.Dir << endl;
+				std::cout << _("Name           : ") << packageName << std::endl
+					<< _("Alias          : ") << j.alias << std::endl
+					<< _("Description    : ") << j.description << std::endl
+					<< _("Categories     : ") << j.categories << std::endl
+					<< _("Set            : ") << j.set << std::endl
+					<< _("Groups         : ") << j.group << std::endl
+					<< _("URL            : ") << j.URL << std::endl
+					<< _("Version        : ") << j.version << std::endl
+					<< _("Release        : ") << j.release << std::endl
+					<< _("Maintainer(s)  : ") << j.maintainer << std::endl
+					<< _("Contributor(s) : ") << j.contributors << std::endl
+					<< _("Packager       : ") << j.packager << std::endl
+					<< _("Build date     : ") << getDateFromEpoch(j.buildDate) << std::endl
+					<< _("Binary URL     : ") << i.Url << std::endl
+					<< _("Local folder   : ") << i.Dir << std::endl;
 				break;
 			}
 		}
@@ -626,7 +625,7 @@ std::string Pkgrepo::getPortDir (const std::string& portName)
 	if (!m_parseCollectionDirectory)
 		parseCollectionDirectory();
 
-	string portDir = "";
+	std::string portDir = "";
 	bool found = false;
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
@@ -647,9 +646,9 @@ std::string Pkgrepo::getBasePackageName(const std::string& packageName)
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
 
-	string basePackageName = packageName;
-	string::size_type pos = packageName.find('.');
-	if (pos != string::npos) {
+	std::string basePackageName = packageName;
+	std::string::size_type pos = packageName.find('.');
+	if (pos != std::string::npos) {
 		basePackageName=packageName.substr(0,pos);
 	}
 	for (auto i : m_portsDirectoryList) {
@@ -661,7 +660,7 @@ std::string Pkgrepo::getBasePackageName(const std::string& packageName)
 	}
 	return "";
 }
-std::string Pkgrepo::getBasePackageVersion(const string& packageName)
+std::string Pkgrepo::getBasePackageVersion(const std::string& packageName)
 {
 	if (!m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
@@ -681,9 +680,9 @@ std::string Pkgrepo::getBasePortName (const std::string& portName)
 		parseCollectionDirectory();
 	if (!m_parsePackagePkgfileFile)
 		parsePackagePkgfileFile();
-	string basePortName = portName;
-	string::size_type pos = portName.find('.');
-	if (pos != string::npos) {
+	std::string basePortName = portName;
+	std::string::size_type pos = portName.find('.');
+	if (pos != std::string::npos) {
 		basePortName = portName.substr(0,pos);
 	}
 	for (auto i : m_portsDirectoryList) {
@@ -751,9 +750,9 @@ bool Pkgrepo::checkPortExist(const std::string& portName)
 	if (!m_parsePackagePkgfileFile)
 		parsePackagePkgfileFile();
 
-	string basePortName = portName;
-	string::size_type pos = portName.find('.');
-	if (pos != string::npos) {
+	std::string basePortName = portName;
+	std::string::size_type pos = portName.find('.');
+	if (pos != std::string::npos) {
 		basePortName=portName.substr(0,pos);
 	}
 
@@ -770,9 +769,9 @@ time_t Pkgrepo::getBinaryBuildTime (const std::string& packageName)
 {
 	if (! m_parsePkgRepoCollectionFile)
 		parsePkgRepoCollectionFile();
-	string basePackageName = packageName;
-	string::size_type pos = packageName.find('.');
-	if (pos != string::npos)
+	std::string basePackageName = packageName;
+	std::string::size_type pos = packageName.find('.');
+	if (pos != std::string::npos)
 		basePackageName=packageName.substr(0,pos);
 	time_t buildTime = 0;
 	bool found = false;
@@ -804,8 +803,8 @@ int Pkgrepo::parseConfig(const char *fileName, Config& config)
 			return result;
 	}
 #ifndef NDEBUG
-	cerr << "name:" << config.name << endl
-		<< "version:" << config.version << endl;
+	std::cerr << "name:" << config.name << std::endl
+		<< "version:" << config.version << std::endl;
 #endif
 	if ( config.name.size() == 0 ) {
 		config.name="current";
@@ -819,16 +818,16 @@ int Pkgrepo::parseConfig(const char *fileName, Config& config)
 	if ( result != 0 )
 		return result;
 
-	for (vector<DirUrl>::iterator i = config.dirUrl.begin();
+	for (std::vector<DirUrl>::iterator i = config.dirUrl.begin();
 	i != config.dirUrl.end();
 	++i) {
 		DirUrl DU = *i ;
 		if (DU.Url.size() == 0 )
 			continue;
 
-		string categoryDir = DU.Dir;
-		string category = basename(const_cast<char*>(categoryDir.c_str()));
-		string url = DU.Url
+		std::string categoryDir = DU.Dir;
+		std::string category = basename(const_cast<char*>(categoryDir.c_str()));
+		std::string url = DU.Url
 			+ "/"
 			+ getMachineType()
 			+ "/"
@@ -837,7 +836,7 @@ int Pkgrepo::parseConfig(const char *fileName, Config& config)
 			+ category;
 
 #ifndef NDEBUG
-		cerr << url << endl;
+		std::cerr << url << std::endl;
 #endif
 		i->Url = url;
 	}

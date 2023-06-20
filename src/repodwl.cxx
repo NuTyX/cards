@@ -109,8 +109,7 @@ void Repodwl::downloadPackageFileName(const std::string& packageName)
 }
 bool Repodwl::checkBinaryExist(const std::string& packageName)
 {
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
+	parsePkgRepoCollectionFile();
 
 	string basePackageName = packageName;
 	string::size_type pos = packageName.find('.');

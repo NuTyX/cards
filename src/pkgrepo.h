@@ -85,117 +85,125 @@ class Pkgrepo
 {
 public:
 
-		Pkgrepo(const std::string& fileName);
+	Pkgrepo(const std::string& fileName);
 		virtual ~Pkgrepo() { clearPackagesList(); }
 
-		static int parseConfig(const char *fileName,
-			Config& config);
+	static int parseConfig(const char *fileName,
+		Config& config);
 
-		void throwError(const std::string& s) const;
+	void throwError(const std::string& s) const;
 
 /**
- *
- *  return a list of ports which has to be compiled OR
- *  has to be updated
+ * return a list of ports which has to be compiled OR
+ * has to be updated
  *
  * Depends on: parsePkgRepoCollectionFile
  *
  * Populate: nothing
  *
  */
-		std::set<std::string> getListOutOfDate();
+	std::set<std::string> getListOutOfDate();
 
 /**
- *	return the folder of the port name
+ * return the folder of the port name
  *
  */
-		std::string getPortDir (const std::string& portName);
-
-
-/**
- *
- * 	return the basename of the portname
- *
- */
-		std::string getBasePortName (const std::string& portName);
-/**
- *      return the basename of the packagename
- *
- */
-		std::string getBasePackageName(const std::string& packageName);
-/**
- *
- *	return the version of the packagename
- */
-
-		std::string getBasePackageVersion(const std::string& packageName);
-/**
- *  return the version of the port name
- */
-		std::string getPortVersion (const std::string& portName);
+	std::string getPortDir (const std::string& portName);
 
 /**
- *  return the release of the packagename
+ * return the basename of the portname
  *
  */
-		int getBasePackageRelease (const std::string& packageName);
+	std::string getBasePortName (const std::string& portName);
 
 /**
- *  return the release of the port name
+ * return the basename of the packagename
+ *
  */
-		int getPortRelease(const std::string& portName);
+	std::string getBasePackageName(const std::string& packageName);
+
 /**
- *  return true if port name exist
+ * return the version of the packagename
+ *
+ */
+	std::string getBasePackageVersion(const std::string& packageName);
+
+/**
+ * return the version of the port name
+ *
+ */
+	std::string getPortVersion (const std::string& portName);
+
+/**
+ * return the release of the packagename
+ *
+ */
+	int getBasePackageRelease (const std::string& packageName);
+
+/**
+ * return the release of the port name
+ *
+ */
+	int getPortRelease(const std::string& portName);
+
+/**
+ * return true if port name exist
+ *
  */ 
-		bool checkPortExist(const std::string& portName);
+	bool checkPortExist(const std::string& portName);
 
 /**
- *  retun list of packages of the collection
- */
-		std::set<std::string> getListOfPackagesFromCollection(const std::string& collectionName);
-
-/**
- *  retun list of packages of a set
- */
-		std::set<std::string> getListOfPackagesFromSet(const std::string& collectionName);
-
-/**
- *	return the build time of the binary 
- */
-		time_t getBinaryBuildTime (const std::string& portName);
-
-/**
- *  return the list of available binaries packages
+ * retun list of packages of the collection
  *
  */
-		std::set<std::string> getBinaryPackageList();
+	std::set<std::string> getListOfPackagesFromCollection(const std::string& collectionName);
 
 /**
- *  return a Pkg set List of available binaries packages
+ * retun list of packages of a set
  *
  */
-		std::set<Pkg*> getBinaryPackageSet();
+	std::set<std::string> getListOfPackagesFromSet(const std::string& collectionName);
+
+/**
+ * return the build time of the binary
+ *
+ */
+	time_t getBinaryBuildTime (const std::string& portName);
+
+/**
+ * return the list of available binaries packages
+ *
+ */
+	std::set<std::string> getBinaryPackageList();
+
+/**
+ * return a Pkg set List of available binaries packages
+ *
+ */
+	std::set<Pkg*> getBinaryPackageSet();
+
 /**
  * populate RepoInfo List
  *
  */
-		std::vector<RepoInfo> getRepoInfo();
+	std::vector<RepoInfo> getRepoInfo();
+
 /**
  * printout the list of available ports which are compiled
  *  return a list of name version
  *
  */
-    unsigned int getPortsList();
+	unsigned int getPortsList();
 
-		bool getBinaryPackageInfo(const std::string& packageName);
-		bool getPortInfo(const std::string& portName);
+	bool getBinaryPackageInfo(const std::string& packageName);
+	bool getPortInfo(const std::string& portName);
 
 protected:
 /**
- *
  * parse the config file
+ *
  **/
-    int parseConfig(const char *fileName);
+	int parseConfig(const char *fileName);
 
 /**
  * parse the .PKGREPO file which belong to the collection found
@@ -209,7 +217,7 @@ protected:
  * with the contents of the collection .PKGREPO file
  *
  **/
-    void parsePkgRepoCollectionFile();
+	void parsePkgRepoCollectionFile();
 
 /**
  * parse the directory directly based on what we have locally.
@@ -221,7 +229,7 @@ protected:
  * populate:  m_portsDirectoryList  ( Dir, BasePackageInfo->basePackageName only )
  *
  **/
-    void parseCollectionDirectory();
+	void parseCollectionDirectory();
 
 /**
  * parse the ".PKGREPO" file of a port directory
@@ -234,34 +242,35 @@ protected:
  * Populate: m_portFilesList (md5SUM.name,arch)
  *
  */
-    void parseCurrentPackagePkgRepoFile();
+	void parseCurrentPackagePkgRepoFile();
 
 /**
  * parse the "Pkgfile" file for each basePackage
  * add the version of the port found in the Pkgfile
  *
  */
-    void parsePackagePkgfileFile();
+	void parsePackagePkgfileFile();
 
 
-		bool m_parsePkgRepoCollectionFile;
-		bool m_parseCollectionDirectory;
-		bool m_parsePackagePkgfileFile;
+	std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
+	std::vector<BasePackageInfo>::iterator m_BasePackageInfo_i;
+	std::vector<PortFilesList>::iterator m_PortFilesList_i;
 
-		std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
-		std::vector<BasePackageInfo>::iterator m_BasePackageInfo_i;
-		std::vector<PortFilesList>::iterator m_PortFilesList_i;
+	std::vector<PortFilesList> m_portFilesList;
 
-		std::vector<PortFilesList> m_portFilesList;
+	std::string m_configFileName;
+	Config m_config;
 
-		std::string m_configFileName;
-		Config m_config;
+	std::vector<PortsDirectory> m_portsDirectoryList;
 
-		std::vector<PortsDirectory> m_portsDirectoryList;
 private:
-		error m_ErrorCond;
-		void clearPackagesList();
-		std::set<Pkg*> m_packagesList;
+	bool m_parsePkgRepoCollectionFile;
+	bool m_parseCollectionDirectory;
+	bool m_parsePackagePkgfileFile;
+
+	error m_ErrorCond;
+	void clearPackagesList();
+	std::set<Pkg*> m_packagesList;
 };
 #endif /* PKGREPO_H */
 // vim:set ts=2 :
