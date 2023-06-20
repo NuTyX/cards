@@ -2,7 +2,7 @@
 //  file_utils.h
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2023 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ bool createRecursiveDirs(const std::string& pathname);
 void cleanupMetaFiles(const std::string& basedir);
 void removeFile(const std::string& basedir, const std::string& filename);
 int copyFile(const char *  destFile, const char *  origFile);
-int findFile(std::set<std::string>& filesList, const std::string& basedir);
+int findDir(std::set<std::string>& filesList, const std::string& basedir);
 int findDir(itemList *filenameList, const char *path);
 int findRecursiveFile(std::set<std::string>& filenameList, const char *filename, int spec);
 int readFileStripSpace(itemList *fileContent, const char *fileName);

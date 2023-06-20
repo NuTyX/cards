@@ -3,7 +3,7 @@
 //
 //  Copyright (c) 2000 - 2005 Per Liden
 //  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2023 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
 
 #include "file_utils.h"
 
-using namespace std;
-
 int getConfig(const char *fileName, Config& config)
 {
 	FILE* fp = fopen(fileName, "r");
@@ -32,7 +30,7 @@ int getConfig(const char *fileName, Config& config)
 		return -1;
 	const int length = BUFSIZ;
 	char line[length];
-	string s;
+	std::string s;
 	while (fgets(line, length, fp)) {
 		if (line[strlen(line)-1] == '\n' ) {
 			line[strlen(line)-1] = '\0';
@@ -40,25 +38,25 @@ int getConfig(const char *fileName, Config& config)
 		s = line;
 
 		// strip comments
-		string::size_type pos = s.find('#');
-		if (pos != string::npos) {
+		std::string::size_type pos = s.find('#');
+		if (pos != std::string::npos) {
 			s = s.substr(0,pos);
 		}
 
 		// whitespace separates
 		pos = s.find(' ');
-		if (pos == string::npos) {
+		if (pos == std::string::npos) {
 			// try with a tab
 			pos = s.find('\t');
 		}
-		if (pos != string::npos) {
-			string key = s.substr(0, pos);
-			string val = stripWhiteSpace(s.substr(pos));
+		if (pos != std::string::npos) {
+			std::string key = s.substr(0, pos);
+			std::string val = stripWhiteSpace(s.substr(pos));
 
 			if (key == "dir") {
-				string::size_type pos = val.find('|');
+				std::string::size_type pos = val.find('|');
 				DirUrl DU;
-				if (pos != string::npos) {
+				if (pos != std::string::npos) {
 					DU.Dir = stripWhiteSpace(val.substr(0,pos));
 					DU.Url = stripWhiteSpace(val.substr(pos+1));
 				} else {
@@ -100,16 +98,16 @@ int getConfig(const char *fileName, Config& config)
 				config.archs.push_back(val);
 			}
 #ifndef NDEBUG
-		cerr << "name: " << config.name << endl
-			<< "version: " << config.version << endl;
-		for ( auto i : config.dirUrl) cerr << "Dir: " << i.Dir << endl
-			<< "Url: " << i.Url << endl;
+		std::cerr << "name: " << config.name << std::endl
+			<< "version: " << config.version << std::endl;
+		for ( auto i : config.dirUrl) std::cerr << "Dir: " << i.Dir << std::endl
+			<< "Url: " << i.Url << std::endl;
 #endif
 		}
 	}
 	fclose(fp);
 	if (config.url.size() > 0) {
-		vector<DirUrl> list;
+		std::vector<DirUrl> list;
 		DirUrl DU;
 		for ( auto i : config.dirUrl) {
 			DU.Dir=i.Dir;
@@ -132,7 +130,7 @@ void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmem
     return NULL;
   if (fseek (file, offset, SEEK_SET))
   {
-    cerr << "Cannot seek" << endl;
+    std::cerr << "Cannot seek" << std::endl;
     return NULL;
   }
   mvar = var;
@@ -140,11 +138,11 @@ void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmem
   {
   /* Check for overflow.  */
     if (nmemb < (~(size_t) 0 - 1) / size)
-      /* + 1 so that we can '\0' terminate invalid string table sections.  */
+      /* + 1 so that we can '\0' terminate invalid std::string table sections.  */
       mvar = malloc (size * nmemb + 1);
     if (mvar == NULL)
     {
-      cerr << "Out of memory" << endl;
+      std::cerr << "Out of memory" << std::endl;
       return NULL;
     }
     ((char *) mvar)[size * nmemb] = '\0';
@@ -157,17 +155,17 @@ void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmem
   return mvar;
 }
 
-string trimFileName(const string& filename)
+std::string trimFileName(const std::string& filename)
 {
-  string search("//");
-  string result = filename;
+  std::string search("//");
+  std::string result = filename;
 
-  for (string::size_type pos = result.find(search); pos != string::npos; pos = result.find(search))
+  for (std::string::size_type pos = result.find(search); pos != std::string::npos; pos = result.find(search))
     result.replace(pos, search.size(), "/");
 
   return result;
 }
-time_t getEpochModifyTimeFile(const string& filename)
+time_t getEpochModifyTimeFile(const std::string& filename)
 {
 	struct stat buf;
 	if (stat(filename.c_str(), &buf) != 0) {
@@ -175,7 +173,7 @@ time_t getEpochModifyTimeFile(const string& filename)
 	}
 	return buf.st_mtime;
 }
-string getDateFromEpoch(const time_t& epoch)
+std::string getDateFromEpoch(const time_t& epoch)
 {
 	const struct tm* time = localtime(&epoch);
 	char datetime[100] = {0};
@@ -184,9 +182,9 @@ string getDateFromEpoch(const time_t& epoch)
 	else
 		return "";
 }
-string getModifyTimeFile(const string& filename)
+std::string getModifyTimeFile(const std::string& filename)
 {
-	string sTimeFile = "";
+	std::string sTimeFile = "";
 	char * c_time_s;
 	struct stat buf;
 	if (stat(filename.c_str(), &buf) != 0) {
@@ -194,19 +192,19 @@ string getModifyTimeFile(const string& filename)
 	}
 	return getDateFromEpoch(buf.st_mtime);
 }
-bool checkFileExist(const string& filename)
+bool checkFileExist(const std::string& filename)
 {
   struct stat buf;
   return !lstat(filename.c_str(), &buf);
 }
-bool checkFileSignature(const string& filename, const string& signature)
+bool checkFileSignature(const std::string& filename, const std::string& signature)
 {
 	if (!checkFileExist(filename))
 		return false;
 
 	return checkMD5sum(filename.c_str(), signature.c_str());
 }
-bool checkFileEmpty(const string& filename)
+bool checkFileEmpty(const std::string& filename)
 {
   struct stat buf;
 
@@ -215,7 +213,7 @@ bool checkFileEmpty(const string& filename)
 
   return (S_ISREG(buf.st_mode) && buf.st_size == 0);
 }
-bool checkRegularFile(const string& filename)
+bool checkRegularFile(const std::string& filename)
 {
 	struct stat buf;
 	if (!checkFileExist(filename))
@@ -223,7 +221,7 @@ bool checkRegularFile(const string& filename)
 	stat(filename.c_str(), &buf);
 	return (S_ISREG(buf.st_mode));
 }
-bool checkFilesEqual(const string& file1, const string& file2)
+bool checkFilesEqual(const std::string& file1, const std::string& file2)
 {
   struct stat buf1, buf2;
 	const int length = BUFSIZ;
@@ -236,8 +234,8 @@ bool checkFilesEqual(const string& file1, const string& file2)
 
   // Regular files
   if (S_ISREG(buf1.st_mode) && S_ISREG(buf2.st_mode)) {
-    ifstream f1(file1.c_str());
-    ifstream f2(file2.c_str());
+    std::ifstream f1(file1.c_str());
+    std::ifstream f2(file2.c_str());
 
     if (!f1 || !f2)
       return false;
@@ -282,7 +280,7 @@ bool checkFilesEqual(const string& file1, const string& file2)
 
   return false;
 }
-bool checkPermissionsEqual(const string& file1, const string& file2)
+bool checkPermissionsEqual(const std::string& file1, const std::string& file2)
 {
   struct stat buf1;
   struct stat buf2;
@@ -297,46 +295,46 @@ bool checkPermissionsEqual(const string& file1, const string& file2)
     (buf1.st_uid == buf2.st_uid) &&
     (buf1.st_gid == buf2.st_gid);
 }
-void cleanupMetaFiles(const string& basedir)
+void cleanupMetaFiles(const std::string& basedir)
 {
 	if ( checkFileExist( basedir + "/.INFO") ) {
 #ifndef NDEBUG
-		cerr << basedir << "/.INFO removed" << endl;
+		std::cerr << basedir << "/.INFO removed" << std::endl;
 #endif
 		removeFile ( basedir, "/.INFO");
 	}
 	if ( checkFileExist( basedir + "/.META") ) {
 #ifndef NDEBUG
-		cerr << basedir << "/.META removed" << endl;
+		std::cerr << basedir << "/.META removed" << std::endl;
 #endif
 		removeFile ( basedir, "/.META");
 	}
 	if ( checkFileExist ( basedir + "/.PRE" ) ) {
 #ifndef NDEBUG
-		cerr << basedir << "/.PRE removed" << endl;
+		std::cerr << basedir << "/.PRE removed" << std::endl;
 #endif
 		removeFile ( basedir, "/.PRE");
 	}
 	if ( checkFileExist ( basedir + "/.POST" ) ) {
 #ifndef NDEBUG
-		cerr << basedir << "/.POST removed" << endl;
+		std::cerr << basedir << "/.POST removed" << std::endl;
 #endif
 		removeFile ( basedir , "/.POST");
 	}
 	if ( checkFileExist ( basedir + "/.MTREE" ) ) {
 #ifndef NDEBUG
-		cerr << basedir << "/.MTREE removed" << endl;
+		std::cerr << basedir << "/.MTREE removed" << std::endl;
 #endif
 		removeFile ( basedir, "/.MTREE");
 	}
 	if ( checkFileExist ( basedir + "/.README" ) ) {
 #ifndef NDEBUG
-		cerr << basedir << "/.README" << endl;
+		std::cerr << basedir << "/.README" << std::endl;
 #endif
 		removeFile ( basedir, "/.README");
 	}
 }
-void removeFile(const string& basedir, const string& filename)
+void removeFile(const std::string& basedir, const std::string& filename)
 {
   if (filename != basedir && !remove(filename.c_str())) {
     char* path = strdup(filename.c_str());
@@ -382,19 +380,19 @@ int findDir(itemList* filesList, const char* path)
 					addItemToItemList(filesList,fullPath);
 					closedir(sd);
 				} else {
-					cerr << "WARNING "<< fullPath << " is NOT a directory..."<< endl;
+					std::cerr << "WARNING "<< fullPath << " is NOT a directory..."<< std::endl;
 				}
 			}
 		}
 		closedir(d);
 	} else { 
-		cerr << "Cannot open " << path << endl;
+		std::cerr << "Cannot open " << path << std::endl;
 		return -1;
 	}
 	return 0;
 }
 	
-int findFile(set<string>& filesList, const string& path)
+int findDir(std::set<std::string>& filesList, const std::string& path)
 {
   DIR *d;
   struct dirent *dir;
@@ -409,12 +407,12 @@ int findFile(set<string>& filesList, const string& path)
     }
     closedir(d);
   } else {
-		cerr << YELLOW << path << " not exist." << NORMAL << endl;
+		std::cerr << YELLOW << path << " not exist." << NORMAL << std::endl;
 		return -1;
 	}
   return 0;
 }
-bool createRecursiveDirs(const string& path)
+bool createRecursiveDirs(const std::string& path)
 {
   char opath[MAXPATHLEN];
   char *p;
@@ -442,7 +440,7 @@ bool createRecursiveDirs(const string& path)
   return false;
 }
 
-int findRecursiveFile(set<string>& filenameList, const char *filename, int spec)
+int findRecursiveFile(std::set<std::string>& filenameList, const char *filename, int spec)
 {
 	struct dirent *dent;
 	DIR *dir;
@@ -450,7 +448,7 @@ int findRecursiveFile(set<string>& filenameList, const char *filename, int spec)
 	char fn[FILENAME_MAX];
 	int res = WALK_OK;
 	int len = strlen(filename);
-	string sfilename;
+	std::string sfilename;
 	if (len >= FILENAME_MAX - 1)
                 return WALK_NAMETOOLONG;
 
@@ -507,8 +505,8 @@ int readFileStripSpace(itemList* fileContent, const char* fileName)
 	char input[lenght];
 	while (fgets(input, lenght, fp)) {
 		input[strlen(input)-1] = '\0';
-		string inputS = input;
-		string stripString = stripWhiteSpace(inputS);
+		std::string inputS = input;
+		std::string stripString = stripWhiteSpace(inputS);
 		if (stripString.size() > 0)
 			addItemToItemList(fileContent,stripString.c_str());
 		}
@@ -529,14 +527,14 @@ int readFile(itemList* fileContent, const char* fileName)
 	fclose(fp);
 	return 0;
 }
-int parseFile(set<string>& fileContent, const char* fileName)
+int parseFile(std::set<std::string>& fileContent, const char* fileName)
 {
 	FILE* fp = fopen(fileName, "r");
 	if (!fp)
 		return -1;
 	const int length = BUFSIZ;
   char input[length];
-	string line;
+	std::string line;
   while (fgets(input, length, fp)) {
 		input[strlen(input)-1] = '\0';
 		line = input;
@@ -546,14 +544,14 @@ int parseFile(set<string>& fileContent, const char* fileName)
   return 0;
 }
 
-int parseFile(vector<string>& fileContent, const char* fileName)
+int parseFile(std::vector<std::string>& fileContent, const char* fileName)
 {
 	FILE* fp = fopen(fileName, "r");
 	if (!fp)
 		return -1;
 	const int length = BUFSIZ;
 	char input[length];
-	string line;
+	std::string line;
 	while (fgets(input, length, fp)) {
 		input[strlen(input)-1] = '\0';
 		line = input;
@@ -569,27 +567,27 @@ int parseFile(std::string& Depends, const char* key, const char* fileName)
 		return -1;
 	const int length = BUFSIZ;
 	char input[length];
-	string k = key;
-	string line;
-	string::size_type pos;
+	std::string k = key;
+	std::string line;
+	std::string::size_type pos;
 	bool find_end = false;
 	while ( fgets( input, length, fp ) ) {
 		line = stripWhiteSpace( input );
 		if ( find_end ) {
 			pos = line.find( ')' );
-			if ( pos != string::npos ) {
+			if ( pos != std::string::npos ) {
 #ifndef NDEBUG
-				cerr << line << endl;
+				std::cerr << line << std::endl;
 #endif
 				Depends += line.substr(0, pos);
 #ifndef NDEBUG
-				cerr << Depends << endl;
+				std::cerr << Depends << std::endl;
 #endif
 				break;
 			} else {
 				// Check for comment lines and inline comments
 				pos = line.find( '#' );
-				if ( pos != string::npos ) {
+				if ( pos != std::string::npos ) {
 					Depends += line.substr(0, pos) + " ";
 				} else {
 					Depends += line + " ";
@@ -598,19 +596,19 @@ int parseFile(std::string& Depends, const char* key, const char* fileName)
 		}
 		if ( line.substr( 0, k.size() ) == key ){
 			pos = line.find( ')' );
-			if ( pos != string::npos ) {
+			if ( pos != std::string::npos ) {
 #ifndef NDEBUG
-				cout << line << endl;
+				std::cout << line << std::endl;
 #endif
 				Depends += line.substr(k.size(), pos - k.size());
 #ifndef NDEBUG
-				cerr << Depends << endl;
+				std::cerr << Depends << std::endl;
 #endif
 				break;
 			} else {
 				// Check for comments lines and inline comments
 				pos = line.find( '#' );
-				if ( pos != string::npos ) {
+				if ( pos != std::string::npos ) {
 					Depends += line.substr(k.size(), pos - k.size()) + " ";
 				} else {
 					Depends += line.substr(k.size()) + " ";
@@ -622,7 +620,7 @@ int parseFile(std::string& Depends, const char* key, const char* fileName)
 	fclose(fp);
 	return 0;
 }
-bool findMD5sum(const string& fileName, unsigned char* result)
+bool findMD5sum(const std::string& fileName, unsigned char* result)
 {
 	struct md5_context ctx;
 	unsigned char buffer[1000];
