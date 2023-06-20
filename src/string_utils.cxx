@@ -2,7 +2,7 @@
 //  strings_utils.cxx
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
-//  Copyright (c) 2013-2017 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2023 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 //
 
 #include "string_utils.h"
-
-using namespace std;
 
 void *Malloc(size_t s)
 {
@@ -76,12 +74,12 @@ void freeItemList(itemList *list)
 	}
 }
 
-keyValue splitKeyValue(string s, char delimiter)
+keyValue splitKeyValue(std::string s, char delimiter)
 {
 	keyValue pv;
-	string entry;
+	std::string entry;
   size_t found =  s.find(delimiter);
-  if (found != string::npos)
+  if (found != std::string::npos)
   {
 		entry = s;
 		entry.erase(s.find(delimiter),s.size());
@@ -97,7 +95,7 @@ keyValue splitKeyValue(string s, char delimiter)
   return pv;
 }
 
-string sizeHumanRead(int value)
+std::string sizeHumanRead(int value)
 {
 	char buffer[255];
 	if ( value < KILO ) {
@@ -116,11 +114,11 @@ string sizeHumanRead(int value)
 	return buffer;
 		
 }
-set<string> getKeysList(string file, string delimiter)
+std::set<std::string> getKeysList(std::string file, std::string delimiter)
 {
-  set<string> parameter_list;
-  ifstream in(file.c_str());
-  string line, property;
+  std::set<std::string> parameter_list;
+  std::ifstream in(file.c_str());
+  std::string line, property;
   if (in) {
     while (!in.eof()) {
       getline(in, line);
@@ -134,11 +132,11 @@ set<string> getKeysList(string file, string delimiter)
   return parameter_list;
 }
 
-string getValueOfKey(string file, char delimiter,string parameter)
+std::string getValueOfKey(std::string file, char delimiter,std::string parameter)
 {
-  map<string,string> property_list;
-  ifstream in(file.c_str());
-  string line;
+  std::map<std::string,std::string> property_list;
+  std::ifstream in(file.c_str());
+  std::string line;
   keyValue pv;
   if (in) {
     while (!in.eof()) {
@@ -152,46 +150,46 @@ string getValueOfKey(string file, char delimiter,string parameter)
   }
   return stripWhiteSpace(property_list[parameter]);
 }
-string getValue( const string& s, char delimiter )
+std::string getValue( const std::string& s, char delimiter )
 {
-	string::size_type pos = s.find( delimiter );
-	if ( pos != string::npos && pos+1 < s.length() ) {
+	std::string::size_type pos = s.find( delimiter );
+	if ( pos != std::string::npos && pos+1 < s.length() ) {
 		return s.substr( pos + 1 );
 	}
 	return "";
 }
-string getValueBefore( const string& s, char del )
+std::string getValueBefore( const std::string& s, char del )
 {
-	string::size_type pos = s.find( del );
-	if ( pos != string::npos ) {
+	std::string::size_type pos = s.find( del );
+	if ( pos != std::string::npos ) {
 		return s.substr( 0, pos );
 	}
 	return s;
 }
-string getValueBeforeLast(const string& s, char del)
+std::string getValueBeforeLast(const std::string& s, char del)
 {
-	string::size_type pos = s.rfind( del );
-	if ( pos != string::npos )
+	std::string::size_type pos = s.rfind( del );
+	if ( pos != std::string::npos )
 		return s.substr( 0, pos );
 	return s;
 }
 
-string itos(unsigned int value)
+std::string itos(unsigned int value)
 {
   static char buf[20];
   sprintf(buf, "%u", value);
   return buf;
 }
 
-string ultos(unsigned long int value)
+std::string ultos(unsigned long int value)
 {
 	static char buf[20];
 	sprintf(buf, "%lu", value);
 	return buf;
 }
-string mtos(mode_t mode)
+std::string mtos(mode_t mode)
 {
-  string s;
+  std::string s;
 
   // File type
   switch (mode & S_IFMT) {
@@ -237,17 +235,17 @@ string mtos(mode_t mode)
 
   return s;
 }
-string getFirstValueOfKeyAfterDelim(const string& s, char delimiter)
+std::string getFirstValueOfKeyAfterDelim(const std::string& s, char delimiter)
 {
-	string::size_type pos = s.find( delimiter );
-	if ( pos != string::npos && pos+1 < s.length() )
+	std::string::size_type pos = s.find( delimiter );
+	if ( pos != std::string::npos && pos+1 < s.length() )
 		return s.substr( pos + 1 );
 	return "";
 }
-vector<string> parseDelimitedVectorList
-	(const string& s, const char *delimiter)
+std::vector<std::string> parseDelimitedVectorList
+	(const std::string& s, const char *delimiter)
 {
-	vector<string> list;
+	std::vector<std::string> list;
 	if ( s.empty() )
 		return list;
 
@@ -263,9 +261,9 @@ vector<string> parseDelimitedVectorList
 	delete[] cstr;
 	return list;
 }
-set<string> parseDelimitedSetList(const string& s, const char *delimiter)
+std::set<std::string> parseDelimitedSetList(const std::string& s, const char *delimiter)
 {
-	set<string> list;
+	std::set<std::string> list;
 	if ( s.empty() )
 		return list;
 
@@ -281,12 +279,12 @@ set<string> parseDelimitedSetList(const string& s, const char *delimiter)
 	delete[] cstr;
 	return list;
 }
-string stripWhiteSpace(const string& s)
+std::string stripWhiteSpace(const std::string& s)
 {
 	if ( s.empty() )
 		return s;
 	int pos = 0;
-	string line = s;
+	std::string line = s;
 	int len = line.length();
 	while ( pos < len && isspace( line[pos] ) ) {
 		++pos;
@@ -301,10 +299,10 @@ string stripWhiteSpace(const string& s)
 	}
 	return line;
 }
-bool startsWithNoCase(const string& s1, const string& s2)
+bool startsWithNoCase(const std::string& s1, const std::string& s2)
 {
-	string::const_iterator p1 = s1.begin();
-	string::const_iterator p2 = s2.begin();
+	std::string::const_iterator p1 = s1.begin();
+	std::string::const_iterator p2 = s2.begin();
 
 	while ( p1 != s1.end() && p2 != s2.end() ) {
 		if ( toupper( *p1 ) != toupper( *p2 ) ) {
@@ -318,26 +316,26 @@ bool startsWithNoCase(const string& s1, const string& s2)
 	}
 	return true;
 }
-string convertToLowerCase(const string& s)
+std::string convertToLowerCase(const std::string& s)
 {
-	string result = "";
-	for ( string::size_type i = 0; i < s.length(); ++i ) {
+	std::string result = "";
+	for ( std::string::size_type i = 0; i < s.length(); ++i ) {
 		result += tolower( s[i] );
 	}
 	return result;
 }
-string convertToUpperCase(const string& s)
+std::string convertToUpperCase(const std::string& s)
 {
-	string result = "";
-	for ( string::size_type i = 0; i < s.length(); ++i ) {
+	std::string result = "";
+	for ( std::string::size_type i = 0; i < s.length(); ++i ) {
 		result += toupper( s[i] );
 	}
 	return result;
 }
-string replaceAll( string& in, const string& oldString, const string& newString )
+std::string replaceAll( std::string& in, const std::string& oldString, const std::string& newString )
 {
 	size_t pos;
-	while ( (pos = in.find( oldString )) != string::npos ) {
+	while ( (pos = in.find( oldString )) != std::string::npos ) {
 		in = in.replace( pos, oldString.length(), newString );
 	}
 	return in;

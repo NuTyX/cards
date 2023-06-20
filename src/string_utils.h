@@ -2,7 +2,7 @@
 //  string_utils.h
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
-//  Copyright (c) 2013 - 2021 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2023 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ struct keyValue
 };
 
 /**
- itemList is a list of char* dynamically allocated
+ * itemList is a list of char* dynamically allocated
  */
 typedef struct
 {
@@ -58,24 +58,28 @@ typedef struct
 } itemList;
 
 /**
-  initItemList: Create an item List
-*/
+ * initItemList: Create an item List
+ *
+ */
 itemList *initItemList(void);
 
 /**
- addItemToItemList: Add an item to an already created itemList
-*/
+ * addItemToItemList: Add an item to an already created itemList
+ *
+ */
 void addItemToItemList(itemList *list, const char *item);
 
 /**
-freeItemList: Destroy the itemList created and free the allocated memory
-*/
+ * freeItemList: Destroy the itemList created and free the allocated memory
+ *
+ */
  
 void freeItemList(itemList *list);
 
 /**
- splitKeyValue: Split a string value into a keyValue structure
-*/
+ * splitKeyValue: Split a string value into a keyValue structure
+ *
+ */
 keyValue splitKeyValue
 (std::string s, char delimiter);
 
