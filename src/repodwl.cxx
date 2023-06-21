@@ -30,9 +30,34 @@ void Repodwl::downloadPortsPkgRepo(const std::string& packageName)
 	InfoFile downloadFile;
 	std::vector<InfoFile> downloadFilesList;
 	bool found = false;
-	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
-		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
-			if ( m_BasePackageInfo_i->basePackageName == packageName ) {
+	for (auto portsDirectory : m_portsDirectoryList) {
+		for (auto basePackageInfo : portsDirectory.basePackageList) {
+			if ( basePackageInfo.basePackageName == packageName ) {
+				/**
+				 *
+				 * We should check if the PKGREPO of the port is available
+				 * .PKGREPO file is /var/lib/pkg/depot/cli/alsa-lib/.PKGREPO
+				 *
+				 */
+
+				if ( portsDirectory.Url.size() > 0 ) {
+					downloadFile.url = portsDirectory.Url
+						+ "/"
+						+ basePackageInfo.basePackageName
+						+ "/.PKGREPO";
+					downloadFile.dirname = portsDirectory.Dir
+						+ "/"
+						+ basePackageInfo.basePackageName;
+					downloadFile.filename = "/.PKGREPO";
+					downloadFile.md5sum = basePackageInfo.md5SUM;
+					downloadFilesList.push_back(downloadFile);
+#ifndef NDEBUG
+					std::cerr << portsDirectory.Dir
+						+ "/"
+						+ basePackageInfo.basePackageName
+						<< std::endl;
+#endif
+				}
 				found = true;
 				break;
 			}
@@ -40,22 +65,6 @@ void Repodwl::downloadPortsPkgRepo(const std::string& packageName)
 		if (found)
 			break;
 	}
-/**
- *
- * We should check if the PKGREPO of the port is available
- * .PKGREPO file is /var/lib/pkg/depot/cli/alsa-lib/.PKGREPO
- *
- */
-	if ( m_PortsDirectory_i->Url.size() > 0 ) {
-		downloadFile.url = m_PortsDirectory_i->Url + "/" + m_BasePackageInfo_i->basePackageName  + "/.PKGREPO";
-		downloadFile.dirname = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName;
-		downloadFile.filename = "/.PKGREPO";
-		downloadFile.md5sum = m_BasePackageInfo_i-> md5SUM;
-		downloadFilesList.push_back(downloadFile);
-	}
-#ifndef NDEBUG
-	std::cerr << m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName  << std::endl;
-#endif
 	if ( downloadFilesList.size() > 0 ) {
 		FileDownload FD(downloadFilesList,false);
 	}
