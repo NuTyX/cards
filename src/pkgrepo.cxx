@@ -606,8 +606,7 @@ bool Pkgrepo::getPortInfo(const std::string& portName)
 }
 bool Pkgrepo::getBinaryPackageInfo(const std::string& packageName)
 {
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
+	parsePkgRepoCollectionFile();
 
 	bool found = false;
 	// For each defined collection
@@ -641,8 +640,7 @@ bool Pkgrepo::getBinaryPackageInfo(const std::string& packageName)
 }
 std::string Pkgrepo::getPortDir (const std::string& portName)
 {
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
+	parseCollectionDirectory();
 
 	std::string portDir = "";
 	bool found = false;
@@ -662,8 +660,7 @@ std::string Pkgrepo::getPortDir (const std::string& portName)
 std::string Pkgrepo::getBasePackageName(const std::string& packageName)
 {
 
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
+	parsePkgRepoCollectionFile();
 
 	std::string basePackageName = packageName;
 	std::string::size_type pos = packageName.find('.');
@@ -681,8 +678,7 @@ std::string Pkgrepo::getBasePackageName(const std::string& packageName)
 }
 std::string Pkgrepo::getBasePackageVersion(const std::string& packageName)
 {
-	if (!m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
+	parsePkgRepoCollectionFile();
 
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
@@ -695,10 +691,9 @@ std::string Pkgrepo::getBasePackageVersion(const std::string& packageName)
 }
 std::string Pkgrepo::getBasePortName (const std::string& portName)
 {
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
-	if (!m_parsePackagePkgfileFile)
-		parsePackagePkgfileFile();
+	parseCollectionDirectory();
+	parsePackagePkgfileFile();
+
 	std::string basePortName = portName;
 	std::string::size_type pos = portName.find('.');
 	if (pos != std::string::npos) {
@@ -715,10 +710,8 @@ std::string Pkgrepo::getBasePortName (const std::string& portName)
 }
 std::string Pkgrepo::getPortVersion (const std::string& portName)
 {
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
-	if (!m_parsePackagePkgfileFile)
-		parsePackagePkgfileFile();
+	parseCollectionDirectory();
+	parsePackagePkgfileFile();
 
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
@@ -731,8 +724,7 @@ std::string Pkgrepo::getPortVersion (const std::string& portName)
 }
 int Pkgrepo::getBasePackageRelease (const std::string& packageName)
 {
-	if (!m_parsePkgRepoCollectionFile)
-		 parsePkgRepoCollectionFile();
+	 parsePkgRepoCollectionFile();
 
 	int release = 1;
 	for (auto i : m_portsDirectoryList) {
@@ -747,10 +739,8 @@ int Pkgrepo::getBasePackageRelease (const std::string& packageName)
 int Pkgrepo::getPortRelease (const std::string& portName)
 {
 
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
-	if (!m_parsePackagePkgfileFile)
-		parsePackagePkgfileFile();
+	parseCollectionDirectory();
+	parsePackagePkgfileFile();
 
 	int release = 1;
 	for (auto i : m_portsDirectoryList) {
@@ -764,10 +754,8 @@ int Pkgrepo::getPortRelease (const std::string& portName)
 }
 bool Pkgrepo::checkPortExist(const std::string& portName)
 {
-	if (!m_parseCollectionDirectory)
-		parseCollectionDirectory();
-	if (!m_parsePackagePkgfileFile)
-		parsePackagePkgfileFile();
+	parseCollectionDirectory();
+	parsePackagePkgfileFile();
 
 	std::string basePortName = portName;
 	std::string::size_type pos = portName.find('.');
@@ -786,8 +774,8 @@ bool Pkgrepo::checkPortExist(const std::string& portName)
 }
 time_t Pkgrepo::getBinaryBuildTime (const std::string& packageName)
 {
-	if (! m_parsePkgRepoCollectionFile)
-		parsePkgRepoCollectionFile();
+	parsePkgRepoCollectionFile();
+
 	std::string basePackageName = packageName;
 	std::string::size_type pos = packageName.find('.');
 	if (pos != std::string::npos)
