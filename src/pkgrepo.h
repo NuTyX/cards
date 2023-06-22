@@ -271,9 +271,6 @@ protected:
 	void parsePackagePkgfileFile();
 
 
-	std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
-	std::vector<BasePackageInfo>::iterator m_BasePackageInfo_i;
-	std::vector<PortFilesList>::iterator m_PortFilesList_i;
 
 	std::vector<PortFilesList> m_portFilesList;
 
@@ -283,6 +280,11 @@ protected:
 	std::vector<PortsDirectory> m_portsDirectoryList;
 
 private:
+
+	std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
+	std::vector<BasePackageInfo>::iterator m_BasePackageInfo_i;
+	std::vector<PortFilesList>::iterator m_PortFilesList_i;
+
 	bool m_parsePkgRepoCollectionFile;
 	bool m_parseCollectionDirectory;
 	bool m_parsePackagePkgfileFile;

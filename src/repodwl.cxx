@@ -139,48 +139,60 @@ bool Repodwl::checkBinaryExist(const std::string& packageName)
 #endif
 	bool baseBinaryfound = false;
 	bool Binaryfound = false;
-	for (m_PortsDirectory_i = m_portsDirectoryList.begin();m_PortsDirectory_i !=  m_portsDirectoryList.end();++m_PortsDirectory_i) {
+	for (auto portsDirectory: m_portsDirectoryList) {
 #ifndef NDEBUG
-		std::cerr << m_PortsDirectory_i->Url << " " <<  m_PortsDirectory_i->Dir << std::endl;
+		std::cerr << portsDirectory.Url << " " <<  portsDirectory.Dir << std::endl;
 #endif
-		for (m_BasePackageInfo_i = m_PortsDirectory_i->basePackageList.begin(); m_BasePackageInfo_i != m_PortsDirectory_i->basePackageList.end();++m_BasePackageInfo_i) {
+		for (auto basePackageInfo:portsDirectory.basePackageList) {
 #ifndef NDEBUG
-			std::cerr << "m_BasePackageInfo_i->basePackageName: " << m_BasePackageInfo_i->basePackageName << ":" << m_BasePackageInfo_i->s_buildDate <<"." <<  std::endl;
+			std::cerr << "basePackageInfo.basePackageName: "
+				<< basePackageInfo.basePackageName
+				<< ":"
+				<< basePackageInfo.s_buildDate
+				<<"."
+				<<  std::endl;
 #endif
-			if ( m_BasePackageInfo_i->basePackageName == basePackageName ) {
-				baseBinaryfound = true;
-				break;
-			}
-		}	
-		if (baseBinaryfound)
-			break;
-	}
-	if (baseBinaryfound) {
-		if ( ! checkFileExist ( m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO")) {
-			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
-		}
-		std::string pkgRepoFile= m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/.PKGREPO";
-		std::string pkgReporMD5sum = m_BasePackageInfo_i->md5SUM;
-		if ( ! checkMD5sum( pkgRepoFile.c_str(), pkgReporMD5sum.c_str())) {
-			downloadPortsPkgRepo(m_BasePackageInfo_i->basePackageName);
-		}
-		parseCurrentPackagePkgRepoFile();
-		for ( m_PortFilesList_i = m_portFilesList.begin();m_PortFilesList_i != m_portFilesList.end();++m_PortFilesList_i) {
+			if ( basePackageInfo.basePackageName == basePackageName ) {
+				if ( ! checkFileExist ( portsDirectory.Dir + "/" + basePackageInfo.basePackageName + "/.PKGREPO")) {
+					downloadPortsPkgRepo(basePackageInfo.basePackageName);
+				}
+				std::string pkgRepoFile= portsDirectory.Dir
+					+ "/"
+					+ basePackageInfo.basePackageName
+					+ "/.PKGREPO";
+				std::string pkgReporMD5sum = basePackageInfo.md5SUM;
+				if ( ! checkMD5sum( pkgRepoFile.c_str(), pkgReporMD5sum.c_str())) {
+					downloadPortsPkgRepo(basePackageInfo.basePackageName);
+				}
+				parseCurrentPackagePkgRepoFile();
+				for ( auto portFilesList: m_portFilesList) {
 #ifndef NDEBUG
-			std::cerr << m_PortFilesList_i->name << std::endl;
+					std::cerr << portFilesList.name << std::endl;
 #endif
-			if (m_PortFilesList_i->name == packageName) {
+					if (portFilesList.name == packageName) {
+						m_packageFileName = portsDirectory.Dir
+						+ "/"
+						+ basePackageInfo.basePackageName
+						+ "/"
+						+ packageName
+						+ basePackageInfo.s_buildDate
+						+ portFilesList.arch
+						+ basePackageInfo.extention;
+						m_packageFileNameSignature = portFilesList.md5SUM;
+					}
+#ifndef NDEBUG
+					std::cerr << packageName
+						<< " is "
+						<< m_packageFileName
+						<< std::endl;
+#endif
+					baseBinaryfound = true;
+					break;
+				}
 				Binaryfound = true;
 				break;
 			}
 		}
-		if (Binaryfound) {
-			m_packageFileName = m_PortsDirectory_i->Dir + "/" + m_BasePackageInfo_i->basePackageName + "/" + packageName + m_BasePackageInfo_i->s_buildDate + m_PortFilesList_i-> arch + m_BasePackageInfo_i->extention;
-			m_packageFileNameSignature = m_PortFilesList_i -> md5SUM;
-		}
-#ifndef NDEBUG
-		std::cerr << packageName << " is " << m_packageFileName << std::endl;
-#endif
 	}
 	return Binaryfound;
 }
