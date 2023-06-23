@@ -2,7 +2,7 @@
  * mainWindow.h
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,6 +55,8 @@ enum widgetID
 {
     BTN_SYNC,
     BTN_APPLY,
+    BTN_INSTALL,
+    BTN_REMOVE,
     SEARCH_CHANGE,
     CHKB_PACKAGE,
     CHKB_COLLECT,
@@ -80,7 +82,7 @@ public:
      * Constructor of mainWindow class
      *
      */
-    mainWindow(bool pInstaller=false);
+    mainWindow();
 
     virtual ~mainWindow();
     void LoadConfig();
@@ -93,7 +95,7 @@ protected:
     void OnSyncFinished(const CEH_RC rc);
     void OnJobListChange(const CEH_RC rc);
     void OnLogMessage(const std::string& pMessage);
-    void OnPackageInfo(CPackage& pPackage);
+    void OnPackageInfo(Pkg& pPackage);
 
 private:
     void SaveConfig();
@@ -107,6 +109,8 @@ private:
     Fl_Text_Buffer * m_infoBuff;
     Fl_Button* m_btnSync;
     Fl_Button* m_btnApply;
+    Fl_Button* m_btnInstall;
+    Fl_Button* m_btnRemove;
     Fl_Group* m_grpPackage;
     Fl_Group* m_grpCollection;
     Fl_Tabs* m_tabs;

@@ -3,7 +3,7 @@
  *
  * Copyright 2015 - 2018 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 - 2018 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2018 - 2022 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2018 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ bool SortColumn::operator() (const Row &a, const Row &b)
 TableBase::TableBase(int x, int y, int w, int h, const char *l)
     : Fl_Table_Row(x,y,w,h,l)
 {
-    type(SELECT_SINGLE);
+    type(SELECT_MULTI);
     m_sort_reverse = 0;
     m_sort_lastcol = -1;
     end();
@@ -266,4 +266,17 @@ void TableBase::OnRefreshPackageFinished (const CEH_RC rc)
 void TableBase::OnDoJobListFinished(const CEH_RC rc)
 {
     redraw();
+}
+
+int TableBase::getCntRowSelected()
+{
+    int cnt=0;
+    for (int i=0; i< rows(); i++)
+    {
+        if (row_selected(i))
+        {
+            cnt++;
+        }
+    }
+    return cnt;
 }

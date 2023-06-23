@@ -3,7 +3,7 @@
  *
  * Copyright 2015 - 2017 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ void TablePackage::refresh_table()
     clear();
     m_rowdata.clear();
     cols(4);
-    std::vector<CPackage*> pkgList = m_cards->getPackageList();
+    std::vector<Pkg*> pkgList = m_cards->getPackageList();
     for (auto S : pkgList)
     {
         if (m_filter.length()>0)
@@ -75,6 +75,50 @@ void TablePackage::refresh_table()
     autowidth(50);
 }
 
+int TablePackage::install_selected()
+{
+    int cnt=0;
+    m_cards->clearJobList();
+    for (int i =0; i < rows(); i++)
+    {
+        if (row_selected(i))
+            {
+                if (m_rowdata[i].data!=nullptr)
+                {
+                    Pkg* pack = reinterpret_cast<Pkg*>(m_rowdata[i].data);
+                    if (!pack->getStatus()==INSTALLED)
+                    {
+                        pack->setStatus(TO_INSTALL);
+                        cnt++;
+                    }
+                }
+        }
+    }
+    m_cards->refreshJobList();
+    return cnt;
+}
+int TablePackage::remove_selected()
+{
+        int cnt=0;
+        m_cards->clearJobList();
+        for (int i =0; i < rows(); i++)
+        {
+            if (row_selected(i))
+            {
+                if (m_rowdata[i].data!=nullptr)
+                {
+                    Pkg* pack = reinterpret_cast<Pkg*>(m_rowdata[i].data);
+                    if (!pack->getStatus()!=INSTALLED)
+                    {
+                        pack->setStatus(TO_REMOVE);
+                        cnt++;
+                    }
+                }
+            }
+        }
+        m_cards->refreshJobList();
+        return cnt;
+}
 void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
     std::string s = "";
@@ -98,7 +142,7 @@ void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, 
                 }
                 else if (m_rowdata[R].data!=nullptr)
                 {
-                    CPackage* pack=reinterpret_cast<CPackage*>(m_rowdata[R].data);
+                    Pkg* pack=reinterpret_cast<Pkg*>(m_rowdata[R].data);
                     if (pack->isToBeInstalled())
                     {
                         fl_draw_pixmap(download_xpm,X+5,Y);
@@ -130,7 +174,7 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
         {
             if (m_rowdata[pRow].data!=nullptr)
             {
-                CPackage* pack = reinterpret_cast<CPackage*>(m_rowdata[pRow].data);
+                Pkg* pack = reinterpret_cast<Pkg*>(m_rowdata[pRow].data);
                 if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
                 {
                     Fl_Menu_Item rclick_menu[] = {
@@ -140,8 +184,14 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
                         { 0 }
                     };
 #ifndef NDEBUG
-                    cout << pack->getName() << " : " << (pack->isToBeInstalled() ? "To install" : "Nothing" ) << endl;
-                    cout << pack->getName() << " : " << (pack->isToBeRemoved() ? "To remove" : "Nothing" ) << endl;
+                    std::cout << pack->getName()
+                        << " : "
+                        << (pack->isToBeInstalled() ? "To install" : "Nothing" )
+                        << std::endl;
+                    std::cout << pack->getName()
+                        << " : "
+                        << (pack->isToBeRemoved() ? "To remove" : "Nothing" )
+                        << std::endl;
 #endif // NDEBUG
                     if (pack->isInstalled())
                     {
@@ -171,7 +221,10 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
                         pack->setStatus(TO_INSTALL);
                         m_cards->refreshJobList();
 #ifndef NDEBUG
-                        cout << pack->getName() << " : " << (pack->isToBeInstalled() ? "To install" : "Nothing" ) << endl;
+                        std::cout << pack->getName()
+                            << " : "
+                            << (pack->isToBeInstalled() ? "To install" : "Nothing" )
+                            << std::endl;
 #endif // NDEBUG
                     }
                     else if ( strcmp(m->label(), "Remove") == 0 )
@@ -181,7 +234,10 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
                             pack->setStatus(TO_REMOVE);
                             m_cards->refreshJobList();
 #ifndef NDEBUG
-                            cout << pack->getName() << " : " << (pack->isToBeRemoved() ? "To remove" : "Nothing" ) << endl;
+                            std::cout << pack->getName()
+                                << " : "
+                                << (pack->isToBeRemoved() ? "To remove" : "Nothing" )
+                                << std::endl;
 #endif // NDEBUG
                         }
                     }

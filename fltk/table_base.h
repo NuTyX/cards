@@ -3,7 +3,7 @@
  *
  * Copyright 2015 - 2018 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 - 2018 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2018 - 2022 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2018 - 2023  Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -100,6 +100,9 @@ public:
     void autowidth(int pad); // Automatically set the columns widths to the longuest string
     void resize_window();	// Resize the parent window to size of table
     void setFilter(const std::string& pValue);
+    int getCntRowSelected();
+    virtual int install_selected() = 0; // Install rows selected
+    virtual int remove_selected() = 0; // Remove rows selected
 
 protected:
     std::vector<std::string> colTitle;

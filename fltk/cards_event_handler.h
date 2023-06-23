@@ -2,7 +2,7 @@
  * cards_event_handler.h
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,9 @@
 #ifndef  CARDS_EVENT_HANDLER_H
 #define  CARDS_EVENT_HANDLER_H
 
-#include "cards_package.h"
+#include <libcards.h>
+
+#include <string>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
@@ -68,7 +70,7 @@ namespace cards
         virtual void OnRefreshPackageFinished (const CEH_RC rc){}
         virtual void OnJobListChange (const CEH_RC rc){}
         virtual void OnProgressInfo (int percent){}
-        virtual void OnPackageInfo (CPackage& package){}
+        virtual void OnPackageInfo (Pkg& package){}
 
     public:
         static	const std::string getReasonCodeString(const CEH_RC rc);

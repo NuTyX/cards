@@ -2,7 +2,7 @@
  * flcards.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2020 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -108,11 +108,14 @@ int main(int argc, char **argv)
 
     //Enable Log Manager
     if (Theme.length() > 0) Fl::scheme(Theme.c_str());
-    mainWindow win(isInstaller);
+    mainWindow win;
     win.resizable(win);
     win.show(argc, argv);
     win.LoadConfig();
     //Start Auto MainLoop
-    MainLoop(0);
+/*
+ * CLogger is broken for the moment
+ */
+//    MainLoop(0);
     return Fl::run();
 }

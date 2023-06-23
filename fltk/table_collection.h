@@ -3,7 +3,7 @@
  *
  * Copyright 2015 - 2017 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2021 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,6 +67,11 @@ public:
      * displayed as a list sorted by package name, description, version
      */
     void refresh_table(); // Load the Collection list
+
+    int install_selected();
+
+    int remove_selected();
+
 protected:
     void OnDrawCell(TableContext context, int R=0, int C=0, int X=0, int Y=0, int W=0, int H=0);
     void OnEvent(TableContext context, int pCol, int pRow);

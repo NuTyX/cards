@@ -40,8 +40,6 @@ flcards:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_client.o cards_client.cxx
 	echo compiling cards_event_handler.cxx ...
 	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_event_handler.o cards_event_handler.cxx
-	echo compiling cards_package.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_package.o cards_package.cxx
 	echo compiling progressbox.cxx ...
 	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o progressbox.o progressbox.cxx
 	echo compiling cards_log.cxx ...
@@ -49,11 +47,11 @@ flcards:
 	echo "flcards is ready"
 
 
-	$(CXX) flcards.o table_base.o table_package.o table_collection.o mainWindow.o cards_wrapper.o cards_client.o cards_event_handler.o cards_package.o cards_log.o progressbox.o -o $@ -lcards -lcurl -larchive $(LIBFLTK)
-	rm flcards.o mainWindow.o table_base.o table_package.o table_collection.o cards_wrapper.o cards_client.o cards_event_handler.o cards_package.o cards_log.o progressbox.o
+	$(CXX) flcards.o table_base.o table_package.o table_collection.o mainWindow.o cards_wrapper.o cards_client.o cards_event_handler.o cards_log.o progressbox.o -o $@ -lcards -lcurl -larchive $(LIBFLTK)
+	rm flcards.o mainWindow.o table_base.o table_package.o table_collection.o cards_wrapper.o cards_client.o cards_event_handler.o cards_log.o progressbox.o
 
 clean:
-	rm -f flcards flcards.o mainWindow.o table_base.o table_package.o table_collection.o cards_wrapper.o cards_client.o cards_event_handler.o cards_package.o cards_log.o progressbox.o
+	rm -f flcards flcards.o mainWindow.o table_base.o table_package.o table_collection.o cards_wrapper.o cards_client.o cards_event_handler.o cards_log.o progressbox.o
 
 install:
 	install -D -m0755 flcards $(USRBINDIR)/flcards

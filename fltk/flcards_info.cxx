@@ -78,7 +78,8 @@ std::set<std::string> Flcards_info::getListOfInstalledPackages()
 	std::string packageDetails;
 	for (auto i : m_listOfPackages) {
 #ifndef NDEBUG
-		cerr << i.first << endl;
+		std::cerr << i.first
+			<< std::endl;
 #endif
 		packageDetails = i.first + '\t'
 			+ i.second.version + '\t'

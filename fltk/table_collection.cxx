@@ -3,7 +3,7 @@
  *
  * Copyright 2015 - 2019 Thierry Nuttens <tnut@nutyx.org>
  * Copyright 2017 Gianni Peschiutta <artemia@nutyx.org>
- * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 TableCollection::TableCollection(int x, int y, int w, int h, const char *l)
     : TableBase(x,y,w,h,l)
 {
+    type(SELECT_SINGLE);
     colTitle.push_back("");
     colTitle.push_back("Set");
     colTitle.push_back("Name");
@@ -104,6 +105,16 @@ void TableCollection::refresh_table()
     row_height_all(50);
     // Auto-calculate widths, with 20 pixel padding
     autowidth(20);
+}
+
+int TableCollection::install_selected()
+{
+    return 0;
+}
+
+int TableCollection::remove_selected()
+{
+    return 0;
 }
 
 void TableCollection::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
@@ -208,8 +219,8 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 }
                 else if ( strcmp(m->label(), "Install") == 0 )
                 {
-                    std::vector<CPackage*> Packages = Cards->getPackageList();
-                    for (CPackage* Package : Packages)
+                    std::vector<Pkg*> Packages = Cards->getPackageList();
+                    for (Pkg* Package : Packages)
                     {
                         if ((!Package->isInstalled()))
                         {
@@ -223,8 +234,8 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 }
                 else if ( strcmp(m->label(), "Remove") == 0 )
                 {
-                    std::vector<CPackage*> Packages = Cards->getPackageList();
-                    for (CPackage* Package : Packages)
+                    std::vector<Pkg*> Packages = Cards->getPackageList();
+                    for (Pkg* Package : Packages)
                     {
                         if (Package->isInstalled() && (Collec_List.count(Package->getCollection())))
                         {

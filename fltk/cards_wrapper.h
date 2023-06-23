@@ -2,7 +2,7 @@
  * cards_wrapper.h
  *
  * Copyright 2017 Gianni Peschiutta <artmia@nutyx.org>
- * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@
 #include "console_forwarder.h"
 #include "cards_client.h"
 #include "cards_event_handler.h"
-#include "cards_package.h"
 #include "cards_log.h"
 
 #include <libcards.h>
@@ -111,13 +110,15 @@ namespace cards
 
         void doJobList();
 
-        const std::vector<CPackage*>& getPackageList();
+        const std::vector<Pkg*>& getPackageList();
 
-        CPackage* getPackage(const std::string& pName);
+        Pkg* getPackage(const std::string& pName);
 
         void refreshJobList();
 
-        const std::vector<CPackage*>& getJobList();
+        void clearJobList();
+
+        const std::vector<Pkg*>& getJobList();
 
         const std::set<std::string>& getSetList();
 
@@ -146,8 +147,8 @@ namespace cards
 
         /// Containers
         std::vector<CEventHandler*> m_arrEventHandler; // Std array to store callback event clients
-        std::vector<CPackage*> m_arrPackages;
-        std::vector<CPackage*> m_arrJobList;
+        std::vector<Pkg*> m_arrPackages;
+        std::vector<Pkg*> m_arrJobList;
         std::set<std::string> m_arrSets;
 
         /// Threaded Tasks

@@ -2,7 +2,7 @@
  * cards_wrapper.cxx
  *
  * Copyright 2017 Gianni Peschiutta <artmia@nutyx.org>
- * Copyright 2017 - 2022 Thierry Nuttens <tnut@nutyx.org>
+ * Copyright 2017 - 2023 Thierry Nuttens <tnut@nutyx.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ namespace cards
         }
     }
 
-    const std::vector<CPackage*>& CWrapper::getPackageList()
+    const std::vector<Pkg*>& CWrapper::getPackageList()
     {
         return m_arrPackages;
     }
@@ -95,10 +95,10 @@ namespace cards
     ///
     ///
     ///
-    CPackage* CWrapper::getPackage(const std::string& pName)
+    Pkg* CWrapper::getPackage(const std::string& pName)
     {
-        CPackage* ptr=nullptr;
-        for (CPackage* it : m_arrPackages)
+        Pkg* ptr=nullptr;
+        for (Pkg* it : m_arrPackages)
         {
             if (it->getName() == pName)
             {
@@ -114,21 +114,45 @@ namespace cards
     void CWrapper::refreshJobList()
     {
         m_arrJobList.clear();
-        for (CPackage* it:m_arrPackages)
+        for (Pkg* it:m_arrPackages)
         {
             if (it->isToBeInstalled() || it->isToBeRemoved())
             {
                 m_arrJobList.push_back(it);
 #ifndef NDEBUG
-                cerr << "Add Job to list for package " << it->getName() << " Size of job list=" << m_arrJobList.size() << endl;
+                std::cerr << "Add Job to list for package "
+                    << it->getName()
+                    << " Size of job list="
+                    << m_arrJobList.size()
+                    << std::endl;
 #endif
             }
         }
         m_OnJobListChanged_Callback(OK);
     }
+    ///
+    /// \brief CWrapper::clearJobList
+    ///
+    void CWrapper::clearJobList()
+    {
+        if (m_job_running)
+            return;
+        for (Pkg* it:m_arrPackages)
+        {
+            if (it->getStatus() == TO_INSTALL)
+            {
+                it->unSetStatus(TO_INSTALL);
+            }
+            if (it->getStatus() == TO_REMOVE)
+            {
+                it->unSetStatus(TO_REMOVE);
+            }
+        }
+        refreshJobList();
+    }
 
     /** Return the current job list */
-    const std::vector<CPackage*>& CWrapper::getJobList()
+    const std::vector<Pkg*>& CWrapper::getJobList()
     {
         return m_arrJobList;
     }
@@ -144,7 +168,7 @@ namespace cards
         {
             m_job = new std::thread(&CWrapper::m_Sync_Thread, CWrapper::m_ptCWrapper);
             m_job->detach();
-            m_log->log(_("Synchronization started ..."));
+//            m_log->log(_("Synchronization started ..."));
         }
     }
 
@@ -180,8 +204,8 @@ namespace cards
     void CWrapper::m_GetPackageInfo_Thread(std::string pName)
     {
         m_job_running =true;
-        CPackage Package;
-        CPackage* Pack = getPackage(pName);
+        Pkg Package;
+        Pkg* Pack = getPackage(pName);
         if (Pack != nullptr) Package = *Pack;
         for (auto it : m_arrEventHandler)
         {
@@ -197,7 +221,7 @@ namespace cards
     /** Launch a Cards Sync operation*/
     void CWrapper::m_Sync_Thread()
     {
-        m_job_running =true;
+        m_job_running = true;
         CEH_RC rc=CEH_RC::OK;
         if (m_checkRootAccess())
         {
@@ -233,7 +257,7 @@ namespace cards
                 m_log->log(_("Determine Packages Install and Remove List..."));
                 std::set<std::string> Removelist;
                 std::set<std::string> InstallList;
-                for (CPackage* it:m_arrJobList)
+                for (Pkg* it:m_arrJobList)
                 {
                     if (it->isToBeInstalled()) InstallList.insert(it->getName());
                     if (it->isToBeRemoved()) Removelist.insert(it->getName());
@@ -281,24 +305,10 @@ namespace cards
         // First pass get all package available
         m_ClearPackagesList();
 		std::set<Pkg*> AvailablePackages = Cards.getBinaryPackageSet();
-/*		std::set<std::string> AvailablePackages;
-		for ( auto i : binaryList) {
-			std::string s;
-			if ( i->getSet().size()  > 0 )
-				s =  i->getPrimarySet() + "\t";
-			else
-				s =  i->getCollection() + "\t";
-				s += i->getName() + "\t";
-				s += i->getDescription() + "\t";
-				s += i->getVersion() + "\t";
-				s += i->getPackager()+ "\t";
-				AvailablePackages.insert(s);
-		}
-*/
         std::set<std::string> InstalledPackages = Cards.ListOfInstalledPackages();
 		for (auto i : AvailablePackages)
 		{
-			CPackage* Pack = new CPackage();
+			Pkg* Pack = new Pkg();
 			if ( i->getSet().size()  > 0 )
 				Pack->setCollection(i->getPrimarySet());
 			else
@@ -314,54 +324,6 @@ namespace cards
             if (m_arrSets.find(Pack->getCollection()) == m_arrSets.end())
 				m_arrSets.insert(Pack->getCollection());
 		}
-/*        for (auto it : AvailablePackages)
-        {
-            CPackage* Pack = new CPackage();
-            std::string token;
-            std::istringstream tokenStream(it);
-            int i=0;
-            while (getline(tokenStream, token, '\t'))
-            {
-                switch (i)
-                {
-                    case 0: //Collection
-                    {
-                        Pack->setCollection(token);
-                        break;
-                    }
-                    case 1: //Name
-                    {
-                        Pack->setName(token);
-                        break;
-                    }
-                    case 2: //Description
-                    {
-                        Pack-> setDescription(token);
-                        break;
-                    }
-                    case 3: //Version
-                    {
-                        Pack->setVersion(token);
-                        break;
-                    }
-                    case 4: //Packager
-                    {
-                        Pack-> setPackager(token);
-                        break;
-                    }
-                    default:
-                        break;
-                }
-                i++;
-            }
-
-            if (InstalledPackages.find(Pack->getName()) != InstalledPackages.end())
-				Pack->setStatus(INSTALLED);
-            m_arrPackages.push_back(Pack);
-            if (m_arrSets.find(Pack->getCollection()) == m_arrSets.end())
-				m_arrSets.insert(Pack->getCollection());
-        }
-		*/
         m_OnRefreshPackageFinished_Callback(CEH_RC::OK);
         m_job_running =false;
     }
