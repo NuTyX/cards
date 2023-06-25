@@ -36,7 +36,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	m_pkgsync.setConfigFile(configFileName);
 	if ( ! m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
 		m_pkgsync.run();
-	parsePkgRepoCollectionFile();
+	parseCollectionPkgRepoFile();
 	buildSimpleDatabase();
 	std::set<std::string> listOfExistPackages;
 	for (auto i:m_listOfPackages) {
