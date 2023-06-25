@@ -86,7 +86,7 @@ void Repodwl::downloadPackageFileName(const std::string& packageName)
 #endif
 				if ( ! checkFileExist (portsDirectory.Dir + "/" + basePackageInfo.basePackageName + "/.PKGREPO"))
 					downloadPortsPkgRepo(basePackageInfo.basePackageName);
-				parseCurrentPackagePkgRepoFile();
+				parsePackagePkgRepoFile(portsDirectory.Dir + "/" + basePackageInfo.basePackageName + "/.PKGREPO");
 
 				for ( auto portFilesList : m_portFilesList) {
 					if (portFilesList.name == packageName) {
@@ -128,7 +128,7 @@ void Repodwl::downloadPackageFileName(const std::string& packageName)
 }
 bool Repodwl::checkBinaryExist(const std::string& packageName)
 {
-	parsePkgRepoCollectionFile();
+	parseCollectionPkgRepoFile();
 
 	std::string basePackageName = packageName;
 	std::string::size_type pos = packageName.find('.');
@@ -164,7 +164,8 @@ bool Repodwl::checkBinaryExist(const std::string& packageName)
 				if ( ! checkMD5sum( pkgRepoFile.c_str(), pkgReporMD5sum.c_str())) {
 					downloadPortsPkgRepo(basePackageInfo.basePackageName);
 				}
-				parseCurrentPackagePkgRepoFile();
+				parsePackagePkgRepoFile(pkgRepoFile);
+
 				for ( auto portFilesList: m_portFilesList) {
 #ifndef NDEBUG
 					std::cerr << portFilesList.name << std::endl;
