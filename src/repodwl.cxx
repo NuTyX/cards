@@ -137,8 +137,7 @@ bool Repodwl::checkBinaryExist(const std::string& packageName)
 #ifndef NDEBUG
 	std::cerr << "basePackageName: " << basePackageName << std::endl;
 #endif
-	bool baseBinaryfound = false;
-	bool Binaryfound = false;
+
 	for (auto portsDirectory: m_portsDirectoryList) {
 #ifndef NDEBUG
 		std::cerr << portsDirectory.Url << " " <<  portsDirectory.Dir << std::endl;
@@ -180,22 +179,19 @@ bool Repodwl::checkBinaryExist(const std::string& packageName)
 						+ portFilesList.arch
 						+ basePackageInfo.extention;
 						m_packageFileNameSignature = portFilesList.md5SUM;
-					}
 #ifndef NDEBUG
-					std::cerr << packageName
-						<< " is "
-						<< m_packageFileName
-						<< std::endl;
+						std::cerr << packageName
+							<< " is "
+							<< m_packageFileName
+							<< std::endl;
 #endif
-					baseBinaryfound = true;
-					break;
+						return true;
+					}
 				}
-				Binaryfound = true;
-				break;
 			}
 		}
 	}
-	return Binaryfound;
+	return false;
 }
 std::string Repodwl::getPackageFileName(const std::string& packageName)
 {
