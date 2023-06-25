@@ -2,7 +2,7 @@
 //  pkgrepo.h
 //
 //  Copyright (c) 2002 - 2005 by Johannes Winkelmann jw at tks6 dot net
-//  Copyright (c) 2014 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014 - 2023 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -236,7 +236,7 @@ protected:
  * with the contents of the collection .PKGREPO file
  *
  **/
-	void parsePkgRepoCollectionFile();
+	void parseCollectionPkgRepoFile();
 
 /**
  * parse the directory directly based on what we have locally.
@@ -261,7 +261,7 @@ protected:
  * Populate: m_portFilesList (md5SUM.name,arch)
  *
  */
-	void parseCurrentPackagePkgRepoFile();
+	void parsePackagePkgRepoFile(const std::string& pkgRepo);
 
 /**
  * parse the "Pkgfile" file for each basePackage
@@ -280,10 +280,6 @@ protected:
 	std::vector<PortsDirectory> m_portsDirectoryList;
 
 private:
-
-	std::vector<PortsDirectory>::iterator m_PortsDirectory_i;
-	std::vector<BasePackageInfo>::iterator m_BasePackageInfo_i;
-	std::vector<PortFilesList>::iterator m_PortFilesList_i;
 
 	bool m_parsePkgRepoCollectionFile;
 	bool m_parseCollectionDirectory;
