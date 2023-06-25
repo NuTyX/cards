@@ -37,6 +37,7 @@ mainWindow::mainWindow() :
     icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
     size_range(700,500,0,0);
     m_config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
+
     m_search = new Fl_Input(MARGIN+560, MARGIN+5, 300, 30, "Search...");
     m_search->labelfont(2);
     m_search->color(FL_WHITE);
@@ -58,7 +59,7 @@ mainWindow::mainWindow() :
     m_btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Go !");
     m_btnApply->deactivate(); // Disabled by default until a modification is pending
     m_btnApply->callback(&onWindowEvent,BTN_APPLY);
-
+/*
     //Creation of the Install Button
     m_btnInstall = new Fl_Button(MARGIN+220, MARGIN, 100, 40, "Install");
     m_btnInstall->callback(&onWindowEvent,BTN_INSTALL);
@@ -66,7 +67,7 @@ mainWindow::mainWindow() :
     //Creation of the Delete Button
     m_btnRemove = new Fl_Button(MARGIN+320, MARGIN, 100, 40, "Remove");
     m_btnRemove->callback(&onWindowEvent,BTN_REMOVE);
-
+*/
     //Default Tab size and position
     int TabLeftCoord = MARGIN;
 	int TabWidth = w()-MARGIN*3;
@@ -148,7 +149,9 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 {
 	if (pWidget==nullptr) return;
 	mainWindow* win = reinterpret_cast<mainWindow*>(pWidget);
-	while (win->parent()!=nullptr) win = reinterpret_cast<mainWindow*>(win->parent());
+	while (win->parent()!=nullptr)
+        win = reinterpret_cast<mainWindow*>(win->parent());
+
 	switch (static_cast<widgetID>(pID))
 	{
 		case BTN_SYNC:
@@ -157,7 +160,8 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 			box->set_modal();
 			CWrapper::instance()->sync();
 			box->show();
-			while (box->shown()) Fl::wait();
+			while (box->shown())
+                Fl::wait();
 			delete box;
 			break;
 		}
@@ -167,7 +171,8 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 			box->set_modal();
 			CWrapper::instance()->doJobList();
 			box->show();
-			while (box->shown()) Fl::wait();
+			while (box->shown())
+                Fl::wait();
 			delete box;
 		break;
 		}
