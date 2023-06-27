@@ -48,8 +48,6 @@
 #include <FL/Fl_Preferences.H>
 #include <FL/Fl_Check_Button.H>
 
-using namespace cards;
-
 
 enum widgetID
 {
@@ -73,7 +71,7 @@ enum widgetID
  * by libcard operation. This also ensure libcard is quiet to
  * operate like if it was been launched on a terminal.
  */
-class mainWindow : public Fl_Double_Window, public CEventHandler
+class mainWindow : public Fl_Double_Window, public cards::CEventHandler
 {
 public:
     /**
@@ -92,8 +90,8 @@ protected:
     static void onWindowEvent(Fl_Widget* pWidget,long pID);
 
 //Cards Wrapper callbacks
-    void OnSyncFinished(const CEH_RC rc);
-    void OnJobListChange(const CEH_RC rc);
+    void OnSyncFinished(const cards::CEH_RC rc);
+    void OnJobListChange(const cards::CEH_RC rc);
     void OnLogMessage(const std::string& pMessage);
     void OnPackageInfo(Pkg& pPackage);
 
@@ -114,9 +112,9 @@ private:
     Fl_Group* m_grpPackage;
     Fl_Group* m_grpCollection;
     Fl_Tabs* m_tabs;
-    CWrapper* m_cards;
+    cards::CWrapper* m_cards;
     Fl_Preferences* m_config;
-    CLogger* m_log;
+    cards::CLogger* m_log;
 };
 
 #endif // MAINWINDOW_H

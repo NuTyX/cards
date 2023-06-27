@@ -43,8 +43,6 @@
 
 #define MARGIN 20
 
-using namespace cards;
-
 // A single row of columns
 class Row
 {
@@ -71,7 +69,7 @@ public:
  * This class list and manage Card operation by adding , remove or upgrade package
  *
  */
-class TableBase : public Fl_Table_Row, public CEventHandler
+class TableBase : public Fl_Table_Row, public cards::CEventHandler
 {
 public:
     /**
@@ -113,9 +111,9 @@ protected:
     void sort_column(int col, int reverse=0);
     void draw_sort_arrow(int X, int Y, int W, int H);
 
-    void OnDoJobListFinished (const CEH_RC rc);
-    void OnRefreshPackageFinished (const CEH_RC rc);
-    void OnJobListChange(const CEH_RC rc);
+    void OnDoJobListFinished (const cards::CEH_RC rc);
+    void OnRefreshPackageFinished (const cards::CEH_RC rc);
+    void OnJobListChange(const cards::CEH_RC rc);
     virtual void OnDrawCell(TableContext, int, int, int, int, int, int){}
     virtual void OnEvent(TableContext, int, int){}
 
@@ -128,7 +126,7 @@ protected:
     std::vector<Row> m_rowdata;
     int m_sort_reverse;
     int m_sort_lastcol;
-    CWrapper* m_cards;
+    cards::CWrapper* m_cards;
 };
 
 #endif

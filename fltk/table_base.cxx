@@ -25,6 +25,8 @@
 
 #include "table_base.h"
 
+using namespace cards;
+
 SortColumn::SortColumn (int col, int reverse)
 {
     m_col = col;

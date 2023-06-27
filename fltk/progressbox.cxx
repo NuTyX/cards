@@ -26,6 +26,8 @@
 
 #include <FL/Fl_Output.H>
 
+using namespace cards;
+
 ProgressBox::ProgressBox(CW_ACTIONS action) :
     Fl_Double_Window(300,100)
 {

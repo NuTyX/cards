@@ -25,6 +25,8 @@
 
 #include "table_collection.h"
 
+using namespace cards;
+
 /// Constructor
 
 TableCollection::TableCollection(int x, int y, int w, int h, const char *l)

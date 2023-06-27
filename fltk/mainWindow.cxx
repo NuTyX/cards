@@ -25,6 +25,8 @@
 #include "mainWindow.h"
 #include "version.h"
 
+using namespace cards;
+
 /// Constructor of the main window
 mainWindow::mainWindow() :
     Fl_Double_Window(900,900,APP_NAME_VERSION_STR)
