@@ -127,13 +127,15 @@ void Pkginfo::parseArguments(int argc, char** argv)
 	m_packageArchiveName = m_arg;
 
 	if (m_runtimedependencies_mode + m_footprint_mode + m_details_mode +
-	m_list_mode + m_owner_mode + m_epoc + m_archiveinfo +
-	m_footprint_mode + m_libraries_mode + m_runtime_mode == 0)
+		m_installed_mode + m_list_mode + m_owner_mode + m_epoc + m_archiveinfo +
+		m_footprint_mode + m_libraries_mode + m_runtime_mode + m_number_mode == 0)
 	{
 		m_actualError = OPTION_MISSING;
 		treatErrors(m_arg);
 	}
-	if (m_runtimedependencies_mode + m_footprint_mode + m_installed_mode + m_archiveinfo + m_list_mode + m_owner_mode > 1)
+	if (m_runtimedependencies_mode + m_footprint_mode +
+		m_installed_mode + m_archiveinfo + m_list_mode +
+		m_owner_mode + m_number_mode > 1)
 	{
 		m_actualError = TOO_MANY_OPTIONS;
 		treatErrors(m_arg);
