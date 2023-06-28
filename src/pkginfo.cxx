@@ -78,11 +78,6 @@ void Pkginfo::parseArguments(int argc, char** argv)
 			m_list_mode += 1;
 			m_arg = argv[i + 1];
 			i++;
-		} else if (option == "-n" || option == "--number") {
-			assertArgument(argv, argc, i);
-			m_number_mode += 1;
-			m_arg = argv[i + 1];
-			i++;
 		} else if (option == "-R" || option == "--runtimedep") {
 			assertArgument(argv, argc, i);
 			m_runtime_mode += 1;
@@ -133,7 +128,7 @@ void Pkginfo::parseArguments(int argc, char** argv)
 
 	if (m_runtimedependencies_mode + m_footprint_mode + m_details_mode +
 	m_list_mode + m_owner_mode + m_epoc + m_archiveinfo +
-	m_footprint_mode + m_libraries_mode + m_runtime_mode)
+	m_footprint_mode + m_libraries_mode + m_runtime_mode == 0)
 	{
 		m_actualError = OPTION_MISSING;
 		treatErrors(m_arg);
@@ -436,6 +431,8 @@ void Pkginfo::printHelp() const
 		<< OPTIONS << endl
 		<< "  -i, --installed             "
 		<< _("list of installed packages") << endl
+		<< "  -n, --number                "
+		<< _("number of installed packages") << endl
 		<< "  -d, --details               "
 		<< _("list details about the <package>") << endl
 		<< "  -L, --libraries             "
