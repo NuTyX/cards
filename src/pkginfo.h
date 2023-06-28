@@ -50,6 +50,7 @@ protected:
 	int m_footprint_mode;
 	int m_archiveinfo;
 	int m_installed_mode;
+	int m_number_mode;
 	int m_list_mode;
 	int m_owner_mode;
 	int m_details_mode;

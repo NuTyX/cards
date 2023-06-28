@@ -398,6 +398,9 @@ msgstr "Dépendances         : "
 msgid "list of installed packages"
 msgstr "liste les paquets installés"
 
+msgid "number of installed packages"
+msgstr "nombre de paquets installés"
+
 msgid "list details about the <package>"
 msgstr "liste les détails du <paquet>"
 

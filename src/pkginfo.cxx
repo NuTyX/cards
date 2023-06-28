@@ -31,6 +31,7 @@ Pkginfo::Pkginfo(const std::string& commandName)
 	m_footprint_mode(0),
 	m_archiveinfo(0),
 	m_installed_mode(0),
+	m_number_mode(0),
 	m_list_mode(0),
 	m_owner_mode(0),
 	m_details_mode(0),
@@ -65,6 +66,8 @@ void Pkginfo::parseArguments(int argc, char** argv)
 			i++;
 		} else if (option == "-i" || option == "--installed") {
 			m_installed_mode += 1;
+		} else if (option == "-n" || option == "--number") {
+			m_number_mode += 1;
 		} else if (option == "-d" || option == "--details") {
 			assertArgument(argv, argc, i);
 			m_details_mode +=1;
@@ -73,6 +76,11 @@ void Pkginfo::parseArguments(int argc, char** argv)
 		} else if (option == "-l" || option == "--list") {
 			assertArgument(argv, argc, i);
 			m_list_mode += 1;
+			m_arg = argv[i + 1];
+			i++;
+		} else if (option == "-n" || option == "--number") {
+			assertArgument(argv, argc, i);
+			m_number_mode += 1;
 			m_arg = argv[i + 1];
 			i++;
 		} else if (option == "-R" || option == "--runtimedep") {
@@ -124,8 +132,8 @@ void Pkginfo::parseArguments(int argc, char** argv)
 	m_packageArchiveName = m_arg;
 
 	if (m_runtimedependencies_mode + m_footprint_mode + m_details_mode +
-	m_installed_mode + m_list_mode + m_owner_mode + m_epoc + m_archiveinfo +
-	m_footprint_mode + m_libraries_mode + m_runtime_mode == 0)
+	m_list_mode + m_owner_mode + m_epoc + m_archiveinfo +
+	m_footprint_mode + m_libraries_mode + m_runtime_mode)
 	{
 		m_actualError = OPTION_MISSING;
 		treatErrors(m_arg);
@@ -163,6 +171,8 @@ void Pkginfo::run()
 	 */
 	if (m_footprint_mode) {
 		getFootprintPackage(m_arg);
+	} else if (m_number_mode) {
+		cout << getListOfPackagesNames(m_root) << endl;
 	} else {
 		/*
 		 *  Modes that require the database to be opened
