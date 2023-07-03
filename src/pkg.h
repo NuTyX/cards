@@ -42,12 +42,14 @@ public:
 	std::string getPackager();
 	std::string getDescription();
 	std::string getCollection();
+	std::string getArch();
 	std::vector<std::string> getSet();
 	std::string getPrimarySet();
 	void setName(const std::string& name);
 	void setDescription(const std::string& description);
 	void setVersion(const std::string& version);
 	void setCollection(const std::string& collection);
+	void setArch(const std::string& arch);
 	void setSet(const std::string& set);
 	void setPackager(const std::string& packager);
 	bool isInstalled();
@@ -63,6 +65,7 @@ private:
 	std::vector<std::string> m_setList;
 	std::string m_name;
 	std::string m_version;
+	std::string m_arch;
 	std::string m_packager;
 	std::string m_description;
 	CPSTATUS m_status;

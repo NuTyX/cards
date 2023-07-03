@@ -49,6 +49,10 @@ void Pkg::setVersion(const std::string& version)
 {
 	m_version = version;
 }
+void Pkg::setArch(const std::string& arch)
+{
+	m_arch = arch;
+}
 void Pkg::setCollection(const std::string& collection)
 {
 	m_collection = collection;
@@ -87,6 +91,10 @@ string Pkg::getVersion()
 	return m_version;
 }
 
+string Pkg::getArch()
+{
+	return m_arch;
+}
 string Pkg::getPackager()
 {
 	return m_packager;
