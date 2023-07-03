@@ -1281,14 +1281,17 @@ void Pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 	for (m_installedFilesNumber = 0; archive_read_next_header(archive, &entry) ==
 		ARCHIVE_OK; ++m_installedFilesNumber)
 	{
-		string archive_filename = archive_entry_pathname(entry);
-		if ( strcmp(archive_filename.c_str(),PKG_PRE_INSTALL) == 0)
+		const char *archive_filename = archive_entry_pathname(entry);
+		if ( strcmp(archive_filename,PKG_PRE_INSTALL) == 0)
 		{
 			unsigned int flags = ARCHIVE_EXTRACT_OWNER | ARCHIVE_EXTRACT_PERM | ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_UNLINK;
 			if (archive_read_extract(archive, entry, flags) != ARCHIVE_OK)
 			{
 				const char* msg = archive_error_string(archive);
-				cerr << m_utilName << _(": could not install ") + archive_filename << " : " << msg << endl;
+				cerr << m_utilName
+					<< _(": could not install ")
+					<< archive_filename
+					<< " : " << msg << endl;
 				exit(EXIT_FAILURE);
 			}
 			break;
