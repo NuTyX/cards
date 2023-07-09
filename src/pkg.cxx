@@ -66,6 +66,11 @@ void Pkg::setPackager(const std::string& packager)
 	m_packager = packager;
 }
 /// Return
+std::set<std::string> Pkg::getCategories()
+{
+	m_categoriesList = parseDelimitedSetList (m_categories, " ");
+	return m_categoriesList;
+}
 std::vector<std::string> Pkg::getSet()
 {
 	m_setList = parseDelimitedVectorList (m_set, " ");

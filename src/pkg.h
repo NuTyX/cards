@@ -44,6 +44,7 @@ public:
 	std::string getCollection();
 	std::string getArch();
 	std::vector<std::string> getSet();
+	std::set<std::string> getCategories();
 	std::string getPrimarySet();
 	void setName(const std::string& name);
 	void setDescription(const std::string& description);
@@ -63,6 +64,8 @@ private:
 	std::string m_collection;
 	std::string m_set;
 	std::vector<std::string> m_setList;
+	std::string m_categories;
+	std::set<std::string> m_categoriesList;
 	std::string m_name;
 	std::string m_version;
 	std::string m_arch;

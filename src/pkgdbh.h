@@ -205,6 +205,7 @@ public:
 	std::string getSet(const std::string& name) const;
 	std::string getArch(const std::string& name) const;
 	std::string getLicense(const std::string& name) const;
+	std::set<std::string> getCategories(const std::string& name) const;
 
 	int getSize(const std::string& name) const;
 	int getRelease(const std::string& name) const;
@@ -308,7 +309,7 @@ private:
 
 	void runLastPostInstall();
 	std::string getSingleItem(const std::string& PackageName, const char i) const;
-
+	std::set<std::string> getSetOfItems(const std::string& PackageName, const char i) const;
 	std::set<std::string> m_runtimeLibrariesList;
 	std::set<std::string> m_filesList;
 	std::set<std::string> m_listOfPackagesNames;

@@ -291,7 +291,7 @@ void Pkgdbh::progressInfo()
   }
 }
 
-set<string> Pkgdbh::getListOfPackagesNames()
+std::set<std::string> Pkgdbh::getListOfPackagesNames()
 {
 	if (m_listOfPackagesNames.empty())
 		getListOfPackagesNames(m_root);
@@ -311,6 +311,19 @@ std::string Pkgdbh::getSingleItem(const std::string& PackageName, const char i) 
 	}
 	return item;
 }
+std::set<std::string> Pkgdbh::getSetOfItems(const std::string& PackageName, const char i) const
+{
+	const string metaFile = m_root + PKG_DB_DIR + PackageName + '/' + PKG_META;
+	std::set<std::string> fileContent;
+	parseFile(fileContent,metaFile.c_str());
+	std::set<std::string> setOfItems;
+	for ( auto a : fileContent) {
+		if ( a[0] == i ) {
+			setOfItems.insert(a.substr(1));
+		}
+	}
+	return setOfItems;
+}
 std::string Pkgdbh::getDescription(const std::string& name) const
 {
 	return getSingleItem(name,'D');
@@ -326,6 +339,10 @@ std::string Pkgdbh::getCollection(const std::string& name) const
 std::string Pkgdbh::getSet(const std::string& name) const
 {
 	return getSingleItem(name,'s');
+}
+std::set<std::string> Pkgdbh::getCategories (const std::string& name) const
+{
+	return getSetOfItems(name, 'T');
 }
 std::string Pkgdbh::getArch(const std::string& name) const
 {
