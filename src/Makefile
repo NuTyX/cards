@@ -31,6 +31,7 @@ TOOLSOBJECTS =	system_utils.o \
 		file_utils.o \
 		process.o \
 		pkg.o \
+		db.o \
 		runtime_dependencies_utils.o \
 		pkgdbh.o \
 		pkgadd.o \
@@ -82,6 +83,7 @@ LIBOBJECTS =  system_utils.o \
 	file_utils.o \
 	process.o \
 	pkg.o \
+	db.o \
 	runtime_dependencies_utils.o \
 	pkgdbh.o \
 	pkgadd.o \
@@ -98,6 +100,7 @@ WEBOBJECTS =  system_utils.o \
 	pkgrepo.o \
 	mysql.o \
 	pkg.o \
+	db.o \
 	webcards.o
 
 HEADERS = system_utils.h \
@@ -107,6 +110,7 @@ HEADERS = system_utils.h \
 		file_utils.h \
 		archive_utils.h \
 		pkg.h \
+		db.h  \
 		pkgrepo.h \
 		repodwl.h \
 		file_download.h \

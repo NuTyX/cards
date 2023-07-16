@@ -63,10 +63,10 @@ private:
 	std::set<std::string> getKeepFileList(const std::set<std::string>& files,
 		const std::vector<rule_t>& rules);
 	std::set<std::string> applyInstallRules(const std::string& name,
-		pkginfo_t& info,
+		cards::Db& info,
 		const std::vector<rule_t>& rules);
 	void applyPostInstallRules(const std::string& name,
-		pkginfo_t& info,
+		cards::Db& info,
 		const std::vector<rule_t>& rules);
 	void getInstallRulesList(const std::vector<rule_t>& rules,
 		rule_event_t event,

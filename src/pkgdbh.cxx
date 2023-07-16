@@ -336,13 +336,27 @@ std::string Pkgdbh::getCollection(const std::string& name) const
 {
 	return getSingleItem(name,'c');
 }
-std::string Pkgdbh::getSet(const std::string& name) const
+std::string Pkgdbh::getSets(const std::string& name) const
 {
-	return getSingleItem(name,'s');
+	std::string s;
+	for (auto i: getSetOfItems(name,'s'))
+		s = s + " " + i;
+	return s;
 }
-std::set<std::string> Pkgdbh::getCategories (const std::string& name) const
+std::set<string> Pkgdbh::getSetOfSets(const std::string& name) const
+{
+	return getSetOfItems(name,'s');
+}
+std::set<std::string> Pkgdbh::getSetOfCategories (const std::string& name) const
 {
 	return getSetOfItems(name, 'T');
+}
+std::string Pkgdbh::getCategories(const std::string& name) const
+{
+	std::string s;
+	for (auto i: getSetOfItems(name,'T'))
+		s = s + " " + i;
+	return s;
 }
 std::string Pkgdbh::getArch(const std::string& name) const
 {
@@ -387,36 +401,40 @@ int Pkgdbh::getListOfPackagesNames (const std::string& path)
 }
 
 /* get details info of a package */
-std::pair<std::string, pkginfo_t> Pkgdbh::getInfosPackage
-	(const std::string& packageName)
+std::pair<std::string, cards::Db>
+Pkgdbh::getInfosPackage( const std::string& packageName )
 {
-	pair<string, pkginfo_t> result;
+	pair<string, cards::Db> result;
 
 	result.first = packageName;
 	return result;
 }
-std::set<std::string> Pkgdbh::getFilesOfPackage
-	( const std::string& packageName )
+
+std::set<std::string>
+Pkgdbh::getSetOfFiles( const std::string& packageName )
 {
-	string pkgName = m_listOfAlias[packageName];
+	std::string name = m_listOfAlias[packageName];
 	std::set<std::string> packageFiles;
-	const string filelist = m_root
+
+	const std::string fileslist = m_root
 		+ PKG_DB_DIR
-		+ pkgName
+		+ name
 		+ PKG_FILES;
-	int fd = open(filelist.c_str(), O_RDONLY);
+	int fd = open(fileslist.c_str(), O_RDONLY);
 	if (fd == -1) {
 		m_actualError = CANNOT_OPEN_FILE;
-		treatErrors(filelist);
+		treatErrors(fileslist);
 	}
 	stdio_filebuf<char> listbuf(fd, ios::in, getpagesize());
 	istream in(&listbuf);
+
 	if (!in)
-		throw RunTimeErrorWithErrno("could not read " + filelist);
+		throw RunTimeErrorWithErrno("could not read " + fileslist);
+
 	while (!in.eof()){
 	// read alls the files for alls the packages founds
 	for (;;) {
-			string file;
+			std::string file;
 			getline(in, file);
 			if (file.empty())
 				break; // End of record
@@ -425,6 +443,7 @@ std::set<std::string> Pkgdbh::getFilesOfPackage
 	}
 	return packageFiles;
 }
+
 /**
  * Populate the database in following modes:
  * - if nothing specify only get the List of PackageNames
@@ -436,10 +455,12 @@ std::set<std::string> Pkgdbh::getFilesOfPackage
  * - if packageName size() > 0 then we do just for the packageName
  *
  */
-void Pkgdbh::buildDatabase
-	(const bool& progress, const bool& simple,
-	const bool& all, const bool& files,
-	const std::string& packageName)
+void
+Pkgdbh::buildDatabase(const bool& progress,
+		const bool& simple,
+		const bool& all,
+		const bool& files,
+		const std::string& packageName)
 {
 	/*
 	 * This part is done in every cases
@@ -455,32 +476,34 @@ void Pkgdbh::buildDatabase
 	if (m_listOfPackagesNames.empty() )
 		getListOfPackagesNames (m_root);
 
-	for ( auto pkgName : m_listOfPackagesNames) {
+	for ( auto name : m_listOfPackagesNames) {
 		if (progress) {
 			m_actualAction = DB_OPEN_RUN;
 			progressInfo();
 		}
-		const string metaFile = m_root
+		const std::string metaFile = m_root
 		+ PKG_DB_DIR
-		+ pkgName
+		+ name
 		+ '/'
 		+ PKG_META;
 		std::set<std::string> fileContent;
 		parseFile(fileContent,metaFile.c_str());
-		m_listOfAlias[pkgName] = pkgName;
+		m_listOfAlias[name] = name;
 		for ( auto attribute : fileContent) {
 			if ( attribute[0] != 'A' )
 				break;
-			m_listOfAlias[attribute.substr(1)] = pkgName;
+			m_listOfAlias[attribute.substr(1)] = name;
 		}
 	}
+
 	if ( !simple && !all && !files && (packageName.size() == 0) )
 		return;
+
 	if (packageName.size() > 0) {
-		string pkgName = m_listOfAlias[packageName];
-		pkginfo_t info;
-		info.files = getFilesOfPackage(pkgName);
-		m_listOfPackages[pkgName] = info;
+		std::string name = m_listOfAlias[packageName];
+		cards::Db info;
+		info.files(getSetOfFiles(name));
+		m_listOfPackages[name] = info;
 	}
 	if ( !simple && !all && !files ) {
 		if (progress) {
@@ -490,13 +513,13 @@ void Pkgdbh::buildDatabase
 		return;
 	}
 	if (simple) {
-		pkginfo_t info;
+		cards::Db info;
 		for ( auto pkgName : m_listOfPackagesNames) {
 			if (progress) {
 				m_actualAction = DB_OPEN_RUN;
 				progressInfo();
 			}
-			const string metaFile = m_root
+			const std::string metaFile = m_root
 			+ PKG_DB_DIR
 			+ pkgName
 			+ '/'
@@ -505,32 +528,34 @@ void Pkgdbh::buildDatabase
 			parseFile(fileContent,metaFile.c_str());
 			m_listOfAlias[pkgName] = pkgName;
 			unsigned short flags = 0;
-			info.release = 1;
+			info.release(1);
 			for ( auto attribute : fileContent) {
 				if ( attribute[0] == 'B' ) {
-					info.build = strtoul(attribute.substr(1).c_str(),NULL,0);
+					info.build(strtoul(attribute.substr(1).c_str(),NULL,0));
 					flags++;
 				}
 				if ( attribute[0] == 'V' ) {
-					info.version = attribute.substr(1);
+					info.version(attribute.substr(1));
 					flags=flags + 2;
 				}
 				if ( attribute[0] == 'c' ) {
-					info.collection = attribute.substr(1);
+					info.collection(attribute.substr(1));
 					flags = flags + 4;
 				}
 				/* As a group is not always present we cannot
 				 * depend on a found one to break */
 				if ( attribute[0] == 'g' ) {
-					info.group = attribute.substr(1);
+					info.group(attribute.substr(1));
 				}
 				/* As a set is not always present we cannot
 				 * depen on a found one to break */
 				if ( attribute[0] == 's' ) {
-					info.set.insert(attribute.substr(1));
+					std::string s;
+					s = s + " " + attribute.substr(1);
+					info.sets(s);
 				}
 				if ( attribute[0] == 'r' ) {
-					info.release = atoi(attribute.substr(1).c_str());
+					info.release(atoi(attribute.substr(1).c_str()));
 					flags = flags + 8;
 				}
 				if ( flags == 15 ) {
@@ -546,12 +571,14 @@ void Pkgdbh::buildDatabase
 		progressInfo();
 	}
 }
+
 /**
  * Populate m_listOfPackagesWithDeps with:
  * - Name of the package
  * - Dependencies list of the package
  * */
-void Pkgdbh::buildSimpleDependenciesDatabase()
+void
+Pkgdbh::buildSimpleDependenciesDatabase()
 {
 	if (m_listOfPackagesNames.empty() )
 			getListOfPackagesNames (m_root);
@@ -559,11 +586,11 @@ void Pkgdbh::buildSimpleDependenciesDatabase()
 		pair < string, set<string> > packageWithDeps;
 		packageWithDeps.first=i;
 		const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
-		itemList * contentFile = initItemList();
-		readFile(contentFile,metaFile.c_str());
-		for (unsigned int li=0; li < contentFile->count ; ++li) {
-			if ( contentFile->items[li][0] == 'R' ) {
-				string s = contentFile->items[li];
+			std::set<std::string> fileContent;
+			parseFile(fileContent,metaFile.c_str());
+		for (auto attribute : fileContent) {
+			if ( attribute[0] == 'R' ) {
+				string s = attribute;
 				string dependency = s.substr(1,s.size()-11);
 				packageWithDeps.second.insert(dependency);
 			}
@@ -571,6 +598,7 @@ void Pkgdbh::buildSimpleDependenciesDatabase()
 		m_listOfPackagesWithDeps.insert(packageWithDeps);
 	}
 }
+
 /**
  * Populate the database with:
  * - Name
@@ -582,61 +610,63 @@ void Pkgdbh::buildSimpleDependenciesDatabase()
  * - Group name
  * - Packager name
  * */
-void Pkgdbh::buildSimpleDatabase()
+void
+Pkgdbh::buildSimpleDatabase()
 {
 	if (m_miniDB_Empty) {
 		if (m_listOfPackagesNames.empty() )
 			getListOfPackagesNames (m_root);
 		for ( auto i : m_listOfPackagesNames) {
-			pkginfo_t info;
+			cards::Db info;
 			const string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
-			itemList * contentFile = initItemList();
-			readFile(contentFile,metaFile.c_str());
-			info.release = 1;
-			info.dependency = false;
+			std::set<std::string> fileContent;
+			parseFile(fileContent,metaFile.c_str());
+			info.release(1);
+			info.dependency(false);
 			m_listOfAlias[i] = i;
-			for (unsigned int li=0; li < contentFile->count ; ++li) {
-				if ( contentFile->items[li][0] == 'c' ) {
-					string s = contentFile->items[li];
-					info.collection = s.substr(1);
+			for (auto attribute : fileContent) {
+				if ( attribute[0] == 'c' ) {
+					string s = attribute;
+					info.collection(s.substr(1));
 				}
-				if ( contentFile->items[li][0] == 's' ) {
-					string s = contentFile->items[li];
-					info.set.insert(s.substr(1));
+				if ( attribute[0] == 's' ) {
+					std::string s;
+					s = s + " " + attribute.substr(1);
+					info.sets(s);
 				}
-				if ( contentFile->items[li][0] == 'V' ) {
-					string s = contentFile->items[li];
-					info.version = s.substr(1);
+				if ( attribute[0] == 'V' ) {
+					std::string s = attribute;
+					info.version(s.substr(1));
 				}
-				if ( contentFile->items[li][0] == 'r' ) {
-					string s = contentFile->items[li];
-					info.release = atoi(s.substr(1).c_str());
+				if ( attribute[0] == 'r' ) {
+					std::string s = attribute;
+					info.release( atoi(s.substr(1).c_str()) );
 				}
-				if ( contentFile->items[li][0] == 'B' ) {
-					string s = contentFile->items[li];
-					info.build = strtoul(s.substr(1).c_str(),NULL,0);
+				if ( attribute[0] == 'B' ) {
+					std::string s = attribute;
+					info.build( strtoul(s.substr(1).c_str(),NULL,0) );
 				}
-				if ( contentFile->items[li][0] == 'g' ) {
-					string s = contentFile->items[li];
-					info.group = s.substr(1);
+				if ( attribute[0] == 'g' ) {
+					std::string s = attribute;
+					info.group( s.substr(1) );
 				}
-				if ( contentFile->items[li][0] == 'A' ) {
-					string s = contentFile->items[li];
-					m_listOfAlias[s.substr(1)] = i;
+				if ( attribute[0] == 'A' ) {
+					std::string s;
+					s = s + " " + attribute.substr(1);
+					info.alias(s);
 				}
-				if ( contentFile->items[li][0] == 'P' ) {
-					string s = contentFile->items[li];
-					info.packager = s.substr(1);
+				if ( attribute[0] == 'P' ) {
+					string s = attribute;
+					info.packager(s.substr(1));
 				}
-				if ( contentFile->items[li][0] == 'd' ) {
-					string s = contentFile->items[li];
+				if ( attribute[0] == 'd' ) {
+					string s = attribute;
 					if ( s == "d1" )
-						info.dependency = true;
+						info.dependency(true);
 				}
 
 			}
 			m_listOfPackages[i] = info;
-			freeItemList(contentFile);
 		}
 		m_miniDB_Empty=false;
 	}
@@ -668,95 +698,101 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 				m_actualAction = DB_OPEN_RUN;
 				progressInfo();
 			}
-			pkginfo_t info;
+			cards::Db info;
 			const string metaFileDir = m_root + PKG_DB_DIR + i;
 			const string metaFile = metaFileDir + '/' + PKG_META;
-			info.install = getEpochModifyTimeFile(metaFileDir);
-			itemList * contentFile = initItemList();
-			readFile(contentFile,metaFile.c_str());
-			info.release = 1;
-			info.dependency = false;
+			info.install( getEpochModifyTimeFile(metaFileDir) );
+			std::set<std::pair<std::string,time_t>> dependencies;
+			std::set<std::string> files;
+			std::set<std::string> fileContent;
+			parseFile(fileContent,metaFile.c_str());
+			info.release(1);
+			info.dependency(false);
 			m_listOfAlias[i] = i;
-			for (unsigned int li=0; li< contentFile->count ; ++li) {
-				if ( contentFile->items[li][0] == 'C' ) {
-					string s = contentFile->items[li];
-					info.contributors = s.substr(1);
+			for (auto attribute : fileContent) {
+				if ( attribute[0] == 'C' ) {
+					std::string s = attribute;
+					info.contributors( s.substr(1) );
 				}
-				if ( contentFile->items[li][0] == 'D' ) {
-					string s = contentFile->items[li];
-					info.description = s.substr(1);
+				if ( attribute[0] == 'D' ) {
+					std::string s = attribute;
+					info.description( s.substr(1) );
 				}
-				if ( contentFile->items[li][0] == 'B' ) {
-					string s = contentFile->items[li];
-					info.build = strtoul(s.substr(1).c_str(),NULL,0);
+				if ( attribute[0] == 'B' ) {
+					std::string s = attribute;
+					info.build( strtoul(s.substr(1).c_str(),NULL,0) );
 				}
-				if ( contentFile->items[li][0] == 'U' ) {
-					string s = contentFile->items[li];
-					info.url = s.substr(1);
+				if ( attribute[0] == 'U' ) {
+					std::string s = attribute;
+					info.url( s.substr(1) );
 				}
-				if ( contentFile->items[li][0] == 'L' ) {
-					string s = contentFile->items[li];
-					info.license = s.substr(1);
+				if ( attribute[0] == 'L' ) {
+					std::string s = attribute;
+					info.license( s.substr(1) );
 				}
-				if ( contentFile->items[li][0] == 'M' ) {
-					string s = contentFile->items[li];
-					info.maintainer = s.substr(1);
+				if ( attribute[0] == 'M' ) {
+					std::string s = attribute;
+					info.maintainer( s.substr(1) );
 				}
-				if ( contentFile->items[li][0] == 'P' ) {
-					string s = contentFile->items[li];
-					info.packager = s.substr(1);
+				if ( attribute[0] == 'P' ) {
+					std::string s = attribute;
+					info.packager( s.substr(1) );
 				}
-				if ( contentFile->items[li][0] == 'V' ) {
-					string s = contentFile->items[li];
-					info.version = s.substr(1);
+				if ( attribute[0] == 'V' ) {
+					std::string s = attribute;
+					info.version( s.substr(1) );
 				}
-				if ( contentFile->items[li][0] == 'r' ) {
-					string s = contentFile->items[li];
-					info.release = atoi(s.substr(1).c_str());
+				if ( attribute[0] == 'r' ) {
+					std::string s = attribute;
+					info.release( atoi(s.substr(1).c_str()) );
 				}
-				if ( contentFile->items[li][0] == 'a' ) {
-					string s = contentFile->items[li];
-					info.arch = s.substr(1);
+				if ( attribute[0] == 'a' ) {
+					std::string s = attribute;
+					info.arch( s.substr(1) );
 				}
-				if ( contentFile->items[li][0] == 'c' ) {
-					string s = contentFile->items[li];
-					info.collection = s.substr(1);
+				if ( attribute[0] == 'c' ) {
+					std::string s;
+					s = s + " "  + attribute.substr(1);
+					info.collection(s);
 				}
-				if ( contentFile->items[li][0] == 's' ) {
-					string s = contentFile->items[li];
-					info.set.insert(s.substr(1));
+				if ( attribute[0] == 's' ) {
+					std::string s;
+					s = s + " " + attribute.substr(1);
+					info.sets(s);
 				}
-				if ( contentFile->items[li][0] == 'g' ) {
-					string s = contentFile->items[li];
-					info.group = s.substr(1);
+				if ( attribute[0] == 'g' ) {
+					std::string s = attribute;
+					info.group( s.substr(1) );
 				}
-				if ( contentFile->items[li][0] == 'd' ) {
-					string s = contentFile->items[li];
+				if ( attribute[0] == 'd' ) {
+					std::string s = attribute;
 					if ( s == "d1" )
-						info.dependency = true;
+						info.dependency(true);
 				}
-				if ( contentFile->items[li][0] == 'S' ) {
-					string s = contentFile->items[li];
-					info.size = atoi(s.substr(1).c_str());
+				if ( attribute[0] == 'S' ) {
+					std::string s = attribute;
+					info.space( atoi(s.substr(1).c_str()) );
 				}
-				if ( contentFile->items[li][0] == 'A' ) {
-					string s = contentFile->items[li];
-					info.alias.insert(s.substr(1));
-					m_listOfAlias[s.substr(1)] = i;
+				if ( attribute[0] == 'A' ) {
+					std::string s;
+					s = s + " " + attribute.substr(1);
+					info.alias(s);
+					m_listOfAlias[attribute.substr(1)] = i;
 				}
-				if ( contentFile->items[li][0] == 'T' ) {
-					string s = contentFile->items[li];
-					info.categories.insert(s.substr(1));
+				if ( attribute[0] == 'T' ) {
+					std::string s;
+					s = s + " " + attribute.substr(1);
+					info.categories(s);
 				}
-				if ( contentFile->items[li][0] == 'R' ) {
-					string s = contentFile->items[li];
+				if ( attribute[0] == 'R' ) {
+					std::string s = attribute;
 					std::pair<std::string,time_t > NameEpoch;
 					NameEpoch.first=s.substr(1,s.size()-11);
 					NameEpoch.second=strtoul((s.substr(s.size()-10)).c_str(),NULL,0);
-					info.dependencies.insert(NameEpoch);
+					dependencies.insert(NameEpoch);
 				}
 			}
-			freeItemList(contentFile);
+			info.dependencies(dependencies);
 			// list of files
 			const string filelist = m_root + PKG_DB_DIR + i + PKG_FILES;
 			int fd = open(filelist.c_str(), O_RDONLY);
@@ -776,10 +812,12 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					getline(in, file);
 					if (file.empty())
 						break; // End of record
-					info.files.insert(info.files.end(), file);
+					files.insert(files.end(), file);
 				}
-				if (!info.files.empty())
+				if (!files.empty()) {
+					info.files(files);
 					m_listOfPackages[i] = info;
+				}
 			}
 		}
 #ifndef NDEBUG
@@ -795,7 +833,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 		m_DB_Empty=false;
 	}
 }
-void Pkgdbh::moveMetaFilesPackage(const std::string& name, pkginfo_t& info)
+void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
 {
 	set<string> metaFilesList;
 	m_actualAction = PKG_MOVE_META_START;
@@ -803,7 +841,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, pkginfo_t& info)
 	const string packagedir = m_root + PKG_DB_DIR ;
 	const string packagenamedir = m_root + PKG_DB_DIR + name ;
 
-	for (auto i: info.files)
+	for (auto i: info.files())
 	{
 		if ( i[0] == '.' ) {
 #ifndef NDEBUG
@@ -812,7 +850,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, pkginfo_t& info)
 			metaFilesList.insert(metaFilesList.end(), i );
 		}
 	}
-	for ( auto i : metaFilesList) info.files.erase(i);
+	for ( auto i : metaFilesList) info.files().erase(i);
 	removeFile ( m_root, "/.MTREE");
 	metaFilesList.insert(".META");
 	set<string> fileContent;
@@ -850,7 +888,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, pkginfo_t& info)
 	m_actualAction = PKG_MOVE_META_END;
 	progressInfo();
 }
-void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& info)
+void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::Db& info)
 {
 
 	m_listOfPackages[name] = info;
@@ -869,7 +907,9 @@ void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const pkginfo_t& i
 	stdio_filebuf<char> filebuf_new(fd_new, ios::out, getpagesize());
 
 	ostream db_new(&filebuf_new);
-	copy(info.files.begin(), info.files.end(), ostream_iterator<string>(db_new, "\n"));
+	copy(m_listOfPackages[name].files().begin(),
+		m_listOfPackages[name].files().end(),
+		ostream_iterator<string>(db_new, "\n"));
 
 	db_new.flush();
 	if (!db_new)
@@ -900,7 +940,7 @@ bool Pkgdbh::checkPackageNameExist(const std::string& name) const
 bool Pkgdbh::checkDependency(const std::string& name)
 {
 	if  ( checkPackageNameExist(name) )
-		return m_listOfPackages[name].dependency;
+		return m_listOfPackages[name].dependency();
 	return false;
 }
 void Pkgdbh::setDependency()
@@ -911,25 +951,28 @@ void Pkgdbh::resetDependency()
 {
 	m_dependency=false;
 }
-bool Pkgdbh::checkPackageNameUptodate(const std::pair<std::string, pkginfo_t>& archiveName)
+
+bool
+Pkgdbh::checkPackageNameUptodate(std::pair<std::string, cards::Db>& archiveName)
 {
 	set<string>::iterator it = m_listOfPackagesNames.find(archiveName.first);
 	if (it == m_listOfPackagesNames.end())
 		return false;
-	if (m_listOfPackages[archiveName.first].version !=  archiveName.second.version)
+	if (m_listOfPackages[archiveName.first].version() !=  archiveName.second.version())
 		return false;
-	if (m_listOfPackages[archiveName.first].release !=  archiveName.second.release)
+	if (m_listOfPackages[archiveName.first].release() !=  archiveName.second.release())
 		return false;
-	if (m_listOfPackages[archiveName.first].build < archiveName.second.build)
+	if (m_listOfPackages[archiveName.first].build() < archiveName.second.build())
 		return false;
-	if (m_listOfPackages[archiveName.first].collection == "")
+	if (m_listOfPackages[archiveName.first].collection() == "")
 		return true;
-	if (archiveName.second.collection == "" )
+	if (archiveName.second.collection() == "" )
 		return true;
-	if (m_listOfPackages[archiveName.first].collection != archiveName.second.collection)
+	if (m_listOfPackages[archiveName.first].collection() != archiveName.second.collection())
 		return false;
 	return true;
 }
+
 bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild)
 {
 	if (dependencieNameBuild.second == 0)
@@ -937,7 +980,7 @@ bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 	set<string>::iterator it = m_listOfPackagesNames.find(dependencieNameBuild.first);
 	if (it == m_listOfPackagesNames.end())
 		return false;
-	if (m_listOfPackages[dependencieNameBuild.first].build < dependencieNameBuild.second)
+	if (m_listOfPackages[dependencieNameBuild.first].build() < dependencieNameBuild.second)
 		return false;
 	return true;
 }
@@ -945,13 +988,13 @@ bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 void Pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 {
 	if ( checkPackageNameExist(name)){
-		m_packageVersion = m_listOfPackages[name].version;
-		m_packageRelease = itos(m_listOfPackages[name].release);
-		m_packageCollection = m_listOfPackages[name].collection;
+		m_packageVersion = m_listOfPackages[name].version();
+		m_packageRelease = itos(m_listOfPackages[name].release());
+		m_packageCollection = m_listOfPackages[name].collection();
 	}
 	set<string> metaFilesList;
 	const string packagedir = m_root + PKG_DB_DIR ;
-	const string arch = m_listOfPackages[name].arch;
+	const string arch = m_listOfPackages[name].arch();
 	const string packagenamedir = m_root + PKG_DB_DIR + name;
 
 	if ( findDir(metaFilesList, packagenamedir) != 0 ) {
@@ -982,7 +1025,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 /* Remove the physical files after followings some rules */
 void Pkgdbh::removePackageFiles(const std::string& name)
 {
-	m_filesList = m_listOfPackages[name].files;
+	m_filesList = m_listOfPackages[name].files();
 	m_listOfPackages.erase(name);
 	m_packageName =  name ;
 
@@ -993,9 +1036,9 @@ void Pkgdbh::removePackageFiles(const std::string& name)
 #endif
 
 	// Don't delete files that still have references
-	for (packages_t::const_iterator i = m_listOfPackages.begin(); i != m_listOfPackages.end(); ++i)
-		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j)
-			m_filesList.erase(*j);
+	for (auto i : m_listOfPackages)
+		for (auto j : i.second.files())
+			m_filesList.erase(j);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 2 (files that still have references excluded):" << endl;
@@ -1021,7 +1064,7 @@ void Pkgdbh::removePackageFiles(const std::string& name)
 
 void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::string>& keep_list)
 {
-	m_filesList = m_listOfPackages[name].files;
+	m_filesList = m_listOfPackages[name].files();
 	m_listOfPackages.erase(name);
 	m_packageName =  name ;
 #ifndef NDEBUG
@@ -1040,9 +1083,9 @@ void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 #endif
 
 	// Don't delete files that still have references
-	for (packages_t::const_iterator i = m_listOfPackages.begin(); i != m_listOfPackages.end(); ++i)
-		for (set<string>::const_iterator j = i->second.files.begin(); j != i->second.files.end(); ++j)
-			m_filesList.erase(*j);
+	for (auto i: m_listOfPackages)
+		for (auto j: i.second.files())
+			m_filesList.erase(j);
 
 #ifndef NDEBUG
 	cerr << "Removing package phase 3 (files that still have references excluded):" << endl;
@@ -1071,18 +1114,18 @@ void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 void Pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list)
 {
 	if ( checkPackageNameExist(m_packageName)){
-		m_packageVersion = m_listOfPackages[m_packageName].version;
-		m_packageRelease = itos(m_listOfPackages[m_packageName].release);
-		m_packageCollection = m_listOfPackages[m_packageName].collection;
+		m_packageVersion = m_listOfPackages[m_packageName].version();
+		m_packageRelease = itos(m_listOfPackages[m_packageName].release());
+		m_packageCollection = m_listOfPackages[m_packageName].collection();
 	}
 	// Remove all references
-	for (packages_t::iterator i = m_listOfPackages.begin(); i != m_listOfPackages.end(); ++i) {
+	for (auto i : m_listOfPackages) {
 		for ( auto j : files ) {
-			size_t s = i->second.files.size();
-			i->second.files.erase(j);
+			size_t s = i.second.files().size();
+			i.second.files().erase(j);
 			// If number of references have change, we refresh the disk copy
-			if ( s != i->second.files.size())
-				addPackageFilesRefsToDB(i->first,i->second);
+			if ( s != i.second.files().size())
+				addPackageFilesRefsToDB(i.first,i.second);
 		}
 	}
 #ifndef NDEBUG
@@ -1107,16 +1150,16 @@ void Pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std
 	}
 }
 
-std::set<std::string> Pkgdbh::getConflictsFilesList
-	(const std::string& name, const pkginfo_t& info)
+std::set<std::string>
+Pkgdbh::getConflictsFilesList (const std::string& name, cards::Db& info)
 {
 	set<string> files;
 
 	// Find conflicting files in database
-	for (packages_t::const_iterator i = m_listOfPackages.begin(); i != m_listOfPackages.end(); ++i) {
-		if (i->first != name) {
-			set_intersection(info.files.begin(), info.files.end(),
-					 i->second.files.begin(), i->second.files.end(),
+	for (auto i : m_listOfPackages) {
+		if (i.first != name) {
+			set_intersection(info.files().begin(), info.files().end(),
+					 i.second.files().begin(), i.second.files().end(),
 					 inserter(files, files.end()));
 		}
 	}
@@ -1128,10 +1171,10 @@ std::set<std::string> Pkgdbh::getConflictsFilesList
 #endif
 
 	// Find conflicting files in filesystem
-	for (set<string>::iterator i = info.files.begin(); i != info.files.end(); ++i) {
-		const string filename = m_root + *i;
-		if (checkFileExist(filename) && files.find(*i) == files.end())
-			files.insert(files.end(), *i);
+	for (auto i : info.files()) {
+		const string filename = m_root + i;
+		if (checkFileExist(filename) && files.find(i) == files.end())
+			files.insert(files.end(), i);
 	}
 
 #ifndef NDEBUG
@@ -1142,9 +1185,9 @@ std::set<std::string> Pkgdbh::getConflictsFilesList
 
 	// Exclude directories
 	set<string> tmp = files;
-	for (set<string>::const_iterator i = tmp.begin(); i != tmp.end(); ++i) {
-		if ((*i)[i->length() - 1] == '/')
-			files.erase(*i);
+	for (auto i : tmp) {
+		if (i[i.length() - 1] == '/')
+			files.erase(i);
 	}
 
 #ifndef NDEBUG
@@ -1155,8 +1198,8 @@ std::set<std::string> Pkgdbh::getConflictsFilesList
 
 	// If this is an upgrade, remove files already owned by this package
 	if (m_listOfPackages.find(name) != m_listOfPackages.end()) {
-		for (set<string>::const_iterator i = m_listOfPackages[name].files.begin(); i != m_listOfPackages[name].files.end(); ++i)
-			files.erase(*i);
+		for (auto i : m_listOfPackages[name].files())
+			files.erase(i);
 
 #ifndef NDEBUG
 		cerr << "Conflicts phase 4 (files already owned by this package excluded):" << endl;
@@ -1167,10 +1210,11 @@ std::set<std::string> Pkgdbh::getConflictsFilesList
 
 	return files;
 }
-std::pair<std::string, pkginfo_t> Pkgdbh::openArchivePackage(const std::string& filename)
+std::pair<std::string, cards::Db>
+Pkgdbh::openArchivePackage(const std::string& filename)
 {
 	string packageArchiveName;
-	pair<string, pkginfo_t> result;
+	pair<string, cards::Db> result;
 	ArchiveUtils packageArchive(filename.c_str());
 #ifndef NDEBUG
 	cerr << "Number of files: " << packageArchive.size() << endl;
@@ -1202,28 +1246,28 @@ std::pair<std::string, pkginfo_t> Pkgdbh::openArchivePackage(const std::string& 
 		treatErrors(basename);
 	}
 	result.first = packageArchiveName;
-	result.second.description = packageArchive.description();
-	result.second.url = packageArchive.url();
-	result.second.maintainer = packageArchive.maintainer();
-	result.second.packager = packageArchive.packager();
-	result.second.version = packageArchive.version();
-	result.second.release = packageArchive.release();
-	result.second.arch = packageArchive.arch();
-	result.second.build = packageArchive.buildn();
-	result.second.group = packageArchive.group();
+	result.second.description(packageArchive.description());
+	result.second.url(packageArchive.url());
+	result.second.maintainer(packageArchive.maintainer());
+	result.second.packager(packageArchive.packager());
+	result.second.version(packageArchive.version());
+	result.second.release(packageArchive.release());
+	result.second.arch(packageArchive.arch());
+	result.second.build(packageArchive.buildn());
+	result.second.group(packageArchive.group());
 
 	set<string> fileList =  packageArchive.setofFiles();
-	for (set<string>::iterator i = fileList.begin();i != fileList.end();++i) {
-		result.second.files.insert(*i);
+	for (auto i :fileList) {
+		result.second.files().insert(i);
 	}
-	result.second.dependencies = packageArchive.listofDependenciesBuildDate();
+	result.second.dependencies(packageArchive.listofDependenciesBuildDate());
 	m_packageName = packageArchiveName;
 	return result;
 }
-std::set< std::pair<std::string,time_t> > Pkgdbh::getPackageDependencies
-	(const std::string& filename)
+std::set< std::pair<std::string,time_t> >
+Pkgdbh::getPackageDependencies (const std::string& filename)
 {
-	pair<string, pkginfo_t> packageArchive;
+	pair<string, cards::Db> packageArchive;
 	set< pair<string,time_t> > packageNameDepsBuildTime;
 	set< pair<string,time_t> > packageNameDepsBuildTimeTemp;
 	packageArchive = openArchivePackage(filename);
@@ -1238,12 +1282,12 @@ std::set< std::pair<std::string,time_t> > Pkgdbh::getPackageDependencies
 #endif
 		return packageNameDepsBuildTime;
 	}
-	if (! packageArchive.second.dependencies.empty() )
+	if (! packageArchive.second.dependencies().empty() )
 		m_listOfRepoPackages[packageArchive.first] = packageArchive.second;
 #ifndef NDEBUG
 	cerr << "----> End of Direct Dependencies" << endl;
 #endif
-	packageNameDepsBuildTimeTemp = packageArchive.second.dependencies;
+	packageNameDepsBuildTimeTemp = packageArchive.second.dependencies();
 #ifndef NDEBUG
 	cerr << "----> Before cleanup: " << packageArchive.first << endl;
 	for (auto it : packageNameDepsBuildTimeTemp ) cerr << it.first << it.second<< " ";
@@ -1269,10 +1313,17 @@ std::set< std::pair<std::string,time_t> > Pkgdbh::getPackageDependencies
 #endif
 	}
 	if (! packageNameDepsBuildTime.empty() )
-		m_listOfRepoPackages[packageArchive.first].dependencies = packageNameDepsBuildTime;
+		m_listOfRepoPackages[packageArchive.first].dependencies(packageNameDepsBuildTime);
 #ifndef NDEBUG
-	cerr << "----> Number of remains direct deps: " << packageArchive.first << ": " << packageNameDepsBuildTime.size() << "/" << packageArchive.second.dependencies.size() << endl;
-	for ( auto it : packageNameDepsBuildTime ) cerr << it.first << " " ;
+	cerr << "----> Number of remains direct deps: "
+		<< packageArchive.first
+		<< ": "
+		<< packageNameDepsBuildTime.size()
+		<< "/"
+		<< packageArchive.second.dependencies().size()
+		<< endl;
+	for ( auto it : packageNameDepsBuildTime )
+		cerr << it.first << " " ;
 	cerr << endl;
 #endif
 	return packageNameDepsBuildTime;

@@ -28,6 +28,8 @@
 #ifndef PKGDBH_H
 #define PKGDBH_H
 
+#include "enum.h"
+#include "db.h"
 #include "archive_utils.h"
 #include "file_utils.h"
 #include "process.h"
@@ -155,7 +157,7 @@ struct pkginfo_t {
 	std::set<std::string> categories;
 	std::set<std::string> files;
 };
-typedef std::map<std::string, pkginfo_t> packages_t;
+typedef std::map<std::string, cards::Db> packages_t;
 
 enum rule_event_t {
 	LDCONF,
@@ -202,10 +204,14 @@ public:
 	std::string getDescription(const std::string& name) const;
 	std::string getVersion(const std::string& name) const;
 	std::string getCollection(const std::string& name) const;
-	std::string getSet(const std::string& name) const;
+	std::string getSets(const std::string& name) const;
+	std::set<std::string> getSetOfSets(const std::string& name) const;
 	std::string getArch(const std::string& name) const;
 	std::string getLicense(const std::string& name) const;
-	std::set<std::string> getCategories(const std::string& name) const;
+	std::string getCategories(const std::string& name) const;
+	std::set<std::string> getSetOfCategories(const std::string& name) const;
+	std::set<std::string> getSetOfFiles(const std::string& packageName);
+
 
 	int getSize(const std::string& name) const;
 	int getRelease(const std::string& name) const;
@@ -222,9 +228,8 @@ public:
 protected:
 	// Database
 
-	std::set<std::string> getFilesOfPackage(const std::string& packageName);
 	int getListOfPackagesNames(const std::string& path);
-	std::pair<std::string, pkginfo_t> getInfosPackage(const std::string& packageName);
+	std::pair<std::string, cards::Db> getInfosPackage(const std::string& packageName);
 	void buildSimpleDatabase();
 	void buildSimpleDependenciesDatabase();
 
@@ -237,12 +242,12 @@ protected:
 
 
 	void addPackageFilesRefsToDB(const std::string& name,
-		const pkginfo_t& info);
+		const cards::Db& info);
 
-	bool checkPackageNameUptodate(const std::pair<std::string,
-		pkginfo_t>& archiveName);
-	bool checkPackageNameBuildDateSame(const std::pair<std::string,
-		time_t>& dependencieNameBuild);
+	bool
+	checkPackageNameUptodate(std::pair<std::string, cards::Db>& archiveName);
+	bool
+	checkPackageNameBuildDateSame(const std::pair<std::string, time_t>& dependencieNameBuild);
 
 	/*
 	 * Remove the physical files after followings some rules
@@ -257,11 +262,12 @@ protected:
 	void removePackageFilesRefsFromDB(const std::string& name);
 	void removePackageFilesRefsFromDB(std::set<std::string> files,
 		const std::set<std::string>& keep_list);
-	std::set<std::string> getConflictsFilesList(const std::string& name,
-		const pkginfo_t& info);
+
+	std::set<std::string>
+	getConflictsFilesList(const std::string& name,cards::Db& info);
 
 	// Tar.gz
-	std::pair<std::string, pkginfo_t> openArchivePackage(const std::string& filename);
+	std::pair<std::string, cards::Db> openArchivePackage(const std::string& filename);
 	std::set< std::pair<std::string, time_t> > getPackageDependencies(const std::string& filename);
 	void extractAndRunPREfromPackage(const std::string& filename);
 	void installArchivePackage(const std::string& filename,
@@ -271,14 +277,15 @@ protected:
 	/*
 	 * The folder holding the meta datas is going to be create here
 	 */
-	void moveMetaFilesPackage(const std::string& name, pkginfo_t& info);
+	void moveMetaFilesPackage(const std::string& name, cards::Db& info);
 
 
 	void readRulesFile();
 	void getInstallRulesList(const std::vector<rule_t>& rules,
-		rule_event_t event, std::vector<rule_t>& found) const;
+			rule_event_t event, std::vector<rule_t>& found) const;
+
 	bool checkRuleAppliesToFile(const rule_t& rule,
-		const std::string& file);
+			const std::string& file);
 
 	void getFootprintPackage(std::string& filename);
 

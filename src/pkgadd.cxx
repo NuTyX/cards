@@ -23,8 +23,6 @@
 
 #include "pkgadd.h"
 
-using namespace std;
-
 Pkgadd::Pkgadd()
 	: Pkgdbh("pkgadd"),
 	m_runPrePost(true),
@@ -48,7 +46,7 @@ Pkgadd::Pkgadd(const std::string& commandName)
 void Pkgadd::parseArguments(int argc, char** argv)
 {
 	for (int i = 1; i < argc; i++) {
-		string option(argv[i]);
+		std::string option(argv[i]);
 		if (option == "-r" || option == "--root") {
 			assertArgument(argv, argc, i);
 			m_root = argv[i + 1];
@@ -102,7 +100,7 @@ void Pkgadd::run()
 	buildCompleteDatabase(false);
 
 	// Reading the archiving to find a list of files
-	pair<string, pkginfo_t> package = openArchivePackage(m_packageArchiveName);
+	std::pair<std::string, cards::Db> package = openArchivePackage(m_packageArchiveName);
 
 	readRulesFile();
 
@@ -118,37 +116,41 @@ void Pkgadd::run()
 		treatErrors(package.first);
 	}
 
-	set<string> non_install_files = applyInstallRules(package.first,
+	std::set<std::string> non_install_files = applyInstallRules(package.first,
 		package.second, m_actionRules);
 	if (!m_upgrade) {
 #ifndef NDEBUG
-		cerr << "Run extractAndRunPREfromPackage without upgrade" << endl;
+		std::cerr << "Run extractAndRunPREfromPackage without upgrade"
+			<< std::endl;
 #endif
 		if (m_runPrePost) preRun();
 	}
-	set<string> conflicting_files = getConflictsFilesList(package.first,
+	std::set<std::string> conflicting_files = getConflictsFilesList(package.first,
 		package.second);
 	if (!conflicting_files.empty()) {
 		if (m_force) {
 			Db_lock lock(m_root, true);
-			set<string> keep_list;
+			std::set<std::string> keep_list;
 			// Don't remove files matching the rules in configuration
 			if (m_upgrade)
 				keep_list = getKeepFileList(conflicting_files, m_actionRules);
 			// Remove unwanted conflicts
 			removePackageFilesRefsFromDB(conflicting_files, keep_list);
 		} else {
-			copy(conflicting_files.begin(), conflicting_files.end(),
-				ostream_iterator<string>(cerr, "\n"));
+			for (auto f : conflicting_files)
+				std::cerr << f ;
+/*			copy(conflicting_files.begin(), conflicting_files.end(),
+				std::ostream_iterator<std::string>(std::cerr, "\n")); */
 			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
 			treatErrors(package.first);
 		}
 	}
 
-	set<string> keep_list;
+	std::set<std::string> keep_list;
 	if (m_upgrade) {
 #ifndef NDEBUG
-		cerr << "Run extractAndRunPREfromPackage with upgrade" << endl;
+		std::cerr << "Run extractAndRunPREfromPackage with upgrade"
+			<< std::endl;
 #endif
 
 		if ( checkDependency(package.first) )
@@ -157,7 +159,7 @@ void Pkgadd::run()
 		Db_lock lock(m_root, true);
 		// Remove metadata about the package removed
 		removePackageFilesRefsFromDB(package.first);
-		keep_list = getKeepFileList(package.second.files, m_actionRules);
+		keep_list = getKeepFileList(package.second.files(), m_actionRules);
 		removePackageFiles(package.first, keep_list);
 	}
 	{
@@ -188,7 +190,7 @@ void Pkgadd::postRun()
 		progressInfo();
 		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
 		if (postinstall.executeShell()) {
-			cerr << _("WARNING Run post-install FAILED, continue") << endl;
+			std::cerr << _("WARNING Run post-install FAILED, continue") << std::endl;
 		}
 		m_actualAction = PKG_POSTINSTALL_END;
 		progressInfo();
@@ -197,38 +199,38 @@ void Pkgadd::postRun()
 }
 void Pkgadd::printHelp() const
 {
-	cout << USAGE << m_utilName << " [options] <file>" << endl
-	<< OPTIONS << endl
+	std::cout << USAGE << m_utilName << " [options] <file>" << std::endl
+	<< OPTIONS << std::endl
 	<< "  -i, --ignore        "
 	<< _("do not execute pre/post install scripts")
-	<< endl
+	<< std::endl
 	<< "  -u, --upgrade       "
 	<< _("upgrade package with the same name")
-	<< endl
+	<< std::endl
 	<< "  -f, --force         "
 	<< _("force install, overwrite conflicting files")
-	<< endl
+	<< std::endl
 	<< "  -r, --root <path>   "
 	<< _("specify alternative installation root")
-	<< endl
+	<< std::endl
 	<< "  -v, --version       "
 	<< _("print version and exit")
-	<< endl
+	<< std::endl
 	<< "  -h, --help          "
 	<< _("print help and exit")
-	<< endl;
+	<< std::endl;
 }
 
-std::set<string> Pkgadd::getKeepFileList(const std::set< std::string>& files,
-	const std::vector<rule_t>& rules)
+std::set<std::string>
+Pkgadd::getKeepFileList(const std::set< std::string>& files, const std::vector<rule_t>& rules)
 {
-	set<string> keep_list;
-	vector<rule_t> found;
+	std::set<std::string> keep_list;
+	std::vector<rule_t> found;
 
 	getInstallRulesList(rules, UPGRADE, found);
 
 	for (auto i : files) {
-		for (vector<rule_t>::reverse_iterator j = found.rbegin();
+		for (std::vector<rule_t>::reverse_iterator j = found.rbegin();
 		j != found.rend();
 		j++) {
 			if (checkRuleAppliesToFile(*j, i)) {
@@ -241,31 +243,32 @@ std::set<string> Pkgadd::getKeepFileList(const std::set< std::string>& files,
 	}
 
 #ifndef NDEBUG
-	cerr << "Keep list:" << endl;
-	for (auto j : keep_list) cerr << "   " << j << endl;
-	cerr << endl;
+	std::cerr << "Keep list:" << std::endl;
+	for (auto j : keep_list)
+		std::cerr << "   " << j << std::endl;
+	std::cerr << std::endl;
 #endif
 	return keep_list;
 }
 
-std::set<string> Pkgadd::applyInstallRules(const std::string& name,
-	pkginfo_t& info,
-	const vector<rule_t>& rules)
+std::set<std::string>
+Pkgadd::applyInstallRules(const std::string& name, cards::Db& info,
+		const std::vector<rule_t>& rules)
 {
 	// TODO: better algo(?)
-	set<string> install_set;
-	set<string> non_install_set;
+	std::set<std::string> install_set;
+	std::set<std::string> non_install_set;
 
-	vector<rule_t> files_found;
+	std::vector<rule_t> files_found;
 	getInstallRulesList(rules, INSTALL, files_found);
 
-	vector<rule_t> scripts_found;
+	std::vector<rule_t> scripts_found;
 	getPostInstallRulesList(rules, scripts_found);
 
-	for (auto i : info.files) {
+	for (auto i : info.files()) {
 
 		bool install_file = true;
-		for (vector<rule_t>::reverse_iterator j = files_found.rbegin();
+		for (std::vector<rule_t>::reverse_iterator j = files_found.rbegin();
 		j != files_found.rend();
 		j++) {
 			if (checkRuleAppliesToFile(*j, i)) {
@@ -278,8 +281,8 @@ std::set<string> Pkgadd::applyInstallRules(const std::string& name,
 		else
 			non_install_set.insert(i);
 
-		pair <string, int> a;
-		for (vector<rule_t>::reverse_iterator j = scripts_found.rbegin();
+		std::pair <std::string, int> a;
+		for (std::vector<rule_t>::reverse_iterator j = scripts_found.rbegin();
 		j != scripts_found.rend();
 		j++) {
 			a.first=i;
@@ -300,37 +303,43 @@ std::set<string> Pkgadd::applyInstallRules(const std::string& name,
 		}
 	}
 	scripts_found.clear();
-	info.files.clear();
-	info.files = install_set;
+	info.files().clear();
+	info.files() = install_set;
 
 #ifndef NDEBUG
-	cerr << "PostInstall set:" << endl;
-	for (auto i : m_postInstallList) cerr << "  " \
-	<< i.first << " " << i.second << endl;
-	cerr << "Install set:" << endl;
-	for  (auto i : info.files) cerr << "   " << i << endl;
-	cerr << endl;
-	cerr << "Non-Install set:" << endl;
-	for (auto i : non_install_set) cerr << "   " << i << endl;
-	cerr << endl;
+	std::cerr << "PostInstall set:" << std::endl;
+	for (auto i : m_postInstallList)
+		std::cerr << "  "
+			<< i.first
+			<< " "
+			<< i.second
+			<< std::endl;
+	std::cerr << "Install set:" << std::endl;
+	for  (auto i : info.files())
+		std::cerr << "   " << i << std::endl;
+	std::cerr << std::endl;
+	std::cerr << "Non-Install set:" << std::endl;
+	for (auto i : non_install_set)
+		std::cerr << "   " << i << std::endl;
+	std::cerr << std::endl;
 #endif
 
 	return non_install_set;
 }
-void Pkgadd::applyPostInstallRules(const std::string& name,
-	pkginfo_t& info,
-	const std::vector<rule_t>& rules)
+void
+Pkgadd::applyPostInstallRules(const std::string& name, cards::Db& info,
+			const std::vector<rule_t>& rules)
 {
-	vector<rule_t> found;
+	std::vector<rule_t> found;
 
 	getPostInstallRulesList(rules, found);
 
-	for (auto i : info.files) {
+	for (auto i : info.files()) {
 		bool install_file = true;
-		for (vector<rule_t>::reverse_iterator j = found.rbegin();
+		for (std::vector<rule_t>::reverse_iterator j = found.rbegin();
 		j != found.rend();
 		j++) {
-			pair <string, int> a;
+			std::pair <std::string, int> a;
 			a.first=(*j).event;
 			a.second=(*j).action;
 
@@ -349,8 +358,8 @@ void Pkgadd::applyPostInstallRules(const std::string& name,
 		}
 	}
 }
-void Pkgadd::getInstallRulesList(const std::vector<rule_t>& rules,
-	rule_event_t event, 
+void
+Pkgadd::getInstallRulesList(const std::vector<rule_t>& rules, rule_event_t event, 
 	std::vector<rule_t>& found) const
 {
 	for (auto i : rules ) {
@@ -358,7 +367,8 @@ void Pkgadd::getInstallRulesList(const std::vector<rule_t>& rules,
 			found.push_back(i);
 	}
 }
-void Pkgadd::getPostInstallRulesList(const std::vector<rule_t>& rules,
+void
+Pkgadd::getPostInstallRulesList(const std::vector<rule_t>& rules,
 	std::vector<rule_t>& found) const
 {
 	for (auto i : rules ) {

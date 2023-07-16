@@ -1,78 +1,87 @@
-//
-//  pkg.h
-//
-//  Copyright 2017 - 2023 NuTyX <tnut@nutyx.org>
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
-//  USA.
-//
+#ifndef PKG_H
+#define PKG_H
 
-#ifndef  PKG_H
-#define  PKG_H
+#include <string>
+#include <set>
 
-#include "string_utils.h"
-
-enum CPSTATUS
-{
-	INSTALLED = 0x01,
-	TO_INSTALL = 0x02,
-	TO_REMOVE = 0x04,
-	TO_UPGRADE = 0x08
-};
+namespace cards {
 
 class Pkg
-{
+{	
 public:
 	Pkg();
 	~Pkg();
-	std::string getName();
-	std::string getVersion();
-	std::string getPackager();
-	std::string getDescription();
-	std::string getCollection();
-	std::string getArch();
-	std::vector<std::string> getSet();
-	std::set<std::string> getCategories();
-	std::string getPrimarySet();
-	void setName(const std::string& name);
-	void setDescription(const std::string& description);
-	void setVersion(const std::string& version);
-	void setCollection(const std::string& collection);
-	void setArch(const std::string& arch);
-	void setSet(const std::string& set);
-	void setPackager(const std::string& packager);
-	bool isInstalled();
-	bool isToBeInstalled();
-	bool isToBeRemoved();
-	void setStatus(CPSTATUS pstatus);
-	void unSetStatus(CPSTATUS pstatus);
-	CPSTATUS getStatus();
+	std::string description();
+	std::string url();
+	std::string maintainer();
+	std::string packager();
+	std::string contributors();
+	std::set<std::pair<std::string,time_t>> dependencies();
+
+	const std::string version();
+	unsigned short int release();
+
+	std::string alias();
+	std::string group();
+	std::string sets();
+	std::string collection();
+	std::string categories();
+	std::string arch();
+	std::string license();
+	std::string signature();
+	std::string origin();
+	std::string branch();
+	time_t build();
+
+	void description(const std::string& description);
+	void url(const std::string& url);
+	void maintainer(const std::string& maintainer);
+	void packager(const std::string& packager);
+	void contributors(const std::string& contributors);
+	void dependencies(const std::set<std::pair<std::string,time_t>> dependencies);
+
+	void version(const std::string& version);
+	void release(unsigned short int release);
+
+	void alias(const std::string& alias);
+	void group(const std::string& group);
+	void sets(const std::string& sets);
+	void collection(const std::string& collection);
+	void categories(const std::string& categories);
+	void arch(const std::string& arch);
+	void license(const std::string& license);
+	void signature(const std::string& signature);
+	void origin(const std::string& origin);
+	void branch (const std::string& branch);
+	void build(time_t time);
 
 private:
-	std::string m_collection;
-	std::string m_set;
-	std::vector<std::string> m_setList;
-	std::string m_categories;
-	std::set<std::string> m_categoriesList;
-	std::string m_name;
-	std::string m_version;
-	std::string m_arch;
-	std::string m_packager;
 	std::string m_description;
-	CPSTATUS m_status;
+	std::string m_url;
+	std::string m_maintainer;
+	std::string m_packager;
+	std::string m_contributors;
+
+	std::string m_version;
+	unsigned short int m_release;
+
+	std::string m_alias;
+	std::string m_group;
+	std::string m_sets;
+	std::string m_collection;
+	std::string m_categories;
+	std::string m_arch;
+	std::string m_license;
+	std::string m_signature;
+	std::string m_origin;
+	std::string m_branch;
+	std::set<std::pair<std::string,time_t>> m_dependencies;
+
+	time_t m_build;
+
+
 };
 
-#endif /* PKG_H */
-// vim:set ts=2 :
+} //end of 'cards' namespace
+
+#endif

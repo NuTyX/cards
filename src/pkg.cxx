@@ -1,141 +1,165 @@
-/*
- * cards_package.cxx
- *
- * Copyright 2017 - 2021 NuTyX <tnut@nutyx.org>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
- *
- *
- */
-
 #include "pkg.h"
 
-using namespace std;
-
-/// Constructor
+namespace cards {
 Pkg::Pkg()
 {
-	m_status = (CPSTATUS) 0;
+// nothing to do ATM
 }
-
-/// Destructor
 Pkg::~Pkg()
 {
-// Nothing for moment
+// nothing to do ATM
 }
-// Sets
-void Pkg::setName(const std::string& name)
-{
-	m_name = name;
-}
-void Pkg::setDescription(const std::string& description)
+void Pkg::description(const std::string& description)
 {
 	m_description = description;
 }
-void Pkg::setVersion(const std::string& version)
-{
-	m_version = version;
-}
-void Pkg::setArch(const std::string& arch)
-{
-	m_arch = arch;
-}
-void Pkg::setCollection(const std::string& collection)
-{
-	m_collection = collection;
-}
-void Pkg::setSet(const std::string& set)
-{
-	m_set = set;
-}
-void Pkg::setPackager(const std::string& packager)
-{
-	m_packager = packager;
-}
-/// Return
-std::set<std::string> Pkg::getCategories()
-{
-	m_categoriesList = parseDelimitedSetList (m_categories, " ");
-	return m_categoriesList;
-}
-std::vector<std::string> Pkg::getSet()
-{
-	m_setList = parseDelimitedVectorList (m_set, " ");
-	return m_setList;
-}
-std::string Pkg::getPrimarySet()
-{
-	m_setList = parseDelimitedVectorList (m_set, " ");
-	return m_setList[0];
-}
-string Pkg::getCollection()
-{
-	return m_collection;
-}
-
-string Pkg::getName()
-{
-	return m_name;
-}
-
-string Pkg::getVersion()
-{
-	return m_version;
-}
-
-string Pkg::getArch()
-{
-	return m_arch;
-}
-string Pkg::getPackager()
-{
-	return m_packager;
-}
-
-string Pkg::getDescription()
+std::string Pkg::description()
 {
 	return m_description;
 }
-
-bool Pkg::isInstalled()
+void Pkg::url(const std::string& url)
 {
-	return m_status & CPSTATUS::INSTALLED;
+	m_url = url;
+}
+std::string Pkg::url()
+{
+	return m_url;
+}
+void Pkg::maintainer(const std::string& maintainer)
+{
+	m_maintainer = maintainer;
+}
+std::string Pkg::maintainer()
+{
+	return m_maintainer;
+}
+void Pkg::packager(const std::string& packager)
+{
+	m_packager = packager;
+}
+std::string Pkg::packager()
+{
+	return m_packager;
+}
+void Pkg::contributors(const std::string& contributors)
+{
+	m_contributors = contributors;
+}
+std::string Pkg::contributors()
+{
+	return m_contributors;
+}
+void Pkg::version(const std::string& version)
+{
+	m_version = version;
+}
+const std::string Pkg::version()
+{
+	return m_version;
+}
+void Pkg::release(unsigned short int release)
+{
+	m_release = release;
+}
+unsigned short int Pkg::release()
+{
+	return m_release;
+}
+void Pkg::alias(const std::string& alias)
+{
+	m_alias = alias;
+}
+std::string Pkg::alias()
+{
+	return m_alias;
+}
+void Pkg::group(const std::string& group)
+{
+	m_group = group;
+}
+std::string Pkg::group()
+{
+	return m_group;
+}
+void Pkg::sets(const std::string& sets)
+{
+	m_sets = sets;
+}
+std::string Pkg::sets()
+{
+	return m_sets;
+}
+void Pkg::collection(const std::string& collection)
+{
+	m_collection = collection;
+}
+std::string Pkg::collection()
+{
+	return m_collection;
+}
+void Pkg::categories(const std::string& categories)
+{
+	m_categories = categories;
+}
+std::string Pkg::categories()
+{
+	return m_categories;
+}
+void Pkg::arch(const std::string& arch)
+{
+	m_arch = arch;
+}
+std::string Pkg::arch()
+{
+	return m_arch;
+}
+void Pkg::license(const std::string& license)
+{
+	m_license = license;
+}
+std::string Pkg::license()
+{
+	return m_license;
+}
+void Pkg::signature(const std::string& signature)
+{
+	m_signature = signature;
+}
+std::string Pkg::signature()
+{
+	return m_signature;
+}
+void Pkg::origin(const std::string& origin)
+{
+	m_origin = origin;
+}
+std::string Pkg::origin()
+{
+	return m_origin;
+}
+void Pkg::branch(const std::string& branch)
+{
+	m_branch = branch;
+}
+std::string Pkg::branch()
+{
+	return m_branch;
+}
+void Pkg::build(const time_t build)
+{
+	m_build = build;
+}
+time_t Pkg::build()
+{
+	return m_build;
+}
+void Pkg::dependencies(std::set<std::pair<std::string,time_t>> dependencies)
+{
+	m_dependencies=dependencies;
+}
+std::set<std::pair<std::string,time_t>> Pkg::dependencies()
+{
+	return m_dependencies;
 }
 
-bool Pkg::isToBeInstalled()
-{
-	return m_status & CPSTATUS::TO_INSTALL;
-}
-
-bool Pkg::isToBeRemoved()
-{
-	return m_status & CPSTATUS::TO_REMOVE;
-}
-
-void Pkg::setStatus(CPSTATUS pstatus)
-{
-	m_status = (CPSTATUS)(m_status | pstatus);
-}
-
-void Pkg::unSetStatus(CPSTATUS pstatus)
-{
-	m_status = (CPSTATUS)(m_status & (~pstatus));
-}
-
-CPSTATUS Pkg::getStatus()
-{
-	return m_status;
-}
+} // end of cards namespace 

@@ -23,8 +23,6 @@
 
 #include "pkgrm.h"
 
-using namespace std;
-
 Pkgrm::Pkgrm ()
 	: Pkgdbh("pkgrm")
 {
@@ -37,7 +35,7 @@ void Pkgrm::getListOfManInstalledPackages ()
 	getListOfPackagesNames(m_root);
 
 	for ( auto i : m_listOfPackages) {
-		if ( i.second.dependency == false )
+		if ( i.second.dependency() == false )
 			m_listOfManInstalledPackages.insert(i.first);
 	}
 	buildSimpleDependenciesDatabase();
@@ -101,13 +99,13 @@ void Pkgrm::run()
 }
 void Pkgrm::printHelp() const
 {
-	cout << USAGE << m_utilName << " [options] <package>" << endl
-	     << OPTIONS << endl
+	std::cout << USAGE << m_utilName << " [options] <package>" << std::endl
+	     << OPTIONS << std::endl
 	     << "  -r, --root <path>   "
-	     << _("specify alternative installation root") << endl
+	     << _("specify alternative installation root") << std::endl
 	     << "  -v, --version       "
-	     << _("print version and exit") << endl
+	     << _("print version and exit") << std::endl
 	     << "  -h, --help          "
-	     << _("print help and exit") << endl;
+	     << _("print help and exit") << std::endl;
 }
 // vim:set ts=2 :
