@@ -812,7 +812,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					getline(in, file);
 					if (file.empty())
 						break; // End of record
-					info.files.insert(files.end(), file);
+					info.files.insert(info.files.end(), file);
 				}
 				if (!files.empty()) {
 					m_listOfPackages[i] = info;
