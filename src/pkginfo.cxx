@@ -212,11 +212,11 @@ void Pkginfo::run()
 			buildDatabase(true,false,false,false,m_arg);
 			if (checkPackageNameExist(m_arg)) {
 				std::string arg = m_listOfAlias[m_arg];
-				for (auto f : m_listOfPackages[arg].files())
+				for (auto f : m_listOfPackages[arg].files)
 					std::cout << f << std::endl;
 			} else if (checkFileExist(m_arg)) {
 				std::pair<std::string, cards::Db> package = openArchivePackage(m_arg);
-				for (auto f : package.second.files())
+				for (auto f : package.second.files)
 					std::cout << f << std::endl;
 			}
 		} else if (m_runtimedependencies_mode) {
@@ -244,7 +244,7 @@ void Pkginfo::run()
 				for (auto i : librariesList) {
 					for (auto j : m_listOfPackages) {
 						bool found = false;
-						for (auto k : j.second.files()) {
+						for (auto k : j.second.files) {
 							if ( k.find('/' + i) != std::string::npos) {
 								std::string dependency = j.first + ultos(j.second.build());
 								runtimeList.insert(dependency);
@@ -279,7 +279,7 @@ void Pkginfo::run()
 			std::set<std::string> librariesList;
 			int Result = -1;
 			if (checkPackageNameExist(m_arg)) {
-				for (auto i : m_listOfPackages[m_arg].files() ){
+				for (auto i : m_listOfPackages[m_arg].files ){
 					std::string filename('/' + i);
 					Result = getRuntimeLibrariesList(librariesList,filename);
 				}
@@ -289,7 +289,7 @@ void Pkginfo::run()
 						for ( auto i : librariesList ) {
 							for ( auto j : m_listOfPackages ){
 								bool found = false;
-								for ( auto k : j.second.files() ) {
+								for ( auto k : j.second.files ) {
 									if ( k.find('/' + i) != std::string::npos) {
 										runtimeList.insert(j.first);
 										break;
@@ -358,7 +358,7 @@ void Pkginfo::run()
 					<< _("Installed date : ") << getDateFromEpoch(m_listOfPackages[arg].install()) << std::endl
 					<< _("Installed Size : ") << sizeHumanRead(m_listOfPackages[arg].space())
 					<< _("bytes") << std::endl
-					<< _("Number of Files: ") << m_listOfPackages[arg].files().size()
+					<< _("Number of Files: ") << m_listOfPackages[arg].files.size()
 					<< _(" file(s)") << std::endl
 					<< _("Arch           : ") << m_listOfPackages[arg].arch() << std::endl;
 				if ( m_listOfPackages[m_arg].dependency() == false )
@@ -390,7 +390,7 @@ void Pkginfo::run()
 			std::cerr << m_arg << std::endl;
 #endif
 			for (auto i : m_listOfPackages) {
-				for (auto j : i.second.files()) {
+				for (auto j : i.second.files) {
 					const std::string file('/' + j);
 					if (!regexec(&preg, file.c_str(), 0, 0, 0)) {
 						result.push_back(std::pair<std::string, std::string>(i.first, j));

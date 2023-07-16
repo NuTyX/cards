@@ -502,7 +502,7 @@ Pkgdbh::buildDatabase(const bool& progress,
 	if (packageName.size() > 0) {
 		std::string name = m_listOfAlias[packageName];
 		cards::Db info;
-		info.files(getSetOfFiles(name));
+		info.files=getSetOfFiles(name);
 		m_listOfPackages[name] = info;
 	}
 	if ( !simple && !all && !files ) {
@@ -794,7 +794,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 			}
 			info.dependencies(dependencies);
 			// list of files
-			const string filelist = m_root + PKG_DB_DIR + i + PKG_FILES;
+			const std::string filelist = m_root + PKG_DB_DIR + i + PKG_FILES;
 			int fd = open(filelist.c_str(), O_RDONLY);
 			if (fd == -1) {
 				m_actualError = CANNOT_OPEN_FILE;
@@ -812,10 +812,9 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					getline(in, file);
 					if (file.empty())
 						break; // End of record
-					files.insert(files.end(), file);
+					info.files.insert(files.end(), file);
 				}
 				if (!files.empty()) {
-					info.files(files);
 					m_listOfPackages[i] = info;
 				}
 			}
@@ -841,7 +840,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
 	const string packagedir = m_root + PKG_DB_DIR ;
 	const string packagenamedir = m_root + PKG_DB_DIR + name ;
 
-	for (auto i: info.files())
+	for (auto i: info.files)
 	{
 		if ( i[0] == '.' ) {
 #ifndef NDEBUG
@@ -850,7 +849,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
 			metaFilesList.insert(metaFilesList.end(), i );
 		}
 	}
-	for ( auto i : metaFilesList) info.files().erase(i);
+	for ( auto i : metaFilesList) info.files.erase(i);
 	removeFile ( m_root, "/.MTREE");
 	metaFilesList.insert(".META");
 	set<string> fileContent;
@@ -907,8 +906,8 @@ void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::Db& i
 	stdio_filebuf<char> filebuf_new(fd_new, ios::out, getpagesize());
 
 	ostream db_new(&filebuf_new);
-	copy(m_listOfPackages[name].files().begin(),
-		m_listOfPackages[name].files().end(),
+	copy(m_listOfPackages[name].files.begin(),
+		m_listOfPackages[name].files.end(),
 		ostream_iterator<string>(db_new, "\n"));
 
 	db_new.flush();
@@ -1025,7 +1024,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 /* Remove the physical files after followings some rules */
 void Pkgdbh::removePackageFiles(const std::string& name)
 {
-	m_filesList = m_listOfPackages[name].files();
+	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
 	m_packageName =  name ;
 
@@ -1037,7 +1036,7 @@ void Pkgdbh::removePackageFiles(const std::string& name)
 
 	// Don't delete files that still have references
 	for (auto i : m_listOfPackages)
-		for (auto j : i.second.files())
+		for (auto j : i.second.files)
 			m_filesList.erase(j);
 
 #ifndef NDEBUG
@@ -1064,7 +1063,7 @@ void Pkgdbh::removePackageFiles(const std::string& name)
 
 void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::string>& keep_list)
 {
-	m_filesList = m_listOfPackages[name].files();
+	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
 	m_packageName =  name ;
 #ifndef NDEBUG
@@ -1084,7 +1083,7 @@ void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 
 	// Don't delete files that still have references
 	for (auto i: m_listOfPackages)
-		for (auto j: i.second.files())
+		for (auto j: i.second.files)
 			m_filesList.erase(j);
 
 #ifndef NDEBUG
@@ -1121,10 +1120,10 @@ void Pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std
 	// Remove all references
 	for (auto i : m_listOfPackages) {
 		for ( auto j : files ) {
-			size_t s = i.second.files().size();
-			i.second.files().erase(j);
+			size_t s = i.second.files.size();
+			i.second.files.erase(j);
 			// If number of references have change, we refresh the disk copy
-			if ( s != i.second.files().size())
+			if ( s != i.second.files.size())
 				addPackageFilesRefsToDB(i.first,i.second);
 		}
 	}
@@ -1158,8 +1157,8 @@ Pkgdbh::getConflictsFilesList (const std::string& name, cards::Db& info)
 	// Find conflicting files in database
 	for (auto i : m_listOfPackages) {
 		if (i.first != name) {
-			set_intersection(info.files().begin(), info.files().end(),
-					 i.second.files().begin(), i.second.files().end(),
+			set_intersection(info.files.begin(), info.files.end(),
+					 i.second.files.begin(), i.second.files.end(),
 					 inserter(files, files.end()));
 		}
 	}
@@ -1171,7 +1170,7 @@ Pkgdbh::getConflictsFilesList (const std::string& name, cards::Db& info)
 #endif
 
 	// Find conflicting files in filesystem
-	for (auto i : info.files()) {
+	for (auto i : info.files) {
 		const string filename = m_root + i;
 		if (checkFileExist(filename) && files.find(i) == files.end())
 			files.insert(files.end(), i);
@@ -1198,7 +1197,7 @@ Pkgdbh::getConflictsFilesList (const std::string& name, cards::Db& info)
 
 	// If this is an upgrade, remove files already owned by this package
 	if (m_listOfPackages.find(name) != m_listOfPackages.end()) {
-		for (auto i : m_listOfPackages[name].files())
+		for (auto i : m_listOfPackages[name].files)
 			files.erase(i);
 
 #ifndef NDEBUG
@@ -1258,7 +1257,7 @@ Pkgdbh::openArchivePackage(const std::string& filename)
 
 	set<string> fileList =  packageArchive.setofFiles();
 	for (auto i :fileList) {
-		result.second.files().insert(i);
+		result.second.files.insert(i);
 	}
 	result.second.dependencies(packageArchive.listofDependenciesBuildDate());
 	m_packageName = packageArchiveName;

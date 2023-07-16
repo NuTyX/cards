@@ -26,14 +26,6 @@ void Db::install(time_t time)
 {
 	m_install = time;
 }
-void Db::files(std::set<std::string> files)
-{
-	m_files = files;
-}
-std::set<std::string> Db::files()
-{
-	return m_files;
-}
 bool Db::dependency()
 {
 	return m_dependency;

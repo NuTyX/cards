@@ -159,7 +159,7 @@ void Pkgadd::run()
 		Db_lock lock(m_root, true);
 		// Remove metadata about the package removed
 		removePackageFilesRefsFromDB(package.first);
-		keep_list = getKeepFileList(package.second.files(), m_actionRules);
+		keep_list = getKeepFileList(package.second.files, m_actionRules);
 		removePackageFiles(package.first, keep_list);
 	}
 	{
@@ -265,7 +265,7 @@ Pkgadd::applyInstallRules(const std::string& name, cards::Db& info,
 	std::vector<rule_t> scripts_found;
 	getPostInstallRulesList(rules, scripts_found);
 
-	for (auto i : info.files()) {
+	for (auto i : info.files) {
 
 		bool install_file = true;
 		for (std::vector<rule_t>::reverse_iterator j = files_found.rbegin();
@@ -303,8 +303,8 @@ Pkgadd::applyInstallRules(const std::string& name, cards::Db& info,
 		}
 	}
 	scripts_found.clear();
-	info.files().clear();
-	info.files() = install_set;
+	info.files.clear();
+	info.files = install_set;
 
 #ifndef NDEBUG
 	std::cerr << "PostInstall set:" << std::endl;
@@ -315,7 +315,7 @@ Pkgadd::applyInstallRules(const std::string& name, cards::Db& info,
 			<< i.second
 			<< std::endl;
 	std::cerr << "Install set:" << std::endl;
-	for  (auto i : info.files())
+	for  (auto i : info.files)
 		std::cerr << "   " << i << std::endl;
 	std::cerr << std::endl;
 	std::cerr << "Non-Install set:" << std::endl;
@@ -334,7 +334,7 @@ Pkgadd::applyPostInstallRules(const std::string& name, cards::Db& info,
 
 	getPostInstallRulesList(rules, found);
 
-	for (auto i : info.files()) {
+	for (auto i : info.files) {
 		bool install_file = true;
 		for (std::vector<rule_t>::reverse_iterator j = found.rbegin();
 		j != found.rend();
