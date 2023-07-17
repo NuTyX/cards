@@ -33,8 +33,6 @@
 #include "pkgrepo.h"
 #include "cards_base.h"
 
-using namespace std;
-
 Cards_base::Cards_base(const CardsArgumentParser& argParser)
 	: Pkgdbh("cards base"), m_argParser(argParser)
 {
@@ -57,8 +55,8 @@ void Cards_base::run(int argc, char** argv)
 		}
 	}
 
-	string basePackageName,installPackageName,installFullPackageName;
-	set<string> removePackagesList,basePackagesList;
+	std::string basePackageName,installPackageName,installFullPackageName;
+	std::set<std::string> removePackagesList,basePackagesList;
 
 	// For all the base packages list Directories
 	for ( auto i : config.baseDir) {
@@ -70,22 +68,22 @@ void Cards_base::run(int argc, char** argv)
 	}
 
 	if (basePackagesList.size() == 0) {
-		throw runtime_error("No package found for the base System" );
+		throw std::runtime_error("No package found for the base System" );
 	}
-	set<string> installedList = getListOfPackagesNames();
+	std::set<std::string> installedList = getListOfPackagesNames();
 	// For all the installed packages
 	for ( auto installFullPackageName : installedList) {
 		// We need to compare the base part if it not one
-		string::size_type pos = installFullPackageName.find('.');
-		if (pos != string::npos) {
+		std::string::size_type pos = installFullPackageName.find('.');
+		if (pos != std::string::npos) {
 			installPackageName = installFullPackageName.substr(0,pos);
 		} else {
 			installPackageName = installFullPackageName;
 		}
 		bool found = false;
 		for ( auto val : basePackagesList) {
-			string::size_type pos = val.find('@');
-			if (pos != string::npos) {
+			std::string::size_type pos = val.find('@');
+			if (pos != std::string::npos) {
 				basePackageName = val.substr(0,pos);
 			} else {
 				basePackageName = val;
@@ -122,23 +120,23 @@ void Cards_base::run(int argc, char** argv)
 				removePackageFiles(i);
 			}
 		} else {
-			for (auto i : removePackagesList) cout << " SIM: " <<  i << endl;
+			for (auto i : removePackagesList) std::cout << " SIM: " <<  i << std::endl;
 		}
 	}
 }
 void Cards_base::printHelp() const
 {
-	cout << endl 
-			<< "  You should have one or severall valid directories " << endl
-			<< " otherwise you will not be able to return to a " << endl
-			<< " base system. In thoses directories should be the" << endl
-			<< " packages you want to keep in the same format as" << endl
-			<< " the ports" << endl << endl
-			<< " It's made on purpose that a list of packages which" << endl
-			<< " should be remove comes out by default to avoid any mistakes" << endl << endl
-			<< "usage: cards base [options]" << endl
-			<< "options:" << endl
-			<< "   -R, --remove       remove all the packages found, use with care, check first the list without passing any options" << endl
-			<< "   -H, --info         print this help and exit" << endl;
+	std::cout << std::endl
+			<< "  You should have one or severall valid directories " << std::endl
+			<< " otherwise you will not be able to return to a " << std::endl
+			<< " base system. In thoses directories should be the" << std::endl
+			<< " packages you want to keep in the same format as" << std::endl
+			<< " the ports" << std::endl << std::endl
+			<< " It's made on purpose that a list of packages which" << std::endl
+			<< " should be remove comes out by default to avoid any mistakes" << std::endl << std::endl
+			<< "usage: cards base [options]" << std::endl
+			<< "options:" << std::endl
+			<< "   -R, --remove       remove all the packages found, use with care, check first the list without passing any options" << std::endl
+			<< "   -H, --info         print this help and exit" << std::endl;
 }
 // vim:set ts=2 :

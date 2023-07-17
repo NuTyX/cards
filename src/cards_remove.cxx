@@ -25,9 +25,7 @@
 #include "cards_remove.h"
 #include "pkgrepo.h"
 
-using namespace std;
-
-Cards_remove::Cards_remove(const string& commandName,
+Cards_remove::Cards_remove(const std::string& commandName,
 	const CardsArgumentParser& argParser,
 	const char *configFileName)
 	: Pkgrm(commandName),m_argParser(argParser)
@@ -44,7 +42,7 @@ Cards_remove::Cards_remove(const string& commandName,
 	Pkgrepo::parseConfig(configFileName, config);
 
 	if (!m_argParser.isSet(CardsArgumentParser::OPT_ALL)){
-		set<string> basePackagesList;
+		std::set<std::string> basePackagesList;
 		for (auto i : config.baseDir) {
 			if ( findDir(basePackagesList, i) != 0 ) {
 				m_actualError = CANNOT_READ_DIRECTORY;
@@ -52,36 +50,36 @@ Cards_remove::Cards_remove(const string& commandName,
 			}
 		}
 		if (basePackagesList.empty())
-			throw runtime_error(_("No package found for the base System") );
+			throw std::runtime_error(_("No package found for the base System") );
 
 		// Retrieve info about all the packages
 		buildCompleteDatabase(false);
 
-		set< pair<string,string> > listOfPackagesToRemove;
-		pair<string,string> PackageToRemove;
+		std::set< std::pair<std::string,std::string> > listOfPackagesToRemove;
+		std::pair<std::string,std::string> PackageToRemove;
 
 		for ( auto i : m_argParser.otherArguments() ) {
 			for (auto j : m_listOfPackages) {
-				for (auto k : j.second.dependencies ){
+				for (auto k : j.second.dependencies() ){
 					if ( i == k.first) {
 						m_actualError = PACKAGE_IN_USE;
-						cout << endl << i << _(" is a runtime dependency for ") << j.first << " !!!" << endl << endl;
+						std::cout << std::endl << i << _(" is a runtime dependency for ") << j.first << " !!!" << std::endl << std::endl;
 						treatErrors(i);
 					}
 				}
-				if  ((j.second.collection == i) ||
-					(j.second.group == i)) {
+				if  ((j.second.collection() == i) ||
+					(j.second.group() == i)) {
 					PackageToRemove.first=j.first;
-					PackageToRemove.second=j.second.collection;
+					PackageToRemove.second=j.second.collection();
 					listOfPackagesToRemove.insert(PackageToRemove);
 				}
 			}
 			if ( listOfPackagesToRemove.empty()) {
 				for (auto j : m_listOfPackages) {
-					for (auto k : j.second.set) {
+					for (auto k : parseDelimitedSetList(j.second.sets()," ")) {
 						if ( i == k ) {
 							PackageToRemove.first = j.first;
-							PackageToRemove.second=j.second.collection;
+							PackageToRemove.second=j.second.collection();
 							listOfPackagesToRemove.insert(PackageToRemove);
 						}
 					}
@@ -89,12 +87,12 @@ Cards_remove::Cards_remove(const string& commandName,
 			}
 			{
 				// if it's an alias get the real name
-				string a = m_listOfAlias [i];
+				std::string a = m_listOfAlias [i];
 				PackageToRemove.first = a ;
 				listOfPackagesToRemove.insert(PackageToRemove);
 			}
 		}
-		set< pair<string,string> > groupSetPackagesToRemove;
+		std::set< std::pair<std::string,std::string> > groupSetPackagesToRemove;
 		for ( auto i :  config.group ) {
 			if ( i == "lib" )
 				continue;
@@ -117,9 +115,9 @@ Cards_remove::Cards_remove(const string& commandName,
 				}
 			}
 			if (found){
-				cout << "The package '" << i.first
-					<< "' is in the base list" << endl;
-				cout << "   specify -a to remove it anyway" << endl;
+				std::cout << "The package '" << i.first
+					<< "' is in the base list" << std::endl;
+				std::cout << "   specify -a to remove it anyway" << std::endl;
 				continue;
 			}
 
@@ -127,7 +125,7 @@ Cards_remove::Cards_remove(const string& commandName,
 			if (m_packageName.size() == 0 )
 				continue;
 			run();
-			string name = "(" +  m_packageCollection + ") ";
+			std::string name = "(" +  m_packageCollection + ") ";
 			name += i.first;
 			syslog(LOG_INFO,"%s",name.c_str());
 		}
@@ -135,7 +133,7 @@ Cards_remove::Cards_remove(const string& commandName,
 		for ( auto i : m_argParser.otherArguments() ) {
 			m_packageName = i;
 			run();
-			string name = "(" + m_packageCollection + ") ";
+			std::string name = "(" + m_packageCollection + ") ";
 			name += m_packageName;
 			syslog(LOG_INFO,"%s",name.c_str());
 		}
@@ -144,8 +142,8 @@ Cards_remove::Cards_remove(const string& commandName,
 	// Lets get read of obsolets dependencies
 	getListOfManInstalledPackages ();
 	bool found;
-	set<string> obsoletsDeps;
-	set<string> obsoletsGroups;
+	std::set<std::string> obsoletsDeps;
+	std::set<std::string> obsoletsGroups;
 	for ( auto i : m_listOfPackages  ) {
 		found = false;
 		for (  auto j : m_listofDependencies ) {
@@ -171,7 +169,7 @@ Cards_remove::Cards_remove(const string& commandName,
 	for ( auto i : obsoletsDeps ) {
 		m_packageName = i;
 		run();
-		string name = "(" +  m_packageCollection + ") ";
+		std::string name = "(" +  m_packageCollection + ") ";
 		name += i;
 		syslog(LOG_INFO,"%s",name.c_str());
 	}

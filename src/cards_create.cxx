@@ -44,19 +44,18 @@ Cards_create::Cards_create(const CardsArgumentParser& argParser,
 void Cards_create::createBinaries(const char *configFileName,
 	const std::string& packageName)
 {
-	using namespace std;
 	Config config;
 	Pkgrepo::parseConfig(configFileName, config);
-	cout << "create of " << packageName << endl;
-	string pkgdir = getPortDir(packageName);
+	std::cout << "create of " << packageName << std::endl;
+	std::string pkgdir = getPortDir(packageName);
 	if (pkgdir == "" ) {
 		m_actualError = PACKAGE_NOT_FOUND;
 		treatErrors(packageName);
 	}
-	string timestamp;
-	string commandName = "cards create: ";
-	string message;
-	string packageFileName;
+	std::string timestamp;
+	std::string commandName = "cards create: ";
+	std::string message;
+	std::string packageFileName;
 	int fdlog = -1;
 
 	if ( config.logdir != "" ) {
@@ -64,7 +63,7 @@ void Cards_create::createBinaries(const char *configFileName,
 			m_actualError = CANNOT_CREATE_DIRECTORY;
 			treatErrors(config.logdir);
 		}
-		string logFile = config.logdir + "/" + packageName + ".log";
+		std::string logFile = config.logdir + "/" + packageName + ".log";
 		unlink( logFile.c_str() );
 		fdlog = open(logFile.c_str(),O_APPEND | O_WRONLY | O_CREAT, 0666 );
 		if ( fdlog == -1 ) {
@@ -73,7 +72,7 @@ void Cards_create::createBinaries(const char *configFileName,
 		}
 	}
 	message = commandName + pkgdir + " package(s)";
-	cout << message << endl;
+	std::cout << message << std::endl;
 	
 	if ( config.logdir != "" ) {
 		write( fdlog, message.c_str(), message.length());
@@ -86,17 +85,17 @@ void Cards_create::createBinaries(const char *configFileName,
 	}
 	chdir( pkgdir.c_str() );
 	
-	string runscriptCommand = "sh";
-	string cmd = "pkgmk";
-	string args = "-d ";
+	std::string runscriptCommand = "sh";
+	std::string cmd = "pkgmk";
+	std::string args = "-d ";
 
 	process makeprocess( cmd, args, fdlog );
 	int result = 0 ;
 	result = makeprocess.executeShell();
 #ifndef NDEBUG
-	cerr << "result:" << result << endl;
+	cerr << "result:" << result << std::endl;
 #endif
-	string s = RED;
+	std::string s = RED;
 	switch ( result )
 	{
 		case 1:
@@ -146,7 +145,7 @@ void Cards_create::createBinaries(const char *configFileName,
 		write( fdlog, "\n", 1 );
 	}
 
-	set<string> listOfPackages;
+	std::set<std::string> listOfPackages;
 	if (findDir(listOfPackages, pkgdir) != 0) {
 		m_actualError = CANNOT_READ_DIRECTORY;
 		treatErrors(pkgdir);
@@ -158,8 +157,8 @@ void Cards_create::createBinaries(const char *configFileName,
 			continue;
 		packageFileName = pkgdir + "/" + i;
 		ArchiveUtils packageArchive(packageFileName.c_str());
-		string name = packageArchive.name();
-		string version = packageArchive.version();
+		std::string name = packageArchive.name();
+		std::string version = packageArchive.version();
 		message = "CREATED: " + name + " " + version;
 		m_upgrade=0;
 		buildSimpleDatabase();
@@ -169,7 +168,7 @@ void Cards_create::createBinaries(const char *configFileName,
 		}
 		m_packageArchiveName = pkgdir + "/" + i;
 		run();
-		cout << message << endl;
+		std::cout << message << std::endl;
 		if ( config.logdir != "" ) {
 			write( fdlog, message.c_str(), message.length());
 			write( fdlog, "\n", 1 );

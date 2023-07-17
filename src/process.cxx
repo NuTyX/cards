@@ -23,8 +23,6 @@
 
 #include "process.h"
 
-using namespace std;
-
 process::process()
 {
 }
@@ -38,33 +36,33 @@ void process::execute(const std::string& app, const std::string& arguments, int 
 	m_arguments=arguments;
 	m_fileDescriptorLog=fdlog;
 #ifndef NDEBUG
-		cerr << m_application << " " << m_arguments << " start" << endl;
+		std::cerr << m_application << " " << m_arguments << " start" << std::endl;
 #endif
 
-	cout << "  " << m_application << " " << m_arguments << endl;
+	std::cout << "  " << m_application << " " << m_arguments << std::endl;
 	execute();
 
 #ifndef NDEBUG
-		cerr << m_application << " " << m_arguments << " end" << endl;
+		std::cerr << m_application << " " << m_arguments << " end" << std::endl;
 #endif
 }
-string process::name()
+std::string process::name()
 {
 	return m_application;
 }
-string process::args()
+std::string process::args()
 {
 	return m_arguments;
 }
 int process::execute()
 {
-	list<string> args;
+	std::list<std::string> args;
 	split( m_arguments, ' ', args, 0, false );
 
 	const int argc = 1 + args.size() + 1; // app, args, NULL
 
 	char** argv = new char*[argc];
-	list<string>::iterator it = args.begin();
+	std::list<std::string>::iterator it = args.begin();
 
 	int i = 0;
 	argv[i] = const_cast<char*>( m_application.c_str() );

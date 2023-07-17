@@ -50,7 +50,6 @@ Pkgsync::Pkgsync ( const std::string& url,
 }
 void Pkgsync::treatErrors(const std::string& s) const
 {
-	using namespace std;
 	switch ( m_actualError )
 	{
 		case CANNOT_FIND_FILE:
@@ -87,13 +86,13 @@ void Pkgsync::treatErrors(const std::string& s) const
 		case CANNOT_CREATE_FILE:
 			break;
 		case CANNOT_DOWNLOAD_FILE:
-			throw runtime_error("could not download " + s);
+			throw std::runtime_error("could not download " + s);
 			break;
 		case CANNOT_OPEN_FILE:
 			throw RunTimeErrorWithErrno("could not open " + s);
 			break;
 		case CANNOT_READ_FILE:
-			throw runtime_error("could not read " + s);
+			throw std::runtime_error("could not read " + s);
 			break;
 		case CANNOT_READ_DIRECTORY:
 			throw RunTimeErrorWithErrno("could not read directory " + s);
@@ -102,7 +101,7 @@ void Pkgsync::treatErrors(const std::string& s) const
 			throw RunTimeErrorWithErrno("could not create directory " + s);
 			break;
 		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
-			throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
+			throw std::runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
 			break;
 	}
 }
@@ -140,24 +139,22 @@ unsigned int Pkgsync::getRemotePackages(const std::string& pkgrepoFile)
 }
 void Pkgsync::run()
 {
-	using namespace std;
 /*	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	} */
-	string configFile = m_root + m_configFile;
+	std::string configFile = m_root + m_configFile;
 	Config config;
 	Pkgrepo::parseConfig(configFile.c_str(), config);
-	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
-		DirUrl DU = *i ;
+	for (auto DU : config.dirUrl) {
 		if (DU.Url.size() == 0 ) {
 			continue;
 		}
-		string categoryDir, url ;
+		std::string categoryDir, url ;
 		categoryDir = DU.Dir;
 		url = DU.Url;
-		string category = basename(const_cast<char*>(categoryDir.c_str()));
-		string categoryPKGREPOFile = categoryDir + "/" + m_repoFile ;
+		std::string category = basename(const_cast<char*>(categoryDir.c_str()));
+		std::string categoryPKGREPOFile = categoryDir + "/" + m_repoFile ;
 		FileDownload PKGRepo(url + "/" + m_repoFile,
 			categoryDir,
 			m_repoFile, false);
@@ -165,35 +162,33 @@ void Pkgsync::run()
 }
 void Pkgsync::purge()
 {
-	using namespace std;
 	if (getuid()) {
 			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 			treatErrors("");
 	}
 	Config config;
-	string configFile = m_root + m_configFile;
+	std::string configFile = m_root + m_configFile;
 	Pkgrepo::parseConfig(configFile.c_str(), config);
 
-	for (vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end(); ++i) {
-		if ( i->Url.size() == 0)
+	for (auto i : config.dirUrl) {
+		if ( i.Url.size() == 0)
 			continue;
-		if ( getLocalPackages(i->Dir) == 0 )
+		if ( getLocalPackages(i.Dir) == 0 )
 			continue;
-		for (set<string>::const_iterator dir = m_localPackagesList.begin(); dir != m_localPackagesList.end(); ++dir) {
-			deleteFolder(i->Dir + "/" + *dir);
+		for (auto dir : m_localPackagesList) {
+			deleteFolder(i.Dir + "/" + dir);
 		}
 	}
 }
 void Pkgsync::deleteFolder(const std::string& folderName)
 {
-	using namespace std;
-	set<string> filesToDelete;
+	std::set<std::string> filesToDelete;
 	if ( findDir(filesToDelete, folderName) != 0 ){
 			m_actualError = CANNOT_READ_FILE;
 			treatErrors(folderName);
 	}
-	for (set<string>::const_iterator f = filesToDelete.begin(); f != filesToDelete.end(); f++) {
-		string fileName = folderName + "/" + *f;
+	for (auto f : filesToDelete) {
+		std::string fileName = folderName + "/" + f;
 #ifndef NDEBUG
 		if (f->size() > 0)
 			cerr << "Deleting " << fileName << endl;

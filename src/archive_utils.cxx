@@ -21,21 +21,19 @@
 
 #include "archive_utils.h"
 
-using namespace std;
-
 ArchiveUtils::ArchiveUtils(const std::string& fileName)
 	: m_fileName(fileName)
 {
 #ifndef NDEBUG
-	cerr << "extractFileContent META" << endl;
+	std::cerr << "extractFileContent META" << std::endl;
 #endif
 	m_contentMeta = extractFileContent(METAFILE);
 #ifndef NDEBUG
-	cerr << "extractFileContent MTREE" << endl;
+	std::cerr << "extractFileContent MTREE" << std::endl;
 #endif
  	m_contentMtree = extractFileContent(MTREEFILE);
 #ifndef NDEBUG
-	cerr << "extractFileContent INFO" << endl;
+	std::cerr << "extractFileContent INFO" << std::endl;
 #endif
  	m_contentInfo = extractFileContent(INFOFILE);
 
@@ -61,28 +59,28 @@ void ArchiveUtils::treatErrors(const std::string& message) const
 	switch (m_actualError)
 	{
 		case CANNOT_OPEN_ARCHIVE:
-			throw runtime_error(gettext("could not open the archive ") + message);
+			throw std::runtime_error(gettext("could not open the archive ") + message);
 			break;
 		case CANNOT_READ_ARCHIVE:
-			throw runtime_error(gettext("could not read the archive ") + message);
+			throw std::runtime_error(gettext("could not read the archive ") + message);
 			break;
 		case CANNOT_FIND_META_FILE:
-			throw runtime_error(gettext("Invalid meta data in file ") + message);
+			throw std::runtime_error(gettext("Invalid meta data in file ") + message);
 			break;
 		case CANNOT_FIND_MTREE_FILE:
-			throw runtime_error(gettext("Invalid mtree in file ") + message);
+			throw std::runtime_error(gettext("Invalid mtree in file ") + message);
 			break;
 		case EMPTY_ARCHIVE:
-			throw runtime_error(message + gettext(" is not an archive"));
+			throw std::runtime_error(message + gettext(" is not an archive"));
 			break;
 		case CANNOT_FIND_NAME:
-			throw runtime_error(message + gettext(" is not a CARDS archive"));
+			throw std::runtime_error(message + gettext(" is not a CARDS archive"));
 		case CANNOT_FIND_ARCH:
-			throw runtime_error(gettext("archive ") + message + gettext(": invalid architecture"));
+			throw std::runtime_error(gettext("archive ") + message + gettext(": invalid architecture"));
 			break;
 	}
 }
-set<string> ArchiveUtils::setofFiles()
+std::set<std::string> ArchiveUtils::setofFiles()
 {
 	return m_filesList;
 }
@@ -95,16 +93,16 @@ unsigned int long ArchiveUtils::size()
 void ArchiveUtils::list()
 {
 	if ( m_contentMtree.size() == 0) {
-		cout << gettext("Not found") << endl;
+		std::cout << gettext("Not found") << std::endl;
 	} else {
 		for (auto i : m_contentMtree) {
-			cout << i << endl;
+			std::cout << i << std::endl;
 		}
 	}
 }
-vector<string> ArchiveUtils::extractFileContent(const char * fileName)
+std::vector<std::string> ArchiveUtils::extractFileContent(const char * fileName)
 {
-	vector<string> contentFile;
+	std::vector<std::string> contentFile;
 	struct archive* ar;
 	struct archive_entry* ae;
 
@@ -125,7 +123,7 @@ vector<string> ArchiveUtils::extractFileContent(const char * fileName)
 			char *fC = (char*)Malloc(entry_size);
 			archive_read_data(ar,fC,entry_size);
 			fC[entry_size-1]='\0';
-			string s_contentFile = fC;
+			std::string s_contentFile = fC;
 			if ( fC != nullptr ) {
 				free(fC);
 				fC = nullptr;
@@ -175,22 +173,22 @@ void ArchiveUtils::printDeps()
 {
 	getRunTimeDependencies();
 	for ( auto i : m_rtDependenciesList)
-		cout << i << endl;
+		std::cout << i << std::endl;
 }
 
 void ArchiveUtils::printMeta()
 {
 	for ( auto i : m_contentMeta)
-		cout << i << endl;
+		std::cout << i << std::endl;
 }
 void ArchiveUtils::printInfo()
 {
 	if ( m_contentInfo.size() != 0) {
 		for (auto i : m_contentInfo)
-			cout << i << endl;
+			std::cout << i << std::endl;
 	}
 }
-string ArchiveUtils::getPackageName()
+std::string ArchiveUtils::getPackageName()
 {
 	if  ( m_contentMeta.size() == 0 ) {
 		m_actualError = CANNOT_FIND_NAME;
@@ -207,7 +205,7 @@ string ArchiveUtils::getPackageName()
 	treatErrors(m_fileName);
 	return "";
 }
-string ArchiveUtils::getPackageArch()
+std::string ArchiveUtils::getPackageArch()
 {
 	if ( m_contentMeta.size() == 0 ) {
 		m_actualError = CANNOT_FIND_ARCH;
@@ -222,23 +220,23 @@ string ArchiveUtils::getPackageArch()
 	}
 	return "";
 }
-string ArchiveUtils::namebuildn()
+std::string ArchiveUtils::namebuildn()
 {
 	return getPackageName() + epochBuildDate();
 }
-set<string> ArchiveUtils::listofDependencies()
+std::set<std::string> ArchiveUtils::listofDependencies()
 {
 	m_rtDependenciesList.insert(namebuildn());
 	getRunTimeDependencies();
 
 	return m_rtDependenciesList;
 }
-set<string> ArchiveUtils::listofAlias()
+std::set<std::string> ArchiveUtils::listofAlias()
 {
 	getAliasList();
 	return m_aliasList;
 }
-set< std::pair<std::string,time_t> > ArchiveUtils::listofDependenciesBuildDate()
+std::set< std::pair<std::string,time_t> > ArchiveUtils::listofDependenciesBuildDate()
 {
 	std::pair<std::string,time_t> NameEpoch;
 	NameEpoch.first=getPackageName();
@@ -247,15 +245,15 @@ set< std::pair<std::string,time_t> > ArchiveUtils::listofDependenciesBuildDate()
 	getRunTimeDependenciesEpoch();
 	return m_rtDependenciesEpochList;
 }
-string ArchiveUtils::name()
+std::string ArchiveUtils::name()
 {
 	return m_packageName;
 }
-string ArchiveUtils::arch()
+std::string ArchiveUtils::arch()
 {
 	return m_packageArch;
 }
-string ArchiveUtils::version()
+std::string ArchiveUtils::version()
 {
 	for (auto version : m_contentMeta) {
 		if ( version[0] == 'V' ) {
@@ -275,7 +273,7 @@ int ArchiveUtils::release()
 	}
 	return 0;
 }
-string ArchiveUtils::url()
+std::string ArchiveUtils::url()
 {
 	for (auto url : m_contentMeta) {
 		if ( url[0] == 'U' ) {
@@ -285,7 +283,7 @@ string ArchiveUtils::url()
 	}
 	return "";
 }
-string ArchiveUtils::description()
+std::string ArchiveUtils::description()
 {
 	for (auto description : m_contentMeta) {
 		if ( description[0] == 'D' ) {
@@ -295,7 +293,7 @@ string ArchiveUtils::description()
 	}
 	return "";
 }
-string ArchiveUtils::group()
+std::string ArchiveUtils::group()
 {
 	for (auto group : m_contentMeta) {
 		if ( group[0] == 'g' ) {
@@ -305,7 +303,7 @@ string ArchiveUtils::group()
 	}
 	return "";
 }
-string ArchiveUtils::maintainer()
+std::string ArchiveUtils::maintainer()
 {
   for (auto maintainer : m_contentMeta) {
     if ( maintainer[0] == 'M' ) {
@@ -315,7 +313,7 @@ string ArchiveUtils::maintainer()
   }
   return "";
 }
-string ArchiveUtils::contributors()
+std::string ArchiveUtils::contributors()
 {
   for (auto contributors : m_contentMeta) {
     if ( contributors[0] == 'C' ) {
@@ -325,7 +323,7 @@ string ArchiveUtils::contributors()
   }
   return "";
 }
-string ArchiveUtils::packager()
+std::string ArchiveUtils::packager()
 {
   for (auto maintainer : m_contentMeta) {
     if ( maintainer[0] == 'P' ) {
@@ -335,7 +333,7 @@ string ArchiveUtils::packager()
   }
   return "";
 }
-string ArchiveUtils::collection()
+std::string ArchiveUtils::collection()
 {
 	for (auto collection : m_contentMeta) {
 		if ( collection[0] == 'c' ) {
@@ -345,10 +343,10 @@ string ArchiveUtils::collection()
 	}
 	return "";
 }
-string ArchiveUtils::builddate()
+std::string ArchiveUtils::builddate()
 {
 	char * c_time_s;
-	string buildtime;
+	std::string buildtime;
 	for (auto bt : m_contentMeta) {
 		if ( buildtime[0] == 'B' ) {
 			buildtime=bt.substr(1);
@@ -357,10 +355,10 @@ string ArchiveUtils::builddate()
 	}
 	time_t ct = strtoul(buildtime.c_str(),NULL,0);
 	c_time_s = ctime(&ct);
-	string build = c_time_s;
+	std::string build = c_time_s;
 	return build;
 }
-string ArchiveUtils::epochBuildDate()
+std::string ArchiveUtils::epochBuildDate()
 {
 	for (auto epochSVal : m_contentMeta) {
 		if ( epochSVal[0] == 'B' ) {

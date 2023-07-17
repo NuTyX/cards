@@ -24,7 +24,7 @@
 #define PKGREPO_H
 
 #include "file_utils.h"
-#include "pkg.h"
+#include "cache.h"
 
 struct PortFilesList {
 	std::string md5SUM;
@@ -181,7 +181,7 @@ public:
  * return a Pkg set List of available binaries packages
  *
  */
-	std::set<Pkg*> getBinaryPackageSet();
+	std::set<cards::Cache*> getBinaryPackageSet();
 
 /**
  * populate RepoInfo List
@@ -287,7 +287,7 @@ private:
 
 	error m_ErrorCond;
 	void clearPackagesList();
-	std::set<Pkg*> m_packagesList;
+	std::set<cards::Cache*> m_packagesList;
 };
 #endif /* PKGREPO_H */
 // vim:set ts=2 :

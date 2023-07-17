@@ -1,7 +1,7 @@
 //
 //  pkginst.cxx
 //
-//  Copyright (c) 2015 - 2021 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2015 - 2023 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ void Pkginst::generateDependencies()
 				<< " found in m_listOfRepoPackages"
 				<< std::endl;
 #endif
-			directDependencies = m_listOfRepoPackages[packageName].dependencies;
+			directDependencies = m_listOfRepoPackages[packageName].dependencies();
 #ifndef NDEBUG
 			for (auto i : directDependencies )
 				std::cerr << i.first

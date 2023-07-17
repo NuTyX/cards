@@ -29,8 +29,6 @@
 
 #include "argument_parser.h"
 
-using namespace std;
-
 ArgParser::ArgParser()
     : m_cmdIdCounter(0),
       m_optIdCounter(0)
@@ -39,12 +37,12 @@ ArgParser::ArgParser()
 
 ArgParser::~ArgParser()
 {
-    map<int, Option*>::iterator oit = m_options.begin();
+    std::map<int, Option*>::iterator oit = m_options.begin();
     for (; oit != m_options.end(); ++oit) {
         delete oit->second;
     }
 
-    map<string, Command*>::iterator cit = m_commands.begin();
+    std::map<std::string, Command*>::iterator cit = m_commands.begin();
     for (; cit != m_commands.end(); ++cit) {
         delete cit->second;
     }
@@ -139,7 +137,7 @@ int ArgParser::addOption(CMD commandKey,
 void ArgParser::parse(int argc, char** argv)
 {
     bool commandFound = false;
-    string command = "";
+    std::string command = "";
     Command* cmd = 0;
     int cmdPos = 0;
 
@@ -150,7 +148,7 @@ void ArgParser::parse(int argc, char** argv)
             if (!commandFound) {
                 if (m_commands.find(argv[i]) == m_commands.end()) {
                     parseError("Non option / Non command argument \033[1;31m" +
-                               string(argv[i]) + NORMAL);
+                               std::string(argv[i]) + NORMAL);
                 }
                 cmd = m_commands[argv[i]];
                 m_command.id = cmd->id;
@@ -162,9 +160,9 @@ void ArgParser::parse(int argc, char** argv)
         } else {
             // TODO: add proper handling for global options
 
-            string arg = argv[i];
+            std::string arg = argv[i];
             if (arg == "-h" || arg == "--help") {
-                cout << generateUsage() << endl;
+                std::cout << generateUsage() << std::endl;
                 exit(0);
             }
         }
@@ -195,16 +193,16 @@ void ArgParser::parse(int argc, char** argv)
 
                 if (m_optionsByLongName.find(argv[i]+2) ==
                     m_optionsByLongName.end()) {
-                    parseError(_("unknown option: ") + string(argv[i]+2),
+                    parseError(_("unknown option: ") + std::string(argv[i]+2),
                                cmd->name);
                 }
 
                 Option* o = m_optionsByLongName[argv[i]+2];
-                string val = "";
+                std::string val = "";
                 if (o->requiresValue) {
                     if (valPtr == NULL || *valPtr == 0) {
                         parseError(_("Value required for option '") +
-                                   string(argv[i]+2), cmd->name);
+                                   std::string(argv[i]+2), cmd->name);
                     } else {
                         val = valPtr;
                     }
@@ -213,21 +211,21 @@ void ArgParser::parse(int argc, char** argv)
             } else {
                 if (argv[i][2] != '\0') {
                     parseError(_("invalid short option '") +
-                               string(argv[i]+1) + "'", cmd->name);
+                               std::string(argv[i]+1) + "'", cmd->name);
                 }
 
                 if (m_optionsByShortName.find(argv[i][1]) ==
                     m_optionsByShortName.end()) {
-                    parseError(_("unknown short option: ") + string(argv[i]+1),
+                    parseError(_("unknown short option: ") + std::string(argv[i]+1),
                                cmd->name);
                 }
 
                 Option* o = m_optionsByShortName[argv[i][1]];
-                string val = "";
+                std::string val = "";
                 if (o->requiresValue) {
                     if (i+1 == argc) {
                         parseError(_("Option required for option '") +
-                                   string(argv[i]+1), cmd->name);
+                                   std::string(argv[i]+1), cmd->name);
                     } else {
                         val = argv[i+1];
                         ++i;
@@ -236,12 +234,13 @@ void ArgParser::parse(int argc, char** argv)
                 m_setOptions[o->id] = val;
             }
         } else {
-            m_otherArguments.push_back(string(argv[i]));
+            m_otherArguments.push_back(std::string(argv[i]));
         }
     }
 
     if (isSet(PREDEFINED_CMD_HELP)) {
-        cout << generateHelpForCommand(cmd->name) << endl;
+        std::cout << generateHelpForCommand(cmd->name)
+					<< std::endl;
         exit(0);
     } else {
 
@@ -253,9 +252,9 @@ void ArgParser::parse(int argc, char** argv)
             if (!isSet(it->second->id)) {
                 parseError(_("Command ") + cmd->name +
                            _(" requires option ") +
-                           string("-") + it->second->shortName +
-                           string(",  ") +
-                           string("--") + it->second->longName + _(" not found"),
+                           std::string("-") + it->second->shortName +
+                           std::string(",  ") +
+                           std::string("--") + it->second->longName + _(" not found"),
                            cmd->name);
             }
         }
@@ -265,7 +264,7 @@ void ArgParser::parse(int argc, char** argv)
     {
         case EQ:
             if (m_otherArguments.size() != cmd->argNumber) {
-                ostringstream ostr;
+                std::ostringstream ostr;
                 ostr << BLUE << cmd->name << NORMAL
                      << _(" takes exactly ")
                      << cmd->argNumber
@@ -276,7 +275,7 @@ void ArgParser::parse(int argc, char** argv)
             break;
         case MIN:
             if (m_otherArguments.size() < cmd->argNumber) {
-                ostringstream ostr;
+                std::ostringstream ostr;
                 ostr << BLUE << cmd->name << NORMAL
                      << _(" takes at least ")
                      << cmd->argNumber
@@ -287,7 +286,7 @@ void ArgParser::parse(int argc, char** argv)
             break;
         case MAX:
             if (m_otherArguments.size() > cmd->argNumber) {
-                ostringstream ostr;
+                std::ostringstream ostr;
                 ostr << BLUE << cmd->name << NORMAL
                      << _(" takes at most ")
                      << cmd->argNumber
@@ -302,14 +301,14 @@ void ArgParser::parse(int argc, char** argv)
     }
 }
 
-void ArgParser::parseError(const string& error, const string& cmd) const
+void ArgParser::parseError(const std::string& error, const std::string& cmd) const
 {
 //    cerr << "Parse error: " << error << endl;
-		cerr << error << endl;
+		std::cerr << error << std::endl;
     if (cmd != "") {
-        cerr << generateHelpForCommand(cmd) << endl;
+        std::cerr << generateHelpForCommand(cmd) << std::endl;
     } else {
-        cerr << generateUsage() << endl;
+        std::cerr << generateUsage() << std::endl;
     }
     exit(-1);
 }
@@ -340,9 +339,9 @@ bool ArgParser::isSet(int key) const
     return m_setOptions.find(key) != m_setOptions.end();
 }
 
-void ArgParser::printHelp(const string& cmd)
+void ArgParser::printHelp(const std::string& cmd)
 {
-	cerr << generateHelpForCommand(cmd) << endl;	
+	std::cerr << generateHelpForCommand(cmd) << std::endl;	
 }
 std::string ArgParser::getOptionValue(const APOpt& key) const
 {
@@ -364,7 +363,7 @@ std::string ArgParser::generateHelpForCommand(const std::string& command) const
 	}
 
 	const Command * const  cmd = cit->second;
-	string help = "";
+	std::string help = "";
 	help += ACTION;
 	help += "\n  " + cmd->shortInfo;
 	help += "\n\n";
@@ -399,9 +398,9 @@ std::string ArgParser::generateHelpForCommand(const std::string& command) const
 	return help;
 }
 
-string ArgParser::generateOptionString(Option* o) const
+std::string ArgParser::generateOptionString(Option* o) const
 {
-	string help = "  ";
+	std::string help = "  ";
 
 	if (o->shortName) {
 		help += "-";
@@ -432,7 +431,7 @@ string ArgParser::generateOptionString(Option* o) const
 
 std::string ArgParser::generateUsage() const
 {
-	string usage = getAppIdentification() +
+	std::string usage = getAppIdentification() +
   	USAGE;
 	usage += " ";
 	usage += BLUE + m_appName + " ";

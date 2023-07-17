@@ -3,7 +3,7 @@
 //
 //  Copyright (c) 2000 - 2005 Per Liden
 //  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2023 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -132,30 +132,6 @@ enum action
 	RM_PKG_FILES_START,
 	RM_PKG_FILES_RUN,
 	RM_PKG_FILES_END
-};
-
-struct pkginfo_t {
-	std::string group;
-	std::string collection;
-	std::string description;
-	std::string signature;
-	time_t build; // date of build
-	std::string version;
-	int release;
-	std::string url;
-	std::string contributors;
-	std::string packager;
-	std::string maintainer;
-	time_t install; // date of last installation
-	std::string arch;
-	std::string license;
-	int size;
-	bool dependency; // true it's a dependency: automaticaly install
-	std::set< std::pair<std::string,time_t> > dependencies;
-	std::set<std::string> alias;
-	std::set<std::string> set;
-	std::set<std::string> categories;
-	std::set<std::string> files;
 };
 typedef std::map<std::string, cards::Db> packages_t;
 

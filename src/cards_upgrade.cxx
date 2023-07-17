@@ -25,7 +25,6 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	const char *configFileName)
 	: Pkginst("cards upgrade",configFileName), m_argParser(argParser)
 {
-	using namespace std;
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
 
@@ -62,7 +61,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		}
 		if ( tmpList.size() > 0) {
 			for ( auto i : tmpList) {
-				pair<string,time_t> packageNameBuildDate;
+				std::pair<std::string,time_t> packageNameBuildDate;
 				packageNameBuildDate.first = i;
 				packageNameBuildDate.second = getBinaryBuildTime(i);
 				if (checkPackageNameBuildDateSame(packageNameBuildDate))
@@ -76,7 +75,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 			m_ListOfPackagesToDelete.insert(i.first);
 			continue;
 		}
-		pair<string,time_t> packageNameBuildDate;
+		std::pair<std::string,time_t> packageNameBuildDate;
 		packageNameBuildDate.first = i.first ;
 		packageNameBuildDate.second = getBinaryBuildTime(i.first);
 		if ( checkPackageNameBuildDateSame(packageNameBuildDate)) {
@@ -92,7 +91,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		if ( (! m_argParser.isSet(CardsArgumentParser::OPT_SIZE)) &&
 				(! m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) ) {
 			if ( m_ListOfPackages.size() == 0  && ( m_ListOfPackagesToDelete.size() == 0 ) ) {
-				std::cout << _("Your system is up to date.") << endl;
+				std::cout << _("Your system is up to date.") << std::endl;
 			} else {
 				if (! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
 					if (getuid()) {
@@ -107,7 +106,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	}
 	if ( m_argParser.getCmdValue() == ArgParser::CMD_DIFF) {
 		if ( ( m_ListOfPackages.size() == 0 ) && ( m_ListOfPackagesToDelete.size() == 0 ) ) {
-			std::cout << _("Your system is up to date.") << endl;
+			std::cout << _("Your system is up to date.") << std::endl;
 		} else {
 			dry();
 		}

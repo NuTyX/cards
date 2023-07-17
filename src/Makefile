@@ -3,7 +3,7 @@
 #
 #  Copyright (c) 2000 - 2005 by Per Liden <per@fukt.bth.se>
 #  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013 - 2022 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013 - 2023 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ TOOLSOBJECTS =	system_utils.o \
 		process.o \
 		pkg.o \
 		db.o \
+		cache.o \
 		runtime_dependencies_utils.o \
 		pkgdbh.o \
 		pkgadd.o \
@@ -45,6 +46,8 @@ CARDSOBJECTS =	system_utils.o \
 		string_utils.o \
 		archive_utils.o \
 		pkg.o \
+		db.o \
+		cache.o \
 		pkgrepo.o \
 		file_download.o \
 		repodwl.o \
@@ -84,6 +87,7 @@ LIBOBJECTS =  system_utils.o \
 	process.o \
 	pkg.o \
 	db.o \
+	cache.o \
 	runtime_dependencies_utils.o \
 	pkgdbh.o \
 	pkgadd.o \
@@ -101,6 +105,7 @@ WEBOBJECTS =  system_utils.o \
 	mysql.o \
 	pkg.o \
 	db.o \
+	cache.o \
 	webcards.o
 
 HEADERS = system_utils.h \

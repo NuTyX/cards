@@ -440,11 +440,13 @@ std::set<std::string> Pkgrepo::getBinaryPackageList()
 	}
 	return binaryList;
 }
-std::set<Pkg*> Pkgrepo::getBinaryPackageSet()
+
+std::set<cards::Cache*>
+Pkgrepo::getBinaryPackageSet()
 {
 	parseCollectionPkgRepoFile();
 
-	// set<Pkg*> pkgList;
+	// std::set<cards::Cache*> pkgList;
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
@@ -457,18 +459,18 @@ std::set<Pkg*> Pkgrepo::getBinaryPackageSet()
 				<< j.description << " "
 				<< j.version << std::endl;
 #endif
-			Pkg* pkg = new Pkg();
+			cards::Cache* pkg = new cards::Cache();
 			std::string baseDir = basename(const_cast<char*>(i.Dir.c_str()));
-			pkg->setName(j.basePackageName);
-			pkg->setVersion(j.version);
-			pkg->setDescription(j.description);
+			pkg->name(j.basePackageName);
+			pkg->version(j.version);
+			pkg->description(j.description);
 			if ( ( j.set=="none ") || (j.set.size()==0 ) || 
 				 ( j.set=="none") )
-				pkg->setCollection(baseDir);
+				pkg->collection(baseDir);
 			else
-				pkg->setSet(j.set);
+				pkg->sets(j.set);
 
-			pkg->setPackager(j.packager);
+			pkg->packager(j.packager);
 
 			m_packagesList.insert(pkg);
 		}

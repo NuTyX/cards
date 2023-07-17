@@ -37,9 +37,7 @@
 #include "pkgrm.h"
 #include "pkginfo.h"
 
-using namespace std;
-
-Pkgdbh* select_utility(const string& name)
+Pkgdbh* select_utility(const std::string& name)
 {
 	if (name == "pkgadd")
 		return new Pkgadd;
@@ -48,22 +46,22 @@ Pkgdbh* select_utility(const string& name)
 	else if (name == "pkginfo")
 		return new Pkginfo;
 	else	
-		throw runtime_error("command not supported by cards");
+		throw std::runtime_error("command not supported by cards");
 }
 
 int main(int argc, char** argv)
 {
-	string name = basename(argv[0]);
+	std::string name = basename(argv[0]);
 	setlocale(LC_ALL,"");
 	bindtextdomain(GETTEXT_PACKAGE,PACKAGE_LOCALE_DIR);
 	textdomain(GETTEXT_PACKAGE);
 
 	try {
-		unique_ptr<Pkgdbh> util(select_utility(name));
+		std::unique_ptr<Pkgdbh> util(select_utility(name));
 
 		// Handle common options
 		for (int i = 1; i < argc; i++) {
-			string option(argv[i]);
+			std::string option(argv[i]);
 			if (option == "-v" || option == "--version") {
 				util->print_version();
 				return EXIT_SUCCESS;
@@ -74,8 +72,8 @@ int main(int argc, char** argv)
 		}
 		util->run(argc, argv);
 
-	} catch (runtime_error& e) {
-		cerr << name <<  " " << VERSION << ": " << e.what() << endl;
+	} catch (std::runtime_error& e) {
+		std::cerr << name <<  " " << VERSION << ": " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 

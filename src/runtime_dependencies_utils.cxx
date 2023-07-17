@@ -21,7 +21,6 @@
 
 #include "runtime_dependencies_utils.h"
 
-using namespace std;
 
 int error ( const char* message);
 void dependencies_utils_end (void);
@@ -65,7 +64,7 @@ int get_64bit_elf_header_part(FILE *file)
 	elf_header_64bits=*buffer_64bits_part;
 	return 0;
 }
-int getRuntimeLibrariesList(set<string>& runtimeLibrariesList, const string& fileName)
+int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList, const std::string& fileName)
 {
 #ifndef NDEBUG
 	printf("\n==>File open: %s\n",fileName.c_str());

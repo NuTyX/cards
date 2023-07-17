@@ -23,8 +23,6 @@
 #include <fstream>
 #include <iterator>
 
-using namespace std;
-
 FileDownloadEvent::FileDownloadEvent()
 {
 	FileDownload::SuscribeToEvents(this);
@@ -41,7 +39,7 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 	curl_global_init(CURL_GLOBAL_ALL);
 	m_curl = curl_easy_init();
 	if (! m_curl)
-		throw runtime_error ("Curl error");
+		throw std::runtime_error ("Curl error");
 	if ( progress ) {
 		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 0L);
 	} else {
@@ -61,7 +59,7 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 		initFileToDownload(m_url,m_downloadFileName);
 		downloadFile();
 		if ( ! checkMD5sum() )
-			throw runtime_error (m_downloadFileName + " " + m_MD5Sum +": checksum error");
+			throw std::runtime_error (m_downloadFileName + " " + m_MD5Sum +": checksum error");
 	}
 }
 
@@ -72,7 +70,7 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 	curl_global_init(CURL_GLOBAL_ALL);
 	m_curl = curl_easy_init();
 	if (! m_curl)
-		throw runtime_error ("Curl error");
+		throw std::runtime_error ("Curl error");
 	m_slist=NULL;
 	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
 	createRecursiveDirs(dirName);
@@ -92,7 +90,7 @@ FileDownload::FileDownload(std::string fileInfo,std::string url, std::string dir
   curl_global_init(CURL_GLOBAL_ALL);
   m_curl = curl_easy_init();
   if (! m_curl)
-    throw runtime_error ("Curl error");
+    throw std::runtime_error ("Curl error");
 
 	m_slist=NULL;
 	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
@@ -106,7 +104,7 @@ FileDownload::FileDownload(std::string fileInfo,std::string url, std::string dir
 	}
 	downloadFile();
 	if ( ! checkMD5sum() )
-		throw runtime_error (m_downloadFileName + " " + m_MD5Sum +": checksum error");
+		throw std::runtime_error (m_downloadFileName + " " + m_MD5Sum +": checksum error");
 }
 
 void FileDownload::downloadFile()
@@ -135,10 +133,10 @@ void FileDownload::downloadFile()
 #endif
 	m_curlCode = curl_easy_perform(m_curl);
 	if (m_progress)
-		cout << endl;
+		std::cout << std::endl;
 	if ( m_curlCode != CURLE_OK) {
-		cerr << curl_easy_strerror(m_curlCode) << endl;
-		throw runtime_error ( "\n\nURL   : " +
+		std::cerr << curl_easy_strerror(m_curlCode) << std::endl;
+		throw std::runtime_error ( "\n\nURL   : " +
 		m_url + "\nFILE  : " +
 		m_downloadFileName + "\nMD5SUM: " +
 		m_MD5Sum +"\n\n !!! download failed !!! \n");
@@ -242,7 +240,7 @@ bool FileDownload::checkUpToDate()
 }
 // vim:set ts=2 :
 
-set<FileDownloadEvent*> FileDownload::m_arrCallBacks;
+std::set<FileDownloadEvent*> FileDownload::m_arrCallBacks;
 
 void FileDownload::SendProgressEvent(FileDownloadState event)
 {
@@ -268,3 +266,4 @@ void FileDownload::UnSuscribeFromEvents(FileDownloadEvent* callback)
 		FileDownload::m_arrCallBacks.erase(it);
 	}
 }
+// vim:set ts=2 :

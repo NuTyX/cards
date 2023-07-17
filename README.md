@@ -1,4 +1,4 @@
-## Cards - Package Management Utilities for NuTyX-Linux
+## cards - Package Management Utilities for NuTyX-Linux
 
 ### Online Documentation
 
@@ -7,7 +7,7 @@ http://cards.nutyx.org
 
 ### Description
 
-**Cards** which stands for *Create, Add, Remove and Download System* is a set of utilities
+**cards** which stands for *Create, Add, Remove and Download System* is a set of utilities
 (pkgadd, pkgrm, pkginfo, pkgmk and cards), which are used for managing software packages in NuTyX-Linux.
 
 *Cards* is based on a fork of the [CRUX-Linux](http://crux.nu) pkgutils and prt-get tools and is under active
@@ -17,7 +17,6 @@ development. [NuTyX-Linux Team](http://nutyx.org)
 #### The most notable additions and improvements
 
 * Full support for *binary packages*
-* Support for sources from *version control system (VCS)* (Bazaar, Git, Subversion and Mercurial)
 
 
 ### Building and installing
@@ -68,7 +67,7 @@ $ cards help
 
 ### Copyright
 
-**Cards** Copyright (c) 2013-2022 [NuTyX-Linux Team](http://nutyx.org) licensed under the GNU General Public License 2
+**cards** Copyright (c) 2013-2023 [NuTyX-Linux Team](http://nutyx.org) licensed under the GNU General Public License 2
 or later.
 
 Read the COPYING file for the complete license.
