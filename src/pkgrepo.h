@@ -53,7 +53,7 @@ struct BasePackageInfo {
 	int release;
 	std::string description;
 	std::string categories;
-	std::string URL;
+	std::string url;
 	std::string contributors;
 	std::string maintainer;
 	std::string packager;
@@ -67,8 +67,8 @@ struct BasePackageInfo {
 };
 
 struct PortsDirectory {
-	std::string Dir;
-	std::string Url;
+	std::string dir;
+	std::string url;
 	std::vector<BasePackageInfo> basePackageList;
 };
 /**

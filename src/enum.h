@@ -19,9 +19,7 @@
 //  USA.
 //
 
-#ifndef ENUM_H
-#define ENUM_H
-
+ #pragma once
 namespace cards {
 
 enum StatusEnum {
@@ -73,5 +71,4 @@ enum RuleEnum {
 
 } // end of cards namespace
 
-#endif /* ENUM_H */
 // vim:set ts:2 :

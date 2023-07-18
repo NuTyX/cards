@@ -151,10 +151,10 @@ int main(int argc, char** argv)
 
 				for ( auto i : config.dirUrl ) {
 					index++;
-					cout << index << _(" Directory: ") << i.Dir ;
-					if ( i.Url != "" )
+					cout << index << _(" Directory: ") << i.dir ;
+					if ( i.url != "" )
 						cout << _(" from ")
-						<< i.Url ;
+						<< i.url ;
 					cout << endl;
 				}
 				for ( auto i : config.baseDir )

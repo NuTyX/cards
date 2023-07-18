@@ -147,12 +147,12 @@ void Pkgsync::run()
 	Config config;
 	Pkgrepo::parseConfig(configFile.c_str(), config);
 	for (auto DU : config.dirUrl) {
-		if (DU.Url.size() == 0 ) {
+		if (DU.url.size() == 0 ) {
 			continue;
 		}
 		std::string categoryDir, url ;
-		categoryDir = DU.Dir;
-		url = DU.Url;
+		categoryDir = DU.dir;
+		url = DU.url;
 		std::string category = basename(const_cast<char*>(categoryDir.c_str()));
 		std::string categoryPKGREPOFile = categoryDir + "/" + m_repoFile ;
 		FileDownload PKGRepo(url + "/" + m_repoFile,
@@ -171,12 +171,12 @@ void Pkgsync::purge()
 	Pkgrepo::parseConfig(configFile.c_str(), config);
 
 	for (auto i : config.dirUrl) {
-		if ( i.Url.size() == 0)
+		if ( i.url.size() == 0)
 			continue;
-		if ( getLocalPackages(i.Dir) == 0 )
+		if ( getLocalPackages(i.dir) == 0 )
 			continue;
 		for (auto dir : m_localPackagesList) {
-			deleteFolder(i.Dir + "/" + dir);
+			deleteFolder(i.dir + "/" + dir);
 		}
 	}
 }

@@ -165,24 +165,24 @@ conf:
 	sed -e "s/#ARCH#/`uname -m`/" cards.conf.in > cards.conf
 
 pkgadd: .tools_depend $(TOOLSOBJECTS)
-	$(CXX) $(TOOLSOBJECTS) -o $@ -static $(LIBARCHIVELIBS) 
+	$(CXX) -g $(TOOLSOBJECTS) -o $@ -static $(LIBARCHIVELIBS) 
 	echo "$@ is ready"
 
 cards:  .cards_depend $(CARDSOBJECTS)
-	$(CXX) $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
+	$(CXX) -g $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
 	echo "$@ is ready"
 
 .libs_depend:
-	$(CXX) $(CXXFLAGS) -MM $(LIBOBJECTS:.o=.cxx) > .libs_depend
+	$(CXX) -g $(CXXFLAGS) -MM $(LIBOBJECTS:.o=.cxx) > .libs_depend
 
 .tools_depend:
-	$(CXX) $(CXXFLAGS) -MM $(TOOLSOBJECTS:.o=.cxx) > .tools_depend
+	$(CXX) -g $(CXXFLAGS) -MM $(TOOLSOBJECTS:.o=.cxx) > .tools_depend
 
 .cards_depend:
-	$(CXX) $(CXXFLAGS) -MM $(CARDSOBJECTS:.o=.cxx) > .cards_depend
+	$(CXX) -g $(CXXFLAGS) -MM $(CARDSOBJECTS:.o=.cxx) > .cards_depend
 
 .web_depend:
-	$(CXX) $(CXXFLAGS) -MM $(WEBOBJECTS:.o=.cxx) > .web_depend
+	$(CXX) -g $(CXXFLAGS) -MM $(WEBOBJECTS:.o=.cxx) > .web_depend
 
 ifeq (.cards_depend,$(wildcard .cards_depend))
 include .cards_depend

@@ -57,11 +57,11 @@ int getConfig(const char *fileName, Config& config)
 				std::string::size_type pos = val.find('|');
 				DirUrl DU;
 				if (pos != std::string::npos) {
-					DU.Dir = stripWhiteSpace(val.substr(0,pos));
-					DU.Url = stripWhiteSpace(val.substr(pos+1));
+					DU.dir = stripWhiteSpace(val.substr(0,pos));
+					DU.url = stripWhiteSpace(val.substr(pos+1));
 				} else {
-					DU.Dir = stripWhiteSpace(val);
-					DU.Url = "";
+					DU.dir = stripWhiteSpace(val);
+					DU.url = "";
 				}
 				config.dirUrl.push_back(DU);
 			}
@@ -100,8 +100,8 @@ int getConfig(const char *fileName, Config& config)
 #ifndef NDEBUG
 		std::cerr << "name: " << config.name << std::endl
 			<< "version: " << config.version << std::endl;
-		for ( auto i : config.dirUrl) std::cerr << "Dir: " << i.Dir << std::endl
-			<< "Url: " << i.Url << std::endl;
+		for ( auto i : config.dirUrl) std::cerr << "Dir: " << i.dir << std::endl
+			<< "Url: " << i.url << std::endl;
 #endif
 		}
 	}
@@ -110,11 +110,11 @@ int getConfig(const char *fileName, Config& config)
 		std::vector<DirUrl> list;
 		DirUrl DU;
 		for ( auto i : config.dirUrl) {
-			DU.Dir=i.Dir;
-			if ( i.Url.size() == 0 ) {
-				DU.Url=config.url;
+			DU.dir=i.dir;
+			if ( i.url.size() == 0 ) {
+				DU.url=config.url;
 			} else {
-				DU.Url=i.Url;
+				DU.url=i.url;
 			}
 			list.push_back(DU);
 		}

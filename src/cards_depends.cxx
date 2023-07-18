@@ -36,6 +36,9 @@ CardsDepends::CardsDepends (const CardsArgumentParser& argParser)
 {
 	parseArguments();
 }
+CardsDepends::~CardsDepends ()
+{
+}
 void CardsDepends::parseArguments()
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
@@ -179,6 +182,7 @@ void CardsDepends::showDependencies()
 		}
 	}
 }
+
 void CardsDepends::showLevel()
 {
 	if ( level() != 0 )
@@ -257,17 +261,16 @@ int CardsDepends::level()
 	itemList *filesList = initItemList();
 	Config config;
 	Pkgrepo::parseConfig("/etc/cards.conf", config);
-	for (std::vector<DirUrl>::iterator i = config.dirUrl.begin();i != config.dirUrl.end();++i) {
-		if ( i->Url.size() > 0)
+	for (auto DU : config.dirUrl) {
+		if ( DU.url.size() > 0)
 			continue;
-		DirUrl DU  = *i ;
-		std::string prtDir = DU.Dir;
+		std::string prtDir = DU.dir;
 		if ( (findDir(filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(prtDir);
 		}
 #ifndef NDEBUG
-		std::cerr << i->Dir << " " << i->Url  << std::endl;
+		std::cerr << DU.dir << " " << DU.url  << std::endl;
 #endif
 	}
 #ifndef NDEBUG
@@ -318,7 +321,7 @@ int CardsDepends::level()
 	}
 	freeItemList(filesList);
 // TODO findout why segmentfault
-//freePkgInfo(package);
+	freePkgInfo(package);
 	freePkgList(packagesList);
 #ifndef NDEBUG
 	std::cerr << "Level() FINISH" << std::endl;
@@ -333,7 +336,7 @@ int CardsDepends::depends()
 	Config config;
 	Pkgrepo::parseConfig("/etc/cards.conf", config);
 	for ( auto DU : config.dirUrl ) {
-		std::string prtDir = DU.Dir;
+		std::string prtDir = DU.dir;
 		if ( (findDir(filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(prtDir);
@@ -382,9 +385,9 @@ int CardsDepends::depends()
 #endif
 				if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == currentNiveau ) {
 					bool found = false;
-					for (std::vector<std::string>::iterator i = m_dependenciesList.begin();i != m_dependenciesList.end();++i) {
+					for (auto i : m_dependenciesList) {
 						std::string s = filesList->items[dependenciesList->depsIndex[dInd]];
-						if ( s == *i) {
+						if ( s == i) {
 							found = true;
 							break;
 						}
@@ -398,6 +401,7 @@ int CardsDepends::depends()
 		}
 	}
 	m_dependenciesList.push_back(longPackageName);
+
 	freeItemList(filesList);
 	freePkgList(packagesList);
 // TODO findout why it's segment fault
@@ -424,7 +428,7 @@ int CardsDepends::deptree()
 	Config config;
 	Pkgrepo::parseConfig("/etc/cards.conf", config);
 	for ( auto DU : config.dirUrl ) {
-		std::string prtDir = DU.Dir;
+		std::string prtDir = DU.dir;
 		if ( (findDir(filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(prtDir);
@@ -464,12 +468,12 @@ int CardsDepends::deptree()
 	std::set<std::string> localPackagesList, depsPackagesList;
 
 	for (auto DU : config.dirUrl ) {
-	if ( DU.Url == "")
+	if ( DU.url == "")
 		continue;
 
 	std::string prtDir, Url ;
-	prtDir = DU.Dir;
-	Url = DU.Url;
+	prtDir = DU.dir;
+	Url = DU.url;
 		std::string category = basename(const_cast<char*>(prtDir.c_str()));
 		std::string remoteUrl = Url + "/" + category;
 		DIR *d;
@@ -519,7 +523,7 @@ int CardsDepends::deptree()
 		}
 	}
 	freeItemList(filesList);
-	// TODO Findou why it's segmentfault
+	// TODO Findout why it's segmentfault
 //	freePkgInfo(package);
 	freePkgList(packagesList);
 	return 0;

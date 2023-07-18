@@ -1,7 +1,4 @@
-#ifndef DB_H
-#define DB_H
-
-
+#pragma once
 #include "pkg.h"
 
 namespace cards {
@@ -28,5 +25,3 @@ private:
 };
 
 } //end of 'cards' namespace
-
-#endif

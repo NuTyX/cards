@@ -62,8 +62,8 @@ struct InfoFile
 };
 
 struct DirUrl {
-	std::string Dir;
-	std::string Url;
+	std::string dir;
+	std::string url;
 };
 
 struct Config {

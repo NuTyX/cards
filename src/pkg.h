@@ -1,5 +1,4 @@
-#ifndef PKG_H
-#define PKG_H
+#pragma once
 
 #include <string>
 #include <set>
@@ -84,4 +83,3 @@ private:
 
 } //end of 'cards' namespace
 
-#endif

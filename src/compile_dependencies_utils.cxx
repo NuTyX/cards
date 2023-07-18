@@ -91,6 +91,9 @@ pkgInfo *addInfoToPkgInfo(unsigned int nameIndex)
 void freePkgInfo(pkgInfo *package)
 {
 	if (package != nullptr) {
+		if (package->dependences != nullptr) {
+			freeDepList (package->dependences);
+		}
 		free(package);
 		package = nullptr;
 	}
@@ -131,7 +134,7 @@ void freePkgList(pkgList *packagesList)
 	}
 	if (packagesList->pkgs != nullptr) {
 		free( packagesList->pkgs);
-		packagesList = nullptr;
+		packagesList->pkgs = nullptr;
 	}
 	if (packagesList != nullptr) {
 		free(packagesList);
