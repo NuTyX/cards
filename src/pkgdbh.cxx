@@ -701,7 +701,6 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 			const std::string metaFile = metaFileDir + '/' + PKG_META;
 			info.install( getEpochModifyTimeFile(metaFileDir) );
 			std::set<std::pair<std::string,time_t>> dependencies;
-			std::set<std::string> files;
 			std::set<std::string> fileContent;
 			parseFile(fileContent,metaFile.c_str());
 			info.release(1);
@@ -812,7 +811,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 						break; // End of record
 					info.files.insert(info.files.end(), file);
 				}
-				if (!files.empty()) {
+				if (!info.files.empty()) {
 					m_listOfPackages[i] = info;
 				}
 			}
