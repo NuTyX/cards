@@ -34,10 +34,23 @@ CardsDepends::CardsDepends (const CardsArgumentParser& argParser)
 	: Pkgdbh(""),
 		m_argParser(argParser)
 {
+	package = nullptr;
+	packagesList = initPkgList();
+	m_filesList = initItemList();
+
 	parseArguments();
 }
 CardsDepends::~CardsDepends ()
 {
+	for (auto i: m_levelList) {
+		if (i != nullptr) {
+			delete i;
+			i=nullptr;
+		}
+	}
+	freeItemList(m_filesList);
+	freePkgInfo(package);
+	freePkgList(packagesList);
 }
 void CardsDepends::parseArguments()
 {
@@ -48,18 +61,18 @@ void CardsDepends::parseArguments()
 	else
 		m_root=m_root+"/";
 }
-depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int nameIndex)
+depList * CardsDepends::readDependenciesList(itemList *m_filesList, unsigned int nameIndex)
 {
-	if ( nameIndex > filesList->count  ) {
+	if ( nameIndex > m_filesList->count  ) {
 		return NULL;
 	}
-	depList *dependancesList = initDepsList();
+	depList* dependancesList = initDepsList();
 	char fullPathfileName[PATH_MAX];
 	char name[PATH_MAX];
-	sprintf(name,"%s",basename(filesList->items[nameIndex]));
+	sprintf(name,"%s",basename(m_filesList->items[nameIndex]));
 	itemList *nameDeps = initItemList();
 	std::string missingDep = "";
-	sprintf(fullPathfileName,"%s/Pkgfile",filesList->items[nameIndex]);
+	sprintf(fullPathfileName,"%s/Pkgfile",m_filesList->items[nameIndex]);
 	if ( ! checkFileExist(fullPathfileName) ) {
 		m_actualError = CANNOT_READ_FILE;
 		treatErrors(fullPathfileName);
@@ -96,8 +109,8 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 			if (strcmp(s.c_str(),name) == 0 )
 					continue;
 			char n[PATH_MAX];
-			for(j = 0; j < filesList->count; j++) {
-				sprintf(n,"%s",basename(filesList->items[j]));
+			for(j = 0; j < m_filesList->count; j++) {
+				sprintf(n,"%s",basename(m_filesList->items[j]));
 				if (strcmp(s.c_str(),n) == 0 ) {
 					addDepToDepList(dependancesList,j,0);
 					found=true;
@@ -108,7 +121,7 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 				missingDep = "WARNING ";
 				missingDep += s;
 				missingDep += " from ";
-				missingDep += filesList->items[nameIndex];
+				missingDep += m_filesList->items[nameIndex];
 				missingDep += " NOT FOUND ...";
 				m_missingDepsList.insert(missingDep);
 			}
@@ -117,7 +130,7 @@ depList * CardsDepends::readDependenciesList(itemList *filesList, unsigned int n
 	freeItemList(nameDeps);
 	return dependancesList;
 }
-std::vector<LevelName>& CardsDepends::getLevel()
+std::vector<LevelName*>& CardsDepends::getLevel()
 {
 	if ( level() !=0 )
 	{
@@ -192,7 +205,7 @@ void CardsDepends::showLevel()
 	}
 
 	if ( (m_missingDepsList.size() == 0 ) || ( m_argParser.isSet(CardsArgumentParser::OPT_IGNORE))) {
-		for ( auto i : m_levelList) std::cout << i.l << ": " << i.name << std::endl;
+		for ( auto i : m_levelList) std::cout << i->l << ": " << i->name << std::endl;
 	} else {
 		for ( auto i : m_missingDepsList ) std::cout << i << std::endl;
 	}
@@ -255,17 +268,13 @@ void CardsDepends::treatErrors(const std::string& s) const
 }
 int CardsDepends::level()
 {
-	pkgInfo *package = NULL;
-	pkgList *packagesList = initPkgList();
-
-	itemList *filesList = initItemList();
 	Config config;
 	Pkgrepo::parseConfig("/etc/cards.conf", config);
 	for (auto DU : config.dirUrl) {
 		if ( DU.url.size() > 0)
 			continue;
 		std::string prtDir = DU.dir;
-		if ( (findDir(filesList,prtDir.c_str())) != 0) {
+		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(prtDir);
 		}
@@ -274,55 +283,48 @@ int CardsDepends::level()
 #endif
 	}
 #ifndef NDEBUG
-	std::cerr << "number of files: " << filesList->count << std::endl;
+	std::cerr << "number of files: " << m_filesList->count << std::endl;
 #endif
-	for (unsigned int nInd=0;nInd <filesList->count;nInd++) {
+	for (unsigned int nInd=0;nInd <m_filesList->count;nInd++) {
 #ifndef NDEBUG
-		std::cerr << nInd << " " << filesList->items[nInd] << std::endl;
+		std::cerr << nInd << " " << m_filesList->items[nInd] << std::endl;
 #endif
 		package = addInfoToPkgInfo(nInd);
 		addPkgToPkgList(packagesList,package);
-		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
+		packagesList->pkgs[nInd]->dependences=readDependenciesList(m_filesList,nInd);
 		if  (packagesList->pkgs[nInd]->dependences== NULL)
 			return -1;
 	}
-	unsigned int niveau = 0;
-	static unsigned  int *pNiveau = &niveau;
-	generate_level (filesList,packagesList,pNiveau);
-#ifndef NDEBUG
-	std::cerr << "Number of level: " << *pNiveau << std::endl;
-#endif
+	unsigned int level = 0;
+	static unsigned  int *pNiveau = &level;
+	generate_level (m_filesList,packagesList,pNiveau);
 	if (*pNiveau == 0 ) {
 		m_actualError = CANNOT_GENERATE_LEVEL;
 		treatErrors(" in level()");
-	} else {
+	}
 #ifndef NDEBUG
 		std::cerr << "Number of level: " << *pNiveau << std::endl;
 #endif
-	}
-	depList *dependenciesList = initDepsList();
-	if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,1) != 0 ) {
+	depList* dependenciesList = initDepsList();
+	if ( int returnVal = deps_direct (m_filesList,packagesList,dependenciesList,1) != 0 ) {
 		return returnVal;
 	}
-	int currentNiveau = 0;
-	while ( currentNiveau <= *pNiveau) {
+	int currentLevel = 0;
+	while ( currentLevel <= *pNiveau) {
 		for ( unsigned int nameIndex = 0; nameIndex < packagesList -> count; nameIndex++ ) {
 #ifndef NDEBUG
-			std::cerr << "packagesList -> pkgs[nameIndex]->niveau: " << packagesList -> pkgs[nameIndex]->niveau << " " << filesList->items[nameIndex] << std::endl;
+			std::cerr << "packagesList -> pkgs[nameIndex]->level: " << packagesList -> pkgs[nameIndex]->level << " " << m_filesList->items[nameIndex] << std::endl;
 #endif
-			if ( packagesList -> pkgs[nameIndex]->niveau == currentNiveau ) {
-				LevelName LN;
-				LN.l = currentNiveau;
-				LN.name = filesList->items[nameIndex];
+
+			if ( packagesList -> pkgs[nameIndex]->level == currentLevel ) {
+				LevelName* LN = new LevelName();
+				LN->l = currentLevel;
+				LN->name = m_filesList->items[nameIndex];
 				m_levelList.push_back(LN);
 			}
 		}
-		currentNiveau++;
+		currentLevel++;
 	}
-	freeItemList(filesList);
-// TODO findout why segmentfault
-	freePkgInfo(package);
-	freePkgList(packagesList);
 #ifndef NDEBUG
 	std::cerr << "Level() FINISH" << std::endl;
 #endif
@@ -330,20 +332,17 @@ int CardsDepends::level()
 }
 int CardsDepends::depends()
 {
-	pkgInfo *package = NULL;
-	pkgList *packagesList = initPkgList();
-	itemList *filesList = initItemList();
 	Config config;
 	Pkgrepo::parseConfig("/etc/cards.conf", config);
 	for ( auto DU : config.dirUrl ) {
 		std::string prtDir = DU.dir;
-		if ( (findDir(filesList,prtDir.c_str())) != 0) {
+		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(prtDir);
 		}
 	}
 	char * longPackageName = NULL;
-	if ( (longPackageName = getLongPackageName(filesList,m_packageName)) == NULL) {
+	if ( (longPackageName = getLongPackageName(m_filesList,m_packageName)) == NULL) {
 		m_actualError = PACKAGE_NOT_FOUND;
 		treatErrors(m_packageName);
 	}
@@ -351,62 +350,57 @@ int CardsDepends::depends()
 	std::cerr << longPackageName << " " << m_packageName << std::endl;
 #endif
 	// for all the Pkgfile files found
-	for (unsigned int nInd=0;nInd <filesList->count;nInd++){
+	for (unsigned int nInd=0;nInd <m_filesList->count;nInd++){
 		package = addInfoToPkgInfo(nInd);
 		addPkgToPkgList(packagesList,package);
-		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
+		packagesList->pkgs[nInd]->dependences=readDependenciesList(m_filesList,nInd);
 	}
-	unsigned int niveau = 0;
-	static unsigned int *pNiveau = &niveau;
-	generate_level (filesList,packagesList,pNiveau);
+	unsigned int level = 0;
+	static unsigned int *pNiveau = &level;
+	generate_level (m_filesList,packagesList,pNiveau);
 	if (*pNiveau == 0 ) {
 		m_actualError = CANNOT_GENERATE_LEVEL;
 		treatErrors(" in depends()");
-	} else {
-#ifndef NDEBUG
-		std::cerr << "Number of level: " << *pNiveau << std::endl;
-#endif
 	}
-	depList *dependenciesList = initDepsList();
-	if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,longPackageName,1) != 0 ) {
+#ifndef NDEBUG
+	std::cerr << "Number of level: " << *pNiveau << std::endl;
+#endif
+	depList* dependenciesList = initDepsList();
+	if ( int returnVal = deps_direct (m_filesList,packagesList,dependenciesList,longPackageName,1) != 0 ) {
 		return returnVal;
 	}
 	if (dependenciesList ->count > 0) {
-		int currentNiveau = 0;
-		while ( currentNiveau <= *pNiveau) {
+		int currentLevel = 0;
+		while ( currentLevel <= *pNiveau) {
 #ifndef NDEBUG
-			std::cerr << "Level: " << currentNiveau << std::endl;
+			std::cerr << "Level: " << currentLevel << std::endl;
 #endif
 			for ( unsigned int dInd=0; dInd < dependenciesList->count; dInd++ ) {
 #ifndef NDEBUG
-				std::cerr << "packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau: "
-						<< packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau
-						<< " " << filesList->items[dependenciesList->depsIndex[dInd]] << std::endl;
+				std::cerr << "packagesList->pkgs[dependenciesList->depsIndex[dInd]]->level: "
+						<< packagesList->pkgs[dependenciesList->depsIndex[dInd]]->level
+						<< " " << m_filesList->items[dependenciesList->depsIndex[dInd]] << std::endl;
 #endif
-				if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->niveau == currentNiveau ) {
+				if ( packagesList->pkgs[dependenciesList->depsIndex[dInd]]->level == currentLevel ) {
 					bool found = false;
 					for (auto i : m_dependenciesList) {
-						std::string s = filesList->items[dependenciesList->depsIndex[dInd]];
+						std::string s = m_filesList->items[dependenciesList->depsIndex[dInd]];
 						if ( s == i) {
 							found = true;
 							break;
 						}
 					}
 					if ( ! found ) { // if not allready found
-						m_dependenciesList.push_back(filesList->items[dependenciesList->depsIndex[dInd]]);
+						m_dependenciesList.push_back(m_filesList->items[dependenciesList->depsIndex[dInd]]);
 					}
 				}
 			}
-			currentNiveau++;
+			currentLevel++;
 		}
 	}
 	m_dependenciesList.push_back(longPackageName);
-
-	freeItemList(filesList);
-	freePkgList(packagesList);
-// TODO findout why it's segment fault
-//	freePkgInfo(package);
 	free(longPackageName);
+
 #ifndef NDEBUG
 	std::cerr << "depends() FINISH" << std::endl;
 #endif
@@ -416,37 +410,31 @@ int CardsDepends::depends()
 int CardsDepends::deptree()
 {
 	m_packageName = m_argParser.otherArguments()[0].c_str();
-
-	itemList *filesList = initItemList();
-
-	pkgInfo *package = NULL;
-	pkgList *packagesList = initPkgList();
-
-	depList *dependenciesList = NULL;
+	depList* dependenciesList = NULL;
 	dependenciesList = initDepsList();
 
 	Config config;
 	Pkgrepo::parseConfig("/etc/cards.conf", config);
 	for ( auto DU : config.dirUrl ) {
 		std::string prtDir = DU.dir;
-		if ( (findDir(filesList,prtDir.c_str())) != 0) {
+		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
 			treatErrors(prtDir);
 		}
 	}
-	char * longPackageName = NULL;
-	if ( (longPackageName = getLongPackageName(filesList,m_packageName)) == NULL) {
+	char* longPackageName = NULL;
+	if ( (longPackageName = getLongPackageName(m_filesList,m_packageName)) == NULL) {
 		m_actualError = PACKAGE_NOT_FOUND;
 		treatErrors(m_packageName);
 	}
 
-	for (unsigned int nInd=0;nInd <filesList->count;nInd++) {
+	for (unsigned int nInd=0;nInd <m_filesList->count;nInd++) {
 		package = addInfoToPkgInfo(nInd);
 		addPkgToPkgList(packagesList,package);
-		packagesList->pkgs[nInd]->dependences=readDependenciesList(filesList,nInd);
+		packagesList->pkgs[nInd]->dependences=readDependenciesList(m_filesList,nInd);
 	}
 
-	if ( int returnVal = deps_direct (filesList,packagesList,dependenciesList,longPackageName,1) != 0 ) {
+	if ( int returnVal = deps_direct (m_filesList,packagesList,dependenciesList,longPackageName,1) != 0 ) {
 		return returnVal;
 	}
 
@@ -455,11 +443,11 @@ int CardsDepends::deptree()
 		for (unsigned int dInd=0; dInd < dependenciesList ->count; dInd++) {
 			printf("  ");
 			int j=1;
-			while ( j < dependenciesList->niveau[dInd]) {
+			while ( j < dependenciesList->level[dInd]) {
 				printf("  ");
 				j++;
 			}
-			printf("%d) %s\n",dependenciesList->niveau[dInd],basename(filesList->items[dependenciesList->depsIndex[dInd]]));
+			printf("%d) %s\n",dependenciesList->level[dInd],basename(m_filesList->items[dependenciesList->depsIndex[dInd]]));
 		}
 	}
 
@@ -522,10 +510,9 @@ int CardsDepends::deptree()
 			return -1;
 		}
 	}
-	freeItemList(filesList);
-	// TODO Findout why it's segmentfault
-//	freePkgInfo(package);
-	freePkgList(packagesList);
+#ifndef NDEBUG
+	std::cerr << "deptree() FINISH" << std::endl;
+#endif
 	return 0;
 }
 // vim:set ts=2 :

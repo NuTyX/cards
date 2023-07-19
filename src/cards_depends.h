@@ -1,8 +1,8 @@
 //
 // cards_depends.h
-// 
+//
 //  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
-// 
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
@@ -15,7 +15,7 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
 
@@ -53,10 +53,10 @@ public:
 
 	void showDependencies();
 	void showLevel();
-	
+
 	std::vector<std::string>& getDependencies();
 	std::vector<std::string>& getNeededDependencies();
-	std::vector<LevelName>& getLevel();
+	std::vector<LevelName*>& getLevel();
 
 	int deptree();
 
@@ -71,19 +71,23 @@ private:
 	* kde: all the necessary apps
 	* xfce4: same
 	*/
-	depList *readDependenciesList(itemList *filesList, unsigned int nameIndex);
+	depList* readDependenciesList(itemList *filesList, unsigned int nameIndex);
 
 	int depends();
 	int level();
 
 	std::vector<std::string> m_dependenciesList;
 	std::vector<std::string> m_neededDependenciesList;
-	std::vector<LevelName> m_levelList;
+	std::vector<LevelName*> m_levelList;
 	std::set<std::string> m_missingDepsList;
-	
+
 	const CardsArgumentParser& m_argParser;
 	const char* m_packageName;
 	error m_actualError;
+
+	pkgInfo*  package;
+	pkgList*  packagesList;
+	itemList* m_filesList;
 };
 #endif
 // vim:set ts=2 :
