@@ -21,9 +21,9 @@
 
 #include "compile_dependencies_utils.h"
 
-depList *initDepsList(void)
+depList* initDepsList(void)
 {
-	depList *list;
+	depList* list;
 	list = (depList*)Malloc(sizeof *list );
 	list->depsIndex = (unsigned int*)Malloc(sizeof (*list->depsIndex ));
 	list->level = (int*)Malloc(sizeof (*list->level));
@@ -36,7 +36,7 @@ depList *initDepsList(void)
 /* Add a reference to PackagesList index and the level of deps to the Dependencies List */
 void addDepToDepList(depList *list, unsigned int nameIndex, int level)
 {
-	 unsigned int  *realloc_tmp;
+	 unsigned int*  realloc_tmp;
 
 	realloc_tmp = (unsigned int*)realloc(list->depsIndex, sizeof (*list->depsIndex ) * (list->count+1));
 	if (realloc_tmp == NULL) {
@@ -46,7 +46,7 @@ void addDepToDepList(depList *list, unsigned int nameIndex, int level)
 	list->depsIndex = realloc_tmp;
 	list->depsIndex[list->count] = nameIndex;
 
-	int	*realloc_tmp2 = (int*)realloc(list->level, sizeof (*list->level ) * (list->count+1));
+	int*	realloc_tmp2 = (int*)realloc(list->level, sizeof (*list->level ) * (list->count+1));
 	list->level = realloc_tmp2;
 	list->level[list->count] = level;
 	++list->count;
@@ -70,7 +70,7 @@ void freeDepList(depList *list)
 		list = nullptr;
 	}
 }
-pkgInfo *initPkgInfo(void)
+pkgInfo* initPkgInfo(void)
 {
 	pkgInfo *package;
 	package = (pkgInfo*)Malloc(sizeof *package);
@@ -81,15 +81,15 @@ pkgInfo *initPkgInfo(void)
 	return package;
 }
 
-pkgInfo *addInfoToPkgInfo(unsigned int nameIndex)
+pkgInfo* addInfoToPkgInfo(unsigned int nameIndex)
 {
-	pkgInfo *package;
+	pkgInfo* package;
 	package = initPkgInfo();
 	package->nameIndex = nameIndex;
 	return package;
 }
 
-void freePkgInfo(pkgInfo *package)
+void freePkgInfo(pkgInfo* package)
 {
 	if (package != nullptr) {
 		if (package->dependences != nullptr) {
@@ -100,9 +100,9 @@ void freePkgInfo(pkgInfo *package)
 	}
 }
 
-pkgList *initPkgList(void)
+pkgList* initPkgList(void)
 {
-	pkgList *list = NULL;
+	pkgList* list = NULL;
 	list = (pkgList*)Malloc(sizeof *list);
 	list->pkgs = (pkgInfo**)Malloc(sizeof *list->pkgs);
 	list->count = 0;
@@ -111,7 +111,7 @@ pkgList *initPkgList(void)
 
 void addPkgToPkgList(pkgList *list, pkgInfo *package)
 {
-	pkgInfo **realloc_tmp;
+	pkgInfo** realloc_tmp;
 
 	realloc_tmp = (pkgInfo**)realloc(list->pkgs,
 		sizeof *list->pkgs * (list->count+1));
@@ -125,7 +125,7 @@ void addPkgToPkgList(pkgList *list, pkgInfo *package)
 
 	++list->count;
 }
-void freePkgList(pkgList *packagesList)
+void freePkgList(pkgList* packagesList)
 {
 	if (packagesList != nullptr) {
 		for (unsigned int i = 0 ; i < packagesList->count;i++) {
@@ -146,7 +146,7 @@ void freePkgList(pkgList *packagesList)
 }
 
 /* Get the tree dependencies of the dependencies recursively */
-int deps_tree (pkgList *packagesList, depList *dependenciesList,unsigned int nameIndex, unsigned int level)
+int deps_tree (pkgList* packagesList, depList* dependenciesList,unsigned int nameIndex, unsigned int level)
 {
 	level++;
 	if ( packagesList->pkgs[nameIndex]->dependences->count == 0) {
@@ -174,7 +174,7 @@ int deps_tree (pkgList *packagesList, depList *dependenciesList,unsigned int nam
 }
 
 /* Get the direct dependencies of all the package found and for each direct dependencies we check the deps recursively */
-int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList, unsigned int level)
+int deps_direct (itemList* filesList, pkgList* packagesList, depList* dependenciesList, unsigned int level)
 {
 	for (unsigned int nInd=0; nInd < filesList->count;nInd++) {
 		if (packagesList->pkgs[nInd]->dependences->count > 0) {
@@ -196,7 +196,7 @@ int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenci
 	Get the direct dependencies of the packageName and for each direct dependencies
 	we check the deps recursively
 */
-int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenciesList, const char* packageName, unsigned int level)
+int deps_direct (itemList* filesList, pkgList* packagesList, depList* dependenciesList, const char* packageName, unsigned int level)
 {
 	for (unsigned int nInd=0; nInd < filesList->count;nInd++) {
 		if ( strcmp(filesList->items[nInd],packageName) == 0 ) {
@@ -220,7 +220,7 @@ int deps_direct (itemList *filesList, pkgList *packagesList, depList *dependenci
 /* Generate the all list of package sorted by level where level = 0 No deps ,
 	level = 1 somes deps from level 0 etc
 */
-void generate_level ( itemList *filesList, pkgList *packagesList, unsigned int *level)
+void generate_level ( itemList* filesList, pkgList* packagesList, unsigned int* level)
 {
 
 #ifndef NDEBUG
@@ -310,9 +310,9 @@ void generate_level ( itemList *filesList, pkgList *packagesList, unsigned int *
 /* Return the full path with the name including
 the name, version and release of the package
 */
-char *getLongPackageName(itemList *filesList, const char * packageName)
+char* getLongPackageName(itemList* filesList, const char* packageName)
 {
-	char *name = NULL;
+	char* name = NULL;
 	bool found = false;
 	unsigned int i = 0 ;
 	for (i = 0; i < filesList->count;i++) {
