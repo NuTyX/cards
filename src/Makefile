@@ -108,7 +108,8 @@ WEBOBJECTS =  system_utils.o \
 	cache.o \
 	webcards.o
 
-HEADERS = system_utils.h \
+HEADERS = enum.h \
+		system_utils.h \
 		error_treat.h \
 		md5.h \
 		string_utils.h \
@@ -116,6 +117,7 @@ HEADERS = system_utils.h \
 		archive_utils.h \
 		pkg.h \
 		db.h  \
+		cache.h \
 		pkgrepo.h \
 		repodwl.h \
 		file_download.h \
@@ -146,9 +148,10 @@ libs:	.libs_depend $(LIBOBJECTS)
 	|grep -v '^#define ERROR'|grep -v '^#define MD5' \
 	|grep -v '^#define STRING'|grep -v '^#define ARCHIVE' \
 	|grep -v '^#define PKG'|grep -v '^#define RUNTIME' \
+	|grep -v '^#pragma'|grep -v '^#define CACHE' \
 	|grep -v '^#define FILE'|grep -v '^#define PROCESS' \
 	|grep -v '^#define DEPENDENCIES' \
-	|grep -v '^#include \"'|grep -v '^#ifndef' \
+	|grep -v '^#include "'|grep -v '^#ifndef' \
 	|grep -v '^#endif /*'|grep -v '^//' >> libcards.h
 	-@echo "#endif" >> libcards.h
 	-@echo "// vim:set ts=2 :" >> libcards.h

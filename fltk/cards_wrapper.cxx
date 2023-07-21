@@ -82,7 +82,7 @@ namespace cards
         }
     }
 
-    const std::vector<Pkg*>& CWrapper::getPackageList()
+    const std::vector<cards::Cache*>& CWrapper::getPackageList()
     {
         return m_arrPackages;
     }
@@ -95,12 +95,12 @@ namespace cards
     ///
     ///
     ///
-    Pkg* CWrapper::getPackage(const std::string& pName)
+    cards::Cache* CWrapper::getPackage(const std::string& pName)
     {
-        Pkg* ptr=nullptr;
-        for (Pkg* it : m_arrPackages)
+        cards::Cache* ptr=nullptr;
+        for (cards::Cache* it : m_arrPackages)
         {
-            if (it->getName() == pName)
+            if (it->name() == pName)
             {
                 ptr=it;
                 break;
@@ -114,14 +114,14 @@ namespace cards
     void CWrapper::refreshJobList()
     {
         m_arrJobList.clear();
-        for (Pkg* it:m_arrPackages)
+        for (cards::Cache* it:m_arrPackages)
         {
-            if (it->isToBeInstalled() || it->isToBeRemoved())
+            if (it->toinstall() || it->toremove())
             {
                 m_arrJobList.push_back(it);
 #ifndef NDEBUG
                 std::cerr << "Add Job to list for package "
-                    << it->getName()
+                    << it->name()
                     << " Size of job list="
                     << m_arrJobList.size()
                     << std::endl;
@@ -137,22 +137,22 @@ namespace cards
     {
         if (m_job_running)
             return;
-        for (Pkg* it:m_arrPackages)
+        for (cards::Cache* it:m_arrPackages)
         {
-            if (it->getStatus() == TO_INSTALL)
+            if (it->status() == cards::STATUS_ENUM_TO_INSTALL)
             {
-                it->unSetStatus(TO_INSTALL);
+                it->unsetStatus(cards::STATUS_ENUM_TO_INSTALL);
             }
-            if (it->getStatus() == TO_REMOVE)
+            if (it->status() == cards::STATUS_ENUM_TO_REMOVE)
             {
-                it->unSetStatus(TO_REMOVE);
+                it->unsetStatus(cards::STATUS_ENUM_TO_REMOVE);
             }
         }
         refreshJobList();
     }
 
     /** Return the current job list */
-    const std::vector<Pkg*>& CWrapper::getJobList()
+    const std::vector<cards::Cache*>& CWrapper::getJobList()
     {
         return m_arrJobList;
     }
@@ -204,8 +204,8 @@ namespace cards
     void CWrapper::m_GetPackageInfo_Thread(std::string pName)
     {
         m_job_running =true;
-        Pkg Package;
-        Pkg* Pack = getPackage(pName);
+        cards::Cache Package;
+        cards::Cache* Pack = getPackage(pName);
         if (Pack != nullptr) Package = *Pack;
         for (auto it : m_arrEventHandler)
         {
@@ -257,10 +257,10 @@ namespace cards
                 m_log->log(_("Determine Packages Install and Remove List..."));
                 std::set<std::string> Removelist;
                 std::set<std::string> InstallList;
-                for (Pkg* it:m_arrJobList)
+                for (cards::Cache* it:m_arrJobList)
                 {
-                    if (it->isToBeInstalled()) InstallList.insert(it->getName());
-                    if (it->isToBeRemoved()) Removelist.insert(it->getName());
+                    if (it->toinstall()) InstallList.insert(it->name());
+                    if (it->toremove()) Removelist.insert(it->name());
                 }
                 m_log->log(_("Ok, ") + std::to_string(Removelist.size()) + _(" Package(s) will be removed and ") +
                     std::to_string(InstallList.size()) + _(" Package(s) will be installed... "));
@@ -304,25 +304,25 @@ namespace cards
         CClient Cards;
         // First pass get all package available
         m_ClearPackagesList();
-		std::set<Pkg*> AvailablePackages = Cards.getBinaryPackageSet();
+		std::set<cards::Cache*> AvailablePackages = Cards.getBinaryPackageSet();
         std::set<std::string> InstalledPackages = Cards.ListOfInstalledPackages();
 		for (auto i : AvailablePackages)
 		{
-			Pkg* Pack = new Pkg();
-			if ( i->getSet().size()  > 0 )
-				Pack->setCollection(i->getPrimarySet());
+			cards::Cache* Pack = new cards::Cache();
+			if ( i->sets().size()  > 0 )
+				Pack->collection(i->sets());
 			else
-				Pack->setCollection(i->getCollection());
+				Pack->collection(i->collection());
 
-			Pack->setName(i->getName());
-			Pack->setDescription(i->getDescription());
-			Pack->setVersion(i->getVersion());
-			Pack->setPackager(i->getPackager());
-            if (InstalledPackages.find(Pack->getName()) != InstalledPackages.end())
-				Pack->setStatus(INSTALLED);
+			Pack->name(i->name());
+			Pack->description(i->description());
+			Pack->version(i->version());
+			Pack->packager(i->packager());
+            if (InstalledPackages.find(Pack->name()) != InstalledPackages.end())
+				Pack->setStatus(STATUS_ENUM_INSTALLED);
             m_arrPackages.push_back(Pack);
-            if (m_arrSets.find(Pack->getCollection()) == m_arrSets.end())
-				m_arrSets.insert(Pack->getCollection());
+            if (m_arrSets.find(Pack->collection()) == m_arrSets.end())
+				m_arrSets.insert(Pack->collection());
 		}
         m_OnRefreshPackageFinished_Callback(CEH_RC::OK);
         m_job_running =false;

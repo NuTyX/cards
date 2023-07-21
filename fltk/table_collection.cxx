@@ -221,27 +221,27 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 }
                 else if ( strcmp(m->label(), "Install") == 0 )
                 {
-                    std::vector<Pkg*> Packages = Cards->getPackageList();
-                    for (Pkg* Package : Packages)
+                    std::vector<cards::Cache*> Packages = Cards->getPackageList();
+                    for (cards::Cache* Package : Packages)
                     {
-                        if ((!Package->isInstalled()))
+                        if ((!Package->installed()))
                         {
-							if (Collec_List.count(Package->getCollection()))
-								Package->setStatus(TO_INSTALL);
-							if (Collec_List.count(Package->getName()))
-								Package->setStatus(TO_INSTALL);
+							if (Collec_List.count(Package->collection()))
+								Package->setStatus(STATUS_ENUM_TO_INSTALL);
+							if (Collec_List.count(Package->name()))
+								Package->setStatus(STATUS_ENUM_TO_INSTALL);
                         }
                     }
                     Cards->refreshJobList();
                 }
                 else if ( strcmp(m->label(), "Remove") == 0 )
                 {
-                    std::vector<Pkg*> Packages = Cards->getPackageList();
-                    for (Pkg* Package : Packages)
+                    std::vector<cards::Cache*> Packages = Cards->getPackageList();
+                    for (cards::Cache* Package : Packages)
                     {
-                        if (Package->isInstalled() && (Collec_List.count(Package->getCollection())))
+                        if (Package->installed() && (Collec_List.count(Package->collection())))
                         {
-                            Package->setStatus(TO_REMOVE);
+                            Package->setStatus(STATUS_ENUM_TO_REMOVE);
                         }
                     }
                     Cards->refreshJobList();

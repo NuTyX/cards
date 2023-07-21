@@ -46,27 +46,27 @@ void TablePackage::refresh_table()
     clear();
     m_rowdata.clear();
     cols(4);
-    std::vector<Pkg*> pkgList = m_cards->getPackageList();
+    std::vector<cards::Cache*> pkgList = m_cards->getPackageList();
     for (auto S : pkgList)
     {
         if (m_filter.length()>0)
-            if ((S->getName().find(m_filter) == std::string::npos) &&
-                (S->getCollection().find(m_filter) == std::string::npos) &&
-                (S->getDescription().find(m_filter) == std::string::npos) &&
-                (S->getVersion().find(m_filter) == std::string::npos) ) continue;
+            if ((S->name().find(m_filter) == std::string::npos) &&
+                (S->collection().find(m_filter) == std::string::npos) &&
+                (S->description().find(m_filter) == std::string::npos) &&
+                (S->version().find(m_filter) == std::string::npos) ) continue;
         // Add a new row
         Row newrow;
         newrow.data=S;
-        if(S->isInstalled())
+        if(S->installed())
         {
             newrow.cols.push_back("I");
         }
         else newrow.cols.push_back("U");
-        newrow.cols.push_back(S->getName());
-        newrow.cols.push_back(S->getVersion());
-        newrow.cols.push_back(S->getDescription());
-        newrow.cols.push_back(S->getCollection());
-        newrow.cols.push_back(S->getPackager());
+        newrow.cols.push_back(S->name());
+        newrow.cols.push_back(S->version());
+        newrow.cols.push_back(S->description());
+        newrow.cols.push_back(S->collection());
+        newrow.cols.push_back(S->packager());
 
         m_rowdata.push_back(newrow);
     }
@@ -86,10 +86,10 @@ int TablePackage::install_selected()
             {
                 if (m_rowdata[i].data!=nullptr)
                 {
-                    Pkg* pack = reinterpret_cast<Pkg*>(m_rowdata[i].data);
-                    if (!pack->getStatus()==INSTALLED)
+                    cards::Cache* pack = reinterpret_cast<cards::Cache*>(m_rowdata[i].data);
+                    if (!pack->status()==cards::STATUS_ENUM_INSTALLED)
                     {
-                        pack->setStatus(TO_INSTALL);
+                        pack->setStatus(cards::STATUS_ENUM_TO_INSTALL);
                         cnt++;
                     }
                 }
@@ -108,10 +108,10 @@ int TablePackage::remove_selected()
             {
                 if (m_rowdata[i].data!=nullptr)
                 {
-                    Pkg* pack = reinterpret_cast<Pkg*>(m_rowdata[i].data);
-                    if (!pack->getStatus()!=INSTALLED)
+                    cards::Cache* pack = reinterpret_cast<cards::Cache*>(m_rowdata[i].data);
+                    if (!pack->status()!=cards::STATUS_ENUM_INSTALLED)
                     {
-                        pack->setStatus(TO_REMOVE);
+                        pack->setStatus(cards::STATUS_ENUM_TO_REMOVE);
                         cnt++;
                     }
                 }
@@ -143,16 +143,16 @@ void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, 
                 }
                 else if (m_rowdata[R].data!=nullptr)
                 {
-                    Pkg* pack=reinterpret_cast<Pkg*>(m_rowdata[R].data);
-                    if (pack->isToBeInstalled())
+                    cards::Cache* pack=reinterpret_cast<cards::Cache*>(m_rowdata[R].data);
+                    if (pack->installed())
                     {
                         fl_draw_pixmap(download_xpm,X+5,Y);
                     }
-                    else if (pack->isToBeRemoved())
+                    else if (pack->toremove())
                     {
                         fl_draw_pixmap(deleted_xpm,X+5,Y);
                     }
-                    else if (pack->isInstalled())
+                    else if (pack->installed())
                     {
                         fl_draw_pixmap(checked_xpm,X+5,Y);
                     }
@@ -175,7 +175,7 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
         {
             if (m_rowdata[pRow].data!=nullptr)
             {
-                Pkg* pack = reinterpret_cast<Pkg*>(m_rowdata[pRow].data);
+                cards::Cache* pack = reinterpret_cast<cards::Cache*>(m_rowdata[pRow].data);
                 if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
                 {
                     Fl_Menu_Item rclick_menu[] = {
@@ -185,28 +185,28 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
                         { 0 }
                     };
 #ifndef NDEBUG
-                    std::cout << pack->getName()
+                    std::cout << pack->name()
                         << " : "
-                        << (pack->isToBeInstalled() ? "To install" : "Nothing" )
+                        << (pack->toinstall() ? "To install" : "Nothing" )
                         << std::endl;
-                    std::cout << pack->getName()
+                    std::cout << pack->name()
                         << " : "
-                        << (pack->isToBeRemoved() ? "To remove" : "Nothing" )
+                        << (pack->toremove() ? "To remove" : "Nothing" )
                         << std::endl;
 #endif // NDEBUG
-                    if (pack->isInstalled())
+                    if (pack->installed())
                     {
                         rclick_menu[0].deactivate();
-                        if (pack->isToBeRemoved())
+                        if (pack->toremove())
                         {
                             rclick_menu[1].deactivate();
                         }
                         else rclick_menu[2].deactivate();
                     }
-                    if (!pack->isInstalled())
+                    if (!pack->installed())
                     {
                         rclick_menu[1].deactivate();
-                        if (pack->isToBeInstalled())
+                        if (pack->toinstall())
                         {
                             rclick_menu[0].deactivate();
                         }
@@ -219,37 +219,37 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
                     }
                     else if ( strcmp(m->label(), "Install") == 0 )
                     {
-                        pack->setStatus(TO_INSTALL);
+                        pack->setStatus(cards::STATUS_ENUM_TO_INSTALL);
                         m_cards->refreshJobList();
 #ifndef NDEBUG
-                        std::cout << pack->getName()
+                        std::cout << pack->name()
                             << " : "
-                            << (pack->isToBeInstalled() ? "To install" : "Nothing" )
+                            << (pack->toinstall() ? "To install" : "Nothing" )
                             << std::endl;
 #endif // NDEBUG
                     }
                     else if ( strcmp(m->label(), "Remove") == 0 )
                     {
-                        if (pack->isInstalled())
+                        if (pack->installed())
                         {
-                            pack->setStatus(TO_REMOVE);
+                            pack->setStatus(cards::STATUS_ENUM_TO_REMOVE);
                             m_cards->refreshJobList();
 #ifndef NDEBUG
-                            std::cout << pack->getName()
+                            std::cout << pack->name()
                                 << " : "
-                                << (pack->isToBeRemoved() ? "To remove" : "Nothing" )
+                                << (pack->toremove() ? "To remove" : "Nothing" )
                                 << std::endl;
 #endif // NDEBUG
                         }
                     }
                     else if ( strcmp(m->label(), "Cancel") == 0 )
                     {
-                        if (pack->isToBeInstalled()) pack->unSetStatus(TO_INSTALL);
-                        if (pack->isToBeRemoved()) pack->unSetStatus(TO_REMOVE);
+                        if (pack->toinstall()) pack->unsetStatus(cards::STATUS_ENUM_TO_INSTALL);
+                        if (pack->toremove()) pack->unsetStatus(cards::STATUS_ENUM_TO_REMOVE);
                         m_cards->refreshJobList();
                     }
                 }
-                m_cards->getPackageInfo(pack->getName());
+                m_cards->getPackageInfo(pack->name());
             }
             select_row(pRow);
             break;

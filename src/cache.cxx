@@ -18,9 +18,13 @@ unsigned int Cache::size()
 {
 	return m_size;
 }
-void Cache::status(StatusEnum status)
+void Cache::setStatus(StatusEnum status)
 {
-	m_status = status;
+	m_status = (StatusEnum)(m_status | status);
+}
+void Cache::unsetStatus(StatusEnum status)
+{
+	m_status = (StatusEnum)(m_status & (~status));
 }
 StatusEnum Cache::status()
 {
@@ -34,4 +38,17 @@ const std::string Cache::name()
 {
 	return m_name;
 }
+bool Cache::installed()
+{
+	return m_status & StatusEnum::STATUS_ENUM_INSTALLED;
+}
+bool Cache::toinstall()
+{
+	return m_status & StatusEnum::STATUS_ENUM_TO_INSTALL;
+}
+bool Cache::toremove()
+{
+	return m_status & StatusEnum::STATUS_ENUM_TO_REMOVE;
+}
+
 } // endof cards namespace

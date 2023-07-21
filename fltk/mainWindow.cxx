@@ -260,7 +260,7 @@ void mainWindow::OnSyncFinished(const CEH_RC rc)
 void mainWindow::OnJobListChange(const CEH_RC rc)
 {
     Fl::lock();
-    std::vector<Pkg*> jobList = m_cards->getJobList();
+    std::vector<cards::Cache*> jobList = m_cards->getJobList();
     if (jobList.size() > 0)
     {
         m_btnApply->activate();
@@ -273,21 +273,21 @@ void mainWindow::OnJobListChange(const CEH_RC rc)
     Fl::unlock();
 }
 
-void mainWindow::OnPackageInfo(Pkg& pPackage)
+void mainWindow::OnPackageInfo(cards::Cache& pPackage)
 {
     Fl::lock();
     if (m_infoBuff!=nullptr)
     {
         m_infoBuff->remove(0,m_infoBuff->length());
-        if (pPackage.getName()=="")
+        if (pPackage.name()=="")
             m_infoBuff->append("No information available for this package");
         else
         {
-            m_infoBuff->append(std::string(pPackage.getName()).c_str());
-            m_infoBuff->append(std::string(" " + pPackage.getVersion()+"\n").c_str());
-            m_infoBuff->append(std::string(pPackage.getDescription()+"\n").c_str());
-            m_infoBuff->append(std::string("build by: " + pPackage.getPackager()+"\n").c_str());
-            m_infoBuff->append(std::string("from    : " + pPackage.getCollection()+" collection/set of packages").c_str());
+            m_infoBuff->append(std::string(pPackage.name()).c_str());
+            m_infoBuff->append(std::string(" " + pPackage.version()+"\n").c_str());
+            m_infoBuff->append(std::string(pPackage.description()+"\n").c_str());
+            m_infoBuff->append(std::string("build by: " + pPackage.packager()+"\n").c_str());
+            m_infoBuff->append(std::string("from    : " + pPackage.collection()+" collection/set of packages").c_str());
         }
 
     }

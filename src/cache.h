@@ -14,10 +14,13 @@ public:
 	unsigned int size();
 	StatusEnum status();
 	bool installed();
+	bool toinstall();
+	bool toremove();
 	const std::string name();
 
 	void size(unsigned int size);
-	void status(StatusEnum status);
+	void setStatus(StatusEnum status);
+	void unsetStatus(StatusEnum status);
 	void installed(bool installed);
 	void name(const std::string& name);
 
@@ -30,4 +33,4 @@ private:
 };
 
 } // endof cards namespace
-#endif
+#endif /* CACHE_H */
