@@ -795,8 +795,11 @@ int Pkgrepo::parseConfig(const char *fileName, Config& config)
 	result = getConfig(fileName,config);
 	if ( result != 0 )
 		return result;
-
-	for (auto DU : config.dirUrl) {
+	//TODO Find out why we still need an iterator here
+	for (std::vector<DirUrl>::iterator i = config.dirUrl.begin();
+	i != config.dirUrl.end();
+	++i) {
+		DirUrl DU = *i ;
 		if (DU.url.size() == 0 )
 			continue;
 
@@ -809,11 +812,10 @@ int Pkgrepo::parseConfig(const char *fileName, Config& config)
 			+ config.version
 			+ "/"
 			+ category;
-
+		i->url = url;
 #ifndef NDEBUG
-		std::cerr << url << std::endl;
+		std::cerr << url << " " << DU.url << " " << i->url << std::endl;
 #endif
-		DU.url = url;
 	}
 	return result;
 }

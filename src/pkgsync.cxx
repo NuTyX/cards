@@ -150,13 +150,8 @@ void Pkgsync::run()
 		if (DU.url.size() == 0 ) {
 			continue;
 		}
-		std::string categoryDir, url ;
-		categoryDir = DU.dir;
-		url = DU.url;
-		std::string category = basename(const_cast<char*>(categoryDir.c_str()));
-		std::string categoryPKGREPOFile = categoryDir + "/" + m_repoFile ;
-		FileDownload PKGRepo(url + "/" + m_repoFile,
-			categoryDir,
+		FileDownload PKGRepo(DU.url + "/" + m_repoFile,
+			DU.dir,
 			m_repoFile, false);
 	}
 }
