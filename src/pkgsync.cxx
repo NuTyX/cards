@@ -144,9 +144,8 @@ void Pkgsync::run()
 		treatErrors("");
 	} */
 	std::string configFile = m_root + m_configFile;
-	Config config;
-	Pkgrepo::parseConfig(configFile.c_str(), config);
-	for (auto DU : config.dirUrl) {
+	cards::Conf config(configFile);
+	for (auto DU : config.dirUrl()) {
 		if (DU.url.size() == 0 ) {
 			continue;
 		}
@@ -161,11 +160,10 @@ void Pkgsync::purge()
 			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 			treatErrors("");
 	}
-	Config config;
 	std::string configFile = m_root + m_configFile;
-	Pkgrepo::parseConfig(configFile.c_str(), config);
+	cards::Conf config(configFile);
 
-	for (auto i : config.dirUrl) {
+	for (auto i : config.dirUrl()) {
 		if ( i.url.size() == 0)
 			continue;
 		if ( getLocalPackages(i.dir) == 0 )

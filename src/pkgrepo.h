@@ -25,6 +25,7 @@
 
 #include "file_utils.h"
 #include "cache.h"
+#include "conf.h"
 
 struct PortFilesList {
 	std::string md5SUM;
