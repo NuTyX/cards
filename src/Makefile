@@ -40,7 +40,8 @@ TOOLSOBJECTS =	system_utils.o \
 		pkginfo.o \
 		tools.o
 
-CARDSOBJECTS =	system_utils.o \
+CARDSOBJECTS =	conf.o \
+		system_utils.o \
 		error_treat.o \
 		md5.o \
 		string_utils.o \
@@ -75,7 +76,8 @@ CARDSOBJECTS =	system_utils.o \
 		cards.o
 
 
-LIBOBJECTS =  system_utils.o \
+LIBOBJECTS =  conf.o \
+	system_utils.o \
 	error_treat.o \
 	md5.o \
 	string_utils.o \
@@ -96,7 +98,8 @@ LIBOBJECTS =  system_utils.o \
 	pkginst.o \
 	pkgsync.o
 
-WEBOBJECTS =  system_utils.o \
+WEBOBJECTS =  conf.o \
+	system_utils.o \
 	error_treat.o \
 	md5.o \
 	file_utils.o \
@@ -109,6 +112,7 @@ WEBOBJECTS =  system_utils.o \
 	webcards.o
 
 HEADERS = enum.h \
+		conf.h \
 		system_utils.h \
 		error_treat.h \
 		md5.h \
