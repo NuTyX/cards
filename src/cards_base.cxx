@@ -45,8 +45,7 @@ Cards_base::Cards_base(const CardsArgumentParser& argParser)
 }
 void Cards_base::run(int argc, char** argv)
 {
-	Config config;
-	Pkgrepo::parseConfig("/etc/cards.conf", config);
+	cards::Conf config;
 
 	if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {
 		if (getuid()) {
@@ -59,7 +58,7 @@ void Cards_base::run(int argc, char** argv)
 	std::set<std::string> removePackagesList,basePackagesList;
 
 	// For all the base packages list Directories
-	for ( auto i : config.baseDir) {
+	for ( auto i : config.baseDir()) {
 		// we get all the packages from the basePackageList directory
 		if ( findDir(basePackagesList, i) != 0 ) {
 			m_actualError = CANNOT_READ_DIRECTORY;

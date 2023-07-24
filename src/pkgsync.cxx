@@ -162,7 +162,6 @@ void Pkgsync::purge()
 	}
 	std::string configFile = m_root + m_configFile;
 	cards::Conf config(configFile);
-
 	for (auto i : config.dirUrl()) {
 		if ( i.url.size() == 0)
 			continue;

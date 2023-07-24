@@ -144,12 +144,12 @@ int main(int argc, char** argv)
 
 			case ArgParser::CMD_CONFIG:
 			{
-				Config config;
-				Pkgrepo::parseConfig(configFile.c_str(), config);
+				cards::Conf config(configFile);
+
 				unsigned int index = 0;
 				string prtDir, url ;
 
-				for ( auto i : config.dirUrl ) {
+				for ( auto i : config.dirUrl() ) {
 					index++;
 					cout << index << _(" Directory: ") << i.dir ;
 					if ( i.url != "" )
@@ -157,14 +157,14 @@ int main(int argc, char** argv)
 						<< i.url ;
 					cout << endl;
 				}
-				for ( auto i : config.baseDir )
+				for ( auto i : config.baseDir() )
 					cout << _("Base System list directory: ") << i << endl;
 				cout <<   _("Binaries : ")
-					<< config.arch << endl;
-				for ( auto i : config.group ) cout << "Group    : " << i << endl;
-				if ( config.logdir != "") {
+					<< config.arch() << endl;
+				for ( auto i : config.groups() ) cout << "Group    : " << i << endl;
+				if ( config.logdir() != "") {
 					cout << _("log directory: ")
-						<< config.logdir << endl;
+						<< config.logdir() << endl;
 				}
 			}
 			return EXIT_SUCCESS;

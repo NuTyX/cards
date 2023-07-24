@@ -22,8 +22,10 @@ public:
 	std::string version();
 	std::string url();
 	std::string arch();
+	std::string logdir();
 	std::vector<std::string> groups();
 	std::vector<DirUrl> dirUrl();
+	std::vector<std::string> baseDir();
 
 private:
 	std::string m_filename;

@@ -90,9 +90,6 @@ public:
 
 	virtual ~Pkgrepo() { clearPackagesList(); }
 
-	static int parseConfig(const char *fileName,
-		Config& config);
-
 	void throwError(const std::string& s) const;
 
 /**
@@ -219,11 +216,6 @@ std::vector<PortFilesList> getCurrentPackagePkgRepoFile(const std::string& portN
 	bool getPortInfo(const std::string& portName);
 
 protected:
-/**
- * parse the config file
- *
- **/
-	int parseConfig(const char *fileName);
 
 /**
  * parse the .PKGREPO file which belong to the collection found

@@ -268,9 +268,9 @@ void CardsDepends::treatErrors(const std::string& s) const
 }
 int CardsDepends::level()
 {
-	Config config;
-	Pkgrepo::parseConfig("/etc/cards.conf", config);
-	for (auto DU : config.dirUrl) {
+	cards::Conf config;
+
+	for (auto DU : config.dirUrl()) {
 		if ( DU.url.size() > 0)
 			continue;
 		std::string prtDir = DU.dir;
@@ -332,9 +332,9 @@ int CardsDepends::level()
 }
 int CardsDepends::depends()
 {
-	Config config;
-	Pkgrepo::parseConfig("/etc/cards.conf", config);
-	for ( auto DU : config.dirUrl ) {
+	cards::Conf config;
+
+	for ( auto DU : config.dirUrl() ) {
 		std::string prtDir = DU.dir;
 		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
@@ -413,9 +413,9 @@ int CardsDepends::deptree()
 	depList* dependenciesList = NULL;
 	dependenciesList = initDepsList();
 
-	Config config;
-	Pkgrepo::parseConfig("/etc/cards.conf", config);
-	for ( auto DU : config.dirUrl ) {
+	cards::Conf config;
+
+	for ( auto DU : config.dirUrl() ) {
 		std::string prtDir = DU.dir;
 		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
 			m_actualError = CANNOT_READ_DIRECTORY;
@@ -455,7 +455,7 @@ int CardsDepends::deptree()
 	std::string name = "";
 	std::set<std::string> localPackagesList, depsPackagesList;
 
-	for (auto DU : config.dirUrl ) {
+	for (auto DU : config.dirUrl() ) {
 	if ( DU.url == "")
 		continue;
 

@@ -26,7 +26,8 @@
 
 Cards_install::Cards_install(const CardsArgumentParser& argParser,
 		const char *configFileName)
-	: Pkginst("cards install",configFileName),m_argParser(argParser)
+	: Pkginst("cards install",configFileName),m_argParser(argParser),
+		m_configFileName(configFileName)
 {
 	parseArguments();
 	for( auto i : m_argParser.otherArguments() ) {
@@ -40,7 +41,8 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			treatErrors(i);
 		}
 	}
-	Pkgrepo::parseConfig(configFileName, m_config);
+	cards::Conf config(configFileName);
+
 	buildSimpleDatabase();
 	for( auto i : m_argParser.otherArguments() ) {
 		std::set<std::string> ListOfPackage = getListOfPackagesFromSet(i);
@@ -104,7 +106,8 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	: Pkginst("cards install",configFileName),m_argParser(argParser)
 {
 	parseArguments();
-	Pkgrepo::parseConfig(configFileName, m_config);
+	cards::Conf config(configFileName);
+
 	buildCompleteDatabase(false);
 	m_upgrade=0;
 	m_force=0;
@@ -125,7 +128,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			std::string name = packageArchive.name();
 			if ( checkPackageNameExist(name) )
 				continue;
-			if ( m_config.group.empty() ) {
+			if ( config.groups().empty() ) {
 				run();
 				continue;
 			}
@@ -133,7 +136,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 				run();
 				continue;
 			}
-			for (auto k : m_config.group) {
+			for (auto k : config.groups()) {
 				if ( packageArchive.group() == k ) {
 					run();
 					continue;
@@ -164,10 +167,12 @@ void Cards_install::parseArguments()
 void Cards_install::getLocalePackagesList()
 {
 	std::string packageFileName;
-	if (m_config.group.empty())
+	cards::Conf config(m_configFileName);
+
+	if (config.groups().empty())
 		return;
 	std::set<std::string> tmpList;
-	for ( auto i :  m_config.group ) {
+	for ( auto i :  config.groups() ) {
 		for ( auto j :m_dependenciesList ) {
 			std::string packageName  = j.first + "." + i;
 #ifndef NDEBUG

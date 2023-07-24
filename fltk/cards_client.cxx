@@ -112,9 +112,9 @@ namespace cards
 
         CClient Cards;
         std::set<std::string> basePackagesList;
-        Config config;
-        Pkgrepo::parseConfig(Cards.m_configFileName.c_str(),config);
-        for (auto it : config.baseDir)
+        cards::Conf config(Cards.m_configFileName);
+
+        for (auto it : config.baseDir())
         {
             findDir(basePackagesList,it);
         }

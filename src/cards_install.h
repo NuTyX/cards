@@ -45,7 +45,8 @@ class Cards_install: public Pkginst
 		const CardsArgumentParser& m_argParser;
 		void parseArguments();
 		void getLocalePackagesList();
-		Config m_config;
+		std::string m_configFileName;
+//		Config m_config;
 
 };
 

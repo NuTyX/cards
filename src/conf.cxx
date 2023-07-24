@@ -189,9 +189,17 @@ std::string Conf::arch()
 {
 	return m_arch;
 }
+std::string Conf::logdir()
+{
+	return m_logdir;
+}
 std::vector<std::string> Conf::groups()
 {
 	return m_groups;
+}
+std::vector<std::string> Conf::baseDir()
+{
+	return m_baseDir;
 }
 } // endof cards namespace
 

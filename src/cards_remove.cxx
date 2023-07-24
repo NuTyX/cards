@@ -38,12 +38,11 @@ Cards_remove::Cards_remove(const std::string& commandName,
 	else
 		m_root=m_root+"/";
 
-	Config config;
-	Pkgrepo::parseConfig(configFileName, config);
+	cards::Conf config(configFileName);
 
 	if (!m_argParser.isSet(CardsArgumentParser::OPT_ALL)){
 		std::set<std::string> basePackagesList;
-		for (auto i : config.baseDir) {
+		for (auto i : config.baseDir()) {
 			if ( findDir(basePackagesList, i) != 0 ) {
 				m_actualError = CANNOT_READ_DIRECTORY;
 				treatErrors(i);
@@ -93,7 +92,7 @@ Cards_remove::Cards_remove(const std::string& commandName,
 			}
 		}
 		std::set< std::pair<std::string,std::string> > groupSetPackagesToRemove;
-		for ( auto i :  config.group ) {
+		for ( auto i :  config.groups() ) {
 			if ( i == "lib" )
 				continue;
 			for ( auto j : listOfPackagesToRemove ) {
@@ -155,7 +154,7 @@ Cards_remove::Cards_remove(const std::string& commandName,
 		if (!found)
 			obsoletsDeps.insert(i.first);
 	}
-	for ( auto i :  config.group ) {
+	for ( auto i :  config.groups() ) {
 		if ( i == "lib" )
 			continue;
 		for ( auto j : obsoletsDeps ) {

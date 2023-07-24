@@ -53,8 +53,8 @@ void Pkgrepo::parseCollectionPkgRepoFile()
 {
 	if (m_parsePkgRepoCollectionFile)
 		return;
-	parseConfig(m_configFileName.c_str());
-	for (auto i : m_config.dirUrl) {
+	cards::Conf config(m_configFileName);
+	for (auto i : config.dirUrl()) {
 		PortsDirectory portsDirectory;
 		portsDirectory.dir = i.dir;
 		portsDirectory.url = i.url;
@@ -192,8 +192,8 @@ void Pkgrepo::parseCollectionDirectory()
 {
 	if (m_parseCollectionDirectory)
 		return;
-	parseConfig(m_configFileName.c_str());
-	for (auto i : m_config.dirUrl) {
+	cards::Conf config(m_configFileName);
+	for (auto i : config.dirUrl()) {
 		// We don't want to check the folders which cannot sync with any mirror
 		if ( i.url.size() > 0 )
 			continue;
@@ -767,57 +767,6 @@ time_t Pkgrepo::getBinaryBuildTime (const std::string& packageName)
 			break;
 	}
 	return buildTime;
-}
-int Pkgrepo::parseConfig(const char *fileName)
-{
-	return parseConfig(fileName,m_config);
-}
-int Pkgrepo::parseConfig(const char *fileName, Config& config)
-{
-	int result = 0;
-	if (checkFileExist("/var/lib/pkg/nutyx-version") ) {
-		result = getConfig( "/var/lib/pkg/nutyx-version" , config);
-		if ( result != 0 )
-			return result;
-	}
-#ifndef NDEBUG
-	std::cerr << "name:" << config.name << std::endl
-		<< "version:" << config.version << std::endl;
-#endif
-	if ( config.name.size() == 0 ) {
-		config.name="current";
-	}
-	if ( config.version.size() == 0 ) {
-		config.version="current";
-	}
-
-	std::string::size_type pos;
-	result = getConfig(fileName,config);
-	if ( result != 0 )
-		return result;
-	//TODO Find out why we still need an iterator here
-	for (std::vector<DirUrl>::iterator i = config.dirUrl.begin();
-	i != config.dirUrl.end();
-	++i) {
-		DirUrl DU = *i ;
-		if (DU.url.size() == 0 )
-			continue;
-
-		std::string categoryDir = DU.dir;
-		std::string category = basename(const_cast<char*>(categoryDir.c_str()));
-		std::string url = DU.url
-			+ "/"
-			+ getMachineType()
-			+ "/"
-			+ config.version
-			+ "/"
-			+ category;
-		i->url = url;
-#ifndef NDEBUG
-		std::cerr << url << " " << DU.url << " " << i->url << std::endl;
-#endif
-	}
-	return result;
 }
 void Pkgrepo::clearPackagesList()
 {

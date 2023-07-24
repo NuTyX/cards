@@ -44,8 +44,8 @@ Cards_create::Cards_create(const CardsArgumentParser& argParser,
 void Cards_create::createBinaries(const char *configFileName,
 	const std::string& packageName)
 {
-	Config config;
-	Pkgrepo::parseConfig(configFileName, config);
+	cards::Conf config(configFileName);
+
 	std::cout << "create of " << packageName << std::endl;
 	std::string pkgdir = getPortDir(packageName);
 	if (pkgdir == "" ) {
@@ -58,12 +58,12 @@ void Cards_create::createBinaries(const char *configFileName,
 	std::string packageFileName;
 	int fdlog = -1;
 
-	if ( config.logdir != "" ) {
-		if ( ! createRecursiveDirs(config.logdir) ) {
+	if ( config.logdir() != "" ) {
+		if ( ! createRecursiveDirs(config.logdir()) ) {
 			m_actualError = CANNOT_CREATE_DIRECTORY;
-			treatErrors(config.logdir);
+			treatErrors(config.logdir());
 		}
-		std::string logFile = config.logdir + "/" + packageName + ".log";
+		std::string logFile = config.logdir() + "/" + packageName + ".log";
 		unlink( logFile.c_str() );
 		fdlog = open(logFile.c_str(),O_APPEND | O_WRONLY | O_CREAT, 0666 );
 		if ( fdlog == -1 ) {
@@ -74,7 +74,7 @@ void Cards_create::createBinaries(const char *configFileName,
 	message = commandName + pkgdir + " package(s)";
 	std::cout << message << std::endl;
 	
-	if ( config.logdir != "" ) {
+	if ( config.logdir() != "" ) {
 		write( fdlog, message.c_str(), message.length());
 		time_t startTime;
 		time(&startTime);
@@ -134,7 +134,7 @@ void Cards_create::createBinaries(const char *configFileName,
 		m_actualError = CANNOT_PARSE_FILE;
 		treatErrors("Pkgfile: " + s);
 	} 
-	if ( config.logdir != "" ) {
+	if ( config.logdir() != "" ) {
 		time_t endTime;
 		time(&endTime);
 		timestamp = ctime(&endTime);
@@ -169,13 +169,13 @@ void Cards_create::createBinaries(const char *configFileName,
 		m_packageArchiveName = pkgdir + "/" + i;
 		run();
 		std::cout << message << std::endl;
-		if ( config.logdir != "" ) {
+		if ( config.logdir() != "" ) {
 			write( fdlog, message.c_str(), message.length());
 			write( fdlog, "\n", 1 );
 		}
 		
 	}
-	if ( config.logdir != "" ) {
+	if ( config.logdir() != "" ) {
 		time_t finishTime;
 		time(&finishTime);
 		timestamp = ctime(&finishTime);
