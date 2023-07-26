@@ -112,13 +112,13 @@ WEBOBJECTS =  conf.o \
 	webcards.o
 
 HEADERS = enum.h \
-		conf.h \
 		system_utils.h \
 		error_treat.h \
 		md5.h \
 		string_utils.h \
 		file_utils.h \
 		archive_utils.h \
+		conf.h \
 		pkg.h \
 		db.h  \
 		cache.h \

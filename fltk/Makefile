@@ -1,7 +1,7 @@
 #
 #  flcards
 #
-#  Copyright (c) 2016 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2016 - 2023 by NuTyX team (http://nutyx.org)
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,35 +23,30 @@ include ../Makefile.inc
 
 LIBFLTK  := $(shell fltk-config --ldflags)
 
-flcards:
-	echo compiling mainWindow.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DVERSION=$(VERSION) -fPIC -c -o mainWindow.o mainWindow.cxx
-	echo compiling flcards.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o flcards.o flcards.cxx
-	echo compiling table_base.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o table_base.o table_base.cxx
-	echo compiling table_package.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o table_package.o table_package.cxx
-	echo compiling table_collection.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o table_collection.o table_collection.cxx
-	echo compiling cards_wrapper.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_wrapper.o cards_wrapper.cxx
-	echo compiling cards_client.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_client.o cards_client.cxx
-	echo compiling cards_event_handler.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_event_handler.o cards_event_handler.cxx
-	echo compiling progressbox.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o progressbox.o progressbox.cxx
-	echo compiling cards_log.cxx ...
-	$(CXX) -DNDEBUG -std=c++11 -O2 -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o cards_log.o cards_log.cxx
-	echo "flcards is ready"
+FLOBJECTS = cards_event_handler.o \
+	    cards_log.o \
+	    cards_client.o \
+	    cards_wrapper.o \
+	    table_base.o \
+	    table_package.o \
+	    table_collection.o \
+	    progressbox.o \
+	    mainWindow.o \
+	    flcards.o
 
+.flcards_depend:
+	$(CXX) -g $(CXXFLAGS) -MM $(FLOBJECTS:.o=.cxx) > .flcards_depend
 
-	$(CXX) flcards.o table_base.o table_package.o table_collection.o mainWindow.o cards_wrapper.o cards_client.o cards_event_handler.o cards_log.o progressbox.o -o $@ -lcards -lcurl -larchive $(LIBFLTK)
+flcards: .flcards_depend $(FLOBJECTS)
+	$(CXX) $(FLOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS) $(LIBFLTK) -lcards
+	echo "$@ is ready"
+
 	rm flcards.o mainWindow.o table_base.o table_package.o table_collection.o cards_wrapper.o cards_client.o cards_event_handler.o cards_log.o progressbox.o
 
 clean:
-	rm -f flcards flcards.o mainWindow.o table_base.o table_package.o table_collection.o cards_wrapper.o cards_client.o cards_event_handler.o cards_log.o progressbox.o
+	rm -fv .flcards_depend
+	rm -fv $(FLOBJECTS)
+	rm -fv flcards
 
 install:
 	install -D -m0755 flcards $(USRBINDIR)/flcards
