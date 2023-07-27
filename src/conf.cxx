@@ -13,7 +13,6 @@ Conf::Conf(const std::string& filename)
 	m_filename = filename;
 	parseCardsconf();
 }
-	
 void Conf::parseCardsconf()
 {
 	FILE* fp = fopen(CARDS_CONF_FILE, "r");
@@ -122,6 +121,10 @@ std::vector<DirUrl> Conf::dirUrl()
 	for (auto i : m_dirUrl) {
 		DirUrl du;
 		du.dir = i.dir;
+		if (i.url.size()==0) {
+			ret.push_back(du);
+			continue;
+		}
 		du.url = i.url
 			+ "/"
 			+ arch()
