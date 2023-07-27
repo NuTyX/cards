@@ -23,7 +23,7 @@
 
 include ../Makefile.inc
 
-all: pkgmk build-port mybld cards resolve-libs
+all: pkgmk build-port mybld cards resolve-libs libcards.pc
 
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
@@ -39,6 +39,7 @@ install: all
 	install -D -m0755 pkgmk $(USRBINDIR)/pkgmk
 	install -D -m0644 pkgmk.conf $(ETCDIR)/pkgmk.conf.example
 	install -D -m0644 cards $(ETCDIR)/profile.d/cards.sh
+	install -D -m0644 libcards.pc $(LIBDIR)/pkgconfig/libcards.pc
 
 
 clean:
@@ -47,6 +48,7 @@ clean:
 	rm -f mybld
 	rm -f resolve-libs
 	rm -f cards
+	rm -f libcards.pc
 
 distclean: clean
 
