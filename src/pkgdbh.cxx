@@ -748,9 +748,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					info.arch( s.substr(1) );
 				}
 				if ( attribute[0] == 'c' ) {
-					std::string s;
-					s = s + " "  + attribute.substr(1);
-					info.collection(s);
+					info.collection(attribute.substr(1));
 				}
 				if ( attribute[0] == 's' ) {
 					std::string s;
