@@ -186,14 +186,12 @@ void Pkgadd::postRun()
 			removeFile(m_root,PKG_POST_INSTALL);
 			return;
 		}
-		m_actualAction = cards::ACTION_ENUM_PKG_POSTINSTALL_START;
-		progressInfo();
+		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_START);
 		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
 		if (postinstall.executeShell()) {
 			std::cerr << _("WARNING Run post-install FAILED, continue") << std::endl;
 		}
-		m_actualAction = cards::ACTION_ENUM_PKG_POSTINSTALL_END;
-		progressInfo();
+		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_END);
 		removeFile(m_root,PKG_POST_INSTALL);
 	}
 }

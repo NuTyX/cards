@@ -198,14 +198,9 @@ void Pkgdbh::treatErrors(const std::string& s) const
 }
 void Pkgdbh::progressInfo(cards::ActionEnum action)
 {
-	m_actualAction = action;
-	progressInfo();
-}
-void Pkgdbh::progressInfo()
-{
 	using namespace cards;
   static int j=0;
-  switch ( m_actualAction )
+  switch ( action )
   {
 		case ACTION_ENUM_PKG_DOWNLOAD_START:
 			break;
@@ -511,8 +506,7 @@ Pkgdbh::buildDatabase(const bool& progress,
 	}
 	if ( !simple && !all && !files ) {
 		if (progress) {
-			m_actualAction = ACTION_ENUM_DB_OPEN_END;
-			progressInfo();
+			progressInfo(ACTION_ENUM_DB_OPEN_END);
 		}
 		return;
 	}
@@ -520,8 +514,7 @@ Pkgdbh::buildDatabase(const bool& progress,
 		cards::Db info;
 		for ( auto pkgName : m_listOfPackagesNames) {
 			if (progress) {
-				m_actualAction = ACTION_ENUM_DB_OPEN_RUN;
-				progressInfo();
+				progressInfo(ACTION_ENUM_DB_OPEN_RUN);
 			}
 			const std::string metaFile = m_root
 			+ PKG_DB_DIR
@@ -571,8 +564,7 @@ Pkgdbh::buildDatabase(const bool& progress,
 	}
 	if (progress)
 	{
-		m_actualAction = ACTION_ENUM_DB_OPEN_END;
-		progressInfo();
+		progressInfo(ACTION_ENUM_DB_OPEN_END);
 	}
 }
 
@@ -691,8 +683,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 			getListOfPackagesNames (m_root);
 
 		if (!silent) {
-			m_actualAction = ACTION_ENUM_DB_OPEN_START;
-			progressInfo();
+			progressInfo(ACTION_ENUM_DB_OPEN_START);
 		}
 #ifndef NDEBUG
 		std::cerr << "m_root: " << m_root<< std::endl;
@@ -700,8 +691,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 
 		for (auto i : m_listOfPackagesNames) {
 			if (!silent) {
-				m_actualAction = ACTION_ENUM_DB_OPEN_RUN;
-				progressInfo();
+				progressInfo(ACTION_ENUM_DB_OPEN_RUN);
 			}
 			cards::Db info;
 			const std::string metaFileDir = m_root + PKG_DB_DIR + i;
@@ -828,8 +818,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 #endif
 		if (!silent)
 		{
-			m_actualAction = ACTION_ENUM_DB_OPEN_END;
-			progressInfo();
+			progressInfo(ACTION_ENUM_DB_OPEN_END);
 		}
 		m_DB_Empty=false;
 	}
@@ -837,8 +826,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
 {
 	std::set<std::string> metaFilesList;
-	m_actualAction = cards::ACTION_ENUM_PKG_MOVE_META_START;
-	progressInfo();
+	progressInfo(cards::ACTION_ENUM_PKG_MOVE_META_START);
 	const std::string packagedir = m_root + PKG_DB_DIR ;
 	const std::string packagenamedir = m_root + PKG_DB_DIR + name ;
 
@@ -886,8 +874,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
 		out.close();
 		m_dependency=false;
 	}
-	m_actualAction = cards::ACTION_ENUM_PKG_MOVE_META_END;
-	progressInfo();
+	progressInfo(cards::ACTION_ENUM_PKG_MOVE_META_END);
 }
 void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::Db& info)
 {
@@ -1047,20 +1034,17 @@ void Pkgdbh::removePackageFiles(const std::string& name)
 	std::cerr << std::endl;
 #endif
 
-	m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_START;
-	progressInfo();
+	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_START);
 	// Delete the files from bottom to up to make sure we delete the contents of any folder before
 	for (std::set<std::string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
-		m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_RUN;
-		progressInfo();
+		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_RUN);
 		const std::string filename = m_root + *i;
 		if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
 			const char* msg = strerror(errno);
 			std::cerr << m_utilName << ": could not remove " << filename << ": " << msg << std::endl;
 		}
 	}
-	m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_END;
-	progressInfo();
+	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
 }
 
 void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::string>& keep_list)
@@ -1095,11 +1079,9 @@ void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 #endif
 
 	// Delete the files
-	m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_START;
-	progressInfo();
+	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_START);
 	for (std::set<std::string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
-		m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_RUN;
-		progressInfo();
+		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_RUN);
 		const std::string filename = m_root + *i;
 		if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
 			if (errno == ENOTEMPTY)
@@ -1108,8 +1090,7 @@ void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 			std::cerr << m_utilName << ": could not remove " << filename << ": " << msg << std::endl;
 		}
 	}
-	m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_END;
-	progressInfo();
+	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
 }
 
 void Pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list)
@@ -1371,15 +1352,13 @@ void Pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 	FREE_ARCHIVE(archive);
 	if (checkFileExist(PKG_PRE_INSTALL))
 	{
-		m_actualAction = cards::ACTION_ENUM_PKG_PREINSTALL_START;
-		progressInfo();
+		progressInfo(cards::ACTION_ENUM_PKG_PREINSTALL_START);
 		process preinstall(SHELL,PKG_PRE_INSTALL, 0 );
 		if (preinstall.executeShell()) {
 			exit(EXIT_FAILURE);
 		}
 		removeFile(m_root,PKG_PRE_INSTALL);
-		m_actualAction = cards::ACTION_ENUM_PKG_PREINSTALL_END;
-		progressInfo();
+		progressInfo(cards::ACTION_ENUM_PKG_PREINSTALL_END);
 	}
 	chdir(buf);
 }
@@ -1407,13 +1386,11 @@ void Pkgdbh::installArchivePackage
 #ifndef NDEBUG
 	std::cout << "absm_root: " <<  absm_root  << " and m_root: " << m_root<< std::endl;
 #endif
-	m_actualAction = cards::ACTION_ENUM_PKG_INSTALL_START;
-	progressInfo();
+	progressInfo(cards::ACTION_ENUM_PKG_INSTALL_START);
 	for (m_installedFilesNumber = 0; archive_read_next_header(archive, &entry) ==
 	     ARCHIVE_OK; ++m_installedFilesNumber) {
 
-		m_actualAction = cards::ACTION_ENUM_PKG_INSTALL_RUN;
-		progressInfo();
+		progressInfo(cards::ACTION_ENUM_PKG_INSTALL_RUN);
 		std::string archive_filename = archive_entry_pathname(entry);
 		std::string reject_dir = trimFileName(absm_root + std::string("/") + std::string(PKG_REJECTED));
 		std::string original_filename = trimFileName(absm_root + std::string("/") + archive_filename);
@@ -1471,8 +1448,7 @@ void Pkgdbh::installArchivePackage
 				std::cout << m_utilName << ": rejecting " << archive_filename << ", keeping existing version" << std::endl;
 		}
 	}
-	m_actualAction = cards::ACTION_ENUM_PKG_INSTALL_END;
-	progressInfo();
+	progressInfo(cards::ACTION_ENUM_PKG_INSTALL_END);
 	if (m_installedFilesNumber == 0) {
 		if (archive_errno(archive) == 0)
 		{
@@ -1579,8 +1555,7 @@ void Pkgdbh::readRulesFile()
 void Pkgdbh::runLastPostInstall()
 {
 	if ( m_postInstallList.size() > 0 ) {
-		m_actualAction = cards::ACTION_ENUM_PKG_POSTINSTALL_START;
-		progressInfo();
+		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_START);
 #ifndef NDEBUG
 		for (auto i : m_postInstallList)
 			std::cerr << i.second << " " << i.first << std::endl;
@@ -1675,8 +1650,7 @@ void Pkgdbh::runLastPostInstall()
 				}
 			break;
 		}
-		m_actualAction = cards::ACTION_ENUM_PKG_POSTINSTALL_END;
-		progressInfo();
+		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_END);
 	}
 }
 bool Pkgdbh::checkRuleAppliesToFile
