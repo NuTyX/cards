@@ -44,7 +44,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		}
 	}
 	if ( listOfExistPackages.empty() ) {
-		m_actualError = CANNOT_FIND_DEPOT;
+		m_actualError = cards::ERROR_ENUM_CANNOT_FIND_DEPOT;
 		treatErrors("");
 	}
 	if (!m_config.group.empty()) {
@@ -95,7 +95,7 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 			} else {
 				if (! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
 					if (getuid()) {
-						m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+						m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 						treatErrors("");
 					}
 				}

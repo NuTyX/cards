@@ -52,55 +52,55 @@ void Pkgsync::treatErrors(const std::string& s) const
 {
 	switch ( m_actualError )
 	{
-		case CANNOT_FIND_FILE:
-		case CANNOT_PARSE_FILE:
-		case CANNOT_WRITE_FILE:
-		case CANNOT_SYNCHRONIZE:
-		case CANNOT_COPY_FILE:
-		case CANNOT_RENAME_FILE:
-		case CANNOT_DETERMINE_NAME_BUILDNR:
-		case WRONG_ARCHITECTURE:
-		case EMPTY_PACKAGE:
-		case CANNOT_FORK:
-		case WAIT_PID_FAILED:
-		case DATABASE_LOCKED:
-		case CANNOT_LOCK_DIRECTORY:
-		case CANNOT_REMOVE_FILE:
-		case CANNOT_RENAME_DIRECTORY:
-		case OPTION_ONE_ARGUMENT:
-		case INVALID_OPTION:
-		case OPTION_MISSING:
-		case TOO_MANY_OPTIONS:
-		case LISTED_FILES_ALLREADY_INSTALLED:
-		case PKGADD_CONFIG_LINE_TOO_LONG:
-		case PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS:
-		case PKGADD_CONFIG_UNKNOWN_ACTION:
-		case PKGADD_CONFIG_UNKNOWN_EVENT:
-		case CANNOT_COMPILE_REGULAR_EXPRESSION:
-		case NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE:
-		case PACKAGE_NOT_FOUND:
-		case PACKAGE_ALLREADY_INSTALL:
-		case PACKAGE_NOT_INSTALL:
-		case PACKAGE_NOT_PREVIOUSLY_INSTALL:
-		case CANNOT_GENERATE_LEVEL:
-		case CANNOT_CREATE_FILE:
+		case cards::ERROR_ENUM_CANNOT_FIND_FILE:
+		case cards::ERROR_ENUM_CANNOT_PARSE_FILE:
+		case cards::ERROR_ENUM_CANNOT_WRITE_FILE:
+		case cards::ERROR_ENUM_CANNOT_SYNCHRONIZE:
+		case cards::ERROR_ENUM_CANNOT_COPY_FILE:
+		case cards::ERROR_ENUM_CANNOT_RENAME_FILE:
+		case cards::ERROR_ENUM_CANNOT_DETERMINE_NAME_BUILDNR:
+		case cards::ERROR_ENUM_WRONG_ARCHITECTURE:
+		case cards::ERROR_ENUM_EMPTY_PACKAGE:
+		case cards::ERROR_ENUM_CANNOT_FORK:
+		case cards::ERROR_ENUM_WAIT_PID_FAILED:
+		case cards::ERROR_ENUM_DATABASE_LOCKED:
+		case cards::ERROR_ENUM_CANNOT_LOCK_DIRECTORY:
+		case cards::ERROR_ENUM_CANNOT_REMOVE_FILE:
+		case cards::ERROR_ENUM_CANNOT_RENAME_DIRECTORY:
+		case cards::ERROR_ENUM_OPTION_ONE_ARGUMENT:
+		case cards::ERROR_ENUM_INVALID_OPTION:
+		case cards::ERROR_ENUM_OPTION_MISSING:
+		case cards::ERROR_ENUM_TOO_MANY_OPTIONS:
+		case cards::ERROR_ENUM_LISTED_FILES_ALLREADY_INSTALLED:
+		case cards::ERROR_ENUM_PKGADD_CONFIG_LINE_TOO_LONG:
+		case cards::ERROR_ENUM_PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS:
+		case cards::ERROR_ENUM_PKGADD_CONFIG_UNKNOWN_ACTION:
+		case cards::ERROR_ENUM_PKGADD_CONFIG_UNKNOWN_EVENT:
+		case cards::ERROR_ENUM_CANNOT_COMPILE_REGULAR_EXPRESSION:
+		case cards::ERROR_ENUM_NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE:
+		case cards::ERROR_ENUM_PACKAGE_NOT_FOUND:
+		case cards::ERROR_ENUM_PACKAGE_ALLREADY_INSTALL:
+		case cards::ERROR_ENUM_PACKAGE_NOT_INSTALL:
+		case cards::ERROR_ENUM_PACKAGE_NOT_PREVIOUSLY_INSTALL:
+		case cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL:
+		case cards::ERROR_ENUM_CANNOT_CREATE_FILE:
 			break;
-		case CANNOT_DOWNLOAD_FILE:
+		case cards::ERROR_ENUM_CANNOT_DOWNLOAD_FILE:
 			throw std::runtime_error("could not download " + s);
 			break;
-		case CANNOT_OPEN_FILE:
+		case cards::ERROR_ENUM_CANNOT_OPEN_FILE:
 			throw RunTimeErrorWithErrno("could not open " + s);
 			break;
-		case CANNOT_READ_FILE:
+		case cards::ERROR_ENUM_CANNOT_READ_FILE:
 			throw std::runtime_error("could not read " + s);
 			break;
-		case CANNOT_READ_DIRECTORY:
+		case cards::ERROR_ENUM_CANNOT_READ_DIRECTORY:
 			throw RunTimeErrorWithErrno("could not read directory " + s);
 			break;
-		case CANNOT_CREATE_DIRECTORY:
+		case cards::ERROR_ENUM_CANNOT_CREATE_DIRECTORY:
 			throw RunTimeErrorWithErrno("could not create directory " + s);
 			break;
-		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
+		case cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
 			throw std::runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
 			break;
 	}
@@ -109,7 +109,7 @@ unsigned int Pkgsync::getLocalPackages(const std::string& path)
 {
 	m_localPackagesList.clear();
 	if ( findDir( m_localPackagesList, path) != 0 ) {
-		m_actualError = CANNOT_READ_DIRECTORY;
+		m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
 		treatErrors(path);
 	}
 	return m_localPackagesList.size();	
@@ -132,7 +132,7 @@ unsigned int Pkgsync::getRemotePackages(const std::string& pkgrepoFile)
 {
 	m_remotePackagesList.clear();
 	if ( parseFile(m_remotePackagesList,pkgrepoFile.c_str()) != 0) {
-		m_actualError = CANNOT_READ_FILE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 		treatErrors(pkgrepoFile);
 	}
 	return m_remotePackagesList.size();
@@ -157,7 +157,7 @@ void Pkgsync::run()
 void Pkgsync::purge()
 {
 	if (getuid()) {
-			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+			m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 			treatErrors("");
 	}
 	std::string configFile = m_root + m_configFile;
@@ -176,7 +176,7 @@ void Pkgsync::deleteFolder(const std::string& folderName)
 {
 	std::set<std::string> filesToDelete;
 	if ( findDir(filesToDelete, folderName) != 0 ){
-			m_actualError = CANNOT_READ_FILE;
+			m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 			treatErrors(folderName);
 	}
 	for (auto f : filesToDelete) {

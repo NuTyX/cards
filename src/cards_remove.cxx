@@ -44,7 +44,7 @@ Cards_remove::Cards_remove(const std::string& commandName,
 		std::set<std::string> basePackagesList;
 		for (auto i : config.baseDir()) {
 			if ( findDir(basePackagesList, i) != 0 ) {
-				m_actualError = CANNOT_READ_DIRECTORY;
+				m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
 				treatErrors(i);
 			}
 		}
@@ -61,7 +61,7 @@ Cards_remove::Cards_remove(const std::string& commandName,
 			for (auto j : m_listOfPackages) {
 				for (auto k : j.second.dependencies() ){
 					if ( i == k.first) {
-						m_actualError = PACKAGE_IN_USE;
+						m_actualError = cards::ERROR_ENUM_PACKAGE_IN_USE;
 						std::cout << std::endl << i << _(" is a runtime dependency for ") << j.first << " !!!" << std::endl << std::endl;
 						treatErrors(i);
 					}

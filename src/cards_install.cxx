@@ -37,7 +37,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 		if ( getListOfPackagesFromCollection(i).empty() &&
 			(! checkBinaryExist(i) )  && 
 			getListOfPackagesFromSet(i).empty() ){
-			m_actualError = PACKAGE_NOT_FOUND;
+			m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_FOUND;
 			treatErrors(i);
 		}
 	}
@@ -117,7 +117,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			break;
 		std::set<std::string> listofBinaries;
 		if (findDir(listofBinaries, i) != 0) {
-			m_actualError = CANNOT_READ_DIRECTORY;
+			m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
 			treatErrors(i);
 		}
 		for (auto j : listofBinaries ) {
@@ -154,7 +154,7 @@ void Cards_install::parseArguments()
 	else
 		m_root=m_root+"/";
 	if (getuid()) {
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
 	if (m_argParser.isSet(CardsArgumentParser::OPT_FORCE))

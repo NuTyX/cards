@@ -112,7 +112,7 @@ void Pkginfo::parseArguments(int argc, char** argv)
 			m_arg = argv[i + 1];
 			i++; 
 		} else {
-			m_actualError = INVALID_OPTION;
+			m_actualError = cards::ERROR_ENUM_INVALID_OPTION;
 			treatErrors(option);
 		}
 		if (m_root.empty())
@@ -128,14 +128,14 @@ void Pkginfo::parseArguments(int argc, char** argv)
 		m_installed_mode + m_list_mode + m_owner_mode + m_epoc + m_archiveinfo +
 		m_footprint_mode + m_libraries_mode + m_runtime_mode + m_number_mode == 0)
 	{
-		m_actualError = OPTION_MISSING;
+		m_actualError = cards::ERROR_ENUM_OPTION_MISSING;
 		treatErrors(m_arg);
 	}
 	if (m_runtimedependencies_mode + m_footprint_mode +
 		m_installed_mode + m_archiveinfo + m_list_mode +
 		m_owner_mode + m_number_mode > 1)
 	{
-		m_actualError = TOO_MANY_OPTIONS;
+		m_actualError = cards::ERROR_ENUM_TOO_MANY_OPTIONS;
 		treatErrors(m_arg);
 	}
 }
@@ -206,7 +206,7 @@ void Pkginfo::run()
 			buildDatabase(true,false,false,false,"");
 			if ( (! checkPackageNameExist(m_arg)) &&
 					(! checkPackageNameExist(m_arg)) ) {
-				m_actualError = NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
+				m_actualError = cards::ERROR_ENUM_NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
 				treatErrors(m_arg);
 			}
 			buildDatabase(true,false,false,false,m_arg);
@@ -380,7 +380,7 @@ void Pkginfo::run()
 			buildCompleteDatabase(false);
 			regex_t preg;
 			if (regcomp(&preg, m_arg.c_str(), REG_EXTENDED | REG_NOSUB)) {
-				m_actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
+				m_actualError = cards::ERROR_ENUM_CANNOT_COMPILE_REGULAR_EXPRESSION;
 				treatErrors(m_arg);
 			}
 			std::vector<std::pair<std::string, std::string> > result;

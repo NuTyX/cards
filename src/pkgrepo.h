@@ -278,7 +278,7 @@ private:
 	bool m_parseCollectionDirectory;
 	bool m_parsePackagePkgfileFile;
 
-	error m_ErrorCond;
+	cards::ErrorEnum m_ErrorCond;
 	void clearPackagesList();
 	std::set<cards::Cache*> m_packagesList;
 };

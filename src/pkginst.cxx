@@ -87,7 +87,7 @@ void Pkginst::generateDependencies()
 					<< std::endl;
 #endif
 			} else {
-				m_actualError = PACKAGE_NOT_EXIST;
+				m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_EXIST;
 				treatErrors (packageName);
 
 			}

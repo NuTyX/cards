@@ -49,7 +49,7 @@ public:
 
 	void parseArguments();
 
-	virtual void treatErrors(const std::string& s) const;
+	virtual void treatErrors(cards::ErrorEnum action, const std::string& s) const;
 
 	void showDependencies();
 	void showLevel();
@@ -83,7 +83,6 @@ private:
 
 	const CardsArgumentParser& m_argParser;
 	const char* m_packageName;
-	error m_actualError;
 
 	pkgInfo*  package;
 	pkgList*  packagesList;

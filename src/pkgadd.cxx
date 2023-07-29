@@ -58,14 +58,14 @@ void Pkgadd::parseArguments(int argc, char** argv)
 		} else if (option == "-f" || option == "--force") {
 			m_force = true;
 		} else if (option[0] == '-' || !m_packageArchiveName.empty()) {
-			m_actualError = INVALID_OPTION;
+			m_actualError = cards::ERROR_ENUM_INVALID_OPTION;
 			treatErrors(option);
 		} else {
 			m_packageArchiveName = option;
 		}
 	}
 	if (m_packageArchiveName.empty()) {
-		m_actualError = OPTION_MISSING;
+		m_actualError = cards::ERROR_ENUM_OPTION_MISSING;
 		treatErrors("");
 	}
 	if (m_root.empty())
@@ -76,7 +76,7 @@ void Pkgadd::parseArguments(int argc, char** argv)
 	// Check UID
 	if (getuid())
 	{
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
 
@@ -86,7 +86,7 @@ void Pkgadd::preRun()
 	// Check UID
 	if (getuid())
 	{
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
 	extractAndRunPREfromPackage(m_packageArchiveName);
@@ -107,12 +107,12 @@ void Pkgadd::run()
 	bool installed = checkPackageNameExist(package.first);
 	if (installed && !m_upgrade)
 	{
-		m_actualError = PACKAGE_ALLREADY_INSTALL;
+		m_actualError = cards::ERROR_ENUM_PACKAGE_ALLREADY_INSTALL;
 		treatErrors (package.first);
 	}
 	else if (!installed && m_upgrade)
 	{
-		m_actualError = PACKAGE_NOT_PREVIOUSLY_INSTALL;
+		m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_PREVIOUSLY_INSTALL;
 		treatErrors(package.first);
 	}
 
@@ -141,7 +141,7 @@ void Pkgadd::run()
 				std::cerr << f ;
 /*			copy(conflicting_files.begin(), conflicting_files.end(),
 				std::ostream_iterator<std::string>(std::cerr, "\n")); */
-			m_actualError = LISTED_FILES_ALLREADY_INSTALLED;
+			m_actualError = cards::ERROR_ENUM_LISTED_FILES_ALLREADY_INSTALLED;
 			treatErrors(package.first);
 		}
 	}
@@ -186,13 +186,13 @@ void Pkgadd::postRun()
 			removeFile(m_root,PKG_POST_INSTALL);
 			return;
 		}
-		m_actualAction = PKG_POSTINSTALL_START;
+		m_actualAction = cards::ACTION_ENUM_PKG_POSTINSTALL_START;
 		progressInfo();
 		process postinstall(SHELL,PKG_POST_INSTALL, 0 );
 		if (postinstall.executeShell()) {
 			std::cerr << _("WARNING Run post-install FAILED, continue") << std::endl;
 		}
-		m_actualAction = PKG_POSTINSTALL_END;
+		m_actualAction = cards::ACTION_ENUM_PKG_POSTINSTALL_END;
 		progressInfo();
 		removeFile(m_root,PKG_POST_INSTALL);
 	}

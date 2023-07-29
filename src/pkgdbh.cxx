@@ -52,7 +52,7 @@ void Pkgdbh::parseArguments(int argc, char** argv)
 			m_root = argv[i + 1];
 			i++;
 		} else if (option[0] == '-' || !m_packageName.empty()) {
-			m_actualError = INVALID_OPTION;
+			m_actualError = cards::ERROR_ENUM_INVALID_OPTION;
 			treatErrors(option);
 		} else {
 			m_packageName = option;
@@ -71,165 +71,172 @@ void Pkgdbh::run(int argc, char** argv)
 
 void Pkgdbh::treatErrors(const std::string& s) const
 {
+	using namespace cards;
 	switch ( m_actualError )
 	{
-		case CANNOT_FIND_DEPOT:
+		case ERROR_ENUM_CANNOT_FIND_DEPOT:
 			throw std::runtime_error(_("cannot find any depot, check your /etc/cards.conf file") + s);
 			break;
-		case CANNOT_CREATE_DIRECTORY:
-		case CANNOT_GENERATE_LEVEL:
+		case ERROR_ENUM_CANNOT_CREATE_DIRECTORY:
+		case ERROR_ENUM_CANNOT_GENERATE_LEVEL:
 			break;
-		case CANNOT_DOWNLOAD_FILE:
+		case ERROR_ENUM_CANNOT_DOWNLOAD_FILE:
 			throw std::runtime_error(_("could not download ") + s);
 			break;
-		case CANNOT_CREATE_FILE:
+		case ERROR_ENUM_CANNOT_CREATE_FILE:
 			throw RunTimeErrorWithErrno(_("could not created ") + s);
 			break;
-		case CANNOT_OPEN_FILE:
+		case ERROR_ENUM_CANNOT_OPEN_FILE:
 			throw RunTimeErrorWithErrno(_("could not open ") + s);
 			break;
-		case CANNOT_FIND_FILE:
+		case ERROR_ENUM_CANNOT_FIND_FILE:
 			throw RunTimeErrorWithErrno(_("could not find ") + s);
 			break;
-		case CANNOT_READ_FILE:
+		case ERROR_ENUM_CANNOT_READ_FILE:
 			throw std::runtime_error(_("could not read ") + s);
 			break;
-		case CANNOT_PARSE_FILE:
+		case ERROR_ENUM_CANNOT_PARSE_FILE:
 			throw std::runtime_error(_("could not parse ") + s);
 			break;
-		case CANNOT_READ_DIRECTORY:
+		case ERROR_ENUM_CANNOT_READ_DIRECTORY:
 			throw RunTimeErrorWithErrno(_("could not read directory ") + s);
 			break;
-		case CANNOT_WRITE_FILE:
+		case ERROR_ENUM_CANNOT_WRITE_FILE:
 			throw RunTimeErrorWithErrno(_("could not write file ") + s);
 			break;
-		case CANNOT_SYNCHRONIZE:
+		case ERROR_ENUM_CANNOT_SYNCHRONIZE:
 			throw RunTimeErrorWithErrno(_("could not synchronize ") + s);
 			break;
-		case CANNOT_RENAME_FILE:
+		case ERROR_ENUM_CANNOT_RENAME_FILE:
 			throw RunTimeErrorWithErrno(_("could not rename ") + s);
 			break;
-		case CANNOT_COPY_FILE:
+		case ERROR_ENUM_CANNOT_COPY_FILE:
 			throw RunTimeErrorWithErrno(_("could not copy ") + s);
 			break;
-		case CANNOT_DETERMINE_NAME_BUILDNR:
+		case ERROR_ENUM_CANNOT_DETERMINE_NAME_BUILDNR:
 			throw RunTimeErrorWithErrno(_("could not determine name / build number ") + s);
 			break;
-		case WRONG_ARCHITECTURE:
+		case ERROR_ENUM_WRONG_ARCHITECTURE:
 			throw std::runtime_error(s + _(": wrong architecture") );
 			break;
-		case EMPTY_PACKAGE:
+		case ERROR_ENUM_EMPTY_PACKAGE:
 			throw RunTimeErrorWithErrno(_("empty package ") + s);
 			break;
-		case CANNOT_FORK:
+		case ERROR_ENUM_CANNOT_FORK:
 			throw RunTimeErrorWithErrno(_("fork() failed ") + s);
 			break;
-		case WAIT_PID_FAILED:
+		case ERROR_ENUM_WAIT_PID_FAILED:
 			throw RunTimeErrorWithErrno(_("waitpid() failed ") + s);
 			break;
-		case DATABASE_LOCKED:
+		case ERROR_ENUM_DATABASE_LOCKED:
 			throw RunTimeErrorWithErrno(_("Database  ") + s + _(" locked by another user"));
 			break;
-		case CANNOT_LOCK_DIRECTORY:
+		case ERROR_ENUM_CANNOT_LOCK_DIRECTORY:
 			throw RunTimeErrorWithErrno(_("could not lock directory ") + s);
 			break;
-		case CANNOT_REMOVE_FILE:
+		case ERROR_ENUM_CANNOT_REMOVE_FILE:
 			throw RunTimeErrorWithErrno(_("could not remove file ") + s);
 			break;
-		case CANNOT_RENAME_DIRECTORY:
+		case ERROR_ENUM_CANNOT_RENAME_DIRECTORY:
 			throw RunTimeErrorWithErrno(_("could not rename directory ") + s);
 			break;
-		case OPTION_ONE_ARGUMENT:
+		case ERROR_ENUM_OPTION_ONE_ARGUMENT:
 			throw RunTimeErrorWithErrno(s + _(" require one argument"));
 			break;
-		case INVALID_OPTION:
+		case ERROR_ENUM_INVALID_OPTION:
 			throw std::runtime_error(s + _(" invalid option") );
 			break;
-		case OPTION_MISSING:
+		case ERROR_ENUM_OPTION_MISSING:
 			throw std::runtime_error(s + _(" option missing"));
 			break;
-		case TOO_MANY_OPTIONS:
+		case ERROR_ENUM_TOO_MANY_OPTIONS:
 			throw std::runtime_error(s+ _(": to many options"));
 			break;
-		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
+		case ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
 			throw std::runtime_error(s + _(" only root can install / upgrade / remove packages"));
 			break;
-		case PACKAGE_ALLREADY_INSTALL:
+		case ERROR_ENUM_PACKAGE_ALLREADY_INSTALL:
 			throw std::runtime_error(_("package ") + s + _(" already installed (use -u to upgrade)"));
 			break;
-		case PACKAGE_NOT_INSTALL:
+		case ERROR_ENUM_PACKAGE_NOT_INSTALL:
 			throw std::runtime_error(_("package ") + s + _(" not yet installed"));
 			break;
-		case PACKAGE_NOT_PREVIOUSLY_INSTALL:
+		case ERROR_ENUM_PACKAGE_NOT_PREVIOUSLY_INSTALL:
 			throw std::runtime_error(_("package ") + s + _(" not previously installed (skip -u to install)"));
 			break;
-		case LISTED_FILES_ALLREADY_INSTALLED:
+		case ERROR_ENUM_LISTED_FILES_ALLREADY_INSTALLED:
 			throw std::runtime_error(s + _(": listed file(s) already installed (use -f to ignore and overwrite)"));
 			break;
-		case PKGADD_CONFIG_LINE_TOO_LONG:
+		case ERROR_ENUM_PKGADD_CONFIG_LINE_TOO_LONG:
 			throw RunTimeErrorWithErrno(s + _(": line too long, aborting"));
 			break;
-		case PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS:
+		case ERROR_ENUM_PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS:
 			throw RunTimeErrorWithErrno(s + _(": wrong number of arguments, aborting"));
 			break;
-		case PKGADD_CONFIG_UNKNOWN_ACTION:
+		case ERROR_ENUM_PKGADD_CONFIG_UNKNOWN_ACTION:
 			throw RunTimeErrorWithErrno(s + _("': config unknown action, should be YES or NO, aborting"));
 			break;
-		case PKGADD_CONFIG_UNKNOWN_EVENT:
+		case ERROR_ENUM_PKGADD_CONFIG_UNKNOWN_EVENT:
 			throw RunTimeErrorWithErrno(s + _("' unknown event, aborting"));
 			break;
-		case CANNOT_COMPILE_REGULAR_EXPRESSION:
+		case ERROR_ENUM_CANNOT_COMPILE_REGULAR_EXPRESSION:
 			throw std::runtime_error(_("error compiling regular expression '") + s + _("', aborting"));
 			break;
-		case NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE:
+		case ERROR_ENUM_NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE:
 			throw std::runtime_error(s + _(" is neither an installed package nor a package file"));
 			break;
-		case PACKAGE_NOT_FOUND:
+		case ERROR_ENUM_PACKAGE_NOT_FOUND:
 			throw std::runtime_error(_("The package ") + s + _(" is not found"));
 			break;
-		case PACKAGE_NOT_EXIST:
+		case ERROR_ENUM_PACKAGE_NOT_EXIST:
 			throw std::runtime_error(_("The package ") + s + _(" does not exist"));
 			break;
-		case PACKAGE_IN_USE:
+		case ERROR_ENUM_PACKAGE_IN_USE:
 			throw std::runtime_error(_("The package ") + s + _(" is in use"));
 			break;
 	}
 }
+void Pkgdbh::progressInfo(cards::ActionEnum action)
+{
+	m_actualAction = action;
+	progressInfo();
+}
 void Pkgdbh::progressInfo()
 {
+	using namespace cards;
   static int j=0;
   switch ( m_actualAction )
   {
-		case PKG_DOWNLOAD_START:
+		case ACTION_ENUM_PKG_DOWNLOAD_START:
 			break;
-		case PKG_DOWNLOAD_RUN:
+		case ACTION_ENUM_PKG_DOWNLOAD_RUN:
 			break;
-		case PKG_DOWNLOAD_END:
+		case ACTION_ENUM_PKG_DOWNLOAD_END:
 			break;
-		case PKG_MOVE_META_START:
+		case ACTION_ENUM_PKG_MOVE_META_START:
 			break;
-		case PKG_MOVE_META_END:
+		case ACTION_ENUM_PKG_MOVE_META_END:
 			break;
-		case DB_OPEN_START:
+		case ACTION_ENUM_DB_OPEN_START:
 			std::cout << _("Retrieve info about the ")
 			<< m_listOfPackagesNames.size() << _(" packages: ");
 			break;
-		case DB_OPEN_RUN:
+		case ACTION_ENUM_DB_OPEN_RUN:
 			j++;
 			printf("%3u%%\b\b\b\b",
 				( j * 100 ) / m_listOfPackagesNames.size() );
 			break;
-		case DB_OPEN_END:
+		case ACTION_ENUM_DB_OPEN_END:
 			printf("100 %%\n");
 			j=0;
 			break;
-		case PKG_PREINSTALL_START:
+		case ACTION_ENUM_PKG_PREINSTALL_START:
 			std::cout << _("pre-install: start") << std::endl;
 			break;
-		case PKG_PREINSTALL_END:
+		case ACTION_ENUM_PKG_PREINSTALL_END:
 			std::cout << _("pre-install: finish") << std::endl;
 			break;
-		case PKG_INSTALL_START:
+		case ACTION_ENUM_PKG_INSTALL_START:
 			j=0;
 			std::cout << _("   ADD: (")
 				<< m_packageArchiveCollection
@@ -242,25 +249,25 @@ void Pkgdbh::progressInfo()
 				<< ", "
 				<< m_filesNumber << _(" files: ");
 			break;
-		case PKG_INSTALL_RUN:
+		case ACTION_ENUM_PKG_INSTALL_RUN:
 			j++;
 			printf("%3u%%\b\b\b\b",
 				(m_installedFilesNumber * 100 ) /  m_filesNumber );
 			break;
-		case PKG_INSTALL_END:
+		case ACTION_ENUM_PKG_INSTALL_END:
 			printf("100 %%\n");
 			break;
-		case PKG_POSTINSTALL_START:
+		case ACTION_ENUM_PKG_POSTINSTALL_START:
 			std::cout << _("post-install: start") << std::endl;
 			break;
-		case PKG_POSTINSTALL_END:
+		case ACTION_ENUM_PKG_POSTINSTALL_END:
 			std::cout << _("post-install: finish") << std::endl;
 			break;
-		case DB_ADD_PKG_START:
+		case ACTION_ENUM_DB_ADD_PKG_START:
 			break;
-		case DB_ADD_PKG_END:
+		case ACTION_ENUM_DB_ADD_PKG_END:
 			break;
-		case RM_PKG_FILES_START:
+		case ACTION_ENUM_RM_PKG_FILES_START:
 			j=0;
 			std::cout << _("REMOVE: (")
 				<< m_packageCollection
@@ -274,17 +281,17 @@ void Pkgdbh::progressInfo()
 				<< m_filesList.size()
 				<< _(" files: ");
 			break;
-		case RM_PKG_FILES_RUN:
+		case ACTION_ENUM_RM_PKG_FILES_RUN:
 			j++;
 			printf("%3u%%\b\b\b\b",
 				( j * 100 ) / m_filesList.size() );
 			break;
-		case RM_PKG_FILES_END:
+		case ACTION_ENUM_RM_PKG_FILES_END:
 			printf("100 %%\n");
 			break;
-		case LDCONFIG_START:
+		case ACTION_ENUM_LDCONFIG_START:
 			break;
-		case LDCONFIG_END:
+		case ACTION_ENUM_LDCONFIG_END:
 			break;
   }
 }
@@ -387,7 +394,7 @@ int Pkgdbh::getListOfPackagesNames (const std::string& path)
 	std::cerr << "pathdb: " << pathdb << std::endl;
 #endif
 	if ( findDir(m_listOfPackagesNames, pathdb) != 0 ) {
-		m_actualError = CANNOT_READ_FILE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 		treatErrors(pathdb);
 	}
 #ifndef NDEBUG
@@ -420,7 +427,7 @@ Pkgdbh::getSetOfFiles( const std::string& packageName )
 		+ PKG_FILES;
 	int fd = open(fileslist.c_str(), O_RDONLY);
 	if (fd == -1) {
-		m_actualError = CANNOT_OPEN_FILE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
 		treatErrors(fileslist);
 	}
 	stdio_filebuf<char> listbuf(fd, std::ios::in, getpagesize());
@@ -460,13 +467,13 @@ Pkgdbh::buildDatabase(const bool& progress,
 		const bool& files,
 		const std::string& packageName)
 {
+	using namespace cards;
 	/*
 	 * This part is done in every cases
 	 */
 	cleanupMetaFiles(m_root);
 	if (progress) {
-		m_actualAction = DB_OPEN_START;
-		progressInfo();
+		progressInfo(ACTION_ENUM_DB_OPEN_START);
 	}
 #ifndef NDEBUG
 	std::cerr << "m_root: " << m_root << std::endl;
@@ -476,8 +483,7 @@ Pkgdbh::buildDatabase(const bool& progress,
 
 	for ( auto name : m_listOfPackagesNames) {
 		if (progress) {
-			m_actualAction = DB_OPEN_RUN;
-			progressInfo();
+			progressInfo(ACTION_ENUM_DB_OPEN_RUN);
 		}
 		const std::string metaFile = m_root
 		+ PKG_DB_DIR
@@ -505,7 +511,7 @@ Pkgdbh::buildDatabase(const bool& progress,
 	}
 	if ( !simple && !all && !files ) {
 		if (progress) {
-			m_actualAction = DB_OPEN_END;
+			m_actualAction = ACTION_ENUM_DB_OPEN_END;
 			progressInfo();
 		}
 		return;
@@ -514,7 +520,7 @@ Pkgdbh::buildDatabase(const bool& progress,
 		cards::Db info;
 		for ( auto pkgName : m_listOfPackagesNames) {
 			if (progress) {
-				m_actualAction = DB_OPEN_RUN;
+				m_actualAction = ACTION_ENUM_DB_OPEN_RUN;
 				progressInfo();
 			}
 			const std::string metaFile = m_root
@@ -565,7 +571,7 @@ Pkgdbh::buildDatabase(const bool& progress,
 	}
 	if (progress)
 	{
-		m_actualAction = DB_OPEN_END;
+		m_actualAction = ACTION_ENUM_DB_OPEN_END;
 		progressInfo();
 	}
 }
@@ -678,13 +684,14 @@ Pkgdbh::buildSimpleDatabase()
  */
 void Pkgdbh::buildCompleteDatabase(const bool& silent)
 {
+	using namespace cards;
 	cleanupMetaFiles(m_root);
 	if (m_DB_Empty) {
 		if (m_listOfPackagesNames.empty() )
 			getListOfPackagesNames (m_root);
 
 		if (!silent) {
-			m_actualAction = DB_OPEN_START;
+			m_actualAction = ACTION_ENUM_DB_OPEN_START;
 			progressInfo();
 		}
 #ifndef NDEBUG
@@ -693,7 +700,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 
 		for (auto i : m_listOfPackagesNames) {
 			if (!silent) {
-				m_actualAction = DB_OPEN_RUN;
+				m_actualAction = ACTION_ENUM_DB_OPEN_RUN;
 				progressInfo();
 			}
 			cards::Db info;
@@ -792,7 +799,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 			const std::string filelist = m_root + PKG_DB_DIR + i + PKG_FILES;
 			int fd = open(filelist.c_str(), O_RDONLY);
 			if (fd == -1) {
-				m_actualError = CANNOT_OPEN_FILE;
+				m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
 				treatErrors(filelist);
 			}
 			stdio_filebuf<char> listbuf(fd, std::ios::in, getpagesize());
@@ -821,7 +828,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 #endif
 		if (!silent)
 		{
-			m_actualAction = DB_OPEN_END;
+			m_actualAction = ACTION_ENUM_DB_OPEN_END;
 			progressInfo();
 		}
 		m_DB_Empty=false;
@@ -830,7 +837,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
 {
 	std::set<std::string> metaFilesList;
-	m_actualAction = PKG_MOVE_META_START;
+	m_actualAction = cards::ACTION_ENUM_PKG_MOVE_META_START;
 	progressInfo();
 	const std::string packagedir = m_root + PKG_DB_DIR ;
 	const std::string packagenamedir = m_root + PKG_DB_DIR + name ;
@@ -849,7 +856,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
 	metaFilesList.insert(".META");
 	std::set<std::string> fileContent;
 	if ( parseFile(fileContent,".META") == -1 ) {
-		m_actualError = CANNOT_FIND_FILE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_FIND_FILE;
 		treatErrors(".META");
 	}
 
@@ -861,12 +868,12 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
 		destFile++;
 		std::string file = packagenamedir + "/" + destFile;
 		if (rename(i.c_str(), file.c_str()) == -1) {
-			m_actualError = CANNOT_RENAME_FILE;
+			m_actualError = cards::ERROR_ENUM_CANNOT_RENAME_FILE;
 			treatErrors( i + " to " + file);
 		}
 		if ( i == ".POST" ) {
 			if (copyFile(i.c_str(), file.c_str()) == -1) {
-				m_actualError = CANNOT_COPY_FILE;
+				m_actualError = cards::ERROR_ENUM_CANNOT_COPY_FILE;
 				treatErrors( file  + " to " + i);
 			}
 		}
@@ -879,7 +886,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
 		out.close();
 		m_dependency=false;
 	}
-	m_actualAction = PKG_MOVE_META_END;
+	m_actualAction = cards::ACTION_ENUM_PKG_MOVE_META_END;
 	progressInfo();
 }
 void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::Db& info)
@@ -894,7 +901,7 @@ void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::Db& i
 	int fd_new = creat(fileslist_new.c_str(),0644);
 	if (fd_new == -1)
 	{
-		m_actualError = CANNOT_CREATE_FILE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_CREATE_FILE;
 		treatErrors(fileslist_new);
 	}
 
@@ -909,21 +916,21 @@ void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::Db& i
 	if (!db_new)
 	{
 		rmdir(packagenamedir.c_str());
-		m_actualError = CANNOT_WRITE_FILE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_WRITE_FILE;
 		treatErrors(fileslist_new);
 	}
 	// Synchronize file to disk
 	if (fsync(fd_new) == -1)
 	{
 		rmdir(packagenamedir.c_str());
-		m_actualError = CANNOT_SYNCHRONIZE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_SYNCHRONIZE;
 		treatErrors(fileslist_new);
 	}
 	// Move new database into place
 	if (rename(fileslist_new.c_str(), fileslist.c_str()) == -1)
 	{
 		rmdir(packagenamedir.c_str());
-		m_actualError = CANNOT_RENAME_FILE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_RENAME_FILE;
 		treatErrors(fileslist_new + " to " + fileslist);
 	}
 }
@@ -992,7 +999,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 	const std::string packagenamedir = m_root + PKG_DB_DIR + name;
 
 	if ( findDir(metaFilesList, packagenamedir) != 0 ) {
-		m_actualError = CANNOT_READ_FILE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 		treatErrors(packagenamedir);
 	}
 	if (metaFilesList.size() > 0) {
@@ -1040,11 +1047,11 @@ void Pkgdbh::removePackageFiles(const std::string& name)
 	std::cerr << std::endl;
 #endif
 
-	m_actualAction = RM_PKG_FILES_START;
+	m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_START;
 	progressInfo();
 	// Delete the files from bottom to up to make sure we delete the contents of any folder before
 	for (std::set<std::string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
-		m_actualAction = RM_PKG_FILES_RUN;
+		m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_RUN;
 		progressInfo();
 		const std::string filename = m_root + *i;
 		if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
@@ -1052,7 +1059,7 @@ void Pkgdbh::removePackageFiles(const std::string& name)
 			std::cerr << m_utilName << ": could not remove " << filename << ": " << msg << std::endl;
 		}
 	}
-	m_actualAction = RM_PKG_FILES_END;
+	m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_END;
 	progressInfo();
 }
 
@@ -1088,10 +1095,10 @@ void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 #endif
 
 	// Delete the files
-	m_actualAction = RM_PKG_FILES_START;
+	m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_START;
 	progressInfo();
 	for (std::set<std::string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
-		m_actualAction = RM_PKG_FILES_RUN;
+		m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_RUN;
 		progressInfo();
 		const std::string filename = m_root + *i;
 		if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
@@ -1101,7 +1108,7 @@ void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 			std::cerr << m_utilName << ": could not remove " << filename << ": " << msg << std::endl;
 		}
 	}
-	m_actualAction = RM_PKG_FILES_END;
+	m_actualAction = cards::ACTION_ENUM_RM_PKG_FILES_END;
 	progressInfo();
 }
 
@@ -1216,7 +1223,7 @@ Pkgdbh::openArchivePackage(const std::string& filename)
 	std::string basename(filename, filename.rfind('/') + 1);
 	m_filesNumber = packageArchive.size();
 	if (m_filesNumber == 0 ) {
-		m_actualError = EMPTY_PACKAGE;
+		m_actualError = cards::ERROR_ENUM_EMPTY_PACKAGE;
 		treatErrors(basename);
 	}
 	packageArchiveName = packageArchive.name();
@@ -1228,7 +1235,7 @@ Pkgdbh::openArchivePackage(const std::string& filename)
 				<< " architecture, everything is OK..."
 				<< std::endl;
 		} else {
-			m_actualError = WRONG_ARCHITECTURE;
+			m_actualError = cards::ERROR_ENUM_WRONG_ARCHITECTURE;
 			treatErrors(basename);
 		}
 	}
@@ -1236,7 +1243,7 @@ Pkgdbh::openArchivePackage(const std::string& filename)
 	m_packageArchiveVersion = packageArchive.version();
 	m_packageArchiveRelease = itos(packageArchive.release());
 	if (packageArchiveName.empty() ) {
-		m_actualError = CANNOT_DETERMINE_NAME_BUILDNR;
+		m_actualError = cards::ERROR_ENUM_CANNOT_DETERMINE_NAME_BUILDNR;
 		treatErrors(basename);
 	}
 	result.first = packageArchiveName;
@@ -1333,7 +1340,7 @@ void Pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 		filename.c_str(),
 		DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
 	{
-		m_actualError = CANNOT_OPEN_FILE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
 		treatErrors(filename);
 	}
 
@@ -1364,14 +1371,14 @@ void Pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 	FREE_ARCHIVE(archive);
 	if (checkFileExist(PKG_PRE_INSTALL))
 	{
-		m_actualAction = PKG_PREINSTALL_START;
+		m_actualAction = cards::ACTION_ENUM_PKG_PREINSTALL_START;
 		progressInfo();
 		process preinstall(SHELL,PKG_PRE_INSTALL, 0 );
 		if (preinstall.executeShell()) {
 			exit(EXIT_FAILURE);
 		}
 		removeFile(m_root,PKG_PRE_INSTALL);
-		m_actualAction = PKG_PREINSTALL_END;
+		m_actualAction = cards::ACTION_ENUM_PKG_PREINSTALL_END;
 		progressInfo();
 	}
 	chdir(buf);
@@ -1392,7 +1399,7 @@ void Pkgdbh::installArchivePackage
 	    filename.c_str(),
 	    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
 		{
-			m_actualError = CANNOT_OPEN_FILE;
+			m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
 			treatErrors(filename);
 		}
 	chdir(m_root.c_str());
@@ -1400,12 +1407,12 @@ void Pkgdbh::installArchivePackage
 #ifndef NDEBUG
 	std::cout << "absm_root: " <<  absm_root  << " and m_root: " << m_root<< std::endl;
 #endif
-	m_actualAction = PKG_INSTALL_START;
+	m_actualAction = cards::ACTION_ENUM_PKG_INSTALL_START;
 	progressInfo();
 	for (m_installedFilesNumber = 0; archive_read_next_header(archive, &entry) ==
 	     ARCHIVE_OK; ++m_installedFilesNumber) {
 
-		m_actualAction = PKG_INSTALL_RUN;
+		m_actualAction = cards::ACTION_ENUM_PKG_INSTALL_RUN;
 		progressInfo();
 		std::string archive_filename = archive_entry_pathname(entry);
 		std::string reject_dir = trimFileName(absm_root + std::string("/") + std::string(PKG_REJECTED));
@@ -1464,17 +1471,17 @@ void Pkgdbh::installArchivePackage
 				std::cout << m_utilName << ": rejecting " << archive_filename << ", keeping existing version" << std::endl;
 		}
 	}
-	m_actualAction = PKG_INSTALL_END;
+	m_actualAction = cards::ACTION_ENUM_PKG_INSTALL_END;
 	progressInfo();
 	if (m_installedFilesNumber == 0) {
 		if (archive_errno(archive) == 0)
 		{
-			m_actualError = EMPTY_PACKAGE;
+			m_actualError = cards::ERROR_ENUM_EMPTY_PACKAGE;
 			treatErrors(filename);
 		}
 		else
 		{
-			m_actualError = CANNOT_READ_FILE;
+			m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 			treatErrors(filename);
 		}
 	}
@@ -1494,7 +1501,7 @@ void Pkgdbh::readRulesFile()
 			linecount++;
 			if (!line.empty() && line[0] != '#') {
 				if (line.length() >= PKGADD_CONF_MAXLINE) {
-					m_actualError = PKGADD_CONFIG_LINE_TOO_LONG;
+					m_actualError = cards::ERROR_ENUM_PKGADD_CONFIG_LINE_TOO_LONG;
 					treatErrors(filename + ":" + itos(linecount));
 				}
 				char event[PKGADD_CONF_MAXLINE];
@@ -1502,7 +1509,7 @@ void Pkgdbh::readRulesFile()
 				char action[PKGADD_CONF_MAXLINE];
 				char dummy[PKGADD_CONF_MAXLINE];
 				if (sscanf(line.c_str(), "%s %s %s %s", event, pattern, action, dummy) != 3) {
-					m_actualError = PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS;
+					m_actualError = cards::ERROR_ENUM_PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS;
 					treatErrors(filename + ":" + itos(linecount));
 				}
 				if (!strcmp(event, "UPGRADE") || !strcmp(event, "INSTALL") \
@@ -1548,13 +1555,13 @@ void Pkgdbh::readRulesFile()
 					} else if (!strcmp(action, "NO")) {
 						rule.action = false;
 					} else {
-						m_actualError = PKGADD_CONFIG_UNKNOWN_ACTION;
+						m_actualError = cards::ERROR_ENUM_PKGADD_CONFIG_UNKNOWN_ACTION;
 						treatErrors(filename + ":" + itos(linecount) + ": '" +
 							std::string(action));
 					}
 					m_actionRules.push_back(rule);
 				} else {
-					m_actualError = PKGADD_CONFIG_UNKNOWN_EVENT;
+					m_actualError = cards::ERROR_ENUM_PKGADD_CONFIG_UNKNOWN_EVENT;
 					treatErrors(filename + ":" + itos(linecount) + ": '" +
 						std::string(event));
 				}
@@ -1572,7 +1579,7 @@ void Pkgdbh::readRulesFile()
 void Pkgdbh::runLastPostInstall()
 {
 	if ( m_postInstallList.size() > 0 ) {
-		m_actualAction = PKG_POSTINSTALL_START;
+		m_actualAction = cards::ACTION_ENUM_PKG_POSTINSTALL_START;
 		progressInfo();
 #ifndef NDEBUG
 		for (auto i : m_postInstallList)
@@ -1668,7 +1675,7 @@ void Pkgdbh::runLastPostInstall()
 				}
 			break;
 		}
-		m_actualAction = PKG_POSTINSTALL_END;
+		m_actualAction = cards::ACTION_ENUM_PKG_POSTINSTALL_END;
 		progressInfo();
 	}
 }
@@ -1679,7 +1686,7 @@ bool Pkgdbh::checkRuleAppliesToFile
 	bool ret;
 
 	if (regcomp(&preg, rule.pattern.c_str(), REG_EXTENDED | REG_NOSUB)) {
-		m_actualError = CANNOT_COMPILE_REGULAR_EXPRESSION;
+		m_actualError = cards::ERROR_ENUM_CANNOT_COMPILE_REGULAR_EXPRESSION;
 		treatErrors(rule.pattern);
 	}
 	ret = !regexec(&preg, file.c_str(), 0, 0, 0);
@@ -1708,7 +1715,7 @@ void Pkgdbh::getFootprintPackage(std::string& filename)
 	    filename.c_str(),
 	    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
 			{
-				m_actualError = CANNOT_OPEN_FILE;
+				m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
 				treatErrors(filename);
 			}
       //         throw RunTimeErrorWithErrno("could not open " + filename, archive_errno(archive));
@@ -1726,7 +1733,7 @@ void Pkgdbh::getFootprintPackage(std::string& filename)
 
 		if (S_ISREG(mode) && archive_read_data_skip(archive))
 		{
-			m_actualError = CANNOT_READ_FILE;
+			m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 			treatErrors(filename);
 		//	throw RunTimeErrorWithErrno("could not read " + filename, archive_errno(archive));
 		}
@@ -1742,7 +1749,7 @@ void Pkgdbh::getFootprintPackage(std::string& filename)
 	    filename.c_str(),
 	    DEFAULT_BYTES_PER_BLOCK) != ARCHIVE_OK)
 			{
-				m_actualError = CANNOT_OPEN_FILE;
+				m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
 				treatErrors(filename);
         // throw RunTimeErrorWithErrno("could not open " + filename, archive_errno(archive));
 			}
@@ -1807,7 +1814,7 @@ void Pkgdbh::getFootprintPackage(std::string& filename)
 
 		if (S_ISREG(mode) && archive_read_data_skip(archive))
 		{
-			m_actualError = CANNOT_READ_FILE;
+			m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 			treatErrors(filename);
 		//	throw RunTimeErrorWithErrno("could not read " + filename, archive_errno(archive));
 		}
@@ -1816,12 +1823,12 @@ void Pkgdbh::getFootprintPackage(std::string& filename)
 	if (i == 0) {
 		if (archive_errno(archive) == 0)
 		{
-			m_actualError = EMPTY_PACKAGE;
+			m_actualError = cards::ERROR_ENUM_EMPTY_PACKAGE;
 			treatErrors(filename);
 		}
 		else
 		{
-			m_actualError = CANNOT_READ_FILE;
+			m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 			treatErrors(filename);
 		}
 	}

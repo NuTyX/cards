@@ -73,7 +73,7 @@ void Pkgrm::run()
 	// Check UID
 	if (getuid())
 	{
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
 
@@ -86,7 +86,7 @@ void Pkgrm::run()
 	buildCompleteDatabase(false);
 
 	if (!checkPackageNameExist(m_packageName)) {
-			m_actualError = PACKAGE_NOT_INSTALL;
+			m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_INSTALL;
 			treatErrors(m_packageName);
 	}
 

@@ -108,31 +108,7 @@
 #define FC_CACHE     "usr/bin/fc-cache"
 #define FC_CACHE_ARGS  ""
 
-enum action
-{
-	PKG_DOWNLOAD_START,
-	PKG_DOWNLOAD_RUN,
-	PKG_DOWNLOAD_END,
-	DB_OPEN_START,
-	DB_OPEN_RUN,
-	DB_OPEN_END,
-	PKG_PREINSTALL_START,
-	PKG_PREINSTALL_END,
-	PKG_INSTALL_START,
-	PKG_INSTALL_END,
-	PKG_INSTALL_RUN,
-	PKG_POSTINSTALL_START,
-	PKG_POSTINSTALL_END,
-	PKG_MOVE_META_START,
-	PKG_MOVE_META_END,
-	DB_ADD_PKG_START,
-	DB_ADD_PKG_END,
-	LDCONFIG_START,
-	LDCONFIG_END,
-	RM_PKG_FILES_START,
-	RM_PKG_FILES_RUN,
-	RM_PKG_FILES_END
-};
+
 typedef std::map<std::string, cards::Db> packages_t;
 
 enum rule_event_t {
@@ -171,6 +147,7 @@ public:
 
 	virtual void printHelp() const {};
 
+	virtual void progressInfo(cards::ActionEnum action);
 	virtual void progressInfo();
 	virtual void treatErrors(const std::string& s) const;
 
@@ -285,8 +262,8 @@ protected:
 
 	std::set<std::pair<std::string,std::set<std::string> > > m_listOfPackagesWithDeps;
 
-	action m_actualAction;
-	error m_actualError;
+	cards::ActionEnum m_actualAction;
+	cards::ErrorEnum m_actualError;
 
 private:
 

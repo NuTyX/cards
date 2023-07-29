@@ -49,7 +49,7 @@ void Cards_base::run(int argc, char** argv)
 
 	if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {
 		if (getuid()) {
-			m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+			m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 			treatErrors("");
 		}
 	}
@@ -61,7 +61,7 @@ void Cards_base::run(int argc, char** argv)
 	for ( auto i : config.baseDir()) {
 		// we get all the packages from the basePackageList directory
 		if ( findDir(basePackagesList, i) != 0 ) {
-			m_actualError = CANNOT_READ_DIRECTORY;
+			m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
 			treatErrors(i);
 		}
 	}

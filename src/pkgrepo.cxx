@@ -44,7 +44,7 @@ void Pkgrepo::throwError
 {
 	switch ( m_ErrorCond )
 	{
-		case CANNOT_FIND_DEPOT:
+		case cards::ERROR_ENUM_CANNOT_FIND_DEPOT:
 			throw RunTimeErrorWithErrno("could not find the Depot META " + s);
 			break;
 	}
@@ -63,7 +63,7 @@ void Pkgrepo::parseCollectionPkgRepoFile()
 			if ( i.url.size() > 0 ) {
 				std::cout << "You should use " << YELLOW << "cards sync" << NORMAL << " for " << i.dir << std::endl;
 			} else {
-				m_ErrorCond = CANNOT_FIND_DEPOT;
+				m_ErrorCond = cards::ERROR_ENUM_CANNOT_FIND_DEPOT;
 				throwError(collectionPkgRepoFile);
 			}
 			continue;
@@ -71,7 +71,7 @@ void Pkgrepo::parseCollectionPkgRepoFile()
 		std::vector<std::string> PkgRepoFileContent;
 
 		if ( parseFile(PkgRepoFileContent,collectionPkgRepoFile.c_str()) != 0) {
-			m_ErrorCond = CANNOT_FIND_DEPOT;
+			m_ErrorCond = cards::ERROR_ENUM_CANNOT_FIND_DEPOT;
 			throwError(collectionPkgRepoFile);
 		}
 

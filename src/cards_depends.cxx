@@ -74,8 +74,7 @@ depList * CardsDepends::readDependenciesList(itemList *m_filesList, unsigned int
 	std::string missingDep = "";
 	sprintf(fullPathfileName,"%s/Pkgfile",m_filesList->items[nameIndex]);
 	if ( ! checkFileExist(fullPathfileName) ) {
-		m_actualError = CANNOT_READ_FILE;
-		treatErrors(fullPathfileName);
+		treatErrors(cards::ERROR_ENUM_CANNOT_READ_FILE,fullPathfileName);
 	}
 #ifndef NDEBUG
 	std::cerr << fullPathfileName << std::endl;
@@ -134,8 +133,7 @@ std::vector<LevelName*>& CardsDepends::getLevel()
 {
 	if ( level() !=0 )
 	{
-		m_actualError = CANNOT_GENERATE_LEVEL;
-		treatErrors(" in level()");
+		treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL," in level()");
 	}
 
 #ifndef NDEBUG
@@ -200,8 +198,7 @@ void CardsDepends::showLevel()
 {
 	if ( level() != 0 )
 	{
-		m_actualError = CANNOT_GENERATE_LEVEL;
-		treatErrors(" in level()");
+		treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL," in level()");
 	}
 
 	if ( (m_missingDepsList.size() == 0 ) || ( m_argParser.isSet(CardsArgumentParser::OPT_IGNORE))) {
@@ -210,58 +207,58 @@ void CardsDepends::showLevel()
 		for ( auto i : m_missingDepsList ) std::cout << i << std::endl;
 	}
 }
-void CardsDepends::treatErrors(const std::string& s) const
+void CardsDepends::treatErrors(cards::ErrorEnum action, const std::string& s) const
 {
-	switch ( m_actualError )
+	switch ( action )
 	{
-		case CANNOT_CREATE_DIRECTORY:
-		case CANNOT_CREATE_FILE:
-		case CANNOT_WRITE_FILE:
-		case CANNOT_SYNCHRONIZE:
-		case CANNOT_COPY_FILE:
-		case CANNOT_RENAME_FILE:
-		case CANNOT_DETERMINE_NAME_BUILDNR:
-		case WRONG_ARCHITECTURE:
-		case EMPTY_PACKAGE:
-		case CANNOT_FORK:
-		case WAIT_PID_FAILED:
-		case DATABASE_LOCKED:
-		case CANNOT_LOCK_DIRECTORY:
-		case CANNOT_REMOVE_FILE:
-		case CANNOT_RENAME_DIRECTORY:
-		case OPTION_ONE_ARGUMENT:
-		case INVALID_OPTION:
-		case OPTION_MISSING:
-		case TOO_MANY_OPTIONS:
-		case ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
-		case PACKAGE_ALLREADY_INSTALL:
-		case PACKAGE_NOT_INSTALL:
-		case PACKAGE_NOT_PREVIOUSLY_INSTALL:
-		case LISTED_FILES_ALLREADY_INSTALLED:
-		case PKGADD_CONFIG_LINE_TOO_LONG:
-		case PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS:
-		case PKGADD_CONFIG_UNKNOWN_ACTION:
-		case PKGADD_CONFIG_UNKNOWN_EVENT:
-		case CANNOT_COMPILE_REGULAR_EXPRESSION:
-		case NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE:
-		case CANNOT_OPEN_FILE:
-		case CANNOT_FIND_FILE:
-		case CANNOT_PARSE_FILE:
+		case cards::ERROR_ENUM_CANNOT_CREATE_DIRECTORY:
+		case cards::ERROR_ENUM_CANNOT_CREATE_FILE:
+		case cards::ERROR_ENUM_CANNOT_WRITE_FILE:
+		case cards::ERROR_ENUM_CANNOT_SYNCHRONIZE:
+		case cards::ERROR_ENUM_CANNOT_COPY_FILE:
+		case cards::ERROR_ENUM_CANNOT_RENAME_FILE:
+		case cards::ERROR_ENUM_CANNOT_DETERMINE_NAME_BUILDNR:
+		case cards::ERROR_ENUM_WRONG_ARCHITECTURE:
+		case cards::ERROR_ENUM_EMPTY_PACKAGE:
+		case cards::ERROR_ENUM_CANNOT_FORK:
+		case cards::ERROR_ENUM_WAIT_PID_FAILED:
+		case cards::ERROR_ENUM_DATABASE_LOCKED:
+		case cards::ERROR_ENUM_CANNOT_LOCK_DIRECTORY:
+		case cards::ERROR_ENUM_CANNOT_REMOVE_FILE:
+		case cards::ERROR_ENUM_CANNOT_RENAME_DIRECTORY:
+		case cards::ERROR_ENUM_OPTION_ONE_ARGUMENT:
+		case cards::ERROR_ENUM_INVALID_OPTION:
+		case cards::ERROR_ENUM_OPTION_MISSING:
+		case cards::ERROR_ENUM_TOO_MANY_OPTIONS:
+		case cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
+		case cards::ERROR_ENUM_PACKAGE_ALLREADY_INSTALL:
+		case cards::ERROR_ENUM_PACKAGE_NOT_INSTALL:
+		case cards::ERROR_ENUM_PACKAGE_NOT_PREVIOUSLY_INSTALL:
+		case cards::ERROR_ENUM_LISTED_FILES_ALLREADY_INSTALLED:
+		case cards::ERROR_ENUM_PKGADD_CONFIG_LINE_TOO_LONG:
+		case cards::ERROR_ENUM_PKGADD_CONFIG_WRONG_NUMBER_ARGUMENTS:
+		case cards::ERROR_ENUM_PKGADD_CONFIG_UNKNOWN_ACTION:
+		case cards::ERROR_ENUM_PKGADD_CONFIG_UNKNOWN_EVENT:
+		case cards::ERROR_ENUM_CANNOT_COMPILE_REGULAR_EXPRESSION:
+		case cards::ERROR_ENUM_NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE:
+		case cards::ERROR_ENUM_CANNOT_OPEN_FILE:
+		case cards::ERROR_ENUM_CANNOT_FIND_FILE:
+		case cards::ERROR_ENUM_CANNOT_PARSE_FILE:
 			throw std::runtime_error("unknow error");
 			break;
-		case CANNOT_DOWNLOAD_FILE:
+		case cards::ERROR_ENUM_CANNOT_DOWNLOAD_FILE:
 			throw std::runtime_error("could not download " + s);
 			break;
-		case CANNOT_READ_FILE:
+		case cards::ERROR_ENUM_CANNOT_READ_FILE:
 			throw std::runtime_error("could not read " + s);
 			break;
-		case CANNOT_READ_DIRECTORY:
+		case cards::ERROR_ENUM_CANNOT_READ_DIRECTORY:
 			throw RunTimeErrorWithErrno("could not read directory " + s);
 			break;
-		case PACKAGE_NOT_FOUND:
+		case cards::ERROR_ENUM_PACKAGE_NOT_FOUND:
 			throw std::runtime_error("package " + s + " not found");
 			break;
-		case CANNOT_GENERATE_LEVEL:
+		case cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL:
 			throw std::runtime_error("cannot generate the levels" + s);
 			break;
 	}
@@ -275,8 +272,7 @@ int CardsDepends::level()
 			continue;
 		std::string prtDir = DU.dir;
 		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
-			m_actualError = CANNOT_READ_DIRECTORY;
-			treatErrors(prtDir);
+			treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY,prtDir);
 		}
 #ifndef NDEBUG
 		std::cerr << DU.dir << " " << DU.url  << std::endl;
@@ -299,8 +295,7 @@ int CardsDepends::level()
 	static unsigned  int *pNiveau = &level;
 	generate_level (m_filesList,packagesList,pNiveau);
 	if (*pNiveau == 0 ) {
-		m_actualError = CANNOT_GENERATE_LEVEL;
-		treatErrors(" in level()");
+		treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL," in level()");
 	}
 #ifndef NDEBUG
 		std::cerr << "Number of level: " << *pNiveau << std::endl;
@@ -337,14 +332,12 @@ int CardsDepends::depends()
 	for ( auto DU : config.dirUrl() ) {
 		std::string prtDir = DU.dir;
 		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
-			m_actualError = CANNOT_READ_DIRECTORY;
-			treatErrors(prtDir);
+			treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY,prtDir);
 		}
 	}
 	char * longPackageName = NULL;
 	if ( (longPackageName = getLongPackageName(m_filesList,m_packageName)) == NULL) {
-		m_actualError = PACKAGE_NOT_FOUND;
-		treatErrors(m_packageName);
+		treatErrors(cards::ERROR_ENUM_PACKAGE_NOT_FOUND,m_packageName);
 	}
 #ifndef NDEBUG
 	std::cerr << longPackageName << " " << m_packageName << std::endl;
@@ -359,8 +352,7 @@ int CardsDepends::depends()
 	static unsigned int *pNiveau = &level;
 	generate_level (m_filesList,packagesList,pNiveau);
 	if (*pNiveau == 0 ) {
-		m_actualError = CANNOT_GENERATE_LEVEL;
-		treatErrors(" in depends()");
+		treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL," in depends()");
 	}
 #ifndef NDEBUG
 	std::cerr << "Number of level: " << *pNiveau << std::endl;
@@ -418,14 +410,12 @@ int CardsDepends::deptree()
 	for ( auto DU : config.dirUrl() ) {
 		std::string prtDir = DU.dir;
 		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
-			m_actualError = CANNOT_READ_DIRECTORY;
-			treatErrors(prtDir);
+			treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY,prtDir);
 		}
 	}
 	char* longPackageName = NULL;
 	if ( (longPackageName = getLongPackageName(m_filesList,m_packageName)) == NULL) {
-		m_actualError = PACKAGE_NOT_FOUND;
-		treatErrors(m_packageName);
+		treatErrors(cards::ERROR_ENUM_PACKAGE_NOT_FOUND,m_packageName);
 	}
 
 	for (unsigned int nInd=0;nInd <m_filesList->count;nInd++) {
@@ -483,8 +473,7 @@ int CardsDepends::deptree()
 								+ "/" + dir->d_name + "/" + name + ".deps";
 						if (checkFileExist(depFile)) {
 								if (parseFile(depsPackagesList,depFile.c_str()) != 0 ) {
-									m_actualError = CANNOT_READ_FILE;
-									treatErrors(depFile);
+									treatErrors(cards::ERROR_ENUM_CANNOT_READ_FILE,depFile);
 								}
 						} else {
 							FileDownload DepsPort(remoteUrl + "/" + dirName  + "/" + name + ".deps",
@@ -492,8 +481,7 @@ int CardsDepends::deptree()
 					name + ".deps",
 					false);
 							if (parseFile(depsPackagesList,depFile.c_str()) != 0 ) {
-								m_actualError = CANNOT_READ_FILE;
-								treatErrors(depFile);
+								treatErrors(cards::ERROR_ENUM_CANNOT_READ_FILE,depFile);
 							}
 						}
 					}

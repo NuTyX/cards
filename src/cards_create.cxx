@@ -49,7 +49,7 @@ void Cards_create::createBinaries(const char *configFileName,
 	std::cout << "create of " << packageName << std::endl;
 	std::string pkgdir = getPortDir(packageName);
 	if (pkgdir == "" ) {
-		m_actualError = PACKAGE_NOT_FOUND;
+		m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_FOUND;
 		treatErrors(packageName);
 	}
 	std::string timestamp;
@@ -60,14 +60,14 @@ void Cards_create::createBinaries(const char *configFileName,
 
 	if ( config.logdir() != "" ) {
 		if ( ! createRecursiveDirs(config.logdir()) ) {
-			m_actualError = CANNOT_CREATE_DIRECTORY;
+			m_actualError = cards::ERROR_ENUM_CANNOT_CREATE_DIRECTORY;
 			treatErrors(config.logdir());
 		}
 		std::string logFile = config.logdir() + "/" + packageName + ".log";
 		unlink( logFile.c_str() );
 		fdlog = open(logFile.c_str(),O_APPEND | O_WRONLY | O_CREAT, 0666 );
 		if ( fdlog == -1 ) {
-			m_actualError = CANNOT_OPEN_FILE;
+			m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
 			treatErrors(logFile);
 		}
 	}
@@ -131,7 +131,7 @@ void Cards_create::createBinaries(const char *configFileName,
 	}
 	if (result > 0) {
 		s += NORMAL;
-		m_actualError = CANNOT_PARSE_FILE;
+		m_actualError = cards::ERROR_ENUM_CANNOT_PARSE_FILE;
 		treatErrors("Pkgfile: " + s);
 	} 
 	if ( config.logdir() != "" ) {
@@ -147,7 +147,7 @@ void Cards_create::createBinaries(const char *configFileName,
 
 	std::set<std::string> listOfPackages;
 	if (findDir(listOfPackages, pkgdir) != 0) {
-		m_actualError = CANNOT_READ_DIRECTORY;
+		m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
 		treatErrors(pkgdir);
 	}
 
@@ -196,7 +196,7 @@ void Cards_create::parseArguments()
 		m_root=m_root+"/";
 
 	if (getuid()) {
-		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+		m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
 }

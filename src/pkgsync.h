@@ -75,7 +75,7 @@ private:
 	std::string m_repoFile;
 	std::string m_root;
 	std::string m_configFile;
-	error m_actualError;
+	cards::ErrorEnum m_actualError;
 
 	
 };
