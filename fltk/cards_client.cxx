@@ -124,7 +124,7 @@ namespace cards
 
             if (!checkPackageNameExist(pack))
             {
-                m_actualError = PACKAGE_NOT_INSTALL;
+                m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_INSTALL;
                 treatErrors(pack);
             }
             if (basePackagesList.find(pack) != basePackagesList.end())
@@ -140,9 +140,9 @@ namespace cards
     /// Fill m_dependenciesList with LocalPackageList
     void CClient::getLocalePackagesList()
     {
-        if (m_config.group.empty()) return;
+        if (m_config.groups().empty()) return;
         std::set<std::string> tmpList;
-        for ( auto i :  m_config.group )
+        for ( auto i :  m_config.groups() )
         {
             for ( auto j :m_dependenciesList )
             {
@@ -167,41 +167,23 @@ namespace cards
 
     void CClient::progressInfo()
     {
-        int Value=0;
-        static unsigned int j = 0;
-        int i;
-        switch ( m_actualAction )
-        {
-			case DB_OPEN_RUN:
+			int Value=0;
+			static unsigned int j = 0;
+			int i;
+			switch ( m_actualAction )
+			{
+			case cards::ACTION_ENUM_DB_OPEN_RUN:
 			{
 				i = j / ( getListOfPackagesNames("") / 100);
 				Value = i;
 				j++;
 				break;
 			}
-            case PKG_INSTALL_RUN:
-            {
-                if (getFilesNumber() > 100)
-                {
-                    i= getInstalledFilesNumber() / ( getFilesNumber() /100);
-                    Value = i;
-                } else {
-					Value = j;
-				}
-                j++;
-                break;
-            }
-            case RM_PKG_FILES_START:
-            {
-                j = 0;
-                break;
-			}
-			case RM_PKG_FILES_RUN:
+			case cards::ACTION_ENUM_PKG_INSTALL_RUN:
 			{
-				unsigned int l = getFilesList().size();
-				if ( l > 100 )
+				if (getFilesNumber() > 100)
 				{
-					i = j / ( l / 100);
+					i= getInstalledFilesNumber() / ( getFilesNumber() /100);
 					Value = i;
 				} else {
 					Value = j;
@@ -209,12 +191,30 @@ namespace cards
 				j++;
 				break;
 			}
-        }
-        for (CClientEvents* it : m_arrCallback)
-        {
-            it->OnProgressInfo(Value);
-        }
-    }
+			case cards::ACTION_ENUM_RM_PKG_FILES_START:
+			{
+				j = 0;
+				break;
+			}
+			case cards::ACTION_ENUM_RM_PKG_FILES_RUN:
+			{
+					unsigned int l = getFilesList().size();
+					if ( l > 100 )
+					{
+						i = j / ( l / 100);
+						Value = i;
+					} else {
+						Value = j;
+					}
+					j++;
+					break;
+				}
+			}
+			for (CClientEvents* it : m_arrCallback)
+			{
+				it->OnProgressInfo(Value);
+			}
+		}
 
     // Add a nex suscriber to the callback event list
     void CClient::subscribeToEvents(CClientEvents* pCallBack)

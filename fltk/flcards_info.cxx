@@ -36,17 +36,17 @@ void Flcards_info::progressInfo()
 	n = getListOfPackagesNames("");
 	switch ( m_actualAction )
 	{
-		case DB_OPEN_START:
+		case cards::ACTION_ENUM_DB_OPEN_START:
 			m_progressBar->value(0);
 			break;
-		case DB_OPEN_RUN:
+		case cards::ACTION_ENUM_DB_OPEN_RUN:
 			if (n >100) {
 				i = j / ( n / 100);
 				m_progressBar->value(i);
 			}
 			j++;
 			break;
-		case DB_OPEN_END:
+		case cards::ACTION_ENUM_DB_OPEN_END:
 				m_progressBar->value(100);
 				break;
 	}
