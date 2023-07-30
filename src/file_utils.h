@@ -25,6 +25,7 @@
 
 #include "md5.h"
 #include "string_utils.h"
+#include "conf.h"
 
 #include <utime.h>
 #include <dirent.h>
@@ -66,26 +67,6 @@ struct DirUrl {
 	std::string url;
 };
 
-struct Config {
-	Config() {}
-	std::string hostname;
-	std::string database;
-	std::string username;
-	std::string password;
-	std::string socket;
-	std::string collection;
-	std::string name;
-	std::string version;
-	std::string arch;
-	std::string url;
-	std::string logdir;
-	std::vector<std::string> group;
-	std::vector<DirUrl> dirUrl;
-	std::vector<std::string> baseDir;
-	std::vector<std::string> archs;
-};
-
-int getConfig(const char *fileName, Config& config);
 void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmemb);
 std::string trimFileName(const std::string& filename);
 time_t getEpochModifyTimeFile(const std::string& filename);

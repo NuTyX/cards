@@ -147,6 +147,7 @@ public:
 
 	virtual void printHelp() const {};
 
+	virtual void progressInfo();
 	virtual void progressInfo(cards::ActionEnum action);
 	virtual void treatErrors(const std::string& s) const;
 
@@ -261,6 +262,7 @@ protected:
 
 	std::set<std::pair<std::string,std::set<std::string> > > m_listOfPackagesWithDeps;
 
+	cards::ActionEnum m_actualAction;
 	cards::ErrorEnum m_actualError;
 
 private:

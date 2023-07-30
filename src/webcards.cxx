@@ -144,7 +144,7 @@ string::size_type parseArguments(arguments_t &arguments)
 	set<string> listOfArguments;
 	char * pArgument = getenv ("QUERY_STRING");
 	string::size_type pos;
-	listOfArguments = parseDelimitedSetList(pArgument,'&');
+	listOfArguments = parseDelimitedSetList(pArgument,"&");
 	arguments.docName="index";
 	for ( auto i : listOfArguments) {
 		pos = i.find("arch=");
@@ -279,14 +279,14 @@ content_t getContent(std::set<string>& list)
 contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 {
 	string search = arguments.packageSearch;
-	vector<string> v_search = parseDelimitedList(search, '%');
+	vector<string> v_search = parseDelimitedVectorList(search, "%");
 	for (auto i : v_search ) {
 		if ( i.size() > 0) {
 			search = i;
 			break;
 		}
 	}
-	v_search = parseDelimitedList(search, '+');
+	v_search = parseDelimitedVectorList(search, "+");
 	for (auto i : v_search ) {
 		if ( i.size() > 0) {
 			search = i;
@@ -343,7 +343,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 					continue;
 				}
 				set<string> groupList;
-				groupList = parseDelimitedSetList(j.group,' ');
+				groupList = parseDelimitedSetList(j.group," ");
 				for ( auto k : groupList ) {
 					if ( convertToLowerCase(search) == k ) {
 						string name = j.basePackageName
@@ -353,7 +353,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 					}
 				}
 				set<string> aliasList;
-				aliasList = parseDelimitedSetList(j.alias,' ');
+				aliasList = parseDelimitedSetList(j.alias," ");
 				for ( auto k : aliasList ) {
 					if ( convertToLowerCase(search) == k ) {
 						string name = j.basePackageName;

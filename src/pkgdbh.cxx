@@ -198,9 +198,14 @@ void Pkgdbh::treatErrors(const std::string& s) const
 }
 void Pkgdbh::progressInfo(cards::ActionEnum action)
 {
+	m_actualAction = action;
+	progressInfo();
+}
+void Pkgdbh::progressInfo()
+{
 	using namespace cards;
   static int j=0;
-  switch ( action )
+  switch (m_actualAction)
   {
 		case ACTION_ENUM_PKG_DOWNLOAD_START:
 			break;

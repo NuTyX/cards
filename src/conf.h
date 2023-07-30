@@ -21,6 +21,10 @@ public:
 
 	std::string version();
 	std::string url();
+	std::string hostname();
+	std::string username();
+	std::string password();
+	std::string database();
 	std::string arch();
 	std::string logdir();
 	std::vector<std::string> groups();

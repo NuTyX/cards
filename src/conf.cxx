@@ -183,7 +183,22 @@ std::string Conf::url()
 {
 	return m_url;
 }
-
+std::string Conf::hostname()
+{
+	return m_hostname;
+}
+std::string Conf::username()
+{
+	return m_username;
+}
+std::string Conf::password()
+{
+	return m_password;
+}
+std::string Conf::database()
+{
+	return m_database;
+}
 std::string Conf::version()
 {
 	return m_version;

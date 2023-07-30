@@ -23,16 +23,16 @@ namespace Sql
 {
 mysql::mysql(const char *configFileName)
 {
-	getConfig(configFileName,mysqlConfig);
+	cards::Conf mysqlConfig(configFileName);
 	m_socket=NULL;
 
 	m_connection = mysql_init(NULL);
 	mysql_options(m_connection, MYSQL_INIT_COMMAND, "SET NAMES utf8");	
 	mysql_real_connect(m_connection,
-		mysqlConfig.hostname.c_str(),
-		mysqlConfig.username.c_str(),
-		mysqlConfig.password.c_str(),
-		mysqlConfig.database.c_str(),
+		mysqlConfig.hostname().c_str(),
+		mysqlConfig.username().c_str(),
+		mysqlConfig.password().c_str(),
+		mysqlConfig.database().c_str(),
 		m_port_no,
 		m_socket,
 		m_opt);

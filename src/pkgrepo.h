@@ -268,7 +268,7 @@ protected:
 	std::vector<PortFilesList> m_portFilesList;
 
 	std::string m_configFileName;
-	Config m_config;
+	cards::Conf m_config;
 
 	std::vector<PortsDirectory> m_portsDirectoryList;
 

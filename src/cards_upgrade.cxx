@@ -47,10 +47,15 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		m_actualError = cards::ERROR_ENUM_CANNOT_FIND_DEPOT;
 		treatErrors("");
 	}
-	if (!m_config.group.empty()) {
+#ifndef NDEBUG
+	for ( auto j :  m_config.groups() ) {
+		std::cout << j << std::endl;
+	}
+#endif
+	if (!m_config.groups().empty()) {
 		std::set<std::string> tmpList;
 		for (auto i: m_listOfPackages) {
-			for ( auto j :  m_config.group ) {
+			for ( auto j :  m_config.groups() ) {
 					std::string packageName  = getBasePackageName(i.first) + "." + j;
 					if ( i.first == packageName )
 						continue;

@@ -53,8 +53,8 @@ void Pkgrepo::parseCollectionPkgRepoFile()
 {
 	if (m_parsePkgRepoCollectionFile)
 		return;
-	cards::Conf config(m_configFileName);
-	for (auto i : config.dirUrl()) {
+	cards::Conf m_config(m_configFileName);
+	for (auto i : m_config.dirUrl()) {
 		PortsDirectory portsDirectory;
 		portsDirectory.dir = i.dir;
 		portsDirectory.url = i.url;
@@ -192,8 +192,8 @@ void Pkgrepo::parseCollectionDirectory()
 {
 	if (m_parseCollectionDirectory)
 		return;
-	cards::Conf config(m_configFileName);
-	for (auto i : config.dirUrl()) {
+	cards::Conf m_config(m_configFileName);
+	for (auto i : m_config.dirUrl()) {
 		// We don't want to check the folders which cannot sync with any mirror
 		if ( i.url.size() > 0 )
 			continue;

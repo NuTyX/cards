@@ -22,8 +22,8 @@
 //
 
 #include "file_utils.h"
-
-int getConfig(const char *fileName, Config& config)
+/*
+int getConfig(const char *fileName, cards::Conf& config)
 {
 	FILE* fp = fopen(fileName, "r");
 	if (!fp)
@@ -63,7 +63,7 @@ int getConfig(const char *fileName, Config& config)
 					DU.dir = stripWhiteSpace(val);
 					DU.url = "";
 				}
-				config.dirUrl.push_back(DU);
+				config.dirUrl().push_back(DU);
 			}
 			if (key == "logdir") {
 				config.logdir = val;
@@ -122,7 +122,7 @@ int getConfig(const char *fileName, Config& config)
 	}
 	return 0;
 }
-
+*/
 void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmemb)
 {
   void * mvar;
