@@ -40,19 +40,6 @@ mainWindow::mainWindow() :
     size_range(700,500,0,0);
     m_config = new Fl_Preferences(Fl_Preferences::USER,"nutyx","flcards");
 
-    m_search = new Fl_Input(MARGIN+560, MARGIN+5, 300, 30, "Search...");
-    m_search->labelfont(2);
-    m_search->color(FL_WHITE);
-    m_search->callback(&onWindowEvent,SEARCH_CHANGE);
-    m_search->when(FL_WHEN_CHANGED);
-/*
-	m_console = new Fl_Text_Display(MARGIN, 700, w()-MARGIN*2, 200-MARGIN, "Cards operation");
-	m_consoleBuff = new Fl_Text_Buffer();
-	m_console->buffer(m_consoleBuff);
-	m_console->color(FL_GRAY);
-	m_console->textcolor(FL_BLACK);
-	m_console->labeltype(FL_NO_LABEL );
-*/
     //Creation of the Sync Button
     m_btnSync = new Fl_Button(MARGIN, MARGIN, 100, 40, "Sync");
     m_btnSync->callback(&onWindowEvent,BTN_SYNC);
@@ -61,15 +48,7 @@ mainWindow::mainWindow() :
     m_btnApply = new Fl_Button(MARGIN+120, MARGIN, 100, 40, "Go !");
     m_btnApply->deactivate(); // Disabled by default until a modification is pending
     m_btnApply->callback(&onWindowEvent,BTN_APPLY);
-/*
-    //Creation of the Install Button
-    m_btnInstall = new Fl_Button(MARGIN+220, MARGIN, 100, 40, "Install");
-    m_btnInstall->callback(&onWindowEvent,BTN_INSTALL);
 
-    //Creation of the Delete Button
-    m_btnRemove = new Fl_Button(MARGIN+320, MARGIN, 100, 40, "Remove");
-    m_btnRemove->callback(&onWindowEvent,BTN_REMOVE);
-*/
     //Default Tab size and position
     int TabLeftCoord = MARGIN;
 	int TabWidth = w()-MARGIN*3;
@@ -81,31 +60,19 @@ mainWindow::mainWindow() :
         "All available packages");
     resizable(m_tablePackages);
 
-/*
-	m_tabs = new Fl_Tabs(TabLeftCoord,MARGIN +50 , TabWidth,h()-325);
-    {
-        m_grpPackage = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"All Packages");
-        {
-            m_tablePackages = reinterpret_cast<TableBase*>(new TablePackage(TabLeftCoord, MARGIN+80, TabWidth, h()-330));
-            resizable(m_tablePackages);
-        }
-        m_grpPackage->end();
-        m_grpCollection = new Fl_Group(TabLeftCoord,MARGIN+80,TabWidth,h()-330,"Set of Packages");
-        {
-            m_tableCollections = reinterpret_cast<TableBase*>(new TableCollection(TabLeftCoord, MARGIN+80, TabWidth, h()-330));
-            resizable (m_tableCollections);
-        }
-        m_grpCollection->end();
-        if (pInstaller) m_tabs->value(m_grpCollection);
-    }
-    m_tabs->end();
-*/
     m_info = new Fl_Text_Display (MARGIN, 700, TabWidth, 190-MARGIN,"Package Information");
     m_infoBuff = new Fl_Text_Buffer();
     m_info->buffer(m_infoBuff);
-	m_info->color(FL_GRAY0);
-	m_info->textcolor(FL_WHITE);
-	m_info->textfont(FL_COURIER);
+    m_info->color(FL_GRAY0);
+    m_info->textcolor(FL_WHITE);
+    m_info->textfont(FL_COURIER);
+
+    m_search = new Fl_Input(MARGIN+560, MARGIN+5, 300, 30, "Search...");
+    m_search->labelfont(2);
+    m_search->color(FL_WHITE);
+    m_search->when(FL_WHEN_CHANGED);
+    m_search->callback(&onWindowEvent,SEARCH_CHANGE);
+
     m_cards = CWrapper::instance();
     m_cards->subscribeToEvents(this);
     //_log->log(_("FlCards use ") + _cards->getCardsVersion());
