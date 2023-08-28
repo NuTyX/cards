@@ -28,7 +28,6 @@
 // Project Includes
 #include "pixmaps/flcards.xpm"
 #include "table_package.h"
-#include "table_collection.h"
 #include "cards_wrapper.h"
 #include "progressbox.h"
 #include "cards_log.h"
@@ -98,8 +97,6 @@ protected:
 private:
     void SaveConfig();
     TableBase* m_tablePackages;
-    TableBase* m_tableCollections;
-    //PackList* _packList;
     Fl_Input* m_search;
     Fl_Text_Display* m_console;
     Fl_Text_Display* m_info;
@@ -109,8 +106,6 @@ private:
     Fl_Button* m_btnApply;
     Fl_Button* m_btnInstall;
     Fl_Button* m_btnRemove;
-    Fl_Group* m_grpPackage;
-    Fl_Group* m_grpCollection;
     Fl_Tabs* m_tabs;
     cards::CWrapper* m_cards;
     Fl_Preferences* m_config;

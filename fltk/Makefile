@@ -29,7 +29,6 @@ FLOBJECTS = cards_event_handler.o \
 	    cards_wrapper.o \
 	    table_base.o \
 	    table_package.o \
-	    table_collection.o \
 	    progressbox.o \
 	    mainWindow.o \
 	    flcards.o
@@ -42,7 +41,6 @@ flcards: .flcards_depend $(FLOBJECTS)
 	echo "$@ is ready"
 
 clean:
-	rm flcards.o mainWindow.o table_base.o table_package.o table_collection.o cards_wrapper.o cards_client.o cards_event_handler.o cards_log.o progressbox.o
 	rm -fv .flcards_depend
 	rm -fv $(FLOBJECTS)
 	rm -fv flcards
