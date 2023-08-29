@@ -176,43 +176,48 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
             if (m_rowdata[pRow].data!=nullptr)
             {
                 cards::Cache* pack = reinterpret_cast<cards::Cache*>(m_rowdata[pRow].data);
-                if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
+                if ( Fl::event() == FL_RELEASE && Fl::event_button() == 1 )
                 {
-                    Fl_Menu_Item rclick_menu[] = {
-                        { "Install" },
-                        { "Remove" },
-                        { "Cancel" },
-                        { 0 }
-                    };
 #ifndef NDEBUG
                     std::cout << pack->name()
                         << " : "
-                        << (pack->toinstall() ? "To install" : "Nothing" )
+                        << (!pack->installed() ? "To install" : "Nothing" )
                         << std::endl;
                     std::cout << pack->name()
                         << " : "
-                        << (pack->toremove() ? "To remove" : "Nothing" )
+                        << (pack->installed() ? "To remove" : "Nothing" )
                         << std::endl;
 #endif // NDEBUG
-                    if (pack->installed())
-                    {
-                        rclick_menu[0].deactivate();
-                        if (pack->toremove())
-                        {
-                            rclick_menu[1].deactivate();
-                        }
-                        else rclick_menu[2].deactivate();
-                    }
-                    if (!pack->installed())
-                    {
-                        rclick_menu[1].deactivate();
-                        if (pack->toinstall())
-                        {
-                            rclick_menu[0].deactivate();
-                        }
-                        else rclick_menu[2].deactivate();
-                    }
-                    const Fl_Menu_Item *m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+                    const Fl_Menu_Item *m;
+					if (pack->installed() && !pack->toremove()) {
+						Fl_Menu_Item rclick_menu[] = {
+							{ "Remove" },
+							{ 0 }
+						};
+						m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+					}
+					if (!pack->installed() && !pack->toinstall()) {
+						Fl_Menu_Item rclick_menu[] = {
+							{ "Install" },
+							{ 0 }
+						};
+						m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+					}
+					if (pack->toremove()) {
+						Fl_Menu_Item rclick_menu[] = {
+							{ "Cancel Remove" },
+							{ 0 }
+						};
+						m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+					}
+					if (pack->toinstall()) {
+						Fl_Menu_Item rclick_menu[] = {
+							{ "Cancel Install" },
+							{ 0 }
+						};
+						m = rclick_menu->popup(Fl::event_x(), Fl::event_y(), 0, 0, 0);
+					}
+
                     if ( !m )
                     {
                         return;
@@ -242,7 +247,8 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
 #endif // NDEBUG
                         }
                     }
-                    else if ( strcmp(m->label(), "Cancel") == 0 )
+                    else if ( ( strcmp(m->label(), "Cancel Install") == 0 ) ||
+								( strcmp(m->label(), "Cancel Remove") == 0 ) )
                     {
                         if (pack->toinstall()) pack->unsetStatus(cards::STATUS_ENUM_TO_INSTALL);
                         if (pack->toremove()) pack->unsetStatus(cards::STATUS_ENUM_TO_REMOVE);
