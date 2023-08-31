@@ -22,7 +22,6 @@
  *
  */
 
-#include "version.h"
 #include "cards_wrapper.h"
 
 
@@ -379,7 +378,7 @@ namespace cards
 
     std::string CWrapper::getCardsVersion()
     {
-        return std::string(APP_NAME_VERSION_STR);
+        return std::string(VERSION);
     }
 
     /** Check if the application is curently running as root
