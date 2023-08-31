@@ -25,7 +25,6 @@
 #ifndef  CARDS_WRAPPER_H
 #define  CARDS_WRAPPER_H
 
-#include "console_forwarder.h"
 #include "cards_client.h"
 #include "cards_event_handler.h"
 #include "cards_log.h"

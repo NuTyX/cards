@@ -124,6 +124,7 @@ void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, 
 {
     std::string s = "";
     if ( (R < (int)m_rowdata.size()) && (C < (int)m_rowdata[R].cols.size()) )
+		//s = "";
         s = m_rowdata[R].cols[C];
     switch (context)
     {
@@ -146,15 +147,15 @@ void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, 
                     cards::Cache* pack=reinterpret_cast<cards::Cache*>(m_rowdata[R].data);
                     if (pack->installed())
                     {
-                        fl_draw_pixmap(download_xpm,X+5,Y);
+                        fl_draw_pixmap(download_xpm,X+5,Y+5);
                     }
-                    else if (pack->toremove())
+                    if (pack->toremove())
                     {
-                        fl_draw_pixmap(deleted_xpm,X+5,Y);
+                        fl_draw_pixmap(deleted_xpm,X+5,Y+5);
                     }
-                    else if (pack->installed())
+                    if (pack->toinstall())
                     {
-                        fl_draw_pixmap(checked_xpm,X+5,Y);
+                        fl_draw_pixmap(checked_xpm,X+5,Y+5);
                     }
                 }
                 // Border
