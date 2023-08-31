@@ -57,11 +57,13 @@ void TablePackage::refresh_table()
         // Add a new row
         Row newrow;
         newrow.data=S;
-        if(S->installed())
-        {
-            newrow.cols.push_back("I");
-        }
-        else newrow.cols.push_back("U");
+        if (S->toinstall())
+            newrow.cols.push_back("A");
+        else if (S->toremove())
+            newrow.cols.push_back("B");
+        else if(S->installed())
+            newrow.cols.push_back("C");
+        else newrow.cols.push_back("D");
         newrow.cols.push_back(S->name());
         newrow.cols.push_back(S->version());
         newrow.cols.push_back(S->description());
@@ -124,7 +126,6 @@ void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, 
 {
     std::string s = "";
     if ( (R < (int)m_rowdata.size()) && (C < (int)m_rowdata[R].cols.size()) )
-		//s = "";
         s = m_rowdata[R].cols[C];
     switch (context)
     {

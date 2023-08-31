@@ -78,7 +78,8 @@ TableBase::TableBase(int x, int y, int w, int h, const char *l)
 /// Sort a column up or down
 void TableBase::sort_column(int col, int reverse)
 {
-    sort(m_rowdata.begin(), m_rowdata.end(), SortColumn(col, reverse));
+	 // FIXME find out why std prefix is not needed here
+    std::sort(m_rowdata.begin(), m_rowdata.end(), SortColumn(col, reverse));
     redraw();
 }
 
@@ -255,6 +256,7 @@ void TableBase::setFilter(const std::string& pValue)
 
 void TableBase::OnJobListChange(const CEH_RC rc)
 {
+    refresh_table();
     redraw();
 }
 
