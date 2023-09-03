@@ -1247,10 +1247,10 @@ update_footprint() {
 build_needed() {
 	local FILE RESULT
 	RESULT="yes"
-	if [ -f $TARGET ]; then 
+	if [ -f $PKGMK_PACKAGE_DIR/$TARGET ]; then
 		RESULT="no"
 		FILE="$(get_filename $PKGMK_PKGFILE)"
-		if [ ! -e $FILE ] || [ ! $TARGET -nt $FILE ]; then
+		if [ ! -e $FILE ] || [ ! $PKGMK_PACKAGE_DIR/$TARGET -nt $FILE ]; then
 			RESULT="yes"
 		fi
 	fi
@@ -1535,13 +1535,12 @@ main() {
 		PKGMK_IGNORE_RUNTIMEDEPS="yes"
 	fi
 
-	local FILE TARGET DIR NAME
+	local FILE TARGET NAME
 
 	release=1
 	NAME="$(basename $PKGMK_ROOT)"
 
-	DIR="$(dirname $PKGMK_ROOT)"
-	COLLECTION="$(basename $DIR)"
+	COLLECTION="$(basename $(dirname $PKGMK_ROOT))"
 	if [ -z $PKGMK_COLLECTIONS ]; then
 		if [ $COLLECTION != "base" ]; then
 			case $COLLECTION in
@@ -1585,6 +1584,11 @@ main() {
 		error "Variable 'name' not the same as port name (directory)."
 		exit $E_PKGFILE
 	fi
+	check_directory ../../../$COLLECTION/$name
+	pushd ../../../$COLLECTION/$name > /dev/null
+	readonly PKGMK_PACKAGE_DIR="$PWD"
+	popd > /dev/null
+
 
 	[ ! -z $pkgver ] && version=$pkgver
 	[ ! -z $pkgrel ] && release=$pkgrel
@@ -1680,6 +1684,7 @@ main() {
 		exit 0
 	fi
 	# Print all informations
+	info "PKGMK_PACKAGE_DIR: $PKGMK_PACKAGE_DIR"
 	info "PKGMK_INSTALL: $PKGMK_INSTALL"
 	info "PKGMK_WORK_DIR: $PKGMK_WORK_DIR"
 	info "PKGMK_SOURCE_DIR: $PKGMK_SOURCE_DIR"
@@ -1812,7 +1817,6 @@ export LC_ALL=POSIX
 readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
 readonly PKGMK_ROOT="$PWD"
-readonly PKGMK_PACKAGE_DIR="$PWD"
 
 PKGMK_BUILDVER="$(date +%s)"
 PKGMK_PACKAGE_EXT="cards.tar"
