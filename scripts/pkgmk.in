@@ -1584,8 +1584,8 @@ main() {
 		exit $E_PKGFILE
 	fi
  	if [ -z $PKGMK_PACKAGE_DIR ]; then
-	 	check_directory ../../../$COLLECTION/$name
-		pushd ../../../$COLLECTION/$name > /dev/null
+	 	check_directory $PKGMK_ROOT/../../../$COLLECTION/$name
+		pushd $PKGMK_ROOT/../../../$COLLECTION/$name > /dev/null
 		readonly PKGMK_PACKAGE_DIR="$PWD"
 		popd > /dev/null
 	fi
