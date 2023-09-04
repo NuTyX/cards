@@ -1107,13 +1107,12 @@ build_package() {
 			fi
 		done
 		check_build
-		if [ "$(ls|wc -l)" != "0" ]; then
-			bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} *
-		else
+  		if [[ -z $(ls) ]]; then
 			remove_dependencies
 			error "No files found in $PKG..."
 			exit $E_BUILD
-		fi
+   		fi
+		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} *
 		if [ $? = 0 ]; then
 			BUILD_SUCCESSFUL="yes"
 			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
@@ -1584,12 +1583,12 @@ main() {
 		error "Variable 'name' not the same as port name (directory)."
 		exit $E_PKGFILE
 	fi
-	check_directory ../../../$COLLECTION/$name
-	pushd ../../../$COLLECTION/$name > /dev/null
-	readonly PKGMK_PACKAGE_DIR="$PWD"
-	popd > /dev/null
-
-
+ 	if [ -z $PKGMK_PACKAGE_DIR ]; then
+	 	check_directory ../../../$COLLECTION/$name
+		pushd ../../../$COLLECTION/$name > /dev/null
+		readonly PKGMK_PACKAGE_DIR="$PWD"
+		popd > /dev/null
+	fi
 	[ ! -z $pkgver ] && version=$pkgver
 	[ ! -z $pkgrel ] && release=$pkgrel
 	[ ! -z "$pkgdesc" ] && description=$pkgdesc
