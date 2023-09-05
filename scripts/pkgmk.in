@@ -323,7 +323,7 @@ remove_source() {
 }
 unpack_source() {
 	local FILE LOCAL_FILENAME COMMAND
-	
+
 	for FILE in ${source[@]}; do
 		LOCAL_FILENAME="$(get_filename $FILE)"
 		case $LOCAL_FILENAME in
@@ -363,12 +363,12 @@ get_packages_list() {
 }
 make_md5sum() {
 	local FILE LOCAL_FILENAMES
-	
+
 	if [ "$source" ]; then
 		for FILE in ${source[@]}; do
 			LOCAL_FILENAMES="$LOCAL_FILENAMES $(get_filename $FILE)"
 		done
-		
+
 		md5sum $LOCAL_FILENAMES | sed -e 's|  .*/|  |' | sort -k 2
 	fi
 }
@@ -385,7 +385,7 @@ check_md5sum() {
 	local FILE="$PKGMK_WORK_DIR/.tmp"
 
 	cd $PKGMK_ROOT
-	
+
 	if [ -f $PKGMK_MD5SUM ]; then
 		make_md5sum > $FILE.md5sum
 		sort -k 2 $PKGMK_MD5SUM > $FILE.md5sum.orig
@@ -419,7 +419,7 @@ check_md5sum() {
 			info "Md5sum not found."
 			exit $E_MD5
 		fi
-		
+
 		warning "Md5sum not found, creating new."
 		make_md5sum > $PKGMK_MD5SUM
 	fi
@@ -434,9 +434,9 @@ check_md5sum() {
 }
 strip_files() {
 	local FILE FILTER
-	
+
 	cd $PKG
-	
+
 	if [ -f $PKGMK_ROOT/$PKGMK_NOSTRIP ]; then
 		FILTER="grep -v -f $PKGMK_ROOT/$PKGMK_NOSTRIP"
 	else
@@ -460,13 +460,13 @@ compress_manpages() {
 	local FILE DIR TARGET
 
 	cd $PKG
-	
+
 	find . -type f -path "*/share/man*/*" | while read FILE; do
 		if [ "$FILE" = "${FILE%%.gz}" ]; then
 			gzip -9 "$FILE"
 		fi
 	done
-	
+
 	find . -type l -path "*/share/man*/*" | while read FILE; do
 	TARGET="$(readlink -n "$FILE")"
 		TARGET="${TARGET##*/}"
@@ -499,7 +499,7 @@ compress_manpages() {
 }
 check_footprint() {
 	local TARGET FILE="$PKGMK_WORK_DIR/.tmp"
-	
+
 	cd $PKGMK_PACKAGE_DIR
 	if [ -z $TARGETS ]; then
 		get_packages_list
@@ -545,7 +545,7 @@ make_work_dir() {
 	pkgdir=$PKG
 	srcdir=$SRC
 	umask 022
-	
+
 	cd $PKGMK_ROOT
 	[ "$PKGMK_PACK_ONLY" == "yes" ] ||  rm -rf $PKGMK_WORK_DIR
 	mkdir -p $SRC $PKG
@@ -618,7 +618,7 @@ pack_devel() {
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
-				
+
 			fi
 		done
 	done
@@ -1031,7 +1031,7 @@ build_package() {
 		if [ "$PKGMK_NO_STRIP" = "no" ]; then
 			strip_files
 		fi
-		
+
 		compress_manpages
 
 		cd $PKG
@@ -1167,17 +1167,17 @@ install_package() {
 	for TARGET in ${TARGETS[@]}; do
 		if [ "$(get_package_arch $TARGET)" = "$PKGMK_ARCH" ] || [ "$(get_package_arch $TARGET)" = "any" ]; then
 			info "Installing '$TARGET'."
-	
+
 			if [ "$PKGMK_INSTALL" = "install" ]; then
 				COMMAND="pkgadd $PKGMK_PACKAGE_DIR/$TARGET"
 			else
 				COMMAND="pkgadd -u $PKGMK_PACKAGE_DIR/$TARGET"
 			fi
-	
+
 			cd $PKGMK_ROOT
 			echo "$COMMAND"
 			$COMMAND
-	
+
 			if [ $? = 0 ]; then
 				info "Installing '$TARGET' succeeded."
 			else
@@ -1189,8 +1189,8 @@ install_package() {
 }
 recursive() {
 	local ARGS FILE DIR
-	[ -f $PKGMK_REPO ] && rm -v $PKGMK_REPO
-	
+#	[ -f $PKGMK_REPO ] && rm -v $PKGMK_REPO
+
 	ARGS="$(echo "$@" | sed -e "s/--recursive//g" -e "s/-r//g")"
 
 	for FILE in $(find $PKGMK_ROOT -name $PKGMK_PKGFILE | sort); do
@@ -1216,7 +1216,7 @@ clean() {
 		done
 	else
 		warning "$TARGETS not found"
-	fi	
+	fi
 	find $PKGMK_ROOT -name "*.md5sum" -exec rm -v {} \; 2> /dev/null
 	find $PKGMK_ROOT -name "*.footprint" -exec rm -v {} \; 2> /dev/null
 	unset TARGETS
@@ -1225,7 +1225,7 @@ update_footprint() {
 	cd $PKGMK_PACKAGE_DIR
 	if [ -z $TARGETS ]; then
 		get_packages_list
-		if [ -z $TARGETS ]; then		
+		if [ -z $TARGETS ]; then
 			error "Package(s) not found(s), unable to update footprint."
 			exit $E_FOOTPRINT
 		fi
@@ -1258,8 +1258,8 @@ build_needed() {
 update_collection_repo() {
 	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION \
 ALIAS GROUP CONTRIBUTORS SET CATEGORY
-	if [ -f $PKGMK_REPO ]; then
-		for i in $(tail -n +2  $PKGMK_REPO)
+	if [ -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO ]; then
+		for i in $(tail -n +2  $PKGMK_PACKAGE_DIR/$PKGMK_REPO)
 		do
 			if [ "$(echo $i|cut -d "#" -f3)" != "" ];then
 				for j in ${PKGMK_GROUPS[@]}; do
@@ -1269,7 +1269,7 @@ ALIAS GROUP CONTRIBUTORS SET CATEGORY
 				done
 			fi
 		done
-		HEAD="$(head -1 $PKGMK_REPO)"
+		HEAD="$(head -1 $PKGMK_PACKAGE_DIR/$PKGMK_REPO)"
 		if [ "${HEAD:10:1}" = "#" ]; then
 			BUILD_DATE="$(echo $HEAD|cut -d "#" -f1)"
 			EXTENSION="$(echo $HEAD|cut -d "#" -f2)"
@@ -1305,10 +1305,10 @@ ALIAS GROUP CONTRIBUTORS SET CATEGORY
 				ALIAS=""
 			fi
 
-			[ -f ../$PKGMK_REPO ] && sed -i "/#$name#/d" ../$PKGMK_REPO
+			[ -f $PKGMK_PACKAGE_DIR/../$PKGMK_REPO ] && sed -i "/#$name#/d" $PKGMK_PACKAGE_DIR/../$PKGMK_REPO
 			echo \
-"$(md5sum $PKGMK_REPO|cut -d " " -f1)#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP#$CONTRIBUTORS#$SET#$CATEGORY" \
-			>> ../$PKGMK_REPO
+"$(md5sum $PKGMK_PACKAGE_DIR/$PKGMK_REPO|cut -d " " -f1)#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP#$CONTRIBUTORS#$SET#$CATEGORY" \
+			>> $PKGMK_PACKAGE_DIR/../$PKGMK_REPO
 		fi
 	fi
 }
@@ -1331,31 +1331,31 @@ update_repo() {
 	[ -z "$categories" ] && categories="none"
 	if [ ! -z $TARGETS ]; then
 		EXT="$(get_package_extension $TARGETS)"
-		echo -n "$(get_package_builddate $TARGETS)#$EXT#$version#$release" > $PKGMK_REPO
-		echo -n "#$description#$url#$maintainer#$packager#$contributors#$set#$categories" >> .PKGREPO
-		printf "\n" >> .PKGREPO
+		echo -n "$(get_package_builddate $TARGETS)#$EXT#$version#$release" > $PKGMK_PACKAGE_DIR/$PKGMK_REPO
+		echo -n "#$description#$url#$maintainer#$packager#$contributors#$set#$categories" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO
+		printf "\n" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO
 		for TARGET in ${TARGETS[@]}; do
 			FILE="$(basename $TARGET)"
 			MD5SUM="$(md5sum $TARGET|cut -d " " -f1)"
-			echo "$MD5SUM#$(get_package_name $TARGET)#$(get_package_arch $TARGET|sed "s/-//")" >> $PKGMK_REPO
+			echo "$MD5SUM#$(get_package_name $TARGET)#$(get_package_arch $TARGET|sed "s/-//")" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO
 		done
 		for FILE in  ${name}*
 		do
 			[ ! -f "$FILE" ] && break
 			if [ "${FILE:$((${#FILE} - ${#EXT} ))}" != "$EXT" ]; then
-				echo "$(md5sum $FILE|cut -d " " -f1)#$FILE" >> $PKGMK_REPO
+				echo "$(md5sum $FILE|cut -d " " -f1)#$FILE" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO
 			fi
 		done
 	else
-		rm -f $PKGMK_REPO
+		rm -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO
 	fi
-	echo "$(md5sum $PKGMK_PKGFILE|cut -d " " -f1)#$PKGMK_PKGFILE" >> $PKGMK_REPO
+	echo "$(md5sum $PKGMK_PKGFILE|cut -d " " -f1)#$PKGMK_PKGFILE" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO
 }
 clean_repo_files() {
 	cd $PKGMK_ROOT
-	if [ -f $PKGMK_REPO ]; then
-		rm $PKGMK_REPO
-		info "Removing $PKGMK_REPO"
+	if [ -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO ]; then
+		rm $PKGMK_PACKAGE_DIR/$PKGMK_REPO
+		info "Removing $PKGMK_PACKAGE_DIR/$PKGMK_REPO"
 	fi
 }
 check_sources_uptodate() {
@@ -1657,7 +1657,7 @@ main() {
 		done
 		exit 0
 	fi
-	
+
 	if [ "$PKGMK_UPDATE_MD5SUM" = "yes" ]; then
 		download_source
 		check_file "$PKGMK_MD5SUM"
