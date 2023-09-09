@@ -1560,7 +1560,6 @@ main() {
 		recursive "$@"
 		exit 0
 	fi
-	[ ! -f $PKGMK_PKGFILE  ] && PKGMK_PKGFILE="PKGBUILD"
 
 	if [ ! -f $PKGMK_PKGFILE  ]; then
 		error "File '$PKGMK_PKGFILE' not found."
@@ -1573,28 +1572,15 @@ main() {
 	unset name
 	. $PKGMK_PKGFILE
 
-	if [ ! -z $pkgname ];then
-			name=$pkgname
-	fi
-
 	# If variable name still not define we take the directory name
 	[ -z $name ] && name=$NAME
 	if [ "$name" != "$NAME" ]; then
 		error "Variable 'name' not the same as port name (directory)."
 		exit $E_PKGFILE
 	fi
- 	if [ -z $PKGMK_PACKAGE_DIR ]; then
-	 	check_directory $PKGMK_ROOT/../../../$COLLECTION/$name
-		pushd $PKGMK_ROOT/../../../$COLLECTION/$name > /dev/null
-		readonly PKGMK_PACKAGE_DIR="$PWD"
-		popd > /dev/null
-	fi
-	[ ! -z $pkgver ] && version=$pkgver
-	[ ! -z $pkgrel ] && release=$pkgrel
-	[ ! -z "$pkgdesc" ] && description=$pkgdesc
-
 	if [ -z "$version" ]; then
-		warning "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+		error "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
+		exit $E_PKGFILE
 	fi
 	if [ "$PKGMK_SHOW_VERSION" == "yes" ]; then
 		echo "$version"
@@ -1817,6 +1803,7 @@ readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
 readonly PKGMK_ROOT="$PWD"
 
+PKGMK_PACKAGE_DIR="PWD"
 PKGMK_BUILDVER="$(date +%s)"
 PKGMK_PACKAGE_EXT="cards.tar"
 PKGMK_REPO=".PKGREPO"
