@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 #  USA.
 #
 ##
@@ -133,7 +133,7 @@ check_diff()
 	output_sorted=$(mktemp) || exit 1
 	found="no"
 
-	cards list -p|grep $BINARY_BASE|sed "s@$BINARY_BASE/@@" >> $binaries_list
+	cards list -p|grep "($BINARY_BASE)"|sed "s@($BINARY_BASE) @@" >> $binaries_list
 	list_ports >> $ports_list
 
 	for binary_package in $(cat $binaries_list | gawk '{ print $1 }'); do

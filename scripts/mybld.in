@@ -31,6 +31,9 @@ OPTIONS
       -I, --init
              Create all the necessary folder (sources, LOGS and depot).
 
+      -d, --diff
+             Check what are the outdated packages
+
       -s, --sync <package|collection>
              Synchronize all the binaries of the <package|collection>.
 
@@ -270,6 +273,17 @@ Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
 
     -I|--init)
       INIT="yes";;
+
+    -d|--diff)
+      DIFF="yes"
+      shift
+      if [ -z ${1} ]; then
+        echo "
+>>> Specify a collection/name
+"
+        exit 1
+      fi
+      PARAM+=($1);;
 
     -s|--sync)
       SYNC="yes"
@@ -659,10 +673,18 @@ $PAUSE \
 [ -z "$PACKAGES_LIST" ] || CHROOT="ncurses readline bash"
 
 if [ ! -z ${PACKAGES_LIST} ]; then
-   DEVEL="$DEVEL -a"
+   if [ "$DIFF" == "yes" ];then
+      DEVEL="$DEVEL -d"
+   else
+      DEVEL="$DEVEL -a"
+   fi
 else
   if [ -z "${PARAM[0]}" ]; then
-    DEVEL="$DEVEL -a"
+    if [ "$DIFF" == "yes" ];then
+      DEVEL="$DEVEL -d"
+    else
+      DEVEL="$DEVEL -a"
+    fi
   else
     DEVEL="$DEVEL ${PARAM[0]}"
   fi

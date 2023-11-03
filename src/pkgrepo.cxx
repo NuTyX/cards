@@ -194,7 +194,7 @@ void Pkgrepo::parseCollectionDirectory()
 		return;
 	cards::Conf m_config(m_configFileName);
 	for (auto i : m_config.dirUrl()) {
-		// We don't want to check the folders which cannot sync with any mirror
+		// We don't want to check the folders which can sync with a mirror
 		if ( i.url.size() > 0 )
 			continue;
 		PortsDirectory portsDirectory;
@@ -302,9 +302,10 @@ void Pkgrepo::parsePackagePkgfileFile()
 	std::string::size_type pos;
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
+			cards::Cache* pkg = new cards::Cache();
 			std::string pkgFile = i.dir + "/" + j.basePackageName  + "/Pkgfile";
 			if ( ! checkFileExist (pkgFile) ) {
-				j.basePackageName = "";
+				pkg->name("");
 				continue;
 			}
 			j.fileDate = getModifyTimeFile(pkgFile);
@@ -313,34 +314,37 @@ void Pkgrepo::parsePackagePkgfileFile()
 				std::cout << "You should use " << YELLOW << "ports -u" << NORMAL << " for " << i.dir << std::endl;
 				std::cerr << "Cannot read the file: " << pkgFile << std::endl
 					<< " ... continue with next" << std::endl;
-				j.basePackageName = "";
+				pkg->name("");
 				continue;
 			}
-			j.release = 1;
+			std::string baseDir = basename(const_cast<char*>(i.dir.c_str()));
+			pkg->collection(baseDir);
+			pkg->name(j.basePackageName);
+			pkg->release(1);
 			for (auto p : pkgFileContent) {
 				std::string line = stripWhiteSpace(p);
 				if ( line.substr( 0, 12 ) == "description=" ){
 					j.description = getValueBefore( getValue( line, '=' ), '#' );
-					j.description = stripWhiteSpace( j.description );
+					pkg->description(stripWhiteSpace( j.description ));
 				} else if ( line.substr( 0, 4 ) == "url=" ){
 					j.url = getValueBefore( getValue( line, '=' ), '#' );
-					j.url = stripWhiteSpace( j.url );
+					pkg->url(stripWhiteSpace( j.url ));
 				} else if ( line.substr( 0, 9 ) == "packager=" ){
 					j.packager = getValueBefore( getValue( line, '=' ), '#' );
-					j.packager = stripWhiteSpace( j.packager );
+					pkg->packager(stripWhiteSpace( j.packager ));
 				} else if ( line.substr( 0, 13 ) == "contributors=" ){
 					j.contributors = getValueBefore( getValue( line, '=' ), '#' );
-					j.contributors = stripWhiteSpace( j.contributors );
+					pkg->contributors(stripWhiteSpace( j.contributors ));
 				} else if ( line.substr( 0, 11 ) == "maintainer=" ){
 					j.maintainer = getValueBefore( getValue( line, '=' ), '#' );
-					j.maintainer = stripWhiteSpace( j.maintainer );
+					pkg->maintainer(stripWhiteSpace( j.maintainer ));
 				} else if ( line.substr( 0, 8 ) == "version=" ){
 					j.version = getValueBefore( getValue( line, '=' ), '#' );
-					j.version = stripWhiteSpace( j.version );
+					pkg->version(stripWhiteSpace( j.version ));
 				} else if ( line.substr( 0, 8 ) == "release=" ){
 					std::string release = getValueBefore( getValue( line, '=' ), '#' );
 					release = stripWhiteSpace(release );
-					j.release = atoi(release.c_str());
+					pkg->release(atoi(release.c_str()));
 				} else if ( line[0] == '#' ) {
 					while ( !line.empty() &&
 							( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
@@ -349,17 +353,18 @@ void Pkgrepo::parsePackagePkgfileFile()
 					pos = line.find(':');
 					if ( pos != std::string::npos ) {
 						if ( startsWithNoCase( line, "desc" ) ) {
-							j.description = stripWhiteSpace( getValue( line, ':' ) );
+							pkg->description(stripWhiteSpace( getValue( line, ':' ) ) );
 						} else if ( startsWithNoCase( line, "url" ) ) {
-							j.url = stripWhiteSpace( getValue( line, ':' ) );
+							pkg->url(stripWhiteSpace( getValue( line, ':' ) ) );
 						} else if ( startsWithNoCase( line, "pac" ) ) {
-							j.packager = stripWhiteSpace( getValue( line, ':' ) );
+							pkg->packager(stripWhiteSpace( getValue( line, ':' ) ) );
 						} else if ( startsWithNoCase( line, "mai" ) ) {
-							j.maintainer = stripWhiteSpace( getValue( line, ':' ) );
+							pkg->maintainer(stripWhiteSpace( getValue( line, ':' ) ) );
 						}
 					}
 				}
 			}
+			m_packagesList.insert(pkg);
 		}
 	}
 	m_parsePackagePkgfileFile = true;
@@ -422,7 +427,7 @@ std::set<std::string> Pkgrepo::getBinaryPackageList()
 					<< j.s_buildDate << " "
 					<< j.extention << std::endl ;
 #endif
-			if ( ( j.set=="none ") || (j.set.size()==0 ) || 
+			if ( ( j.set=="none ") || (j.set.size()==0 ) ||
 				 ( j.set=="none") )
 				baseDir = basename(const_cast<char*>(i.dir.c_str()));
 			else
@@ -464,7 +469,7 @@ Pkgrepo::getBinaryPackageSet()
 			pkg->name(j.basePackageName);
 			pkg->version(j.version);
 			pkg->description(j.description);
-			if ( ( j.set=="none ") || (j.set.size()==0 ) || 
+			if ( ( j.set=="none ") || (j.set.size()==0 ) ||
 				 ( j.set=="none") )
 				pkg->collection(baseDir);
 			else
@@ -513,35 +518,18 @@ unsigned int Pkgrepo::getPortsList()
 
 
 	unsigned int numberOfPorts = 0;
-	// For each defined collection
-	for (auto i : m_portsDirectoryList) {
+	for (auto j : m_packagesList) {
 		// For each directory found in this collection
-#ifndef NDEBUG
-		std::cerr << i.dir << " " << i.url << std::endl;
-#endif
-		for (auto j : i.basePackageList) {
-#ifndef NDEBUG
-			std::cerr << j.basePackageName << " "
-				<< j.description << " "
-				<< j.md5SUM << " "
-				<< j.version << " "
-				<< j.release << " "
-				<< j.s_buildDate << " "
-				<< j.extention << std::endl ;
-#endif
-			if (j.basePackageName.size() > 0) {
-				std::string baseDir = basename(const_cast<char*>(i.dir.c_str()));
-				std::cout <<  i.dir + "/"
-					+ j.basePackageName
-					<< " "
-					<< j.version
-					<< "-"
-					<< j.release
-					<< " "
-					<< j.packager << std::endl;
-				numberOfPorts++;
-			}
-		}
+		std::cout << "("
+			<< j->collection()
+			<< ") "
+			<< j->name()
+			<< " "
+			<< j->version()
+			<< "-"
+			<< j->release()
+			<<  std::endl;
+		numberOfPorts++;
 	}
 	return numberOfPorts;
 }
