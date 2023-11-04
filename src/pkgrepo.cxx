@@ -308,7 +308,7 @@ void Pkgrepo::parsePackagePkgfileFile()
 				pkg->name("");
 				continue;
 			}
-			j.fileDate = getModifyTimeFile(pkgFile);
+			pkg->fileDate(getModifyTimeFile(pkgFile));
 			std::vector<std::string> pkgFileContent;
 			if ( parseFile(pkgFileContent,pkgFile.c_str()) != 0) {
 				std::cout << "You should use " << YELLOW << "ports -u" << NORMAL << " for " << i.dir << std::endl;
@@ -317,6 +317,7 @@ void Pkgrepo::parsePackagePkgfileFile()
 				pkg->name("");
 				continue;
 			}
+			pkg->dirName(i.dir);
 			std::string baseDir = basename(const_cast<char*>(i.dir.c_str()));
 			pkg->collection(baseDir);
 			pkg->name(j.basePackageName);
@@ -540,25 +541,19 @@ bool Pkgrepo::getPortInfo(const std::string& portName)
 	parsePackagePkgfileFile();
 
 	bool found = false;
-	// For each defined collection
-	for (auto i : m_portsDirectoryList) {
-		if (i.url.size() > 0 )
-			continue;
-		// For each directory found in this collection
-		for (auto j : i.basePackageList) {
-			if ( j.basePackageName == portName ) {
-				found = true;
-				std::cout << _("Name           : ") << portName << std::endl
-					<< _("Description    : ") << j.description << std::endl
-					<< _("URL            : ") << j.url << std::endl
-					<< _("Version        : ") << j.version << std::endl
-					<< _("Release        : ") << j.release << std::endl
-					<< _("Maintainer(s)  : ") << j.maintainer << std::endl
-					<< _("Contributor(s) : ") << j.contributors << std::endl
-					<< _("Packager       : ") << j.packager << std::endl
-					<< _("Date of Pkgfile: ") << j.fileDate << std::endl
-					<< _("Local folder   : ") << i.dir << std::endl;
-			}
+	for (auto j : m_packagesList) {
+		if ( j->name() == portName ) {
+			found = true;
+			std::cout << _("Name           : ") << portName << std::endl
+				<< _("Description    : ") << j->description() << std::endl
+				<< _("URL            : ") << j->url() << std::endl
+				<< _("Version        : ") << j->version() << std::endl
+				<< _("Release        : ") << j->release() << std::endl
+				<< _("Maintainer(s)  : ") << j->maintainer() << std::endl
+				<< _("Contributor(s) : ") << j->contributors() << std::endl
+				<< _("Packager       : ") << j->packager() << std::endl
+				<< _("Date of Pkgfile: ") << j->fileDate() << std::endl
+				<< _("Local folder   : ") << j->dirName() << std::endl;
 		}
 	}
 	return found;

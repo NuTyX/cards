@@ -38,6 +38,22 @@ const std::string Cache::name()
 {
 	return m_name;
 }
+void Cache::dirName(const std::string& dirname)
+{
+	m_dirName=dirname;
+}
+const std::string Cache::dirName()
+{
+	return m_dirName;
+}
+void Cache::fileDate(const std::string& filedate)
+{
+	m_fileDate=filedate;
+}
+const std::string Cache::fileDate()
+{
+	return m_fileDate;
+}
 bool Cache::installed()
 {
 	return m_status & StatusEnum::STATUS_ENUM_INSTALLED;
