@@ -36,7 +36,8 @@ have_function() {
 get_dependencies() {
 	[ -z $PKGMK_DEPENDS ] && return
 	info "Get dependencies ..."
-	local NAME COLLECTION PKGNAME
+	local NAME COLLECTION PKGNAME DIR
+	DIR="$(dirname $PKGMK_ROOT)"
 	i=0
 	for COLLECTION in ${PKGMK_COLLECTIONS[@]}; do
 		for NAME in ${PKGMK_DEPENDS[@]}; do
