@@ -40,102 +40,91 @@ Cards_remove::Cards_remove(const std::string& commandName,
 
 	cards::Conf config(configFileName);
 
-	if (!m_argParser.isSet(CardsArgumentParser::OPT_ALL)){
-		std::set<std::string> basePackagesList;
-		for (auto i : config.baseDir()) {
-			if ( findDir(basePackagesList, i) != 0 ) {
-				m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
-				treatErrors(i);
-			}
+	std::set<std::string> basePackagesList;
+	for (auto i : config.baseDir()) {
+		if ( findDir(basePackagesList, i) != 0 ) {
+			m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
+			treatErrors(i);
 		}
-		if (basePackagesList.empty())
-			throw std::runtime_error(_("No package found for the base System") );
+	}
+	if (basePackagesList.empty())
+		throw std::runtime_error(_("No package found for the base System") );
 
-		// Retrieve info about all the packages
-		buildCompleteDatabase(false);
+	// Retrieve info about all the packages
+	buildCompleteDatabase(false);
 
-		std::set< std::pair<std::string,std::string> > listOfPackagesToRemove;
-		std::pair<std::string,std::string> PackageToRemove;
+	std::set< std::pair<std::string,std::string> > listOfPackagesToRemove;
+	std::pair<std::string,std::string> PackageToRemove;
 
-		for ( auto i : m_argParser.otherArguments() ) {
-			for (auto j : m_listOfPackages) {
-				for (auto k : j.second.dependencies() ){
-					if ( i == k.first) {
-						m_actualError = cards::ERROR_ENUM_PACKAGE_IN_USE;
-						std::cout << std::endl << i << _(" is a runtime dependency for ") << j.first << " !!!" << std::endl << std::endl;
-						treatErrors(i);
-					}
-				}
-				if  ((j.second.collection() == i) ||
-					(j.second.group() == i)) {
-					PackageToRemove.first=j.first;
-					PackageToRemove.second=j.second.collection();
-					listOfPackagesToRemove.insert(PackageToRemove);
+	for ( auto i : m_argParser.otherArguments() ) {
+		for (auto j : m_listOfPackages) {
+			for (auto k : j.second.dependencies() ){
+				if ( i == k.first) {
+					m_actualError = cards::ERROR_ENUM_PACKAGE_IN_USE;
+					std::cout << std::endl << i << _(" is a runtime dependency for ") << j.first << " !!!" << std::endl << std::endl;
+					treatErrors(i);
 				}
 			}
-			if ( listOfPackagesToRemove.empty()) {
-				for (auto j : m_listOfPackages) {
-					for (auto k : parseDelimitedSetList(j.second.sets()," ")) {
-						if ( i == k ) {
-							PackageToRemove.first = j.first;
-							PackageToRemove.second=j.second.collection();
-							listOfPackagesToRemove.insert(PackageToRemove);
-						}
-					}
-				}
-			}
-			{
-				// if it's an alias get the real name
-				std::string a = m_listOfAlias [i];
-				PackageToRemove.first = a ;
+			if  ((j.second.collection() == i) ||
+				(j.second.group() == i)) {
+				PackageToRemove.first=j.first;
+				PackageToRemove.second=j.second.collection();
 				listOfPackagesToRemove.insert(PackageToRemove);
 			}
 		}
-		std::set< std::pair<std::string,std::string> > groupSetPackagesToRemove;
-		for ( auto i :  config.groups() ) {
-			if ( i == "lib" )
-				continue;
-			for ( auto j : listOfPackagesToRemove ) {
-				PackageToRemove.first = j.first  + "." + i;
-				PackageToRemove.second = j.second;
-				groupSetPackagesToRemove.insert(PackageToRemove);
-			}
-		}
-		for ( auto i : groupSetPackagesToRemove ) {
-			if (checkPackageNameExist(i.first))
-				listOfPackagesToRemove.insert(i);
-		}
-		for ( auto i : listOfPackagesToRemove ) {
-			bool found = false;
-			for (auto j : basePackagesList) {
-				if ( i.first == j) {
-					found = true;
-					break;
+		if ( listOfPackagesToRemove.empty()) {
+			for (auto j : m_listOfPackages) {
+				for (auto k : parseDelimitedSetList(j.second.sets()," ")) {
+					if ( i == k ) {
+						PackageToRemove.first = j.first;
+						PackageToRemove.second=j.second.collection();
+						listOfPackagesToRemove.insert(PackageToRemove);
+					}
 				}
 			}
-			if (found){
+		}
+		{
+			// if it's an alias get the real name
+			std::string a = m_listOfAlias [i];
+			PackageToRemove.first = a ;
+			listOfPackagesToRemove.insert(PackageToRemove);
+		}
+	}
+	std::set< std::pair<std::string,std::string> > groupSetPackagesToRemove;
+	for ( auto i :  config.groups() ) {
+		if ( i == "lib" )
+			continue;
+		for ( auto j : listOfPackagesToRemove ) {
+			PackageToRemove.first = j.first  + "." + i;
+			PackageToRemove.second = j.second;
+			groupSetPackagesToRemove.insert(PackageToRemove);
+		}
+	}
+	for ( auto i : groupSetPackagesToRemove ) {
+		if (checkPackageNameExist(i.first))
+			listOfPackagesToRemove.insert(i);
+	}
+	for ( auto i : listOfPackagesToRemove ) {
+		bool found = false;
+		for (auto j : basePackagesList) {
+			if ( i.first == j) {
+				found = true;
+				break;
+			}
+		}
+		if ( found && !m_argParser.isSet(CardsArgumentParser::OPT_ALL)){
 				std::cout << "The package '" << i.first
 					<< "' is in the base list" << std::endl;
 				std::cout << "   specify -a to remove it anyway" << std::endl;
 				continue;
-			}
-
-			m_packageName = i.first;
-			if (m_packageName.size() == 0 )
-				continue;
-			run();
-			std::string name = "(" +  m_packageCollection + ") ";
-			name += i.first;
-			syslog(LOG_INFO,"%s",name.c_str());
 		}
-	} else {
-		for ( auto i : m_argParser.otherArguments() ) {
-			m_packageName = i;
-			run();
-			std::string name = "(" + m_packageCollection + ") ";
-			name += m_packageName;
-			syslog(LOG_INFO,"%s",name.c_str());
-		}
+		m_packageName = i.first;
+		if (m_packageName.size() == 0 )
+			continue;
+		run();
+		std::string name = "(" +  m_packageCollection + ") ";
+		name += i.first;
+		syslog(LOG_INFO,"%s",name.c_str());
 	}
 
 	// Lets get read of obsolets dependencies
