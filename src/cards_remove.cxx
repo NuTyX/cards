@@ -57,6 +57,17 @@ Cards_remove::Cards_remove(const std::string& commandName,
 	std::pair<std::string,std::string> PackageToRemove;
 
 	for ( auto i : m_argParser.otherArguments() ) {
+		if ( i == "base" ) {
+			m_actualError = cards::ERROR_ENUM_PACKAGE_IN_USE;
+			std::cout << std::endl
+				<< _("The collection ")
+				<< i
+				<< _(" is part of the minimal system and cannot be removed !!!")
+				<< std::endl
+				<< std::endl;
+			treatErrors(i);
+		}
+
 		for (auto j : m_listOfPackages) {
 			for (auto k : j.second.dependencies() ){
 				if ( i == k.first) {

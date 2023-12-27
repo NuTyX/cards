@@ -779,3 +779,9 @@ msgstr "ont été remplacés sur votre NuTyX."
 
 msgid "have been removed from your NuTyX."
 msgstr "ont été supprimés sur votre NuTyX."
+
+msgid "The collection "
+msgstr "La collection "
+
+msgid " is part of the minimal system and cannot be removed !!!"
+msgstr " fait parti du système minimum et ne peut pas être supprimée !!!"
