@@ -1,7 +1,7 @@
 //
 //  compile_dependencies_utils.cxx
 //
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2024 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,7 +38,8 @@ void addDepToDepList(depList *list, unsigned int nameIndex, int level)
 {
 	 unsigned int*  realloc_tmp;
 
-	realloc_tmp = (unsigned int*)realloc(list->depsIndex, sizeof (*list->depsIndex ) * (list->count+1));
+	realloc_tmp = (unsigned int*)realloc(list->depsIndex,
+		sizeof (*list->depsIndex ) * (list->count+1));
 	if (realloc_tmp == NULL) {
 		fprintf(stderr,"Failed to realloc %s\n","pkgs");
 		exit(EXIT_FAILURE);
@@ -46,7 +47,8 @@ void addDepToDepList(depList *list, unsigned int nameIndex, int level)
 	list->depsIndex = realloc_tmp;
 	list->depsIndex[list->count] = nameIndex;
 
-	int*	realloc_tmp2 = (int*)realloc(list->level, sizeof (*list->level ) * (list->count+1));
+	int*	realloc_tmp2 = (int*)realloc(list->level,
+		sizeof (*list->level ) * (list->count+1));
 	list->level = realloc_tmp2;
 	list->level[list->count] = level;
 	++list->count;
@@ -125,6 +127,7 @@ void addPkgToPkgList(pkgList *list, pkgInfo *package)
 
 	++list->count;
 }
+
 void freePkgList(pkgList* packagesList)
 {
 	if (packagesList != nullptr) {
@@ -146,7 +149,10 @@ void freePkgList(pkgList* packagesList)
 }
 
 /* Get the tree dependencies of the dependencies recursively */
-int deps_tree (pkgList* packagesList, depList* dependenciesList,unsigned int nameIndex, unsigned int level)
+int deps_tree (pkgList* packagesList,
+	depList* dependenciesList,
+	unsigned int nameIndex,
+	unsigned int level)
 {
 	level++;
 	if ( packagesList->pkgs[nameIndex]->dependences->count == 0) {
@@ -174,7 +180,10 @@ int deps_tree (pkgList* packagesList, depList* dependenciesList,unsigned int nam
 }
 
 /* Get the direct dependencies of all the package found and for each direct dependencies we check the deps recursively */
-int deps_direct (itemList* filesList, pkgList* packagesList, depList* dependenciesList, unsigned int level)
+int deps_direct (itemList* filesList,
+	pkgList* packagesList,
+	depList* dependenciesList,
+	unsigned int level)
 {
 	for (unsigned int nInd=0; nInd < filesList->count;nInd++) {
 		if (packagesList->pkgs[nInd]->dependences->count > 0) {
@@ -196,7 +205,11 @@ int deps_direct (itemList* filesList, pkgList* packagesList, depList* dependenci
 	Get the direct dependencies of the packageName and for each direct dependencies
 	we check the deps recursively
 */
-int deps_direct (itemList* filesList, pkgList* packagesList, depList* dependenciesList, const char* packageName, unsigned int level)
+int deps_direct (itemList* filesList,
+	pkgList* packagesList,
+	depList* dependenciesList,
+	const char* packageName,
+	unsigned int level)
 {
 	for (unsigned int nInd=0; nInd < filesList->count;nInd++) {
 		if ( strcmp(filesList->items[nInd],packageName) == 0 ) {
@@ -220,7 +233,9 @@ int deps_direct (itemList* filesList, pkgList* packagesList, depList* dependenci
 /* Generate the all list of package sorted by level where level = 0 No deps ,
 	level = 1 somes deps from level 0 etc
 */
-void generate_level ( itemList* filesList, pkgList* packagesList, unsigned int* level)
+void generate_level (itemList* filesList,
+	pkgList* packagesList,
+	unsigned int* level)
 {
 
 #ifndef NDEBUG
@@ -310,7 +325,8 @@ void generate_level ( itemList* filesList, pkgList* packagesList, unsigned int* 
 /* Return the full path with the name including
 the name, version and release of the package
 */
-char* getLongPackageName(itemList* filesList, const char* packageName)
+char* getLongPackageName(itemList* filesList,
+	const char* packageName)
 {
 	char* name = NULL;
 	bool found = false;
@@ -322,10 +338,9 @@ char* getLongPackageName(itemList* filesList, const char* packageName)
 			break;
 		}
 	}
-	if (found) {
+	if (found)
 		return name;
-	} else {
-		return NULL;
-	}
+
+	return NULL;
 }
 // vim:set ts=2 :

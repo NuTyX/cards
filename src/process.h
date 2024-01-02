@@ -3,7 +3,7 @@
 //
 //  AUTHORS:     Johannes Winkelmann, jw@tks6.net
 //              Output redirection by Logan Ingalls, log@plutor.org
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2024 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -50,9 +50,13 @@ class process
 {
 public:
 	process();
-	process( const std::string& app, const std::string& args, int fileDescriptorLog=0 );
+	process(const std::string& app,
+		const std::string& args,
+		int fileDescriptorLog=0 );
 
-	void execute(const std::string& app, const std::string& arguments, int fileDescriptorLog=0  );
+	void execute(const std::string& app,
+		const std::string& arguments,
+		int fileDescriptorLog=0  );
 
 	/**
 		* execute the process

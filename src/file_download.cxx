@@ -1,6 +1,6 @@
 //  file_download.cc
 //
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2024 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -59,12 +59,20 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 		initFileToDownload(m_url,m_downloadFileName);
 		downloadFile();
 		if ( ! checkMD5sum() )
-			throw std::runtime_error (m_downloadFileName + " " + m_MD5Sum +": checksum error");
+			throw std::runtime_error (m_downloadFileName
+			+ " "
+			+ m_MD5Sum +": checksum error");
 	}
 }
 
-FileDownload::FileDownload(std::string url, std::string dirName, std::string fileName, bool progress)
-	: m_fileInfo(fileName),m_url(url),m_downloadFileName(dirName+"/"+fileName),m_progress(progress)
+FileDownload::FileDownload(std::string url,
+	std::string dirName,
+	std::string fileName,
+	bool progress)
+	: m_fileInfo(fileName),
+		m_url(url),
+		m_downloadFileName(dirName+"/"+fileName),
+		m_progress(progress)
 {
 
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -84,8 +92,16 @@ FileDownload::FileDownload(std::string url, std::string dirName, std::string fil
 	downloadFile();
 }
 
-FileDownload::FileDownload(std::string fileInfo,std::string url, std::string dirName, std::string fileName, std::string MD5Sum, bool progress )
-  : m_fileInfo(fileInfo),m_url(url),m_downloadFileName(dirName+"/"+fileName),m_MD5Sum(MD5Sum),m_progress(progress)
+FileDownload::FileDownload(std::string fileInfo,std::string url,
+	std::string dirName,
+	std::string fileName,
+	std::string MD5Sum,
+	bool progress)
+  : m_fileInfo(fileInfo),
+		m_url(url),
+		m_downloadFileName(dirName+"/"+fileName),
+		m_MD5Sum(MD5Sum),
+		m_progress(progress)
 {
   curl_global_init(CURL_GLOBAL_ALL);
   m_curl = curl_easy_init();
@@ -151,7 +167,8 @@ void FileDownload::downloadFile()
 	}
 }
 
-void FileDownload::initFileToDownload(std::string  _url, std::string  _file)
+void FileDownload::initFileToDownload(std::string _url,
+	std::string _file)
 {
   m_destinationFile.url = _url;
   m_destinationFile.filename = _file;
@@ -161,9 +178,10 @@ void FileDownload::initFileToDownload(std::string  _url, std::string  _file)
   m_downloadProgress.curl = m_curl;
 }
 
-
-
-size_t FileDownload::writeToStream(void *buffer, size_t size, size_t nmemb, void *stream)
+size_t FileDownload::writeToStream(void *buffer,
+	size_t size,
+	size_t nmemb,
+	void *stream)
 {
 	InfoFile *outputf = (InfoFile *)stream;
 	if ( outputf && ! outputf->stream)
@@ -174,7 +192,12 @@ size_t FileDownload::writeToStream(void *buffer, size_t size, size_t nmemb, void
 	}
 	return fwrite(buffer,size,nmemb,outputf->stream);
 }
-int FileDownload::updateProgress(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
+
+int FileDownload::updateProgress(void *p,
+	curl_off_t dltotal,
+	curl_off_t dlnow,
+	curl_off_t ultotal,
+	curl_off_t ulnow)
 {
 	struct dwlProgress *CurrentProgress = (struct dwlProgress *)p;
 	CURL *curl = CurrentProgress->curl;
@@ -202,14 +225,24 @@ int FileDownload::updateProgress(void *p, curl_off_t dltotal, curl_off_t dlnow, 
 	SendProgressEvent(state);
 	return 0;
 }
-int FileDownload::updateProgressHandle(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow)
+
+int FileDownload::updateProgressHandle(void *p,
+	curl_off_t dltotal,
+	curl_off_t dlnow,
+	curl_off_t ultotal,
+	curl_off_t ulnow)
 {
 	return static_cast<FileDownload*>(p)->updateProgress(p,dltotal,dlnow,ultotal,ulnow);
 }
-size_t FileDownload::writeToStreamHandle(void *buffer, size_t size, size_t nmemb, void *stream)
+
+size_t FileDownload::writeToStreamHandle(void *buffer,
+	size_t size,
+	size_t nmemb,
+	void *stream)
 {
 	return static_cast<FileDownload*>(stream)->writeToStream(buffer,size,nmemb,stream);
 }
+
 bool FileDownload::checkMD5sum()
 {
 	bool same = true;
@@ -234,11 +267,11 @@ bool FileDownload::checkMD5sum()
 	}
 	return same;
 }
+
 bool FileDownload::checkUpToDate()
 {
 	return true;
 }
-// vim:set ts=2 :
 
 std::set<FileDownloadEvent*> FileDownload::m_arrCallBacks;
 
@@ -252,18 +285,15 @@ void FileDownload::SendProgressEvent(FileDownloadState event)
 
 void FileDownload::SuscribeToEvents(FileDownloadEvent* callback)
 {
-	if ((FileDownload::m_arrCallBacks.find(callback)==FileDownload::m_arrCallBacks.end()) && (callback!=nullptr))
-	{
+	if ((FileDownload::m_arrCallBacks.find(callback)==FileDownload::m_arrCallBacks.end())
+		&& (callback!=nullptr))
 		FileDownload::m_arrCallBacks.insert(callback);
-	}
 }
 
 void FileDownload::UnSuscribeFromEvents(FileDownloadEvent* callback)
 {
 	auto it =  FileDownload::m_arrCallBacks.find(callback);
 	if (it != FileDownload::m_arrCallBacks.end())
-	{
 		FileDownload::m_arrCallBacks.erase(it);
-	}
 }
 // vim:set ts=2 :

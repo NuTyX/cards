@@ -1,7 +1,7 @@
 //
 //  file_download.h
 //
-//  Copyright (c) 2013 - 2021 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2024 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -98,7 +98,9 @@ class FileDownload
 	 * \param fileName file where to store the downloaded datas
 	 * \param progress If true, show what's going on
 	 */
-	FileDownload(std::string url, std::string dirName, std::string fileName, bool progress);
+	FileDownload(std::string url,
+		std::string dirName,
+		std::string fileName, bool progress);
 
 	/**
 	 * Download a file with the possibility of checking the signature of the file
@@ -110,7 +112,12 @@ class FileDownload
 	 * \param MD5Sum Signature to use for checking the download file
 	 * \param progress If true, show what's going on
 	 */
-	FileDownload(std::string fileInfo, std::string url, std::string dirName, std::string fileName, std::string MD5Sum , bool progress);
+	FileDownload(std::string fileInfo,
+		std::string url,
+		std::string dirName,
+		std::string fileName,
+		std::string MD5Sum,
+		bool progress);
 
 	/**
 	 * Download a list of InfoFile (a vector of InfoFile type)
@@ -119,7 +126,8 @@ class FileDownload
 	 * \param destinationFiles List of files to download
 	 * \param progress If true, show what's going on
 	 */
-	FileDownload(std::vector<InfoFile> destinationFiles,bool progress);
+	FileDownload(std::vector<InfoFile> destinationFiles,
+		bool progress);
 
 	/**
 	 * Destructor need to cleanup all the created pointers for the internal cook
@@ -147,11 +155,29 @@ class FileDownload
 	 */
 	void downloadFile();
 
-	static int updateProgressHandle(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
-	static size_t writeToStreamHandle(void *buffer, size_t size, size_t nmemb, void *stream);
-	int updateProgress(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow);
-	size_t writeToStream(void *buffer, size_t size, size_t nmemb, void *stream);
-	void initFileToDownload(std::string _url, std::string _file);
+	static int updateProgressHandle(void *p,
+		curl_off_t dltotal,
+		curl_off_t dlnow,
+		curl_off_t ultotal,
+		curl_off_t ulnow);
+
+	static size_t writeToStreamHandle(void *buffer,
+		size_t size,
+		size_t nmemb,
+		void *stream);
+	int updateProgress(void *p,
+		curl_off_t dltotal,
+		curl_off_t dlnow,
+		curl_off_t ultotal,
+		curl_off_t ulnow);
+
+	size_t writeToStream(void *buffer,
+		size_t size,
+		size_t nmemb,
+		void *stream);
+
+	void initFileToDownload(std::string _url,
+		std::string _file);
 
 	/**
 	 * \return true if package is uptodate else false

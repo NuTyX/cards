@@ -1,7 +1,7 @@
 //
 // cards_upgrade.h
 // 
-//  Copyright (c) 2015 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2015 - 2024 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class Cards_upgrade : public Pkginst {
 private:
 	std::set<std::string>                   m_ListOfPackagesToDelete;
 	std::set<std::pair<std::string,time_t>> m_ListOfPackages;
-	const CardsArgumentParser& m_argParser;
+	const CardsArgumentParser&              m_argParser;
 	Pkgsync m_pkgsync;
 
 public:
@@ -45,7 +45,7 @@ public:
 	
 	// True if some updates availables
 	void Isuptodate();
-	int Isdownload();
+	int  Isdownload();
 	void upgrade();
 	void summary();
 };

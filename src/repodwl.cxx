@@ -1,7 +1,7 @@
 //
 //  repodwl.cxx
 //
-//  Copyright (c) 2016 - 2023 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2016 - 2024 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,6 @@ void Repodwl::downloadPortsPkgRepo(const std::string& packageName)
 				 * .PKGREPO file is /var/lib/pkg/depot/cli/alsa-lib/.PKGREPO
 				 *
 				 */
-
 				if ( portsDirectory.url.size() > 0 ) {
 					downloadFile.url = portsDirectory.url
 						+ "/"

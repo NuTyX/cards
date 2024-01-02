@@ -107,8 +107,13 @@ void Conf::parseCardsconf()
 #ifndef NDEBUG
 	std::cerr << "name: " << m_name << std::endl
 		<< "version: " << m_version << std::endl;
-	for ( auto i : m_dirUrl) std::cerr << "Dir: " << i.dir << std::endl
-		<< "Url: " << i.url << std::endl;
+	for ( auto i : m_dirUrl)
+		std::cerr << "Dir: "
+			<< i.dir
+			<< std::endl
+			<< "Url: "
+			<< i.url
+			<< std::endl;
 #endif
 }
 Conf::~Conf()

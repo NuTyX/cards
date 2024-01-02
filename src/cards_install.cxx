@@ -196,6 +196,7 @@ void Cards_install::getLocalePackagesList()
 			m_dependenciesList.push_back(PackageTime);
 		}
 #ifndef NDEBUG
-	for (auto i : m_dependenciesList ) std::cerr << i.first << " " << i.second << std::endl;
+	for (auto i : m_dependenciesList )
+		std::cerr << i.first << " " << i.second << std::endl;
 #endif
 }

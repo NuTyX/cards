@@ -1,7 +1,7 @@
 //
 // cards_upgrade.cxx
 //
-//  Copyright (c) 2015 - 2022 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2015 - 2024 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -143,13 +143,18 @@ return EXIT_SUCCESS;
 void Cards_upgrade::dry()
 {
 	if (m_ListOfPackages.size() > 1 )
-				std::cout << _("Packages") << ": ";
+				std::cout << _("Packages")
+					<< ": ";
 	if (m_ListOfPackages.size() == 1 )
-				std::cout << _("Package")<< " : ";
+				std::cout << _("Package")
+					<< " : ";
 	for (auto i : m_ListOfPackages )
-		std::cout << "'" << i.first  << "' ";
+		std::cout << "'"
+			<< i.first
+			<< "' ";
 	if (m_ListOfPackages.size() > 0 )
-				std::cout << _("will be replaced when you upgrade your NuTyX.") << std::endl;
+				std::cout << _("will be replaced when you upgrade your NuTyX.")
+					<< std::endl;
 
 	if (m_ListOfPackagesToDelete.size() > 1 )
 				std::cout << _("Packages") << ": ";
@@ -158,7 +163,8 @@ void Cards_upgrade::dry()
 	for (auto i: m_ListOfPackagesToDelete)
 			std::cout << "'" << i << "' ";
 	if (m_ListOfPackagesToDelete.size() > 0 )
-				std::cout << _("will be removed when you upgrade your NuTyX.") << std::endl;
+				std::cout << _("will be removed when you upgrade your NuTyX.")
+					<< std::endl;
 
 }
 void Cards_upgrade::upgrade()
@@ -197,15 +203,22 @@ void Cards_upgrade::summary()
 {
 	if (m_ListOfPackages.size() > 1 ) {
 		std::cout << std::endl;
-		std::cout << _("Packages") << ": ";
+		std::cout << _("Packages")
+			<< ": ";
 		for (auto i : m_ListOfPackages )
-			std::cout << "'" << i.first  << "' ";
-		std::cout << _("have been replaced on your NuTyX.") << std::endl;
+			std::cout << "'"
+				<< i.first
+				<< "' ";
+		std::cout << _("have been replaced on your NuTyX.")
+			<< std::endl;
 	}
 	if (m_ListOfPackagesToDelete.size() > 1 ) {
-		std::cout << _("Packages") << ": ";
+		std::cout << _("Packages")
+			<< ": ";
 		for (auto i: m_ListOfPackagesToDelete)
-			std::cout << "'" << i << "' ";
+			std::cout << "'"
+				<< i
+				<< "' ";
 		std::cout << _("have been removed from your NuTyX.") << std::endl;
 	}
 	if (m_ListOfPackages.size() > 1 || m_ListOfPackagesToDelete.size() > 1 )

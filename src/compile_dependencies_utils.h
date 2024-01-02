@@ -1,7 +1,7 @@
 //
 // compile_dependencies_utils.h
 //
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2024 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -70,7 +70,11 @@ typedef struct
  *  depList: Create the list, Add dependence to the list, free the list
  */
 depList* initDepsList(void);
-void addDepToDepList(depList* list, unsigned int nameIndex, int level);
+
+void addDepToDepList(depList* list,
+	unsigned int nameIndex,
+	int level);
+
 void freeDepList(depList *list);
 
 /*** pkgInfo: create the pkg, Add info, free the pkgInfo  ***/
@@ -80,13 +84,26 @@ void freePkgInfo(pkgInfo *package);
 
 /*** pkgList: create the pkgList, add pkgs, free the pkgList ***/
 pkgList* initPkgList(void);
-void addPkgToPkgList(pkgList* list, pkgInfo* package);
+
+void addPkgToPkgList(pkgList* list,
+	pkgInfo* package);
+
 void freePkgList(pkgList* packagesList);
 
-int deps_direct (itemList* filesList, pkgList* packagesList, depList* dependenciesList,unsigned int level);
-int deps_direct (itemList* filesList, pkgList* packagesList, depList* dependenciesList,const char* pkgName, unsigned int level);
+int deps_direct (itemList* filesList,
+	pkgList* packagesList,
+	depList* dependenciesList,
+	unsigned int level);
 
-void generate_level ( itemList* filesList, pkgList* packagesList, unsigned int* level);
+int deps_direct (itemList* filesList,
+	pkgList* packagesList,
+	depList* dependenciesList,
+	const char* pkgName,
+	unsigned int level);
+
+void generate_level (itemList* filesList,
+	pkgList* packagesList,
+	unsigned int* level);
 
 char *getLongPackageName(itemList* filesList, const char* packageName);
 #endif /* COMPILE_DEPENDENCIES_UTILS_H */

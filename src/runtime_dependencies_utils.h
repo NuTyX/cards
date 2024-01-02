@@ -1,7 +1,7 @@
 //
 //  runtime_dependencies_utils.h
 //
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2024 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,8 @@
 #include <sys/stat.h>
 
 
-int getRuntimeLibrariesList (std::set<std::string>& runtimeLibrariesList, const std::string& filename);
+int getRuntimeLibrariesList (std::set<std::string>& runtimeLibrariesList,
+		const std::string& filename);
 
 #endif /* RUNTIME_DEPENDENCIES_UTILS_H */
 // vim:set ts=2 :

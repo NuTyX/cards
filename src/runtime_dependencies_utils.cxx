@@ -1,7 +1,7 @@
 //
 //  runtime_dependencies_utils.cxx
 //
-//  Copyright (c) 2013 - 2020 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2024 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -64,7 +64,8 @@ int get_64bit_elf_header_part(FILE *file)
 	elf_header_64bits=*buffer_64bits_part;
 	return 0;
 }
-int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList, const std::string& fileName)
+int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
+	const std::string& fileName)
 {
 #ifndef NDEBUG
 	printf("\n==>File open: %s\n",fileName.c_str());

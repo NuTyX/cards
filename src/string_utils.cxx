@@ -2,7 +2,7 @@
 //  strings_utils.cxx
 // 
 //  Copyright (c) 2002 by Johannes Winkelmann
-//  Copyright (c) 2013-2023 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013-2024 by NuTyX team (http://nutyx.org)
 // 
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -141,8 +141,7 @@ std::string getValueOfKey(std::string file, char delimiter,std::string parameter
   if (in) {
     while (!in.eof()) {
       getline(in, line);
-			
-      if ((line[0] != '#' ) && ( line.find(delimiter) > 0) && ( line.size() > 0)) {
+			if ((line[0] != '#' ) && ( line.find(delimiter) > 0) && ( line.size() > 0)) {
         pv = splitKeyValue(stripWhiteSpace(line),delimiter);
         property_list[pv.parameter]=pv.value;
       }
@@ -161,9 +160,9 @@ std::string getValue( const std::string& s, char delimiter )
 std::string getValueBefore( const std::string& s, char del )
 {
 	std::string::size_type pos = s.find( del );
-	if ( pos != std::string::npos ) {
+	if ( pos != std::string::npos )
 		return s.substr( 0, pos );
-	}
+
 	return s;
 }
 std::string getValueBeforeLast(const std::string& s, char del)
