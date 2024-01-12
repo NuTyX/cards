@@ -422,7 +422,7 @@ find_collection () {
 
 find_runtime () {
   for i in $(find ${ROOTMOUNT}/$(uname -m)/${VERSION}/ -name "*$(uname -m).cards*"); do
-    LANG=C pkginfo -a $i|grep "${1}1"|grep "Dependencies"|cut -d ":" -f1
+    LANG=C pkginfo -a $i|grep "${1}"|grep "Dependencies"|cut -d ":" -f1
   done
 }
 setup_pkgmk_conf() {
