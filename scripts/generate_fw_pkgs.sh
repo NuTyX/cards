@@ -1,0 +1,84 @@
+#!/bin/sh
+
+if [ -z "${1}" ]; then
+  echo "
+>>> At least one argument is mandatory
+"
+  exit 1
+fi
+
+VERSION=${1}
+[ -z $BRANCH ] && BRANCH="testing"
+
+if [ ! -f WHENCE ];then
+  echo "
+>>> WHENCE file not found !!!
+>>> Are you at the root of linux-firmware source tree ?
+"
+  exit 1
+fi
+
+if [ -z $HOME ]; then
+  echo "
+>>> \$HOME not set !!!
+>>> Cannot help you
+"
+  exit 1
+
+fi
+
+ROOT=$HOME/$BRANCH/base
+
+cp WHENCE WHENCE.in
+
+sed -i "s@bnx2x:@bnx2x -@" WHENCE.in
+sed -i "s@Driver:Atheros@Driver: Atheros@" WHENCE.in
+
+rm -f List List.sort List.uniq
+rm -r $ROOT/*-firmware
+
+grep -E '^Driver:' WHENCE.in|while read D N l;do echo "$D $N " >>List;done
+cat List |sort>List.sort
+cat List.sort|uniq> List.uniq
+
+cat List.uniq|while read N
+do
+  FILE=${N/Driver: /}
+  DESCRIPTION=$FILE
+  FILE=${FILE,,}
+  DIR="$ROOT/${FILE//\//-}-firmware"
+
+  mkdir -p $DIR
+
+  sed -n "/${N//\//\\/}/,/^-----/p" WHENCE.in >"$DIR/WHENCE"
+  sed -i "/${N//\//\\/}/,/^-----/d" WHENCE.in
+  sed -i "s/^Driver /Driver:/" "$DIR/WHENCE"
+  DESCRIPTION="$(echo $(head -1 $DIR/WHENCE)|sed s/^Driver:\ //)"
+
+  echo "description=\"$DESCRIPTION\"
+url='https://git.kernel.org/?p=linux/kernel/git/firmware/linux-firmware.git;a=summary'
+
+packager=\"tnut <tnut@nutyx.org>\"
+contributors=\"Spiky\"
+
+set=(linux-firmware)
+
+name=${FILE//\//-}-firmware
+version=$VERSION
+
+makedepends=(rdfind)
+source=(WHENCE
+        https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot/linux-firmware-\$version.tar.gz)
+
+build() {
+
+cd linux-firmware-\$version
+cp ../WHENCE .
+make DESTDIR=\$PKG FIRMWAREDIR=/lib/firmware install
+
+install -Dt \$PKG/usr/share/licenses/\$name -m644 WHENCE
+}
+" > $DIR/Pkgfile
+
+done
+rm -f List List.sort List.uniq WHENCE.in
