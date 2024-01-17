@@ -33,6 +33,8 @@ cp WHENCE WHENCE.in
 
 sed -i "s@bnx2x:@bnx2x -@" WHENCE.in
 sed -i "s@Driver:Atheros@Driver: Atheros@" WHENCE.in
+sed -i "s/^Driver /Driver:/" WHENCE.in
+
 
 rm -f List List.sort List.uniq
 rm -r $ROOT/*-firmware
@@ -52,8 +54,10 @@ do
 
   sed -n "/${N//\//\\/}/,/^-----/p" WHENCE.in >"$DIR/WHENCE"
   sed -i "/${N//\//\\/}/,/^-----/d" WHENCE.in
-  sed -i "s/^Driver /Driver:/" "$DIR/WHENCE"
   DESCRIPTION="$(echo $(head -1 $DIR/WHENCE)|sed s/^Driver:\ //)"
+
+  [ -z "$DESCRIPTION" ] && DESCRIPTION="$FILE firmware for Linux"
+  [ "$DESCRIPTION" == "$FILE" ] && DESCRIPTION="$FILE firmware for Linux"
 
   echo "description=\"$DESCRIPTION\"
 url='https://git.kernel.org/?p=linux/kernel/git/firmware/linux-firmware.git;a=summary'
