@@ -39,6 +39,7 @@
 
 struct contentInfo_t {
 	std::string date;
+	std::string boardId;
 	std::vector<std::string> text;
 };
 struct arguments_t {

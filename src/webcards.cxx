@@ -267,13 +267,15 @@ content_t getContent(std::set<string>& list)
 {
   content_t content;
   for ( auto i : list) {
-   string fullName = "content/" + i;
-   contentInfo_t contentInfo;
-   contentInfo.date = getModifyTimeFile(fullName);
-	 vector<string> contentFile;
-	 parseFile(contentInfo.text,fullName.c_str());
-	 content[i] = contentInfo;
-  }
+		keyValue pv = splitKeyValue(i,'.');
+		string fullName = "content/" + pv.parameter;
+		contentInfo_t contentInfo;
+		contentInfo.date = getModifyTimeFile(fullName);
+		contentInfo.boardId= pv.value;
+		vector<string> contentFile;
+		parseFile(contentInfo.text,fullName.c_str());
+		content[i] = contentInfo;
+	}
 	return content;
 }
 contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
