@@ -41,7 +41,8 @@ class mysql
 public:
 	virtual ~mysql();
 	mysql(const char *configFileName);
-	void lastPosts(const char *forum,int n);
+	void lastPosts(const char *forum, int n);
+	void lastPosts(const char *forum, const char *id_board, int n);
 
 private:
 	const char *m_hostname;

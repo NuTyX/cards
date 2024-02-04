@@ -27,7 +27,7 @@ mysql::mysql(const char *configFileName)
 	m_socket=NULL;
 
 	m_connection = mysql_init(NULL);
-	mysql_options(m_connection, MYSQL_INIT_COMMAND, "SET NAMES utf8");	
+	mysql_options(m_connection, MYSQL_INIT_COMMAND, "SET NAMES utf8");
 	mysql_real_connect(m_connection,
 		mysqlConfig.hostname().c_str(),
 		mysqlConfig.username().c_str(),
@@ -50,7 +50,7 @@ void mysql::lastPosts(const char *forum, int n)
 	boardInfo_t info;
 	if(mysql_query(m_connection,
 	"select id_board, name, id_cat from smf_boards order by id_board"))
-		cerr << mysql_error(m_connection) << endl;
+		std::cerr << mysql_error(m_connection) << std::endl;
 	m_result= mysql_use_result(m_connection);
 	board_t listOfBoards;
 
@@ -63,7 +63,7 @@ void mysql::lastPosts(const char *forum, int n)
 	// retrieve the list of categories
 	if(mysql_query(m_connection,
 	"select id_cat, name from smf_categories order by id_cat"))
-		cerr << mysql_error(m_connection) << endl;
+		std::cerr << mysql_error(m_connection) << std::endl;
 	m_result= mysql_use_result(m_connection);
 
 	category_t listOfCategories;
@@ -74,7 +74,7 @@ void mysql::lastPosts(const char *forum, int n)
 	// retrieve the list of members
 	if (mysql_query(m_connection,
 	"select id_member, member_name, real_name from smf_members order by id_member"))
-		cerr << mysql_error(m_connection) << endl;
+		std::cerr << mysql_error(m_connection) << stfd::endl;
 	m_result= mysql_use_result(m_connection);
 
 	userInfo_t user;
@@ -87,26 +87,26 @@ void mysql::lastPosts(const char *forum, int n)
 	// retrieve the list of messages
 	if(mysql_query(m_connection,
 	"select id_topic, id_msg, id_member, poster_time, subject, icon, id_board from smf_messages order by id_msg"))
-		cerr << mysql_error(m_connection) << endl;
+		std::cerr << mysql_error(m_connection) << std::endl;
 	m_result= mysql_use_result(m_connection);
 
-	vector<string> list;
-	string sforum = forum;
+	std::vector<std::string> list;
+	std::string sforum = forum;
 	while ((rows = mysql_fetch_row(m_result)) != NULL) {
-		string category = "<div style=\"text-transform: uppercase;\">";
+		std:string category = "<div style=\"text-transform: uppercase;\">";
 		category += listOfCategories[ listOfBoards[rows[6]].category ] + ":</div>";
-		string id_topic = rows[0];
-		string id_msg = rows[1];
-		string time = "<p class=\"updated\">";
+		std::string id_topic = rows[0];
+		std::string id_msg = rows[1];
+		std::string time = "<p class=\"updated\">";
 		time +=getDateFromEpoch(strtoul(rows[3],NULL,0)) + " UTC</p>";
-        string board = "<b>";
+        std::string board = "<b>";
 		board += listOfBoards[ rows[6] ].name;
-		string author = "<i>";
+		std::string author = "<i>";
 		author += listOfUsers[ rows[2] ].real_name;
 		author += "</i>";
-		string subject = rows[4];
-		string icon = rows[5];
-		string message = time;
+		std::string subject = rows[4];
+		std::string icon = rows[5];
+		std::string message = time;
 		message += category;
 		message += board + "</b><br>";
 		message += author;
@@ -127,6 +127,15 @@ void mysql::lastPosts(const char *forum, int n)
 		if ( i != n + 1)
 			cout << "<hr align=\"center\" style=\"width: 50%;\">" << endl;
 	}
+}
+void mysql::lastPosts(const char *forum, const char *id_board, int n)
+{
+	std::string sboard = id_board;
+	std::string query = "select poster_name, subject, body icon from smf_messages where id_board = " \
+			+ sboard + " order by id_msg";
+	if(mysql_query(m_connection, query.c_str()))
+		std::cerr << mysql_error(m_connection) << std::endl;
+	m_result= mysql_use_result(m_connection);
 }
 } /* namespace Sql */
 // vim:set ts=2 :
