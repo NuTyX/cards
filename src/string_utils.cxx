@@ -91,6 +91,7 @@ keyValue splitKeyValue(std::string s, char delimiter)
   else
   {
     pv.value = "";
+    pv.parameter = s;
   }
   return pv;
 }
