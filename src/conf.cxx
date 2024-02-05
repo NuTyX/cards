@@ -15,7 +15,7 @@ Conf::Conf(const std::string& filename)
 }
 void Conf::parseCardsconf()
 {
-	FILE* fp = fopen(CARDS_CONF_FILE, "r");
+	FILE* fp = fopen(m_filename.c_str(), "r");
 	if (!fp)
 		return;
 	const int length = BUFSIZ;
