@@ -268,12 +268,13 @@ content_t getContent(std::set<string>& list)
   content_t content;
   for ( auto i : list) {
 		keyValue pv = splitKeyValue(i,'.');
-		string fullName = "content/" + pv.parameter;
+		string fullName = "content/" + i;
 		contentInfo_t contentInfo;
 		contentInfo.date = getModifyTimeFile(fullName);
 		contentInfo.boardId= pv.value;
 		vector<string> contentFile;
 		parseFile(contentInfo.text,fullName.c_str());
+
 		content[pv.parameter] = contentInfo;
 	}
 	return content;
@@ -540,6 +541,21 @@ cellspacing=\"10\" width=\"100%\">" << endl
 			"<h",
 			tocTitle);
 		for (auto i : page) cout << i << endl;
+		if (Content[arguments.docName].boardId.size() > 0) {
+			std::cout << "<p>"
+				<< std::endl
+				<< "<a href=\"https://";
+			if ( sLang == "fr" ) {
+				std::cout << "forum.nutyx.org/index.php/board,"
+					<< Content[arguments.docName].boardId
+					<< "\">Soyez le premier à venir commenter le sujet.</a>";
+			} else {
+				std::cout << "forums.nutyx.org/index.php/board,"
+					<< Content[arguments.docName].boardId
+					<< "\">Be the first to comment on this subject.</a>";
+			}
+			std::cout << std::endl;
+		}
 		FOOTERTEXT;
 		endOfPage();
 		return 0;
