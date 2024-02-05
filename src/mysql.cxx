@@ -49,8 +49,9 @@ void mysql::lastPosts(const char *forum, int n)
 	// retrieve the list of boards
 	boardInfo_t info;
 	if(mysql_query(m_connection,
-	"select id_board, name, id_cat from smf_boards order by id_board"))
-		std::cerr << mysql_error(m_connection) << std::endl;
+		"select id_board, name, id_cat from smf_boards order by id_board"))
+			std::cout << mysql_error(m_connection)
+				<< std::endl;
 	m_result= mysql_use_result(m_connection);
 	board_t listOfBoards;
 
@@ -74,7 +75,7 @@ void mysql::lastPosts(const char *forum, int n)
 	// retrieve the list of members
 	if (mysql_query(m_connection,
 	"select id_member, member_name, real_name from smf_members order by id_member"))
-		std::cerr << mysql_error(m_connection) << stfd::endl;
+		std::cerr << mysql_error(m_connection) << std::endl;
 	m_result= mysql_use_result(m_connection);
 
 	userInfo_t user;
