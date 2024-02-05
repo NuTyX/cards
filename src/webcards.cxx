@@ -274,7 +274,7 @@ content_t getContent(std::set<string>& list)
 		contentInfo.boardId= pv.value;
 		vector<string> contentFile;
 		parseFile(contentInfo.text,fullName.c_str());
-		content[i] = contentInfo;
+		content[pv.parameter] = contentInfo;
 	}
 	return content;
 }
