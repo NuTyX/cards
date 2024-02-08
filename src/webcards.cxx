@@ -18,28 +18,27 @@
 using namespace std;
 using namespace Sql;
 
-vector<string> parseHTMLDelimitedList
-(const vector<string>& text,
-	const string startTagValue,
-	const string contentTitle )
+std::vector<std::string> parseHTMLDelimitedList
+(const std::vector<std::string>& text,
+	const std::string startTagValue,
+	const std::string contentTitle )
 {
-	string::size_type start = 0, end = 0;
-	vector<string> page;
-	vector<string> body;
-	string endTagValue = "</";
+	std::string::size_type start = 0, end = 0;
+	std::vector<std::string> page;
+	std::vector<std::string> body;
+	std::string endTagValue = "</";
 	int previousHeaderLevel = '2';
 	/* First pass to check if we have h2, h3, h3, h4, h5 , h6 paragraphs
      h1 can only be ones at the first line */
 	bool haveContent=false;
 	int ref=0;
-	for (vector<string>::const_iterator i = text.begin(); i != text.end(); ++i) {
-		string line = *i;
+	for (auto line : text) {
 		start = 0;
 		end = 0;
 		start = line.find(startTagValue);
 
 		/* line contains startTag  not found, just copy the line*/
-		if ( start == string::npos) {
+		if ( start == std::string::npos) {
 			/* if they is no content yet we go on with copy */
 			if (! haveContent ) {
 				page.push_back(line);
@@ -57,7 +56,7 @@ vector<string> parseHTMLDelimitedList
 
 		/* line contains first '>' after startTag found ? */
 		start = line.find('>', start + 1);
-		if ( start == string::npos) {
+		if ( start == std::string::npos) {
 			page.push_back(line);
 			continue;
 		}
@@ -67,7 +66,7 @@ vector<string> parseHTMLDelimitedList
 		end = line.find(endTagValue);
 		/* line contains endTag
 		We store the line as it is*/
-		if ( end != string::npos) {
+		if ( end != std::string::npos) {
 			/* First time we find a paragraph header ? */
 			if ( ! haveContent ) {
 				page.push_back( "<div class=\"toc\">\n <h2>");
@@ -78,7 +77,7 @@ vector<string> parseHTMLDelimitedList
 			haveContent = true;
 			ref++;
 
-			string sRef = "";
+			std::string sRef = "";
 			if ( headerLevel != previousHeaderLevel ) {
 				int i = headerLevel ;
 				while ( i > previousHeaderLevel ) { /* means > '2' */
@@ -114,8 +113,7 @@ vector<string> parseHTMLDelimitedList
 	if (! haveContent )
 		return page;
 
-	for (vector<string>::const_iterator i = body.begin(); i != body.end(); ++i) {
-		string line = *i;
+	for (auto line : body) {
 		page.push_back(line);
 	}
 	return page;
@@ -133,42 +131,42 @@ void visitOfPage(char * argument)
 }
 void endOfPage(void)
 {
-	cout << "   </tr>" <<endl
-	<< "  </table>" << endl
-	<< " </body>" << endl
-	<< "</html>" << endl;
+	std::cout << "   </tr>" << std::endl
+	<< "  </table>" << std::endl
+	<< " </body>" << std::endl
+	<< "</html>" << std::endl;
 }
 string::size_type parseArguments(arguments_t &arguments)
 {
 	/* All the possible arguments */
-	set<string> listOfArguments;
+	std::set<std::string> listOfArguments;
 	char * pArgument = getenv ("QUERY_STRING");
-	string::size_type pos;
+	std::string::size_type pos;
 	listOfArguments = parseDelimitedSetList(pArgument,"&");
 	arguments.docName="index";
 	for ( auto i : listOfArguments) {
 		pos = i.find("arch=");
-		if ( pos != string::npos ){
+		if ( pos != std::string::npos ){
 			arguments.packageArch = i.substr(pos+5);
 		}
 		pos = i.find("branch=");
-		if ( pos != string::npos ){
+		if ( pos != std::string::npos ){
 			arguments.packageBranch = i.substr(pos+7);
 		}
 		pos = i.find("page=");
-		if ( pos != string::npos ){
+		if ( pos != std::string::npos ){
 			arguments.docName = i.substr(pos+5);
 		}
 		pos = i.find("search=");
-		if ( pos != string::npos ){
+		if ( pos != std::string::npos ){
 			arguments.stringSearch = i.substr(pos+7);
 		}
 		pos = i.find("searchpkg=");
-		if ( pos != string::npos ){
+		if ( pos != std::string::npos ){
 			arguments.packageSearch = i.substr(pos+10);
 		}
 		pos = i.find("type=");
-		if ( pos != string::npos ){
+		if ( pos != std::string::npos ){
 			arguments.type = i.substr(pos+5);
 		}
 	}
@@ -248,31 +246,36 @@ void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
 }
 void sideBar( const char *forum)
 {
-	cout << "  <td class=\"sidebar\" width=\"20%\">" << endl
-		<< "   <h4>Forum</h4>" << endl
-		<< "    <div>" << endl;
+	std::cout << "  <td class=\"sidebar\" width=\"20%\">"
+		<< std::endl
+		<< "   <h4>Forum</h4>"
+		<< std::endl
+		<< "    <div>"
+		<< std::endl;
 	mysql forumDB("content/.mysql.conf");
 	forumDB.lastPosts(forum,10);
-	cout << "    </div>" << endl
+	std::cout << "    </div>"
+		<< std::endl
 		<< "<hr>";
 
 }
 void lastUpdate(std::string& date)
 {
-	cout << "    <p class=\"updated\"> "
-	<< date
-	<< " UTC</p>" << endl;
+	std::cout << "    <p class=\"updated\"> "
+		<< date
+		<< " UTC</p>"
+		<< std::endl;
 }
 content_t getContent(std::set<string>& list)
 {
   content_t content;
   for ( auto i : list) {
 		keyValue pv = splitKeyValue(i,'.');
-		string fullName = "content/" + i;
+		std::string fullName = "content/" + i;
 		contentInfo_t contentInfo;
 		contentInfo.date = getModifyTimeFile(fullName);
 		contentInfo.boardId= pv.value;
-		vector<string> contentFile;
+		std::vector<std::string> contentFile;
 		parseFile(contentInfo.text,fullName.c_str());
 
 		content[pv.parameter] = contentInfo;
@@ -281,8 +284,8 @@ content_t getContent(std::set<string>& list)
 }
 contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 {
-	string search = arguments.packageSearch;
-	vector<string> v_search = parseDelimitedVectorList(search, "%");
+	std::string search = arguments.packageSearch;
+	std::vector<std::string> v_search = parseDelimitedVectorList(search, "%");
 	for (auto i : v_search ) {
 		if ( i.size() > 0) {
 			search = i;
@@ -298,12 +301,12 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 	}
 	time_t timer;
 	time(&timer);
-	string row = "odd";
+	std::string row = "odd";
 	contentInfo_t contentInfo;
 	contentInfo.date = getDateFromEpoch(timer);
-	vector<RepoInfo> List;
+	std::vector<RepoInfo> List;
 	Pkgrepo repoList(".webcards.conf");
-	set<string> listOfPackages;
+	std::set<std::string> listOfPackages;
 	List = repoList.getRepoInfo();
 	for (auto i : List) {
 		for (auto j : i.basePackageList) {
@@ -329,7 +332,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 				if ( ( arguments.packageArch != i.arch ) &&
 					( arguments.packageArch != "all" )  )
 					continue;
-				string::size_type pos;
+				std::string::size_type pos;
 				pos = i.collection.find(convertToLowerCase(search));
 				if (pos != std::string::npos) {
 					INSERTPACKAGE(j.basePackageName, j.basePackageName);
@@ -345,21 +348,21 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 					INSERTPACKAGE(j.basePackageName, j.basePackageName);
 					continue;
 				}
-				set<string> groupList;
+				std::set<std::string> groupList;
 				groupList = parseDelimitedSetList(j.group," ");
 				for ( auto k : groupList ) {
 					if ( convertToLowerCase(search) == k ) {
-						string name = j.basePackageName
+						std::string name = j.basePackageName
 							+ "."
 							+ k;
 						INSERTPACKAGE(j.basePackageName, name);
 					}
 				}
-				set<string> aliasList;
+				std::set<std::string> aliasList;
 				aliasList = parseDelimitedSetList(j.alias," ");
 				for ( auto k : aliasList ) {
 					if ( convertToLowerCase(search) == k ) {
-						string name = j.basePackageName;
+						std::string name = j.basePackageName;
 						INSERTPACKAGE(j.basePackageName, name);
 					}
 				}
@@ -405,14 +408,14 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 }
 int main (int argc, char** argv)
 {
-	set<string> ArticleNamesList;
+	std::set<std::string> ArticleNamesList;
 
 	findDir(ArticleNamesList, "content/");
 	/* All the contents */
 	content_t Content;
 	Content = getContent(ArticleNamesList);
 
-	string::size_type pos;
+	std::string::size_type pos;
 	arguments_t arguments;
 
 	char * pArgument = getenv ("QUERY_STRING");
@@ -426,23 +429,23 @@ int main (int argc, char** argv)
 	if ( !pPwd)
 		return 0;
 
-	string  sPwd =  pPwd;
+	std::string  sPwd =  pPwd;
 	pos = sPwd.find_last_of( "/\\" );
 
 	/* If PATH is not found, no need to continue */
 	if ( pos == string::npos )
 		return 0;
 
-	string sPath = sPwd.substr(0,pos);
+	std::string sPath = sPwd.substr(0,pos);
 
 	HEADERTEXT;
 	CSSDATA;
 	pos = sPath.find_last_of( "/\\" );
 
-	if ( pos == string::npos )
+	if ( pos == std::string::npos )
 		return 0;
 
-	string sLang = sPath.substr(pos+1);
+	std::string sLang = sPath.substr(pos+1);
 	const char * tocTitle;
 	const char * search;
 	if ( sLang == "fr" ) {
@@ -460,9 +463,11 @@ int main (int argc, char** argv)
 		tocTitle = "Contents";
 	}
 	/* The main table */
-	cout << "<table border=\"0\" cellpadding=\"15\" \
-cellspacing=\"10\" width=\"100%\">" << endl
-  << " <tr valign=\"top\">" << endl;
+	std::cout << "<table border=\"0\" cellpadding=\"15\" \
+cellspacing=\"10\" width=\"100%\">"
+		<< std::endl
+  		<< " <tr valign=\"top\">"
+		<< std::endl;
 	const char * forumAdress;
 	if ( sLang == "fr" )
 	{
@@ -471,7 +476,8 @@ cellspacing=\"10\" width=\"100%\">" << endl
 		forumAdress = "https://forums.nutyx.org";
 	}
 	sideBar(forumAdress);
-	cout << "  <td valign=\"top\" align=\"left\" width=\"100%\">" << endl;
+	std::cout << "  <td valign=\"top\" align=\"left\" width=\"100%\">"
+		<< std::endl;
 
 	/* Parse all knows argument so far */
 	pos = parseArguments(arguments);
@@ -482,15 +488,16 @@ cellspacing=\"10\" width=\"100%\">" << endl
 	if ( arguments.packageSearch.size() > 0 ) {
 		visitOfPage(pArgument);
 		if (arguments.packageSearch.size() < 2) {
-			cout << "<div class=\"note\"><img alt=\"[Note]\" \
-			src=\"../graphics/note.gif\" />min 2 characters...</div>" << endl;
+			std::cout << "<div class=\"note\"><img alt=\"[Note]\" \
+			src=\"../graphics/note.gif\" />min 2 characters...</div>"
+				<< std::endl;
 		} else {
 			Content["packages"] = getFormatedBinaryPackageList
 				(arguments);
 			if ( Content["packages"].text.size() > 0) {
 				lastUpdate(Content["packages"].date);
 				for (auto i : Content["packages"].text)
-					cout << i << endl;
+					std::cout << i << std::endl;
 			}
 		}
 		FOOTERTEXT;
@@ -499,19 +506,20 @@ cellspacing=\"10\" width=\"100%\">" << endl
 	}
 	if ( arguments.stringSearch.size() > 0) {
 		if (arguments.stringSearch.size() < 3) {
-			cout << endl
-			<< "<div class=\"note\"><img alt=\"[Note]\" \
-			src=\"../graphics/note.gif\" />min 3 characters...</div>" << endl;
+			std::cout << std::endl
+				<< "<div class=\"note\"><img alt=\"[Note]\" \
+			src=\"../graphics/note.gif\" />min 3 characters...</div>"
+				<< std::endl;
 		} else {
 			arguments.docName = "packages";
-			vector<string> searchList;
+			std::vector<std::string> searchList;
 			for (auto i : Content) {
 				for (auto j : i.second.text) {
 					if ( i.first == "packages" )
 						continue;
-					string lower = convertToLowerCase(j);
+					std::string lower = convertToLowerCase(j);
 					pos = lower.find(convertToLowerCase(arguments.stringSearch));
-					if (pos != string::npos) {
+					if (pos != std::string::npos) {
 						searchList.push_back("<a href=\"?page=" + i.first
 						+ "\">" + i.first + "</a><br>...<br>");
 						searchList.push_back(j);
@@ -519,7 +527,7 @@ cellspacing=\"10\" width=\"100%\">" << endl
 					}
 				}
 			}
-			for ( auto i : searchList) cout << i << endl;
+			for ( auto i : searchList) std::cout << i << std::endl;
 		}
 		FOOTERTEXT;
 		endOfPage();
@@ -529,7 +537,7 @@ cellspacing=\"10\" width=\"100%\">" << endl
 		contentInfo_t contentInfo;
 		contentInfo.text.push_back("<h1>NuTyX Packages</h1>");
 		searchpkg(contentInfo,arguments);
-		for (auto i : contentInfo.text) cout << i << endl;
+		for (auto i : contentInfo.text) std::cout << i << std::endl;
 		FOOTERTEXT;
 		endOfPage();
 		return 0;
@@ -537,10 +545,10 @@ cellspacing=\"10\" width=\"100%\">" << endl
 	if ( Content.find(arguments.docName) != Content.end() ){
 		SEARCH;
 		lastUpdate(Content[arguments.docName].date);
-		vector<string> page = parseHTMLDelimitedList( Content[arguments.docName].text,
+		std::vector<std::string> page = parseHTMLDelimitedList( Content[arguments.docName].text,
 			"<h",
 			tocTitle);
-		for (auto i : page) cout << i << endl;
+		for (auto i : page) std::cout << i << std::endl;
 		if (Content[arguments.docName].boardId.size() > 0) {
 			std::cout << "<p>"
 				<< std::endl
@@ -562,9 +570,11 @@ cellspacing=\"10\" width=\"100%\">" << endl
 	}
 	else
 	{
-		cout << "<h1>" << arguments.docName << " is not existing yet</h1>"
-		<< endl;
-		for (auto i : Content["under-construction"].text) cout << i << endl;
+		std::cout << "<h1>"
+			<< arguments.docName
+			<< " is not existing yet</h1>"
+			<< std::endl;
+		for (auto i : Content["under-construction"].text) std::cout << i << std::endl;
 		FOOTERTEXT;
 		endOfPage();
 		return 0;
