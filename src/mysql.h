@@ -50,6 +50,9 @@ private:
 	const char *m_username;
 	const char *m_password;
 	const char *m_socket;
+
+	std::vector<std::string> m_list;
+
 	enum {
 		m_port_no = 3306,
 		m_opt = 0

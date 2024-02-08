@@ -183,7 +183,7 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
 #define FOOTERTEXT   cout << "<hr>" << endl \
   << "    <footer >" << endl \
   << "     <p id=\"foot\"> Powered by cards " <<  VERSION \
-  << "     &copy; 2007 - 2017 " \
+  << "     &copy; 2007 - 2024 " \
   << "<a href=\".\">NuTyX</a>.<br><br>" << endl \
   << "Hosted by <a href=\"http://tuxfamily.org\"><img src=\"../graphics/logo_tuxfamily_50.png\"/></a><br><br>" << endl \
   << "     <a href=\"http://www.wtfpl.net/\">" << endl \

@@ -259,6 +259,12 @@ void sideBar( const char *forum)
 		<< "<hr>";
 
 }
+void postedMessages ( const char *forum, const char *boardId)
+{
+		mysql forumDB("content/.mysql.conf");
+		forumDB.lastPosts(forum,boardId,10);
+
+}
 void lastUpdate(std::string& date)
 {
 	std::cout << "    <p class=\"updated\"> "
@@ -550,17 +556,27 @@ cellspacing=\"10\" width=\"100%\">"
 			tocTitle);
 		for (auto i : page) std::cout << i << std::endl;
 		if (Content[arguments.docName].boardId.size() > 0) {
+			const char * forumAdress;
+
 			std::cout << "<p>"
 				<< std::endl
 				<< "<a href=\"https://";
 			if ( sLang == "fr" ) {
+				forumAdress = "https://forum.nutyx.org";
 				std::cout << "forum.nutyx.org/index.php/board,"
 					<< Content[arguments.docName].boardId
 					<< "\">Soyez le premier à venir commenter le sujet.</a>";
+/*
+ * 				postedMessages(forumAdress,Content[arguments.docName].boardId.c_str());
+ */
 			} else {
+				forumAdress = "https://forums.nutyx.org";
 				std::cout << "forums.nutyx.org/index.php/board,"
 					<< Content[arguments.docName].boardId
 					<< "\">Be the first to comment on this subject.</a>";
+/*
+ * 				postedMessages(forumAdress,Content[arguments.docName].boardId.c_str());
+ */
 			}
 			std::cout << std::endl;
 		}
@@ -574,7 +590,9 @@ cellspacing=\"10\" width=\"100%\">"
 			<< arguments.docName
 			<< " is not existing yet</h1>"
 			<< std::endl;
-		for (auto i : Content["under-construction"].text) std::cout << i << std::endl;
+		for (auto i : Content["under-construction"].text)
+			std::cout << i << std::endl;
+
 		FOOTERTEXT;
 		endOfPage();
 		return 0;

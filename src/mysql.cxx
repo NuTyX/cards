@@ -18,7 +18,7 @@
 //  USA.
 //
 #include "mysql.h"
-using namespace std;
+
 namespace Sql
 {
 mysql::mysql(const char *configFileName)
@@ -137,17 +137,46 @@ void mysql::lastPosts(const char *forum, int n)
 void mysql::lastPosts(const char *forum, const char *id_board, int n)
 {
 	std::string sboard = id_board;
-	std::string query = "select poster_name, subject, body icon from smf_messages where id_board = " \
+	std::string query = "select poster_name, subject, body, icon from smf_messages where id_board = " \
 			+ sboard + " order by id_msg";
 	if(mysql_query(m_connection, query.c_str()))
 		std::cout << mysql_error(m_connection)
 						<< std::endl;
 	m_result= mysql_use_result(m_connection);
 
-	std::vector<std::string> list;
 	std::string sforum = forum;
 
+	std::string message = "<h1>Messages</h1>\n";
+	message+="<table>\n <tr class=\"header\">\n";
+	message+="  <td>Author</td><td>Topic</td>\n";
+	message+="   <tbody id=\"fbody\">\n";
+	m_list.push_back(message);
 	while ((m_rows = mysql_fetch_row(m_result)) != NULL) {
+		std::string author=" <td><b>";
+		author += m_rows[0];
+		author += "</b></td>";
+		message = "  <tr>\n";
+		message += author;
+		std::string subject="<td><b>";
+		subject += m_rows[1];
+		subject +="\n<p>\n<hr align=\"center\" style=\"width: 100%;\">\n";
+		subject += "</b></td>\n";
+		message += subject;
+		message +="  </tr>\n  <tr>\n  <td></td><td>";
+/*		message += m_rows[2];
+		message +="\n</a><br><br>"; */
+		message += "\n  </td>\n</tr>";
+		m_list.push_back(message);
+
+	}
+	message = "</tbody>\n</table>";
+	m_list.push_back(message);
+
+	int i = 0;
+	while ( i < m_list.size()) {
+					std::cout << m_list[i]
+									<< std::endl;
+		i++;
 	}
 }
 } /* namespace Sql */
