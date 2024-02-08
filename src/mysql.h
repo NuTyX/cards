@@ -56,7 +56,7 @@ private:
 	};
 	MYSQL *m_connection;
 	MYSQL_RES *m_result;
-	MYSQL_ROW rows;
+	MYSQL_ROW m_rows;
 	cards::Conf mysqlConfig;
 };
 } /* namespace Sql */

@@ -55,58 +55,61 @@ void mysql::lastPosts(const char *forum, int n)
 	m_result= mysql_use_result(m_connection);
 	board_t listOfBoards;
 
-	while ((rows = mysql_fetch_row(m_result)) != NULL) {
-		info.category = rows[2];
-		info.name = rows[1];
-		listOfBoards[ rows[0] ] = info;
+	while ((m_rows = mysql_fetch_row(m_result)) != NULL) {
+		info.category = m_rows[2];
+		info.name = m_rows[1];
+		listOfBoards[ m_rows[0] ] = info;
 	}
 
 	// retrieve the list of categories
 	if(mysql_query(m_connection,
 	"select id_cat, name from smf_categories order by id_cat"))
-		std::cerr << mysql_error(m_connection) << std::endl;
+		std::cout << mysql_error(m_connection)
+						<< std::endl;
 	m_result= mysql_use_result(m_connection);
 
 	category_t listOfCategories;
-	while ((rows = mysql_fetch_row(m_result)) != NULL) {
-		listOfCategories[ rows[0] ] = rows[1];
+	while ((m_rows = mysql_fetch_row(m_result)) != NULL) {
+		listOfCategories[ m_rows[0] ] = m_rows[1];
 	}
 
 	// retrieve the list of members
 	if (mysql_query(m_connection,
 	"select id_member, member_name, real_name from smf_members order by id_member"))
-		std::cerr << mysql_error(m_connection) << std::endl;
+		std::cout << mysql_error(m_connection)
+						<< std::endl;
 	m_result= mysql_use_result(m_connection);
 
 	userInfo_t user;
 	user_t listOfUsers;
-	while (( rows = mysql_fetch_row(m_result)) != NULL) {
-		user.member_name=rows[1];
-		user.real_name=rows[2];
-		listOfUsers[ rows[0] ] = user;
+	while (( m_rows = mysql_fetch_row(m_result)) != NULL) {
+		user.member_name=m_rows[1];
+		user.real_name=m_rows[2];
+		listOfUsers[ m_rows[0] ] = user;
 	}
 	// retrieve the list of messages
 	if(mysql_query(m_connection,
 	"select id_topic, id_msg, id_member, poster_time, subject, icon, id_board from smf_messages order by id_msg"))
-		std::cerr << mysql_error(m_connection) << std::endl;
+		std::cout << mysql_error(m_connection)
+						<< std::endl;
 	m_result= mysql_use_result(m_connection);
 
 	std::vector<std::string> list;
 	std::string sforum = forum;
-	while ((rows = mysql_fetch_row(m_result)) != NULL) {
-		std:string category = "<div style=\"text-transform: uppercase;\">";
-		category += listOfCategories[ listOfBoards[rows[6]].category ] + ":</div>";
-		std::string id_topic = rows[0];
-		std::string id_msg = rows[1];
+	while ((m_rows = mysql_fetch_row(m_result)) != NULL) {
+		std::string category = "<div style=\"text-transform: uppercase;\">";
+		category += listOfCategories[ listOfBoards[m_rows[6]].category ] + ":</div>";
+		std::string id_topic = m_rows[0];
+		std::string id_msg = m_rows[1];
 		std::string time = "<p class=\"updated\">";
-		time +=getDateFromEpoch(strtoul(rows[3],NULL,0)) + " UTC</p>";
+		time +=getDateFromEpoch(strtoul(m_rows[3],NULL,0)) + " UTC</p>";
         std::string board = "<b>";
-		board += listOfBoards[ rows[6] ].name;
+		board += listOfBoards[ m_rows[6] ].name;
 		std::string author = "<i>";
-		author += listOfUsers[ rows[2] ].real_name;
+		author += listOfUsers[ m_rows[2] ].real_name;
 		author += "</i>";
-		std::string subject = rows[4];
-		std::string icon = rows[5];
+		std::string subject = m_rows[4];
+		std::string icon = m_rows[5];
 		std::string message = time;
 		message += category;
 		message += board + "</b><br>";
@@ -123,10 +126,12 @@ void mysql::lastPosts(const char *forum, int n)
 	}
 	int i = 1;
 	while ( i < n + 1) {
-		cout << list[list.size()-i] << endl;
+					std::cout << list[list.size()-i]
+									<< std::endl;
 		i++;
 		if ( i != n + 1)
-			cout << "<hr align=\"center\" style=\"width: 50%;\">" << endl;
+			std::cout << "<hr align=\"center\" style=\"width: 50%;\">"
+							<< std::endl;
 	}
 }
 void mysql::lastPosts(const char *forum, const char *id_board, int n)
@@ -135,8 +140,15 @@ void mysql::lastPosts(const char *forum, const char *id_board, int n)
 	std::string query = "select poster_name, subject, body icon from smf_messages where id_board = " \
 			+ sboard + " order by id_msg";
 	if(mysql_query(m_connection, query.c_str()))
-		std::cerr << mysql_error(m_connection) << std::endl;
+		std::cout << mysql_error(m_connection)
+						<< std::endl;
 	m_result= mysql_use_result(m_connection);
+
+	std::vector<std::string> list;
+	std::string sforum = forum;
+
+	while ((m_rows = mysql_fetch_row(m_result)) != NULL) {
+	}
 }
 } /* namespace Sql */
 // vim:set ts=2 :
