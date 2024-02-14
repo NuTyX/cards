@@ -28,13 +28,13 @@ struct boardInfo_t {
 	std::string category;
 	std::string name;
 };
-struct userInfo_t {
+struct memberInfo_t {
 	std::string member_name;
 	std::string real_name;
 };
 typedef std::map< std::string, boardInfo_t > board_t;
 typedef std::map< std::string, std::string > category_t;
-typedef std::map< std::string, userInfo_t > user_t;
+typedef std::map< std::string, memberInfo_t > member_t;
 
 class mysql
 {
@@ -45,6 +45,12 @@ public:
 	void lastPosts(const char *forum, const char *id_board, int n);
 
 private:
+
+	void listOfBoards();
+	void listOfCategories();
+	void listOfMembers();
+	void listOfMessages();
+
 	const char *m_hostname;
 	const char *m_database;
 	const char *m_username;
@@ -57,10 +63,14 @@ private:
 		m_port_no = 3306,
 		m_opt = 0
 	};
-	MYSQL *m_connection;
-	MYSQL_RES *m_result;
-	MYSQL_ROW m_rows;
-	cards::Conf mysqlConfig;
+	MYSQL     *m_connection;
+	cards::Conf m_sqlConfig;
+
+	board_t    m_listOfBoards;
+	category_t m_listOfCategories;
+	member_t   m_listOfMembers;
+	std::vector<std::string> m_listOfMessages;
+
 };
 } /* namespace Sql */
 #endif /* MYSQL_H */
