@@ -50,52 +50,6 @@ void mysql::lastPosts(const char *forum, int n)
 	MYSQL_RES *res;
 	MYSQL_ROW rows;
 
-	/*
-	// retrieve the list of boards
-	boardInfo_t info;
-	if(mysql_query(m_connection,
-		"select id_board, name, id_cat from smf_boards order by id_board"))
-			std::cout << mysql_error(m_connection)
-				<< std::endl;
-	m_result= mysql_use_result(m_connection);
-	board_t listOfBoards;
-
-	while ((m_rows = mysql_fetch_row(m_result)) != NULL) {
-		info.category = m_rows[2];
-		info.name = m_rows[1];
-		listOfBoards[ m_rows[0] ] = info;
-	}
-	*/
-	/*
-	// retrieve the list of categories
-	if(mysql_query(m_connection,
-	"select id_cat, name from smf_categories order by id_cat"))
-		std::cout << mysql_error(m_connection)
-						<< std::endl;
-	m_result= mysql_use_result(m_connection);
-
-	category_t listOfCategories;
-	while ((m_rows = mysql_fetch_row(m_result)) != NULL) {
-		listOfCategories[ m_rows[0] ] = m_rows[1];
-	}
-	*/
-	/*
-	// retrieve the list of members
-	if (mysql_query(m_connection,
-	"select id_member, member_name, real_name from smf_members order by id_member"))
-		std::cout << mysql_error(m_connection)
-						<< std::endl;
-	m_result= mysql_use_result(m_connection);
-
-	userInfo_t user;
-	user_t listOfUsers;
-	while (( m_rows = mysql_fetch_row(m_result)) != NULL) {
-		user.member_name=m_rows[1];
-		user.real_name=m_rows[2];
-		listOfUsers[ m_rows[0] ] = user;
-	}
-	*/
-
 	// retrieve the list of messages
 	if(mysql_query(m_connection,
 	"select id_topic, id_msg, id_member, poster_time, subject, icon, id_board from smf_messages order by id_msg"))
