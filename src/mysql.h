@@ -32,9 +32,21 @@ struct memberInfo_t {
 	std::string member_name;
 	std::string real_name;
 };
+struct messageInfo_t {
+	std::string id_board;
+	std::string id_topic;
+	std::string id_member;
+	std::string poster_time;
+	std::string poster_name;
+	std::string subject;
+	std::string icon;
+	std::string body;
+
+};
 typedef std::map< std::string, boardInfo_t > board_t;
 typedef std::map< std::string, std::string > category_t;
 typedef std::map< std::string, memberInfo_t > member_t;
+typedef std::map< std::string, messageInfo_t > message_t;
 
 class mysql
 {
@@ -69,7 +81,7 @@ private:
 	board_t    m_listOfBoards;
 	category_t m_listOfCategories;
 	member_t   m_listOfMembers;
-	std::vector<std::string> m_listOfMessages;
+	message_t  m_listOfMessages;
 
 };
 } /* namespace Sql */

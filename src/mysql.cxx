@@ -49,12 +49,14 @@ void mysql::lastPosts(const char *forum, int n)
 	listOfMembers();
 	MYSQL_RES *res;
 	MYSQL_ROW rows;
+	std::vector<std::string> list;
 
 	// retrieve the list of messages
 	if(mysql_query(m_connection,
-	"select id_topic, id_msg, id_member, poster_time, subject, icon, id_board from smf_messages order by id_msg"))
-		std::cout << mysql_error(m_connection)
-						<< std::endl;
+	"select id_topic,id_msg,id_member,poster_time,subject,icon,id_board \
+		from smf_messages order by id_msg"))
+			std::cout << mysql_error(m_connection)
+				<< std::endl;
 	res= mysql_use_result(m_connection);
 
 	std::string sforum = forum;
@@ -84,7 +86,7 @@ void mysql::lastPosts(const char *forum, int n)
 		message += "\">";
 		message += subject;
 		message += "</a><br><br>";
-		m_listOfMessages.push_back(message);
+		list.push_back(message);
 	}
 
 	if (res)
@@ -92,12 +94,12 @@ void mysql::lastPosts(const char *forum, int n)
 
 	int i = 1;
 	while ( i < n + 1) {
-					std::cout << m_listOfMessages[m_listOfMessages.size()-i]
-									<< std::endl;
+		std::cout << list[list.size()-i]
+			<< std::endl;
 		i++;
 		if ( i != n + 1)
 			std::cout << "<hr align=\"center\" style=\"width: 50%;\">"
-							<< std::endl;
+				<< std::endl;
 	}
 }
 
@@ -105,7 +107,8 @@ void mysql::lastPosts(const char *forum, const char *id_board, int n)
 {
 				/*
 	std::string sboard = id_board;
-	std::string query = "select poster_name, subject, body, icon from smf_messages where id_board = " \
+	std::string query = "select poster_name,subject,body,icon \
+		from smf_messages where id_board = " \
 			+ sboard + " order by id_msg";
 	if(mysql_query(m_connection, query.c_str()))
 		std::cout << mysql_error(m_connection)
@@ -157,9 +160,10 @@ void mysql::listOfBoards()
 
 
 	if(mysql_query(m_connection,
-		"select id_board, name, id_cat from smf_boards order by id_board"))
-			std::cout << mysql_error(m_connection)
-				<< std::endl;
+		"select id_board,name,id_cat \
+			from smf_boards order by id_board"))
+				std::cout << mysql_error(m_connection)
+					<< std::endl;
 
 	if (res= mysql_use_result(m_connection))
 			std::cout << mysql_error(m_connection)
@@ -181,13 +185,14 @@ void mysql::listOfCategories()
 	category_t info;
 
 	if(mysql_query(m_connection,
-	"select id_cat, name from smf_categories order by id_cat"))
-		std::cout << mysql_error(m_connection)
-						<< std::endl;
+	"select id_cat,name \
+		from smf_categories order by id_cat"))
+			std::cout << mysql_error(m_connection)
+				<< std::endl;
 
 	if(res= mysql_use_result(m_connection))
-					std::cout << mysql_error(m_connection)
-									<< std::endl;
+		std::cout << mysql_error(m_connection)
+			<< std::endl;
 
 	while ((rows = mysql_fetch_row(res)) != NULL) {
 		m_listOfCategories[ rows[0] ] = rows[1];
@@ -203,13 +208,14 @@ void mysql::listOfMembers()
 	memberInfo_t member;
 
 	if(mysql_query(m_connection,
-	"select id_member, member_name, real_name from smf_members order by id_member"))
-		std::cout << mysql_error(m_connection)
-						<< std::endl;
+	"select id_member,member_name,real_name \
+		from smf_members order by id_member"))
+			std::cout << mysql_error(m_connection)
+				<< std::endl;
 
 	if(res= mysql_use_result(m_connection))
-					std::cout << mysql_error(m_connection)
-									<< std::endl;
+		std::cout << mysql_error(m_connection)
+			<< std::endl;
 
 	while (( rows = mysql_fetch_row(res)) != NULL) {
 		member.member_name=rows[1];
@@ -220,6 +226,36 @@ void mysql::listOfMembers()
 	if (res)
 		mysql_free_result(res);
 }
+void mysql::listOfMessages()
+{
+	MYSQL_RES *res;
+	MYSQL_ROW  rows;
+	messageInfo_t message;
 
+	if(mysql_query(m_connection,
+	"select id_msg,id_board,id_topic,id_member,poster_time,subject,icon \
+		from smf_messages order by id_msg"))
+			std::cout << mysql_error(m_connection)
+				<< std::endl;
+
+	if(res=mysql_use_result(m_connection))
+		std::cout << mysql_error(m_connection)
+			<< std::endl;
+
+	while (( rows = mysql_fetch_row(res)) !=NULL) {
+		message.id_board=rows[1];
+		message.id_topic=rows[2];
+		message.id_member=rows[3];
+		message.poster_time=rows[4];
+		message.subject=rows[5];
+		message.icon=rows[6];
+
+		m_listOfMessages [ rows[0] ] = message;
+
+	}
+
+	if(res)
+		mysql_free_result(res);
+}
 } /* namespace Sql */
 // vim:set ts=2 :
