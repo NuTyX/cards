@@ -131,10 +131,12 @@ void visitOfPage(char * argument)
 }
 void endOfPage(void)
 {
-	std::cout << "   </tr>" << std::endl
-	<< "  </table>" << std::endl
-	<< " </body>" << std::endl
-	<< "</html>" << std::endl;
+	std::cout << "   </tr>"
+		<< std::endl
+		<< "  </table>"
+		<< std::endl
+		<< " </body>"
+		<< std::endl;
 }
 string::size_type parseArguments(arguments_t &arguments)
 {
@@ -414,6 +416,9 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 }
 int main (int argc, char** argv)
 {
+	using namespace std::chrono;
+	high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
 	std::set<std::string> ArticleNamesList;
 
 	findDir(ArticleNamesList, "content/");
@@ -508,6 +513,7 @@ cellspacing=\"10\" width=\"100%\">"
 		}
 		FOOTERTEXT;
 		endOfPage();
+		std::cout << "</html>";
 		return 0;
 	}
 	if ( arguments.stringSearch.size() > 0) {
@@ -537,6 +543,7 @@ cellspacing=\"10\" width=\"100%\">"
 		}
 		FOOTERTEXT;
 		endOfPage();
+		std::cout << "</html>";
 		return 0;
 	}
 	if ( arguments.docName == "packages" ) {
@@ -546,6 +553,7 @@ cellspacing=\"10\" width=\"100%\">"
 		for (auto i : contentInfo.text) std::cout << i << std::endl;
 		FOOTERTEXT;
 		endOfPage();
+		std::cout << "</html>";
 		return 0;
 	}
 	if ( Content.find(arguments.docName) != Content.end() ){
@@ -582,6 +590,14 @@ cellspacing=\"10\" width=\"100%\">"
 		}
 		FOOTERTEXT;
 		endOfPage();
+
+		high_resolution_clock::time_point t2 = high_resolution_clock::now();
+		duration<double> time_span = duration_cast<duration<double>>((t2 - t1)*1000);
+		std::cout << time_span.count() << " mS"
+			<< std::endl
+			<< "</html>"
+			 << std::endl;
+
 		return 0;
 	}
 	else
@@ -595,6 +611,7 @@ cellspacing=\"10\" width=\"100%\">"
 
 		FOOTERTEXT;
 		endOfPage();
+		std::cout << "</html>";
 		return 0;
 	}
 	return 0;

@@ -47,6 +47,7 @@ void mysql::lastPosts(const char *forum, int n)
 	listOfBoards();
 	listOfCategories();
 	listOfMembers();
+	listOfMessages();
 	MYSQL_RES *res;
 	MYSQL_ROW rows;
 	std::vector<std::string> list;

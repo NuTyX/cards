@@ -24,6 +24,10 @@
 #include "pkgrepo.h"
 #include "mysql.h"
 
+#include <ctime>
+#include <ratio>
+#include <chrono>
+
 #define INSERTPACKAGE(basename, name) listOfPackages.insert("<td>" \
 + i.arch + "</td>" \
 + "<td>" + i.branch + "</td>"  \
