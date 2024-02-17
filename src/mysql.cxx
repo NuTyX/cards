@@ -49,38 +49,35 @@ void mysql::lastPosts(const char *forum)
 	listOfMembers();
 	listOfMessages();
 
-	int i = 1;
+	int i = 0;
 
-	while ( i < 11) {
+	while ( i < 10) {
 
-		std::cout << "<div style=\"text-transform: uppercase;\">"
-			<< m_listOfCategories[m_listOfBoards[m_listOfMessages[m_listOfMessages.size()-i].id_board].category]
-			<< ":</div>"
-			<< "<p class=\"updated\">"
-			<< getDateFromEpoch(strtoul(m_listOfMessages[m_listOfMessages.size()-i].poster_time.c_str(),NULL,0))
-			<< " UTC</p><b>"
-			<< m_listOfBoards[ m_listOfMessages[m_listOfMessages.size()-i].id_board ].name
-			<< "</b><br>"
-			<< "<i>"
-			<< m_listOfMembers[ m_listOfMessages[m_listOfMessages.size()-i].id_member].real_name
-			<< "</i>"
-			<< "<br><img src=\"../../graphics/"
-			<< m_listOfMessages[m_listOfMessages.size()-i].icon
+		std::cout			<< "<p class=\"updated\">"
+			<< getDateFromEpoch(strtoul(m_listOfMessages[i].poster_time.c_str(),NULL,0))
+			<< " UTC</p><div style=\"text-transform: uppercase;\">"
+			<< m_listOfCategories[m_listOfBoards[m_listOfMessages[i].id_board].category]
+			<< ":</div><b>"
+			<< m_listOfBoards[ m_listOfMessages[i].id_board ].name
+			<< "</b><br><i>"
+			<< m_listOfMembers[ m_listOfMessages[i].id_member].real_name
+			<< "</i><br><img src=\"../../graphics/"
+			<< m_listOfMessages[i].icon
 			<< ".gif\" alt=\"\" /> <a href=\""
 			<< forum
 			<< "/index.php?topic="
-			<< m_listOfMessages[m_listOfMessages.size()-i].id_topic
+			<< m_listOfMessages[i].id_topic
 			<< ".msg"
-			<< m_listOfMessages[m_listOfMessages.size()-i].id_msg
+			<< m_listOfMessages[i].id_msg
 			<< "#msg"
-			<< m_listOfMessages[m_listOfMessages.size()-i].id_msg
+			<< m_listOfMessages[i].id_msg
 			<< "\">"
-			<< m_listOfMessages[m_listOfMessages.size()-i].subject
+			<< m_listOfMessages[i].subject
 			<< "</a><br><br>";
 
 		i++;
 
-		if ( i != 11)
+		if ( i < 10)
 			std::cout << "<hr align=\"center\" style=\"width: 50%;\">"
 				<< std::endl;
 
@@ -279,7 +276,8 @@ void mysql::listOfMessages()
 
 	if(mysql_query(m_connection,
 	"select id_msg,id_board,id_topic,id_member,poster_time,subject,icon \
-		from smf_messages order by id_msg"))
+		from smf_messages order by id_msg \
+		DESC LIMIT 10"))
 			std::cout << mysql_error(m_connection)
 				<< std::endl;
 
