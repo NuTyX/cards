@@ -529,20 +529,23 @@ cellspacing=\"10\" width=\"100%\">"
 					}
 				}
 			}
-			for ( auto i : searchList) std::cout << i << std::endl;
+			for (auto i : searchList)
+				std::cout << i << std::endl;
 		}
 	} else if ( arguments.docName == "packages" ) {
 		contentInfo_t contentInfo;
 		contentInfo.text.push_back("<h1>NuTyX Packages</h1>");
 		searchpkg(contentInfo,arguments);
-		for (auto i : contentInfo.text) std::cout << i << std::endl;
+		for (auto i : contentInfo.text)
+			std::cout << i << std::endl;
 	} else if ( Content.find(arguments.docName) != Content.end() ){
 		SEARCH;
 		lastUpdate(Content[arguments.docName].date);
 		std::vector<std::string> page = parseHTMLDelimitedList( Content[arguments.docName].text,
 			"<h",
 			tocTitle);
-		for (auto i : page) std::cout << i << std::endl;
+		for (auto i : page)
+			std::cout << i << std::endl;
 		if (Content[arguments.docName].boardId.size() > 0) {
 			const char * forumAdress;
 
@@ -584,10 +587,8 @@ cellspacing=\"10\" width=\"100%\">"
 
 	high_resolution_clock::time_point t2 = high_resolution_clock::now();
 	duration<double> time_span = duration_cast<duration<double>>((t2 - t1)*1000);
-	std::cout << time_span.count() << " mS"
-		<< std::endl
-		<< "</html>"
-		<< std::endl;
+	std::cout << time_span.count()
+		<< " mS\n</html>\n";
 
 	return 0;
 }
