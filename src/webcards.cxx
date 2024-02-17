@@ -491,11 +491,6 @@ cellspacing=\"10\" width=\"100%\">"
 	/* Parse all knows argument so far */
 	pos = parseArguments(arguments);
 
-	if  ( pos == string::npos ) {
-		std::cout << "Wrong arguments"
-			<< std::endl;
-		return 0;
-	}
 	if ( arguments.packageSearch.size() > 0 ) {
 		visitOfPage(pArgument);
 		if (arguments.packageSearch.size() < 2) {

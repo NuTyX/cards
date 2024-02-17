@@ -48,8 +48,6 @@ void mysql::lastPosts(const char *forum)
 	listOfCategories();
 	listOfMembers();
 	listOfMessages();
-	MYSQL_RES *res;
-	MYSQL_ROW rows;
 
 	int i = 1;
 
