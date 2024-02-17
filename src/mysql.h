@@ -33,6 +33,7 @@ struct memberInfo_t {
 	std::string real_name;
 };
 struct messageInfo_t {
+	std::string id_msg;
 	std::string id_board;
 	std::string id_topic;
 	std::string id_member;
@@ -46,13 +47,15 @@ struct messageInfo_t {
 typedef std::map< std::string, boardInfo_t > board_t;
 typedef std::map< std::string, std::string > category_t;
 typedef std::map< std::string, memberInfo_t > member_t;
-typedef std::map< std::string, messageInfo_t > message_t;
+typedef std::vector<messageInfo_t> message_t;
 
 class mysql
 {
 public:
-	virtual ~mysql();
 	mysql(const char *configFileName);
+	virtual ~mysql();
+
+	void lastPosts(const char *forum);
 	void lastPosts(const char *forum, int n);
 	void lastPosts(const char *forum, const char *id_board, int n);
 

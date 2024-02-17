@@ -250,13 +250,12 @@ void sideBar( const char *forum)
 {
 	std::cout << "  <td class=\"sidebar\" width=\"20%\">"
 		<< std::endl
-		<< "   <h4>Forum</h4>"
-		<< std::endl
+		<< "   <h4>Forum</h4>\n"
 		<< "    <div>"
 		<< std::endl;
 	mysql forumDB("content/.mysql.conf");
-	forumDB.lastPosts(forum,10);
-	std::cout << "    </div>"
+	forumDB.lastPosts(forum);
+	std::cout << "\n    </div>"
 		<< std::endl
 		<< "<hr>";
 
@@ -283,7 +282,6 @@ content_t getContent(std::set<string>& list)
 		contentInfo_t contentInfo;
 		contentInfo.date = getModifyTimeFile(fullName);
 		contentInfo.boardId= pv.value;
-		std::vector<std::string> contentFile;
 		parseFile(contentInfo.text,fullName.c_str());
 
 		content[pv.parameter] = contentInfo;
@@ -493,9 +491,11 @@ cellspacing=\"10\" width=\"100%\">"
 	/* Parse all knows argument so far */
 	pos = parseArguments(arguments);
 
-/*	if  ( pos == string::npos )
+	if  ( pos == string::npos ) {
+		std::cout << "Wrong arguments"
+			<< std::endl;
 		return 0;
-*/
+	}
 	if ( arguments.packageSearch.size() > 0 ) {
 		visitOfPage(pArgument);
 		if (arguments.packageSearch.size() < 2) {
@@ -511,12 +511,7 @@ cellspacing=\"10\" width=\"100%\">"
 					std::cout << i << std::endl;
 			}
 		}
-		FOOTERTEXT;
-		endOfPage();
-		std::cout << "</html>";
-		return 0;
-	}
-	if ( arguments.stringSearch.size() > 0) {
+	} else if ( arguments.stringSearch.size() > 0) {
 		if (arguments.stringSearch.size() < 3) {
 			std::cout << std::endl
 				<< "<div class=\"note\"><img alt=\"[Note]\" \
@@ -541,22 +536,12 @@ cellspacing=\"10\" width=\"100%\">"
 			}
 			for ( auto i : searchList) std::cout << i << std::endl;
 		}
-		FOOTERTEXT;
-		endOfPage();
-		std::cout << "</html>";
-		return 0;
-	}
-	if ( arguments.docName == "packages" ) {
+	} else if ( arguments.docName == "packages" ) {
 		contentInfo_t contentInfo;
 		contentInfo.text.push_back("<h1>NuTyX Packages</h1>");
 		searchpkg(contentInfo,arguments);
 		for (auto i : contentInfo.text) std::cout << i << std::endl;
-		FOOTERTEXT;
-		endOfPage();
-		std::cout << "</html>";
-		return 0;
-	}
-	if ( Content.find(arguments.docName) != Content.end() ){
+	} else if ( Content.find(arguments.docName) != Content.end() ){
 		SEARCH;
 		lastUpdate(Content[arguments.docName].date);
 		std::vector<std::string> page = parseHTMLDelimitedList( Content[arguments.docName].text,
@@ -588,17 +573,6 @@ cellspacing=\"10\" width=\"100%\">"
 			}
 			std::cout << std::endl;
 		}
-		FOOTERTEXT;
-		endOfPage();
-
-		high_resolution_clock::time_point t2 = high_resolution_clock::now();
-		duration<double> time_span = duration_cast<duration<double>>((t2 - t1)*1000);
-		std::cout << time_span.count() << " mS"
-			<< std::endl
-			<< "</html>"
-			 << std::endl;
-
-		return 0;
 	}
 	else
 	{
@@ -608,12 +582,18 @@ cellspacing=\"10\" width=\"100%\">"
 			<< std::endl;
 		for (auto i : Content["under-construction"].text)
 			std::cout << i << std::endl;
-
-		FOOTERTEXT;
-		endOfPage();
-		std::cout << "</html>";
-		return 0;
 	}
+
+	FOOTERTEXT;
+	endOfPage();
+
+	high_resolution_clock::time_point t2 = high_resolution_clock::now();
+	duration<double> time_span = duration_cast<duration<double>>((t2 - t1)*1000);
+	std::cout << time_span.count() << " mS"
+		<< std::endl
+		<< "</html>"
+		<< std::endl;
+
 	return 0;
 }
 // vim:set ts=2 :

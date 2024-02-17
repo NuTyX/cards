@@ -42,6 +42,52 @@ mysql::~mysql()
 	if (m_connection)
 		mysql_close(m_connection);
 }
+void mysql::lastPosts(const char *forum)
+{
+	listOfBoards();
+	listOfCategories();
+	listOfMembers();
+	listOfMessages();
+	MYSQL_RES *res;
+	MYSQL_ROW rows;
+
+	int i = 1;
+
+	while ( i < 11) {
+
+		std::cout << "<div style=\"text-transform: uppercase;\">"
+			<< m_listOfCategories[m_listOfBoards[m_listOfMessages[m_listOfMessages.size()-i].id_board].category]
+			<< ":</div>"
+			<< "<p class=\"updated\">"
+			<< getDateFromEpoch(strtoul(m_listOfMessages[m_listOfMessages.size()-i].poster_time.c_str(),NULL,0))
+			<< " UTC</p><b>"
+			<< m_listOfBoards[ m_listOfMessages[m_listOfMessages.size()-i].id_board ].name
+			<< "</b><br>"
+			<< "<i>"
+			<< m_listOfMembers[ m_listOfMessages[m_listOfMessages.size()-i].id_member].real_name
+			<< "</i>"
+			<< "<br><img src=\"../../graphics/"
+			<< m_listOfMessages[m_listOfMessages.size()-i].icon
+			<< ".gif\" alt=\"\" /> <a href=\""
+			<< forum
+			<< "/index.php?topic="
+			<< m_listOfMessages[m_listOfMessages.size()-i].id_topic
+			<< ".msg"
+			<< m_listOfMessages[m_listOfMessages.size()-i].id_msg
+			<< "#msg"
+			<< m_listOfMessages[m_listOfMessages.size()-i].id_msg
+			<< "\">"
+			<< m_listOfMessages[m_listOfMessages.size()-i].subject
+			<< "</a><br><br>";
+
+		i++;
+
+		if ( i != 11)
+			std::cout << "<hr align=\"center\" style=\"width: 50%;\">"
+				<< std::endl;
+
+	}
+}
 void mysql::lastPosts(const char *forum, int n)
 {
 	listOfBoards();
@@ -58,7 +104,7 @@ void mysql::lastPosts(const char *forum, int n)
 		from smf_messages order by id_msg"))
 			std::cout << mysql_error(m_connection)
 				<< std::endl;
-	res= mysql_use_result(m_connection);
+	res = mysql_use_result(m_connection);
 
 	std::string sforum = forum;
 	while ((rows = mysql_fetch_row(res)) != NULL) {
@@ -166,7 +212,7 @@ void mysql::listOfBoards()
 				std::cout << mysql_error(m_connection)
 					<< std::endl;
 
-	if (res= mysql_use_result(m_connection))
+	if (res = mysql_use_result(m_connection))
 			std::cout << mysql_error(m_connection)
 				<< std::endl;
 
@@ -214,7 +260,7 @@ void mysql::listOfMembers()
 			std::cout << mysql_error(m_connection)
 				<< std::endl;
 
-	if(res= mysql_use_result(m_connection))
+	if(res = mysql_use_result(m_connection))
 		std::cout << mysql_error(m_connection)
 			<< std::endl;
 
@@ -239,11 +285,12 @@ void mysql::listOfMessages()
 			std::cout << mysql_error(m_connection)
 				<< std::endl;
 
-	if(res=mysql_use_result(m_connection))
+	if(res = mysql_use_result(m_connection))
 		std::cout << mysql_error(m_connection)
 			<< std::endl;
 
 	while (( rows = mysql_fetch_row(res)) !=NULL) {
+		message.id_msg=rows[0];
 		message.id_board=rows[1];
 		message.id_topic=rows[2];
 		message.id_member=rows[3];
@@ -251,7 +298,7 @@ void mysql::listOfMessages()
 		message.subject=rows[5];
 		message.icon=rows[6];
 
-		m_listOfMessages [ rows[0] ] = message;
+		m_listOfMessages.push_back(message);
 
 	}
 
