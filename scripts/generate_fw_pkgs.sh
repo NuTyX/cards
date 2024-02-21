@@ -2,7 +2,7 @@
 
 if [ -z "${1}" ]; then
   echo "
->>> At least one argument is mandatory
+>>> The version is mandatory
 "
   exit 1
 fi
@@ -55,7 +55,6 @@ do
   sed -n "/${N//\//\\/}/,/^-----/p" WHENCE.in >"$DIR/WHENCE"
   sed -i "/${N//\//\\/}/,/^-----/d" WHENCE.in
   DESCRIPTION="$(echo $(head -1 $DIR/WHENCE)|sed s/^Driver:\ //)"
-
   [ -z "$DESCRIPTION" ] && DESCRIPTION="$FILE firmware for Linux"
   [ "$DESCRIPTION" == "$FILE" ] && DESCRIPTION="$FILE firmware for Linux"
 
@@ -64,6 +63,8 @@ url='https://git.kernel.org/?p=linux/kernel/git/firmware/linux-firmware.git;a=su
 
 packager=\"tnut <tnut@nutyx.org>\"
 contributors=\"Spiky\"
+
+license=\"Custom\"
 
 set=(linux-firmware)
 
@@ -80,9 +81,16 @@ cd linux-firmware-\$version
 cp ../WHENCE .
 make DESTDIR=\$PKG FIRMWAREDIR=/lib/firmware install
 
-install -Dt \$PKG/usr/share/licenses/\$name -m644 WHENCE
-}
-" > $DIR/Pkgfile
+install -Dt \$PKG/usr/share/licenses/\$name -m644 WHENCE" > $DIR/Pkgfile
+
+for LICENSE in $(grep LICEN $DIR/WHENCE|sed -e 's/^.*See //;s/ .*//')
+do
+ [ -f "$LICENSE" ] && \
+ echo "install -Dt \$PKG/usr/share/licenses/\$name -m644\
+ $LICENSE" >> $DIR/Pkgfile
+done
+
+echo "}" >> $DIR/Pkgfile
 
 done
 rm -f List List.sort List.uniq WHENCE.in
