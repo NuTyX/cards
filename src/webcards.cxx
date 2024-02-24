@@ -256,8 +256,7 @@ void sideBar( const char *forum)
 	mysql forumDB("content/.mysql.conf");
 	forumDB.lastPosts(forum);
 	std::cout << "\n    </div>"
-		<< std::endl
-		<< "<hr>";
+		<< std::endl;
 
 }
 void postedMessages ( const char *forum, const char *boardId)
@@ -449,6 +448,7 @@ int main (int argc, char** argv)
 
 	HEADERTEXT;
 	CSSDATA;
+
 	pos = sPath.find_last_of( "/\\" );
 
 	if ( pos == std::string::npos )
