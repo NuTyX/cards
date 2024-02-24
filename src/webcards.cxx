@@ -447,7 +447,6 @@ int main (int argc, char** argv)
 	std::string sPath = sPwd.substr(0,pos);
 
 	HEADERTEXT;
-	CSSDATA;
 
 	pos = sPath.find_last_of( "/\\" );
 

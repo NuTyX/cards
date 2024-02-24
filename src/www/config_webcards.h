@@ -198,11 +198,13 @@ AAAAFUlEQVR42mJgBAEGGMmAxAYCgAADAAGGABmnk/7aAAAAAElFTkSuQmCC); " << endl \
 #define HEADERTEXT  	cout << "Content-type:text/html\r\n\r\n" \
 	<< "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"" << endl \
 	<< "     \"http://www.w3.org/TR/html4/strict.dtd\">" << endl \
-	<< "<HTML>" << endl \
-	<< "   <HEAD>" << endl \
-	<< "      <TITLE>NuTyX GNU/Linux</TITLE>" << endl \
-	<< "      <META charset=\"utf-8\" />" << endl \
-	<< "      <LINK rel=\"shortcut icon\" href=\"../favicon.icon\">" \
+	<< "<html>" << endl \
+	<< "   <head>" << endl \
+	<< "      <title>NuTyX GNU/Linux</title>" << endl \
+	<< "      <meta charset=\"utf-8\" />" << endl \
+	<< "      <link rel=\"shortcut icon\" href=\"../favicon.icon\">" << endl \
+	<< "      <link href=\"../style.css\" rel=\"stylesheet\">" << endl \
+	<< "   </head>" \
 	<< endl
 
 #define SEARCH cout << "   <div>" << endl \
