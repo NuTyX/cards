@@ -53,17 +53,17 @@ void mysql::lastPosts(const char *forum)
 
 	while ( i < 10) {
 
-		std::cout			<< "<p class=\"updated\">"
+		std::cout			<< "   <div class=\"post-time\">"
 			<< getDateFromEpoch(strtoul(m_listOfMessages[i].poster_time.c_str(),NULL,0))
-			<< " UTC</p><div style=\"text-transform: uppercase;\">"
+			<< " UTC</div>\n   <div class=\"post-category\">"
 			<< m_listOfCategories[m_listOfBoards[m_listOfMessages[i].id_board].category]
-			<< ":</div><b>"
+			<< ":</div>\n   <div class=\"post-subject\">"
 			<< m_listOfBoards[ m_listOfMessages[i].id_board ].name
-			<< "</b><br><i>"
+			<< "</div>\n   <div class=\"post-author\">"
 			<< m_listOfMembers[ m_listOfMessages[i].id_member].real_name
-			<< "</i><br><img src=\"../../graphics/"
+			<< "</div>\n   <img class=\"post-icon\" src=\"../../graphics/"
 			<< m_listOfMessages[i].icon
-			<< ".gif\" alt=\"\" /> <a href=\""
+			<< ".gif\" alt=\"\" />\n   <a class=\"post-link\" href=\""
 			<< forum
 			<< "/index.php?topic="
 			<< m_listOfMessages[i].id_topic
@@ -71,9 +71,9 @@ void mysql::lastPosts(const char *forum)
 			<< m_listOfMessages[i].id_msg
 			<< "#msg"
 			<< m_listOfMessages[i].id_msg
-			<< "\">"
+			<< "\">\n    "
 			<< m_listOfMessages[i].subject
-			<< "</a><br><br>";
+			<< "\n   </a>\n\n   ";
 
 		i++;
 
@@ -83,117 +83,6 @@ void mysql::lastPosts(const char *forum)
 
 	}
 }
-void mysql::lastPosts(const char *forum, int n)
-{
-	listOfBoards();
-	listOfCategories();
-	listOfMembers();
-	listOfMessages();
-	MYSQL_RES *res;
-	MYSQL_ROW rows;
-	std::vector<std::string> list;
-
-	// retrieve the list of messages
-	if(mysql_query(m_connection,
-	"select id_topic,id_msg,id_member,poster_time,subject,icon,id_board \
-		from smf_messages order by id_msg"))
-			std::cout << mysql_error(m_connection)
-				<< std::endl;
-	res = mysql_use_result(m_connection);
-
-	std::string sforum = forum;
-	while ((rows = mysql_fetch_row(res)) != NULL) {
-		std::string category = "<div style=\"text-transform: uppercase;\">";
-		category += m_listOfCategories[ m_listOfBoards[rows[6]].category ] + ":</div>";
-		std::string id_topic = rows[0];
-		std::string id_msg = rows[1];
-		std::string time = "<p class=\"updated\">";
-		time +=getDateFromEpoch(strtoul(rows[3],NULL,0)) + " UTC</p>";
-        std::string board = "<b>";
-		board += m_listOfBoards[ rows[6] ].name;
-		std::string author = "<i>";
-		author += m_listOfMembers[ rows[2] ].real_name;
-		author += "</i>";
-		std::string subject = rows[4];
-		std::string icon = rows[5];
-		std::string message = time;
-		message += category;
-		message += board + "</b><br>";
-		message += author;
-		message += "<br><img src=\"../../graphics/" + icon;
-		message += ".gif\" alt=\"\" /> <a href=\"" + sforum;
-		message += "/index.php?topic=" + id_topic;
-		message += ".msg" + id_msg;
-		message += "#msg" + id_msg;
-		message += "\">";
-		message += subject;
-		message += "</a><br><br>";
-		list.push_back(message);
-	}
-
-	if (res)
-		mysql_free_result(res);
-
-	int i = 1;
-	while ( i < n + 1) {
-		std::cout << list[list.size()-i]
-			<< std::endl;
-		i++;
-		if ( i != n + 1)
-			std::cout << "<hr align=\"center\" style=\"width: 50%;\">"
-				<< std::endl;
-	}
-}
-
-void mysql::lastPosts(const char *forum, const char *id_board, int n)
-{
-				/*
-	std::string sboard = id_board;
-	std::string query = "select poster_name,subject,body,icon \
-		from smf_messages where id_board = " \
-			+ sboard + " order by id_msg";
-	if(mysql_query(m_connection, query.c_str()))
-		std::cout << mysql_error(m_connection)
-						<< std::endl;
-	m_result= mysql_use_result(m_connection);
-
-	std::string sforum = forum;
-
-	std::string message = "<h1>Messages</h1>\n";
-	message+="<table>\n <tr class=\"header\">\n";
-	message+="  <td>Author</td><td>Topic</td>\n";
-	message+="   <tbody id=\"fbody\">\n";
-	m_list.push_back(message);
-	while ((m_rows = mysql_fetch_row(m_result)) != NULL) {
-		std::string author=" <td><b>";
-		author += m_rows[0];
-		author += "</b></td>";
-		message = "  <tr>\n";
-		message += author;
-		std::string subject="<td><b>";
-		subject += m_rows[1];
-		subject +="\n<p>\n<hr align=\"center\" style=\"width: 100%;\">\n";
-		subject += "</b></td>\n";
-		message += subject;
-		message +="  </tr>\n  <tr>\n  <td></td><td>";
-		message += m_rows[2];
-		message +="\n</a><br><br>";
-		message += "\n  </td>\n</tr>";
-		m_list.push_back(message);
-
-	}
-	message = "</tbody>\n</table>";
-	m_list.push_back(message);
-
-	int i = 0;
-	while ( i < m_list.size()) {
-					std::cout << m_list[i]
-									<< std::endl;
-		i++;
-	}
-	*/
-}
-
 void mysql::listOfBoards()
 {
 	MYSQL_RES *res;

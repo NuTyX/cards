@@ -56,7 +56,6 @@ public:
 	virtual ~mysql();
 
 	void lastPosts(const char *forum);
-	void lastPosts(const char *forum, int n);
 	void lastPosts(const char *forum, const char *id_board, int n);
 
 private:

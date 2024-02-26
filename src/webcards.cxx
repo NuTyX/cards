@@ -131,11 +131,7 @@ void visitOfPage(char * argument)
 }
 void endOfPage(void)
 {
-	std::cout << "   </tr>"
-		<< std::endl
-		<< "  </table>"
-		<< std::endl
-		<< " </body>"
+	std::cout << " </body>"
 		<< std::endl;
 }
 string::size_type parseArguments(arguments_t &arguments)
@@ -248,22 +244,17 @@ void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
 }
 void sideBar( const char *forum)
 {
-	std::cout << "  <td class=\"sidebar\" width=\"20%\">"
-		<< std::endl
-		<< "   <h4>Forum</h4>\n"
-		<< "    <div>"
+	std::cout << "<td class=\"forum\">\n"
+		<< "   <h1 class=\"forum\">Forum</h1>"
 		<< std::endl;
 	mysql forumDB("content/.mysql.conf");
 	forumDB.lastPosts(forum);
-	std::cout << "\n    </div>"
-		<< std::endl;
-
 }
 void postedMessages ( const char *forum, const char *boardId)
 {
-		mysql forumDB("content/.mysql.conf");
+/*		mysql forumDB("content/.mysql.conf");
 		forumDB.lastPosts(forum,boardId,10);
-
+*/
 }
 void lastUpdate(std::string& date)
 {
@@ -460,22 +451,12 @@ int main (int argc, char** argv)
 		MENUFR;
 		tocTitle = "Sommaire";
 		search = "Recherche ...";
-
-	} else if ( sLang == "tr" ) {
-		MENUTR;
-		search = "Ara ...";
-		tocTitle = "İçindekiler ";
 	 } else {
 		MENUEN;
 		search = "Search ...";
 		tocTitle = "Contents";
 	}
-	/* The main table */
-	std::cout << "<table border=\"0\" cellpadding=\"15\" \
-cellspacing=\"10\" width=\"100%\">"
-		<< std::endl
-  		<< " <tr valign=\"top\">"
-		<< std::endl;
+
 	const char * forumAdress;
 	if ( sLang == "fr" )
 	{
@@ -484,7 +465,7 @@ cellspacing=\"10\" width=\"100%\">"
 		forumAdress = "https://forums.nutyx.org";
 	}
 	sideBar(forumAdress);
-	std::cout << "  <td valign=\"top\" align=\"left\" width=\"100%\">"
+	std::cout << "  </td>\n   <td class=\"content\">\n  "
 		<< std::endl;
 
 	/* Parse all knows argument so far */

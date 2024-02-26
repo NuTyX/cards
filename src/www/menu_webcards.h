@@ -22,83 +22,61 @@
 
 #define MENUFR cout << "<body>" << endl \
   << "    <table>" << endl \
-  << "     <tr>" << endl \
-  << "      <td style=\"text-align: center; width: 20%;\">" << endl \
-  << "       <a href=\".\"><img id=\"logo\" src=\"../graphics/logo_nutyx_120.png\" alt=\"logo nutyx\" /></a>" << endl \
+  << "     <tr>\n" << endl \
+  << "      <td class\"logo\">" << endl \
+  << "       <a href=\".\">" << endl \
+  << "        <img src=\"../graphics/logo_nutyx_120.png\" alt=\"NuTyX Reload\" height=\"85\" width=\"60\" class=\"center\">" << endl \
+  << "       </a>" << endl \
   << "      </td>" << endl \
-  << "      <td>" << endl \
-  << "       <table class=\"sidebar\" >" << endl \
-  << "        <tr>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"news\">Nouvelles</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"downloads\">Téléchargements</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"documentation\">Documentation</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"packages\">Paquets</a><br><br>" << endl \
-  << "        </tr>" << endl \
-  << "        <tr>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"faq\">FAQ</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"information\">Information</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"screenshots\">Captures d'écrans</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"../en\" title=\"Home\"> <img src=\"../graphics/gb.gif\" alt=\"Home\" height=\"12\" width=\"35\"></a><br><br>" << endl \
-  << "        </tr>" << endl \
-  << "       </table>" << endl \
-  << "      </td>" << endl \
-  << "     </tr>" << endl \
-  << "    </table>" << endl \
-  << "   <hr>" << endl
-
-#define MENUTR cout << "<body>" << endl \
-  << "    <table>" << endl \
-  << "     <tr>" << endl \
-  << "      <td style=\"text-align: center; width: 20%;\">" << endl \
-  << "       <a href=\".\"><img id=\"logo\" src=\"../graphics/logo_nutyx_120.png\" alt=\"logo nutyx\" /></a>" << endl \
-  << "      </td>" << endl \
-  << "      <td>" << endl \
+  << "      <td class=\"top-menu\">" << endl \
   << "       <table>" << endl \
   << "        <tr>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"news\">Haberler</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"downloads\">Indirmeler</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"information\">Bilgilendirme</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"documentation\">Dökümantasyon</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"packages\">Paketler</a><br><br>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"news\">Nouvelles</a>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"downloads\">Téléchargements</a>"  << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"documentation\">Documentation</a>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"packages\">Paquets</a>" << endl \
   << "        </tr>" << endl \
   << "        <tr>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"faq\">Sık Sorulan Sorular</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"information\">Bilgilendirme</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"screenshots\">Screenshots</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"../en\" title=\"Home\"> <img src=\"../graphics/gb.gif\" alt=\"Home\" height=\"12\" width=\"35\"></a><br><br>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"faq\">FAQ</a>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"information\">Information</a>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"screenshots\">Captures d'écrans</a>"  << endl \
+  << "            <td class=\"menu\"><a href=\"../en\" title=\"Home\"> <img src=\"../graphics/gb.gif\" alt=\"Home\" height=\"25\" width=\"60\" class=\"center\">" << endl \
+  << "           </a>" << endl \
   << "        </tr>" << endl \
   << "       </table>" << endl \
   << "      </td>" << endl \
   << "     </tr>" << endl \
-  << "    </table>" << endl \
-  << "   <hr>" << endl
-
+  << "     <hr>" << endl \
+  << "     <tr>" << endl
 
 #define MENUEN cout << "<body>" << endl \
   << "    <table>" << endl \
-  << "     <tr>" << endl \
-  << "      <td style=\"text-align: center; width: 20%\">" << endl \
-  << "       <a href=\".\"><img id=\"logo\" src=\"../graphics/logo_nutyx_120.png\" alt=\"logo nutyx\" /></a>" << endl \
+  << "     <tr>\n" << endl \
+  << "      <td class\"logo\">" << endl \
+  << "       <a href=\".\">" << endl \
+  << "        <img src=\"../graphics/logo_nutyx_120.png\" alt=\"NuTyX Reload\" height=\"85\" width=\"60\" class=\"center\">" << endl \
+  << "       </a>" << endl \
   << "      </td>" << endl \
-  << "      <td>" << endl \
+  << "      <td class=\"top-menu\">" << endl \
   << "       <table>" << endl \
   << "        <tr>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"news\">News</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"downloads\">Downloads</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"documentation\">Documentation</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"packages\">Packages</a><br><br>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"news\">News</a>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"downloads\">Downloads</a>"  << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"documentation\">Documentation</a>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"packages\">Packages</a>" << endl \
   << "        </tr>" << endl \
   << "        <tr>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"faq\">FAQ</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"information\">Information</a><br><br>" << endl \
-  << "            <td class=\"menu\"><br><a href=\"screenshots\">Screenshots</a><br><br>"  << endl \
-  << "            <td class=\"menu\"><br><a href=\"../fr\" title=\"Accueil\"> <img src=\"../graphics/fr.gif\" alt=\"Accueil\" height=\"12\" width=\"35\"></a><br><br>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"faq\">FAQ</a>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"information\">Information</a>" << endl \
+  << "            <td class=\"menu\"><a class=\"menu\" href=\"screenshots\">Screenshots</a>"  << endl \
+  << "            <td class=\"menu\"><a href=\"../fr\" title=\"Home\"> <img src=\"../graphics/fr.gif\" alt=\"Home\" height=\"25\" width=\"60\" class=\"center\">" << endl \
+  << "           </a>" << endl \
   << "        </tr>" << endl \
   << "       </table>" << endl \
   << "      </td>" << endl \
   << "     </tr>" << endl \
-  << "    </table>" << endl \
-  << "   <hr>" << endl
+  << "     <hr>" << endl \
+  << "     <tr>" << endl
 
 #endif /* MENUWEBCARDS_H */
 // vim:set ts=2 :
