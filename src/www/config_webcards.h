@@ -31,7 +31,7 @@
 	<< "   </head>" \
 	<< endl
 
-#define FOOTERTEXT   cout << "\n      </td>\n     </tr>\n    </table>\n<hr>\n" \
+#define FOOTERTEXT   cout << "\n      </td>\n     </tr>\n    </table>\n" \
   << "    <footer>\n" \
   << "     <p> Powered by cards " <<  VERSION \
   << "     &copy; 2007 - 2024 " \

@@ -21,7 +21,7 @@
 #define MENUWEBCARDS_H
 
 #define MENUFR cout << "<body>" << endl \
-  << "    <table>" << endl \
+  << "    <table class=\"page\">" << endl \
   << "     <tr>\n" << endl \
   << "      <td class\"logo\">" << endl \
   << "       <a href=\".\">" << endl \
@@ -29,7 +29,7 @@
   << "       </a>" << endl \
   << "      </td>" << endl \
   << "      <td class=\"top-menu\">" << endl \
-  << "       <table>" << endl \
+  << "       <table class=\"top-menu\">" << endl \
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><a class=\"menu\" href=\"news\">Nouvelles</a>" << endl \
   << "            <td class=\"menu\"><a class=\"menu\" href=\"downloads\">Téléchargements</a>"  << endl \
@@ -46,11 +46,10 @@
   << "       </table>" << endl \
   << "      </td>" << endl \
   << "     </tr>" << endl \
-  << "     <hr>" << endl \
   << "     <tr>" << endl
 
 #define MENUEN cout << "<body>" << endl \
-  << "    <table>" << endl \
+  << "    <table class=\"page\">" << endl \
   << "     <tr>\n" << endl \
   << "      <td class\"logo\">" << endl \
   << "       <a href=\".\">" << endl \
@@ -58,7 +57,7 @@
   << "       </a>" << endl \
   << "      </td>" << endl \
   << "      <td class=\"top-menu\">" << endl \
-  << "       <table>" << endl \
+  << "       <table class=\"top-menu\">" << endl \
   << "        <tr>" << endl \
   << "            <td class=\"menu\"><a class=\"menu\" href=\"news\">News</a>" << endl \
   << "            <td class=\"menu\"><a class=\"menu\" href=\"downloads\">Downloads</a>"  << endl \
@@ -75,7 +74,6 @@
   << "       </table>" << endl \
   << "      </td>" << endl \
   << "     </tr>" << endl \
-  << "     <hr>" << endl \
   << "     <tr>" << endl
 
 #endif /* MENUWEBCARDS_H */

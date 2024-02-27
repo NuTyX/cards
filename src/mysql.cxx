@@ -53,17 +53,17 @@ void mysql::lastPosts(const char *forum)
 
 	while ( i < 10) {
 
-		std::cout			<< "   <div class=\"post-time\">"
+		std::cout			<< "       <div class=\"post-time\">"
 			<< getDateFromEpoch(strtoul(m_listOfMessages[i].poster_time.c_str(),NULL,0))
-			<< " UTC</div>\n   <div class=\"post-category\">"
+			<< " UTC</div>\n       <div class=\"post-category\">"
 			<< m_listOfCategories[m_listOfBoards[m_listOfMessages[i].id_board].category]
-			<< ":</div>\n   <div class=\"post-subject\">"
+			<< ":</div>\n       <div class=\"post-subject\">"
 			<< m_listOfBoards[ m_listOfMessages[i].id_board ].name
-			<< "</div>\n   <div class=\"post-author\">"
+			<< "</div>\n       <div class=\"post-author\">"
 			<< m_listOfMembers[ m_listOfMessages[i].id_member].real_name
-			<< "</div>\n   <img class=\"post-icon\" src=\"../../graphics/"
+			<< "</div>\n       <img class=\"post-icon\" src=\"../../graphics/"
 			<< m_listOfMessages[i].icon
-			<< ".gif\" alt=\"\" />\n   <a class=\"post-link\" href=\""
+			<< ".gif\" alt=\"\" />\n       <a class=\"post-link\" href=\""
 			<< forum
 			<< "/index.php?topic="
 			<< m_listOfMessages[i].id_topic
@@ -73,12 +73,12 @@ void mysql::lastPosts(const char *forum)
 			<< m_listOfMessages[i].id_msg
 			<< "\">\n    "
 			<< m_listOfMessages[i].subject
-			<< "\n   </a>\n\n   ";
+			<< "\n      </a>\n\n   ";
 
 		i++;
 
 		if ( i < 10)
-			std::cout << "<hr align=\"center\" style=\"width: 50%;\">"
+			std::cout << "      <hr align=\"center\" style=\"width: 50%;\">"
 				<< std::endl;
 
 	}

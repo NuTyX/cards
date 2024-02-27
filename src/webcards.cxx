@@ -244,11 +244,12 @@ void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
 }
 void sideBar( const char *forum)
 {
-	std::cout << "<td class=\"forum\">\n"
-		<< "   <h1 class=\"forum\">Forum</h1>"
+	std::cout << "      <td class=\"forum\">\n"
+		<< "       <h1 class=\"forum\">Forum</h1>"
 		<< std::endl;
 	mysql forumDB("content/.mysql.conf");
 	forumDB.lastPosts(forum);
+	std::cout << "</td>\n";
 }
 void postedMessages ( const char *forum, const char *boardId)
 {
@@ -465,7 +466,7 @@ int main (int argc, char** argv)
 		forumAdress = "https://forums.nutyx.org";
 	}
 	sideBar(forumAdress);
-	std::cout << "  </td>\n   <td class=\"content\">\n  "
+	std::cout << "   <td class=\"content\">\n"
 		<< std::endl;
 
 	/* Parse all knows argument so far */
