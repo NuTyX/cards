@@ -23,7 +23,7 @@
 #define MENUFR cout << "<body>" << endl \
   << "    <table class=\"page\">" << endl \
   << "     <tr>\n" << endl \
-  << "      <td class\"logo\">" << endl \
+  << "      <td class=\"logo\">" << endl \
   << "       <a href=\".\">" << endl \
   << "        <img src=\"../graphics/logo_nutyx_120.png\" alt=\"NuTyX Reload\" height=\"85\" width=\"60\" class=\"center\">" << endl \
   << "       </a>" << endl \
@@ -51,7 +51,7 @@
 #define MENUEN cout << "<body>" << endl \
   << "    <table class=\"page\">" << endl \
   << "     <tr>\n" << endl \
-  << "      <td class\"logo\">" << endl \
+  << "      <td class=\"logo\">" << endl \
   << "       <a href=\".\">" << endl \
   << "        <img src=\"../graphics/logo_nutyx_120.png\" alt=\"NuTyX Reload\" height=\"85\" width=\"60\" class=\"center\">" << endl \
   << "       </a>" << endl \
