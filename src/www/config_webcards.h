@@ -26,7 +26,7 @@
 	<< "   <head>\n" \
 	<< "      <title>NuTyX GNU/Linux</title>\n" \
 	<< "      <meta charset=\"utf-8\" />\n" \
-	<< "      <link rel=\"shortcut icon\" href=\"../favicon.icon\">\n" \
+	<< "      <link rel=\"shortcut icon\" href=\"../favicon.ico\">\n" \
 	<< "      <link href=\"../style.css\" rel=\"stylesheet\">\n" \
 	<< "   </head>" \
 	<< endl
