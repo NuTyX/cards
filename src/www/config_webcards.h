@@ -31,18 +31,6 @@
 	<< "   </head>" \
 	<< endl
 
-#define FOOTERTEXT   cout << "\n      </td>\n     </tr>\n    </table>\n" \
-  << "    <footer>\n" \
-  << "     <p> Powered by cards " <<  VERSION \
-  << "     &copy; 2007 - 2024 " \
-  << "<a href=\".\">NuTyX</a>.<br><br>\n" \
-  << "Hosted by <a href=\"http://tuxfamily.org\"><img src=\"../graphics/logo_tuxfamily_50.png\"/></a><br><br>\n" \
-  << "     <a href=\"http://www.wtfpl.net/\">\n" \
-  << "     <img src=\"../graphics/logo_wtfpl_80.png\"\n" \
-  << "     width=\"80\" height=\"15\" alt=\"WTFPL\" /></a> \n" \
-  << "    </footer>\n"
-
-
 #define SEARCH cout << "   <div>\n" \
   << "  <form method=\"get\" action=\".\">\n" \
   << "     <fieldset>\n" \
