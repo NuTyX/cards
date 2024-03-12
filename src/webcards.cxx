@@ -72,7 +72,7 @@ std::vector<std::string> parseHTMLDelimitedList
 				page.push_back( "<div class=\"toc\">\n <h2>");
 				page.push_back( contentTitle );
 				page.push_back( "</h2>");
-				page.push_back( "  <ul style=\"list-style-type: none; padding: 0;\">" );
+				page.push_back( "  <ul class=\"h2\">" );
 			}
 			haveContent = true;
 			ref++;
@@ -81,7 +81,7 @@ std::vector<std::string> parseHTMLDelimitedList
 			if ( headerLevel != previousHeaderLevel ) {
 				int i = headerLevel ;
 				while ( i > previousHeaderLevel ) { /* means > '2' */
-					sRef += "<li>\n <ul style=\"list-style-type: none;\">";
+					sRef += "<li>\n <ul class=\"hN\">";
 					i--;
 				}
 				i = headerLevel ;
@@ -100,8 +100,8 @@ std::vector<std::string> parseHTMLDelimitedList
 			Newline += "<a name=\"";
 			Newline += itos(ref);
 			Newline += "\"></a>";
-			Newline += line;
-			body.push_back(Newline);
+			line.insert(start,Newline);
+			body.push_back(line);
 		}
 		/* We'll need to know what was the previous level */
 		previousHeaderLevel = headerLevel;
