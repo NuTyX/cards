@@ -569,7 +569,7 @@ std::cout << "\n      </td>\n     </tr>\n    </table>\n" \
 std::cout << time_span.count() << " mS \n   <br><br>\n" \
     << "Hosted by <a href=\"http://tuxfamily.org\"><img src=\"../graphics/logo_tuxfamily_50.png\"/></a><br><br>\n" \
     << "     <a href=\"http://www.wtfpl.net/\">\n" \
-    << "     <img src=\"http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png\"\n" \
+    << "     <img src=\"../graphics/logo_wtfpl_80.png\"\n" \
     << "     width=\"80\" height=\"15\" alt=\"WTFPL\" /></a> \n" \
     << "    </footer>\n" \
     << " </body>\n</html>" \
