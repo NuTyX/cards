@@ -252,7 +252,6 @@ protected:
 	std::string m_packageCollection;
 	std::string m_utilName;
 	std::string m_root;
-	std::string m_build;
 	std::vector<rule_t> m_actionRules;
 	std::set< std::pair<std::string, int> > m_postInstallList;
 	alias_t	m_listOfAlias;
