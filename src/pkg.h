@@ -22,9 +22,9 @@ public:
 
 	std::string alias();
 	std::string group();
-	std::string sets();
 	std::string collection();
-	std::string categories();
+	std::set<std::string> sets();
+	std::set<std::string> categories();
 	std::string arch();
 	std::string license();
 	std::string signature();
@@ -44,9 +44,9 @@ public:
 
 	void alias(const std::string& alias);
 	void group(const std::string& group);
-	void sets(const std::string& sets);
+	void sets(const std::set<std::string>& sets);
 	void collection(const std::string& collection);
-	void categories(const std::string& categories);
+	void categories(const std::set<std::string>& categories);
 	void arch(const std::string& arch);
 	void license(const std::string& license);
 	void signature(const std::string& signature);
@@ -66,9 +66,9 @@ private:
 
 	std::string m_alias;
 	std::string m_group;
-	std::string m_sets;
 	std::string m_collection;
-	std::string m_categories;
+	std::set<std::string> m_sets;
+	std::set<std::string> m_categories;
 	std::string m_arch;
 	std::string m_license;
 	std::string m_signature;

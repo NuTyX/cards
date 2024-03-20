@@ -58,11 +58,14 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 			std::set<std::string> sortedPackagesList;
 			std::set<cards::Cache*> binaryList = getBinaryPackageSet();
 			for ( auto i : binaryList) {
-				std::string s;
-				if ( i->sets().size()  > 0 )
-					s =  "(" + i->sets() + ") ";
-				else
+				std::string s, _s;
+				if ( i->sets().size()  > 0 ) {
+					for (auto s: i->sets())
+							_s += s + " ";
+					s =  "(" + _s + ") ";
+				} else {
 					s = "(" + i->collection() + ") ";
+				}
 				s += i->name() + " ";
 				s +=  i->version() + " ";
 				s +=  i->description();
@@ -76,8 +79,10 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 			std::set<std::string> sortedSetList;
 			std::set<cards::Cache*> binaryList = getBinaryPackageSet();
 			for ( auto i : binaryList )
-				if ( i->sets().size() > 0 )
-					sortedSetList.insert(i->sets());
+				if ( i->sets().size() > 0 ) {
+					for ( auto s:i->sets() )
+						sortedSetList.insert(s);
+				}
 			for ( auto i : sortedSetList )
 				std::cout << i << std::endl;
 		} else {

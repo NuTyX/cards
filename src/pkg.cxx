@@ -81,11 +81,11 @@ std::string Pkg::group()
 {
 	return m_group;
 }
-void Pkg::sets(const std::string& sets)
+void Pkg::sets(const std::set<std::string>& sets)
 {
 	m_sets = sets;
 }
-std::string Pkg::sets()
+std::set<std::string> Pkg::sets()
 {
 	return m_sets;
 }
@@ -97,11 +97,11 @@ std::string Pkg::collection()
 {
 	return m_collection;
 }
-void Pkg::categories(const std::string& categories)
+void Pkg::categories(const std::set<std::string>& categories)
 {
 	m_categories = categories;
 }
-std::string Pkg::categories()
+std::set<std::string> Pkg::categories()
 {
 	return m_categories;
 }

@@ -515,6 +515,8 @@ Pkgdbh::buildDatabase(const bool& progress,
 		}
 		return;
 	}
+
+	std::set<std::string> sets;
 	if (simple) {
 		cards::Db info;
 		for ( auto pkgName : m_listOfPackagesNames) {
@@ -552,15 +554,14 @@ Pkgdbh::buildDatabase(const bool& progress,
 				/* As a std::set is not always present we cannot
 				 * depen on a found one to break */
 				if ( attribute[0] == 's' ) {
-					std::string s;
-					s = s + " " + attribute.substr(1);
-					info.sets(s);
+					sets.insert(attribute.substr(1));
 				}
 				if ( attribute[0] == 'r' ) {
 					info.release(atoi(attribute.substr(1).c_str()));
 					flags = flags + 8;
 				}
 				if ( flags == 15 ) {
+					info.sets(sets);
 					m_listOfPackages[pkgName] = info;
 					break;
 				}
@@ -624,6 +625,7 @@ Pkgdbh::buildSimpleDatabase()
 			parseFile(fileContent,metaFile.c_str());
 			info.release(1);
 			info.dependency(false);
+			std::set<std::string> sets;
 			m_listOfAlias[i] = i;
 			for (auto attribute : fileContent) {
 				if ( attribute[0] == 'c' ) {
@@ -631,9 +633,7 @@ Pkgdbh::buildSimpleDatabase()
 					info.collection(s.substr(1));
 				}
 				if ( attribute[0] == 's' ) {
-					std::string s;
-					s = s + " " + attribute.substr(1);
-					info.sets(s);
+					sets.insert(attribute.substr(1));
 				}
 				if ( attribute[0] == 'V' ) {
 					std::string s = attribute;
@@ -665,8 +665,8 @@ Pkgdbh::buildSimpleDatabase()
 					if ( s == "d1" )
 						info.dependency(true);
 				}
-
 			}
+			info.sets(sets);
 			m_listOfPackages[i] = info;
 		}
 		m_miniDB_Empty=false;
@@ -704,6 +704,8 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 			info.install( getEpochModifyTimeFile(metaFileDir) );
 			std::set<std::pair<std::string,time_t>> dependencies;
 			std::set<std::string> fileContent;
+			std::set<std::string> categories;
+			std::set<std::string> sets;
 			parseFile(fileContent,metaFile.c_str());
 			info.release(1);
 			info.dependency(false);
@@ -753,9 +755,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					info.collection(attribute.substr(1));
 				}
 				if ( attribute[0] == 's' ) {
-					std::string s;
-					s = s + " " + attribute.substr(1);
-					info.sets(s);
+					sets.insert(attribute.substr(1));
 				}
 				if ( attribute[0] == 'g' ) {
 					std::string s = attribute;
@@ -777,9 +777,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					m_listOfAlias[attribute.substr(1)] = i;
 				}
 				if ( attribute[0] == 'T' ) {
-					std::string s;
-					s = s + " " + attribute.substr(1);
-					info.categories(s);
+					categories.insert(attribute.substr(1));
 				}
 				if ( attribute[0] == 'R' ) {
 					std::string s = attribute;
@@ -789,6 +787,8 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 					dependencies.insert(NameEpoch);
 				}
 			}
+			info.sets(sets);
+			info.categories(categories);
 			info.dependencies(dependencies);
 			// list of files
 			const std::string filelist = m_root + PKG_DB_DIR + i + PKG_FILES;

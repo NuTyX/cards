@@ -85,7 +85,7 @@ Cards_remove::Cards_remove(const std::string& commandName,
 		}
 		if ( listOfPackagesToRemove.empty()) {
 			for (auto j : m_listOfPackages) {
-				for (auto k : parseDelimitedSetList(j.second.sets()," ")) {
+				for (auto k : j.second.sets()) {
 					if ( i == k ) {
 						PackageToRemove.first = j.first;
 						PackageToRemove.second=j.second.collection();

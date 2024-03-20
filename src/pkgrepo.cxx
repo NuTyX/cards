@@ -466,6 +466,7 @@ Pkgrepo::getBinaryPackageSet()
 				<< j.version << std::endl;
 #endif
 			cards::Cache* pkg = new cards::Cache();
+			std::set<std::string> sets;
 			std::string baseDir = basename(const_cast<char*>(i.dir.c_str()));
 			pkg->name(j.basePackageName);
 			pkg->version(j.version);
@@ -473,9 +474,10 @@ Pkgrepo::getBinaryPackageSet()
 			if ( ( j.set=="none ") || (j.set.size()==0 ) ||
 				 ( j.set=="none") )
 				pkg->collection(baseDir);
-			else
-				pkg->sets(j.set);
-
+			else {
+				sets.insert(j.set);
+				pkg->sets(sets);
+			}
 			pkg->packager(j.packager);
 
 			m_packagesList.insert(pkg);
