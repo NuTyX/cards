@@ -65,11 +65,11 @@ unsigned short int Pkg::release()
 {
 	return m_release;
 }
-void Pkg::alias(const std::string& alias)
+void Pkg::alias(std::set<std::string>& alias)
 {
 	m_alias = alias;
 }
-std::string Pkg::alias()
+std::set<std::string> Pkg::alias()
 {
 	return m_alias;
 }

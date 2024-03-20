@@ -493,10 +493,10 @@ Pkgdbh::buildDatabase(const bool& progress,
 		std::set<std::string> fileContent;
 		parseFile(fileContent,metaFile.c_str());
 		m_listOfAlias[name] = name;
-		for ( auto attribute : fileContent) {
-			if ( attribute[0] != 'A' )
+		for ( auto s : fileContent) {
+			if ( s[0] != 'A' )
 				break;
-			m_listOfAlias[attribute.substr(1)] = name;
+			m_listOfAlias[s.substr(1)] = name;
 		}
 	}
 
@@ -533,31 +533,31 @@ Pkgdbh::buildDatabase(const bool& progress,
 			m_listOfAlias[pkgName] = pkgName;
 			unsigned short flags = 0;
 			info.release(1);
-			for ( auto attribute : fileContent) {
-				if ( attribute[0] == 'B' ) {
-					info.build(strtoul(attribute.substr(1).c_str(),NULL,0));
+			for ( auto s : fileContent) {
+				if ( s[0] == 'B' ) {
+					info.build(strtoul(s.substr(1).c_str(),NULL,0));
 					flags++;
 				}
-				if ( attribute[0] == 'V' ) {
-					info.version(attribute.substr(1));
+				if ( s[0] == 'V' ) {
+					info.version(s.substr(1));
 					flags=flags + 2;
 				}
-				if ( attribute[0] == 'c' ) {
-					info.collection(attribute.substr(1));
+				if ( s[0] == 'c' ) {
+					info.collection(s.substr(1));
 					flags = flags + 4;
 				}
 				/* As a group is not always present we cannot
 				 * depend on a found one to break */
-				if ( attribute[0] == 'g' ) {
-					info.group(attribute.substr(1));
+				if ( s[0] == 'g' ) {
+					info.group(s.substr(1));
 				}
 				/* As a std::set is not always present we cannot
 				 * depen on a found one to break */
-				if ( attribute[0] == 's' ) {
-					sets.insert(attribute.substr(1));
+				if ( s[0] == 's' ) {
+					sets.insert(s.substr(1));
 				}
-				if ( attribute[0] == 'r' ) {
-					info.release(atoi(attribute.substr(1).c_str()));
+				if ( s[0] == 'r' ) {
+					info.release(atoi(s.substr(1).c_str()));
 					flags = flags + 8;
 				}
 				if ( flags == 15 ) {
@@ -626,54 +626,51 @@ Pkgdbh::buildSimpleDatabase()
 			info.release(1);
 			info.dependency(false);
 			std::set<std::string> sets;
+			std::set<std::string> alias;
 			m_listOfAlias[i] = i;
-			for (auto attribute : fileContent) {
-				if ( attribute[0] == 'c' ) {
-					std::string s = attribute;
+			for (auto s : fileContent) {
+				if ( s[0] == 'c' ) {
 					info.collection(s.substr(1));
 				}
-				if ( attribute[0] == 's' ) {
-					sets.insert(attribute.substr(1));
+				if ( s[0] == 's' ) {
+					sets.insert(s.substr(1));
 				}
-				if ( attribute[0] == 'V' ) {
-					std::string s = attribute;
+				if ( s[0] == 'V' ) {
 					info.version(s.substr(1));
 				}
-				if ( attribute[0] == 'r' ) {
-					std::string s = attribute;
-					info.release( atoi(s.substr(1).c_str()) );
+				if ( s[0] == 'r' ) {
+					info.release(atoi(s.substr(1).c_str()));
 				}
-				if ( attribute[0] == 'B' ) {
-					std::string s = attribute;
-					info.build( strtoul(s.substr(1).c_str(),NULL,0) );
+				if ( s[0] == 'B' ) {
+					info.build(strtoul(s.substr(1).c_str(),NULL,0));
 				}
-				if ( attribute[0] == 'g' ) {
-					std::string s = attribute;
-					info.group( s.substr(1) );
+				if ( s[0] == 'g' ) {
+					info.group(s.substr(1));
 				}
-				if ( attribute[0] == 'A' ) {
-					std::string s;
-					s = s + " " + attribute.substr(1);
-					info.alias(s);
+				if ( s[0] == 'A' ) {
+					alias.insert(s.substr(1));
 				}
-				if ( attribute[0] == 'P' ) {
-					std::string s = attribute;
+				if ( s[0] == 'P' ) {
 					info.packager(s.substr(1));
 				}
-				if ( attribute[0] == 'd' ) {
-					std::string s = attribute;
+				if ( s[0] == 'd' ) {
 					if ( s == "d1" )
 						info.dependency(true);
 				}
 			}
 			info.sets(sets);
+			info.alias(alias);
 			m_listOfPackages[i] = info;
 		}
 		m_miniDB_Empty=false;
 	}
 #ifndef NDEBUG
 	for (auto i : m_listOfAlias)
-		std::cerr << "Alias: " << i.first << ", Package: " << i.second << std::endl;
+		std::cerr << "Alias: "
+			<< i.first
+			<< ", Package: "
+			<< i.second
+			<< std::endl;
 #endif
 }
  /**
@@ -706,87 +703,73 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 			std::set<std::string> fileContent;
 			std::set<std::string> categories;
 			std::set<std::string> sets;
+			std::set<std::string> alias;
 			parseFile(fileContent,metaFile.c_str());
 			info.release(1);
 			info.dependency(false);
 			m_listOfAlias[i] = i;
-			for (auto attribute : fileContent) {
-				if ( attribute[0] == 'C' ) {
-					std::string s = attribute;
+			for (auto s : fileContent) {
+				if ( s[0] == 'C' ) {
 					info.contributors( s.substr(1) );
 				}
-				if ( attribute[0] == 'D' ) {
-					std::string s = attribute;
+				if ( s[0] == 'D' ) {
 					info.description( s.substr(1) );
 				}
-				if ( attribute[0] == 'B' ) {
-					std::string s = attribute;
+				if ( s[0] == 'B' ) {
 					info.build( strtoul(s.substr(1).c_str(),NULL,0) );
 				}
-				if ( attribute[0] == 'U' ) {
-					std::string s = attribute;
+				if ( s[0] == 'U' ) {
 					info.url( s.substr(1) );
 				}
-				if ( attribute[0] == 'L' ) {
-					std::string s = attribute;
+				if ( s[0] == 'L' ) {
 					info.license( s.substr(1) );
 				}
-				if ( attribute[0] == 'M' ) {
-					std::string s = attribute;
+				if ( s[0] == 'M' ) {
 					info.maintainer( s.substr(1) );
 				}
-				if ( attribute[0] == 'P' ) {
-					std::string s = attribute;
+				if ( s[0] == 'P' ) {
 					info.packager( s.substr(1) );
 				}
-				if ( attribute[0] == 'V' ) {
-					std::string s = attribute;
+				if ( s[0] == 'V' ) {
 					info.version( s.substr(1) );
 				}
-				if ( attribute[0] == 'r' ) {
-					std::string s = attribute;
+				if ( s[0] == 'r' ) {
 					info.release( atoi(s.substr(1).c_str()) );
 				}
-				if ( attribute[0] == 'a' ) {
-					std::string s = attribute;
+				if ( s[0] == 'a' ) {
 					info.arch( s.substr(1) );
 				}
-				if ( attribute[0] == 'c' ) {
-					info.collection(attribute.substr(1));
+				if ( s[0] == 'c' ) {
+					info.collection(s.substr(1));
 				}
-				if ( attribute[0] == 's' ) {
-					sets.insert(attribute.substr(1));
+				if ( s[0] == 's' ) {
+					sets.insert(s.substr(1));
 				}
-				if ( attribute[0] == 'g' ) {
-					std::string s = attribute;
+				if ( s[0] == 'g' ) {
 					info.group( s.substr(1) );
 				}
-				if ( attribute[0] == 'd' ) {
-					std::string s = attribute;
+				if ( s[0] == 'd' ) {
 					if ( s == "d1" )
 						info.dependency(true);
 				}
-				if ( attribute[0] == 'S' ) {
-					std::string s = attribute;
+				if ( s[0] == 'S' ) {
 					info.space( atoi(s.substr(1).c_str()) );
 				}
-				if ( attribute[0] == 'A' ) {
-					std::string s;
-					s = s + " " + attribute.substr(1);
-					info.alias(s);
-					m_listOfAlias[attribute.substr(1)] = i;
+				if ( s[0] == 'A' ) {
+					alias.insert(s.substr(1));
+					m_listOfAlias[s.substr(1)] = i;
 				}
-				if ( attribute[0] == 'T' ) {
-					categories.insert(attribute.substr(1));
+				if ( s[0] == 'T' ) {
+					categories.insert(s.substr(1));
 				}
-				if ( attribute[0] == 'R' ) {
-					std::string s = attribute;
+				if ( s[0] == 'R' ) {
 					std::pair<std::string,time_t > NameEpoch;
 					NameEpoch.first=s.substr(1,s.size()-11);
 					NameEpoch.second=strtoul((s.substr(s.size()-10)).c_str(),NULL,0);
 					dependencies.insert(NameEpoch);
 				}
 			}
+			info.alias(alias);
 			info.sets(sets);
 			info.categories(categories);
 			info.dependencies(dependencies);
