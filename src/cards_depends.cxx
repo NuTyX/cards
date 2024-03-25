@@ -1,6 +1,6 @@
 //  cards_depends.cxx
 //
-//  Copyright (c) 2013 - 2023 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2013 - 2024 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ std::vector<LevelName*>& CardsDepends::getLevel()
 
 #ifndef NDEBUG
 	for ( auto i : m_levelList ) {
-		std::cerr << i.name<< std::endl;
+		std::cerr << i->name<< std::endl;
 	}
 #endif
 	return m_levelList;
@@ -271,8 +271,10 @@ int CardsDepends::level()
 		if ( DU.url.size() > 0)
 			continue;
 		std::string prtDir = DU.dir;
-		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
-			treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY,prtDir);
+		if ( (findDir(m_filesList,basename(const_cast<char*>(prtDir.c_str())))) != 0) {
+			if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
+				treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY,prtDir);
+			}
 		}
 #ifndef NDEBUG
 		std::cerr << DU.dir << " " << DU.url  << std::endl;
@@ -331,8 +333,10 @@ int CardsDepends::depends()
 
 	for ( auto DU : config.dirUrl() ) {
 		std::string prtDir = DU.dir;
-		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
-			treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY,prtDir);
+		if ( (findDir(m_filesList,basename(const_cast<char*>(prtDir.c_str())))) != 0) {
+			if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
+				treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY,prtDir);
+			}
 		}
 	}
 	char * longPackageName = NULL;
@@ -409,8 +413,10 @@ int CardsDepends::deptree()
 
 	for ( auto DU : config.dirUrl() ) {
 		std::string prtDir = DU.dir;
-		if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
-			treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY,prtDir);
+		if ( (findDir(m_filesList,basename(const_cast<char*>(prtDir.c_str())))) != 0) {
+			if ( (findDir(m_filesList,prtDir.c_str())) != 0) {
+				treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY,prtDir);
+			}
 		}
 	}
 	char* longPackageName = NULL;

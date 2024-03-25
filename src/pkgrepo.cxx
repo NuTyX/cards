@@ -2,7 +2,7 @@
 //  pkgrepo.cxx
 //
 //  Copyright (c) 2002 - 2005 by Johannes Winkelmann jw at tks6 dot net
-//  Copyright (c) 2014 - 2023 by NuTyX team (http://nutyx.org)
+//  Copyright (c) 2014 - 2024 by NuTyX team (http://nutyx.org)
 //
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -604,8 +604,16 @@ std::string Pkgrepo::getPortDir (const std::string& portName)
 		for (auto j : i.basePackageList) {
 			if ( j.basePackageName == portName ) {
 				portDir = i.dir + "/" + j.basePackageName;
-				found = true;
-				break;
+				if (checkFileExist(portDir + "/Pkgfile")) {
+					found = true;
+					break;
+				}
+				portDir = basename(const_cast<char*>(i.dir.c_str()));
+				portDir += "/" + j.basePackageName;
+				if (checkFileExist(portDir + "/Pkgfile")) {
+					found = true;
+					break;
+				}
 			}
 		}
 		if (found)
