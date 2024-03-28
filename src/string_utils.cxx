@@ -279,6 +279,25 @@ std::set<std::string> parseDelimitedSetList(const std::string& s, const char *de
 	delete[] cstr;
 	return list;
 }
+const std::vector<std::string> parseDelimitedVectorList
+(const std::string& s, const char& c)
+{
+	std::string b{""};
+	std::vector<std::string> v;
+
+	for (auto n:s)
+	{
+		if(n != c) b+=n; else
+		if(n == c && b != "")
+		{
+			v.push_back(b);
+			b="";
+		}
+	}
+	if(b != "")
+		v.push_back(b);
+	return v;
+}
 std::string stripWhiteSpace(const std::string& s)
 {
 	if ( s.empty() )

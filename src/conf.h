@@ -10,6 +10,7 @@ namespace cards {
 struct DirUrl {
 	std::string dir;
 	std::string url;
+	std::string collection;
 };
 
 class Conf
@@ -25,6 +26,7 @@ public:
 	std::string username();
 	std::string password();
 	std::string database();
+
 	std::string arch();
 	std::string logdir();
 	std::vector<std::string> groups();

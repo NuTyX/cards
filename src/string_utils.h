@@ -111,6 +111,9 @@ std::string stripWhiteSpace(const std::string& s);
 std::vector<std::string> parseDelimitedVectorList
 (const std::string& s, const char *delimiter);
 
+const std::vector<std::string> parseDelimitedVectorList
+(const std::string& s, const char& c);
+
 /* populate a set of string with delimited characters */
 std::set<std::string> parseDelimitedSetList
 (const std::string& s, const char *delimiter);
