@@ -711,7 +711,8 @@ build() {
 			meson)
 				mkdir build
 				cd    build
-				meson --prefix=/usr \
+				meson setup --prefix=/usr \
+                                      --buildtype=release \
                                       ../$name-$version
 				ninja
 				DESTDIR=$PKG ninja install;;
