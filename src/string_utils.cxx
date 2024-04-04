@@ -40,19 +40,24 @@ itemList *initItemList(void)
 {
 	itemList *list = (itemList*)Malloc(sizeof *list);
 	list->items = (char **)Malloc(sizeof (*list->items));
-	list->count = 0;
+	list->count = 1;
+	list->capacity = 1;
 	return list;
 }
 
 void addItemToItemList(itemList *list, const char *item)
 {
-	char **realloc_tmp;
-	realloc_tmp = (char **)realloc( list->items, sizeof *list->items * (list->count + 1) );
-	if ( realloc_tmp == NULL ) {
-		return;
+	if ( list->capacity == list->count) {
+		char **realloc_tmp;
+		list->capacity = list->count * 2;
+		realloc_tmp = (char **)realloc( list->items, sizeof *list->items * list->capacity );
+		if ( realloc_tmp == NULL ) {
+			printf("Cannot reallocate realloc_tmp: %d", &realloc_tmp);
+			return;
+		}
+		list->items = realloc_tmp;
 	}
-	list->items = realloc_tmp;
-	list->items[ list->count ] = strdup(item);
+	list->items[ list->count - 1 ] = strdup(item);
 	++list->count;
 }
 

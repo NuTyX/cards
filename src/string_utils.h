@@ -55,6 +55,7 @@ typedef struct
 {
 	char **items;
 	unsigned int count;
+	unsigned int capacity;
 } itemList;
 
 /**
@@ -111,6 +112,7 @@ std::string stripWhiteSpace(const std::string& s);
 std::vector<std::string> parseDelimitedVectorList
 (const std::string& s, const char *delimiter);
 
+/* populate a vector of string with a delimited character */
 const std::vector<std::string> parseDelimitedVectorList
 (const std::string& s, const char& c);
 
