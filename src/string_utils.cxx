@@ -26,7 +26,7 @@ void *Malloc(size_t s)
 {
 	void *p;
 	if ( ! ( p = malloc(s) ) ) {
-		fprintf(stderr,"Failled to malloc\n");
+		fprintf(stderr,"Failed to malloc\n");
 		if ( errno ) {
 			perror("malloc");
 			exit(EXIT_FAILURE);
@@ -48,14 +48,12 @@ itemList *initItemList(void)
 void addItemToItemList(itemList *list, const char *item)
 {
 	if ( list->capacity == list->count) {
-		char **realloc_tmp;
 		list->capacity = list->count * 2;
-		realloc_tmp = (char **)realloc( list->items, sizeof *list->items * list->capacity );
-		if ( realloc_tmp == NULL ) {
-			printf("Cannot reallocate realloc_tmp: %d", &realloc_tmp);
+		list->items = (char **)realloc( list->items, sizeof *list->items * list->capacity );
+		if ( list->items == NULL ) {
+			printf("Cannot reallocate realloc_tmp: %d", &list->items);
 			return;
 		}
-		list->items = realloc_tmp;
 	}
 	list->items[ list->count - 1 ] = strdup(item);
 	++list->count;
@@ -266,7 +264,8 @@ std::vector<std::string> parseDelimitedVectorList
 	delete[] cstr;
 	return list;
 }
-std::set<std::string> parseDelimitedSetList(const std::string& s, const char *delimiter)
+std::set<std::string> parseDelimitedSetList
+	(const std::string& s, const char *delimiter)
 {
 	std::set<std::string> list;
 	if ( s.empty() )
@@ -285,7 +284,7 @@ std::set<std::string> parseDelimitedSetList(const std::string& s, const char *de
 	return list;
 }
 const std::vector<std::string> parseDelimitedVectorList
-(const std::string& s, const char& c)
+	(const std::string& s, const char& c)
 {
 	std::string b{""};
 	std::vector<std::string> v;
