@@ -224,7 +224,7 @@ std::vector<std::string> Conf::baseDir()
 {
 	return m_baseDir;
 }
-} // endof cards namespace
+} // end of cards namespace
 
 // vim:set ts=2 :
 
