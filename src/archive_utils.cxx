@@ -128,7 +128,7 @@ std::vector<std::string> ArchiveUtils::extractFileContent(const char * fileName)
 				free(fC);
 				fC = nullptr;
 			}
-			contentFile = parseDelimitedVectorList(s_contentFile, "\n");
+			contentFile = parseDelimitedVectorList(s_contentFile, '\n');
 			break;
 		}
 		++i;
