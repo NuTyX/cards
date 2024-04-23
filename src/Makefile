@@ -26,6 +26,7 @@ include ../Makefile.inc
 TOOLSOBJECTS =	system_utils.o \
 		error_treat.o \
 		md5.o \
+		vector.o \
 		string_utils.o \
 		archive_utils.o \
 		file_utils.o \
@@ -44,6 +45,7 @@ CARDSOBJECTS =	conf.o \
 		system_utils.o \
 		error_treat.o \
 		md5.o \
+		vector.o \
 		string_utils.o \
 		archive_utils.o \
 		pkg.o \
@@ -80,6 +82,7 @@ LIBOBJECTS =  conf.o \
 	system_utils.o \
 	error_treat.o \
 	md5.o \
+	vector.o \
 	string_utils.o \
 	archive_utils.o \
 	pkgrepo.o \
@@ -102,6 +105,7 @@ WEBOBJECTS =  conf.o \
 	system_utils.o \
 	error_treat.o \
 	md5.o \
+	vector.o \
 	file_utils.o \
 	string_utils.o \
 	pkgrepo.o \
@@ -115,6 +119,7 @@ HEADERS = enum.h \
 		system_utils.h \
 		error_treat.h \
 		md5.h \
+		vector.h \
 		string_utils.h \
 		file_utils.h \
 		archive_utils.h \
