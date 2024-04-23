@@ -1,5 +1,7 @@
 #include <libcards.h>
 
+using namespace cards;
+
 class Pkg_inst : public Pkgdbh
 {
 	public:
@@ -18,7 +20,7 @@ std::set<std::string> Pkg_inst::getList()
 {
 	std::set<std::string> m_List;
 	for (auto i : m_listOfPackages)
-		m_List.insert(i.first + " " + i.second.version + " " + i.second.description);
+		m_List.insert(i.first + " " + i.second.version() + " " + i.second.description());
 	return m_List;
 }
 int main(int argc, char** argv)
@@ -30,6 +32,6 @@ int main(int argc, char** argv)
 		std::cout << i << std::endl;
 
 
-	return EXIT_SUCCESS;
+	return 0;
 }
 // vim:set ts=2 :
