@@ -23,26 +23,32 @@
 
 include ../Makefile.inc
 
-all: test1 test2 list1
+all: uname test1 test2 list1
+
+uname:
+	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	rm $@.o
 
 test1:
-	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o test1.o test1.cxx
-	$(CXX) test1.o -o $@ -L"../src" -lcards -lcurl -larchive
-	rm test1.o
+	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	rm $@.o
 
 test2:
-	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o test2.o test2.cxx
-	$(CXX) test2.o -o $@ -L"../src" -lcards -lcurl -larchive
-	rm test2.o
+	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	rm $@.o
 
 list1:
-	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o list1.o list1.cxx
-	$(CXX) list1.o -o $@ -L"../src" -lcards -lcurl -larchive
-	rm list1.o
+	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	rm $@.o
 
 clean:
 	rm -f list1
 	rm -f test1
 	rm -f test2
+	rm -f uname
 
 # End of file
