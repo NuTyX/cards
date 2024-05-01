@@ -18,7 +18,7 @@ a.out
 *.gch
 ChangeLog
 archives
-tests/test
+tests/filesList
 documentation/htdocs
 documentation/Doxyfile
 documentation/latex

@@ -1,4 +1,6 @@
 #pragma once
+#include "string_utils.h"
+
 namespace cards {
 
 class vector
@@ -6,17 +8,19 @@ class vector
 public:
     vector();
     vector(const unsigned int capacity);
-    ~vector(){};
+    vector(char * element);
+    ~vector();
 
-    void push_back(const void * element);
+    const char* value(const unsigned int index);
+    void push_back(char * element);
     const unsigned int size();
     const unsigned int capacity();
 
 
 private:
-    unsigned int m_capacity;
+    char **m_items;
     unsigned int m_size;
-
+    unsigned int m_capacity;
 };
 } // end of cards namespace
 
