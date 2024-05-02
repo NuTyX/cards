@@ -24,5 +24,15 @@ int main() {
 
 	printf("First Value: %s\n",myVector.value(0));
 	printf("Last Value: %s\n",myVector.value(myVector.size()));
+
+	cards::vector Vector;
+	Vector.push_back("hello");
+	Vector.push_back("how ");
+	Vector.push_back("are");
+	Vector.push_back("you");
+	Vector.push_back("?");
+	printf("First Value: %s\n",Vector.value(0));
+	printf("Last Value: %s\n",Vector.value(Vector.size()-1));
+
 	return 0;
 }

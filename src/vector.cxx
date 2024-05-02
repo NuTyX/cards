@@ -16,7 +16,7 @@ vector::vector(char * element) {
     m_size = 1;
     m_items[0] = strdup(element);
 }
-void vector::push_back(char * element) {
+void vector::push_back(const char * element) {
 	if ( m_capacity == m_size) {
 		m_capacity = m_size * 2;
 		m_items = (char **)realloc( m_items, sizeof m_items * m_capacity );
@@ -46,6 +46,11 @@ vector::~vector(){
             m_items[i] = nullptr;
         }
     }
+    if (m_items != nullptr) {
+        free(m_items);
+        m_items = nullptr;
+    }
+
 }
 } // end of cards namespace
 

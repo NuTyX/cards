@@ -12,13 +12,13 @@ public:
     ~vector();
 
     const char* value(const unsigned int index);
-    void push_back(char * element);
+    void push_back(const char* element);
     const unsigned int size();
     const unsigned int capacity();
 
 
 private:
-    char **m_items;
+    char** m_items;
     unsigned int m_size;
     unsigned int m_capacity;
 };
