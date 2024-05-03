@@ -53,6 +53,12 @@ void Conf::parseCardsconf()
 					DU.dir = stripWhiteSpace(val);
 					DU.url = "";
 				}
+				pos = DU.dir.rfind('/');
+				if (pos != std::string::npos) {
+					DU.collection = stripWhiteSpace(DU.dir.substr(pos+1));
+				} else {
+					DU.collection = "";
+				}
 				m_dirUrl.push_back(DU);
 			}
 			if (key == "logdir") {
@@ -95,6 +101,7 @@ void Conf::parseCardsconf()
 		DirUrl DU;
 		for ( auto i : m_dirUrl) {
 			DU.dir=i.dir;
+			DU.collection=i.collection;
 			if ( i.url.size() == 0 ) {
 				DU.url=m_url;
 			} else {
@@ -113,6 +120,9 @@ void Conf::parseCardsconf()
 			<< std::endl
 			<< "Url: "
 			<< i.url
+			<< std::endl
+			<< "Collection: "
+			<< i.collection
 			<< std::endl;
 #endif
 }
@@ -126,6 +136,7 @@ std::vector<DirUrl> Conf::dirUrl()
 	for (auto i : m_dirUrl) {
 		DirUrl du;
 		du.dir = i.dir;
+		du.collection = i.collection;
 		if (i.url.size()==0) {
 			ret.push_back(du);
 			continue;
@@ -136,7 +147,7 @@ std::vector<DirUrl> Conf::dirUrl()
 			+ "/"
 			+ version()
 			+ "/"
-			+ basename(const_cast<char*>(i.dir.c_str()));
+			+ i.collection;
 		ret.push_back(du);
 	}
 	return ret;
