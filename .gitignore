@@ -19,6 +19,7 @@ a.out
 ChangeLog
 archives
 tests/filesList
+tests/cards.conf
 documentation/htdocs
 documentation/Doxyfile
 documentation/latex

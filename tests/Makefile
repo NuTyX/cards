@@ -23,19 +23,14 @@
 
 include ../Makefile.inc
 
-all: uname test1 test2 list1 vector
+all: uname pkgdbh pkg_inst vector conf
 
 uname:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
 	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
 	rm $@.o
 
-test1:
-	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
-	rm $@.o
-
-test2:
+pkgdbh:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
 	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
 	rm $@.o
@@ -45,16 +40,21 @@ vector:
 	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
 	rm $@.o
 
-list1:
+conf:
+	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	rm $@.o
+
+pkg_inst:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
 	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
 	rm $@.o
 
 clean:
-	rm -f list1
-	rm -f test1
-	rm -f test2
+	rm -f pkg_inst
+	rm -f pkgdbh
 	rm -f vector
 	rm -f uname
+	rm -f conf
 
 # End of file

@@ -1,4 +1,4 @@
-#include <libcards.h>
+#include "../src/libcards.h"
 
 int main(int argc, char** argv)
 {
