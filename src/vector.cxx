@@ -18,15 +18,20 @@ vector::vector(char * element) {
 }
 void vector::push_back(const char * element) {
 	if ( m_capacity == m_size) {
-		m_capacity = m_size * 2;
-		m_items = (char **)realloc( m_items, sizeof m_items * m_capacity );
-		if ( m_items == NULL ) {
-			printf("Cannot reallocate m_items: %d", &m_items);
-			return;
-		}
+		reserve(m_size * 2);
 	}
 	m_items[ m_size ] = strdup(element);
 	++m_size;
+}
+void vector::reserve(const unsigned int capacity) {
+    if (m_capacity >= capacity)
+        return;
+    m_capacity = capacity;
+    m_items = (char **)realloc( m_items, sizeof m_items * m_capacity);
+    if ( m_items == NULL ) {
+        printf("Cannot reallocate m_items: %d", &m_items);
+        return;
+    }
 }
 const char* vector::value(const unsigned int index) {
     if (index > m_size - 1)

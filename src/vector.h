@@ -12,6 +12,7 @@ public:
     ~vector();
 
     const char* value(const unsigned int index);
+    void reserve(const unsigned int capacity);
     void push_back(const char* element);
     const unsigned int size();
     const unsigned int capacity();
