@@ -5,7 +5,7 @@ vector::vector() {
     m_items = (char**)malloc(sizeof m_items * m_capacity);
     m_size = 0;
 }
-vector::vector(const unsigned int capacity){
+vector::vector(const unsigned int capacity) {
     m_capacity = capacity;
     m_items = (char**)malloc(sizeof m_items * m_capacity);
     m_size = 0;
@@ -38,13 +38,13 @@ const char* vector::value(const unsigned int index) {
         return m_items[m_size - 1];
     return m_items[index];
 }
-const unsigned int vector::size(){
+const unsigned int vector::size() {
     return m_size;
 }
-const unsigned int vector::capacity(){
+const unsigned int vector::capacity() {
     return m_capacity;
 }
-vector::~vector(){
+vector::~vector() {
     for (unsigned int i=0; i < m_size;i++) {
         if (m_items[i] != nullptr) {
             free(m_items[i]);
