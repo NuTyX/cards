@@ -23,7 +23,7 @@
 
 include ../Makefile.inc
 
-all: uname pkgdbh pkg_inst vector conf
+all: uname pkgdbh pkg_inst string vector conf
 
 uname:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
@@ -36,6 +36,11 @@ pkgdbh:
 	rm $@.o
 
 vector:
+	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	rm $@.o
+
+string:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
 	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
 	rm $@.o
@@ -56,5 +61,6 @@ clean:
 	rm -f vector
 	rm -f uname
 	rm -f conf
+	rm -f string
 
 # End of file

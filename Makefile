@@ -50,17 +50,9 @@ pkgadd:
 
 	$(MAKE) -C $(DIRSRC) pkgadd
 
-ports:
-
-	$(MAKE) -C $(DIRSCRIPTS) ports
-
 pkgmk:
 
 	$(MAKE) -C $(DIRSCRIPTS) pkgmk
-
-pkgmkall:
-
-	$(MAKE) -C $(DIRSCRIPTS) pkgmkall
 
 cards:
 

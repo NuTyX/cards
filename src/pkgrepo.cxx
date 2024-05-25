@@ -172,7 +172,7 @@ void Pkgrepo::parseCollectionPkgRepoFile()
 #ifndef NDEBUG
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
-			std::cerr << i.url << " "<< i.Dir << " "
+			std::cerr << i.url << " "<< i.dir << " "
 			<< j.basePackageName  << " "
 			<< j.version << " "
 			<< j.md5SUM <<  " "
@@ -262,10 +262,6 @@ void Pkgrepo::parsePackagePkgRepoFile(const std::string& pkgRepoFile)
 				// If there are only 2 fields then it's not a binary go on with next one
 				continue;
 			}
-#ifndef NDEBUG
-			std::cerr << m_BasePackageInfo_i->basePackageName << ": " << portFilesList.md5SUM
-			<< " " << portFilesList.name << " " << portFilesList.arch << std::endl;
-#endif
 		}
 		m_portFilesList.push_back(portFilesList);
 	}

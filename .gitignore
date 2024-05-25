@@ -1,5 +1,6 @@
 *.[oa]
 *~
+.vscode
 .cards_depend
 *.geany
 .tools_depend
@@ -13,7 +14,6 @@ pkgmk2
 pkgadd
 pkgrm
 pkginfo
-pkgtest
 a.out
 *.gch
 ChangeLog

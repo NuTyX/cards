@@ -65,7 +65,6 @@ CARDSOBJECTS =	conf.o \
 		pkgrm.o \
 		pkginfo.o \
 		pkginst.o \
-		pkgtest.o \
 		pkgsync.o \
 		cards_create.o \
 		cards_sync.o \

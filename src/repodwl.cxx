@@ -51,7 +51,7 @@ void Repodwl::downloadPortsPkgRepo(const std::string& packageName)
 					downloadFile.md5sum = basePackageInfo.md5SUM;
 					downloadFilesList.push_back(downloadFile);
 #ifndef NDEBUG
-					std::cerr << portsDirectory.Dir
+					std::cerr << portsDirectory.dir
 						+ "/"
 						+ basePackageInfo.basePackageName
 						<< std::endl;

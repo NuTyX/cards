@@ -33,6 +33,12 @@ int main() {
 	Vector.push_back("?");
 	printf("First Value: %s\n",Vector.value(0));
 	printf("Last Value: %s\n",Vector.value(Vector.size()-1));
+	printf("First value: %s\n",Vector[3]);
+/* TODO
+   Find out what's wrong here
+	Vector[3]="Hello";
+*/
+	printf("Value 4: %s\n",Vector[3]);
 
  cards::vector Vector2;
  printf("Size: %u\nCapacity: %u\n\n",Vector2.size(),Vector2.capacity());
