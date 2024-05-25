@@ -61,12 +61,6 @@ struct InfoFile
 	utimbuf acmodtime;
 	FILE *stream;
 };
-
-struct DirUrl {
-	std::string dir;
-	std::string url;
-};
-
 void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmemb);
 std::string trimFileName(const std::string& filename);
 time_t getEpochModifyTimeFile(const std::string& filename);
