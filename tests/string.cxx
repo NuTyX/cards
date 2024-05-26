@@ -1,11 +1,14 @@
 #include "../src/libcards.h"
 
 int main() {
-    std::string string1;
+    cards::string string1;
     printf("Capacity of string1: %u\n",string1.capacity());
     string1="123456789012345678";
     printf("Capacity of string1: %u\n",string1.capacity());
     string1.shrink_to_fit();
+    printf("Value :%s\n",string1.data());
+    string1[10]='a';
+    printf("Value :%s\n",string1.c_str());
     printf("Size of string1: %u\n",string1.size());
     printf("Lenght of string1: %u\n",string1.length());
     printf("Capacity of string1: %u\n",string1.capacity());

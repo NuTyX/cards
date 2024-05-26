@@ -26,6 +26,7 @@ include ../Makefile.inc
 TOOLSOBJECTS =	system_utils.o \
 		error_treat.o \
 		md5.o \
+		string.o \
 		vector.o \
 		string_utils.o \
 		archive_utils.o \
@@ -45,6 +46,7 @@ CARDSOBJECTS =	conf.o \
 		system_utils.o \
 		error_treat.o \
 		md5.o \
+		string.o \
 		vector.o \
 		string_utils.o \
 		archive_utils.o \
@@ -81,6 +83,7 @@ LIBOBJECTS =  conf.o \
 	system_utils.o \
 	error_treat.o \
 	md5.o \
+	string.o \
 	vector.o \
 	string_utils.o \
 	archive_utils.o \
@@ -118,6 +121,7 @@ HEADERS = enum.h \
 		system_utils.h \
 		error_treat.h \
 		md5.h \
+		string.h \
 		vector.h \
 		string_utils.h \
 		file_utils.h \
