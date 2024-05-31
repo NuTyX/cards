@@ -44,6 +44,12 @@ const unsigned int vector::size() {
 const unsigned int vector::capacity() {
     return m_capacity;
 }
+char* vector::operator[](unsigned int i) const {
+	return m_items[i];
+}
+char*& vector::operator[](unsigned int i) {
+	return m_items[i];
+}
 vector::~vector() {
     for (unsigned int i=0; i < m_size;i++) {
         if (m_items[i] != nullptr) {
@@ -55,7 +61,6 @@ vector::~vector() {
         free(m_items);
         m_items = nullptr;
     }
-
 }
 } // end of cards namespace
 
