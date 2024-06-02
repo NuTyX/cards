@@ -104,7 +104,7 @@ namespace cards
         }
         m_log->log(message);
 
-        Db_lock lock(m_root, true);
+        cards::lock Lock(m_root, true);
         // Get the list of installed packages
         getListOfPackagesNames(m_root);
         // Retrieve info about all the packages

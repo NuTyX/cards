@@ -44,6 +44,6 @@ private:
 	void getDirectDependencies(std::string& name);
 
 };
-
 #endif /* PKGRM_H */
+
 // vim:set ts=2 :

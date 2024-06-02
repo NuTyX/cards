@@ -40,5 +40,9 @@
  */
 std::string getMachineType ();
 
+void assertArgument(char** argv, int argc, int index);
+void rotatingCursor();
+
+
 #endif /* SYSTEM_UTILS_H */
 // vim:set ts=2 :

@@ -1485,32 +1485,32 @@ void Pkgdbh::readRulesFile()
 					|| !strcmp(event, "SCHEMAS") || !strcmp(event, "DESKTOP_DB")) {
 
 					rule_t rule;
-					if (!strcmp(event, "UPGRADE"))
-						rule.event = UPGRADE;
-					if (!strcmp(event, "INSTALL"))
-						rule.event = INSTALL;
-					if (!strcmp(event, "INFO"))
-						rule.event = INFO;
-					if (!strcmp(event, "LDCONF"))
-						rule.event = LDCONF;
+					if (!strcmp(event, "cards::UPGRADE"))
+						rule.event = cards::UPGRADE;
+					if (!strcmp(event, "cards::INSTALL"))
+						rule.event = cards::INSTALL;
+					if (!strcmp(event, "cards::INFO"))
+						rule.event = cards::INFO;
+					if (!strcmp(event, "cards::LDCONF"))
+						rule.event = cards::LDCONF;
 					if (!strcmp(event, "FONTS"))
-						rule.event = FONTS;
+						rule.event = cards::FONTS;
 					if (!strcmp(event, "ICONS"))
-						rule.event = ICONS;
+						rule.event = cards::ICONS;
 					if (!strcmp(event, "SCHEMAS"))
-						rule.event = SCHEMAS;
+						rule.event = cards::SCHEMAS;
 					if (!strcmp(event, "DESKTOP_DB"))
-						rule.event = DESKTOP_DB;
+						rule.event = cards::DESKTOP_DB;
 					if (!strcmp(event, "MIME_DB"))
-						rule.event = MIME_DB;
+						rule.event = cards::MIME_DB;
 					if (!strcmp(event, "QUERY_PIXBUF"))
-						rule.event = QUERY_PIXBUF;
+						rule.event = cards::QUERY_PIXBUF;
 					if (!strcmp(event, "GIO_QUERY"))
-						rule.event = GIO_QUERY;
+						rule.event = cards::GIO_QUERY;
 					if (!strcmp(event, "QUERY_IMOD3"))
-						rule.event = QUERY_IMOD3;
+						rule.event = cards::QUERY_IMOD3;
 					if (!strcmp(event, "QUERY_IMOD2"))
-						rule.event = QUERY_IMOD2;
+						rule.event = cards::QUERY_IMOD2;
 
 
 					rule.pattern = pattern;
@@ -1553,28 +1553,28 @@ void Pkgdbh::runLastPostInstall()
 		for (auto i : m_postInstallList)
 		switch ( i.second )
 		{
-			case LDCONF:
+			case cards::LDCONF:
 				if (checkFileExist(m_root + LDCONFIG_CONF)) {
 					args = LDCONFIG_CONF_ARGS + m_root;
 					p.execute(m_root + LDCONFIG, args,0);
 				}
 			break;
 
-			case INFO:
+			case cards::INFO:
 				if (checkFileExist(m_root + INSTALL_INFO)) {
 					args = INSTALL_INFO_ARGS + i.first;
 					p.execute(m_root + INSTALL_INFO, args,0);
 				}
 			break;
 
-			case ICONS:
+			case cards::ICONS:
 				if (checkFileExist(m_root + UPDATE_ICON)) {
 					args = UPDATE_ICON_ARGS + i.first;
 					p.execute(m_root + UPDATE_ICON,args,0);
 				}
 			break;
 
-			case FONTS:
+			case cards::FONTS:
 				if (checkFileExist(m_root + MKFONTSCALE)) {
 					args = MKFONTSCALE_ARGS + i.first;
 					p.execute(m_root + MKFONTSCALE, args,0);
@@ -1589,49 +1589,49 @@ void Pkgdbh::runLastPostInstall()
 				}
 				break;
 
-			case SCHEMAS:
+			case cards::SCHEMAS:
 				if (checkFileExist(m_root + COMPILE_SCHEMAS)) {
 					args = COMPILE_SCHEMAS_ARGS + i.first;
 					p.execute(m_root + COMPILE_SCHEMAS, args,0);
 				}
 			break;
 
-			case DESKTOP_DB:
+			case cards::DESKTOP_DB:
 				if (checkFileExist(m_root + UPDATE_DESKTOP_DB)) {
 					args = UPDATE_DESKTOP_DB_ARGS + i.first;
 					p.execute(m_root + UPDATE_DESKTOP_DB, args,0);
 				}
 			break;
 
-			case MIME_DB:
+			case cards::MIME_DB:
 				if (checkFileExist(m_root + UPDATE_MIME_DB)) {
 					args = UPDATE_MIME_DB_ARGS + i.first;
 					p.execute(m_root + UPDATE_MIME_DB, args,0);
 				}
 			break;
 
-			case QUERY_PIXBUF:
+			case cards::QUERY_PIXBUF:
 				if (checkFileExist(m_root + GDK_PIXBUF_QUERY_LOADER)) {
 					args = GDK_PIXBUF_QUERY_LOADER_ARGS;
 					p.execute(m_root + GDK_PIXBUF_QUERY_LOADER, args,0);
 				}
 			break;
 
-			case GIO_QUERY:
+			case cards::GIO_QUERY:
 				if (checkFileExist(m_root + GIO_QUERYMODULES)) {
 					args = GIO_QUERYMODULES_ARGS;
 					p.execute(m_root + GIO_QUERYMODULES, args,0);
 				}
 			break;
 
-			case QUERY_IMOD3:
+			case cards::QUERY_IMOD3:
 				if (checkFileExist(m_root + QUERY_IMMODULES_3)) {
 					args = QUERY_IMMODULES_3_ARGS;
 					p.execute(m_root + QUERY_IMMODULES_3, args,0);
 				}
 			break;
 
-			case QUERY_IMOD2:
+			case cards::QUERY_IMOD2:
 				if (checkFileExist(m_root + QUERY_IMMODULES_2)) {
 					args = QUERY_IMMODULES_2_ARGS;
 					p.execute(m_root + QUERY_IMMODULES_2, args,0);
@@ -1814,62 +1814,5 @@ unsigned int Pkgdbh::getInstalledFilesNumber()
 std::set<std::string> Pkgdbh::getFilesList()
 {
 	return m_filesList;
-}
-Db_lock::Db_lock(const std::string& m_root, bool exclusive)
-	: m_dir(0)
-{
-  // Ignore signals
-  memset(&m_sa, 0, sizeof(m_sa));
-  m_sa.sa_handler = SIG_IGN;
-  sigaction(SIGHUP, &m_sa, NULL);
-  sigaction(SIGINT, &m_sa, NULL);
-  sigaction(SIGQUIT, &m_sa, NULL);
-  sigaction(SIGTERM, &m_sa, NULL);
-
-	const std::string dirname = trimFileName(m_root + std::string("/") + PKG_DB_DIR);
-#ifndef NDEBUG
-	std::cerr << "Lock the database " << dirname << std::endl;
-#endif
-	if (!(m_dir = opendir(dirname.c_str())))
-		throw RunTimeErrorWithErrno("could not read directory " + dirname);
-
-	if (flock(dirfd(m_dir), (exclusive ? LOCK_EX : LOCK_SH) | LOCK_NB) == -1) {
-		if (errno == EWOULDBLOCK)
-			throw std::runtime_error("package database is currently locked by another process");
-		else
-			throw RunTimeErrorWithErrno("could not lock directory " + dirname);
-	}
-}
-
-Db_lock::~Db_lock()
-{
-	m_sa.sa_handler = SIG_DFL;
-	signal(SIGHUP,SIG_DFL);
-	signal(SIGINT,SIG_DFL);
-	signal(SIGQUIT,SIG_DFL);
-	signal(SIGTERM,SIG_DFL);
-	if (m_dir) {
-		flock(dirfd(m_dir), LOCK_UN);
-		closedir(m_dir);
-	}
-#ifndef NDEBUG
-	std::cerr << "Unlock the database " << m_dir << std::endl;
-#endif
-}
-/*******************     End of Members *********************/
-
-/*******************   Various fonctions ********************/
-
-void assertArgument(char** argv, int argc, int index)
-{
-	if (argc - 1 < index + 1)
-		throw std::runtime_error("option " + std::string(argv[index]) + " requires an argument");
-}
-void rotatingCursor() {
-  static int pos=0;
-  char cursor[4]={'/','-','\\','|'};
-  fprintf(stderr,"\r [ %c ] ", cursor[pos]);
-  fflush(stderr);
-  pos = (pos+1) % 4;
 }
 // vim:set ts=2 :

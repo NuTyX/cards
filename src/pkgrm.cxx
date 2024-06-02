@@ -77,7 +77,7 @@ void Pkgrm::run()
 		treatErrors("");
 	}
 
-	Db_lock lock(m_root, true);
+	cards::lock Lock(m_root, true);
 
 	// Get the list of installed packages
 	getListOfPackagesNames(m_root);

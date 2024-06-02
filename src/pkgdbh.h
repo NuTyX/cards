@@ -33,9 +33,8 @@
 #include "archive_utils.h"
 #include "file_utils.h"
 #include "process.h"
+#include "lock.h"
 
-#include <stdexcept>
-#include <csignal>
 #include <algorithm>
 
 #include <regex.h>
@@ -43,7 +42,6 @@
 #include <pwd.h>
 #include <grp.h>
 
-#define PKG_DB_DIR       "var/lib/pkg/DB/"
 #define PKG_FILES        "/files"
 #define PKG_META         "META"
 #define PKG_RECEPT       "Pkgfile"
@@ -111,24 +109,10 @@
 
 typedef std::map<std::string, cards::db> packages_t;
 
-enum rule_event_t {
-	LDCONF,
-	UPGRADE,
-	INSTALL,
-	INFO,
-	ICONS,
-	FONTS,
-	SCHEMAS,
-	DESKTOP_DB,
-	MIME_DB,
-	QUERY_PIXBUF,
-	GIO_QUERY,
-	QUERY_IMOD3,
-	QUERY_IMOD2
-};
+
 
 struct rule_t {
-	rule_event_t event;
+	cards::rule_event_t event;
 	std::string pattern;
 	bool action;
 };
@@ -235,7 +219,7 @@ protected:
 
 	void readRulesFile();
 	void getInstallRulesList(const std::vector<rule_t>& rules,
-			rule_event_t event, std::vector<rule_t>& found) const;
+			cards::rule_event_t event, std::vector<rule_t>& found) const;
 
 	bool checkRuleAppliesToFile(const rule_t& rule,
 			const std::string& file);
@@ -281,18 +265,5 @@ private:
 	bool m_miniDB_Empty;
 };
 
-class Db_lock {
-public:
-	Db_lock(const std::string& m_root, bool exclusive);
-	~Db_lock();
-
-private:
-	DIR* m_dir;
-	struct sigaction m_sa;
-};
-
-// Utility functions
-void assertArgument(char** argv, int argc, int index);
-void rotatingCursor();
 #endif /* PKGDBH_H */
 // vim:set ts=2 :

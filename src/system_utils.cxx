@@ -34,4 +34,17 @@ std::string getMachineType ()
 	}
 	return machineType;
 }
+void rotatingCursor() {
+  static int pos=0;
+  char cursor[4]={'/','-','\\','|'};
+  fprintf(stderr,"\r [ %c ] ", cursor[pos]);
+  fflush(stderr);
+  pos = (pos+1) % 4;
+}
+void assertArgument(char** argv, int argc, int index)
+{
+	if (argc - 1 < index + 1)
+		throw std::runtime_error("option " + std::string(argv[index]) + " requires an argument");
+}
+
 // vim:set ts=2 :

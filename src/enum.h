@@ -112,6 +112,21 @@ enum RuleEnum {
 	RULE_ENUM_QUERY_IMOD3,
 	RULE_ENUM_QUERY_IMOD2
 };
+enum rule_event_t {
+	LDCONF,
+	UPGRADE,
+	INSTALL,
+	INFO,
+	ICONS,
+	FONTS,
+	SCHEMAS,
+	DESKTOP_DB,
+	MIME_DB,
+	QUERY_PIXBUF,
+	GIO_QUERY,
+	QUERY_IMOD3,
+	QUERY_IMOD2
+};
 
 } // end of cards namespace
 

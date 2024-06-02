@@ -36,6 +36,7 @@ TOOLSOBJECTS =	system_utils.o \
 		db.o \
 		cache.o \
 		runtime_dependencies_utils.o \
+		lock.o \
 		pkgdbh.o \
 		pkgadd.o \
 		pkgrm.o \
@@ -51,6 +52,7 @@ CARDSOBJECTS =	conf.o \
 		string_utils.o \
 		archive_utils.o \
 		pkg.o \
+		lock.o \
 		db.o \
 		cache.o \
 		pkgrepo.o \
@@ -93,6 +95,7 @@ LIBOBJECTS =  conf.o \
 	file_utils.o \
 	process.o \
 	pkg.o \
+	lock.o \
 	db.o \
 	cache.o \
 	runtime_dependencies_utils.o \
@@ -128,6 +131,7 @@ HEADERS = enum.h \
 		archive_utils.h \
 		conf.h \
 		pkg.h \
+		lock.h \
 		db.h  \
 		cache.h \
 		pkgrepo.h \

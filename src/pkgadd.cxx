@@ -129,7 +129,7 @@ void Pkgadd::run()
 		package.second);
 	if (!conflicting_files.empty()) {
 		if (m_force) {
-			Db_lock lock(m_root, true);
+			cards::lock Lock(m_root, true);
 			std::set<std::string> keep_list;
 			// Don't remove files matching the rules in configuration
 			if (m_upgrade)
@@ -156,14 +156,14 @@ void Pkgadd::run()
 		if ( checkDependency(package.first) )
 			setDependency ();
 		if (m_runPrePost) preRun();
-		Db_lock lock(m_root, true);
+		cards::lock Lock(m_root, true);
 		// Remove metadata about the package removed
 		removePackageFilesRefsFromDB(package.first);
 		keep_list = getKeepFileList(package.second.files, m_actionRules);
 		removePackageFiles(package.first, keep_list);
 	}
 	{
-		Db_lock lock(m_root, true);
+		cards::lock Lock(m_root, true);
 		// Installation progressInfo of the files on the HD
 		installArchivePackage(m_packageArchiveName,
 			keep_list, non_install_files);
@@ -225,7 +225,7 @@ Pkgadd::getKeepFileList(const std::set< std::string>& files, const std::vector<r
 	std::set<std::string> keep_list;
 	std::vector<rule_t> found;
 
-	getInstallRulesList(rules, UPGRADE, found);
+	getInstallRulesList(rules, cards::UPGRADE, found);
 
 	for (auto i : files) {
 		for (std::vector<rule_t>::reverse_iterator j = found.rbegin();
@@ -258,7 +258,7 @@ Pkgadd::applyInstallRules(const std::string& name, cards::db& info,
 	std::set<std::string> non_install_set;
 
 	std::vector<rule_t> files_found;
-	getInstallRulesList(rules, INSTALL, files_found);
+	getInstallRulesList(rules, cards::INSTALL, files_found);
 
 	std::vector<rule_t> scripts_found;
 	getPostInstallRulesList(rules, scripts_found);
@@ -292,7 +292,7 @@ Pkgadd::applyInstallRules(const std::string& name, cards::db& info,
 				}
 		}
 		if (install_file) {
-			if ( a.second == LDCONF ) {
+			if ( a.second == cards::LDCONF ) {
 				a.first="";
 			} else {
 				a.first=i;
@@ -344,7 +344,7 @@ Pkgadd::applyPostInstallRules(const std::string& name, cards::db& info,
 			if (checkRuleAppliesToFile((*j), i)) {
 				install_file = (*j).action;
 				if (install_file) {
-					if ( a.second == LDCONF ) {
+					if ( a.second == cards::LDCONF ) {
 						a.first="";
 					} else {
 						a.first=i;
@@ -357,7 +357,7 @@ Pkgadd::applyPostInstallRules(const std::string& name, cards::db& info,
 	}
 }
 void
-Pkgadd::getInstallRulesList(const std::vector<rule_t>& rules, rule_event_t event, 
+Pkgadd::getInstallRulesList(const std::vector<rule_t>& rules, cards::rule_event_t event,
 	std::vector<rule_t>& found) const
 {
 	for (auto i : rules ) {
@@ -370,7 +370,7 @@ Pkgadd::getPostInstallRulesList(const std::vector<rule_t>& rules,
 	std::vector<rule_t>& found) const
 {
 	for (auto i : rules ) {
-		if ( (i.event != INSTALL) && (i.event != UPGRADE))
+		if ( (i.event != cards::INSTALL) && (i.event != cards::UPGRADE))
 			found.push_back(i);
 	}
 }

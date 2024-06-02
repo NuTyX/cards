@@ -188,7 +188,7 @@ void Cards_upgrade::upgrade()
 		syslog(LOG_INFO,"%s upgraded",p.c_str());
 		}
 		for (auto i : m_ListOfPackagesToDelete) {
-			Db_lock lock(m_root,true);
+			cards::lock Lock(m_root,true);
 			getListOfPackagesNames(m_root);
 			buildCompleteDatabase(false);
 			removePackageFilesRefsFromDB(i);

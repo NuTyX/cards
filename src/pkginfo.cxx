@@ -174,7 +174,7 @@ void Pkginfo::run()
 		 *  Modes that require the database to be opened
 		 *
 		 */
-		Db_lock lock(m_root, false);
+		cards::lock Lock(m_root, false);
 		getListOfPackagesNames(m_root);
 		if (m_installed_mode) {
 			/*

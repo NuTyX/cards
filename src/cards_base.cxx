@@ -109,7 +109,7 @@ void Cards_base::run(int argc, char** argv)
 			// Retrieve info about all the packages
 			buildCompleteDatabase(false);
 			// Lock the Database, any interruption forbidden
-			Db_lock lock(m_root, true);
+			cards::lock Lock(m_root, true);
 
 			for (auto i : removePackagesList ) {
 				// Remove metadata about the package removed
