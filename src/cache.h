@@ -6,11 +6,11 @@
 
 namespace cards {
 
-class Cache: public Db
+class cache: public db
 {
 public:
-	Cache();
-	~Cache();
+	cache();
+	~cache();
 	unsigned int size();
 	StatusEnum status();
 	bool installed();

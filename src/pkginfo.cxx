@@ -142,7 +142,7 @@ void Pkginfo::parseArguments(int argc, char** argv)
 void Pkginfo::run()
 {
 	if (m_archiveinfo) {
-		std::pair<std::string, cards::Db> packageArchive = openArchivePackage(m_packageArchiveName) ;
+		std::pair<std::string, cards::db> packageArchive = openArchivePackage(m_packageArchiveName) ;
 		std::string name = packageArchive.first + " : ";
 		std::cout
 			<< name << _("Description    : ") << packageArchive.second.description() << std::endl
@@ -215,7 +215,7 @@ void Pkginfo::run()
 				for (auto f : m_listOfPackages[arg].files)
 					std::cout << f << std::endl;
 			} else if (checkFileExist(m_arg)) {
-				std::pair<std::string, cards::Db> package = openArchivePackage(m_arg);
+				std::pair<std::string, cards::db> package = openArchivePackage(m_arg);
 				for (auto f : package.second.files)
 					std::cout << f << std::endl;
 			}

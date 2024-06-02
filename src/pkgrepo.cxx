@@ -298,50 +298,50 @@ void Pkgrepo::parsePackagePkgfileFile()
 	std::string::size_type pos;
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
-			cards::Cache* pkg = new cards::Cache();
+			cards::cache* Pkg = new cards::cache();
 			std::string pkgFile = i.dir + "/" + j.basePackageName  + "/PKG_RECEPT";
 			if ( ! checkFileExist (pkgFile) ) {
-				pkg->name("");
+				Pkg->name("");
 				continue;
 			}
-			pkg->fileDate(getModifyTimeFile(pkgFile));
+			Pkg->fileDate(getModifyTimeFile(pkgFile));
 			std::vector<std::string> pkgFileContent;
 			if ( parseFile(pkgFileContent,pkgFile.c_str()) != 0) {
 				std::cout << "You should use " << YELLOW << "ports -u" << NORMAL << " for " << i.dir << std::endl;
 				std::cerr << "Cannot read the file: " << pkgFile << std::endl
 					<< " ... continue with next" << std::endl;
-				pkg->name("");
+				Pkg->name("");
 				continue;
 			}
-			pkg->dirName(i.dir);
+			Pkg->dirName(i.dir);
 			std::string baseDir = basename(const_cast<char*>(i.dir.c_str()));
-			pkg->collection(baseDir);
-			pkg->name(j.basePackageName);
-			pkg->release(1);
+			Pkg->collection(baseDir);
+			Pkg->name(j.basePackageName);
+			Pkg->release(1);
 			for (auto p : pkgFileContent) {
 				std::string line = stripWhiteSpace(p);
 				if ( line.substr( 0, 12 ) == "description=" ){
 					j.description = getValueBefore( getValue( line, '=' ), '#' );
-					pkg->description(stripWhiteSpace( j.description ));
+					Pkg->description(stripWhiteSpace( j.description ));
 				} else if ( line.substr( 0, 4 ) == "url=" ){
 					j.url = getValueBefore( getValue( line, '=' ), '#' );
-					pkg->url(stripWhiteSpace( j.url ));
+					Pkg->url(stripWhiteSpace( j.url ));
 				} else if ( line.substr( 0, 9 ) == "packager=" ){
 					j.packager = getValueBefore( getValue( line, '=' ), '#' );
-					pkg->packager(stripWhiteSpace( j.packager ));
+					Pkg->packager(stripWhiteSpace( j.packager ));
 				} else if ( line.substr( 0, 13 ) == "contributors=" ){
 					j.contributors = getValueBefore( getValue( line, '=' ), '#' );
-					pkg->contributors(stripWhiteSpace( j.contributors ));
+					Pkg->contributors(stripWhiteSpace( j.contributors ));
 				} else if ( line.substr( 0, 11 ) == "maintainer=" ){
 					j.maintainer = getValueBefore( getValue( line, '=' ), '#' );
-					pkg->maintainer(stripWhiteSpace( j.maintainer ));
+					Pkg->maintainer(stripWhiteSpace( j.maintainer ));
 				} else if ( line.substr( 0, 8 ) == "version=" ){
 					j.version = getValueBefore( getValue( line, '=' ), '#' );
-					pkg->version(stripWhiteSpace( j.version ));
+					Pkg->version(stripWhiteSpace( j.version ));
 				} else if ( line.substr( 0, 8 ) == "release=" ){
 					std::string release = getValueBefore( getValue( line, '=' ), '#' );
 					release = stripWhiteSpace(release );
-					pkg->release(atoi(release.c_str()));
+					Pkg->release(atoi(release.c_str()));
 				} else if ( line[0] == '#' ) {
 					while ( !line.empty() &&
 							( line[0] == '#' || line[0] == ' ' || line[0] == '\t' ) ) {
@@ -350,18 +350,18 @@ void Pkgrepo::parsePackagePkgfileFile()
 					pos = line.find(':');
 					if ( pos != std::string::npos ) {
 						if ( startsWithNoCase( line, "desc" ) ) {
-							pkg->description(stripWhiteSpace( getValue( line, ':' ) ) );
+							Pkg->description(stripWhiteSpace( getValue( line, ':' ) ) );
 						} else if ( startsWithNoCase( line, "url" ) ) {
-							pkg->url(stripWhiteSpace( getValue( line, ':' ) ) );
+							Pkg->url(stripWhiteSpace( getValue( line, ':' ) ) );
 						} else if ( startsWithNoCase( line, "pac" ) ) {
-							pkg->packager(stripWhiteSpace( getValue( line, ':' ) ) );
+							Pkg->packager(stripWhiteSpace( getValue( line, ':' ) ) );
 						} else if ( startsWithNoCase( line, "mai" ) ) {
-							pkg->maintainer(stripWhiteSpace( getValue( line, ':' ) ) );
+							Pkg->maintainer(stripWhiteSpace( getValue( line, ':' ) ) );
 						}
 					}
 				}
 			}
-			m_packagesList.insert(pkg);
+			m_packagesList.insert(Pkg);
 		}
 	}
 	m_parsePackagePkgfileFile = true;
@@ -443,12 +443,12 @@ std::set<std::string> Pkgrepo::getBinaryPackageList()
 	return binaryList;
 }
 
-std::set<cards::Cache*>
+std::set<cards::cache*>
 Pkgrepo::getBinaryPackageSet()
 {
 	parseCollectionPkgRepoFile();
 
-	// std::set<cards::Cache*> pkgList;
+	// std::set<cards::cache*> pkgList;
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
@@ -461,22 +461,22 @@ Pkgrepo::getBinaryPackageSet()
 				<< j.description << " "
 				<< j.version << std::endl;
 #endif
-			cards::Cache* pkg = new cards::Cache();
+			cards::cache* Pkg = new cards::cache();
 			std::set<std::string> sets;
 			std::string baseDir = basename(const_cast<char*>(i.dir.c_str()));
-			pkg->name(j.basePackageName);
-			pkg->version(j.version);
-			pkg->description(j.description);
+			Pkg->name(j.basePackageName);
+			Pkg->version(j.version);
+			Pkg->description(j.description);
 			if ( ( j.set=="none ") || (j.set.size()==0 ) ||
 				 ( j.set=="none") )
-				pkg->collection(baseDir);
+				Pkg->collection(baseDir);
 			else {
 				sets.insert(j.set);
-				pkg->sets(sets);
+				Pkg->sets(sets);
 			}
-			pkg->packager(j.packager);
+			Pkg->packager(j.packager);
 
-			m_packagesList.insert(pkg);
+			m_packagesList.insert(Pkg);
 		}
 	}
 	return m_packagesList;

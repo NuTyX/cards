@@ -3,11 +3,11 @@
 
 namespace cards {
 
-class Db : public Pkg
+class db : public pkg
 {
 public:
-	Db();
-	~Db();
+	db();
+	~db();
 	
 	time_t install();
 	unsigned int space();

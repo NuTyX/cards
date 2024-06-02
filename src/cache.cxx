@@ -2,67 +2,67 @@
 
 namespace cards {
 
-Cache::Cache()
+cache::cache()
 {
 	m_status = STATUS_ENUM_UNKNOWN;
 }
-Cache::~Cache()
+cache::~cache()
 {
 	//nothing todo ATM
 }
-void Cache::size(unsigned int size)
+void cache::size(unsigned int size)
 {
 	m_size = size;
 }
-unsigned int Cache::size()
+unsigned int cache::size()
 {
 	return m_size;
 }
-void Cache::setStatus(StatusEnum status)
+void cache::setStatus(StatusEnum status)
 {
 	m_status = (StatusEnum)(m_status | status);
 }
-void Cache::unsetStatus(StatusEnum status)
+void cache::unsetStatus(StatusEnum status)
 {
 	m_status = (StatusEnum)(m_status & (~status));
 }
-StatusEnum Cache::status()
+StatusEnum cache::status()
 {
 	return m_status;
 }
-void Cache::name(const std::string& name)
+void cache::name(const std::string& name)
 {
 	m_name=name;
 }
-const std::string Cache::name()
+const std::string cache::name()
 {
 	return m_name;
 }
-void Cache::dirName(const std::string& dirname)
+void cache::dirName(const std::string& dirname)
 {
 	m_dirName=dirname;
 }
-const std::string Cache::dirName()
+const std::string cache::dirName()
 {
 	return m_dirName;
 }
-void Cache::fileDate(const std::string& filedate)
+void cache::fileDate(const std::string& filedate)
 {
 	m_fileDate=filedate;
 }
-const std::string Cache::fileDate()
+const std::string cache::fileDate()
 {
 	return m_fileDate;
 }
-bool Cache::installed()
+bool cache::installed()
 {
 	return m_status & StatusEnum::STATUS_ENUM_INSTALLED;
 }
-bool Cache::toinstall()
+bool cache::toinstall()
 {
 	return m_status & StatusEnum::STATUS_ENUM_TO_INSTALL;
 }
-bool Cache::toremove()
+bool cache::toremove()
 {
 	return m_status & StatusEnum::STATUS_ENUM_TO_REMOVE;
 }

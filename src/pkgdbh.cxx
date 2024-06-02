@@ -406,10 +406,10 @@ int Pkgdbh::getListOfPackagesNames (const std::string& path)
 }
 
 /* get details info of a package */
-std::pair<std::string, cards::Db>
+std::pair<std::string, cards::db>
 Pkgdbh::getInfosPackage( const std::string& packageName )
 {
-	std::pair<std::string, cards::Db> result;
+	std::pair<std::string, cards::db> result;
 
 	result.first = packageName;
 	return result;
@@ -505,7 +505,7 @@ Pkgdbh::buildDatabase(const bool& progress,
 
 	if (packageName.size() > 0) {
 		std::string name = m_listOfAlias[packageName];
-		cards::Db info;
+		cards::db info;
 		info.files=getSetOfFiles(name);
 		m_listOfPackages[name] = info;
 	}
@@ -518,7 +518,7 @@ Pkgdbh::buildDatabase(const bool& progress,
 
 	std::set<std::string> sets;
 	if (simple) {
-		cards::Db info;
+		cards::db info;
 		for ( auto pkgName : m_listOfPackagesNames) {
 			if (progress) {
 				progressInfo(ACTION_ENUM_DB_OPEN_RUN);
@@ -619,7 +619,7 @@ Pkgdbh::buildSimpleDatabase()
 		if (m_listOfPackagesNames.empty() )
 			getListOfPackagesNames (m_root);
 		for ( auto i : m_listOfPackagesNames) {
-			cards::Db info;
+			cards::db info;
 			const std::string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
 			std::set<std::string> fileContent;
 			parseFile(fileContent,metaFile.c_str());
@@ -695,7 +695,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 			if (!silent) {
 				progressInfo(ACTION_ENUM_DB_OPEN_RUN);
 			}
-			cards::Db info;
+			cards::db info;
 			const std::string metaFileDir = m_root + PKG_DB_DIR + i;
 			const std::string metaFile = metaFileDir + '/' + PKG_META;
 			info.install( getEpochModifyTimeFile(metaFileDir) );
@@ -811,7 +811,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 		m_DB_Empty=false;
 	}
 }
-void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
+void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 {
 	std::set<std::string> metaFilesList;
 	progressInfo(cards::ACTION_ENUM_PKG_MOVE_META_START);
@@ -864,7 +864,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::Db& info)
 	}
 	progressInfo(cards::ACTION_ENUM_PKG_MOVE_META_END);
 }
-void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::Db& info)
+void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::db& info)
 {
 
 	m_listOfPackages[name] = info;
@@ -929,7 +929,7 @@ void Pkgdbh::resetDependency()
 }
 
 bool
-Pkgdbh::checkPackageNameUptodate(std::pair<std::string, cards::Db>& archiveName)
+Pkgdbh::checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName)
 {
 	std::set<std::string>::iterator it = m_listOfPackagesNames.find(archiveName.first);
 	if (it == m_listOfPackagesNames.end())
@@ -1121,7 +1121,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std
 }
 
 std::set<std::string>
-Pkgdbh::getConflictsFilesList (const std::string& name, cards::Db& info)
+Pkgdbh::getConflictsFilesList (const std::string& name, cards::db& info)
 {
 	std::set<std::string> files;
 
@@ -1180,11 +1180,11 @@ Pkgdbh::getConflictsFilesList (const std::string& name, cards::Db& info)
 
 	return files;
 }
-std::pair<std::string, cards::Db>
+std::pair<std::string, cards::db>
 Pkgdbh::openArchivePackage(const std::string& filename)
 {
 	std::string packageArchiveName;
-	std::pair<std::string, cards::Db> result;
+	std::pair<std::string, cards::db> result;
 	ArchiveUtils packageArchive(filename.c_str());
 #ifndef NDEBUG
 	std::cerr << "Number of files: " << packageArchive.size() << std::endl;
@@ -1237,7 +1237,7 @@ Pkgdbh::openArchivePackage(const std::string& filename)
 std::set< std::pair<std::string,time_t> >
 Pkgdbh::getPackageDependencies (const std::string& filename)
 {
-	std::pair<std::string, cards::Db> packageArchive;
+	std::pair<std::string, cards::db> packageArchive;
 	std::set< std::pair<std::string,time_t> > packageNameDepsBuildTime;
 	std::set< std::pair<std::string,time_t> > packageNameDepsBuildTimeTemp;
 	packageArchive = openArchivePackage(filename);

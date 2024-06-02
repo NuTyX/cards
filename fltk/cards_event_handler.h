@@ -70,7 +70,7 @@ namespace cards
         virtual void OnRefreshPackageFinished (const CEH_RC rc){}
         virtual void OnJobListChange (const CEH_RC rc){}
         virtual void OnProgressInfo (int percent){}
-        virtual void OnPackageInfo (cards::Cache& package){}
+        virtual void OnPackageInfo (cards::cache& package){}
 
     public:
         static	const std::string getReasonCodeString(const CEH_RC rc);

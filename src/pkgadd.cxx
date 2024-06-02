@@ -100,7 +100,7 @@ void Pkgadd::run()
 	buildCompleteDatabase(false);
 
 	// Reading the archiving to find a list of files
-	std::pair<std::string, cards::Db> package = openArchivePackage(m_packageArchiveName);
+	std::pair<std::string, cards::db> package = openArchivePackage(m_packageArchiveName);
 
 	readRulesFile();
 
@@ -250,7 +250,7 @@ Pkgadd::getKeepFileList(const std::set< std::string>& files, const std::vector<r
 }
 
 std::set<std::string>
-Pkgadd::applyInstallRules(const std::string& name, cards::Db& info,
+Pkgadd::applyInstallRules(const std::string& name, cards::db& info,
 		const std::vector<rule_t>& rules)
 {
 	// TODO: better algo(?)
@@ -325,7 +325,7 @@ Pkgadd::applyInstallRules(const std::string& name, cards::Db& info,
 	return non_install_set;
 }
 void
-Pkgadd::applyPostInstallRules(const std::string& name, cards::Db& info,
+Pkgadd::applyPostInstallRules(const std::string& name, cards::db& info,
 			const std::vector<rule_t>& rules)
 {
 	std::vector<rule_t> found;

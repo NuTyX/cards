@@ -109,7 +109,7 @@
 #define FC_CACHE_ARGS  ""
 
 
-typedef std::map<std::string, cards::Db> packages_t;
+typedef std::map<std::string, cards::db> packages_t;
 
 enum rule_event_t {
 	LDCONF,
@@ -182,7 +182,7 @@ protected:
 	// Database
 
 	int getListOfPackagesNames(const std::string& path);
-	std::pair<std::string, cards::Db> getInfosPackage(const std::string& packageName);
+	std::pair<std::string, cards::db> getInfosPackage(const std::string& packageName);
 	void buildSimpleDatabase();
 	void buildSimpleDependenciesDatabase();
 
@@ -195,10 +195,10 @@ protected:
 
 
 	void addPackageFilesRefsToDB(const std::string& name,
-		const cards::Db& info);
+		const cards::db& info);
 
 	bool
-	checkPackageNameUptodate(std::pair<std::string, cards::Db>& archiveName);
+	checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName);
 	bool
 	checkPackageNameBuildDateSame(const std::pair<std::string, time_t>& dependencieNameBuild);
 
@@ -217,10 +217,10 @@ protected:
 		const std::set<std::string>& keep_list);
 
 	std::set<std::string>
-	getConflictsFilesList(const std::string& name,cards::Db& info);
+	getConflictsFilesList(const std::string& name,cards::db& info);
 
 	// Tar.gz
-	std::pair<std::string, cards::Db> openArchivePackage(const std::string& filename);
+	std::pair<std::string, cards::db> openArchivePackage(const std::string& filename);
 	std::set< std::pair<std::string, time_t> > getPackageDependencies(const std::string& filename);
 	void extractAndRunPREfromPackage(const std::string& filename);
 	void installArchivePackage(const std::string& filename,
@@ -230,7 +230,7 @@ protected:
 	/*
 	 * The folder holding the meta datas is going to be create here
 	 */
-	void moveMetaFilesPackage(const std::string& name, cards::Db& info);
+	void moveMetaFilesPackage(const std::string& name, cards::db& info);
 
 
 	void readRulesFile();

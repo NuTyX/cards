@@ -46,7 +46,7 @@ void TablePackage::refresh_table()
     clear();
     m_rowdata.clear();
     cols(4);
-    std::vector<cards::Cache*> pkgList = m_cards->getPackageList();
+    std::vector<cards::cache*> pkgList = m_cards->getPackageList();
     for (auto S : pkgList)
     {
         if (m_filter.length()>0)
@@ -88,7 +88,7 @@ int TablePackage::install_selected()
             {
                 if (m_rowdata[i].data!=nullptr)
                 {
-                    cards::Cache* pack = reinterpret_cast<cards::Cache*>(m_rowdata[i].data);
+                    cards::cache* pack = reinterpret_cast<cards::cache*>(m_rowdata[i].data);
                     if (!pack->status()==cards::STATUS_ENUM_INSTALLED)
                     {
                         pack->setStatus(cards::STATUS_ENUM_TO_INSTALL);
@@ -110,7 +110,7 @@ int TablePackage::remove_selected()
             {
                 if (m_rowdata[i].data!=nullptr)
                 {
-                    cards::Cache* pack = reinterpret_cast<cards::Cache*>(m_rowdata[i].data);
+                    cards::cache* pack = reinterpret_cast<cards::cache*>(m_rowdata[i].data);
                     if (!pack->status()!=cards::STATUS_ENUM_INSTALLED)
                     {
                         pack->setStatus(cards::STATUS_ENUM_TO_REMOVE);
@@ -145,7 +145,7 @@ void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, 
                 }
                 else if (m_rowdata[R].data!=nullptr)
                 {
-                    cards::Cache* pack=reinterpret_cast<cards::Cache*>(m_rowdata[R].data);
+                    cards::cache* pack=reinterpret_cast<cards::cache*>(m_rowdata[R].data);
                     if (pack->installed())
                     {
                         fl_draw_pixmap(download_xpm,X+5,Y+5);
@@ -177,7 +177,7 @@ void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
         {
             if (m_rowdata[pRow].data!=nullptr)
             {
-                cards::Cache* pack = reinterpret_cast<cards::Cache*>(m_rowdata[pRow].data);
+                cards::cache* pack = reinterpret_cast<cards::cache*>(m_rowdata[pRow].data);
                 if ( Fl::event() == FL_RELEASE && Fl::event_button() == 1 )
                 {
 #ifndef NDEBUG

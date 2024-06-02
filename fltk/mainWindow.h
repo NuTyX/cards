@@ -92,7 +92,7 @@ protected:
     void OnSyncFinished(const cards::CEH_RC rc);
     void OnJobListChange(const cards::CEH_RC rc);
     void OnLogMessage(const std::string& pMessage);
-    void OnPackageInfo(cards::Cache& pPackage);
+    void OnPackageInfo(cards::cache& pPackage);
 
 private:
     void SaveConfig();

@@ -181,7 +181,7 @@ public:
  * return a Pkg set List of available binaries packages
  *
  */
-	std::set<cards::Cache*> getBinaryPackageSet();
+	std::set<cards::cache*> getBinaryPackageSet();
 
 /**
  * populate RepoInfo List
@@ -282,7 +282,7 @@ private:
 
 	cards::ErrorEnum m_ErrorCond;
 	void clearPackagesList();
-	std::set<cards::Cache*> m_packagesList;
+	std::set<cards::cache*> m_packagesList;
 };
 #endif /* PKGREPO_H */
 // vim:set ts=2 :

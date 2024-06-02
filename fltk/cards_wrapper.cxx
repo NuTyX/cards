@@ -81,7 +81,7 @@ namespace cards
         }
     }
 
-    const std::vector<cards::Cache*>& CWrapper::getPackageList()
+    const std::vector<cards::cache*>& CWrapper::getPackageList()
     {
         return m_arrPackages;
     }
@@ -94,10 +94,10 @@ namespace cards
     ///
     ///
     ///
-    cards::Cache* CWrapper::getPackage(const std::string& pName)
+    cards::cache* CWrapper::getPackage(const std::string& pName)
     {
-        cards::Cache* ptr=nullptr;
-        for (cards::Cache* it : m_arrPackages)
+        cards::cache* ptr=nullptr;
+        for (cards::cache* it : m_arrPackages)
         {
             if (it->name() == pName)
             {
@@ -113,7 +113,7 @@ namespace cards
     void CWrapper::refreshJobList()
     {
         m_arrJobList.clear();
-        for (cards::Cache* it:m_arrPackages)
+        for (cards::cache* it:m_arrPackages)
         {
             if (it->toinstall() || it->toremove())
             {
@@ -136,7 +136,7 @@ namespace cards
     {
         if (m_job_running)
             return;
-        for (cards::Cache* it:m_arrPackages)
+        for (cards::cache* it:m_arrPackages)
         {
             if (it->status() == cards::STATUS_ENUM_TO_INSTALL)
             {
@@ -151,7 +151,7 @@ namespace cards
     }
 
     /** Return the current job list */
-    const std::vector<cards::Cache*>& CWrapper::getJobList()
+    const std::vector<cards::cache*>& CWrapper::getJobList()
     {
         return m_arrJobList;
     }
@@ -203,8 +203,8 @@ namespace cards
     void CWrapper::m_GetPackageInfo_Thread(std::string pName)
     {
         m_job_running =true;
-        cards::Cache Package;
-        cards::Cache* Pack = getPackage(pName);
+        cards::cache Package;
+        cards::cache* Pack = getPackage(pName);
         if (Pack != nullptr) Package = *Pack;
         for (auto it : m_arrEventHandler)
         {
@@ -256,7 +256,7 @@ namespace cards
                 m_log->log(_("Determine Packages Install and Remove List..."));
                 std::set<std::string> Removelist;
                 std::set<std::string> InstallList;
-                for (cards::Cache* it:m_arrJobList)
+                for (cards::cache* it:m_arrJobList)
                 {
                     if (it->toinstall()) InstallList.insert(it->name());
                     if (it->toremove()) Removelist.insert(it->name());
@@ -303,11 +303,11 @@ namespace cards
         CClient Cards;
         // First pass get all package available
         m_ClearPackagesList();
-		std::set<cards::Cache*> AvailablePackages = Cards.getBinaryPackageSet();
+		std::set<cards::cache*> AvailablePackages = Cards.getBinaryPackageSet();
         std::set<std::string> InstalledPackages = Cards.ListOfInstalledPackages();
 		for (auto i : AvailablePackages)
 		{
-			cards::Cache* Pack = new cards::Cache();
+			cards::cache* Pack = new cards::cache();
 			if ( i->sets().size()  > 0 )
 				Pack->collection(i->sets());
 			else

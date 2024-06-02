@@ -2,35 +2,35 @@
 
 namespace cards {
 
-Db::Db()
+db::db()
 {
 	//nothing todo ATM
 }
-Db::~Db()
+db::~db()
 {
 	//nothing todo ATM
 }
-void Db::space(unsigned int space)
+void db::space(unsigned int space)
 {
 	m_space = space;
 }
-unsigned int Db::space()
+unsigned int db::space()
 {
 	return m_space;
 }
-time_t Db::install()
+time_t db::install()
 {
 	return m_install;
 }
-void Db::install(time_t time)
+void db::install(time_t time)
 {
 	m_install = time;
 }
-bool Db::dependency()
+bool db::dependency()
 {
 	return m_dependency;
 }
-void Db::dependency(bool dependency)
+void db::dependency(bool dependency)
 {
 	m_dependency = dependency;
 }

@@ -5,11 +5,11 @@
 
 namespace cards {
 
-class Pkg
+class pkg
 {	
 public:
-	Pkg();
-	~Pkg();
+	pkg();
+	~pkg();
 	std::string description();
 	std::string url();
 	std::string maintainer();

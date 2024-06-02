@@ -1,163 +1,163 @@
 #include "pkg.h"
 
 namespace cards {
-Pkg::Pkg()
+pkg::pkg()
 {
 // nothing to do ATM
 }
-Pkg::~Pkg()
+pkg::~pkg()
 {
 // nothing to do ATM
 }
-void Pkg::description(const std::string& description)
+void pkg::description(const std::string& description)
 {
 	m_description = description;
 }
-std::string Pkg::description()
+std::string pkg::description()
 {
 	return m_description;
 }
-void Pkg::url(const std::string& url)
+void pkg::url(const std::string& url)
 {
 	m_url = url;
 }
-std::string Pkg::url()
+std::string pkg::url()
 {
 	return m_url;
 }
-void Pkg::maintainer(const std::string& maintainer)
+void pkg::maintainer(const std::string& maintainer)
 {
 	m_maintainer = maintainer;
 }
-std::string Pkg::maintainer()
+std::string pkg::maintainer()
 {
 	return m_maintainer;
 }
-void Pkg::packager(const std::string& packager)
+void pkg::packager(const std::string& packager)
 {
 	m_packager = packager;
 }
-std::string Pkg::packager()
+std::string pkg::packager()
 {
 	return m_packager;
 }
-void Pkg::contributors(const std::string& contributors)
+void pkg::contributors(const std::string& contributors)
 {
 	m_contributors = contributors;
 }
-std::string Pkg::contributors()
+std::string pkg::contributors()
 {
 	return m_contributors;
 }
-void Pkg::version(const std::string& version)
+void pkg::version(const std::string& version)
 {
 	m_version = version;
 }
-const std::string Pkg::version()
+const std::string pkg::version()
 {
 	return m_version;
 }
-void Pkg::release(unsigned short int release)
+void pkg::release(unsigned short int release)
 {
 	m_release = release;
 }
-unsigned short int Pkg::release()
+unsigned short int pkg::release()
 {
 	return m_release;
 }
-void Pkg::alias(std::set<std::string>& alias)
+void pkg::alias(std::set<std::string>& alias)
 {
 	m_alias = alias;
 }
-std::set<std::string> Pkg::alias()
+std::set<std::string> pkg::alias()
 {
 	return m_alias;
 }
-void Pkg::group(const std::string& group)
+void pkg::group(const std::string& group)
 {
 	m_group = group;
 }
-std::string Pkg::group()
+std::string pkg::group()
 {
 	return m_group;
 }
-void Pkg::sets(const std::set<std::string>& sets)
+void pkg::sets(const std::set<std::string>& sets)
 {
 	m_sets = sets;
 }
-std::set<std::string> Pkg::sets()
+std::set<std::string> pkg::sets()
 {
 	return m_sets;
 }
-void Pkg::collection(const std::string& collection)
+void pkg::collection(const std::string& collection)
 {
 	m_collection = collection;
 }
-std::string Pkg::collection()
+std::string pkg::collection()
 {
 	return m_collection;
 }
-void Pkg::categories(const std::set<std::string>& categories)
+void pkg::categories(const std::set<std::string>& categories)
 {
 	m_categories = categories;
 }
-std::set<std::string> Pkg::categories()
+std::set<std::string> pkg::categories()
 {
 	return m_categories;
 }
-void Pkg::arch(const std::string& arch)
+void pkg::arch(const std::string& arch)
 {
 	m_arch = arch;
 }
-std::string Pkg::arch()
+std::string pkg::arch()
 {
 	return m_arch;
 }
-void Pkg::license(const std::string& license)
+void pkg::license(const std::string& license)
 {
 	m_license = license;
 }
-std::string Pkg::license()
+std::string pkg::license()
 {
 	return m_license;
 }
-void Pkg::signature(const std::string& signature)
+void pkg::signature(const std::string& signature)
 {
 	m_signature = signature;
 }
-std::string Pkg::signature()
+std::string pkg::signature()
 {
 	return m_signature;
 }
-void Pkg::origin(const std::string& origin)
+void pkg::origin(const std::string& origin)
 {
 	m_origin = origin;
 }
-std::string Pkg::origin()
+std::string pkg::origin()
 {
 	return m_origin;
 }
-void Pkg::branch(const std::string& branch)
+void pkg::branch(const std::string& branch)
 {
 	m_branch = branch;
 }
-std::string Pkg::branch()
+std::string pkg::branch()
 {
 	return m_branch;
 }
-void Pkg::build(const time_t build)
+void pkg::build(const time_t build)
 {
 	m_build = build;
 }
-time_t Pkg::build()
+time_t pkg::build()
 {
 	return m_build;
 }
-void Pkg::dependencies(std::set<std::pair<std::string,time_t>> dependencies)
+void pkg::dependencies(std::set<std::pair<std::string,time_t>> dependencies)
 {
 	m_dependencies=dependencies;
 }
-std::set<std::pair<std::string,time_t>> Pkg::dependencies()
+std::set<std::pair<std::string,time_t>> pkg::dependencies()
 {
 	return m_dependencies;
 }

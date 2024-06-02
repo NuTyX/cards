@@ -109,15 +109,15 @@ namespace cards
 
         void doJobList();
 
-        const std::vector<cards::Cache*>& getPackageList();
+        const std::vector<cards::cache*>& getPackageList();
 
-        cards::Cache* getPackage(const std::string& pName);
+        cards::cache* getPackage(const std::string& pName);
 
         void refreshJobList();
 
         void clearJobList();
 
-        const std::vector<cards::Cache*>& getJobList();
+        const std::vector<cards::cache*>& getJobList();
 
         const std::set<std::string>& getSetList();
 
@@ -146,8 +146,8 @@ namespace cards
 
         /// Containers
         std::vector<CEventHandler*> m_arrEventHandler; // Std array to store callback event clients
-        std::vector<cards::Cache*> m_arrPackages;
-        std::vector<cards::Cache*> m_arrJobList;
+        std::vector<cards::cache*> m_arrPackages;
+        std::vector<cards::cache*> m_arrJobList;
         std::set<std::string> m_arrSets;
 
         /// Threaded Tasks

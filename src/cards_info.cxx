@@ -56,7 +56,7 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_LIST) ) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
 			std::set<std::string> sortedPackagesList;
-			std::set<cards::Cache*> binaryList = getBinaryPackageSet();
+			std::set<cards::cache*> binaryList = getBinaryPackageSet();
 			for ( auto i : binaryList) {
 				std::string s, _s;
 				if ( i->sets().size()  > 0 ) {
@@ -77,7 +77,7 @@ Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& 
 			getPortsList();
 		} else if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
 			std::set<std::string> sortedSetList;
-			std::set<cards::Cache*> binaryList = getBinaryPackageSet();
+			std::set<cards::cache*> binaryList = getBinaryPackageSet();
 			for ( auto i : binaryList )
 				if ( i->sets().size() > 0 ) {
 					for ( auto s:i->sets() )

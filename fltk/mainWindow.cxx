@@ -226,7 +226,7 @@ void mainWindow::OnSyncFinished(const CEH_RC rc)
 void mainWindow::OnJobListChange(const CEH_RC rc)
 {
     Fl::lock();
-    std::vector<cards::Cache*> jobList = m_cards->getJobList();
+    std::vector<cards::cache*> jobList = m_cards->getJobList();
     if (jobList.size() > 0)
     {
         m_btnApply->activate();
@@ -239,7 +239,7 @@ void mainWindow::OnJobListChange(const CEH_RC rc)
     Fl::unlock();
 }
 
-void mainWindow::OnPackageInfo(cards::Cache& pPackage)
+void mainWindow::OnPackageInfo(cards::cache& pPackage)
 {
     Fl::lock();
     if (m_infoBuff!=nullptr)

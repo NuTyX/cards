@@ -221,8 +221,8 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 }
                 else if ( strcmp(m->label(), "Install") == 0 )
                 {
-                    std::vector<cards::Cache*> Packages = Cards->getPackageList();
-                    for (cards::Cache* Package : Packages)
+                    std::vector<cards::cache*> Packages = Cards->getPackageList();
+                    for (cards::cache* Package : Packages)
                     {
                         if ((!Package->installed()))
                         {
@@ -236,8 +236,8 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
                 }
                 else if ( strcmp(m->label(), "Remove") == 0 )
                 {
-                    std::vector<cards::Cache*> Packages = Cards->getPackageList();
-                    for (cards::Cache* Package : Packages)
+                    std::vector<cards::cache*> Packages = Cards->getPackageList();
+                    for (cards::cache* Package : Packages)
                     {
                         if (Package->installed() && (Collec_List.count(Package->collection())))
                         {
