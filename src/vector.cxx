@@ -28,7 +28,7 @@ void vector::reserve(const unsigned int capacity) {
         return;
     m_capacity = capacity;
     m_items = (char **)realloc( m_items, sizeof m_items * m_capacity);
-    if ( m_items == NULL ) {
+    if ( m_items == nullptr ) {
         printf("Cannot reallocate m_items: %d", &m_items);
         return;
     }
@@ -44,7 +44,7 @@ const unsigned int vector::size() {
 const unsigned int vector::capacity() {
     return m_capacity;
 }
-char* vector::operator[](unsigned int i) const {
+const char* vector::operator[](const unsigned int i) const {
 	return m_items[i];
 }
 char*& vector::operator[](unsigned int i) {

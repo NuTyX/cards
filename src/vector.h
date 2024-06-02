@@ -10,7 +10,7 @@ public:
     vector(const unsigned int capacity);
     vector(char * element);
     ~vector();
-    char* operator[](unsigned int i) const;
+    const char* operator[](const unsigned int i) const;
     char*& operator[](unsigned int i);
     const char* value(const unsigned int index);
     void reserve(const unsigned int capacity);
