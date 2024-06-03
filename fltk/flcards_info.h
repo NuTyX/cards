@@ -31,7 +31,7 @@
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Progress.H>
 
-class Flcards_info : public Pkgdbh, public Pkgrepo {
+class Flcards_info : public Pkgdbh, public pkgrepo {
 public:
 	Flcards_info (const std::string& configFile);
 	~Flcards_info() {}

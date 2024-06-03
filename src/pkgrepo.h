@@ -84,13 +84,13 @@ struct RepoInfo {
 	std::vector<BasePackageInfo> basePackageList;
 };
 
-class Pkgrepo
+class pkgrepo
 {
 public:
 
-	Pkgrepo(const std::string& fileName);
+	pkgrepo(const std::string& fileName);
 
-	virtual ~Pkgrepo() { clearPackagesList(); }
+	virtual ~pkgrepo() { clearPackagesList(); }
 
 	void throwError(const std::string& s) const;
 

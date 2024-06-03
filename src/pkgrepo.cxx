@@ -23,7 +23,7 @@
 
 #include "pkgrepo.h"
 
-Pkgrepo::Pkgrepo(const std::string& fileName)
+pkgrepo::pkgrepo(const std::string& fileName)
 	: m_configFileName(fileName)
 {
 	if (!checkFileExist(m_configFileName)) {
@@ -39,7 +39,7 @@ Pkgrepo::Pkgrepo(const std::string& fileName)
 	m_parsePackagePkgfileFile = false;
 
 }
-void Pkgrepo::throwError
+void pkgrepo::throwError
 	(const std::string& s) const
 {
 	switch ( m_ErrorCond )
@@ -49,7 +49,7 @@ void Pkgrepo::throwError
 			break;
 	}
 }
-void Pkgrepo::parseCollectionPkgRepoFile()
+void pkgrepo::parseCollectionPkgRepoFile()
 {
 	if (m_parsePkgRepoCollectionFile)
 		return;
@@ -182,13 +182,13 @@ void Pkgrepo::parseCollectionPkgRepoFile()
 #endif
 	m_parsePkgRepoCollectionFile = true;
 }
-std::vector<PortsDirectory> Pkgrepo::getListOfPortsDirectory()
+std::vector<PortsDirectory> pkgrepo::getListOfPortsDirectory()
 {
 	parseCollectionPkgRepoFile();
 	return m_portsDirectoryList;
 
 }
-void Pkgrepo::parseCollectionDirectory()
+void pkgrepo::parseCollectionDirectory()
 {
 	if (m_parseCollectionDirectory)
 		return;
@@ -217,14 +217,14 @@ void Pkgrepo::parseCollectionDirectory()
 	if (m_portsDirectoryList.size() > 0)
 		m_parseCollectionDirectory = true;
 }
-std::vector<PortsDirectory> Pkgrepo::getListOfCollectionDirectory()
+std::vector<PortsDirectory> pkgrepo::getListOfCollectionDirectory()
 {
 	parseCollectionDirectory();
 	return m_portsDirectoryList;
 
 }
 
-void Pkgrepo::parsePackagePkgRepoFile(const std::string& pkgRepoFile)
+void pkgrepo::parsePackagePkgRepoFile(const std::string& pkgRepoFile)
 {
 /*
  *
@@ -266,14 +266,14 @@ void Pkgrepo::parsePackagePkgRepoFile(const std::string& pkgRepoFile)
 		m_portFilesList.push_back(portFilesList);
 	}
 }
-std::vector<PortFilesList> Pkgrepo::getCurrentPackagePkgRepoFile(const std::string& portName)
+std::vector<PortFilesList> pkgrepo::getCurrentPackagePkgRepoFile(const std::string& portName)
 {
 	if (checkPortExist(portName))
 		parsePackagePkgRepoFile(portName + "/PKG_REPO");
 
 	return m_portFilesList;
 }
-std::set<std::string> Pkgrepo::getListOutOfDate()
+std::set<std::string> pkgrepo::getListOutOfDate()
 {
 	parseCollectionDirectory();
 
@@ -289,7 +289,7 @@ std::set<std::string> Pkgrepo::getListOutOfDate()
 	}
 	return listOfPackages;
 }
-void Pkgrepo::parsePackagePkgfileFile()
+void pkgrepo::parsePackagePkgfileFile()
 {
 	if (m_parsePackagePkgfileFile)
 		return;
@@ -366,7 +366,7 @@ void Pkgrepo::parsePackagePkgfileFile()
 	}
 	m_parsePackagePkgfileFile = true;
 }
-std::set<std::string> Pkgrepo::getListOfPackagesFromCollection
+std::set<std::string> pkgrepo::getListOfPackagesFromCollection
 	(const std::string& collectionName)
 {
 	parseCollectionPkgRepoFile();
@@ -384,7 +384,7 @@ std::set<std::string> Pkgrepo::getListOfPackagesFromCollection
 	}
 	return listOfPackages;
 }
-std::set<std::string> Pkgrepo::getListOfPackagesFromSet
+std::set<std::string> pkgrepo::getListOfPackagesFromSet
 	(const std::string& setName)
 {
 	parseCollectionPkgRepoFile();
@@ -402,7 +402,7 @@ std::set<std::string> Pkgrepo::getListOfPackagesFromSet
 	}
 	return listOfPackages;
 }
-std::set<std::string> Pkgrepo::getBinaryPackageList()
+std::set<std::string> pkgrepo::getBinaryPackageList()
 {
 	parseCollectionPkgRepoFile();
 
@@ -444,7 +444,7 @@ std::set<std::string> Pkgrepo::getBinaryPackageList()
 }
 
 std::set<cards::cache*>
-Pkgrepo::getBinaryPackageSet()
+pkgrepo::getBinaryPackageSet()
 {
 	parseCollectionPkgRepoFile();
 
@@ -481,7 +481,7 @@ Pkgrepo::getBinaryPackageSet()
 	}
 	return m_packagesList;
 }
-std::vector<RepoInfo> Pkgrepo::getRepoInfo()
+std::vector<RepoInfo> pkgrepo::getRepoInfo()
 {
 	std::string::size_type pos;
 	std::vector<RepoInfo> List;
@@ -510,7 +510,7 @@ std::vector<RepoInfo> Pkgrepo::getRepoInfo()
 	}
 	return List;
 }
-unsigned int Pkgrepo::getPortsList()
+unsigned int pkgrepo::getPortsList()
 {
 	parseCollectionDirectory();
 	parsePackagePkgfileFile();
@@ -532,7 +532,7 @@ unsigned int Pkgrepo::getPortsList()
 	}
 	return numberOfPorts;
 }
-bool Pkgrepo::getPortInfo(const std::string& portName)
+bool pkgrepo::getPortInfo(const std::string& portName)
 {
 
 	parseCollectionDirectory();
@@ -556,7 +556,7 @@ bool Pkgrepo::getPortInfo(const std::string& portName)
 	}
 	return found;
 }
-bool Pkgrepo::getBinaryPackageInfo(const std::string& packageName)
+bool pkgrepo::getBinaryPackageInfo(const std::string& packageName)
 {
 	parseCollectionPkgRepoFile();
 
@@ -590,7 +590,7 @@ bool Pkgrepo::getBinaryPackageInfo(const std::string& packageName)
 	}
 	return found;
 }
-std::string Pkgrepo::getPortDir (const std::string& portName)
+std::string pkgrepo::getPortDir (const std::string& portName)
 {
 	parseCollectionDirectory();
 
@@ -617,7 +617,7 @@ std::string Pkgrepo::getPortDir (const std::string& portName)
 	}
 	return portDir;
 }
-std::string Pkgrepo::getBasePackageName(const std::string& packageName)
+std::string pkgrepo::getBasePackageName(const std::string& packageName)
 {
 
 	parseCollectionPkgRepoFile();
@@ -636,7 +636,7 @@ std::string Pkgrepo::getBasePackageName(const std::string& packageName)
 	}
 	return "";
 }
-std::string Pkgrepo::getBasePackageVersion(const std::string& packageName)
+std::string pkgrepo::getBasePackageVersion(const std::string& packageName)
 {
 	parseCollectionPkgRepoFile();
 
@@ -649,7 +649,7 @@ std::string Pkgrepo::getBasePackageVersion(const std::string& packageName)
 	}
 	return "";
 }
-std::string Pkgrepo::getBasePortName (const std::string& portName)
+std::string pkgrepo::getBasePortName (const std::string& portName)
 {
 	parseCollectionDirectory();
 	parsePackagePkgfileFile();
@@ -668,7 +668,7 @@ std::string Pkgrepo::getBasePortName (const std::string& portName)
 	}
 	return "";
 }
-std::string Pkgrepo::getPortVersion (const std::string& portName)
+std::string pkgrepo::getPortVersion (const std::string& portName)
 {
 	parseCollectionDirectory();
 	parsePackagePkgfileFile();
@@ -682,7 +682,7 @@ std::string Pkgrepo::getPortVersion (const std::string& portName)
 	}
 	return "";
 }
-int Pkgrepo::getBasePackageRelease (const std::string& packageName)
+int pkgrepo::getBasePackageRelease (const std::string& packageName)
 {
 	 parseCollectionPkgRepoFile();
 
@@ -696,7 +696,7 @@ int Pkgrepo::getBasePackageRelease (const std::string& packageName)
 	}
 	return release;
 }
-int Pkgrepo::getPortRelease (const std::string& portName)
+int pkgrepo::getPortRelease (const std::string& portName)
 {
 
 	parseCollectionDirectory();
@@ -712,7 +712,7 @@ int Pkgrepo::getPortRelease (const std::string& portName)
 	}
 	return release;
 }
-bool Pkgrepo::checkPortExist(const std::string& portName)
+bool pkgrepo::checkPortExist(const std::string& portName)
 {
 	parseCollectionDirectory();
 	parsePackagePkgfileFile();
@@ -732,7 +732,7 @@ bool Pkgrepo::checkPortExist(const std::string& portName)
 	}
 	return false;
 }
-time_t Pkgrepo::getBinaryBuildTime (const std::string& packageName)
+time_t pkgrepo::getBinaryBuildTime (const std::string& packageName)
 {
 	parseCollectionPkgRepoFile();
 
@@ -757,7 +757,7 @@ time_t Pkgrepo::getBinaryBuildTime (const std::string& packageName)
 	}
 	return buildTime;
 }
-void Pkgrepo::clearPackagesList()
+void pkgrepo::clearPackagesList()
 {
 	for (auto i : m_packagesList )
 	{

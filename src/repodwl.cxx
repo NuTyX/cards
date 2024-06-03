@@ -22,7 +22,7 @@
 #include "repodwl.h"
 
 Repodwl::Repodwl(const char *fileName)
-	: Pkgrepo(fileName)
+	: pkgrepo(fileName)
 {
 }
 void Repodwl::downloadPortsPkgRepo(const std::string& packageName)

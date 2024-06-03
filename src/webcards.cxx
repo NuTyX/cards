@@ -297,7 +297,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 	contentInfo_t contentInfo;
 	contentInfo.date = getDateFromEpoch(timer);
 	std::vector<RepoInfo> List;
-	Pkgrepo repoList(".webcards.conf");
+	pkgrepo repoList(".webcards.conf");
 	std::set<std::string> listOfPackages;
 	List = repoList.getRepoInfo();
 	for (auto i : List) {

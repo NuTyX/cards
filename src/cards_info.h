@@ -40,7 +40,7 @@
  *
  */
 
-class Cards_info: public Pkginfo, public Pkgrepo
+class Cards_info: public Pkginfo, public pkgrepo
 {
 	public:
 		/**

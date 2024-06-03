@@ -23,7 +23,7 @@
 
 include ../Makefile.inc
 
-all: uname pkgdbh pkg_inst string vector conf
+all: uname pkgdbh pkginst pkgrepo string vector conf
 
 uname:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
@@ -50,13 +50,20 @@ conf:
 	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
 	rm $@.o
 
-pkg_inst:
+pkginst:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
 	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
 	rm $@.o
 
+pkgrepo:
+	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	rm $@.o
+
+
 clean:
-	rm -f pkg_inst
+	rm -f pkginst
+	rm -f pkgrepo
 	rm -f pkgdbh
 	rm -f vector
 	rm -f uname

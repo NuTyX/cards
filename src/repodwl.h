@@ -25,7 +25,7 @@
 #include "file_download.h"
 #include "pkgrepo.h"
 
-class Repodwl: public Pkgrepo {
+class Repodwl: public pkgrepo {
 public:
 
 /**
