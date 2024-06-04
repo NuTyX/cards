@@ -1,8 +1,15 @@
 #include "../src/libcards.h"
 
 int main () {
-	cards::Conf config("cards.conf");
+	cards::conf config("cards.conf");
 	for (auto i : config.dirUrl())
-			std::cout << i.url << " " << i.collection << " " << i.dir << std::endl;
+		std::cout << "url: "
+			<< i.url
+			<< "\ncollection: "
+			<< i.collection
+			<< "\ndir: "
+			<< i.dir
+			<< std::endl;
 	return 0;
 }
+// vim:set ts=2 :

@@ -144,7 +144,7 @@ void Pkgsync::run()
 		treatErrors("");
 	} */
 	std::string configFile = m_root + m_configFile;
-	cards::Conf config(configFile);
+	cards::conf config(configFile);
 	for (auto DU : config.dirUrl()) {
 		if (DU.url.size() == 0 ) {
 			continue;
@@ -161,7 +161,7 @@ void Pkgsync::purge()
 			treatErrors("");
 	}
 	std::string configFile = m_root + m_configFile;
-	cards::Conf config(configFile);
+	cards::conf config(configFile);
 	for (auto i : config.dirUrl()) {
 		if ( i.url.size() == 0)
 			continue;

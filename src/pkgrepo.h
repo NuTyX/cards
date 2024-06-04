@@ -270,7 +270,7 @@ protected:
 	std::vector<PortFilesList> m_portFilesList;
 
 	std::string m_configFileName;
-	cards::Conf m_config;
+	cards::conf m_config;
 
 	std::vector<PortsDirectory> m_portsDirectoryList;
 

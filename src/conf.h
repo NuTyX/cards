@@ -13,12 +13,12 @@ struct DirUrl {
 	std::string collection;
 };
 
-class Conf
+class conf
 {
 public:
-	Conf();
-	Conf(const std::string& filename);
-	~Conf();
+	conf();
+	conf(const std::string& filename);
+	~conf();
 
 	std::string version();
 	std::string url();

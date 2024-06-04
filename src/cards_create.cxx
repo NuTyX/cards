@@ -44,7 +44,7 @@ Cards_create::Cards_create(const CardsArgumentParser& argParser,
 void Cards_create::createBinaries(const char *configFileName,
 	const std::string& packageName)
 {
-	cards::Conf config(configFileName);
+	cards::conf config(configFileName);
 
 	std::cout << "create of " << packageName << std::endl;
 	std::string pkgdir = getPortDir(packageName);

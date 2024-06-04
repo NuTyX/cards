@@ -38,7 +38,7 @@ Cards_remove::Cards_remove(const std::string& commandName,
 	else
 		m_root=m_root+"/";
 
-	cards::Conf config(configFileName);
+	cards::conf config(configFileName);
 
 	std::set<std::string> basePackagesList;
 	for (auto i : config.baseDir()) {

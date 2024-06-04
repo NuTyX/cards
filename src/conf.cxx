@@ -1,19 +1,19 @@
 #include "conf.h"
 namespace cards {
 
-Conf::Conf()
+conf::conf()
 {
 	parseSystemConf();
 	m_filename = CARDS_CONF_FILE;
 	parseCardsconf();
 }
-Conf::Conf(const std::string& filename)
+conf::conf(const std::string& filename)
 {
 	parseSystemConf();
 	m_filename = filename;
 	parseCardsconf();
 }
-void Conf::parseCardsconf()
+void conf::parseCardsconf()
 {
 	FILE* fp = fopen(m_filename.c_str(), "r");
 	if (!fp)
@@ -126,11 +126,11 @@ void Conf::parseCardsconf()
 			<< std::endl;
 #endif
 }
-Conf::~Conf()
+conf::~conf()
 {
 	//nothing todo ATM
 }
-std::vector<DirUrl> Conf::dirUrl()
+std::vector<DirUrl> conf::dirUrl()
 {
 	std::vector<DirUrl> ret;
 	for (auto i : m_dirUrl) {
@@ -152,7 +152,7 @@ std::vector<DirUrl> Conf::dirUrl()
 	}
 	return ret;
 }
-void Conf::parseSystemConf()
+void conf::parseSystemConf()
 {
 	FILE* fp = fopen(NUTYX_VERSION_FILE, "r");
 	if (!fp)
@@ -195,43 +195,43 @@ void Conf::parseSystemConf()
 			<< "version: " << m_version << std::endl;
 #endif
 }
-std::string Conf::url()
+std::string conf::url()
 {
 	return m_url;
 }
-std::string Conf::hostname()
+std::string conf::hostname()
 {
 	return m_hostname;
 }
-std::string Conf::username()
+std::string conf::username()
 {
 	return m_username;
 }
-std::string Conf::password()
+std::string conf::password()
 {
 	return m_password;
 }
-std::string Conf::database()
+std::string conf::database()
 {
 	return m_database;
 }
-std::string Conf::version()
+std::string conf::version()
 {
 	return m_version;
 }
-std::string Conf::arch()
+std::string conf::arch()
 {
 	return m_arch;
 }
-std::string Conf::logdir()
+std::string conf::logdir()
 {
 	return m_logdir;
 }
-std::vector<std::string> Conf::groups()
+std::vector<std::string> conf::groups()
 {
 	return m_groups;
 }
-std::vector<std::string> Conf::baseDir()
+std::vector<std::string> conf::baseDir()
 {
 	return m_baseDir;
 }

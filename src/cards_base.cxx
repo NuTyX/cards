@@ -45,7 +45,7 @@ Cards_base::Cards_base(const CardsArgumentParser& argParser)
 }
 void Cards_base::run(int argc, char** argv)
 {
-	cards::Conf config;
+	cards::conf config;
 
 	if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {
 		if (getuid()) {

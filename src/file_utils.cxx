@@ -23,7 +23,7 @@
 
 #include "file_utils.h"
 /*
-int getConfig(const char *fileName, cards::Conf& config)
+int getConfig(const char *fileName, cards::conf& config)
 {
 	FILE* fp = fopen(fileName, "r");
 	if (!fp)

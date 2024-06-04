@@ -265,7 +265,7 @@ void CardsDepends::treatErrors(cards::ErrorEnum action, const std::string& s) co
 }
 int CardsDepends::level()
 {
-	cards::Conf config;
+	cards::conf config;
 
 	for (auto DU : config.dirUrl()) {
 		if ( DU.url.size() > 0)
@@ -329,7 +329,7 @@ int CardsDepends::level()
 }
 int CardsDepends::depends()
 {
-	cards::Conf config;
+	cards::conf config;
 
 	for ( auto DU : config.dirUrl() ) {
 		std::string prtDir = DU.dir;
@@ -409,7 +409,7 @@ int CardsDepends::deptree()
 	depList* dependenciesList = NULL;
 	dependenciesList = initDepsList();
 
-	cards::Conf config;
+	cards::conf config;
 
 	for ( auto DU : config.dirUrl() ) {
 		std::string prtDir = DU.dir;

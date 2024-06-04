@@ -41,7 +41,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			treatErrors(i);
 		}
 	}
-	cards::Conf config(configFileName);
+	cards::conf config(configFileName);
 
 	buildSimpleDatabase();
 	for( auto i : m_argParser.otherArguments() ) {
@@ -106,7 +106,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	: Pkginst("cards install",configFileName),m_argParser(argParser)
 {
 	parseArguments();
-	cards::Conf config(configFileName);
+	cards::conf config(configFileName);
 
 	buildCompleteDatabase(false);
 	m_upgrade=0;
@@ -167,7 +167,7 @@ void Cards_install::parseArguments()
 void Cards_install::getLocalePackagesList()
 {
 	std::string packageFileName;
-	cards::Conf config(m_configFileName);
+	cards::conf config(m_configFileName);
 
 	if (config.groups().empty())
 		return;

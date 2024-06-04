@@ -112,7 +112,7 @@ namespace cards
 
         CClient Cards;
         std::set<std::string> basePackagesList;
-        cards::Conf config(Cards.m_configFileName);
+        cards::conf config(Cards.m_configFileName);
 
         for (auto it : config.baseDir())
         {

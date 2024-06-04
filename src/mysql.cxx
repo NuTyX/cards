@@ -23,7 +23,7 @@ namespace Sql
 {
 mysql::mysql(const char *configFileName)
 {
-	cards::Conf m_sqlConfig(configFileName);
+	cards::conf m_sqlConfig(configFileName);
 	m_socket=NULL;
 
 	m_connection = mysql_init(NULL);

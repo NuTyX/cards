@@ -78,7 +78,7 @@ private:
 		m_opt = 0
 	};
 	MYSQL     *m_connection;
-	cards::Conf m_sqlConfig;
+	cards::conf m_sqlConfig;
 
 	board_t    m_listOfBoards;
 	category_t m_listOfCategories;
