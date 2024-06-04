@@ -73,7 +73,7 @@ namespace cards
         for ( auto i : m_dependenciesList )
         {
             m_packageArchiveName = getPackageFileName(i.first);
-            ArchiveUtils packageArchive(m_packageArchiveName.c_str());
+            archive packageArchive(m_packageArchiveName.c_str());
             std::string name = packageArchive.name();
             if ( checkPackageNameExist(name ))
             {

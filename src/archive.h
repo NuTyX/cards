@@ -65,13 +65,13 @@ EMPTY_ARCHIVE
 };
 
 
-class ArchiveUtils
+class archive
 {
 	public:
 
 
-	ArchiveUtils(const std::string& fileName);
-	virtual ~ArchiveUtils();
+	archive(const std::string& fileName);
+	virtual ~archive();
 
 	virtual void treatErrors(const std::string& s) const;
 

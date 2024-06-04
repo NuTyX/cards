@@ -156,7 +156,7 @@ void Cards_create::createBinaries(const char *configFileName,
 		if (i.find("cards.tar")== std::string::npos )
 			continue;
 		packageFileName = pkgdir + "/" + i;
-		ArchiveUtils packageArchive(packageFileName.c_str());
+		archive packageArchive(packageFileName.c_str());
 		std::string name = packageArchive.name();
 		std::string version = packageArchive.version();
 		message = "CREATED: " + name + " " + version;

@@ -19,9 +19,9 @@
 //  USA.
 //
 
-#include "archive_utils.h"
+#include "archive.h"
 
-ArchiveUtils::ArchiveUtils(const std::string& fileName)
+archive::archive(const std::string& fileName)
 	: m_fileName(fileName)
 {
 #ifndef NDEBUG
@@ -51,10 +51,10 @@ ArchiveUtils::ArchiveUtils(const std::string& fileName)
 		m_filesList.insert(fileName);
 	}		
 }
-ArchiveUtils::~ArchiveUtils()
+archive::~archive()
 {
 }
-void ArchiveUtils::treatErrors(const std::string& message) const
+void archive::treatErrors(const std::string& message) const
 {
 	switch (m_actualError)
 	{
@@ -80,17 +80,17 @@ void ArchiveUtils::treatErrors(const std::string& message) const
 			break;
 	}
 }
-std::set<std::string> ArchiveUtils::setofFiles()
+std::set<std::string> archive::setofFiles()
 {
 	return m_filesList;
 }
-unsigned int long ArchiveUtils::size()
+unsigned int long archive::size()
 {
 	if (m_contentMtree.size() != 0)
 		return m_contentMtree.size();
 	else return 0;
 }
-void ArchiveUtils::list()
+void archive::list()
 {
 	if ( m_contentMtree.size() == 0) {
 		std::cout << gettext("Not found") << std::endl;
@@ -100,7 +100,7 @@ void ArchiveUtils::list()
 		}
 	}
 }
-std::vector<std::string> ArchiveUtils::extractFileContent(const char * fileName)
+std::vector<std::string> archive::extractFileContent(const char * fileName)
 {
 	std::vector<std::string> contentFile;
 	struct archive* ar;
@@ -142,7 +142,7 @@ std::vector<std::string> ArchiveUtils::extractFileContent(const char * fileName)
 	FREE_ARCHIVE(ar);
 	return contentFile;
 }
-void ArchiveUtils::getRunTimeDependenciesEpoch()
+void archive::getRunTimeDependenciesEpoch()
 {
 	std::pair<std::string,time_t > NameEpoch;
 	for (auto dependency : m_contentMeta) {
@@ -153,7 +153,7 @@ void ArchiveUtils::getRunTimeDependenciesEpoch()
 		}
 	}
 }
-void ArchiveUtils::getRunTimeDependencies()
+void archive::getRunTimeDependencies()
 {
 	for (auto dependency : m_contentMeta) {
 		if ( dependency[0] == 'R' ) {
@@ -161,7 +161,7 @@ void ArchiveUtils::getRunTimeDependencies()
 		}
 	}
 }
-void ArchiveUtils::getAliasList()
+void archive::getAliasList()
 {
 	for (auto i : m_contentMeta) {
 		if ( i[0] == 'A' ) {
@@ -169,26 +169,26 @@ void ArchiveUtils::getAliasList()
 		}
 	}
 }
-void ArchiveUtils::printDeps()
+void archive::printDeps()
 {
 	getRunTimeDependencies();
 	for ( auto i : m_rtDependenciesList)
 		std::cout << i << std::endl;
 }
 
-void ArchiveUtils::printMeta()
+void archive::printMeta()
 {
 	for ( auto i : m_contentMeta)
 		std::cout << i << std::endl;
 }
-void ArchiveUtils::printInfo()
+void archive::printInfo()
 {
 	if ( m_contentInfo.size() != 0) {
 		for (auto i : m_contentInfo)
 			std::cout << i << std::endl;
 	}
 }
-std::string ArchiveUtils::getPackageName()
+std::string archive::getPackageName()
 {
 	if  ( m_contentMeta.size() == 0 ) {
 		m_actualError = CANNOT_FIND_NAME;
@@ -205,7 +205,7 @@ std::string ArchiveUtils::getPackageName()
 	treatErrors(m_fileName);
 	return "";
 }
-std::string ArchiveUtils::getPackageArch()
+std::string archive::getPackageArch()
 {
 	if ( m_contentMeta.size() == 0 ) {
 		m_actualError = CANNOT_FIND_ARCH;
@@ -220,23 +220,23 @@ std::string ArchiveUtils::getPackageArch()
 	}
 	return "";
 }
-std::string ArchiveUtils::namebuildn()
+std::string archive::namebuildn()
 {
 	return getPackageName() + epochBuildDate();
 }
-std::set<std::string> ArchiveUtils::listofDependencies()
+std::set<std::string> archive::listofDependencies()
 {
 	m_rtDependenciesList.insert(namebuildn());
 	getRunTimeDependencies();
 
 	return m_rtDependenciesList;
 }
-std::set<std::string> ArchiveUtils::listofAlias()
+std::set<std::string> archive::listofAlias()
 {
 	getAliasList();
 	return m_aliasList;
 }
-std::set< std::pair<std::string,time_t> > ArchiveUtils::listofDependenciesBuildDate()
+std::set< std::pair<std::string,time_t> > archive::listofDependenciesBuildDate()
 {
 	std::pair<std::string,time_t> NameEpoch;
 	NameEpoch.first=getPackageName();
@@ -245,15 +245,15 @@ std::set< std::pair<std::string,time_t> > ArchiveUtils::listofDependenciesBuildD
 	getRunTimeDependenciesEpoch();
 	return m_rtDependenciesEpochList;
 }
-std::string ArchiveUtils::name()
+std::string archive::name()
 {
 	return m_packageName;
 }
-std::string ArchiveUtils::arch()
+std::string archive::arch()
 {
 	return m_packageArch;
 }
-std::string ArchiveUtils::version()
+std::string archive::version()
 {
 	for (auto version : m_contentMeta) {
 		if ( version[0] == 'V' ) {
@@ -263,7 +263,7 @@ std::string ArchiveUtils::version()
 	}
 	return "";
 }
-int ArchiveUtils::release()
+int archive::release()
 {
 	for (auto release : m_contentMeta) {
 		if ( release[0] == 'r' ) {
@@ -273,7 +273,7 @@ int ArchiveUtils::release()
 	}
 	return 0;
 }
-std::string ArchiveUtils::url()
+std::string archive::url()
 {
 	for (auto url : m_contentMeta) {
 		if ( url[0] == 'U' ) {
@@ -283,7 +283,7 @@ std::string ArchiveUtils::url()
 	}
 	return "";
 }
-std::string ArchiveUtils::description()
+std::string archive::description()
 {
 	for (auto description : m_contentMeta) {
 		if ( description[0] == 'D' ) {
@@ -293,7 +293,7 @@ std::string ArchiveUtils::description()
 	}
 	return "";
 }
-std::string ArchiveUtils::group()
+std::string archive::group()
 {
 	for (auto group : m_contentMeta) {
 		if ( group[0] == 'g' ) {
@@ -303,7 +303,7 @@ std::string ArchiveUtils::group()
 	}
 	return "";
 }
-std::string ArchiveUtils::maintainer()
+std::string archive::maintainer()
 {
   for (auto maintainer : m_contentMeta) {
     if ( maintainer[0] == 'M' ) {
@@ -313,7 +313,7 @@ std::string ArchiveUtils::maintainer()
   }
   return "";
 }
-std::string ArchiveUtils::contributors()
+std::string archive::contributors()
 {
   for (auto contributors : m_contentMeta) {
     if ( contributors[0] == 'C' ) {
@@ -323,7 +323,7 @@ std::string ArchiveUtils::contributors()
   }
   return "";
 }
-std::string ArchiveUtils::packager()
+std::string archive::packager()
 {
   for (auto maintainer : m_contentMeta) {
     if ( maintainer[0] == 'P' ) {
@@ -333,7 +333,7 @@ std::string ArchiveUtils::packager()
   }
   return "";
 }
-std::string ArchiveUtils::collection()
+std::string archive::collection()
 {
 	for (auto collection : m_contentMeta) {
 		if ( collection[0] == 'c' ) {
@@ -343,7 +343,7 @@ std::string ArchiveUtils::collection()
 	}
 	return "";
 }
-std::string ArchiveUtils::builddate()
+std::string archive::builddate()
 {
 	char * c_time_s;
 	std::string buildtime;
@@ -358,7 +358,7 @@ std::string ArchiveUtils::builddate()
 	std::string build = c_time_s;
 	return build;
 }
-std::string ArchiveUtils::epochBuildDate()
+std::string archive::epochBuildDate()
 {
 	for (auto epochSVal : m_contentMeta) {
 		if ( epochSVal[0] == 'B' ) {
@@ -368,7 +368,7 @@ std::string ArchiveUtils::epochBuildDate()
 	}
 	return "";
 }
-time_t ArchiveUtils::buildn()
+time_t archive::buildn()
 {
 	time_t epochVal = 0;
 	for (auto epochSVal : m_contentMeta) {

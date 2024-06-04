@@ -29,7 +29,7 @@ TOOLSOBJECTS =	system_utils.o \
 		string.o \
 		vector.o \
 		string_utils.o \
-		archive_utils.o \
+		archive.o \
 		file_utils.o \
 		process.o \
 		pkg.o \
@@ -50,7 +50,7 @@ CARDSOBJECTS =	conf.o \
 		string.o \
 		vector.o \
 		string_utils.o \
-		archive_utils.o \
+		archive.o \
 		pkg.o \
 		lock.o \
 		db.o \
@@ -88,7 +88,7 @@ LIBOBJECTS =  conf.o \
 	string.o \
 	vector.o \
 	string_utils.o \
-	archive_utils.o \
+	archive.o \
 	pkgrepo.o \
 	repodwl.o \
 	file_download.o \
@@ -128,7 +128,7 @@ HEADERS = enum.h \
 		vector.h \
 		string_utils.h \
 		file_utils.h \
-		archive_utils.h \
+		archive.h \
 		conf.h \
 		pkg.h \
 		lock.h \

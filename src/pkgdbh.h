@@ -30,7 +30,7 @@
 
 #include "enum.h"
 #include "db.h"
-#include "archive_utils.h"
+#include "archive.h"
 #include "file_utils.h"
 #include "process.h"
 #include "lock.h"

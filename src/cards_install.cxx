@@ -63,7 +63,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			 * It's a regular archive file
 			 */
 			m_packageArchiveName = i;
-			ArchiveUtils packageArchive(m_packageArchiveName.c_str());
+			archive packageArchive(m_packageArchiveName.c_str());
 			std::string name = packageArchive.name();
 			if (checkPackageNameExist(name )) {
 				m_upgrade=1;
@@ -84,7 +84,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 	getLocalePackagesList();
 	for ( auto i : m_dependenciesList ) {
 		m_packageArchiveName = getPackageFileName(i.first);
-		ArchiveUtils packageArchive(m_packageArchiveName.c_str());
+		archive packageArchive(m_packageArchiveName.c_str());
 		std::string name = packageArchive.name();
 		if ( checkPackageNameExist(name )) {
 			m_upgrade=1;
@@ -124,7 +124,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 			if ( j.find("cards.tar") == std::string::npos )
 				continue;
 			m_packageArchiveName = i + "/" + j;
-			ArchiveUtils packageArchive(m_packageArchiveName.c_str());
+			archive packageArchive(m_packageArchiveName.c_str());
 			std::string name = packageArchive.name();
 			if ( checkPackageNameExist(name) )
 				continue;
