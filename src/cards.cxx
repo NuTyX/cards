@@ -145,9 +145,7 @@ int main(int argc, char** argv)
 			case ArgParser::CMD_CONFIG:
 			{
 				cards::conf config(configFile);
-
 				unsigned int index = 0;
-				string prtDir, url ;
 
 				for ( auto i : config.dirUrl() ) {
 					index++;
