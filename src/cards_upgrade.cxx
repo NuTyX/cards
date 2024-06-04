@@ -23,7 +23,7 @@
 
 Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 	const char *configFileName)
-	: Pkginst("cards upgrade",configFileName), m_argParser(argParser)
+	: pkginst("cards upgrade",configFileName), m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
@@ -32,9 +32,9 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		m_root="/";
 	else
 		m_root=m_root+"/";
-	m_pkgsync.setConfigFile(configFileName);
+	m_pkgSync.setConfigFile(configFileName);
 	if ( ! m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
-		m_pkgsync.run();
+		m_pkgSync.run();
 	parseCollectionPkgRepoFile();
 	buildSimpleDatabase();
 	std::set<std::string> listOfExistPackages;
@@ -195,7 +195,7 @@ void Cards_upgrade::upgrade()
 			removePackageFiles(i);
 			syslog(LOG_INFO,"%s removed",i.c_str());
 		}
-		m_pkgsync.purge();
+		m_pkgSync.purge();
 		summary();
 	}
 }

@@ -25,9 +25,9 @@
 #include "pkgadd.h"
 #include "repodwl.h"
 
-class Pkginst : public Pkgadd, public Repodwl {
+class pkginst : public Pkgadd, public repodwl {
 public:
-	Pkginst(const std::string& commandName, const char *configFileName);
+	pkginst(const std::string& commandName, const char *configFileName);
 	void generateDependencies(const std::pair<std::string,time_t>& packageName);
 	void generateDependencies();
 

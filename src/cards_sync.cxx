@@ -32,7 +32,7 @@ Cards_sync::Cards_sync ( const CardsArgumentParser& argParser,
 		const std::string& url, const std::string& baseDirectory,
 		const std::string& repoFile)
 		: m_argParser(argParser),
-		Pkgsync(url, baseDirectory,repoFile)
+		pkgsync(url, baseDirectory,repoFile)
 {
 }
 // vim:set ts=2 :

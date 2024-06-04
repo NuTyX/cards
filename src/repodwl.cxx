@@ -21,11 +21,11 @@
 
 #include "repodwl.h"
 
-Repodwl::Repodwl(const char *fileName)
+repodwl::repodwl(const char *fileName)
 	: pkgrepo(fileName)
 {
 }
-void Repodwl::downloadPortsPkgRepo(const std::string& packageName)
+void repodwl::downloadPortsPkgRepo(const std::string& packageName)
 {
 	InfoFile downloadFile;
 	std::vector<InfoFile> downloadFilesList;
@@ -68,7 +68,7 @@ void Repodwl::downloadPortsPkgRepo(const std::string& packageName)
 		FileDownload FD(downloadFilesList,false);
 	}
 }
-void Repodwl::downloadPackageFileName(const std::string& packageName)
+void repodwl::downloadPackageFileName(const std::string& packageName)
 {
 	std::string basePackageName = packageName;
 	std::string::size_type pos = packageName.find('.');
@@ -125,7 +125,7 @@ void Repodwl::downloadPackageFileName(const std::string& packageName)
 			break;
 	}
 }
-bool Repodwl::checkBinaryExist(const std::string& packageName)
+bool repodwl::checkBinaryExist(const std::string& packageName)
 {
 	parseCollectionPkgRepoFile();
 
@@ -192,19 +192,19 @@ bool Repodwl::checkBinaryExist(const std::string& packageName)
 	}
 	return false;
 }
-std::string Repodwl::getPackageFileName(const std::string& packageName)
+std::string repodwl::getPackageFileName(const std::string& packageName)
 {
 	m_packageFileName = packageName;
 	checkBinaryExist(packageName);
 	return m_packageFileName;
 }
-std::string Repodwl::getPackageFileNameSignature(const std::string& packageName)
+std::string repodwl::getPackageFileNameSignature(const std::string& packageName)
 {
 	m_packageFileName = packageName;
 	checkBinaryExist(packageName);
 	return m_packageFileNameSignature;
 }
-void Repodwl::setPackageFileName(const std::string& packageFileName)
+void repodwl::setPackageFileName(const std::string& packageFileName)
 {
 		m_packageFileName=packageFileName;
 }

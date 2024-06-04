@@ -28,7 +28,7 @@
 #include "pkginst.h"
 #include "cards_argument_parser.h"
 
-class Cards_install: public Pkginst
+class Cards_install: public pkginst
 {
 	public:
 		Cards_install(const CardsArgumentParser& argParser,

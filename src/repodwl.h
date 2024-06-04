@@ -25,14 +25,14 @@
 #include "file_download.h"
 #include "pkgrepo.h"
 
-class Repodwl: public pkgrepo {
+class repodwl: public pkgrepo {
 public:
 
 /**
  * Constructor
  *
  */
-	Repodwl(const char *fileName);
+	repodwl(const char *fileName);
 
 /**
  * download the .PKGREPO of packageName

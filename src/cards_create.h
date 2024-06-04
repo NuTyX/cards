@@ -28,7 +28,7 @@
 #include "pkginst.h"
 #include "cards_argument_parser.h"
 
-class Cards_create : public Pkginst
+class Cards_create : public pkginst
 {
 	public:
 		Cards_create(const CardsArgumentParser& argParser,

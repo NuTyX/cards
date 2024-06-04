@@ -26,12 +26,12 @@
 #include "pkginst.h"
 #include "cards_argument_parser.h"
 
-class Cards_upgrade : public Pkginst {
+class Cards_upgrade : public pkginst {
 private:
 	std::set<std::string>                   m_ListOfPackagesToDelete;
 	std::set<std::pair<std::string,time_t>> m_ListOfPackages;
 	const CardsArgumentParser&              m_argParser;
-	Pkgsync m_pkgsync;
+	pkgsync m_pkgSync;
 
 public:
 	Cards_upgrade(const CardsArgumentParser& argParser,

@@ -37,15 +37,15 @@
 #include <libgen.h>
 #include <dirent.h>
 
-class Pkgsync
+class pkgsync
 {
 public:
 	/**
 	 * constructors
 	 *
 	 */
-	Pkgsync();
-	Pkgsync(const std::string& url,
+	pkgsync();
+	pkgsync(const std::string& url,
 			const std::string& directory,
 			const std::string& repoFile);
 

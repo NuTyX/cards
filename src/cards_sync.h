@@ -32,7 +32,7 @@
  *
  */
 
-class Cards_sync : public Pkgsync {
+class Cards_sync : public pkgsync {
 public:
 	/**
 	 * Default constructor without any argument

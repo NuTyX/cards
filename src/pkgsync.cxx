@@ -21,9 +21,9 @@
 
 #include "pkgsync.h"
 
-const std::string Pkgsync::DEFAULT_REPOFILE = ".PKGREPO";
+const std::string pkgsync::DEFAULT_REPOFILE = ".PKGREPO";
 
-Pkgsync::Pkgsync ()
+pkgsync::pkgsync ()
 {
 	m_repoFile = DEFAULT_REPOFILE;
 	if (m_root.empty())
@@ -32,7 +32,7 @@ Pkgsync::Pkgsync ()
 		m_configFile = "etc/cards.conf";
 }
 
-Pkgsync::Pkgsync ( const std::string& url,
+pkgsync::pkgsync ( const std::string& url,
 	const std::string& baseDirectory,
 	const std::string& repoFile)
 	: m_baseDirectory(baseDirectory),
@@ -48,7 +48,7 @@ Pkgsync::Pkgsync ( const std::string& url,
 	if (m_configFile.empty())
 		m_configFile = "etc/cards.conf";
 }
-void Pkgsync::treatErrors(const std::string& s) const
+void pkgsync::treatErrors(const std::string& s) const
 {
 	switch ( m_actualError )
 	{
@@ -105,7 +105,7 @@ void Pkgsync::treatErrors(const std::string& s) const
 			break;
 	}
 }
-unsigned int Pkgsync::getLocalPackages(const std::string& path)
+unsigned int pkgsync::getLocalPackages(const std::string& path)
 {
 	m_localPackagesList.clear();
 	if ( findDir( m_localPackagesList, path) != 0 ) {
@@ -114,21 +114,21 @@ unsigned int Pkgsync::getLocalPackages(const std::string& path)
 	}
 	return m_localPackagesList.size();	
 }
-std::set<std::string> Pkgsync::getListOfLocalPackages(const std::string& path) {
+std::set<std::string> pkgsync::getListOfLocalPackages(const std::string& path) {
 	if (m_localPackagesList.size() == 0 ) {
 		getLocalPackages(path);
 		return m_localPackagesList;
 	}
 	return m_localPackagesList;
 }
-std::set<std::string> Pkgsync::getListOfRemotePackages(const std::string& pkgrepoFile) {
+std::set<std::string> pkgsync::getListOfRemotePackages(const std::string& pkgrepoFile) {
 	if (m_remotePackagesList.size() == 0 ) {
 		getRemotePackages(pkgrepoFile);
 		return m_remotePackagesList;
 	}
 	return m_remotePackagesList;
 }
-unsigned int Pkgsync::getRemotePackages(const std::string& pkgrepoFile)
+unsigned int pkgsync::getRemotePackages(const std::string& pkgrepoFile)
 {
 	m_remotePackagesList.clear();
 	if ( parseFile(m_remotePackagesList,pkgrepoFile.c_str()) != 0) {
@@ -137,7 +137,7 @@ unsigned int Pkgsync::getRemotePackages(const std::string& pkgrepoFile)
 	}
 	return m_remotePackagesList.size();
 }
-void Pkgsync::run()
+void pkgsync::run()
 {
 /*	if (getuid()) {
 		m_actualError = ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
@@ -154,7 +154,7 @@ void Pkgsync::run()
 			m_repoFile, false);
 	}
 }
-void Pkgsync::purge()
+void pkgsync::purge()
 {
 	if (getuid()) {
 			m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
@@ -172,7 +172,7 @@ void Pkgsync::purge()
 		}
 	}
 }
-void Pkgsync::deleteFolder(const std::string& folderName)
+void pkgsync::deleteFolder(const std::string& folderName)
 {
 	std::set<std::string> filesToDelete;
 	if ( findDir(filesToDelete, folderName) != 0 ){
@@ -189,11 +189,11 @@ void Pkgsync::deleteFolder(const std::string& folderName)
 	}	
 	removeFile("/",folderName);
 }
-void Pkgsync::setRootPath(const std::string& path)
+void pkgsync::setRootPath(const std::string& path)
 {
 	m_root=path;
 }
-void Pkgsync::setConfigFile(const std::string& file)
+void pkgsync::setConfigFile(const std::string& file)
 {
 	m_configFile=file;
 }

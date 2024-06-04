@@ -21,18 +21,18 @@
 
 #include "pkginst.h"
 
-Pkginst::Pkginst
+pkginst::pkginst
 	(const std::string& commandName,const char *configFileName)
-	: Pkgadd(commandName), Repodwl(configFileName)
+	: Pkgadd(commandName), repodwl(configFileName)
 {
 }
-void Pkginst::generateDependencies
+void pkginst::generateDependencies
 	(const std::pair<std::string,time_t>& packageName)
 {
 	m_packageName=packageName.first;
 	generateDependencies();
 }
-void Pkginst::generateDependencies()
+void pkginst::generateDependencies()
 {
 	std::vector< std::pair<std::string,time_t> > dependenciesWeMustAdd,depencenciestoSort;
 	std::pair<std::string,time_t> PackageTime;
