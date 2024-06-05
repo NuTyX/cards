@@ -22,7 +22,7 @@
 //
 
 /**
- * Pkginfo class.
+ * pkginfo class.
  */
 
 #ifndef PKGINFO_H
@@ -35,10 +35,10 @@
 #include <iomanip>
 
 
-class Pkginfo : public Pkgdbh {
+class pkginfo : public pkgdbh {
 public:
-	Pkginfo(const std::string& commandName);
-	Pkginfo();
+	pkginfo(const std::string& commandName);
+	pkginfo();
 	virtual void parseArguments(int argc, char** argv);
 	virtual void run();
 	virtual void finish();

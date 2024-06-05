@@ -2,7 +2,7 @@
 
 using namespace cards;
 
-class Pkg_inst : public Pkgdbh
+class Pkg_inst : public pkgdbh
 {
 	public:
 		Pkg_inst();
@@ -10,7 +10,7 @@ class Pkg_inst : public Pkgdbh
 };
 
 Pkg_inst::Pkg_inst()
-	: Pkgdbh("")
+	: pkgdbh("")
 {
 	m_root="/mnt/hd/";
 	getListOfPackagesNames("");

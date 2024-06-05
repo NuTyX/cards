@@ -23,8 +23,8 @@
 
 #include "pkginfo.h"
 
-Pkginfo::Pkginfo(const std::string& commandName)
-	: Pkgdbh(commandName),
+pkginfo::pkginfo(const std::string& commandName)
+	: pkgdbh(commandName),
 	m_runtimedependencies_mode(0),
 	m_footprint_mode(0),
 	m_archiveinfo(0),
@@ -39,8 +39,8 @@ Pkginfo::Pkginfo(const std::string& commandName)
 	m_fulllist_mode(false)
 {
 }
-Pkginfo::Pkginfo()
-	:Pkgdbh("pkginfo"),
+pkginfo::pkginfo()
+	:pkgdbh("pkginfo"),
 	m_runtimedependencies_mode(0),
 	m_footprint_mode(0),
 	m_archiveinfo(0),
@@ -54,7 +54,7 @@ Pkginfo::Pkginfo()
 	m_fulllist_mode(true)
 {
 }
-void Pkginfo::parseArguments(int argc, char** argv)
+void pkginfo::parseArguments(int argc, char** argv)
 {
 	for (int i = 1; i < argc; ++i) {
 		std::string option(argv[i]);
@@ -139,7 +139,7 @@ void Pkginfo::parseArguments(int argc, char** argv)
 		treatErrors(m_arg);
 	}
 }
-void Pkginfo::run()
+void pkginfo::run()
 {
 	if (m_archiveinfo) {
 		std::pair<std::string, cards::db> packageArchive = openArchivePackage(m_packageArchiveName) ;
@@ -424,10 +424,10 @@ void Pkginfo::run()
 		}
 	}
 }
-void Pkginfo::finish()
+void pkginfo::finish()
 {
 }
-void Pkginfo::printHelp() const
+void pkginfo::printHelp() const
 {
 	std::cout << USAGE << m_utilName << " [options]" << std::endl
 		<< OPTIONS << std::endl

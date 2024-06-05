@@ -34,7 +34,7 @@
 #include "cards_base.h"
 
 Cards_base::Cards_base(const CardsArgumentParser& argParser)
-	: Pkgdbh("cards base"), m_argParser(argParser)
+	: pkgdbh("cards base"), m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);

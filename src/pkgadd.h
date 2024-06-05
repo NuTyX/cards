@@ -22,7 +22,7 @@
 //
 
 /**
- * Pkgadd class.
+ * pkgadd class.
  */
 
 #ifndef PKGADD_H
@@ -31,24 +31,24 @@
 #include "pkgdbh.h"
 
 /**
- * \brief Pkgadd class
+ * \brief pkgadd class
  *
  * This class takes care of adding binaries package into the database
  *
  */
 
-class Pkgadd : public Pkgdbh {
+class pkgadd : public pkgdbh {
 public:
 	/**
 	 * Default constructor without any argument
 	 */
-	Pkgadd();
+	pkgadd();
 	/**
 	 * Alternative constructor for derivated classes
 	 * 
 	 * \param commandName Name of the command used in derivated class
 	 */
-	Pkgadd(const std::string& commandName);
+	pkgadd(const std::string& commandName);
 	void parseArguments(int argc, char** argv);
 	void preRun();
 	void postRun();

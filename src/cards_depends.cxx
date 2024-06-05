@@ -31,7 +31,7 @@
 
 
 CardsDepends::CardsDepends (const CardsArgumentParser& argParser)
-	: Pkgdbh(""),
+	: pkgdbh(""),
 		m_argParser(argParser)
 {
 	package = nullptr;

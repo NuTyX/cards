@@ -40,7 +40,7 @@
  */
 
 
-class Cards_remove: public Pkgrm
+class Cards_remove: public pkgrm
 {
 	public:
 		/**

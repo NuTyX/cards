@@ -24,7 +24,7 @@
 #include "pkgdbh.h"
 #include "cards_argument_parser.h"
 
-class Cards_base : public Pkgdbh
+class Cards_base : public pkgdbh
 {
 private:
 	const CardsArgumentParser& m_argParser;

@@ -25,17 +25,17 @@
 
 using __gnu_cxx::stdio_filebuf;
 
-Pkgdbh::Pkgdbh(const std::string& name)
+pkgdbh::pkgdbh(const std::string& name)
 	: m_utilName(name), m_DB_Empty(true), m_miniDB_Empty(true)
 {
 	openlog(m_utilName.c_str(),LOG_CONS,LOG_LOCAL7);
 }
-Pkgdbh::Pkgdbh()
+pkgdbh::pkgdbh()
 	: m_utilName("pkgdbh"), m_DB_Empty(true), m_miniDB_Empty(true)
 {
 	m_root="/";
 }
-Pkgdbh::~Pkgdbh()
+pkgdbh::~pkgdbh()
 {
 #ifndef NDEBUG
 		syslog(LOG_INFO,"Closing log...");
@@ -43,7 +43,7 @@ Pkgdbh::~Pkgdbh()
 		runLastPostInstall();
 		void closelog(void);
 }
-void Pkgdbh::parseArguments(int argc, char** argv)
+void pkgdbh::parseArguments(int argc, char** argv)
 {
 	for (int i = 1; i < argc; i++) {
 		std::string option(argv[i]);
@@ -63,13 +63,13 @@ void Pkgdbh::parseArguments(int argc, char** argv)
 	else
 		m_root=m_root+"/";
 }
-void Pkgdbh::run(int argc, char** argv)
+void pkgdbh::run(int argc, char** argv)
 {
 	parseArguments(argc,argv);
 	run();
 }
 
-void Pkgdbh::treatErrors(const std::string& s) const
+void pkgdbh::treatErrors(const std::string& s) const
 {
 	using namespace cards;
 	switch ( m_actualError )
@@ -196,12 +196,12 @@ void Pkgdbh::treatErrors(const std::string& s) const
 			break;
 	}
 }
-void Pkgdbh::progressInfo(cards::ActionEnum action)
+void pkgdbh::progressInfo(cards::ActionEnum action)
 {
 	m_actualAction = action;
 	progressInfo();
 }
-void Pkgdbh::progressInfo()
+void pkgdbh::progressInfo()
 {
 	using namespace cards;
   static int j=0;
@@ -296,13 +296,13 @@ void Pkgdbh::progressInfo()
   }
 }
 
-std::set<std::string> Pkgdbh::getListOfPackagesNames()
+std::set<std::string> pkgdbh::getListOfPackagesNames()
 {
 	if (m_listOfPackagesNames.empty())
 		getListOfPackagesNames(m_root);
 	return m_listOfPackagesNames;
 }
-std::string Pkgdbh::getSingleItem(const std::string& PackageName, const char i) const
+std::string pkgdbh::getSingleItem(const std::string& PackageName, const char i) const
 {
 	const std::string metaFile = m_root + PKG_DB_DIR + PackageName + '/' + PKG_META;
 	std::set<std::string> fileContent;
@@ -316,7 +316,7 @@ std::string Pkgdbh::getSingleItem(const std::string& PackageName, const char i) 
 	}
 	return item;
 }
-std::set<std::string> Pkgdbh::getSetOfItems(const std::string& PackageName, const char i) const
+std::set<std::string> pkgdbh::getSetOfItems(const std::string& PackageName, const char i) const
 {
 	const std::string metaFile = m_root + PKG_DB_DIR + PackageName + '/' + PKG_META;
 	std::set<std::string> fileContent;
@@ -329,54 +329,54 @@ std::set<std::string> Pkgdbh::getSetOfItems(const std::string& PackageName, cons
 	}
 	return setOfItems;
 }
-std::string Pkgdbh::getDescription(const std::string& name) const
+std::string pkgdbh::getDescription(const std::string& name) const
 {
 	return getSingleItem(name,'D');
 }
-std::string Pkgdbh::getVersion(const std::string& name) const
+std::string pkgdbh::getVersion(const std::string& name) const
 {
 	return getSingleItem(name,'V');
 }
-std::string Pkgdbh::getCollection(const std::string& name) const
+std::string pkgdbh::getCollection(const std::string& name) const
 {
 	return getSingleItem(name,'c');
 }
-std::string Pkgdbh::getSets(const std::string& name) const
+std::string pkgdbh::getSets(const std::string& name) const
 {
 	std::string s;
 	for (auto i: getSetOfItems(name,'s'))
 		s = s + " " + i;
 	return s;
 }
-std::set<std::string> Pkgdbh::getSetOfSets(const std::string& name) const
+std::set<std::string> pkgdbh::getSetOfSets(const std::string& name) const
 {
 	return getSetOfItems(name,'s');
 }
-std::set<std::string> Pkgdbh::getSetOfCategories (const std::string& name) const
+std::set<std::string> pkgdbh::getSetOfCategories (const std::string& name) const
 {
 	return getSetOfItems(name, 'T');
 }
-std::string Pkgdbh::getCategories(const std::string& name) const
+std::string pkgdbh::getCategories(const std::string& name) const
 {
 	std::string s;
 	for (auto i: getSetOfItems(name,'T'))
 		s = s + " " + i;
 	return s;
 }
-std::string Pkgdbh::getArch(const std::string& name) const
+std::string pkgdbh::getArch(const std::string& name) const
 {
 	return getSingleItem(name,'A');
 }
-std::string Pkgdbh::getLicense(const std::string& name) const
+std::string pkgdbh::getLicense(const std::string& name) const
 {
 	return getSingleItem(name,'L');
 }
-int Pkgdbh::getSize(const std::string& name) const
+int pkgdbh::getSize(const std::string& name) const
 {
 	std::string r = getSingleItem(name,'S');
 	return atoi(r.c_str());
 }
-int Pkgdbh::getRelease(const std::string& name) const
+int pkgdbh::getRelease(const std::string& name) const
 {
 	std::string r = getSingleItem(name,'r');
 	return atoi(r.c_str());
@@ -384,7 +384,7 @@ int Pkgdbh::getRelease(const std::string& name) const
 /* Append to the "DB" the number of packages founds
  * (directory containing a file named files
  * */
-int Pkgdbh::getListOfPackagesNames (const std::string& path)
+int pkgdbh::getListOfPackagesNames (const std::string& path)
 {
 	if (! m_listOfPackagesNames.empty())
 		return m_listOfPackagesNames.size();
@@ -407,7 +407,7 @@ int Pkgdbh::getListOfPackagesNames (const std::string& path)
 
 /* get details info of a package */
 std::pair<std::string, cards::db>
-Pkgdbh::getInfosPackage( const std::string& packageName )
+pkgdbh::getInfosPackage( const std::string& packageName )
 {
 	std::pair<std::string, cards::db> result;
 
@@ -416,7 +416,7 @@ Pkgdbh::getInfosPackage( const std::string& packageName )
 }
 
 std::set<std::string>
-Pkgdbh::getSetOfFiles( const std::string& packageName )
+pkgdbh::getSetOfFiles( const std::string& packageName )
 {
 	std::string name = m_listOfAlias[packageName];
 	std::set<std::string> packageFiles;
@@ -461,7 +461,7 @@ Pkgdbh::getSetOfFiles( const std::string& packageName )
  *
  */
 void
-Pkgdbh::buildDatabase(const bool& progress,
+pkgdbh::buildDatabase(const bool& progress,
 		const bool& simple,
 		const bool& all,
 		const bool& files,
@@ -580,7 +580,7 @@ Pkgdbh::buildDatabase(const bool& progress,
  * - Dependencies list of the package
  * */
 void
-Pkgdbh::buildSimpleDependenciesDatabase()
+pkgdbh::buildSimpleDependenciesDatabase()
 {
 	if (m_listOfPackagesNames.empty() )
 			getListOfPackagesNames (m_root);
@@ -613,7 +613,7 @@ Pkgdbh::buildSimpleDependenciesDatabase()
  * - Packager name
  * */
 void
-Pkgdbh::buildSimpleDatabase()
+pkgdbh::buildSimpleDatabase()
 {
 	if (m_miniDB_Empty) {
 		if (m_listOfPackagesNames.empty() )
@@ -676,7 +676,7 @@ Pkgdbh::buildSimpleDatabase()
  /**
  * Populate the database with all details infos
  */
-void Pkgdbh::buildCompleteDatabase(const bool& silent)
+void pkgdbh::buildCompleteDatabase(const bool& silent)
 {
 	using namespace cards;
 	cleanupMetaFiles(m_root);
@@ -811,7 +811,7 @@ void Pkgdbh::buildCompleteDatabase(const bool& silent)
 		m_DB_Empty=false;
 	}
 }
-void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
+void pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 {
 	std::set<std::string> metaFilesList;
 	progressInfo(cards::ACTION_ENUM_PKG_MOVE_META_START);
@@ -864,7 +864,7 @@ void Pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 	}
 	progressInfo(cards::ACTION_ENUM_PKG_MOVE_META_END);
 }
-void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::db& info)
+void pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::db& info)
 {
 
 	m_listOfPackages[name] = info;
@@ -909,27 +909,27 @@ void Pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::db& i
 		treatErrors(fileslist_new + " to " + fileslist);
 	}
 }
-bool Pkgdbh::checkPackageNameExist(const std::string& name) const
+bool pkgdbh::checkPackageNameExist(const std::string& name) const
 {
 	return (m_listOfAlias.find(name) != m_listOfAlias.end());
 }
-bool Pkgdbh::checkDependency(const std::string& name)
+bool pkgdbh::checkDependency(const std::string& name)
 {
 	if  ( checkPackageNameExist(name) )
 		return m_listOfPackages[name].dependency();
 	return false;
 }
-void Pkgdbh::setDependency()
+void pkgdbh::setDependency()
 {
 	m_dependency=true;
 }
-void Pkgdbh::resetDependency()
+void pkgdbh::resetDependency()
 {
 	m_dependency=false;
 }
 
 bool
-Pkgdbh::checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName)
+pkgdbh::checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName)
 {
 	std::set<std::string>::iterator it = m_listOfPackagesNames.find(archiveName.first);
 	if (it == m_listOfPackagesNames.end())
@@ -949,7 +949,7 @@ Pkgdbh::checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName)
 	return true;
 }
 
-bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild)
+bool pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild)
 {
 	if (dependencieNameBuild.second == 0)
 		return false;
@@ -961,7 +961,7 @@ bool Pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 	return true;
 }
 /* Remove meta data about the removed package */
-void Pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
+void pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 {
 	if ( checkPackageNameExist(name)){
 		m_packageVersion = m_listOfPackages[name].version();
@@ -999,7 +999,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 }
 
 /* Remove the physical files after followings some rules */
-void Pkgdbh::removePackageFiles(const std::string& name)
+void pkgdbh::removePackageFiles(const std::string& name)
 {
 	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
@@ -1035,7 +1035,7 @@ void Pkgdbh::removePackageFiles(const std::string& name)
 	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
 }
 
-void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::string>& keep_list)
+void pkgdbh::removePackageFiles(const std::string& name, const std::set<std::string>& keep_list)
 {
 	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
@@ -1081,7 +1081,7 @@ void Pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
 }
 
-void Pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list)
+void pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list)
 {
 	if ( checkPackageNameExist(m_packageName)){
 		m_packageVersion = m_listOfPackages[m_packageName].version();
@@ -1121,7 +1121,7 @@ void Pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std
 }
 
 std::set<std::string>
-Pkgdbh::getConflictsFilesList (const std::string& name, cards::db& info)
+pkgdbh::getConflictsFilesList (const std::string& name, cards::db& info)
 {
 	std::set<std::string> files;
 
@@ -1181,7 +1181,7 @@ Pkgdbh::getConflictsFilesList (const std::string& name, cards::db& info)
 	return files;
 }
 std::pair<std::string, cards::db>
-Pkgdbh::openArchivePackage(const std::string& filename)
+pkgdbh::openArchivePackage(const std::string& filename)
 {
 	std::string packageArchiveName;
 	std::pair<std::string, cards::db> result;
@@ -1235,7 +1235,7 @@ Pkgdbh::openArchivePackage(const std::string& filename)
 	return result;
 }
 std::set< std::pair<std::string,time_t> >
-Pkgdbh::getPackageDependencies (const std::string& filename)
+pkgdbh::getPackageDependencies (const std::string& filename)
 {
 	std::pair<std::string, cards::db> packageArchive;
 	std::set< std::pair<std::string,time_t> > packageNameDepsBuildTime;
@@ -1298,7 +1298,7 @@ Pkgdbh::getPackageDependencies (const std::string& filename)
 #endif
 	return packageNameDepsBuildTime;
 }
-void Pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
+void pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 {
 	char buf[PATH_MAX];
 	struct archive* archive;
@@ -1350,7 +1350,7 @@ void Pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 	}
 	chdir(buf);
 }
-void Pkgdbh::installArchivePackage
+void pkgdbh::installArchivePackage
 	(const std::string& filename, const std::set<std::string>& keep_list,
 	const std::set<std::string>& non_install_list)
 {
@@ -1451,7 +1451,7 @@ void Pkgdbh::installArchivePackage
 	}
 	FREE_ARCHIVE(archive);
 }
-void Pkgdbh::readRulesFile()
+void pkgdbh::readRulesFile()
 {
 	m_actionRules.clear();
 	unsigned int linecount = 0;
@@ -1540,7 +1540,7 @@ void Pkgdbh::readRulesFile()
 	std::cerr << std::endl;
 #endif
 }
-void Pkgdbh::runLastPostInstall()
+void pkgdbh::runLastPostInstall()
 {
 	if ( m_postInstallList.size() > 0 ) {
 		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_START);
@@ -1641,7 +1641,7 @@ void Pkgdbh::runLastPostInstall()
 		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_END);
 	}
 }
-bool Pkgdbh::checkRuleAppliesToFile
+bool pkgdbh::checkRuleAppliesToFile
 	(const rule_t& rule, const std::string& file)
 {
 	regex_t preg;
@@ -1656,7 +1656,7 @@ bool Pkgdbh::checkRuleAppliesToFile
 
 	return ret;
 }
-void Pkgdbh::getFootprintPackage(std::string& filename)
+void pkgdbh::getFootprintPackage(std::string& filename)
 {
 	unsigned int i;
 	struct archive* archive;
@@ -1797,21 +1797,21 @@ void Pkgdbh::getFootprintPackage(std::string& filename)
 	FREE_ARCHIVE(archive);
 }
 
-void Pkgdbh::print_version() const
+void pkgdbh::print_version() const
 {
 	std::cout << m_utilName << " (cards) " << VERSION << std::endl;
 }
 
-unsigned int Pkgdbh::getFilesNumber()
+unsigned int pkgdbh::getFilesNumber()
 {
     return m_filesNumber;
 }
 
-unsigned int Pkgdbh::getInstalledFilesNumber()
+unsigned int pkgdbh::getInstalledFilesNumber()
 {
     return m_installedFilesNumber;
 }
-std::set<std::string> Pkgdbh::getFilesList()
+std::set<std::string> pkgdbh::getFilesList()
 {
 	return m_filesList;
 }

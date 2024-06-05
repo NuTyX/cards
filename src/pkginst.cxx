@@ -23,7 +23,7 @@
 
 pkginst::pkginst
 	(const std::string& commandName,const char *configFileName)
-	: Pkgadd(commandName), repodwl(configFileName)
+	: pkgadd(commandName), repodwl(configFileName)
 {
 }
 void pkginst::generateDependencies

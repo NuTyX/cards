@@ -23,8 +23,8 @@
 
 #include "pkgadd.h"
 
-Pkgadd::Pkgadd()
-	: Pkgdbh("pkgadd"),
+pkgadd::pkgadd()
+	: pkgdbh("pkgadd"),
 	m_runPrePost(true),
 	m_upgrade(false),
 	m_force(false)
@@ -33,8 +33,8 @@ Pkgadd::Pkgadd()
 	readRulesFile();
 
 }
-Pkgadd::Pkgadd(const std::string& commandName)
-	: Pkgdbh(commandName),
+pkgadd::pkgadd(const std::string& commandName)
+	: pkgdbh(commandName),
 	m_runPrePost(true),
 	m_upgrade(false),
 	m_force(false)
@@ -43,7 +43,7 @@ Pkgadd::Pkgadd(const std::string& commandName)
 	readRulesFile();
 
 }
-void Pkgadd::parseArguments(int argc, char** argv)
+void pkgadd::parseArguments(int argc, char** argv)
 {
 	for (int i = 1; i < argc; i++) {
 		std::string option(argv[i]);
@@ -81,7 +81,7 @@ void Pkgadd::parseArguments(int argc, char** argv)
 	}
 
 }
-void Pkgadd::preRun()
+void pkgadd::preRun()
 {
 	// Check UID
 	if (getuid())
@@ -91,7 +91,7 @@ void Pkgadd::preRun()
 	}
 	extractAndRunPREfromPackage(m_packageArchiveName);
 }
-void Pkgadd::run()
+void pkgadd::run()
 {
 	// Get the list of installed packages
 	getListOfPackagesNames(m_root);
@@ -176,7 +176,7 @@ void Pkgadd::run()
 	}
 	postRun();
 }
-void Pkgadd::postRun()
+void pkgadd::postRun()
 {
 	if (checkFileExist(PKG_PRE_INSTALL))
 		removeFile(m_root,PKG_PRE_INSTALL);
@@ -195,7 +195,7 @@ void Pkgadd::postRun()
 		removeFile(m_root,PKG_POST_INSTALL);
 	}
 }
-void Pkgadd::printHelp() const
+void pkgadd::printHelp() const
 {
 	std::cout << USAGE << m_utilName << " [options] <file>" << std::endl
 	<< OPTIONS << std::endl
@@ -220,7 +220,7 @@ void Pkgadd::printHelp() const
 }
 
 std::set<std::string>
-Pkgadd::getKeepFileList(const std::set< std::string>& files, const std::vector<rule_t>& rules)
+pkgadd::getKeepFileList(const std::set< std::string>& files, const std::vector<rule_t>& rules)
 {
 	std::set<std::string> keep_list;
 	std::vector<rule_t> found;
@@ -250,7 +250,7 @@ Pkgadd::getKeepFileList(const std::set< std::string>& files, const std::vector<r
 }
 
 std::set<std::string>
-Pkgadd::applyInstallRules(const std::string& name, cards::db& info,
+pkgadd::applyInstallRules(const std::string& name, cards::db& info,
 		const std::vector<rule_t>& rules)
 {
 	// TODO: better algo(?)
@@ -325,7 +325,7 @@ Pkgadd::applyInstallRules(const std::string& name, cards::db& info,
 	return non_install_set;
 }
 void
-Pkgadd::applyPostInstallRules(const std::string& name, cards::db& info,
+pkgadd::applyPostInstallRules(const std::string& name, cards::db& info,
 			const std::vector<rule_t>& rules)
 {
 	std::vector<rule_t> found;
@@ -357,7 +357,7 @@ Pkgadd::applyPostInstallRules(const std::string& name, cards::db& info,
 	}
 }
 void
-Pkgadd::getInstallRulesList(const std::vector<rule_t>& rules, cards::rule_event_t event,
+pkgadd::getInstallRulesList(const std::vector<rule_t>& rules, cards::rule_event_t event,
 	std::vector<rule_t>& found) const
 {
 	for (auto i : rules ) {
@@ -366,7 +366,7 @@ Pkgadd::getInstallRulesList(const std::vector<rule_t>& rules, cards::rule_event_
 	}
 }
 void
-Pkgadd::getPostInstallRulesList(const std::vector<rule_t>& rules,
+pkgadd::getPostInstallRulesList(const std::vector<rule_t>& rules,
 	std::vector<rule_t>& found) const
 {
 	for (auto i : rules ) {

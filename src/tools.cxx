@@ -37,14 +37,14 @@
 #include "pkgrm.h"
 #include "pkginfo.h"
 
-Pkgdbh* select_utility(const std::string& name)
+pkgdbh* select_utility(const std::string& name)
 {
 	if (name == "pkgadd")
-		return new Pkgadd;
+		return new pkgadd;
 	else if (name == "pkgrm")
-		return new Pkgrm;
+		return new pkgrm;
 	else if (name == "pkginfo")
-		return new Pkginfo;
+		return new pkginfo;
 	else	
 		throw std::runtime_error("command not supported by cards");
 }
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 	textdomain(GETTEXT_PACKAGE);
 
 	try {
-		std::unique_ptr<Pkgdbh> util(select_utility(name));
+		std::unique_ptr<pkgdbh> util(select_utility(name));
 
 		// Handle common options
 		for (int i = 1; i < argc; i++) {

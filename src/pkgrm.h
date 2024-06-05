@@ -21,7 +21,7 @@
 //  USA.
 //
 /**
- * Pkgrm class.
+ * pkgrm class.
  */
 
 #ifndef PKGRM_H
@@ -29,10 +29,10 @@
 
 #include "pkgdbh.h"
 
-class Pkgrm : public Pkgdbh {
+class pkgrm : public pkgdbh {
 public:
-	Pkgrm(const std::string& commandName) : Pkgdbh(commandName) {}
-	Pkgrm();
+	pkgrm(const std::string& commandName) : pkgdbh(commandName) {}
+	pkgrm();
 	void run();
 	void printHelp() const;
 

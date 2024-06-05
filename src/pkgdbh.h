@@ -22,7 +22,7 @@
 //
 
 /**
- * Pkgdbh class.
+ * pkgdbh class.
  */
 
 #ifndef PKGDBH_H
@@ -117,12 +117,12 @@ struct rule_t {
 	bool action;
 };
 
-class Pkgdbh {
+class pkgdbh {
 public:
 
-	explicit Pkgdbh(const std::string& name);
-	explicit Pkgdbh();
-	virtual ~Pkgdbh();
+	explicit pkgdbh(const std::string& name);
+	explicit pkgdbh();
+	virtual ~pkgdbh();
 
 	/* Following methods can be redefined in derivated class */
 	virtual void parseArguments(int argc, char** argv);

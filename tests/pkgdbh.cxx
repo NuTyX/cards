@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv)
 {
-	Pkgdbh ListOfPackages;
+	pkgdbh ListOfPackages;
 
 	for (auto i:ListOfPackages.getListOfPackagesNames()) {
 		for (auto categories:ListOfPackages.getCategories(i)) {

@@ -24,7 +24,7 @@
 #include "cards_info.h"
 
 Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& configFileName)
-	: Pkginfo("cards info"),pkgrepo(configFileName), m_argParser(argParser)
+	: pkginfo("cards info"),pkgrepo(configFileName), m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);

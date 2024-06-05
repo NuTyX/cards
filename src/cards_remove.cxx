@@ -28,7 +28,7 @@
 Cards_remove::Cards_remove(const std::string& commandName,
 	const CardsArgumentParser& argParser,
 	const char *configFileName)
-	: Pkgrm(commandName),m_argParser(argParser)
+	: pkgrm(commandName),m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);

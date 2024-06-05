@@ -24,7 +24,7 @@
 #include "flcards_info.h"
 
 Flcards_info::Flcards_info(const std::string& configFileName)
-	: Pkgdbh(""),pkgrepo(configFileName)
+	: pkgdbh(""),pkgrepo(configFileName)
 {
 	m_root="/";
 }

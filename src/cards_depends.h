@@ -40,7 +40,7 @@ struct LevelName {
 	std::string name;
 };
 
-class CardsDepends: public Pkgdbh
+class CardsDepends: public pkgdbh
 {
 public:
 

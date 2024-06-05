@@ -23,13 +23,13 @@
 
 #include "pkgrm.h"
 
-Pkgrm::Pkgrm ()
-	: Pkgdbh("pkgrm")
+pkgrm::pkgrm ()
+	: pkgdbh("pkgrm")
 {
 	// Checking the rules
 	readRulesFile();
 }
-void Pkgrm::getListOfManInstalledPackages ()
+void pkgrm::getListOfManInstalledPackages ()
 {
 	// Get the list of installed packages
 	getListOfPackagesNames(m_root);
@@ -43,7 +43,7 @@ void Pkgrm::getListOfManInstalledPackages ()
 		getDirectDependencies(i);
 	}
 }
-void Pkgrm::getDirectDependencies(std::string& name)
+void pkgrm::getDirectDependencies(std::string& name)
 {
 	bool found = false;
 	for ( auto i : m_listofDependencies ) {
@@ -68,7 +68,7 @@ void Pkgrm::getDirectDependencies(std::string& name)
 		}
 	}
 }
-void Pkgrm::run()
+void pkgrm::run()
 {
 	// Check UID
 	if (getuid())
@@ -97,7 +97,7 @@ void Pkgrm::run()
 	removePackageFiles(m_packageName);
 
 }
-void Pkgrm::printHelp() const
+void pkgrm::printHelp() const
 {
 	std::cout << USAGE << m_utilName << " [options] <package>" << std::endl
 	     << OPTIONS << std::endl
