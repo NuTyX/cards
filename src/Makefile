@@ -120,32 +120,32 @@ WEBOBJECTS =  conf.o \
 	cache.o \
 	webcards.o
 
-HEADERS = enum.h \
-		system_utils.h \
-		error_treat.h \
-		md5.h \
-		string.h \
-		vector.h \
-		string_utils.h \
-		file_utils.h \
-		archive.h \
-		conf.h \
-		pkg.h \
-		lock.h \
-		db.h  \
-		cache.h \
-		pkgrepo.h \
-		repodwl.h \
-		file_download.h \
-		process.h \
-		runtime_dependencies_utils.h \
-		pkgdbh.h \
-		pkgadd.h \
-		pkgrm.h \
-		pkginfo.h \
-		pkginst.h \
-		pkgsync.h
-
+HEADERS = define.h \
+	enum.h \
+	system_utils.h \
+	error_treat.h \
+	md5.h \
+	string.h \
+	vector.h \
+	string_utils.h \
+	file_utils.h \
+	archive.h \
+	conf.h \
+	pkg.h \
+	lock.h \
+	db.h  \
+	cache.h \
+	pkgrepo.h \
+	repodwl.h \
+	file_download.h \
+	process.h \
+	runtime_dependencies_utils.h \
+	pkgdbh.h \
+	pkgadd.h \
+	pkgrm.h \
+	pkginfo.h \
+	pkginst.h \
+	pkgsync.h
 
 CONSOLEKIT_CFLAGS = -I/usr/include/ConsoleKit/ck-connector -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
 CONSOLEKIT_LIBS = -lck-connector -ldbus-1

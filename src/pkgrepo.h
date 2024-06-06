@@ -27,8 +27,6 @@
 #include "cache.h"
 #include "conf.h"
 
-#define PKG_REPO ".PKGREPO"
-
 struct PortFilesList {
 	std::string md5SUM;
 	std::string name;

@@ -127,6 +127,15 @@ enum rule_event_t {
 	QUERY_IMOD3,
 	QUERY_IMOD2
 };
+enum archive_error {
+    CANNOT_OPEN_ARCHIVE,
+    CANNOT_READ_ARCHIVE,
+    CANNOT_FIND_META_FILE,
+    CANNOT_FIND_MTREE_FILE,
+    CANNOT_FIND_NAME,
+    CANNOT_FIND_ARCH,
+    EMPTY_ARCHIVE
+};
 
 } // end of cards namespace
 

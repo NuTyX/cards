@@ -4,9 +4,6 @@
 
 namespace cards {
 
-#define CARDS_CONF_FILE "/etc/cards.conf"
-#define NUTYX_VERSION_FILE "/var/lib/pkg/nutyx-version"
-
 struct DirUrl {
 	std::string dir;
 	std::string url;

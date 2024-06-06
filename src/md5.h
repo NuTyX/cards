@@ -15,27 +15,25 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 //  USA.
 //
 
 #ifndef MD5_H
 #define MD5_H
 
+#include "define.h"
+
 #include <string.h>
 
-#define uint8  unsigned char
-#define uint32 unsigned long int
-
-struct md5_context
-{
+struct md5_context {
     uint32 total[2];
     uint32 state[4];
     uint8 buffer[64];
 };
 
-void md5_starts( struct md5_context *ctx );
-void md5_update( struct md5_context *ctx, uint8 *input, uint32 length );
-void md5_finish( struct md5_context *ctx, uint8 digest[16] );
+void md5_starts(struct md5_context* ctx);
+void md5_update(struct md5_context* ctx, uint8* input, uint32 length);
+void md5_finish(struct md5_context* ctx, uint8 digest[16]);
 
 #endif /* md5.h */

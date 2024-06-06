@@ -9,8 +9,6 @@
 #include <sys/file.h>
 #include <csignal>
 
-#define PKG_DB_DIR       "var/lib/pkg/DB/"
-
 namespace cards {
 class lock {
 public:

@@ -3,12 +3,11 @@
 
 namespace cards {
 
-class vector
-{
+class vector {
 public:
     vector();
     vector(const unsigned int capacity);
-    vector(char * element);
+    vector(char* element);
     ~vector();
     const char* operator[](const unsigned int i) const;
     char*& operator[](unsigned int i);
@@ -18,7 +17,6 @@ public:
     const unsigned int size();
     const unsigned int capacity();
 
-
 private:
     char** m_items;
     unsigned int m_size;
@@ -27,4 +25,3 @@ private:
 } // end of cards namespace
 
 // vim:set ts=2 :
-

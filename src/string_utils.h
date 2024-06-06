@@ -32,12 +32,6 @@
 
 #include <sys/stat.h>
 
-#define GIGA 1e9
-#define MEGA 1e6
-#define KILO 1e3
-#define PACKAGE_LOCALE_DIR "/usr/share/locale"
-#define GETTEXT_PACKAGE "cards"
-
 typedef std::map<std::string, std::string> alias_t;
 
 void *Malloc(size_t s);
