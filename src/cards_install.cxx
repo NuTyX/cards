@@ -24,7 +24,7 @@
 #include "cards_install.h"
 
 
-Cards_install::Cards_install(const CardsArgumentParser& argParser,
+cards_install::cards_install(const CardsArgumentParser& argParser,
 		const char *configFileName)
 	: pkginst("cards install",configFileName),m_argParser(argParser),
 		m_configFileName(configFileName)
@@ -100,7 +100,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 
 	}
 }
-Cards_install::Cards_install(const CardsArgumentParser& argParser,
+cards_install::cards_install(const CardsArgumentParser& argParser,
 	const char *configFileName,
 	const std::vector<std::string>& listOfPackages)
 	: pkginst("cards install",configFileName),m_argParser(argParser)
@@ -145,7 +145,7 @@ Cards_install::Cards_install(const CardsArgumentParser& argParser,
 		}
 	}
 }
-void Cards_install::parseArguments()
+void cards_install::parseArguments()
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
@@ -164,7 +164,7 @@ void Cards_install::parseArguments()
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DISABLE))
 		m_runPrePost = false;
 }
-void Cards_install::getLocalePackagesList()
+void cards_install::getLocalePackagesList()
 {
 	std::string packageFileName;
 	cards::conf config(m_configFileName);

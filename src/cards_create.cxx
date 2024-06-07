@@ -24,7 +24,7 @@
 #include "cards_create.h"
 
 
-Cards_create::Cards_create(const CardsArgumentParser& argParser,
+cards_create::cards_create(const CardsArgumentParser& argParser,
 	const char *configFileName,
 	const std::vector<std::string>& listOfPackages)
 	: pkginst("cards create",configFileName),m_argParser(argParser)
@@ -33,7 +33,7 @@ Cards_create::Cards_create(const CardsArgumentParser& argParser,
 	for (auto i : listOfPackages) createBinaries(configFileName,
 		basename(const_cast<char*>(i.c_str())) );
 }
-Cards_create::Cards_create(const CardsArgumentParser& argParser,
+cards_create::cards_create(const CardsArgumentParser& argParser,
 	const char *configFileName,
 	const std::string& packageName)
 	: pkginst("cards create",configFileName),m_argParser(argParser)
@@ -41,7 +41,7 @@ Cards_create::Cards_create(const CardsArgumentParser& argParser,
 	parseArguments();
 	createBinaries(configFileName, packageName);
 }
-void Cards_create::createBinaries(const char *configFileName,
+void cards_create::createBinaries(const char *configFileName,
 	const std::string& packageName)
 {
 	cards::conf config(configFileName);
@@ -186,7 +186,7 @@ void Cards_create::createBinaries(const char *configFileName,
 		close ( fdlog );
 	}	
 }
-void Cards_create::parseArguments()
+void cards_create::parseArguments()
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);

@@ -32,48 +32,48 @@ namespace cards
     ///
 
     /** Init static pointer to null */
-    CWrapper* CWrapper::m_ptCWrapper = nullptr;
+    cards_wrapper* cards_wrapper::m_ptcards_wrapper = nullptr;
 
     /** Constructor */
-    CWrapper::CWrapper()
+    cards_wrapper::cards_wrapper()
     {
         m_job_running = false;
         m_job=nullptr;
-        m_log=CLogger::instance();;
+        m_log=cards_logger::instance();;
     }
 
     /** Destructor */
-    CWrapper::~CWrapper()
+    cards_wrapper::~cards_wrapper()
     {
         m_ClearPackagesList();
     }
 
     /** Return or create singleton instance */
-    CWrapper* CWrapper::instance()
+    cards_wrapper* cards_wrapper::instance()
     {
-        if (m_ptCWrapper==nullptr)
-            m_ptCWrapper=new CWrapper();
-        return m_ptCWrapper;
+        if (m_ptcards_wrapper==nullptr)
+            m_ptcards_wrapper=new cards_wrapper();
+        return m_ptcards_wrapper;
     }
 
     /** Destruction of the singleton , only if instance exist */
-    void CWrapper::kill()
+    void cards_wrapper::kill()
     {
-        if (m_ptCWrapper!=nullptr)
-            delete m_ptCWrapper;
+        if (m_ptcards_wrapper!=nullptr)
+            delete m_ptcards_wrapper;
     }
 
     // Add a nex suscriber to the callback event list
-    void CWrapper::subscribeToEvents(CEventHandler* pCallBack)
+    void cards_wrapper::subscribeToEvents(cards_event_handler* pCallBack)
     {
         // Todo : Check if the new susciber is already in the container
         m_arrEventHandler.push_back(pCallBack);
     }
 
     /// Remove an event suscriber from event callback list
-    void CWrapper::unsubscribeFromEvents(CEventHandler* pCallBack)
+    void cards_wrapper::unsubscribeFromEvents(cards_event_handler* pCallBack)
     {
-        std::vector<CEventHandler*>::iterator it;
+        std::vector<cards_event_handler*>::iterator it;
         it=find(m_arrEventHandler.begin(),m_arrEventHandler.end(),pCallBack);
         if (it!=m_arrEventHandler.end())
         {
@@ -81,12 +81,12 @@ namespace cards
         }
     }
 
-    const std::vector<cards::cache*>& CWrapper::getPackageList()
+    const std::vector<cards::cache*>& cards_wrapper::getPackageList()
     {
         return m_arrPackages;
     }
 
-    const std::set<std::string>& CWrapper::getSetList()
+    const std::set<std::string>& cards_wrapper::getSetList()
     {
         return m_arrSets;
     }
@@ -94,7 +94,7 @@ namespace cards
     ///
     ///
     ///
-    cards::cache* CWrapper::getPackage(const std::string& pName)
+    cards::cache* cards_wrapper::getPackage(const std::string& pName)
     {
         cards::cache* ptr=nullptr;
         for (cards::cache* it : m_arrPackages)
@@ -110,7 +110,7 @@ namespace cards
 
     /// Update the job list
 
-    void CWrapper::refreshJobList()
+    void cards_wrapper::refreshJobList()
     {
         m_arrJobList.clear();
         for (cards::cache* it:m_arrPackages)
@@ -130,9 +130,9 @@ namespace cards
         m_OnJobListChanged_Callback(OK);
     }
     ///
-    /// \brief CWrapper::clearJobList
+    /// \brief cards_wrapper::clearJobList
     ///
-    void CWrapper::clearJobList()
+    void cards_wrapper::clearJobList()
     {
         if (m_job_running)
             return;
@@ -151,7 +151,7 @@ namespace cards
     }
 
     /** Return the current job list */
-    const std::vector<cards::cache*>& CWrapper::getJobList()
+    const std::vector<cards::cache*>& cards_wrapper::getJobList()
     {
         return m_arrJobList;
     }
@@ -161,46 +161,46 @@ namespace cards
     ///
 
     /** Create a new thread for Cards Sync operation*/
-    void CWrapper::sync()
+    void cards_wrapper::sync()
     {
         if (m_IsThreadFree())
         {
-            m_job = new std::thread(&CWrapper::m_Sync_Thread, CWrapper::m_ptCWrapper);
+            m_job = new std::thread(&cards_wrapper::m_Sync_Thread, cards_wrapper::m_ptcards_wrapper);
             m_job->detach();
 //            m_log->log(_("Synchronization started ..."));
         }
     }
 
     /** Create a new thread for Cards Sync operation*/
-    void CWrapper::doJobList()
+    void cards_wrapper::doJobList()
     {
         if (m_IsThreadFree())
         {
-            m_job = new std::thread(&CWrapper::m_DoJobList_Thread, CWrapper::m_ptCWrapper);
+            m_job = new std::thread(&cards_wrapper::m_DoJobList_Thread, cards_wrapper::m_ptcards_wrapper);
             m_job->detach();
         }
     }
 
     /** Create a new thread for Cards Sync operation*/
-    void CWrapper::refreshPackageList()
+    void cards_wrapper::refreshPackageList()
     {
         if (m_IsThreadFree())
         {
-            m_job = new std::thread(&CWrapper::m_RefreshPackageList_Thread, CWrapper::m_ptCWrapper);
+            m_job = new std::thread(&cards_wrapper::m_RefreshPackageList_Thread, cards_wrapper::m_ptcards_wrapper);
             m_job->detach();
         }
     }
 
-    void CWrapper::getPackageInfo(const std::string& pName)
+    void cards_wrapper::getPackageInfo(const std::string& pName)
     {
         if (m_IsThreadFree())
         {
-            m_job = new std::thread(&CWrapper::m_GetPackageInfo_Thread, CWrapper::m_ptCWrapper,pName);
+            m_job = new std::thread(&cards_wrapper::m_GetPackageInfo_Thread, cards_wrapper::m_ptcards_wrapper,pName);
             m_job->detach();
         }
     }
 
-    void CWrapper::m_GetPackageInfo_Thread(std::string pName)
+    void cards_wrapper::m_GetPackageInfo_Thread(std::string pName)
     {
         m_job_running =true;
         cards::cache Package;
@@ -218,7 +218,7 @@ namespace cards
     ///
 
     /** Launch a Cards Sync operation*/
-    void CWrapper::m_Sync_Thread()
+    void cards_wrapper::m_Sync_Thread()
     {
         m_job_running = true;
         CEH_RC rc=CEH_RC::OK;
@@ -226,7 +226,7 @@ namespace cards
         {
             try
             {
-                Pkgsync Sync;
+                pkgsync Sync;
                 Sync.run();
             }
             catch (std::exception& e)
@@ -245,7 +245,7 @@ namespace cards
     }
 
     /** Launch a Cards Sync operation*/
-    void CWrapper::m_DoJobList_Thread()
+    void cards_wrapper::m_DoJobList_Thread()
     {
         m_job_running =true;
         CEH_RC rc=CEH_RC::OK;
@@ -265,13 +265,13 @@ namespace cards
                     std::to_string(InstallList.size()) + _(" Package(s) will be installed... "));
                 if (Removelist.size() > 0)
                 {
-                    CClient Cards;
+                    cards_client Cards;
                     Cards.subscribeToEvents(this);
                     Cards.RemovePackages(Removelist);
                 }
                 if (InstallList.size() > 0)
                 {
-                    CClient Cards;
+                    cards_client Cards;
                     Cards.subscribeToEvents(this);
                     Cards.InstallPackages(InstallList);
                 }
@@ -297,32 +297,28 @@ namespace cards
 
 
     /** Threaded task to refresh the package image container*/
-    void CWrapper::m_RefreshPackageList_Thread()
+    void cards_wrapper::m_RefreshPackageList_Thread()
     {
         m_job_running =true;
-        CClient Cards;
+        cards_client Cards;
         // First pass get all package available
         m_ClearPackagesList();
-		std::set<cards::cache*> AvailablePackages = Cards.getBinaryPackageSet();
+        std::set<cards::cache*> AvailablePackages = Cards.getBinaryPackageSet();
         std::set<std::string> InstalledPackages = Cards.ListOfInstalledPackages();
-		for (auto i : AvailablePackages)
-		{
-			cards::cache* Pack = new cards::cache();
-			if ( i->sets().size()  > 0 )
-				Pack->collection(i->sets());
-			else
-				Pack->collection(i->collection());
-
-			Pack->name(i->name());
-			Pack->description(i->description());
-			Pack->version(i->version());
-			Pack->packager(i->packager());
-            if (InstalledPackages.find(Pack->name()) != InstalledPackages.end())
-				Pack->setStatus(STATUS_ENUM_INSTALLED);
-            m_arrPackages.push_back(Pack);
-            if (m_arrSets.find(Pack->collection()) == m_arrSets.end())
-				m_arrSets.insert(Pack->collection());
-		}
+        for (auto i : AvailablePackages)
+        {
+           cards::cache* Pack = new cards::cache();
+           Pack->collection(i->collection());
+           Pack->name(i->name());
+           Pack->description(i->description());
+           Pack->version(i->version());
+           Pack->packager(i->packager());
+           if (InstalledPackages.find(Pack->name()) != InstalledPackages.end())
+           Pack->setStatus(STATUS_ENUM_INSTALLED);
+           m_arrPackages.push_back(Pack);
+           if (m_arrSets.find(Pack->collection()) == m_arrSets.end())
+             m_arrSets.insert(Pack->collection());
+        }
         m_OnRefreshPackageFinished_Callback(CEH_RC::OK);
         m_job_running =false;
     }
@@ -333,7 +329,7 @@ namespace cards
     ///
 
     /** Broadcast to all suscribers the Sync Finished callback*/
-    void CWrapper::m_OnSyncFinished_Callback(const CEH_RC rc=CEH_RC::OK)
+    void cards_wrapper::m_OnSyncFinished_Callback(const CEH_RC rc=CEH_RC::OK)
     {
         if (rc==OK) refreshPackageList();
         for (auto* it : m_arrEventHandler)
@@ -343,7 +339,7 @@ namespace cards
     }
 
     /** Broadcast to all suscribers the Install Finished callback*/
-    void CWrapper::m_OnDoJobListFinished_Callback(const CEH_RC rc=CEH_RC::OK)
+    void cards_wrapper::m_OnDoJobListFinished_Callback(const CEH_RC rc=CEH_RC::OK)
     {
         for (auto* it : m_arrEventHandler)
         {
@@ -353,7 +349,7 @@ namespace cards
 
 
     /** Broadcast the end of the thread to get list of packages to all event suscribers*/
-    void CWrapper::m_OnRefreshPackageFinished_Callback(const CEH_RC rc=CEH_RC::OK)
+    void cards_wrapper::m_OnRefreshPackageFinished_Callback(const CEH_RC rc=CEH_RC::OK)
     {
         for (auto* it : m_arrEventHandler)
         {
@@ -362,7 +358,7 @@ namespace cards
     }
 
     /** Broadcast the end of the thread ot get list of package to all event suscribers*/
-    void CWrapper::m_OnJobListChanged_Callback(const CEH_RC rc=CEH_RC::OK)
+    void cards_wrapper::m_OnJobListChanged_Callback(const CEH_RC rc=CEH_RC::OK)
     {
         for (auto* it : m_arrEventHandler)
         {
@@ -376,14 +372,14 @@ namespace cards
 
     /** Get and print the libcards Version*/
 
-    std::string CWrapper::getCardsVersion()
+    std::string cards_wrapper::getCardsVersion()
     {
         return std::string(VERSION);
     }
 
     /** Check if the application is curently running as root
       * If it is the case, it return true.*/
-    bool CWrapper::m_checkRootAccess()
+    bool cards_wrapper::m_checkRootAccess()
     {
         if (getuid() != 0)
         {
@@ -393,7 +389,7 @@ namespace cards
     }
 
     /** Ensure the thread instance is free and ready to launch a new task */
-    bool CWrapper::m_IsThreadFree()
+    bool cards_wrapper::m_IsThreadFree()
     {
         if (!m_job_running)
         {
@@ -407,7 +403,7 @@ namespace cards
         return false;
     }
 
-    void CWrapper::m_ClearPackagesList()
+    void cards_wrapper::m_ClearPackagesList()
     {
         for (auto it : m_arrPackages)
         {
@@ -419,13 +415,13 @@ namespace cards
         m_arrPackages.clear();
     }
 
-    bool CWrapper::isJobRunning()
+    bool cards_wrapper::isJobRunning()
     {
         return m_job_running;
     }
 
     /** Broadcast progress info event */
-    void CWrapper::OnProgressInfo(int percent)
+    void cards_wrapper::OnProgressInfo(int percent)
     {
         for (auto* it : m_arrEventHandler)
         {

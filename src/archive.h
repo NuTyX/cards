@@ -41,6 +41,9 @@ public:
 	void printInfo(); // the .INFO file
 	void list(); // list the files to stdio
 
+	std::string getPackageName();
+	std::string getPackageArch();
+	std::vector<std::string> extractFileContent(const char* fileName);
 	unsigned int long size(); // Numbers of files in the archive
 	std::set<std::string> setofFiles(); // return a order set of string
 	std::set<std::string> listofDependencies(); // return an order set of dependencies
@@ -63,9 +66,6 @@ public:
 	time_t buildn(); // return the epoch value
 
 private:
-	std::string getPackageName();
-	std::string getPackageArch();
-	std::vector<std::string> extractFileContent(const char* fileName);
 	void getRunTimeDependencies();
 	void getRunTimeDependenciesEpoch();
 	void getAliasList();

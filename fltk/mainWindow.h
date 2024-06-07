@@ -70,7 +70,7 @@ enum widgetID
  * by libcard operation. This also ensure libcard is quiet to
  * operate like if it was been launched on a terminal.
  */
-class mainWindow : public Fl_Double_Window, public cards::CEventHandler
+class mainWindow : public Fl_Double_Window, public cards::cards_event_handler
 {
 public:
     /**
@@ -96,7 +96,7 @@ protected:
 
 private:
     void SaveConfig();
-    TableBase* m_tablePackages;
+    table_base* m_tablePackages;
     Fl_Input* m_search;
     Fl_Text_Display* m_console;
     Fl_Text_Display* m_info;
@@ -107,9 +107,9 @@ private:
     Fl_Button* m_btnInstall;
     Fl_Button* m_btnRemove;
     Fl_Tabs* m_tabs;
-    cards::CWrapper* m_cards;
+    cards::cards_wrapper* m_cards;
     Fl_Preferences* m_config;
-    cards::CLogger* m_log;
+    cards::cards_logger* m_log;
 };
 
 #endif // MAINWINDOW_H

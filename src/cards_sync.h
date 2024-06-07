@@ -32,15 +32,15 @@
  *
  */
 
-class Cards_sync : public pkgsync {
+class cards_sync : public pkgsync {
 public:
 	/**
 	 * Default constructor without any argument
 	 */
-	Cards_sync();
+	cards_sync();
 
-	Cards_sync (const CardsArgumentParser& argParser);
-	Cards_sync (const CardsArgumentParser& argParser,
+	cards_sync (const CardsArgumentParser& argParser);
+	cards_sync (const CardsArgumentParser& argParser,
 		const std::string& url,
 		const std::string& directory,
 		const std::string& repoFile);

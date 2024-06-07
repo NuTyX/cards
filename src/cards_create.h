@@ -28,13 +28,13 @@
 #include "pkginst.h"
 #include "cards_argument_parser.h"
 
-class Cards_create : public pkginst
+class cards_create : public pkginst
 {
 	public:
-		Cards_create(const CardsArgumentParser& argParser,
+		cards_create(const CardsArgumentParser& argParser,
 			const char *configFileName,
 			const std::vector<std::string>& listOfPackages);
-		Cards_create(const CardsArgumentParser& argParser,
+		cards_create(const CardsArgumentParser& argParser,
 			const char *configFileName,
 			const std::string& packageName);
 		void parseArguments();

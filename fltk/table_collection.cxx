@@ -29,8 +29,8 @@ using namespace cards;
 
 /// Constructor
 
-TableCollection::TableCollection(int x, int y, int w, int h, const char *l)
-    : TableBase(x,y,w,h,l)
+table_collection::table_collection(int x, int y, int w, int h, const char *l)
+    : table_base(x,y,w,h,l)
 {
     type(SELECT_SINGLE);
     colTitle.push_back("");
@@ -40,7 +40,7 @@ TableCollection::TableCollection(int x, int y, int w, int h, const char *l)
 }
 
 /// Refresh Table
-void TableCollection::refresh_table()
+void table_collection::refresh_table()
 {
     clear();
     m_rowdata.clear();
@@ -109,17 +109,17 @@ void TableCollection::refresh_table()
     autowidth(20);
 }
 
-int TableCollection::install_selected()
+int table_collection::install_selected()
 {
     return 0;
 }
 
-int TableCollection::remove_selected()
+int table_collection::remove_selected()
 {
     return 0;
 }
 
-void TableCollection::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
+void table_collection::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
     std::string s = "";
     if ( (R < (int)m_rowdata.size()) && (C < (int)m_rowdata[R].cols.size()) )
@@ -168,7 +168,7 @@ void TableCollection::OnDrawCell(TableContext context, int R, int C, int X, int 
     }
 }
 
-void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
+void table_collection::OnEvent(TableContext context, int pCol, int pRow)
 {
     switch ( context )
     {
@@ -177,7 +177,7 @@ void TableCollection::OnEvent(TableContext context, int pCol, int pRow)
             if ( Fl::event() == FL_RELEASE && Fl::event_button() == 3 )
             {
                 std::string Collection = m_rowdata[pRow].cols[1];
-                CWrapper* Cards = CWrapper::instance();
+                cards_wrapper* Cards = cards_wrapper::instance();
                 std::set<std::string> Collec_List;
                 if (Collection=="LXDE")
                 {

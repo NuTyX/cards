@@ -22,7 +22,7 @@
  */
 
 /**
- * Cards_info class.
+ * cards_info class.
  */
 
 #ifndef CARDS_INFO_H
@@ -40,7 +40,7 @@
  *
  */
 
-class Cards_info: public pkginfo, public pkgrepo
+class cards_info: public pkginfo, public pkgrepo
 {
 	public:
 		/**
@@ -49,7 +49,7 @@ class Cards_info: public pkginfo, public pkgrepo
 		 * \param argParser CardsArgumentParser type
 		 * \param configFileName Specify the configuration file name to use
 		 */
-		Cards_info(const CardsArgumentParser& argParser,const std::string& configFileName);
+		cards_info(const CardsArgumentParser& argParser,const std::string& configFileName);
 			
 	private:
 		const CardsArgumentParser& m_argParser;

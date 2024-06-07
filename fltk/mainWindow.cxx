@@ -31,8 +31,8 @@ mainWindow::mainWindow() :
     Fl_Double_Window(900,900,VERSION)
 {
 /*
- *CLogger is broken
- *    m_log = CLogger::instance();
+ *cards_logger is broken
+ *    m_log = cards_logger::instance();
  *    m_log->subscribe(this);
 */
     icon(new Fl_RGB_Image(new Fl_Pixmap(flcards_xpm)));
@@ -50,9 +50,9 @@ mainWindow::mainWindow() :
 
     //Default Tab size and position
     int TabLeftCoord = MARGIN;
-	int TabWidth = w()-MARGIN*3;
+    int TabWidth = w()-MARGIN*3;
 
-    m_tablePackages = new TablePackage(MARGIN,
+    m_tablePackages = new table_package(MARGIN,
         MARGIN+80,
         TabWidth,
         h()-330,
@@ -72,7 +72,7 @@ mainWindow::mainWindow() :
     m_search->when(FL_WHEN_CHANGED);
     m_search->callback(&onWindowEvent,SEARCH_CHANGE);
 
-    m_cards = CWrapper::instance();
+    m_cards = cards_wrapper::instance();
     m_cards->subscribeToEvents(this);
     //_log->log(_("FlCards use ") + _cards->getCardsVersion());
     this->callback(&onWindowEvent,EVT_EXIT);
@@ -126,7 +126,7 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 		{
 			ProgressBox* box = new ProgressBox(SYNC);
 			box->set_modal();
-			CWrapper::instance()->sync();
+			cards_wrapper::instance()->sync();
 			box->show();
 			while (box->shown())
                 Fl::wait();
@@ -137,7 +137,7 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 		{
 			ProgressBox* box = new ProgressBox(DOJOB);
 			box->set_modal();
-			CWrapper::instance()->doJobList();
+			cards_wrapper::instance()->doJobList();
 			box->show();
 			while (box->shown())
                 Fl::wait();
@@ -150,7 +150,7 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 			{
 				ProgressBox* box = new ProgressBox(DOJOB);
 				box->set_modal();
-				CWrapper::instance()->doJobList();
+				cards_wrapper::instance()->doJobList();
 				 box->show();
 				 while (box->shown())
 					Fl::wait();
@@ -164,7 +164,7 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 			{
 				ProgressBox* box = new ProgressBox(DOJOB);
 				box->set_modal();
-				CWrapper::instance()->doJobList();
+				cards_wrapper::instance()->doJobList();
 				box->show();
 				while (box->shown())
 					Fl::wait();
@@ -181,7 +181,7 @@ void mainWindow::onWindowEvent(Fl_Widget* pWidget, long pID)
 		}
 		case EVT_EXIT:
 		{
-			while (CWrapper::instance()->isJobRunning())
+			while (cards_wrapper::instance()->isJobRunning())
 			{
 				Fl::wait(1);
 			}
@@ -214,7 +214,7 @@ void mainWindow::OnLogMessage(const std::string& pMessage)
 void mainWindow::OnSyncFinished(const CEH_RC rc)
 {
     Fl::lock();
-//    m_log->log( "Sync : " + CEventHandler::getReasonCodeString(rc));
+//    m_log->log( "Sync : " + cards_event_handler::getReasonCodeString(rc));
     if (rc==NO_ROOT)
     {
         fl_alert("Please launch this application with root privileges");

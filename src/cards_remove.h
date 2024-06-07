@@ -22,7 +22,7 @@
  */
 
 /**
- * Cards_remove class.
+ * cards_remove class.
  */
 
 #ifndef CARDS_REMOVE_H
@@ -40,7 +40,7 @@
  */
 
 
-class Cards_remove: public pkgrm
+class cards_remove: public pkgrm
 {
 	public:
 		/**
@@ -50,7 +50,7 @@ class Cards_remove: public pkgrm
 		 * \param argParser CardsArgumentParser type
 		 * \param configFileName Specify the configuration file name to use
 		 */
-		Cards_remove(const std::string& commandName,
+		cards_remove(const std::string& commandName,
 		const CardsArgumentParser& argParser,
 		const char *configFileName);
 

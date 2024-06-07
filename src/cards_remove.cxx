@@ -25,7 +25,7 @@
 #include "cards_remove.h"
 #include "pkgrepo.h"
 
-Cards_remove::Cards_remove(const std::string& commandName,
+cards_remove::cards_remove(const std::string& commandName,
 	const CardsArgumentParser& argParser,
 	const char *configFileName)
 	: pkgrm(commandName),m_argParser(argParser)

@@ -35,13 +35,13 @@
 #include "pixmaps/E17.xpm"
 #include "table_base.h"
 
-/** \class TableCollection
+/** \class table_collection
  * \brief widget to manage cards package list
  *
  * This class list and manage Card operation by adding , remove or upgrade package
  *
  */
-class TableCollection : public TableBase
+class table_collection : public table_base
 {
 public:
     /**
@@ -50,7 +50,7 @@ public:
      * Constructor of Tableau class
      *
      */
-    TableCollection(int x, int y, int w, int h, const char *l=0);
+    table_collection(int x, int y, int w, int h, const char *l=0);
 
     /**
      * \brief Destructor
@@ -58,7 +58,7 @@ public:
      * Destructor of Tableau class
      *
      */
-    virtual ~TableCollection(){}
+    virtual ~table_collection(){}
 
     /**
      * \brief Populate the tab with package installed

@@ -28,8 +28,8 @@
 
 /// Constructor
 
-TablePackage::TablePackage(int x, int y, int w, int h, const char *l)
-    : TableBase(x,y,w,h,l)
+table_package::table_package(int x, int y, int w, int h, const char *l)
+    : table_base(x,y,w,h,l)
 {
     colTitle.push_back("");
     colTitle.push_back("Name");
@@ -41,7 +41,7 @@ TablePackage::TablePackage(int x, int y, int w, int h, const char *l)
 }
 
 /// Refresh Table
-void TablePackage::refresh_table()
+void table_package::refreshTable()
 {
     clear();
     m_rowdata.clear();
@@ -78,7 +78,7 @@ void TablePackage::refresh_table()
     autowidth(50);
 }
 
-int TablePackage::install_selected()
+int table_package::install_selected()
 {
     int cnt=0;
     m_cards->clearJobList();
@@ -100,7 +100,7 @@ int TablePackage::install_selected()
     m_cards->refreshJobList();
     return cnt;
 }
-int TablePackage::remove_selected()
+int table_package::remove_selected()
 {
         int cnt=0;
         m_cards->clearJobList();
@@ -122,7 +122,7 @@ int TablePackage::remove_selected()
         m_cards->refreshJobList();
         return cnt;
 }
-void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
+void table_package::OnDrawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
     std::string s = "";
     if ( (R < (int)m_rowdata.size()) && (C < (int)m_rowdata[R].cols.size()) )
@@ -169,7 +169,7 @@ void TablePackage::OnDrawCell(TableContext context, int R, int C, int X, int Y, 
     }
 }
 
-void TablePackage::OnEvent(TableContext context, int pCol, int pRow)
+void table_package::OnEvent(TableContext context, int pCol, int pRow)
 {
     switch ( context )
     {

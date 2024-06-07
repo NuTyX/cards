@@ -26,9 +26,9 @@
 
 namespace cards
 {
-    CLogger* CLogger::m_ptLogger=nullptr;
+    cards_logger* cards_logger::m_ptLogger=nullptr;
 
-    CLogger::CLogger()
+    cards_logger::cards_logger()
     {
         m_ThreadId = std::this_thread::get_id();
     }
@@ -36,11 +36,11 @@ namespace cards
     ///
     ///
     ///
-    CLogger* CLogger::instance()
+    cards_logger* cards_logger::instance()
     {
         if (m_ptLogger==nullptr)
         {
-            m_ptLogger=new CLogger;
+            m_ptLogger=new cards_logger;
         }
         return m_ptLogger;
     }
@@ -48,7 +48,7 @@ namespace cards
     ///
     ///
     ///
-    void CLogger::kill()
+    void cards_logger::kill()
     {
         if (m_ptLogger!=nullptr)
         {
@@ -60,7 +60,7 @@ namespace cards
     ///
     ///
     ///
-    void CLogger::loopCallback()
+    void cards_logger::loopCallback()
     {
         if (m_ptLogger!=nullptr)
         {
@@ -77,7 +77,7 @@ namespace cards
     ///
     /// Thread Safe Logging Message with Critical Level
     ///
-    void CLogger::log(const std::string& pMessage, CL_DEBUG_LEVEL pLevel)
+    void cards_logger::log(const std::string& pMessage, CL_DEBUG_LEVEL pLevel)
     {
         std::string PostMess;
         switch (pLevel)
@@ -123,7 +123,7 @@ namespace cards
     ///
     ///
     ///
-    void CLogger::subscribe(CEventHandler* pSubscriber)
+    void cards_logger::subscribe(cards_event_handler* pSubscriber)
     {
         if (find(m_ArrSubscribers.begin(), m_ArrSubscribers.end(), pSubscriber)==m_ArrSubscribers.end())
         {
@@ -134,7 +134,7 @@ namespace cards
     ///
     ///
     ///
-    void CLogger::unSubscribe(CEventHandler* pSubscriber)
+    void cards_logger::unSubscribe(cards_event_handler* pSubscriber)
     {
         auto it = find(m_ArrSubscribers.begin(), m_ArrSubscribers.end(), pSubscriber);
         if (it != m_ArrSubscribers.end())
@@ -146,9 +146,9 @@ namespace cards
     ///
     ///
     ///
-    void CLogger::sendToSubscribers(const std::string& pMessage)
+    void cards_logger::sendToSubscribers(const std::string& pMessage)
     {
-        for (CEventHandler* it : m_ArrSubscribers)
+        for (cards_event_handler* it : m_ArrSubscribers)
         {
             it->OnLogMessage(pMessage);
         }

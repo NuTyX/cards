@@ -111,3 +111,7 @@
 #define FC_CACHE_ARGS ""
 
 #define PKG_REPO ".PKGREPO"
+
+#define MAX_BUFFER 50
+#define MARGIN 20
+

@@ -28,7 +28,7 @@
 namespace cards
 {
     /// Convert Reason Code Enum to human readable text
-    const std::string CEventHandler::getReasonCodeString(const CEH_RC rc)
+    const std::string cards_event_handler::getReasonCodeString(const CEH_RC rc)
     {
         switch (rc)
         {

@@ -29,12 +29,9 @@
 #include "mainWindow.h"
 #include "cards_log.h"
 
-using namespace std;
-using namespace cards;
-
 int helpFlag = 0;
 bool isInstaller = false;
-string Theme = "gtk+";
+std::string Theme = "gtk+";
 
 ///
 /// Argument parser for FlCards application in Fltk context
@@ -68,7 +65,7 @@ int arg_parser( int argc, char** argv, int &i )
 ///
 void MainLoop(void*)
 {
-    CLogger::loopCallback();
+    cards::cards_logger::loopCallback();
     Fl::add_timeout(0.2, MainLoop);
 }
 
@@ -114,7 +111,7 @@ int main(int argc, char **argv)
     win.LoadConfig();
     //Start Auto MainLoop
 /*
- * CLogger is broken for the moment
+ * cards_logger is broken for the moment
  */
 //    MainLoop(0);
     return Fl::run();

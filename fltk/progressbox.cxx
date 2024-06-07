@@ -34,7 +34,7 @@ ProgressBox::ProgressBox(CW_ACTIONS action) :
     begin();
     m_jobProgress = nullptr;
     m_fileProgress = nullptr;
-    m_cards = CWrapper::instance();
+    m_cards = cards_wrapper::instance();
     m_cards->subscribeToEvents(this);
     switch (action)
     {

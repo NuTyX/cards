@@ -41,8 +41,6 @@
 #include "pixmaps/download.xpm"
 #include "pixmaps/deleted.xpm"
 
-#define MARGIN 20
-
 // A single row of columns
 class Row
 {
@@ -53,13 +51,13 @@ public:
 };
 
 // Class for handling the sorting column using std::sort
-class SortColumn
+class sort_column
 {
 private:
     int m_col, m_reverse;
 
 public:
-    SortColumn (int col, int reverse);
+    sort_column (int col, int reverse);
     bool operator() (const Row &a, const Row &b);
 };
 
@@ -69,7 +67,7 @@ public:
  * This class list and manage Card operation by adding , remove or upgrade package
  *
  */
-class TableBase : public Fl_Table_Row, public cards::CEventHandler
+class table_base : public Fl_Table_Row, public cards::cards_event_handler
 {
 public:
     /**
@@ -78,7 +76,7 @@ public:
      * Constructor of Tableau class
      *
      */
-    TableBase(int x, int y, int w, int h, const char *l=0);
+    table_base(int x, int y, int w, int h, const char *l=0);
 
     /**
      * \brief Destructor
@@ -86,7 +84,7 @@ public:
      * Destructor of Tableau class
      *
      */
-    virtual ~TableBase(){}
+    virtual ~table_base(){}
 
     /**
      * \brief Populate the tab with package installed
@@ -94,9 +92,9 @@ public:
      * Get installed package from cards and extract a list to be
      * displayed as a list sorted by package name, description, version
      */
-    virtual void refresh_table() = 0; // Load the packages list
+    virtual void refreshTable() = 0; // Load the packages list
     void autowidth(int pad); // Automatically set the columns widths to the longuest string
-    void resize_window();	// Resize the parent window to size of table
+    void resizeWindow();	// Resize the parent window to size of table
     void setFilter(const std::string& pValue);
     int getCntRowSelected();
     virtual int install_selected() = 0; // Install rows selected
@@ -106,10 +104,10 @@ protected:
     std::vector<std::string> colTitle;
 
     // table cell drawing
-    void draw_cell(TableContext context, int R=0, int C=0, int X=0, int Y=0, int W=0, int H=0);
+    void drawCell(TableContext context, int R=0, int C=0, int X=0, int Y=0, int W=0, int H=0);
     // sort the table by a column
-    void sort_column(int col, int reverse=0);
-    void draw_sort_arrow(int X, int Y, int W, int H);
+    void sortColumn(int col, int reverse=0);
+    void drawSortArrow(int X, int Y, int W, int H);
 
     void OnDoJobListFinished (const cards::CEH_RC rc);
     void OnRefreshPackageFinished (const cards::CEH_RC rc);
@@ -126,7 +124,7 @@ protected:
     std::vector<Row> m_rowdata;
     int m_sort_reverse;
     int m_sort_lastcol;
-    cards::CWrapper* m_cards;
+    cards::cards_wrapper* m_cards;
 };
 
 #endif

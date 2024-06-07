@@ -33,7 +33,7 @@
 #include "pkgrepo.h"
 #include "cards_base.h"
 
-Cards_base::Cards_base(const CardsArgumentParser& argParser)
+cards_base::cards_base(const CardsArgumentParser& argParser)
 	: pkgdbh("cards base"), m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
@@ -43,7 +43,7 @@ Cards_base::Cards_base(const CardsArgumentParser& argParser)
 
 	getListOfPackagesNames(m_root); // Get the list of installed packages
 }
-void Cards_base::run(int argc, char** argv)
+void cards_base::run(int argc, char** argv)
 {
 	cards::conf config;
 
@@ -123,7 +123,7 @@ void Cards_base::run(int argc, char** argv)
 		}
 	}
 }
-void Cards_base::printHelp() const
+void cards_base::printHelp() const
 {
 	std::cout << std::endl
 			<< "  You should have one or severall valid directories " << std::endl

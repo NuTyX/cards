@@ -45,14 +45,14 @@ namespace cards
         REFRESH
     };
 
-    /** \class Cards_wrapper
+    /** \class cards_wrapper
      * \brief GUI interfacing wrapper for CARDS
      *
      * This class ensure interface cards with GUI application need non-blocking operation,
      * This is a single instance (singleton) that ensure only one instance of cards library.
      *
      */
-    class  CWrapper : public CClientEvents
+    class  cards_wrapper : public cards_clientEvents
     {
     public:
         /**
@@ -62,7 +62,7 @@ namespace cards
          *
          * \return pointer of the singleton
          */
-    static CWrapper*  instance();
+    static cards_wrapper*  instance();
 
         /**
          * \brief Kill the singleton
@@ -76,14 +76,14 @@ namespace cards
          *
          * Record callback from client class which submit callback from Card lib
          */
-        void subscribeToEvents(CEventHandler* pCallBack);
+        void subscribeToEvents(cards_event_handler* pCallBack);
 
         /**
          * \brief Unsuscribe from CARDS Events
          *
          * Unsuscribe client class callbock form Suscribe list
          */
-        void unsubscribeFromEvents(CEventHandler* pCallBack);
+        void unsubscribeFromEvents(cards_event_handler* pCallBack);
 
         /**
          * \brief list of installed packages
@@ -134,18 +134,18 @@ namespace cards
      * \brief Constructor
      * Private constructor
      */
-        CWrapper();
+        cards_wrapper();
 
     /**
      * \brief Destructor
      * Private destructor
      */
-        ~CWrapper();
+        ~cards_wrapper();
 
-        static	CWrapper*	m_ptCWrapper; //Static pointer of the singleton
+        static	cards_wrapper*	m_ptcards_wrapper; //Static pointer of the singleton
 
         /// Containers
-        std::vector<CEventHandler*> m_arrEventHandler; // Std array to store callback event clients
+        std::vector<cards_event_handler*> m_arrEventHandler; // Std array to store callback event clients
         std::vector<cards::cache*> m_arrPackages;
         std::vector<cards::cache*> m_arrJobList;
         std::set<std::string> m_arrSets;
@@ -157,7 +157,7 @@ namespace cards
         void m_GetPackageInfo_Thread(std::string pName);
 
         /// Utils
-        CLogger* m_log;
+        cards_logger* m_log;
 
         /// CallBack
         void m_OnSyncFinished_Callback(const CEH_RC rc); // Callback broadcast for Sync Cards operation

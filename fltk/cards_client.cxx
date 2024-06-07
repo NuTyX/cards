@@ -27,15 +27,15 @@
 namespace cards
 {
     /// Constructor
-    CClient::CClient()
-        : Pkginst("","/etc/cards.conf")
+    cards_client::cards_client()
+        : pkginst("","/etc/cards.conf")
     {
         m_root="/";
-        m_log = CLogger::instance();
+        m_log = cards_logger::instance();
     }
 
     /// Get a string list of installed packages
-    std::set<std::string> CClient::ListOfInstalledPackages()
+    std::set<std::string> cards_client::ListOfInstalledPackages()
     {
         getListOfPackagesNames (m_root);
         buildCompleteDatabase(true);
@@ -48,7 +48,7 @@ namespace cards
     }
 
     /// Install a package list
-    void CClient::InstallPackages(const std::set<std::string>& pPackageList)
+    void cards_client::InstallPackages(const std::set<std::string>& pPackageList)
     {
         if (pPackageList.size() == 0) return;
         std::string message = _("sudo cards install");
@@ -94,7 +94,7 @@ namespace cards
     }
 
     /// Remove a package list
-    void CClient::RemovePackages(const std::set<std::string>& pPackageList)
+    void cards_client::RemovePackages(const std::set<std::string>& pPackageList)
     {
         if (pPackageList.size() == 0) return;
         std::string message = _("sudo cards remove");
@@ -110,7 +110,7 @@ namespace cards
         // Retrieve info about all the packages
         buildCompleteDatabase(false);
 
-        CClient Cards;
+        cards_client Cards;
         std::set<std::string> basePackagesList;
         cards::conf config(Cards.m_configFileName);
 
@@ -138,7 +138,7 @@ namespace cards
     }
 
     /// Fill m_dependenciesList with LocalPackageList
-    void CClient::getLocalePackagesList()
+    void cards_client::getLocalePackagesList()
     {
         if (m_config.groups().empty()) return;
         std::set<std::string> tmpList;
@@ -165,7 +165,7 @@ namespace cards
         }
     }
 
-    void CClient::progressInfo()
+    void cards_client::progressInfo()
     {
 			int Value=0;
 			static unsigned int j = 0;
@@ -210,23 +210,23 @@ namespace cards
 					break;
 				}
 			}
-			for (CClientEvents* it : m_arrCallback)
+			for (cards_clientEvents* it : m_arrCallback)
 			{
 				it->OnProgressInfo(Value);
 			}
 		}
 
     // Add a nex suscriber to the callback event list
-    void CClient::subscribeToEvents(CClientEvents* pCallBack)
+    void cards_client::subscribeToEvents(cards_clientEvents* pCallBack)
     {
         // Todo : Check if the new susciber is already in the container
         m_arrCallback.push_back(pCallBack);
     }
 
     /// Remove an event suscriber from event callback list
-    void CClient::unsubscribeFromEvents(CClientEvents* pCallBack)
+    void cards_client::unsubscribeFromEvents(cards_clientEvents* pCallBack)
     {
-        std::vector<CClientEvents*>::iterator it;
+        std::vector<cards_clientEvents*>::iterator it;
         it=find(m_arrCallback.begin(),m_arrCallback.end(),pCallBack);
         if (it != m_arrCallback.end())
         {

@@ -31,46 +31,46 @@
 
 namespace cards
 {
-    // Define Cards_wrapper singleton for friendship
-    class CWrapper;
-    class CClient;
+    // Define cards_wrapper singleton for friendship
+    class cards_wrapper;
+    class cards_client;
 
     // Abstract Class to enable events callbacks
-    class CClientEvents
+    class cards_clientEvents
     {
-        friend CClient;
+        friend cards_client;
     protected:
         virtual void OnProgressInfo(int percent){}
     };
 
-    /** \class Cards_client
+    /** \class cards_client
      * \brief Interface Class to access Cards Library Method through inheritence
      *
      * This class ensure interface cards with GUI application need non-blocking operation,
      * This is a single instance (singleton) that ensure only one instance of cards library.
      *
      */
-    class CClient : public Pkginst
+    class cards_client : public pkginst
     {
-        // Only Cards_wrapper can own this class
-        friend CWrapper;
+        // Only cards_wrapper can own this class
+        friend cards_wrapper;
 
     protected:
         /**
          * \brief Constructor
          *
-         * Constructor of Cards_client class
+         * Constructor of cards_client class
          */
-        CClient ();
+        cards_client ();
 
         /**
          * \brief Destructor
          *
-         * Destructor of Cards_client class
+         * Destructor of cards_client class
          *
          * \return pointer of the singleton
          */
-        virtual ~CClient (){};
+        virtual ~cards_client (){};
 
         /**
          * \brief Get list of installed package
@@ -99,22 +99,22 @@ namespace cards
          *
          * Record callback from client class which submit callback from Card lib
          */
-        void subscribeToEvents(CClientEvents* pCallBack);
+        void subscribeToEvents(cards_clientEvents* pCallBack);
 
         /**
          * \brief Unsuscribe from CARDS Events
          *
          * Unsuscribe client class callbock form Suscribe list
          */
-        void unsubscribeFromEvents(CClientEvents* pCallBack);
+        void unsubscribeFromEvents(cards_clientEvents* pCallBack);
 
     protected:
         void progressInfo();
 
     private:
-        CLogger* m_log;
+        cards_logger* m_log;
         void getLocalePackagesList();
-        std::vector<CClientEvents*> m_arrCallback;
+        std::vector<cards_clientEvents*> m_arrCallback;
     };
 }
 #endif // CARDS_WRAPPER_H

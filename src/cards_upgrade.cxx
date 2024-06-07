@@ -21,7 +21,7 @@
 
 #include "cards_upgrade.h"
 
-Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
+cards_upgrade::cards_upgrade(const CardsArgumentParser& argParser,
 	const char *configFileName)
 	: pkginst("cards upgrade",configFileName), m_argParser(argParser)
 {
@@ -117,18 +117,18 @@ Cards_upgrade::Cards_upgrade(const CardsArgumentParser& argParser,
 		}
 	}
 }
-void Cards_upgrade::size()
+void cards_upgrade::size()
 {
 	std::cout << m_ListOfPackages.size() + m_ListOfPackagesToDelete.size() << std::endl;
 }
-void Cards_upgrade::Isuptodate()
+void cards_upgrade::Isuptodate()
 {
 	if ( ( m_ListOfPackages.size() == 0 ) && ( m_ListOfPackagesToDelete.size() == 0 ) )
 		std::cout << "no" << std::endl;
 	else
 		std::cout << "yes" << std::endl;
 }
-int Cards_upgrade::Isdownload()
+int cards_upgrade::Isdownload()
 {
 	std::string packageNameSignature, packageName, packageFileName;
 	for (auto i : m_ListOfPackages) {
@@ -140,7 +140,7 @@ int Cards_upgrade::Isdownload()
 
 return EXIT_SUCCESS;
 }
-void Cards_upgrade::dry()
+void cards_upgrade::dry()
 {
 	if (m_ListOfPackages.size() > 1 )
 				std::cout << _("Packages")
@@ -167,7 +167,7 @@ void Cards_upgrade::dry()
 					<< std::endl;
 
 }
-void Cards_upgrade::upgrade()
+void cards_upgrade::upgrade()
 {
 	for (auto i : m_ListOfPackages) generateDependencies(i);
 
@@ -199,7 +199,7 @@ void Cards_upgrade::upgrade()
 		summary();
 	}
 }
-void Cards_upgrade::summary()
+void cards_upgrade::summary()
 {
 	if (m_ListOfPackages.size() > 1 ) {
 		std::cout << std::endl;

@@ -45,23 +45,23 @@ namespace cards
         EXCEPTION
     };
 
-    // Define Cards_wrapper singleton for friendship
-    class CWrapper;
+    // Define cards_wrapper singleton for friendship
+    class cards_wrapper;
 
-    // Define Cards CLogger singleton for friednship
-    class CLogger;
-    /** \class Cards_event_handler
+    // Define Cards cards_logger singleton for friednship
+    class cards_logger;
+    /** \class cards_event_handler
      * \brief Abstract class to handle event from cards_wrapper
      *
      * This class ensure interface cards with GUI application need non-blocking operation,
      * This is a single instance (singleton) that ensure only one instance of cards library.
      *
      */
-    class CEventHandler
+    class cards_event_handler
     {
         // Wrapper and Logger can access those protected methods
-        friend CWrapper;
-        friend CLogger;
+        friend cards_wrapper;
+        friend cards_logger;
     protected:
 
         virtual void OnLogMessage (const std::string& Message){} //NOP method like

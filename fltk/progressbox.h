@@ -32,7 +32,7 @@
 #include <FL/Fl_Progress.H>
 
 
-class ProgressBox : public Fl_Double_Window, public cards::CEventHandler, public FileDownloadEvent
+class ProgressBox : public Fl_Double_Window, public cards::cards_event_handler, public FileDownloadEvent
 {
 public:
     ProgressBox (cards::CW_ACTIONS action);
@@ -46,7 +46,7 @@ static void Callback(Fl_Widget*,void* pInstance);
 private:
     Fl_Progress* m_jobProgress;
     Fl_Progress* m_fileProgress;
-    cards::CWrapper* m_cards;
+    cards::cards_wrapper* m_cards;
 };
 
 #endif

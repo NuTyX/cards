@@ -28,16 +28,16 @@
 #include "pkginst.h"
 #include "cards_argument_parser.h"
 
-class Cards_install: public pkginst
+class cards_install: public pkginst
 {
 	public:
-		Cards_install(const CardsArgumentParser& argParser,
+		cards_install(const CardsArgumentParser& argParser,
 			const char *configFileName);
 
 		/* To install the dependencies of a package
 		 * created with cards create command
 		 */
-		Cards_install(const CardsArgumentParser& argParser,
+		cards_install(const CardsArgumentParser& argParser,
 			const char *configFileName,
 			const std::vector<std::string>& listOfPackages);
 			

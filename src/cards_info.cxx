@@ -23,7 +23,7 @@
 
 #include "cards_info.h"
 
-Cards_info::Cards_info(const CardsArgumentParser& argParser, const std::string& configFileName)
+cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& configFileName)
 	: pkginfo("cards info"),pkgrepo(configFileName), m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))

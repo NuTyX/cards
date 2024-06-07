@@ -32,12 +32,6 @@
 #include <mutex>
 #include <thread>
 
-
-#ifndef _
-    #define _(T) std::string(T)
-#endif
-#define MAX_BUFFER 50
-
 namespace cards
 {
     enum CL_DEBUG_LEVEL
@@ -48,26 +42,26 @@ namespace cards
         LEVEL_ERROR,
     };
 
-    class CLogger
+    class cards_logger
     {
     private:
-        CLogger();
-        virtual ~CLogger(){}
-        static CLogger* m_ptLogger;
+        cards_logger();
+        virtual ~cards_logger(){}
+        static cards_logger* m_ptLogger;
         std::vector<std::string> m_ArrMessages;
-        std::vector<CEventHandler*> m_ArrSubscribers;
+        std::vector<cards_event_handler*> m_ArrSubscribers;
         std::mutex m_ArrMutex;
         std::thread::id m_ThreadId;
         void sendToSubscribers(const std::string& pMessage);
 
     public:
-        static CLogger* instance();
+        static cards_logger* instance();
         static void kill();
         void log ( const std::string& pMessage,
             CL_DEBUG_LEVEL pLevel=LEVEL_INFO);
         static void loopCallback();
-        void subscribe (CEventHandler* pSubscriber);
-        void unSubscribe (CEventHandler* pSubscriber);
+        void subscribe (cards_event_handler* pSubscriber);
+        void unSubscribe (cards_event_handler* pSubscriber);
     };
 }
 

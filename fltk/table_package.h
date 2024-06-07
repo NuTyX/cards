@@ -29,13 +29,13 @@
 #include "table_base.h"
 
 
-/** \class TablePackage
+/** \class table_package
  * \brief widget to manage cards package list
  *
  * This class list and manage Card operation by adding , remove or upgrade package
  *
  */
-class TablePackage : public TableBase
+class table_package : public table_base
 {
 public:
     /**
@@ -44,7 +44,7 @@ public:
      * Constructor of Tableau class
      *
      */
-    TablePackage(int x, int y, int w, int h, const char *l=0);
+    table_package(int x, int y, int w, int h, const char *l=0);
 
     /**
      * \brief Destructor
@@ -52,7 +52,7 @@ public:
      * Destructor of Tableau class
      *
      */
-    virtual ~TablePackage(){}
+    virtual ~table_package(){}
 
     /**
      * \brief Populate the tab with package installed
@@ -60,7 +60,7 @@ public:
      * Get installed package from cards and extract a list to be
      * displayed as a list sorted by package name, description, version
      */
-    void refresh_table(); // Load the packages list
+    void refreshTable(); // Load the packages list
 
     /**
      *  \brief Mark selected package to be installed

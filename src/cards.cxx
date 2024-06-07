@@ -174,20 +174,20 @@ int main(int argc, char** argv)
 					cardsArgPars.printHelp("base");
 					return EXIT_SUCCESS;
 				}
-				unique_ptr<Cards_base> i(new Cards_base(cardsArgPars));
+				unique_ptr<cards_base> i(new cards_base(cardsArgPars));
 				i->run(argc, argv);
 			}
 			return EXIT_SUCCESS;
 
 			case ArgParser::CMD_FILES:
 			{
-				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+				unique_ptr<cards_info> i(new cards_info(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
 			case ArgParser::CMD_SEARCH:
 			{
-				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+				unique_ptr<cards_info> i(new cards_info(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
@@ -197,52 +197,52 @@ int main(int argc, char** argv)
 				throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
 			}
 			{
-				unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
+				unique_ptr<cards_sync> i(new cards_sync(cardsArgPars));
 				i->run();
 			}
 			return EXIT_SUCCESS;
 
 			case ArgParser::CMD_LIST:
 			{
-				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+				unique_ptr<cards_info> i(new cards_info(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
 			case ArgParser::CMD_QUERY:
 			{
-				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+				unique_ptr<cards_info> i(new cards_info(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
 			case ArgParser::CMD_INFO:
 			{
-				unique_ptr<Cards_info> i(new Cards_info(cardsArgPars,configFile.c_str()));
+				unique_ptr<cards_info> i(new cards_info(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
 
 			case ArgParser::CMD_DIFF:
 			{
-				unique_ptr<Cards_upgrade> i(new Cards_upgrade(cardsArgPars,configFile.c_str()));
+				unique_ptr<cards_upgrade> i(new cards_upgrade(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
 
 			case ArgParser::CMD_INSTALL:
 			{
-				unique_ptr<Cards_install> i(new Cards_install(cardsArgPars,configFile.c_str()));
+				unique_ptr<cards_install> i(new cards_install(cardsArgPars,configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
 			case ArgParser::CMD_REMOVE:
 			{
-				unique_ptr<Cards_remove> i(new Cards_remove("cards remove",cardsArgPars, configFile.c_str()));
+				unique_ptr<cards_remove> i(new cards_remove("cards remove",cardsArgPars, configFile.c_str()));
 			}
 			return EXIT_SUCCESS;
 
 			case ArgParser::CMD_UPGRADE:
 			{
-				unique_ptr<Cards_upgrade> i(new Cards_upgrade(cardsArgPars,configFile.c_str()));
+				unique_ptr<cards_upgrade> i(new cards_upgrade(cardsArgPars,configFile.c_str()));
 				if (cardsArgPars.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
 					return i->Isdownload();
 			}
@@ -250,7 +250,7 @@ int main(int argc, char** argv)
 
 			case ArgParser::CMD_PURGE:
 			{
-				unique_ptr<Cards_sync> i(new Cards_sync(cardsArgPars));
+				unique_ptr<cards_sync> i(new cards_sync(cardsArgPars));
 				i->purge();
 			}
 			return EXIT_SUCCESS;
@@ -265,7 +265,7 @@ int main(int argc, char** argv)
 				}
 				if  ( ! cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
 					// go back to a base system
-					unique_ptr<Cards_base> i(new Cards_base(cardsArgPars));
+					unique_ptr<cards_base> i(new cards_base(cardsArgPars));
 					i->run(argc, argv);
 				}
 				// get the list of the dependencies"
@@ -273,10 +273,10 @@ int main(int argc, char** argv)
 				vector<string> listOfDeps = CD.getDependencies();
 
 				if (!listOfDeps.empty())
-					unique_ptr<Cards_install> i(new Cards_install(cardsArgPars,configFile.c_str(),listOfDeps));
+					unique_ptr<cards_install> i(new cards_install(cardsArgPars,configFile.c_str(),listOfDeps));
 
 				// compilation of the final port"
-				unique_ptr<Cards_create> i(new Cards_create( cardsArgPars,
+				unique_ptr<cards_create> i(new cards_create( cardsArgPars,
 					configFile.c_str(),
 					cardsArgPars.otherArguments()[0]));
 			}
@@ -315,7 +315,7 @@ int main(int argc, char** argv)
 				}
 
 				// create (compile and install) the List of deps (including the final package)
-				unique_ptr<Cards_create> i(new Cards_create(cardsArgPars,
+				unique_ptr<cards_create> i(new cards_create(cardsArgPars,
 					configFile.c_str(),listOfPackages));
 			}
 			return EXIT_SUCCESS;

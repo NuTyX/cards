@@ -26,7 +26,7 @@
 #include "pkginst.h"
 #include "cards_argument_parser.h"
 
-class Cards_upgrade : public pkginst {
+class cards_upgrade : public pkginst {
 private:
 	std::set<std::string>                   m_ListOfPackagesToDelete;
 	std::set<std::pair<std::string,time_t>> m_ListOfPackages;
@@ -34,7 +34,7 @@ private:
 	pkgsync m_pkgSync;
 
 public:
-	Cards_upgrade(const CardsArgumentParser& argParser,
+	cards_upgrade(const CardsArgumentParser& argParser,
 		const char *configFileName);
 	void upgradePackages();
 	// show the packages that should be update without upgrade them

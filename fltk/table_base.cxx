@@ -27,13 +27,13 @@
 
 using namespace cards;
 
-SortColumn::SortColumn (int col, int reverse)
+sort_column::sort_column (int col, int reverse)
 {
     m_col = col;
     m_reverse= reverse;
 }
 
-bool SortColumn::operator() (const Row &a, const Row &b)
+bool sort_column::operator() (const Row &a, const Row &b)
 {
     const char *ap = ( m_col < (int)a.cols.size() ) ? a.cols[m_col].c_str() : "",
     *bp = ( m_col < (int)b.cols.size() ) ? b.cols[m_col].c_str() : "";
@@ -51,7 +51,7 @@ bool SortColumn::operator() (const Row &a, const Row &b)
 
 /// Constructor
 
-TableBase::TableBase(int x, int y, int w, int h, const char *l)
+table_base::table_base(int x, int y, int w, int h, const char *l)
     : Fl_Table_Row(x,y,w,h,l)
 {
     type(SELECT_MULTI);
@@ -70,21 +70,21 @@ TableBase::TableBase(int x, int y, int w, int h, const char *l)
     tooltip("Click on the header of the column to sort it");
     color(FL_WHITE);
     selection_color(FL_YELLOW);
-    m_cards=CWrapper::instance();
+    m_cards=cards_wrapper::instance();
     m_cards->subscribeToEvents(this);
     resizable (this);
 }
 
 /// Sort a column up or down
-void TableBase::sort_column(int col, int reverse)
+void table_base::sortColumn(int col, int reverse)
 {
 	 // FIXME find out why std prefix is not needed here
-    std::sort(m_rowdata.begin(), m_rowdata.end(), SortColumn(col, reverse));
+    std::sort(m_rowdata.begin(), m_rowdata.end(), sort_column(col, reverse));
     redraw();
 }
 
 /// Draw sort arrow
-void TableBase::draw_sort_arrow(int X, int Y, int W, int H)
+void table_base::drawSortArrow(int X, int Y, int W, int H)
 {
     int xlft = X+(W-6)-8;
     int xctr = X+(W-6)-4;
@@ -112,7 +112,7 @@ void TableBase::draw_sort_arrow(int X, int Y, int W, int H)
 }
 
 /// Handle drawing all cells in table
-void TableBase::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
+void table_base::drawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
     switch ( context )
     {
@@ -127,7 +127,7 @@ void TableBase::draw_cell(TableContext context, int R, int C, int X, int Y, int 
                     fl_draw(colTitle[C].c_str(), X+2,Y,W,H, FL_ALIGN_CENTER, 0, 0); // +2=pad left
                     if ( C == m_sort_lastcol )
                     {
-                        draw_sort_arrow(X,Y,W,H);
+                        drawSortArrow(X,Y,W,H);
                     }
                 }
             }
@@ -138,7 +138,7 @@ void TableBase::draw_cell(TableContext context, int R, int C, int X, int Y, int 
 }
 
 /// Automatically set columns widths to the longuest string.
-void TableBase::autowidth(int pad)
+void table_base::autowidth(int pad)
 {
     fl_font(FL_HELVETICA, 17);
     // initialize all column widths to pad value
@@ -200,7 +200,7 @@ void TableBase::autowidth(int pad)
 }
 
 /// Resize parent widows to size of tableau
-void TableBase::resize_window()
+void table_base::resizeWindow()
 {
     // Determine exact outer width of tableau with all columns visible
     int width = 4;	// width of table borders
@@ -211,13 +211,13 @@ void TableBase::resize_window()
 }
 
 /// Callback whenever someone clicks on different parts of the table
-void TableBase::event_callback(Fl_Widget*, void *data)
+void table_base::event_callback(Fl_Widget*, void *data)
 {
     if (data != nullptr)
-        ((TableBase*)data)->event_callback2();
+        ((table_base*)data)->event_callback2();
 }
 
-void TableBase::event_callback2()
+void table_base::event_callback2()
 {
     int COL = callback_col();
     int ROW = callback_row();
@@ -246,33 +246,33 @@ void TableBase::event_callback2()
 }
 
 /// Redefine filter and refresh the tab
-void TableBase::setFilter(const std::string& pValue)
+void table_base::setFilter(const std::string& pValue)
 {
     m_filter=pValue;
-    refresh_table();
+    refreshTable();
 }
 
 /// Callback
 
-void TableBase::OnJobListChange(const CEH_RC rc)
+void table_base::OnJobListChange(const CEH_RC rc)
 {
-    refresh_table();
+    refreshTable();
     redraw();
 }
 
-void TableBase::OnRefreshPackageFinished (const CEH_RC rc)
+void table_base::OnRefreshPackageFinished (const CEH_RC rc)
 {
     Fl::lock();
-    if (rc == CEH_RC::OK) refresh_table();
+    if (rc == CEH_RC::OK) refreshTable();
     Fl::unlock();
 }
 
-void TableBase::OnDoJobListFinished(const CEH_RC rc)
+void table_base::OnDoJobListFinished(const CEH_RC rc)
 {
     redraw();
 }
 
-int TableBase::getCntRowSelected()
+int table_base::getCntRowSelected()
 {
     int cnt=0;
     for (int i=0; i< rows(); i++)
