@@ -55,6 +55,7 @@ CARDSOBJECTS =	conf.o \
 		lock.o \
 		db.o \
 		cache.o \
+		pkgfile.o \
 		pkgrepo.o \
 		file_download.o \
 		repodwl.o \
@@ -89,6 +90,7 @@ LIBOBJECTS =  conf.o \
 	vector.o \
 	string_utils.o \
 	archive.o \
+	pkgfile.o \
 	pkgrepo.o \
 	repodwl.o \
 	file_download.o \
@@ -135,6 +137,7 @@ HEADERS = define.h \
 	lock.h \
 	db.h  \
 	cache.h \
+	pkgfile.h \
 	pkgrepo.h \
 	repodwl.h \
 	file_download.h \
