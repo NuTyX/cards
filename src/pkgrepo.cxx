@@ -58,7 +58,7 @@ void pkgrepo::parseCollectionPkgRepoFile()
 		PortsDirectory portsDirectory;
 		portsDirectory.dir = i.dir;
 		portsDirectory.url = i.url;
-		std::string collectionPkgRepoFile = i.dir + "/PKG_REPO" ;
+		std::string collectionPkgRepoFile = i.dir + PKG_REPO ;
 		if ( ! checkFileExist(collectionPkgRepoFile)) {
 			if ( i.url.size() > 0 ) {
 				std::cout << "You should use " << YELLOW << "cards sync" << NORMAL << " for " << i.dir << std::endl;
@@ -269,7 +269,7 @@ void pkgrepo::parsePackagePkgRepoFile(const std::string& pkgRepoFile)
 std::vector<PortFilesList> pkgrepo::getCurrentPackagePkgRepoFile(const std::string& portName)
 {
 	if (checkPortExist(portName))
-		parsePackagePkgRepoFile(portName + "/PKG_REPO");
+		parsePackagePkgRepoFile(portName + PKG_REPO);
 
 	return m_portFilesList;
 }
@@ -299,7 +299,7 @@ void pkgrepo::parsePackagePkgfileFile()
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
 			cards::cache* Pkg = new cards::cache();
-			std::string pkgFile = i.dir + "/" + j.basePackageName  + "/PKG_RECEPT";
+			std::string pkgFile = i.dir + "/" + j.basePackageName  + PKG_RECEPT;
 			if ( ! checkFileExist (pkgFile) ) {
 				Pkg->name("");
 				continue;
@@ -600,13 +600,13 @@ std::string pkgrepo::getPortDir (const std::string& portName)
 		for (auto j : i.basePackageList) {
 			if ( j.basePackageName == portName ) {
 				portDir = i.dir + "/" + j.basePackageName;
-				if (checkFileExist(portDir + "/PKG_RECEPT")) {
+				if (checkFileExist(portDir + PKG_RECEPT)) {
 					found = true;
 					break;
 				}
 				portDir = basename(const_cast<char*>(i.dir.c_str()));
 				portDir += "/" + j.basePackageName;
-				if (checkFileExist(portDir + "/PKG_RECEPT")) {
+				if (checkFileExist(portDir + PKG_RECEPT)) {
 					found = true;
 					break;
 				}

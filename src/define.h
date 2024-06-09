@@ -48,7 +48,8 @@
 
 #define PKG_FILES "/files"
 #define PKG_META "META"
-#define PKG_RECEPT "Pkgfile"
+#define PKG_RECEPT "/Pkgfile"
+#define PKG_REPO "/.PKGREPO"
 #define PKG_README "README"
 #define PKG_PRE_INSTALL ".PRE"
 #define PKG_POST_INSTALL ".POST"
@@ -109,8 +110,6 @@
 // /usr/bin/fc-cache /usr/share/fonts/<dir>/
 #define FC_CACHE "usr/bin/fc-cache"
 #define FC_CACHE_ARGS ""
-
-#define PKG_REPO ".PKGREPO"
 
 #define MAX_BUFFER 50
 #define MARGIN 20

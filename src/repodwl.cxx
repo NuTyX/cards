@@ -35,19 +35,19 @@ void repodwl::downloadPortsPkgRepo(const std::string& packageName)
 			if ( basePackageInfo.basePackageName == packageName ) {
 				/**
 				 *
-				 * We should check if the PKGREPO of the port is available
-				 * .PKGREPO file is /var/lib/pkg/depot/cli/alsa-lib/.PKGREPO
+				 * We should check if the" + PKG_REPO of the port is available
+				 * " + PKG_REPO file is /var/lib/pkg/depot/cli/alsa-lib/" + PKG_REPO
 				 *
 				 */
 				if ( portsDirectory.url.size() > 0 ) {
 					downloadFile.url = portsDirectory.url
 						+ "/"
 						+ basePackageInfo.basePackageName
-						+ "/.PKGREPO";
+						+ PKG_REPO;
 					downloadFile.dirname = portsDirectory.dir
 						+ "/"
 						+ basePackageInfo.basePackageName;
-					downloadFile.filename = "/.PKGREPO";
+					downloadFile.filename = PKG_REPO;
 					downloadFile.md5sum = basePackageInfo.md5SUM;
 					downloadFilesList.push_back(downloadFile);
 #ifndef NDEBUG
@@ -83,9 +83,9 @@ void repodwl::downloadPackageFileName(const std::string& packageName)
 #ifndef NDEBUG
 				std::cerr << packageName << std::endl;
 #endif
-				if ( ! checkFileExist (portsDirectory.dir + "/" + basePackageInfo.basePackageName + "/.PKGREPO"))
+				if ( ! checkFileExist (portsDirectory.dir + "/" + basePackageInfo.basePackageName + PKG_REPO))
 					downloadPortsPkgRepo(basePackageInfo.basePackageName);
-				parsePackagePkgRepoFile(portsDirectory.dir + "/" + basePackageInfo.basePackageName + "/.PKGREPO");
+				parsePackagePkgRepoFile(portsDirectory.dir + "/" + basePackageInfo.basePackageName + PKG_REPO);
 
 				for ( auto portFilesList : m_portFilesList) {
 					if (portFilesList.name == packageName) {
@@ -151,13 +151,13 @@ bool repodwl::checkBinaryExist(const std::string& packageName)
 				<<  std::endl;
 #endif
 			if ( basePackageInfo.basePackageName == basePackageName ) {
-				if ( ! checkFileExist ( portsDirectory.dir + "/" + basePackageInfo.basePackageName + "/.PKGREPO")) {
+				if ( ! checkFileExist ( portsDirectory.dir + "/" + basePackageInfo.basePackageName + PKG_REPO)) {
 					downloadPortsPkgRepo(basePackageInfo.basePackageName);
 				}
 				std::string pkgRepoFile= portsDirectory.dir
 					+ "/"
 					+ basePackageInfo.basePackageName
-					+ "/.PKGREPO";
+					+ PKG_REPO;
 				std::string pkgReporMD5sum = basePackageInfo.md5SUM;
 				if ( ! checkMD5sum( pkgRepoFile.c_str(), pkgReporMD5sum.c_str())) {
 					downloadPortsPkgRepo(basePackageInfo.basePackageName);
