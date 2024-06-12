@@ -12,7 +12,7 @@ class Pkg_inst : public pkgdbh
 Pkg_inst::Pkg_inst()
 	: pkgdbh("")
 {
-	m_root="/mnt/hd/";
+	m_root="/";
 	getListOfPackagesNames("");
 	buildCompleteDatabase(true);
 }

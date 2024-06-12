@@ -14,6 +14,7 @@ pkgmk2
 pkgadd
 pkgrm
 pkginfo
+Pkgfile
 a.out
 *.gch
 ChangeLog
