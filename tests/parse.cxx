@@ -1,6 +1,5 @@
 #include <string>
 #include <cstring>
-#include <vector>
 
 int main() {
 

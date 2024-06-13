@@ -34,4 +34,12 @@ void db::dependency(bool dependency)
 {
 	m_dependency = dependency;
 }
+void db::dependencies(std::set<std::pair<std::string,time_t>> dependencies)
+{
+	m_dependencies=dependencies;
+}
+std::set<std::pair<std::string,time_t>> db::dependencies()
+{
+	return m_dependencies;
+}
 } // end of cards namespace

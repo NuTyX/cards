@@ -153,13 +153,5 @@ time_t pkg::build()
 {
 	return m_build;
 }
-void pkg::dependencies(std::set<std::pair<std::string,time_t>> dependencies)
-{
-	m_dependencies=dependencies;
-}
-std::set<std::pair<std::string,time_t>> pkg::dependencies()
-{
-	return m_dependencies;
-}
 
 } // end of cards namespace 

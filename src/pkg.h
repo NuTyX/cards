@@ -15,7 +15,6 @@ public:
 	std::string maintainer();
 	std::string packager();
 	std::string contributors();
-	std::set<std::pair<std::string,time_t>> dependencies();
 
 	const std::string version();
 	unsigned short int release();
@@ -37,7 +36,6 @@ public:
 	void maintainer(const std::string& maintainer);
 	void packager(const std::string& packager);
 	void contributors(const std::string& contributors);
-	void dependencies(const std::set<std::pair<std::string,time_t>> dependencies);
 
 	void version(const std::string& version);
 	void release(unsigned short int release);
@@ -68,7 +66,6 @@ private:
 	std::set<std::string> m_alias;
 	std::set<std::string> m_sets;
 	std::set<std::string> m_categories;
-	std::set<std::pair<std::string,time_t>> m_dependencies;
 
 	std::string m_group;
 	std::string m_collection;

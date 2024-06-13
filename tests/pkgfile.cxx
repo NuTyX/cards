@@ -2,11 +2,6 @@
 
 int main () {
     cards::pkgfile Repository("cards.conf");
-    for (auto i : Repository.getListOfPackagesNames())
-        std::cout << i.dir
-            << "/"
-            << i.name
-            << std::endl;
     for (auto i : Repository.getListOfPackages())
         std::cout << i.first
             << " "
