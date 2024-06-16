@@ -20,6 +20,7 @@ void pkgfile::parsePackagePkgfileFile()
         return;
     cards::conf m_config(m_configFileName);
     cards::port info;
+    bool found;
     for (auto i : m_config.dirUrl()) {
         DIR* d;
         struct dirent* dir;
@@ -44,8 +45,12 @@ void pkgfile::parsePackagePkgfileFile()
                     m_listOfPackages[portName] = info;
                     continue;
                 }
+                std::string::size_type pos;
+                std::string s;
                 for (auto p : pkgFileContent) {
                     std::string line = stripWhiteSpace(p);
+                    if (line[0] == '#')
+                        continue;
                     if (line.substr(0, 12) == "description=")
                         info.description(stripWhiteSpace(getValueBefore(getValue(line, '='), '#')));
                     else if (line.substr(0, 4) == "url=")
@@ -60,8 +65,27 @@ void pkgfile::parsePackagePkgfileFile()
                         info.contributors(stripWhiteSpace(getValueBefore(getValue(line, '='), '#')));
                     else if (line.substr(0, 11) == "maintainer=")
                         info.maintainer(stripWhiteSpace(getValueBefore(getValue(line, '='), '#')));
-                    m_listOfPackages[portName] = info;
+                    else if (line.substr(0,13) == "makedepends=(") {
+                        s += line.substr(13);
+                        found = true;
+                        pos = s.find(')');
+                        if (pos != std::string::npos) {
+                           s = s.substr(0,pos);
+                           found = false;
+                        }
+                        continue;
+                    }
+                    if (found) {
+                        pos = line.find(')');
+                        if (pos != std::string::npos) {
+                            s += line.substr(0,pos);
+                            found = false;
+                        } else
+                            s = s + " " + line;
+                    }
                 }
+                info.dependencies(parseDelimitedSetList(s," "));
+                m_listOfPackages[portName] = info;
             }
         }
     }
