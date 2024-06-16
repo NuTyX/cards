@@ -65,23 +65,36 @@ void pkgfile::parsePackagePkgfileFile()
                         info.contributors(stripWhiteSpace(getValueBefore(getValue(line, '='), '#')));
                     else if (line.substr(0, 11) == "maintainer=")
                         info.maintainer(stripWhiteSpace(getValueBefore(getValue(line, '='), '#')));
-                    else if (line.substr(0,13) == "makedepends=(") {
+                    else if (line.substr(0, 13) == "makedepends=(") {
                         s += line.substr(13);
                         found = true;
                         pos = s.find(')');
                         if (pos != std::string::npos) {
-                           s = s.substr(0,pos);
+                           s[pos] = ' ';
                            found = false;
-                        }
+                        } else
+                            s = s + " ";
+                        continue;
+                    }
+                    else if (line.substr(0, 5) == "run=(") {
+                        s += line.substr(5);
+                        found = true;
+                        pos = s.find(')');
+                        if (pos != std::string::npos) {
+                           s[pos] = ' ';
+                           found = false;
+                        } else
+                            s = s + " ";
                         continue;
                     }
                     if (found) {
                         pos = line.find(')');
                         if (pos != std::string::npos) {
                             s += line.substr(0,pos);
+                            s = s + " ";
                             found = false;
                         } else
-                            s = s + " " + line;
+                            s = s + line + " ";
                     }
                 }
                 info.dependencies(parseDelimitedSetList(s," "));
@@ -95,6 +108,17 @@ ports_t pkgfile::getListOfPackages()
     if (m_listOfPackages.size() == 0)
         parsePackagePkgfileFile();
     return m_listOfPackages;
+}
+std::set<std::string> pkgfile::getDependencies(const std::string& portName)
+{
+    std::set<std::string> deps;
+    if (m_listOfPackages.size() == 0)
+        parsePackagePkgfileFile();
+
+    if (checkPortExist(portName))
+        return m_listOfPackages[portName].dependencies();
+
+    return deps;
 }
 bool pkgfile::checkPortExist(const std::string& portName)
 {

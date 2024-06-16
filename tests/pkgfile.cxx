@@ -14,13 +14,17 @@ int main () {
             << i.second.collection()
             << std::endl;
 
-    if (Repository.checkPortExist("gcc")){
+    if (Repository.checkPortExist("libreoffice")){
         
-        std::cout << "gcc exist: "
-            << Repository.getPortVersion("gcc")
+        std::cout << "libreoffice exist: "
+            << Repository.getPortVersion("libreoffice")
             << "-"
-            << Repository.getPortRelease("gcc")
+            << Repository.getPortRelease("libreoffice")
             << std::endl;
+        for (auto i : Repository.getDependencies("libreoffice") )
+            std::cout << i
+                << " ";
+        std::cout << std::endl;
     }
     return 0;
 }

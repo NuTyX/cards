@@ -33,6 +33,12 @@ public:
     virtual ~pkgfile() { }
 
     /**
+     * return the set of dependencies of the port name
+     *
+     */
+     std::set<std::string> getDependencies(const std::string& portName);
+
+    /**
      * return the version of the port name
      *
      */
