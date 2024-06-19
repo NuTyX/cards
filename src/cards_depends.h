@@ -40,12 +40,12 @@ struct LevelName {
 	std::string name;
 };
 
-class CardsDepends: public pkgdbh
+class cards_depends: public pkgdbh
 {
 public:
 
-	CardsDepends (const CardsArgumentParser& argParser);
-	~CardsDepends ();
+	cards_depends (const CardsArgumentParser& argParser);
+	~cards_depends ();
 
 	void parseArguments();
 

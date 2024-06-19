@@ -269,7 +269,7 @@ int main(int argc, char** argv)
 					i->run(argc, argv);
 				}
 				// get the list of the dependencies"
-				CardsDepends CD(cardsArgPars);
+				cards_depends CD(cardsArgPars);
 				vector<string> listOfDeps = CD.getDependencies();
 
 				if (!listOfDeps.empty())
@@ -284,20 +284,20 @@ int main(int argc, char** argv)
 
 			case ArgParser::CMD_LEVEL:
 			{
-				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+				unique_ptr<cards_depends> i(new cards_depends(cardsArgPars));
 				i->showLevel();
 			}
 			return EXIT_SUCCESS;
 			case ArgParser::CMD_DEPENDS:
 			{
-				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+				unique_ptr<cards_depends> i(new cards_depends(cardsArgPars));
 				i->showDependencies();
 			}
 			return EXIT_SUCCESS;
 
 			case ArgParser::CMD_DEPTREE:
 			{
-				unique_ptr<CardsDepends> i(new CardsDepends(cardsArgPars));
+				unique_ptr<cards_depends> i(new cards_depends(cardsArgPars));
 				return i->deptree();
 			}
 			return EXIT_SUCCESS;
@@ -305,7 +305,7 @@ int main(int argc, char** argv)
 			case ArgParser::CMD_DEPCREATE:
 			{
 				// get the list of the dependencies
-				CardsDepends CD(cardsArgPars);
+				cards_depends CD(cardsArgPars);
 				vector<string> listOfPackages = CD.getNeededDependencies();
 				if ( listOfPackages.empty() ) {
 					cout << _("The package ")

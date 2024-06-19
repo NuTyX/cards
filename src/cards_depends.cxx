@@ -30,7 +30,7 @@
 #include "pkgrepo.h"
 
 
-CardsDepends::CardsDepends (const CardsArgumentParser& argParser)
+cards_depends::cards_depends (const CardsArgumentParser& argParser)
 	: pkgdbh(""),
 		m_argParser(argParser)
 {
@@ -40,7 +40,7 @@ CardsDepends::CardsDepends (const CardsArgumentParser& argParser)
 
 	parseArguments();
 }
-CardsDepends::~CardsDepends ()
+cards_depends::~cards_depends ()
 {
 	for (auto i: m_levelList) {
 		if (i != nullptr) {
@@ -52,7 +52,7 @@ CardsDepends::~CardsDepends ()
 	freePkgInfo(package);
 	freePkgList(packagesList);
 }
-void CardsDepends::parseArguments()
+void cards_depends::parseArguments()
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
@@ -61,7 +61,7 @@ void CardsDepends::parseArguments()
 	else
 		m_root=m_root+"/";
 }
-depList * CardsDepends::readDependenciesList(itemList *m_filesList, unsigned int nameIndex)
+depList * cards_depends::readDependenciesList(itemList *m_filesList, unsigned int nameIndex)
 {
 	if ( nameIndex > m_filesList->count  ) {
 		return NULL;
@@ -136,7 +136,7 @@ depList * CardsDepends::readDependenciesList(itemList *m_filesList, unsigned int
 	freeItemList(nameDeps);
 	return dependancesList;
 }
-std::vector<LevelName*>& CardsDepends::getLevel()
+std::vector<LevelName*>& cards_depends::getLevel()
 {
 	if ( level() !=0 )
 	{
@@ -150,7 +150,7 @@ std::vector<LevelName*>& CardsDepends::getLevel()
 #endif
 	return m_levelList;
 }
-std::vector<std::string>& CardsDepends::getNeededDependencies()
+std::vector<std::string>& cards_depends::getNeededDependencies()
 {
 	m_packageName = m_argParser.otherArguments()[0].c_str();
 
@@ -176,7 +176,7 @@ std::vector<std::string>& CardsDepends::getNeededDependencies()
 #endif
 	return m_neededDependenciesList;
 }
-std::vector<std::string>& CardsDepends::getDependencies()
+std::vector<std::string>& cards_depends::getDependencies()
 {
 	m_packageName=m_argParser.otherArguments()[0].c_str();
 	depends();
@@ -185,7 +185,7 @@ std::vector<std::string>& CardsDepends::getDependencies()
 #endif
 	return m_dependenciesList;
 }
-void CardsDepends::showDependencies()
+void cards_depends::showDependencies()
 {
 	m_packageName = m_argParser.otherArguments()[0].c_str();
 	if (m_argParser.isSet(CardsArgumentParser::OPT_INSTALLED)) {
@@ -201,7 +201,7 @@ void CardsDepends::showDependencies()
 	}
 }
 
-void CardsDepends::showLevel()
+void cards_depends::showLevel()
 {
 	if ( level() != 0 )
 	{
@@ -214,7 +214,7 @@ void CardsDepends::showLevel()
 		for ( auto i : m_missingDepsList ) std::cout << i << std::endl;
 	}
 }
-void CardsDepends::treatErrors(cards::ErrorEnum action, const std::string& s) const
+void cards_depends::treatErrors(cards::ErrorEnum action, const std::string& s) const
 {
 	switch ( action )
 	{
@@ -270,7 +270,7 @@ void CardsDepends::treatErrors(cards::ErrorEnum action, const std::string& s) co
 			break;
 	}
 }
-int CardsDepends::level()
+int cards_depends::level()
 {
 	cards::conf config;
 
@@ -334,7 +334,7 @@ int CardsDepends::level()
 #endif
 	return 0;
 }
-int CardsDepends::depends()
+int cards_depends::depends()
 {
 	cards::conf config;
 
@@ -410,7 +410,7 @@ int CardsDepends::depends()
 
 	return 0;
 }
-int CardsDepends::deptree()
+int cards_depends::deptree()
 {
 	m_packageName = m_argParser.otherArguments()[0].c_str();
 	depList* dependenciesList = NULL;
