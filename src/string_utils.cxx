@@ -39,9 +39,9 @@ void *Malloc(size_t s)
 itemList *initItemList(void)
 {
 	itemList *list = (itemList*)Malloc(sizeof *list);
-	list->items = (char **)Malloc(sizeof (*list->items));
-	list->count = 1;
-	list->capacity = 1;
+	list->count = 0;
+	list->capacity = 8;
+	list->items = (char **)Malloc(sizeof *list->items * list->capacity);
 	return list;
 }
 
@@ -55,7 +55,7 @@ void addItemToItemList(itemList *list, const char *item)
 			return;
 		}
 	}
-	list->items[ list->count - 1 ] = strdup(item);
+	list->items[ list->count ] = strdup(item);
 	++list->count;
 }
 
