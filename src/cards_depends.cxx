@@ -73,6 +73,8 @@ depList * CardsDepends::readDependenciesList(itemList *m_filesList, unsigned int
 	itemList *nameDeps = initItemList();
 	std::string missingDep = "";
 	sprintf(fullPathfileName,"%s/Pkgfile",m_filesList->items[nameIndex]);
+	if ( m_filesList->items[nameIndex] == NULL)
+					return NULL;
 	if ( ! checkFileExist(fullPathfileName) ) {
 		treatErrors(cards::ERROR_ENUM_CANNOT_READ_FILE,fullPathfileName);
 	}
@@ -97,6 +99,11 @@ depList * CardsDepends::readDependenciesList(itemList *m_filesList, unsigned int
 		replaceAll( depends, ",,", "," );
 		split( depends, ',', deps, 0,true);
 	}
+#ifndef NDEBUG
+	for (auto i: deps)
+					std::cerr << i << ",";
+	std::cerr << std::endl;
+#endif
 	if ( deps.size() >0 ) {
 		bool found=false;
 		unsigned j = 0;
