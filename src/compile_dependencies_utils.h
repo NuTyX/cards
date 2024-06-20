@@ -42,28 +42,28 @@
 #include <dirent.h>
 
 /* depList is a dependances List */
-typedef struct
+struct depList
 {
 	unsigned int* depsIndex;
 	int* level; /* To show a nice incrementation */
 	unsigned int count;
 	unsigned int decrement; /* number of removed dep when searching them */
 	int decount;
-} depList;
+};
 
 /* pkgInfo is the nameindex of a package and the dependencies itemList */
-typedef struct
+struct pkgInfo
 {
 	unsigned int nameIndex;
 	depList* dependences;
 	int level;
-} pkgInfo;
+};
 
-typedef struct
+struct pkgList
 {
 	pkgInfo** pkgs;
 	unsigned int count;
-} pkgList;
+};
 
 
 /*

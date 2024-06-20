@@ -51,7 +51,7 @@ void addItemToItemList(itemList *list, const char *item)
 		list->capacity = list->count * 2;
 		list->items = (char **)realloc( list->items, sizeof *list->items * list->capacity );
 		if ( list->items == NULL ) {
-			printf("Cannot reallocate realloc_tmp: %d", &list->items);
+			printf("Cannot reallocate: %d", &list->items);
 			return;
 		}
 	}

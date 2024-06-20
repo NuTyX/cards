@@ -26,9 +26,9 @@ depList* initDepsList(void)
 	depList* list;
 	list = (depList*)Malloc(sizeof *list );
 	list->depsIndex = (unsigned int*)Malloc(sizeof (*list->depsIndex ));
-	list->level = (int*)Malloc(sizeof (*list->level));
-	list->count = 0;
-	list->decount = 0;
+	list->level     = (int*)Malloc(sizeof (*list->level));
+	list->count     = 0;
+	list->decount   = 0;
 	list->decrement = 0;
 	return list;
 }
@@ -36,20 +36,22 @@ depList* initDepsList(void)
 /* Add a reference to PackagesList index and the level of deps to the Dependencies List */
 void addDepToDepList(depList *list, unsigned int nameIndex, int level)
 {
-	 unsigned int*  realloc_tmp;
 
-	realloc_tmp = (unsigned int*)realloc(list->depsIndex,
+	list->depsIndex = (unsigned int*)realloc(list->depsIndex,
 		sizeof (*list->depsIndex ) * (list->count+1));
-	if (realloc_tmp == NULL) {
-		fprintf(stderr,"Failed to realloc %s\n","pkgs");
+	if (list->depsIndex == NULL) {
+		fprintf(stderr,"Failed to realloc %d\n",&list->depsIndex);
 		exit(EXIT_FAILURE);
 	}
-	list->depsIndex = realloc_tmp;
 	list->depsIndex[list->count] = nameIndex;
 
-	int*	realloc_tmp2 = (int*)realloc(list->level,
+	list->level = (int*)realloc(list->level,
 		sizeof (*list->level ) * (list->count+1));
-	list->level = realloc_tmp2;
+	if (list->level == NULL) {
+		fprintf(stderr,"Failed to realloc %d\n",&list->level);
+		exit(EXIT_FAILURE);
+	}
+
 	list->level[list->count] = level;
 	++list->count;
 	list->decount = list->count;
@@ -77,7 +79,7 @@ pkgInfo* initPkgInfo(void)
 	pkgInfo *package;
 	package = (pkgInfo*)Malloc(sizeof *package);
 	package->nameIndex = 0;
-	package->level = 0;
+	package->level     = 0;
 	package->dependences = initDepsList();
 
 	return package;
@@ -113,18 +115,15 @@ pkgList* initPkgList(void)
 
 void addPkgToPkgList(pkgList *list, pkgInfo *package)
 {
-	pkgInfo** realloc_tmp;
-
-	realloc_tmp = (pkgInfo**)realloc(list->pkgs,
+	list->pkgs = (pkgInfo**)realloc(list->pkgs,
 		sizeof *list->pkgs * (list->count+1));
 
-	if (realloc_tmp == NULL) {
-		fprintf(stderr,"Failed to realloc %s\n","pkgs");
+	if (list->pkgs == NULL) {
+		fprintf(stderr,"Failed to realloc %d\n",&list->pkgs);
 		exit(EXIT_FAILURE);
 	}
-	list->pkgs = realloc_tmp;
-	list->pkgs[list->count] = package;
 
+	list->pkgs[list->count] = package;
 	++list->count;
 }
 
