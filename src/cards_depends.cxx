@@ -42,12 +42,6 @@ cards_depends::cards_depends (const CardsArgumentParser& argParser)
 }
 cards_depends::~cards_depends ()
 {
-	for (auto i: m_levelList) {
-		if (i != nullptr) {
-			delete i;
-			i=nullptr;
-		}
-	}
 	freeItemList(m_filesList);
 	freePkgInfo(package);
 	freePkgList(packagesList);
@@ -136,7 +130,7 @@ depList * cards_depends::readDependenciesList(itemList *m_filesList, unsigned in
 	freeItemList(nameDeps);
 	return dependancesList;
 }
-std::vector<LevelName*>& cards_depends::getLevel()
+std::vector<LevelName> cards_depends::getLevel()
 {
 	if ( level() !=0 )
 	{
@@ -209,7 +203,7 @@ void cards_depends::showLevel()
 	}
 
 	if ( (m_missingDepsList.size() == 0 ) || ( m_argParser.isSet(CardsArgumentParser::OPT_IGNORE))) {
-		for ( auto i : m_levelList) std::cout << i->l << ": " << i->name << std::endl;
+		for ( auto i : m_levelList) std::cout << i.l << ": " << i.name << std::endl;
 	} else {
 		for ( auto i : m_missingDepsList ) std::cout << i << std::endl;
 	}
@@ -321,9 +315,9 @@ int cards_depends::level()
 #endif
 
 			if ( packagesList -> pkgs[nameIndex]->level == currentLevel ) {
-				LevelName* LN = new LevelName();
-				LN->l = currentLevel;
-				LN->name = m_filesList->items[nameIndex];
+				LevelName LN;
+				LN.l = currentLevel;
+				LN.name = m_filesList->items[nameIndex];
 				m_levelList.push_back(LN);
 			}
 		}
