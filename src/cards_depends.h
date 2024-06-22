@@ -48,15 +48,14 @@ public:
 	~cards_depends ();
 
 	void parseArguments();
+	void level();
 
 	virtual void treatErrors(cards::ErrorEnum action, const std::string& s) const;
 
 	void showDependencies();
-	void showLevel();
 
 	std::vector<std::string>& getDependencies();
 	std::vector<std::string>& getNeededDependencies();
-	std::vector<LevelName> getLevel();
 
 	int deptree();
 
@@ -69,19 +68,21 @@ private:
 	*/
 	depList* readDependenciesList(itemList *filesList, unsigned int nameIndex);
 
+	void checkConfig();
 	int depends();
-	int level();
 
 	std::vector<std::string> m_dependenciesList;
 	std::vector<std::string> m_neededDependenciesList;
-	std::vector<LevelName> m_levelList;
-	std::set<std::string> m_missingDepsList;
+	std::vector<LevelName>   m_levelList;
+	std::set<std::string>    m_missingDepsList;
 
 	const CardsArgumentParser& m_argParser;
 	const char* m_packageName;
+	char* m_longPackageName;
 
-	pkgInfo*  package;
-	pkgList*  packagesList;
+	cards::conf m_config;
+	pkgInfo*  m_package;
+	pkgList*  m_packagesList;
 	itemList* m_filesList;
 };
 #endif

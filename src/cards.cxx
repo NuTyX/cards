@@ -285,7 +285,7 @@ int main(int argc, char** argv)
 			case ArgParser::CMD_LEVEL:
 			{
 				unique_ptr<cards_depends> i(new cards_depends(cardsArgPars));
-				i->showLevel();
+				i->level();
 			}
 			return EXIT_SUCCESS;
 			case ArgParser::CMD_DEPENDS:
