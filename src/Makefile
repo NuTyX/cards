@@ -250,5 +250,3 @@ clean:
 
 distclean: clean
 	rm -fv pkgadd pkginfo pkgrm cards
-
-# End of file
