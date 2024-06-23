@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
 #include "lock.h"
 
 namespace cards {
@@ -43,5 +45,3 @@ lock::~lock()
 #endif
 }
 } // end of cards namespace
-
-// vim:set ts:2 :

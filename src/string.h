@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
 #pragma once
 
 #include <cstdlib>
@@ -5,8 +7,8 @@
 #include <cstdio>
 
 namespace cards {
+
 class string {
-private:
     char *m_value;
     unsigned int m_capacity;
     unsigned int m_size;
@@ -32,7 +34,6 @@ public:
     string &assign(const char *str);
     string &assign(string &str);
     string &assign(const char *str,const unsigned int size);
-
-
 };
+
 }

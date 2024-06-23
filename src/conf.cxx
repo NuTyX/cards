@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
 #include "conf.h"
 namespace cards {
 
@@ -236,6 +238,4 @@ std::vector<std::string> conf::baseDir()
 	return m_baseDir;
 }
 } // end of cards namespace
-
-// vim:set ts=2 :
 

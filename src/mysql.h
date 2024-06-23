@@ -1,29 +1,12 @@
-// mysql.h
-//
-//  Copyright (c) 2016 - 2024 by NuTyX team (http://nutyx.org)
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
-//  USA.
-//
-#ifndef MYSQL_H
-#define MYSQL_H
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
+#pragma once
 
 #include "file_utils.h"
 #include <mysql/mysql.h>
 
 namespace Sql {
+
 struct boardInfo_t {
     std::string category;
     std::string name;
@@ -83,5 +66,4 @@ private:
     message_t m_listOfMessages;
 };
 } /* namespace Sql */
-#endif /* MYSQL_H */
-// vim:set ts=2 :
+

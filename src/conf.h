@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
 #pragma once
 
 #include "string_utils.h"
@@ -52,5 +54,3 @@ private:
 };
 
 } // endof cards namespace
-
-// vim:set ts=2 :

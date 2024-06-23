@@ -1,12 +1,14 @@
-/* Based on the code of
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
+#pragma once
+
+/**
+ *  Based on the code of
 	Fred Fish @ Cygnus Support, from information published
 	in "UNIX System V Release 4, Programmers Guide: ANSI C and
 	Programming Support Tools".
-
-	*/
-
-#ifndef _COMMON_H
-#define _COMMON_H
+	*
+	**/
 
 /* Magic number signature */
 #define EI_MAG0      0  /* File identification byte 0 index */
@@ -132,4 +134,3 @@
 #define DT_PREINIT_ARRAY   32
 #define DT_PREINIT_ARRAYSZ 33
 
-#endif /* _COMMON_H */

@@ -1,25 +1,7 @@
-#
-#  cards
-#
+#  SPDX-License-Identifier: LGPL-2.1-or-later
 #  Copyright (c) 2000 - 2005 by Per Liden <per@fukt.bth.se>
-#  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013 - 2023 by NuTyX team (http://nutyx.org)
-#
-#  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 of the License, or
-#  (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
-#  USA.
-#
+#  Copyright (c) 2006 - 2013 by CRUX team (https://crux.nu)
+#  Copyright (c) 2013 - .... by NuTyX team (https://nutyx.org)
 
 include ../Makefile.inc
 
@@ -160,10 +142,13 @@ libs:	.libs_depend $(LIBOBJECTS)
 	$(CXX) -shared -o libcards.so.$(VERSION)  $(LIBOBJECTS) #-Wl,soname=libcards-$(VERSION)
 	$(AR) -r libcards.a $(LIBOBJECTS)
 	$(RANLIB) libcards.a
-	-@cat ../COPYING > libcards.h
+	-@echo "/*" > libcards.h
+	-@cat ../LICENSE.GPL2 >> libcards.h
+	-@echo "*/" >> libcards.h
 	-@echo "#ifndef LIB_CARDS_INCLUDED" >> libcards.h
 	-@echo "#define LIB_CARDS_INCLUDED" >> libcards.h
 	-@cat $(HEADERS)|grep -v '^#define SYSTEM_UTIL' \
+	|grep -v 'SPDX-License-Identifier' \
 	|grep -v '^#define ERROR'|grep -v '^#define MD5' \
 	|grep -v '^#define STRING'|grep -v '^#define ARCHIVE' \
 	|grep -v '^#define PKG'|grep -v '^#define RUNTIME' \
@@ -173,7 +158,6 @@ libs:	.libs_depend $(LIBOBJECTS)
 	|grep -v '^#include "'|grep -v '^#ifndef' \
 	|grep -v '^#endif /*'|grep -v '^//' >> libcards.h
 	-@echo "#endif" >> libcards.h
-	-@echo "// vim:set ts=2 :" >> libcards.h
 
 all: setup-nutyx-log pkgadd cards conf libs
 

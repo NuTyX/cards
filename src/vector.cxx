@@ -1,4 +1,7 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
 #include "vector.h"
+
 namespace cards {
 vector::vector() {
     m_capacity = 15;
@@ -63,6 +66,3 @@ vector::~vector() {
     }
 }
 } // end of cards namespace
-
-// vim:set ts=2 :
-

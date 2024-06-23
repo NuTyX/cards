@@ -1,4 +1,7 @@
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
 #include "string.h"
+
 namespace cards {
 string::string() {
     init();

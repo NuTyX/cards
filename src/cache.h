@@ -1,5 +1,6 @@
-#ifndef CACHE_H
-#define CACHE_H
+/* SPDX-License-Identifier: LGPL-2.1-or-later */
+
+#pragma once
 
 #include "enum.h"
 #include "db.h"
@@ -40,4 +41,3 @@ private:
 };
 
 } // endof cards namespace
-#endif /* CACHE_H */
