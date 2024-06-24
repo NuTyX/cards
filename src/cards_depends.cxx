@@ -13,31 +13,19 @@
 
 
 cards_depends::cards_depends (const CardsArgumentParser& argParser)
-	: pkgdbh(""),
-		m_argParser(argParser)
+	: m_argParser(argParser)
 {
 	m_package = nullptr;
 	m_longPackageName = nullptr;
 	m_packageName = nullptr;
 	m_packagesList = initPkgList();
 	m_filesList = initItemList();
-
-	parseArguments();
 }
 cards_depends::~cards_depends ()
 {
 	freeItemList(m_filesList);
 	freePkgInfo(m_package);
 	freePkgList(m_packagesList);
-}
-void cards_depends::parseArguments()
-{
-	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
-		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
-	if (m_root.empty())
-		m_root="/";
-	else
-		m_root=m_root+"/";
 }
 void cards_depends::checkConfig()
 {
@@ -134,8 +122,8 @@ std::vector<std::string>& cards_depends::getNeededDependencies()
 {
 	m_packageName = m_argParser.otherArguments()[0].c_str();
 
-	buildSimpleDatabase();
-
+	pkgdbh packageDatabase;
+	packageDatabase.buildSimpleDatabase();
 	depends();
 
 	for ( auto i : m_dependenciesList ) {
@@ -147,7 +135,7 @@ std::vector<std::string>& cards_depends::getNeededDependencies()
 		} else {
 				name = packageName;
 		}
-		if ( ! checkPackageNameExist(name)) {
+		if ( ! packageDatabase.checkPackageNameExist(name)) {
 			m_neededDependenciesList.push_back(i);
 		}
 	}

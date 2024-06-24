@@ -2,7 +2,7 @@
 
 int main () {
     cards::pkgfile Repository("cards.conf");
-    for (auto i : Repository.getListOfPackages())
+    for (auto i : Repository.getListOfPackages()) {
         std::cout << i.first
             << " "
             << i.second.version()
@@ -12,8 +12,12 @@ int main () {
             << i.second.description()
             << " "
             << i.second.collection()
-            << std::endl;
-
+            << ": ";
+            for (auto j : Repository.getDependencies(i.first) )
+               std::cout << j
+                   << ",";
+            std::cout << std::endl;
+    }
     if (Repository.checkPortExist("libreoffice")){
         
         std::cout << "libreoffice exist: "
@@ -21,11 +25,6 @@ int main () {
             << "-"
             << Repository.getPortRelease("libreoffice")
             << std::endl;
-        for (auto i : Repository.getDependencies("libreoffice") )
-            std::cout << i
-                << " ";
-        std::cout << std::endl;
     }
     return 0;
 }
-// vim:set ts=2 :

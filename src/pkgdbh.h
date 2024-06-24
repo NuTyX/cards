@@ -59,6 +59,7 @@ public:
     int getSize(const std::string& name) const;
     int getRelease(const std::string& name) const;
 
+    void buildSimpleDatabase();
     bool checkPackageNameExist(const std::string& name) const;
     bool checkDependency(const std::string& name);
     void setDependency();
@@ -73,9 +74,8 @@ protected:
 
     int getListOfPackagesNames(const std::string& path);
     std::pair<std::string, cards::db> getInfosPackage(const std::string& packageName);
-    void buildSimpleDatabase();
-    void buildSimpleDependenciesDatabase();
 
+    void buildSimpleDependenciesDatabase();
     void buildCompleteDatabase(const bool& silent);
     void buildDatabase(const bool& progress,
         const bool& simple,

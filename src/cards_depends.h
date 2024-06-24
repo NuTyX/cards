@@ -20,14 +20,13 @@ struct LevelName {
 	std::string name;
 };
 
-class cards_depends: public pkgdbh
+class cards_depends
 {
 public:
 
 	cards_depends (const CardsArgumentParser& argParser);
 	~cards_depends ();
 
-	void parseArguments();
 	void level();
 
 	virtual void treatErrors(cards::ErrorEnum action, const std::string& s) const;
