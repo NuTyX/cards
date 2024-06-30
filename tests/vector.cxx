@@ -22,6 +22,9 @@ int main() {
 /*	for (unsigned int i = 0; i < myVector.size(); ++i )
 		printf("%s\n",myVector.value(i));
 */
+	for (auto it:myVector)
+		printf("%s\n",it);
+
 	printf("First Value: %s\n",myVector.value(0));
 	printf("Last Value: %s\n",myVector.value(myVector.size()));
 
@@ -49,13 +52,18 @@ int main() {
 	for (unsigned int i = 0; i < Vector.size(); ++i )
 		printf("%s ",Vector[i]);
 	printf("\n");
-
-
+	for (auto it:Vector)
+		printf("%s ",it);
+	printf("\n");
+	for (cards::vector::iterator it = Vector.begin();
+			it!=Vector.end();it++)
+		printf("%s ",*it);
+	printf("\n");
+	
  cards::vector Vector2;
  printf("Size: %u\nCapacity: %u\n\n",Vector2.size(),Vector2.capacity());
  Vector2.reserve(1500);
  printf("Size: %u\nCapacity: %u\n\n",Vector2.size(),Vector2.capacity());
  Vector2.reserve(1000);
  printf("Size: %u\nCapacity: %u\n\n",Vector2.size(),Vector2.capacity());
-
 }
