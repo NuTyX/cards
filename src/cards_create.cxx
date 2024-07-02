@@ -71,8 +71,8 @@ void cards_create::createBinaries(const char *configFileName,
 	process makeprocess( cmd, args, fdlog );
 	int result = 0 ;
 	result = makeprocess.executeShell();
-#ifndef NDEBUG
-	cerr << "result:" << result << std::endl;
+#ifdef DEBUG
+	std::cerr << "result:" << result << std::endl;
 #endif
 	std::string s = RED;
 	switch ( result )

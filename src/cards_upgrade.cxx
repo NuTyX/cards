@@ -28,7 +28,7 @@ cards_upgrade::cards_upgrade(const CardsArgumentParser& argParser,
 		m_actualError = cards::ERROR_ENUM_CANNOT_FIND_DEPOT;
 		treatErrors("");
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	for ( auto j :  m_config.groups() ) {
 		std::cout << j << std::endl;
 	}

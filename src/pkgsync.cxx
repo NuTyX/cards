@@ -162,9 +162,9 @@ void pkgsync::deleteFolder(const std::string& folderName)
 	}
 	for (auto f : filesToDelete) {
 		std::string fileName = folderName + "/" + f;
-#ifndef NDEBUG
-		if (f->size() > 0)
-			cerr << "Deleting " << fileName << endl;
+#ifdef DEBUG
+		if (f.size() > 0)
+			std::cerr << "Deleting " << fileName << std::endl;
 #endif
 		removeFile("/",fileName);
 	}	

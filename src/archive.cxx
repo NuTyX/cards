@@ -5,15 +5,15 @@
 archive::archive(const std::string& fileName)
     : m_fileName(fileName)
 {
-#ifndef NDEBUG
+#ifdef DEBUG
     std::cerr << "extractFileContent META" << std::endl;
 #endif
     m_contentMeta = extractFileContent(METAFILE);
-#ifndef NDEBUG
+#ifdef DEBUG
     std::cerr << "extractFileContent MTREE" << std::endl;
 #endif
     m_contentMtree = extractFileContent(MTREEFILE);
-#ifndef NDEBUG
+#ifdef DEBUG
     std::cerr << "extractFileContent INFO" << std::endl;
 #endif
     m_contentInfo = extractFileContent(INFOFILE);

@@ -15,7 +15,7 @@ lock::lock(const std::string& m_root, bool exclusive)
   sigaction(SIGTERM, &m_sa, NULL);
 
 	const std::string dirname = trimFileName(m_root + std::string("/") + PKG_DB_DIR);
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Lock the database " << dirname << std::endl;
 #endif
 	if (!(m_dir = opendir(dirname.c_str())))
@@ -40,7 +40,7 @@ lock::~lock()
 		flock(dirfd(m_dir), LOCK_UN);
 		closedir(m_dir);
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Unlock the database " << m_dir << std::endl;
 #endif
 }

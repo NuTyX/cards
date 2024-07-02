@@ -215,10 +215,10 @@ int deps_direct (itemList* filesList,
 */
 void generate_level (itemList* filesList,
 	pkgList* packagesList,
-	unsigned int* level)
+	unsigned int& level)
 {
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	printf("List des %d paquets\n",packagesList->count);
 	for (unsigned int nameIndex = 0; nameIndex < packagesList->count; nameIndex++) {
 		printf("%s, Level: %d, Number of deps: %d, Decount: %d \n",filesList->items[nameIndex],
@@ -228,7 +228,7 @@ void generate_level (itemList* filesList,
 	}
 #endif
 	int found = 0;
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Loop: " << *level << std::endl;
 #endif
 
@@ -237,7 +237,7 @@ void generate_level (itemList* filesList,
 		/* Si le paquet nameIndex n'a plus de dépendance son décompte est zero */
 		if ( packagesList->pkgs[nameIndex]->dependences->decount == 0 ) {
 			found = 1;
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << *level
 				<< " ) Paquet: " << filesList->items[nameIndex]
 				<< std::endl;
@@ -246,7 +246,7 @@ void generate_level (itemList* filesList,
 			packagesList->pkgs[nameIndex]->dependences->decount = -1 ;
 
 			/* Le level du paquet nameIndex est mis a la valeur de "level" */
-			packagesList->pkgs[nameIndex]->level = *level;
+			packagesList->pkgs[nameIndex]->level = level;
 
 			/* Pour tous les paquets existants, on cherche dans la liste des dépendances si elle est + grande que 1 */
 			for (unsigned int nameIndexHaveThisDep = 0; nameIndexHaveThisDep < packagesList->count; nameIndexHaveThisDep++) {
@@ -257,13 +257,13 @@ void generate_level (itemList* filesList,
 						/* Si le Paquet [nameIndex] est présent dans la liste des deps */
 						if ( packagesList->pkgs[nameIndexHaveThisDep]->dependences->depsIndex[depIndex] == nameIndex ) {
 							/* On incrémente de UN le nombre de dépendances */
-#ifndef NDEBUG
+#ifdef DEBUG
 							printf("  %d) for %s. Dependencie of %s  %d > ",
 								*level, filesList->items[nameIndex],filesList->items[nameIndexHaveThisDep],
 								packagesList->pkgs[nameIndexHaveThisDep]->dependences->decount);
 #endif
 							packagesList->pkgs[nameIndexHaveThisDep]->dependences->decrement++;
-#ifndef NDEBUG
+#ifdef DEBUG
 							printf(" %d\n",packagesList->pkgs[nameIndexHaveThisDep]->dependences->decrement);
 #endif
 						}
@@ -279,7 +279,7 @@ void generate_level (itemList* filesList,
 			/* Le nouveau nombre de deps = l'actuel - le nombre de deps supprimés */
 			packagesList->pkgs[nameIndex]->dependences->decount = packagesList->pkgs[nameIndex]->dependences->decount
 				- packagesList->pkgs[nameIndex]->dependences->decrement;
-#ifndef NDEBUG
+#ifdef DEBUG
 			printf(" level %d: for %s, increment: %d new level: %d \n",
 				*level,filesList->items[nameIndex],
 				packagesList->pkgs[nameIndex]->dependences->decrement,
@@ -288,14 +288,14 @@ void generate_level (itemList* filesList,
 			packagesList->pkgs[nameIndex]->dependences->decrement = 0;
 		}
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << std::endl;
 #endif
 	if ( found != 0) {
-		(*level)++;
+		level++;
 		generate_level (filesList,packagesList,level);
 	} else {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << "generate_level() FINISH"
 			<< std::endl;
 #endif

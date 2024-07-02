@@ -101,7 +101,7 @@ void pkgadd::run()
 	std::set<std::string> non_install_files = applyInstallRules(package.first,
 		package.second, m_actionRules);
 	if (!m_upgrade) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << "Run extractAndRunPREfromPackage without upgrade"
 			<< std::endl;
 #endif
@@ -130,7 +130,7 @@ void pkgadd::run()
 
 	std::set<std::string> keep_list;
 	if (m_upgrade) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << "Run extractAndRunPREfromPackage with upgrade"
 			<< std::endl;
 #endif
@@ -222,7 +222,7 @@ pkgadd::getKeepFileList(const std::set< std::string>& files, const std::vector<r
 		}
 	}
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Keep list:" << std::endl;
 	for (auto j : keep_list)
 		std::cerr << "   " << j << std::endl;
@@ -286,7 +286,7 @@ pkgadd::applyInstallRules(const std::string& name, cards::db& info,
 	info.files.clear();
 	info.files = install_set;
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "PostInstall set:" << std::endl;
 	for (auto i : m_postInstallList)
 		std::cerr << "  "

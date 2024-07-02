@@ -217,7 +217,7 @@ void pkginfo::run()
 			/*
 			 * Get the own package for all the elf files dependencies libraries
 			 */
-#ifndef NDEBUG
+#ifdef DEBUG
 			for (auto i : librariesList)
 				std::cerr << i << std::endl;
 #endif
@@ -241,7 +241,7 @@ void pkginfo::run()
 					}
 				}
 				if (runtimeList.size()>0) {
-#ifndef NDEBUG
+#ifdef DEBUG
 					std::cerr << "Number of libraries found: " << runtimeList.size() << std::endl;
 #endif
 					unsigned int s = 1;
@@ -380,7 +380,7 @@ void pkginfo::run()
 			std::vector<std::pair<std::string, std::string> > result;
 			result.push_back(std::pair<std::string, std::string>(_("Package"), _("File")));
 			unsigned int width = result.begin()->first.length(); // Width of "Package"
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << m_arg << std::endl;
 #endif
 			for (auto i : m_listOfPackages) {

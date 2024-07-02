@@ -181,37 +181,37 @@ bool checkPermissionsEqual(const std::string& file1, const std::string& file2)
 void cleanupMetaFiles(const std::string& basedir)
 {
 	if ( checkFileExist( basedir + "/.INFO") ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << basedir << "/.INFO removed" << std::endl;
 #endif
 		removeFile ( basedir, "/.INFO");
 	}
 	if ( checkFileExist( basedir + "/.META") ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << basedir << "/.META removed" << std::endl;
 #endif
 		removeFile ( basedir, "/.META");
 	}
 	if ( checkFileExist ( basedir + "/.PRE" ) ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << basedir << "/.PRE removed" << std::endl;
 #endif
 		removeFile ( basedir, "/.PRE");
 	}
 	if ( checkFileExist ( basedir + "/.POST" ) ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << basedir << "/.POST removed" << std::endl;
 #endif
 		removeFile ( basedir , "/.POST");
 	}
 	if ( checkFileExist ( basedir + "/.MTREE" ) ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << basedir << "/.MTREE removed" << std::endl;
 #endif
 		removeFile ( basedir, "/.MTREE");
 	}
 	if ( checkFileExist ( basedir + "/.README" ) ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << basedir << "/.README" << std::endl;
 #endif
 		removeFile ( basedir, "/.README");
@@ -459,11 +459,11 @@ int parseFile(std::string& Depends, const char* key, const char* fileName)
 		if ( find_end ) {
 			pos = line.find( ')' );
 			if ( pos != std::string::npos ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 				std::cerr << line << std::endl;
 #endif
 				Depends += line.substr(0, pos);
-#ifndef NDEBUG
+#ifdef DEBUG
 				std::cerr << Depends << std::endl;
 #endif
 				break;
@@ -480,11 +480,11 @@ int parseFile(std::string& Depends, const char* key, const char* fileName)
 		if ( line.substr( 0, k.size() ) == key ){
 			pos = line.find( ')' );
 			if ( pos != std::string::npos ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 				std::cout << line << std::endl;
 #endif
 				Depends += line.substr(k.size(), pos - k.size());
-#ifndef NDEBUG
+#ifdef DEBUG
 				std::cerr << Depends << std::endl;
 #endif
 				break;

@@ -48,7 +48,7 @@ int get_64bit_elf_header_part(FILE *file)
 int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 	const std::string& fileName)
 {
-#ifndef NDEBUG
+#ifdef DEBUG
 	printf("\n==>File open: %s\n",fileName.c_str());
 #endif
 	unsigned long dynamic_addr = 0;
@@ -70,7 +70,7 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 
 	/* Magic number */
 	buffer = (Elf_Ehdr_Begin *)malloc( sizeof(elf_header_begin));
-#ifndef NDEBUG
+#ifdef DEBUG
 	printf("sizeof elf_header_begin :%d\n",sizeof(elf_header_begin));
 #endif
 	// copy the file into the buffer:
@@ -84,7 +84,7 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
     ||  elf_header_begin.e_ident[EI_MAG2] != ELFMAG2
     ||  elf_header_begin.e_ident[EI_MAG3] != ELFMAG3)
     return error("Not an ELF file");
-#ifndef NDEBUG
+#ifdef DEBUG
   printf("Magic Number: %d %c %c %c\n",
   elf_header_begin.e_ident[EI_MAG0],
   elf_header_begin.e_ident[EI_MAG1],
@@ -110,7 +110,7 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 	if (elf_header_end.e_shnum == 0)
 		return error ("There are no Sections in this file");
 
-#ifndef NDEBUG
+#ifdef DEBUG
   printf("\nNumber of Section header: %d 0x%x\n",
 	elf_header_end.e_shnum,elf_header_end.e_shnum);
 	printf("Size of Section header entity : %d 0x%x\n",
@@ -143,7 +143,7 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 			if ( section_headers_32bits[i].sh_type == SHT_STRTAB )
 			{
 					offset = section_headers_32bits[i].sh_offset;
-#ifndef NDEBUG
+#ifdef DEBUG
 		printf("section_headers_32bits[%d].sh_offset: %u 0x%x\n",
 	i,section_headers_32bits[i].sh_offset,section_headers_32bits[i].sh_offset);
 #endif
@@ -151,7 +151,7 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 					if ( i ==  elf_header_end.e_shnum - 1 )
 					{
 						dependencies_utils_end();
-#ifndef NDEBUG
+#ifdef DEBUG
 	printf("No dynamics found\n");
 		printf("offset : %u 0x%x\n",
 	offset,offset);
@@ -178,7 +178,7 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 				/* save the offset and the size of the dynamic info */
 				dynamic_addr = program_headers_32bits[i].p_offset;
 				dynamic_size_32bits = program_headers_32bits[i].p_filesz;
-#ifndef NDEBUG
+#ifdef DEBUG
 		printf("program_headers_32bits[%d].p_offset: %u 0x%x\n",
 	i,program_headers_32bits[i].p_offset,program_headers_32bits[i].p_offset);
 		printf("program_headers_32bits[%d].p_filesz: %u 0x%x\n",
@@ -197,12 +197,12 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 		if (fseek (file, 0, SEEK_END))
 			return error ("Error to seek to end of the file");
 
-#ifndef NDEBUG
+#ifdef DEBUG
 		printf("File length: %u 0x%x\n",
 	ftell (file),ftell (file));
 #endif
 		str_tab_len = ftell (file) - offset;
-#ifndef NDEBUG
+#ifdef DEBUG
 		printf("offset : %u 0x%x\n",
 	offset,offset);
 		printf("str_tab_len: %u 0x%x\n",
@@ -265,14 +265,14 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 			if ( section_headers_64bits[i].sh_type == SHT_STRTAB )
 			{
 				offset = section_headers_64bits[i].sh_offset;
-#ifndef NDEBUG
+#ifdef DEBUG
 		printf("section_headers_64bits[%d].sh_offset: %u 0x%x\n",
 	i,section_headers_64bits[i].sh_offset,section_headers_64bits[i].sh_offset);
 #endif
 				if ( i ==  elf_header_end.e_shnum - 1 )
 				{
 					dependencies_utils_end();
-#ifndef NDEBUG
+#ifdef DEBUG
 	printf("No dynamics found\n");
 	printf("offset : %u 0x%x\n",
 	offset,offset);
@@ -285,7 +285,7 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
     if ( offset == elf_header_end.e_shnum - 1)
     {
       dependencies_utils_end();
-#ifndef NDEBUG
+#ifdef DEBUG
 	printf("No dynamics found\n");
 	printf("offset : %u 0x%x\n",
 	offset,offset);
@@ -309,7 +309,7 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 				/* save the offset and the size of the dynamic info */ 
 				dynamic_addr = program_headers_64bits[i].p_offset;
 				dynamic_size_64bits = program_headers_64bits[i].p_filesz;
-#ifndef NDEBUG
+#ifdef DEBUG
 		printf("program_headers_64bits[%d].p_offset: %u 0x%x\n",
 	i,program_headers_64bits[i].p_offset,program_headers_64bits[i].p_offset);
 		printf("program_headers_64bits[%d].p_filesz: %u 0x%x\n",
@@ -327,12 +327,12 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 
 		if (fseek (file, 0, SEEK_END))
 			return error ("Error to seek to end of the file");
-#ifndef NDEBUG
+#ifdef DEBUG
     printf("File length: %u 0x%x\n",
   ftell (file),ftell (file));
 #endif
 		str_tab_len = ftell (file) - offset;
-#ifndef NDEBUG
+#ifdef DEBUG
 		printf("offset : %u 0x%x\n",
 	offset,offset);
 		printf("str_tab_len: %u 0x%x\n",
@@ -347,7 +347,7 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 			edyn < dynamics_section_64bits + dynamic_size_64bits;
 			edyn ++)
 		{
-#ifndef NDEBUG
+#ifdef DEBUG
     printf("Tag: %d\n",edyn->d_tag);
 #endif
 			if (edyn->d_tag == DT_NULL)
@@ -438,11 +438,11 @@ void dependencies_utils_end()
 }
 int error ( const char* message)
 {
-#ifndef NDEBUG
+#ifdef DEBUG
   fprintf(stderr,"%s\n",message);
 #endif
   dependencies_utils_end();
-#ifndef NDEBUG
+#ifdef DEBUG
   return 1;
 #else
 	return 0;

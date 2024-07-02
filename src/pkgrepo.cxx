@@ -150,7 +150,7 @@ void pkgrepo::parseCollectionPkgRepoFile()
 		}
 		m_portsDirectoryList.push_back(portsDirectory);
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	for (auto i : m_portsDirectoryList) {
 		for (auto j : i.basePackageList) {
 			std::cerr << i.url << " "<< i.dir << " "
@@ -215,7 +215,7 @@ void pkgrepo::parsePackagePkgRepoFile(const std::string& pkgRepoFile)
  * We have to parse the file /var/lib/pkg/depot/cli/alsa-lib/.PKGREPO
  *
 */
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << pkgRepoFile << std::endl;
 #endif
 	std::vector<std::string> PkgRepoFileContent;
@@ -393,11 +393,11 @@ std::set<std::string> pkgrepo::getBinaryPackageList()
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << i.dir << " " << i.url << std::endl;
 #endif
 		for (auto j : i.basePackageList) {
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << j.basePackageName << " "
 					<< j.description << " "
 					<< j.md5SUM << " "
@@ -433,11 +433,11 @@ pkgrepo::getBinaryPackageSet()
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << i.dir << " " << i.url << std::endl;
 #endif
 		for (auto j : i.basePackageList) {
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << j.basePackageName << " "
 				<< j.description << " "
 				<< j.version << std::endl;

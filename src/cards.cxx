@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 	try {
 		CardsArgumentParser cardsArgPars;
 		cardsArgPars.parse(argc, argv);
-#ifndef NDEBUG
+#ifdef DEBUG
 		cout << cardsArgPars.getIdValue(cardsArgPars.command()) << endl;
 		cout << cardsArgPars.getIdValue() << endl;
 		cout << cardsArgPars.getCmdValue() << endl;

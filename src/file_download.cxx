@@ -126,7 +126,7 @@ void FileDownload::downloadFile()
 	curl_easy_setopt(m_curl, CURLOPT_FAILONERROR,1L);
 	curl_easy_setopt(m_curl, CURLOPT_PROGRESSDATA, &m_downloadProgress);
 	curl_easy_setopt(m_curl, CURLOPT_FILETIME,1L);
-#ifndef NDEBUG
+#ifdef DEBUG
 	curl_easy_setopt(m_curl, CURLOPT_VERBOSE, 1L);
 #endif
 	m_curlCode = curl_easy_perform(m_curl);

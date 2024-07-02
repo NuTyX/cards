@@ -154,7 +154,7 @@ void cards_install::getLocalePackagesList()
 	for ( auto i :  config.groups() ) {
 		for ( auto j :m_dependenciesList ) {
 			std::string packageName  = j.first + "." + i;
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << packageName << std::endl;
 #endif
 			if (checkBinaryExist(packageName)) {
@@ -174,7 +174,7 @@ void cards_install::getLocalePackagesList()
 			generateDependencies();
 			m_dependenciesList.push_back(PackageTime);
 		}
-#ifndef NDEBUG
+#ifdef DEBUG
 	for (auto i : m_dependenciesList )
 		std::cerr << i.first << " " << i.second << std::endl;
 #endif

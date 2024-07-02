@@ -113,7 +113,7 @@ void conf::parseCardsconf()
 		}
 		m_dirUrl.swap(list);
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "name: " << m_name << std::endl
 		<< "version: " << m_version << std::endl;
 	for ( auto i : m_dirUrl)
@@ -192,7 +192,7 @@ void conf::parseSystemConf()
 		}
 	}
 	fclose(fp);
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << "name: " << m_name << std::endl
 			<< "version: " << m_version << std::endl;
 #endif

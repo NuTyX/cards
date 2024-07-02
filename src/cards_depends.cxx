@@ -37,7 +37,7 @@ void cards_depends::checkConfig()
 				treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY,DU.dir);
 			}
 		}
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << DU.dir << " " << DU.url  << std::endl;
 #endif
 	}
@@ -59,7 +59,7 @@ depList * cards_depends::readDependenciesList(itemList *m_filesList, unsigned in
 	if ( ! checkFileExist(fullPathfileName) ) {
 		treatErrors(cards::ERROR_ENUM_CANNOT_READ_FILE,fullPathfileName);
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << fullPathfileName << std::endl;
 #endif
 	std::list<std::string> deps;
@@ -80,7 +80,7 @@ depList * cards_depends::readDependenciesList(itemList *m_filesList, unsigned in
 		replaceAll( depends, ",,", "," );
 		split( depends, ',', deps, 0,true);
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	for (auto i: deps)
 					std::cerr << i << ",";
 	std::cerr << std::endl;
@@ -139,7 +139,7 @@ std::vector<std::string>& cards_depends::getNeededDependencies()
 			m_neededDependenciesList.push_back(i);
 		}
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	for (auto i : m_neededDependenciesList) std::cerr << i << std::endl;
 #endif
 	return m_neededDependenciesList;
@@ -148,7 +148,7 @@ std::vector<std::string>& cards_depends::getDependencies()
 {
 	m_packageName=m_argParser.otherArguments()[0].c_str();
 	depends();
-#ifndef NDEBUG
+#ifdef DEBUG
 	for (auto i : m_dependenciesList) std::cerr << i << std::endl;
 #endif
 	return m_dependenciesList;
@@ -229,12 +229,12 @@ void cards_depends::level()
 {
 	checkConfig();
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "number of files: " << m_filesList->count << std::endl;
 #endif
 	for (unsigned int nInd=0;nInd <m_filesList->count;nInd++) {
-#ifndef NDEBUG
-		std::cerr << nInd << " " << m_filesList->items[nInd] << std::endl;
+#ifdef DEBUG
+		std::cout << nInd << " " << m_filesList->items[nInd] << std::endl;
 #endif
 		m_package = addInfoToPkgInfo(nInd);
 		addPkgToPkgList(m_packagesList,m_package);
@@ -243,12 +243,12 @@ void cards_depends::level()
 			treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL," in level()");
 	}
 	unsigned int level = 0;
-	static unsigned  int *pNiveau = &level;
-	generate_level (m_filesList,m_packagesList,pNiveau);
-	if (*pNiveau == 0 ) {
+	static unsigned  int Niveau = level;
+	generate_level (m_filesList,m_packagesList,Niveau);
+	if (Niveau == 0 ) {
 		treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL," in level()");
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << "Number of level: " << *pNiveau << std::endl;
 #endif
 	depList* dependenciesList = initDepsList();
@@ -257,12 +257,15 @@ void cards_depends::level()
 			treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL," in level()");
 	}
 	int currentLevel = 0;
-	while ( currentLevel <= *pNiveau) {
+	while ( currentLevel <= Niveau) {
 		for ( unsigned int nameIndex = 0; nameIndex < m_packagesList -> count; nameIndex++ ) {
-#ifndef NDEBUG
-			std::cerr << "packagesList -> pkgs[nameIndex]->level: " << packagesList -> pkgs[nameIndex]->level << " " << m_filesList->items[nameIndex] << std::endl;
+#ifdef DEBUG
+			std::cout << "packagesList -> pkgs[nameIndex]->level: "
+				<< m_packagesList -> pkgs[nameIndex]->level
+				<< " "
+				<< m_filesList->items[nameIndex]
+				<< std::endl;
 #endif
-
 			if ( m_packagesList -> pkgs[nameIndex]->level == currentLevel ) {
 				LevelName LN;
 				LN.l = currentLevel;
@@ -272,7 +275,7 @@ void cards_depends::level()
 		}
 		currentLevel++;
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Level() FINISH" << std::endl;
 #endif
 	if ( (m_missingDepsList.size() == 0 ) || ( m_argParser.isSet(CardsArgumentParser::OPT_IGNORE))) {
@@ -288,7 +291,7 @@ int cards_depends::depends()
 	if ( (m_longPackageName = getLongPackageName(m_filesList,m_packageName)) == NULL) {
 		treatErrors(cards::ERROR_ENUM_PACKAGE_NOT_FOUND,m_packageName);
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << m_longPackageName << " " << m_packageName << std::endl;
 #endif
 
@@ -299,12 +302,12 @@ int cards_depends::depends()
 		m_packagesList->pkgs[nInd]->dependences=readDependenciesList(m_filesList,nInd);
 	}
 	unsigned int level = 0;
-	static unsigned int *pNiveau = &level;
-	generate_level (m_filesList,m_packagesList,pNiveau);
-	if (*pNiveau == 0 ) {
+	static unsigned int Niveau = level;
+	generate_level (m_filesList,m_packagesList,Niveau);
+	if (Niveau == 0 ) {
 		treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL," in depends()");
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Number of level: " << *pNiveau << std::endl;
 #endif
 	depList* dependenciesList = initDepsList();
@@ -313,12 +316,12 @@ int cards_depends::depends()
 	}
 	if (dependenciesList ->count > 0) {
 		int currentLevel = 0;
-		while ( currentLevel <= *pNiveau) {
-#ifndef NDEBUG
+		while ( currentLevel <= Niveau) {
+#ifdef DEBUG
 			std::cerr << "Level: " << currentLevel << std::endl;
 #endif
 			for ( unsigned int dInd=0; dInd < dependenciesList->count; dInd++ ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 				std::cerr << "m_packagesList->pkgs[dependenciesList->depsIndex[dInd]]->level: "
 						<< m_packagesList->pkgs[dependenciesList->depsIndex[dInd]]->level
 						<< " " << m_filesList->items[dependenciesList->depsIndex[dInd]] << std::endl;
@@ -343,7 +346,7 @@ int cards_depends::depends()
 	m_dependenciesList.push_back(m_longPackageName);
 	free(m_longPackageName);
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "depends() FINISH" << std::endl;
 #endif
 
@@ -360,7 +363,7 @@ int cards_depends::deptree()
 	if ( (m_longPackageName = getLongPackageName(m_filesList,m_packageName)) == NULL)
 		treatErrors(cards::ERROR_ENUM_PACKAGE_NOT_FOUND,m_packageName);
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << m_longPackageName << " " << m_packageName << std::endl;
 #endif
 
@@ -390,7 +393,7 @@ int cards_depends::deptree()
 	std::string name = "";
 	std::set<std::string> localPackagesList, depsPackagesList;
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "deptree() FINISH" << std::endl;
 #endif
 	return 0;

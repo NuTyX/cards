@@ -31,7 +31,7 @@ void repodwl::downloadPortsPkgRepo(const std::string& packageName)
 					downloadFile.filename = PKG_REPO;
 					downloadFile.md5sum = basePackageInfo.md5SUM;
 					downloadFilesList.push_back(downloadFile);
-#ifndef NDEBUG
+#ifdef DEBUG
 					std::cerr << portsDirectory.dir
 						+ "/"
 						+ basePackageInfo.basePackageName
@@ -61,7 +61,7 @@ void repodwl::downloadPackageFileName(const std::string& packageName)
 	for (auto portsDirectory : m_portsDirectoryList) {
 		for (auto basePackageInfo : portsDirectory.basePackageList) {
 			if ( basePackageInfo.basePackageName == basePackageName) {
-#ifndef NDEBUG
+#ifdef DEBUG
 				std::cerr << packageName << std::endl;
 #endif
 				if ( ! checkFileExist (portsDirectory.dir + "/" + basePackageInfo.basePackageName + PKG_REPO))
@@ -85,7 +85,7 @@ void repodwl::downloadPackageFileName(const std::string& packageName)
 							+ basePackageInfo.s_buildDate
 							+ portFilesList.arch
 							+ basePackageInfo.extention;
-#ifndef NDEBUG
+#ifdef DEBUG
 							std::cerr << url << " "
 								<< dir << " "
 								<< fileName << " "
@@ -114,16 +114,16 @@ bool repodwl::checkBinaryExist(const std::string& packageName)
 	std::string::size_type pos = packageName.find('.');
 	if (pos != std::string::npos)
 		basePackageName=packageName.substr(0,pos);
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "basePackageName: " << basePackageName << std::endl;
 #endif
 
 	for (auto portsDirectory: m_portsDirectoryList) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << portsDirectory.url << " " <<  portsDirectory.dir << std::endl;
 #endif
 		for (auto basePackageInfo:portsDirectory.basePackageList) {
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << "basePackageInfo.basePackageName: "
 				<< basePackageInfo.basePackageName
 				<< ":"
@@ -146,7 +146,7 @@ bool repodwl::checkBinaryExist(const std::string& packageName)
 				parsePackagePkgRepoFile(pkgRepoFile);
 
 				for ( auto portFilesList: m_portFilesList) {
-#ifndef NDEBUG
+#ifdef DEBUG
 					std::cerr << portFilesList.name << std::endl;
 #endif
 					if (portFilesList.name == packageName) {
@@ -159,7 +159,7 @@ bool repodwl::checkBinaryExist(const std::string& packageName)
 						+ portFilesList.arch
 						+ basePackageInfo.extention;
 						m_packageFileNameSignature = portFilesList.md5SUM;
-#ifndef NDEBUG
+#ifdef DEBUG
 						std::cerr << packageName
 							<< " is "
 							<< m_packageFileName

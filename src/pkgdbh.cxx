@@ -19,7 +19,7 @@ pkgdbh::pkgdbh()
 }
 pkgdbh::~pkgdbh()
 {
-#ifndef NDEBUG
+#ifdef DEBUG
 		syslog(LOG_INFO,"Closing log...");
 #endif
 		runLastPostInstall();
@@ -372,14 +372,14 @@ int pkgdbh::getListOfPackagesNames (const std::string& path)
 		return m_listOfPackagesNames.size();
 
 	const std::string pathdb =  m_root + PKG_DB_DIR;
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "pathdb: " << pathdb << std::endl;
 #endif
 	if ( findDir(m_listOfPackagesNames, pathdb) != 0 ) {
 		m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 		treatErrors(pathdb);
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Number of Packages: "
 		<< m_listOfPackagesNames.size()
 		<< std::endl;
@@ -457,7 +457,7 @@ pkgdbh::buildDatabase(const bool& progress,
 	if (progress) {
 		progressInfo(ACTION_ENUM_DB_OPEN_START);
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "m_root: " << m_root << std::endl;
 #endif
 	if (m_listOfPackagesNames.empty() )
@@ -646,7 +646,7 @@ pkgdbh::buildSimpleDatabase()
 		}
 		m_miniDB_Empty=false;
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	for (auto i : m_listOfAlias)
 		std::cerr << "Alias: "
 			<< i.first
@@ -669,7 +669,7 @@ void pkgdbh::buildCompleteDatabase(const bool& silent)
 		if (!silent) {
 			progressInfo(ACTION_ENUM_DB_OPEN_START);
 		}
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << "m_root: " << m_root<< std::endl;
 #endif
 
@@ -781,7 +781,7 @@ void pkgdbh::buildCompleteDatabase(const bool& silent)
 				}
 			}
 		}
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << std::endl;
 		std::cerr << m_listOfPackages.size()
 		<< " packages found in database " << std::endl;
@@ -803,7 +803,7 @@ void pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 	for (auto i: info.files)
 	{
 		if ( i[0] == '.' ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cout << "i: " << i << std::endl;
 #endif
 			metaFilesList.insert(metaFilesList.end(), i );
@@ -966,7 +966,7 @@ void pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 				const char* msg = strerror(errno);
 					std::cerr << m_utilName << ": could not remove " << filename << ": " << msg << std::endl;
 				}
-#ifndef NDEBUG
+#ifdef DEBUG
 				std::cerr  << "File: " << filename << " is removed"<< std::endl;
 #endif
 			}
@@ -975,7 +975,7 @@ void pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 		const char* msg = strerror(errno);
 		std::cerr << m_utilName << ": could not remove " << packagenamedir << ": " << msg << std::endl;
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr  << "Directory: " << packagenamedir << " is removed"<< std::endl;
 #endif
 }
@@ -987,7 +987,7 @@ void pkgdbh::removePackageFiles(const std::string& name)
 	m_listOfPackages.erase(name);
 	m_packageName =  name ;
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Removing package phase 1 (all files in package):" << std::endl;
 	copy(m_filesList.begin(), m_filesList.end(), std::ostream_iterator<std::string>(std::cerr, "\n"));
 	std::cerr << std::endl;
@@ -998,7 +998,7 @@ void pkgdbh::removePackageFiles(const std::string& name)
 		for (auto j : i.second.files)
 			m_filesList.erase(j);
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Removing package phase 2 (files that still have references excluded):" << std::endl;
 	copy(m_filesList.begin(), m_filesList.end(), std::ostream_iterator<std::string>(std::cerr, "\n"));
 	std::cerr << std::endl;
@@ -1022,7 +1022,7 @@ void pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
 	m_packageName =  name ;
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Removing package phase 1 (all files in package):" << std::endl;
 	copy(m_filesList.begin(), m_filesList.end(), std::ostream_iterator<std::string>(std::cerr, "\n"));
 	std::cerr << std::endl;
@@ -1031,7 +1031,7 @@ void pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 	// Don't delete files found in the keep list
 	for (auto i : keep_list) m_filesList.erase(i);
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Removing package phase 2 (files that is in the keep list excluded):" << std::endl;
 	copy(m_filesList.begin(), m_filesList.end(), std::ostream_iterator<std::string>(std::cerr, "\n"));
 	std::cerr << std::endl;
@@ -1042,7 +1042,7 @@ void pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 		for (auto j: i.second.files)
 			m_filesList.erase(j);
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Removing package phase 3 (files that still have references excluded):" << std::endl;
 	copy(m_filesList.begin(), m_filesList.end(), std::ostream_iterator<std::string>(std::cerr, "\n"));
 	std::cerr << std::endl;
@@ -1080,7 +1080,7 @@ void pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std
 				addPackageFilesRefsToDB(i.first,i.second);
 		}
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Removing files:" << std::endl;
 	copy(files.begin(), files.end(), std::ostream_iterator<std::string>(std::cerr, "\n"));
 	std::cerr << std::endl;
@@ -1116,7 +1116,7 @@ pkgdbh::getConflictsFilesList (const std::string& name, cards::db& info)
 		}
 	}
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Conflicts phase 1 (conflicts in database):" << std::endl;
 	copy(files.begin(), files.end(), std::ostream_iterator<std::string>(std::cerr, "\n"));
 	std::cerr << std::endl;
@@ -1129,7 +1129,7 @@ pkgdbh::getConflictsFilesList (const std::string& name, cards::db& info)
 			files.insert(files.end(), i);
 	}
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Conflicts phase 2 (conflicts in filesystem added):" << std::endl;
 	copy(files.begin(), files.end(), std::ostream_iterator<std::string>(std::cerr, "\n"));
 	std::cerr << std::endl;
@@ -1142,7 +1142,7 @@ pkgdbh::getConflictsFilesList (const std::string& name, cards::db& info)
 			files.erase(i);
 	}
 
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Conflicts phase 3 (directories excluded):" << std::endl;
 	copy(files.begin(), files.end(), std::ostream_iterator<std::string>(std::cerr, "\n"));
 	std::cerr << std::endl;
@@ -1153,7 +1153,7 @@ pkgdbh::getConflictsFilesList (const std::string& name, cards::db& info)
 		for (auto i : m_listOfPackages[name].files)
 			files.erase(i);
 
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << "Conflicts phase 4 (files already owned by this package excluded):" << std::endl;
 		copy(files.begin(), files.end(), std::ostream_iterator<std::string>(std::cerr, "\n"));
 		std::cerr << std::endl;
@@ -1168,7 +1168,7 @@ pkgdbh::openArchivePackage(const std::string& filename)
 	std::string packageArchiveName;
 	std::pair<std::string, cards::db> result;
 	archive packageArchive(filename.c_str());
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Number of files: " << packageArchive.size() << std::endl;
 #endif
 	std::string basename(filename, filename.rfind('/') + 1);
@@ -1223,11 +1223,11 @@ pkgdbh::getPackageDependencies (const std::string& filename)
 	std::set< std::pair<std::string,time_t> > packageNameDepsBuildTime;
 	std::set< std::pair<std::string,time_t> > packageNameDepsBuildTimeTemp;
 	packageArchive = openArchivePackage(filename);
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "----> Begin of Direct Dependencies of " << packageArchive.first << std::endl;
 #endif
 	if ( checkPackageNameUptodate(packageArchive ) ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << packageArchive.first << " already installed and Up To Dated" << std::endl
 			<< "----> NO Direct Dependencies" << std::endl
 			<< "----> End of Direct Dependencies" << std::endl;
@@ -1236,18 +1236,18 @@ pkgdbh::getPackageDependencies (const std::string& filename)
 	}
 	if (! packageArchive.second.dependencies().empty() )
 		m_listOfRepoPackages[packageArchive.first] = packageArchive.second;
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "----> End of Direct Dependencies" << std::endl;
 #endif
 	packageNameDepsBuildTimeTemp = packageArchive.second.dependencies();
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "----> Before cleanup: " << packageArchive.first << std::endl;
 	for (auto it : packageNameDepsBuildTimeTemp ) std::cerr << it.first << it.second<< " ";
 	std::cerr << std::endl;
 	int i=1;
 #endif
 	for (auto it : packageNameDepsBuildTimeTemp ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << it.first << " " <<  it.second << std::endl;
 		std::cerr << "packageArchiveName:" <<packageArchive.first << std::endl;
 #endif
@@ -1258,7 +1258,7 @@ pkgdbh::getPackageDependencies (const std::string& filename)
 			continue;
 		packageNameDepsBuildTime.insert(it);
 			//packageNameDepsBuildTime.erase(it);
-#ifndef NDEBUG
+#ifdef DEBUG
 		std::cerr << "----> " << it.first << " deleted" << std::endl;
 		std::cerr << i << std::endl;
 		i++;
@@ -1266,7 +1266,7 @@ pkgdbh::getPackageDependencies (const std::string& filename)
 	}
 	if (! packageNameDepsBuildTime.empty() )
 		m_listOfRepoPackages[packageArchive.first].dependencies(packageNameDepsBuildTime);
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "----> Number of remains direct deps: "
 		<< packageArchive.first
 		<< ": "
@@ -1353,7 +1353,7 @@ void pkgdbh::installArchivePackage
 		}
 	chdir(m_root.c_str());
 	absm_root = getcwd(buf, sizeof(buf));
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cout << "absm_root: " <<  absm_root  << " and m_root: " << m_root<< std::endl;
 #endif
 	progressInfo(cards::ACTION_ENUM_PKG_INSTALL_START);
@@ -1515,7 +1515,7 @@ void pkgdbh::readRulesFile()
 		}
 		in.close();
 	}
-#ifndef NDEBUG
+#ifdef DEBUG
 	std::cerr << "Configuration:" << std::endl;
 	for (auto j : m_actionRules )
 		std::cerr << j.event << "\t" << j.pattern << "\t" << j.action << std::endl;
@@ -1526,7 +1526,7 @@ void pkgdbh::runLastPostInstall()
 {
 	if ( m_postInstallList.size() > 0 ) {
 		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_START);
-#ifndef NDEBUG
+#ifdef DEBUG
 		for (auto i : m_postInstallList)
 			std::cerr << i.second << " " << i.first << std::endl;
 #endif

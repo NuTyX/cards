@@ -26,7 +26,7 @@ void pkginst::generateDependencies()
 	std::string packageNameSignature, packageName, packageFileName;
 
 	while ( ! dependenciesWeMustAdd.empty() ) { // Main WHILE
-#ifndef NDEBUG
+#ifdef DEBUG
 		for (auto i : dependenciesWeMustAdd)
 			std::cerr << i.first << " " << i.second << std::endl;
 #endif
@@ -36,25 +36,25 @@ void pkginst::generateDependencies()
 		dependenciesWeMustAdd.erase(vit);   // Erase the current treated package name
 		std::set< std::pair<std::string,time_t> > directDependencies;
 		if ( m_listOfRepoPackages.find(packageName) != m_listOfRepoPackages.end() ) {
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << packageName
 				<< " found in m_listOfRepoPackages"
 				<< std::endl;
 #endif
 			directDependencies = m_listOfRepoPackages[packageName].dependencies();
-#ifndef NDEBUG
+#ifdef DEBUG
 			for (auto i : directDependencies )
 				std::cerr << i.first
 					<< i.second << " ";
 #endif
 		} else {
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << packageName
 				<< " not found in m_listOfRepoPackages"
 				<< std::endl;
 #endif
 			if ( checkBinaryExist(packageName)) { // directs deps if not yet availables
-#ifndef NDEBUG
+#ifdef DEBUG
 				std::cerr << packageName
 					<< " binary found "
 					<< std::endl;
@@ -62,7 +62,7 @@ void pkginst::generateDependencies()
 				packageFileName = getPackageFileName(packageName);
 				packageNameSignature = getPackageFileNameSignature(packageName);
 
-#ifndef NDEBUG
+#ifdef DEBUG
 				std::cerr << packageFileName
 					<< " archive found "
 					<< std::endl;
@@ -74,20 +74,20 @@ void pkginst::generateDependencies()
 			}
 			if ( ! checkFileSignature(packageFileName, packageNameSignature)) // Binary Archive not yet downloaded or corrupted
 				downloadPackageFileName(packageName); // Get it
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << "getPackageDependencies("
 				<< packageFileName << ")"
 				<< std::endl;
 #endif
 			directDependencies = getPackageDependencies(packageFileName);
-#ifndef NDEBUG
+#ifdef DEBUG
 			for (auto i : directDependencies )
 				std::cerr << i.first << " ";
 #endif
 		}
 		if ( ! checkPackageNameBuildDateSame(PackageTime)) // If not yet install or not up to dated
 		{
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << "checkPackageNameBuildDateSame no:"
 				<<PackageTime.first
 				<< PackageTime.second
@@ -95,7 +95,7 @@ void pkginst::generateDependencies()
 #endif
 			depencenciestoSort.push_back(PackageTime); // Add it
 		}
-#ifndef NDEBUG
+#ifdef DEBUG
 			 else
 		{
 			std::cerr << "checkPackageNameBuildDateSame yes: "
@@ -133,7 +133,7 @@ void pkginst::generateDependencies()
 			}
 		}
 		if (!found) {
-#ifndef NDEBUG
+#ifdef DEBUG
 			std::cerr << "m_dependenciesList.push_back "
 				<< vrit->first
 				<< " "
@@ -142,7 +142,7 @@ void pkginst::generateDependencies()
 #endif
 			m_dependenciesList.push_back(*vrit);
 		}
-#ifndef NDEBUG
+#ifdef DEBUG
 		else std::cerr << "no deps founds" << std::endl;
 #endif
 	}

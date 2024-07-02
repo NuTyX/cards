@@ -19,14 +19,14 @@ void process::execute(const std::string& app, const std::string& arguments, int 
     m_application = app;
     m_arguments = arguments;
     m_fileDescriptorLog = fdlog;
-#ifndef NDEBUG
+#ifdef DEBUG
     std::cerr << m_application << " " << m_arguments << " start" << std::endl;
 #endif
 
     std::cout << "  " << m_application << " " << m_arguments << std::endl;
     execute();
 
-#ifndef NDEBUG
+#ifdef DEBUG
     std::cerr << m_application << " " << m_arguments << " end" << std::endl;
 #endif
 }
