@@ -27,7 +27,7 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 	} else {
 		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
-	m_slist=NULL;
+	m_slist=nullptr;
 	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
 	for (std::vector<InfoFile>::const_iterator i = downloadFiles.begin(); i != downloadFiles.end();++i)
 	{
@@ -61,7 +61,7 @@ FileDownload::FileDownload(std::string url,
 	m_curl = curl_easy_init();
 	if (! m_curl)
 		throw std::runtime_error ("Curl error");
-	m_slist=NULL;
+	m_slist=nullptr;
 	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
 	createRecursiveDirs(dirName);
 
@@ -90,7 +90,7 @@ FileDownload::FileDownload(std::string fileInfo,std::string url,
   if (! m_curl)
     throw std::runtime_error ("Curl error");
 
-	m_slist=NULL;
+	m_slist=nullptr;
 	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
 	createRecursiveDirs(dirName);
 
@@ -155,7 +155,7 @@ void FileDownload::initFileToDownload(std::string _url,
   m_destinationFile.url = _url;
   m_destinationFile.filename = _file;
   m_destinationFile.filetime = 0;
-  m_destinationFile.stream = NULL;
+  m_destinationFile.stream = nullptr;
   m_downloadProgress.lastruntime = 0;
   m_downloadProgress.curl = m_curl;
 }

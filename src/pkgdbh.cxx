@@ -517,7 +517,7 @@ pkgdbh::buildDatabase(const bool& progress,
 			info.release(1);
 			for ( auto s : fileContent) {
 				if ( s[0] == 'B' ) {
-					info.build(strtoul(s.substr(1).c_str(),NULL,0));
+					info.build(strtoul(s.substr(1).c_str(),nullptr,0));
 					flags++;
 				}
 				if ( s[0] == 'V' ) {
@@ -624,7 +624,7 @@ pkgdbh::buildSimpleDatabase()
 					info.release(atoi(s.substr(1).c_str()));
 				}
 				if ( s[0] == 'B' ) {
-					info.build(strtoul(s.substr(1).c_str(),NULL,0));
+					info.build(strtoul(s.substr(1).c_str(),nullptr,0));
 				}
 				if ( s[0] == 'g' ) {
 					info.group(s.substr(1));
@@ -698,7 +698,7 @@ void pkgdbh::buildCompleteDatabase(const bool& silent)
 					info.description( s.substr(1) );
 				}
 				if ( s[0] == 'B' ) {
-					info.build( strtoul(s.substr(1).c_str(),NULL,0) );
+					info.build( strtoul(s.substr(1).c_str(),nullptr,0) );
 				}
 				if ( s[0] == 'U' ) {
 					info.url( s.substr(1) );
@@ -747,7 +747,7 @@ void pkgdbh::buildCompleteDatabase(const bool& silent)
 				if ( s[0] == 'R' ) {
 					std::pair<std::string,time_t > NameEpoch;
 					NameEpoch.first=s.substr(1,s.size()-11);
-					NameEpoch.second=strtoul((s.substr(s.size()-10)).c_str(),NULL,0);
+					NameEpoch.second=strtoul((s.substr(s.size()-10)).c_str(),nullptr,0);
 					dependencies.insert(NameEpoch);
 				}
 			}

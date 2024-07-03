@@ -20,7 +20,7 @@ void addDepToDepList(depList *list, unsigned int nameIndex, int level)
 
 	list->depsIndex = (unsigned int*)realloc(list->depsIndex,
 		sizeof (*list->depsIndex ) * (list->count+1));
-	if (list->depsIndex == NULL) {
+	if (list->depsIndex == nullptr) {
 		fprintf(stderr,"Failed to realloc %d\n",&list->depsIndex);
 		exit(EXIT_FAILURE);
 	}
@@ -28,7 +28,7 @@ void addDepToDepList(depList *list, unsigned int nameIndex, int level)
 
 	list->level = (int*)realloc(list->level,
 		sizeof (*list->level ) * (list->count+1));
-	if (list->level == NULL) {
+	if (list->level == nullptr) {
 		fprintf(stderr,"Failed to realloc %d\n",&list->level);
 		exit(EXIT_FAILURE);
 	}
@@ -87,7 +87,7 @@ void freePkgInfo(pkgInfo* package)
 
 pkgList* initPkgList(void)
 {
-	pkgList* list = NULL;
+	pkgList* list = nullptr;
 	list = (pkgList*)Malloc(sizeof *list);
 	list->pkgs = (pkgInfo**)Malloc(sizeof *list->pkgs);
 	list->count = 0;
@@ -99,7 +99,7 @@ void addPkgToPkgList(pkgList *list, pkgInfo *package)
 	list->pkgs = (pkgInfo**)realloc(list->pkgs,
 		sizeof *list->pkgs * (list->count+1));
 
-	if (list->pkgs == NULL) {
+	if (list->pkgs == nullptr) {
 		fprintf(stderr,"Failed to realloc %d\n",&list->pkgs);
 		exit(EXIT_FAILURE);
 	}
@@ -308,7 +308,7 @@ the name, version and release of the package
 char* getLongPackageName(itemList* filesList,
 	const char* packageName)
 {
-	char* name = NULL;
+	char* name = nullptr;
 	bool found = false;
 	unsigned int i = 0 ;
 	for (i = 0; i < filesList->count;i++) {
@@ -321,5 +321,5 @@ char* getLongPackageName(itemList* filesList,
 	if (found)
 		return name;
 
-	return NULL;
+	return nullptr;
 }

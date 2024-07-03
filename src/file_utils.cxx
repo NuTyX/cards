@@ -10,30 +10,30 @@ void * getDatas ( void * var, FILE * file, long offset, size_t size, size_t nmem
 {
   void * mvar;
   if (size == 0 || nmemb == 0)
-    return NULL;
+    return nullptr;
   if (fseek (file, offset, SEEK_SET))
   {
     std::cerr << "Cannot seek" << std::endl;
-    return NULL;
+    return nullptr;
   }
   mvar = var;
-  if (mvar == NULL)
+  if (mvar == nullptr)
   {
   /* Check for overflow.  */
     if (nmemb < (~(size_t) 0 - 1) / size)
       /* + 1 so that we can '\0' terminate invalid std::string table sections.  */
       mvar = malloc (size * nmemb + 1);
-    if (mvar == NULL)
+    if (mvar == nullptr)
     {
       std::cerr << "Out of memory" << std::endl;
-      return NULL;
+      return nullptr;
     }
     ((char *) mvar)[size * nmemb] = '\0';
   }
   if (fread (mvar, size, nmemb, file) != nmemb)
   {
     printf("Unable to read in 0x%lx bytes", (unsigned long)(size * nmemb));
-    return NULL;
+    return nullptr;
   }
   return mvar;
 }
@@ -252,7 +252,7 @@ int findDir(itemList* filesList, const char* path)
 	d = opendir(path);
 	char fullPath[MAXPATHLEN];
 	if (d) {
-		while ((dir = readdir(d)) != NULL) {
+		while ((dir = readdir(d)) != nullptr) {
 			if ( dir->d_name[0] != '.' ) { // ignore any .directories
 				sprintf(fullPath,"%s/%s",path,dir->d_name);
 				sd = opendir(fullPath);
@@ -282,7 +282,7 @@ int findDir(std::set<std::string>& filesList, const std::string& path)
   d = opendir(path.c_str());
   if (d)
   {
-    while ((dir = readdir(d)) != NULL)
+    while ((dir = readdir(d)) != nullptr)
     {
 			if ( dir->d_name[0] != '.' ) { // ignore any .directories
         	filesList.insert(dir->d_name);

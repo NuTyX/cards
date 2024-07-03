@@ -28,7 +28,7 @@ void pkgfile::parsePackagePkgfileFile()
         struct dirent* dir;
         d = opendir(i.dir.c_str());
         if (d) {
-            while ((dir = readdir(d)) != NULL) {
+            while ((dir = readdir(d)) != nullptr) {
                 if (dir->d_name[0] == '.')
                     continue;
 
