@@ -9,7 +9,7 @@ void *Malloc(size_t s)
 	void *p;
 	if ( ! ( p = malloc(s) ) ) {
 		fprintf(stderr,"Failed to malloc\n");
-		if ( errno ) {
+		if (errno) {
 			perror("malloc");
 			exit(EXIT_FAILURE);
 		}
@@ -29,10 +29,10 @@ itemList *initItemList(void)
 
 void addItemToItemList(itemList *list, const char *item)
 {
-	if ( list->capacity == list->count) {
+	if (list->capacity == list->count) {
 		list->capacity = list->count * 2;
 		list->items = (char **)realloc( list->items, sizeof *list->items * list->capacity );
-		if ( list->items == NULL ) {
+		if (list->items == nullptr) {
 			printf("Cannot reallocate: %d", &list->items);
 			return;
 		}
@@ -146,16 +146,16 @@ std::string getValue( const std::string& s, char delimiter )
 std::string getValueBefore( const std::string& s, char del )
 {
 	std::string::size_type pos = s.find( del );
-	if ( pos != std::string::npos )
-		return s.substr( 0, pos );
+	if (pos != std::string::npos)
+		return s.substr(0, pos);
 
 	return s;
 }
 std::string getValueBeforeLast(const std::string& s, char del)
 {
-	std::string::size_type pos = s.rfind( del );
-	if ( pos != std::string::npos )
-		return s.substr( 0, pos );
+	std::string::size_type pos = s.rfind(del);
+	if (pos != std::string::npos)
+		return s.substr(0,pos);
 	return s;
 }
 
@@ -231,17 +231,17 @@ std::vector<std::string> parseDelimitedVectorList
 	(const std::string& s, const char *delimiter)
 {
 	std::vector<std::string> list;
-	if ( s.empty() )
+	if (s.empty())
 		return list;
 
 	char * cstr = new char [ s.length() + 1 ];
 	std::strcpy (cstr, s.c_str());
 
 	char * pch = std::strtok (cstr,delimiter);
-	while (pch !=NULL)
+	while (pch !=nullptr)
 	{
 		list.push_back(pch);
-		pch = std::strtok (NULL, delimiter);
+		pch = std::strtok (nullptr, delimiter);
 	}
 	delete[] cstr;
 	return list;
@@ -257,10 +257,10 @@ std::set<std::string> parseDelimitedSetList
 	std::strcpy (cstr, s.c_str());
 
 	char * pch = std::strtok (cstr,delimiter);
-	while (pch !=NULL)
+	while (pch !=nullptr)
 	{
 		list.insert(pch);
-		pch = std::strtok (NULL, delimiter);
+		pch = std::strtok (nullptr, delimiter);
 	}
 	delete[] cstr;
 	return list;
@@ -286,22 +286,23 @@ const std::vector<std::string> parseDelimitedVectorList
 }
 std::string stripWhiteSpace(const std::string& s)
 {
-	if ( s.empty() )
+	if (s.empty())
 		return s;
+
 	int pos = 0;
 	std::string line = s;
 	int len = line.length();
-	while ( pos < len && isspace( line[pos] ) ) {
+	while ( pos < len && isspace(line[pos]) )
 		++pos;
-	}
+
 	line.erase( 0, pos );
 	pos = line.length()-1;
-	while ( pos > -1 && isspace( line[pos] ) ) {
+	while ( pos > -1 && isspace(line[pos]) )
 		--pos;
-	}
-	if ( pos != -1 ) {
+
+	if (pos != -1)
 		line.erase( pos+1 );
-	}
+
 	return line;
 }
 bool startsWithNoCase(const std::string& s1, const std::string& s2)
@@ -310,38 +311,38 @@ bool startsWithNoCase(const std::string& s1, const std::string& s2)
 	std::string::const_iterator p2 = s2.begin();
 
 	while ( p1 != s1.end() && p2 != s2.end() ) {
-		if ( toupper( *p1 ) != toupper( *p2 ) ) {
+		if ( toupper( *p1 ) != toupper( *p2 ) )
 			return false;
-		}
+
 		++p1;
 		++p2;
 	}
-	if ( p1 == s1.end() && p2 != s2.end() ) {
+	if ( p1 == s1.end() && p2 != s2.end() )
 		return false;
-	}
+
 	return true;
 }
 std::string convertToLowerCase(const std::string& s)
 {
 	std::string result = "";
-	for ( std::string::size_type i = 0; i < s.length(); ++i ) {
+	for (std::string::size_type i = 0; i < s.length(); ++i)
 		result += tolower( s[i] );
-	}
+
 	return result;
 }
 std::string convertToUpperCase(const std::string& s)
 {
 	std::string result = "";
-	for ( std::string::size_type i = 0; i < s.length(); ++i ) {
+	for ( std::string::size_type i = 0; i < s.length(); ++i )
 		result += toupper( s[i] );
-	}
+
 	return result;
 }
 std::string replaceAll( std::string& in, const std::string& oldString, const std::string& newString )
 {
 	size_t pos;
-	while ( (pos = in.find( oldString )) != std::string::npos ) {
+	while ( (pos = in.find( oldString )) != std::string::npos )
 		in = in.replace( pos, oldString.length(), newString );
-	}
+
 	return in;
 }
