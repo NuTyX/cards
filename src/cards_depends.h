@@ -45,7 +45,7 @@ private:
 	* add the index reference to the depList.
 	* If not add it to the missingDepsList.
 	*/
-	depList* readDependenciesList(itemList *filesList, unsigned int nameIndex);
+	depList* readDependenciesList(unsigned int nameIndex);
 
 	void checkConfig();
 	int depends();
