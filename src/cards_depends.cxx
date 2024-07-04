@@ -230,7 +230,7 @@ void cards_depends::level()
 	}
 	unsigned int level = 0;
 	static unsigned  int Niveau = level;
-	generate_level(m_filesList,m_packagesList,Niveau);
+	generate_level(m_packagesList,Niveau);
 	if (Niveau == 0)
 		treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL," in level()");
 
@@ -274,7 +274,7 @@ int cards_depends::depends()
 	}
 	unsigned int level = 0;
 	static unsigned int Niveau = level;
-	generate_level(m_filesList,m_packagesList,Niveau);
+	generate_level(m_packagesList,Niveau);
 	if (Niveau == 0)
 		treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL," in depends()");
 
@@ -339,10 +339,6 @@ int cards_depends::deptree()
 			printf("%d) %s\n",dependenciesList->level[dInd],basename(m_filesList->items[dependenciesList->depsIndex[dInd]]));
 		}
 	}
-
-	bool found=false;
-	std::string name = "";
-	std::set<std::string> localPackagesList, depsPackagesList;
 
 	return 0;
 }
