@@ -125,32 +125,43 @@ _("If -p is passed, the list is checked against founds Pkgfile ports."),
 		ArgParser::NONE, 0 , "");
 
 
-	addCommand(CMD_DEPCREATE, "depcreate",	//16
+	addCommand(CMD_DEPCREATE, "depcreate",
 		_("create a package AND it's dependencies from the recipe found in the ports."),
 _("This command is used for the packager.\n\
 All the dependencies include the final package will be compiled."),
 		ArgParser::EQ,1 , _("<package>"));
 
-	addCommand(CMD_LEVEL, "level",			//11
+	addCommand(CMD_LEVEL, "level",
 		_("generate all the levels."),
 _("This command is used by the packager.\n\
 It allows to see which package depends on which dependency.\n\
 It is used for the compilation of a port."),
 		ArgParser::NONE, 0 , "");
 
-	addCommand(CMD_DEPENDS, "depends",		//13
+	addCommand(CMD_DEPENDS, "depends",
 		_("list the dependencies of the port."),
 _("This command is used for the packager.\n\
 It shows the list of the dependencies of the package.\n\
 It is used for the compilation of a port."),
 		ArgParser::EQ, 1,_("<port>"));
 
-	addCommand(CMD_DEPTREE, "deptree",		//14
+	addCommand(CMD_DEPENDS_OLD, "depends-old",
+		_("list the dependencies of the port."),
+_("This command is used for the packager.\n\
+It shows the list of the dependencies of the package.\n\
+It is used for the compilation of a port."),
+		ArgParser::EQ, 1,_("<port>"));
+
+	addCommand(CMD_DEPTREE, "deptree",
 		_("list the dependencies tree of the port."),
 _("It's mainly use to know if they are no duplicate call of any dependency."),
 		ArgParser::EQ, 1,_("<port>"));
 
-	addCommand(CMD_CREATE, "create",		//17
+	addCommand(CMD_DEPTREE_OLD, "deptree-old",
+		_("list the dependencies tree of the port."),
+_("It's mainly use to know if they are no duplicate call of any dependency."),
+		ArgParser::EQ, 1,_("<port>"));
+	addCommand(CMD_CREATE, "create",
 		_("create a package from the recipe found in the port."),
 _("This command is used for the packager.\n\
 All the dependencies must be compiled, up to date and available for the creation of the final package.\n\
@@ -158,6 +169,13 @@ If somes dependencies are missing, the command will abort.\n\
 A compilation logfile can be define in /etc/cards.conf as:\n\
 logdir /var/log/pkgbuild for example."),
 		ArgParser::EQ, 1, _("<package>"));
+
+	addCommand(CMD_LEVEL_OLD, "level-old",
+		_("generate all the levels."),
+_("This command is used by the packager.\n\
+It allows to see which package depends on which dependency.\n\
+It is used for the compilation of a port."),
+		ArgParser::NONE, 0 , "");
 
 	OPT_NO_SYNC.init("no-sync",
 		0,
@@ -296,6 +314,9 @@ logdir /var/log/pkgbuild for example."),
 	addOption(CMD_SYNC,OPT_ROOT,false);
 
 	addOption(CardsArgumentParser::CMD_DEPENDS, OPT_INSTALLED, false);
+	addOption(CardsArgumentParser::CMD_DEPENDS_OLD, OPT_INSTALLED, false);
 
 	addOption(CardsArgumentParser::CMD_LEVEL,OPT_IGNORE,false);
+	addOption(CardsArgumentParser::CMD_LEVEL_OLD,OPT_IGNORE,false);
+
 }
