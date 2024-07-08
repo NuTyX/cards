@@ -8,6 +8,7 @@
 #include "cards_remove.h"
 #include "cards_create.h"
 #include "cards_info.h"
+#include "cards_level.h"
 #include "cards_upgrade.h"
 #include "pkgrepo.h"
 #include "pkginfo.h"
@@ -265,6 +266,12 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 
 			case ArgParser::CMD_LEVEL:
+			{
+				unique_ptr<cards::cards_level> i(new cards::cards_level());
+				i->printout();
+				return EXIT_SUCCESS;
+			}
+			case ArgParser::CMD_LEVEL_OLD:
 			{
 				unique_ptr<cards_depends> i(new cards_depends(cardsArgPars));
 				i->level();
