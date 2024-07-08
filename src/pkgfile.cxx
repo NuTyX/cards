@@ -4,17 +4,32 @@
 
 namespace cards {
 
-std::set<std::string> port::dependencies()
-{
-    return m_dependencies;
-}
-void port::dependencies(const std::set<std::string> dependencies)
-{
-    m_dependencies = dependencies;
-}
 pkgfile::pkgfile(const std::string& fileName)
     : m_configFileName(fileName)
 {
+}
+void pkgfile::confirmDependencies()
+{
+    for (auto& i : m_listOfPackages) {
+        std::vector<IndexLevel> indexlevelList;
+        IndexLevel indexlevel;
+        unsigned int n = 1;
+        for (auto j : i.second.dependencies()) {
+            if (m_listOfPackages.find(j) != m_listOfPackages.end()) {
+                indexlevel.index = m_listOfPackages[j].index();
+                indexlevel.level = 0;
+                indexlevelList.push_back(indexlevel);
+                i.second.decount(n);
+                ++n;
+            } else {
+                std::string badDependency = j;
+                badDependency += " from ";
+                badDependency += i.first;
+                m_badDependencies.push_back(badDependency);
+            }
+        }
+        i.second.indexlevel(indexlevelList);
+    }
 }
 void pkgfile::parsePackagePkgfileFile()
 {
@@ -22,6 +37,7 @@ void pkgfile::parsePackagePkgfileFile()
         return;
     cards::conf m_config(m_configFileName);
     cards::port info;
+    unsigned int index = 0;
     bool found;
     for (auto i : m_config.dirUrl()) {
         DIR* d;
@@ -72,19 +88,18 @@ void pkgfile::parsePackagePkgfileFile()
                         found = true;
                         pos = s.find(')');
                         if (pos != std::string::npos) {
-                           s[pos] = ' ';
-                           found = false;
+                            s[pos] = ' ';
+                            found = false;
                         } else
                             s = s + " ";
                         continue;
-                    }
-                    else if (line.substr(0, 5) == "run=(") {
+                    } else if (line.substr(0, 5) == "run=(") {
                         s += line.substr(5);
                         found = true;
                         pos = s.find(')');
                         if (pos != std::string::npos) {
-                           s[pos] = ' ';
-                           found = false;
+                            s[pos] = ' ';
+                            found = false;
                         } else
                             s = s + " ";
                         continue;
@@ -92,18 +107,21 @@ void pkgfile::parsePackagePkgfileFile()
                     if (found) {
                         pos = line.find(')');
                         if (pos != std::string::npos) {
-                            s += line.substr(0,pos);
+                            s += line.substr(0, pos);
                             s = s + " ";
                             found = false;
                         } else
                             s = s + line + " ";
                     }
                 }
-                info.dependencies(parseDelimitedSetList(s," "));
+                info.dependencies(parseDelimitedSetList(s, " "));
+                info.index(index);
                 m_listOfPackages[portName] = info;
+                ++index;
             }
         }
     }
+    confirmDependencies();
 }
 ports_t pkgfile::getListOfPackages()
 {

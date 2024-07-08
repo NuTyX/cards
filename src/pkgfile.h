@@ -24,8 +24,8 @@ struct IndexLevel {
 
 class port : public pkg {
 
-     // The index Name used to check
-    // if dependenciesvalid
+    // The index Name used to check
+    // if dependencies is valid
     unsigned int m_index;
 
     // The level of dependency:
@@ -40,7 +40,8 @@ class port : public pkg {
     // when searching them
     unsigned int m_decrement;
 
-    //TODO findout what's it is used for
+    // number of dependencies that are still
+    // need to be treated
     int m_decount;
 
     // Dependencies made of index Name
@@ -52,37 +53,60 @@ class port : public pkg {
     std::set<std::string> m_dependencies;
 
 public:
-    std::set<std::string> dependencies();
-    void dependencies(const std::set<std::string> dependencies);
-
-    int level() {
+    port()
+        : m_level(0)
+        , m_decount(0)
+        , m_decrement(0)
+    {
+    }
+    int level()
+    {
         return m_level;
     }
-    void level(int level) {
+    void level(int level)
+    {
         m_level = level;
     }
-    int decount() {
+    int decount()
+    {
         return m_decount;
     }
-    void decount(int decount) {
+    void decount(int decount)
+    {
         m_decount = decount;
     }
-    unsigned int index() {
+    unsigned int index()
+    {
         return m_index;
     }
-    void index(unsigned int index) {
+    void index(unsigned int index)
+    {
         m_index = index;
     }
-    unsigned int decrement() {
+    unsigned int decrement()
+    {
         return m_decrement;
     }
-    void decrement(unsigned int decrement) {
+    void decrement(unsigned int decrement)
+    {
         m_decrement = decrement;
     }
-    std::vector<IndexLevel>indexlevel() {
+    std::vector<IndexLevel> indexlevel()
+    {
         return m_indexlevel;
     }
-
+    void indexlevel(std::vector<IndexLevel>& indexlevel)
+    {
+        m_indexlevel = indexlevel;
+    }
+    std::set<std::string> dependencies()
+    {
+        return m_dependencies;
+    }
+    void dependencies(const std::set<std::string>& dependencies)
+    {
+        m_dependencies = dependencies;
+    }
 };
 
 typedef std::map<std::string, cards::port> ports_t;
@@ -93,9 +117,10 @@ class pkgfile {
 
     friend cards_level;
 
-    std::string  m_configFileName;
-    cards::conf  m_config;
-    ports_t      m_listOfPackages;
+    std::string m_configFileName;
+    cards::conf m_config;
+    ports_t m_listOfPackages;
+    std::vector<std::string> m_badDependencies;
 
     void parsePackagePkgfileFile();
 
@@ -104,10 +129,16 @@ public:
     virtual ~pkgfile() { }
 
     /**
+     * check that all the dependencies exist in each package
+     *
+     */
+    void confirmDependencies();
+
+    /**
      * return the set of dependencies of the port name
      *
      */
-     std::set<std::string> getDependencies(const std::string& portName);
+    std::set<std::string> getDependencies(const std::string& portName);
 
     /**
      * return the version of the port name
