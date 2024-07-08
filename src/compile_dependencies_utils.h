@@ -79,7 +79,7 @@ int deps_direct(itemList* filesList,
     const char* pkgName,
     unsigned int level);
 
-void generate_level(pkgList* packagesList,
+void generate_level(itemList* filesList, pkgList* packagesList,
     unsigned int& level);
 
 char* getLongPackageName(itemList* filesList, const char* packageName);
