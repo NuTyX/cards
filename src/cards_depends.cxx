@@ -226,9 +226,8 @@ void cards_depends::level()
             treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL, " in level()");
     }
     unsigned int level = 0;
-    static unsigned int Niveau = level;
-    generate_level(m_packagesList, Niveau);
-    if (Niveau == 0)
+    generate_level(m_filesList, m_packagesList, level);
+    if (level == 0)
         treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL, " in level()");
 
     depList* dependenciesList = initDepsList();
@@ -237,7 +236,7 @@ void cards_depends::level()
             treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL, " in level()");
     }
     int currentLevel = 0;
-    while (currentLevel <= Niveau) {
+    while (currentLevel <= level) {
         for (unsigned int nameIndex = 0; nameIndex < m_packagesList->count; nameIndex++) {
             if (m_packagesList->pkgs[nameIndex]->level == currentLevel) {
                 LevelName LN;
@@ -271,7 +270,7 @@ int cards_depends::depends()
     }
     unsigned int level = 0;
     static unsigned int Niveau = level;
-    generate_level(m_packagesList, Niveau);
+    generate_level(m_filesList, m_packagesList, Niveau);
     if (Niveau == 0)
         treatErrors(cards::ERROR_ENUM_CANNOT_GENERATE_LEVEL, " in depends()");
 
