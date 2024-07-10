@@ -1,7 +1,8 @@
 #include "../src/libcards.h"
 
-int main () {
+int main (int argc, char** argv) {
     cards::pkgfile Repository("cards.conf");
+    /*
     for (auto i : Repository.getListOfPackages()) {
         std::cout << i.first
             << " "
@@ -25,6 +26,12 @@ int main () {
             << "-"
             << Repository.getPortRelease("libreoffice")
             << std::endl;
-    }
+    } */
+    cards::ports_t ports = Repository.getListOfPackages();
+    if (Repository.checkPortExist(argv[1]))
+        for (auto j : Repository.getDependencies(argv[1]))
+            std::cout <<"["<< j << "]"<< std::endl;
+    else
+        std::cout << argv[1] << " not found !!!" << std::endl;
     return 0;
 }
