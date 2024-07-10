@@ -156,7 +156,7 @@ public:
      * return true if port name exist
      *
      */
-    bool checkPortExist(const std::string& portName);
+    bool checkPortExist(const std::string& portName) const;
 
     /**
      * return the list of found Packages

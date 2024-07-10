@@ -15,14 +15,18 @@ void pkgfile::confirmDependencies()
         IndexLevel indexlevel;
         unsigned int n = 1;
         for (auto j : i.second.dependencies()) {
-            if (m_listOfPackages.find(j) != m_listOfPackages.end()) {
-                indexlevel.index = m_listOfPackages[j].index();
+            std::string s = getValueBeforeLast(j,'.');
+            if (m_listOfPackages.find(s) != m_listOfPackages.end()) {
+                if (i.second.index() == m_listOfPackages[s].index())
+                    continue;
+
+                indexlevel.index = m_listOfPackages[s].index();
                 indexlevel.level = 0;
                 indexlevelList.push_back(indexlevel);
                 i.second.decount(n);
                 ++n;
             } else {
-                std::string badDependency = j;
+                std::string badDependency = s ;
                 badDependency += " from ";
                 badDependency += i.first;
                 m_badDependencies.push_back(badDependency);
@@ -140,10 +144,8 @@ std::set<std::string> pkgfile::getDependencies(const std::string& portName)
 
     return deps;
 }
-bool pkgfile::checkPortExist(const std::string& portName)
+bool pkgfile::checkPortExist(const std::string& portName) const
 {
-    if (m_listOfPackages.size() == 0)
-        parsePackagePkgfileFile();
     return (m_listOfPackages.find(portName) != m_listOfPackages.end());
 }
 std::string pkgfile::pkgfile::getPortVersion(const std::string& portName)
