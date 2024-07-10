@@ -21,7 +21,8 @@ void cards_level::generate_level(unsigned int& level)
 {
     bool found = false;
     for (auto& i : m_listOfPackages) {
-        // decount == 0 means no dependencies anymore
+        // decount == 0 means no more dependencies needs
+        // to be treated.
         if (i.second.decount() == 0) {
             found = true;
             // at next loop we don't need to look at it
@@ -33,10 +34,20 @@ void cards_level::generate_level(unsigned int& level)
             // that still have some deps
             // that need to be check
             for (auto& j : m_listOfPackages) {
+                // if both packages in this loop and
+                // the upper loop are same, ignore it
+                if (j.second.index() == i.second.index())
+                    continue;
+
                 // Still some deps that need to be check
                 if (j.second.decount() > 0) {
                     // for all the deps of the package 'j''
                     for (auto k : j.second.indexlevel()) {
+                        // if the depname is the same as the name of the
+                        // package we check the deps, ignore it
+                        if (k.index == j.second.index())
+                            continue;
+
                         // if the package 'i' is found in the deps List
                         if (k.index == i.second.index()) {
                             // we increment the 'decrement' variable
@@ -76,10 +87,13 @@ void cards_level::printout()
                 found = true;
             }
         if (!found)
-            return;
+            break;
         ++level;
         found = false;
     }
+    for (auto i : m_badDependencies)
+        std::cout << i
+                  << std::endl;
 }
 
 } // endof cards namespace
