@@ -4,7 +4,7 @@
 namespace cards {
 
 cards_level::cards_level()
-    : pkgfile("/etc/cards.conf")
+    : m_level(0), pkgfile("/etc/cards.conf")
 {
 }
 cards_level::~cards_level()
@@ -14,10 +14,9 @@ void cards_level::level()
 {
     if (m_listOfPackages.size() == 0)
         parsePackagePkgfileFile();
-    unsigned int level = 0;
-    generate_level(level);
+    generate_level();
 }
-void cards_level::generate_level(unsigned int& level)
+void cards_level::generate_level()
 {
     bool found = false;
     for (auto& i : m_listOfPackages) {
@@ -29,7 +28,7 @@ void cards_level::generate_level(unsigned int& level)
             // decount = -1
             i.second.decount(-1);
             // Set the package level at current level value
-            i.second.level(level);
+            i.second.level(m_level);
             // For all the packages
             // that still have some deps
             // that need to be check
@@ -65,8 +64,8 @@ void cards_level::generate_level(unsigned int& level)
         }
     }
     if (found) {
-        level++;
-        generate_level(level);
+        m_level++;
+        generate_level();
     }
 }
 void cards_level::printout()
