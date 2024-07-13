@@ -4,6 +4,7 @@
 #include "cards_base.h"
 #include "cards_sync.h"
 #include "cards_depends.h"
+#include "deptree.h"
 #include "cards_install.h"
 #include "cards_remove.h"
 #include "cards_create.h"
@@ -285,6 +286,14 @@ int main(int argc, char** argv)
 			return EXIT_SUCCESS;
 
 			case ArgParser::CMD_DEPTREE:
+			{
+                                cards::deptree tree;
+                                std::cout << "  dependencies ( '-->' = listed already)"
+                                        << std::endl;
+                                tree.printDependencies(cardsArgPars.otherArguments()[0],"",0);
+                                return EXIT_SUCCESS;
+			}
+			case ArgParser::CMD_DEPTREE_OLD:
 			{
 				unique_ptr<cards_depends> i(new cards_depends(cardsArgPars));
 				return i->deptree();

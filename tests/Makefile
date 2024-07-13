@@ -5,9 +5,14 @@
 
 include ../Makefile.inc
 
-all: deplist uname pkgdbh pkginst pkgrepo pkgfile string vector conf
+all: deplist deptree uname pkgdbh pkginst pkgrepo pkgfile string vector conf
 
 deplist:
+	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	rm $@.o
+
+deptree:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
 	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
 	rm $@.o
@@ -54,6 +59,7 @@ pkgfile:
 
 
 clean:
+	rm -f deptree
 	rm -f deplist
 	rm -f pkginst
 	rm -f pkgrepo
