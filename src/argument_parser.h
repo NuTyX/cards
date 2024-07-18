@@ -45,32 +45,33 @@ public:
 	/**
 	 * Command passed
 	 */
-	enum CMD {
-		CMD_HELP=1,
-		CMD_CONFIG,
-		CMD_INSTALL,
-		CMD_REMOVE,
-		CMD_FILES,
-		CMD_LIST,
-		CMD_SYNC,
-		CMD_INFO,
-		CMD_QUERY,
-		CMD_SEARCH,
-		CMD_PURGE,
-		CMD_BASE,
-		CMD_DIFF,
-		CMD_UPGRADE,
-		CMD_CREATE,
-		CMD_DEPCREATE,
-		CMD_DEPENDS_OLD,
-		CMD_DEPENDS,
-		CMD_DEPTREE,
-		CMD_DEPTREE_OLD,
-		CMD_LEVEL,
-		CMD_LEVEL_OLD
-	};
+        enum CMD {
+            CMD_HELP = 1,
+            CMD_CONFIG,
+            CMD_INSTALL,
+            CMD_REMOVE,
+            CMD_FILES,
+            CMD_LIST,
+            CMD_SYNC,
+            CMD_INFO,
+            CMD_QUERY,
+            CMD_SEARCH,
+            CMD_PURGE,
+            CMD_BASE,
+            CMD_DIFF,
+            CMD_UPGRADE,
+            CMD_CREATE,
+            CMD_CREATE_OLD,
+            CMD_DEPCREATE,
+            CMD_DEPENDS_OLD,
+            CMD_DEPENDS,
+            CMD_DEPTREE,
+            CMD_DEPTREE_OLD,
+            CMD_LEVEL,
+            CMD_LEVEL_OLD
+        };
 
-	/**
+        /**
 	 * Option passed
 	 */
 	enum OPT {
