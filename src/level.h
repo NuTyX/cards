@@ -4,15 +4,17 @@
 #include "pkgfile.h"
 
 namespace cards {
-class cards_level : public pkgfile
+class level : public pkgfile
 {
-    void level();
-    void generate_level();
-    unsigned int m_level;
+    ports_t m_tree;
+
 public:
-    cards_level();
-    ~cards_level();
-    void printout();
+    level()
+    : pkgfile("/etc/cards.conf")
+    , m_tree(getListOfPackages()) {};
+
+    ~level() {};
+    void print();
 };
 
 }  // endof cards namespace
