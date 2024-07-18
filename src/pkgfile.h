@@ -111,18 +111,18 @@ public:
 
 typedef std::map<std::string, cards::port> ports_t;
 
-class cards_level;
 
 class pkgfile {
 
-    friend cards_level;
 
     std::string m_configFileName;
     cards::conf m_config;
     ports_t m_listOfPackages;
     std::vector<std::string> m_badDependencies;
+    unsigned int m_level;
 
     void parsePackagePkgfileFile();
+    void generate_level();
 
 public:
     pkgfile(const std::string& fileName);
@@ -163,6 +163,12 @@ public:
      *
      */
     ports_t getListOfPackages();
+
+    /**
+     * return the list of bad Dependencies
+     *
+     */
+    std::vector<std::string> getBadDependencies();
 };
 
 } // end of 'cards' namespace
