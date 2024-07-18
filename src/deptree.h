@@ -16,7 +16,7 @@ public:
         , m_tree(getListOfPackages())
         , m_space("") {};
     ~deptree() {};
-    void printDependencies(std::string name, std::string space, int level);
+    void print(std::string name, std::string space, int level);
 };
 
 }

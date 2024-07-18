@@ -1,7 +1,7 @@
 #include "deptree.h"
 
 namespace cards {
-void deptree::printDependencies(std::string name, std::string space, int level)
+void deptree::print(std::string name, std::string space, int level)
 {
     bool found = false;
     for (auto i : m_list) {
@@ -22,7 +22,7 @@ void deptree::printDependencies(std::string name, std::string space, int level)
             for (auto n : m_tree[name].dependencies()) {
                 if (n == name)
                     break;
-                printDependencies(n, space, level);
+                print(n, space, level);
             }
         }
     }
