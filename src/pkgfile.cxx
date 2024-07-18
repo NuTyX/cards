@@ -15,7 +15,7 @@ void pkgfile::confirmDependencies()
         IndexLevel indexlevel;
         unsigned int n = 1;
         for (auto j : i.second.dependencies()) {
-            std::string s = getValueBeforeLast(j,'.');
+            std::string s = getValueBeforeLast(j, '.');
             if (m_listOfPackages.find(s) != m_listOfPackages.end()) {
                 if (i.second.index() == m_listOfPackages[s].index())
                     continue;
@@ -26,7 +26,7 @@ void pkgfile::confirmDependencies()
                 i.second.decount(n);
                 ++n;
             } else {
-                std::string badDependency = s ;
+                std::string badDependency = s;
                 badDependency += " from ";
                 badDependency += i.first;
                 m_badDependencies.push_back(badDependency);
@@ -42,7 +42,7 @@ void pkgfile::parsePackagePkgfileFile()
     cards::conf m_config(m_configFileName);
     cards::port info;
     unsigned int index = 0;
-    bool found;
+    bool found = false;
     for (auto i : m_config.dirUrl()) {
         DIR* d;
         struct dirent* dir;
@@ -71,6 +71,8 @@ void pkgfile::parsePackagePkgfileFile()
                 std::string s;
                 for (auto p : pkgFileContent) {
                     std::string line = stripWhiteSpace(p);
+                    replaceAll(line, ",", " ");
+                    replaceAll(line, "\\", " ");
                     if (line[0] == '#')
                         continue;
                     if (line.substr(0, 12) == "description=")
