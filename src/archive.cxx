@@ -235,6 +235,16 @@ std::string archive::url()
     }
     return "";
 }
+std::string archive::license()
+{
+    for (auto s : m_contentMeta) {
+        if (s[0] == 'L') {
+            return s.substr(1);
+            break;
+        }
+    }
+    return "";
+}
 std::string archive::description()
 {
     for (auto s : m_contentMeta) {

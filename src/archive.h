@@ -38,6 +38,7 @@ public:
 	std::string contributors(); // return the Contributor(s) of the package
 	std::string maintainer(); // return the Maintainer(s) of the package
 	std::string collection(); // return the collection of the package
+	std::string license(); // return the collection of the package
 	std::string packager(); // return the Packager(s) of the package
 	std::string builddate(); // return the date like Mon Mar 24 10:16:00 2014
 	std::string name(); // return the name of the package

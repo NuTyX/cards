@@ -1205,6 +1205,8 @@ pkgdbh::openArchivePackage(const std::string& filename)
 	result.second.arch(packageArchive.arch());
 	result.second.build(packageArchive.buildn());
 	result.second.group(packageArchive.group());
+	result.second.collection(packageArchive.collection());
+	result.second.license(packageArchive.license());
 
 	std::set<std::string> fileList =  packageArchive.setofFiles();
 	for (auto i :fileList) {

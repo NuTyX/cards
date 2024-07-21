@@ -157,8 +157,8 @@ void pkginfo::run()
                   << packageArchive.second.url()
                   << std::endl
                   << "L:"
-                  << std::endl
                   << packageArchive.second.license()
+                  << std::endl
                   << "c:"
                   << packageArchive.second.collection()
                   << std::endl
