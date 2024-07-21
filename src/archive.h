@@ -20,12 +20,11 @@ public:
 
 	void printDeps(); // Print Out the dependencies
 	void printMeta(); // Print Out the .META file
-	void printInfo(); // the .INFO file
 	void list(); // list the files to stdio
 
 	std::string getPackageName();
 	std::string getPackageArch();
-	std::vector<std::string> extractFileContent(const char* fileName);
+	void extractFileContent(std::vector<std::string>& list, const char* fileName);
 	unsigned int long size(); // Numbers of files in the archive
 	std::set<std::string> setofFiles(); // return a order set of string
 	std::set<std::string> listofDependencies(); // return an order set of dependencies
@@ -56,7 +55,6 @@ private:
 
 	std::vector<std::string> m_contentMtree;
 	std::vector<std::string> m_contentMeta;
-	std::vector<std::string> m_contentInfo;
 
 	std::set<std::string> m_rtDependenciesList;
 	std::set<std::pair<std::string, time_t>> m_rtDependenciesEpochList;

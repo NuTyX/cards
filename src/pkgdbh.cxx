@@ -1168,9 +1168,7 @@ pkgdbh::openArchivePackage(const std::string& filename)
 	std::string packageArchiveName;
 	std::pair<std::string, cards::db> result;
 	archive packageArchive(filename.c_str());
-#ifdef DEBUG
-	std::cerr << "Number of files: " << packageArchive.size() << std::endl;
-#endif
+
 	std::string basename(filename, filename.rfind('/') + 1);
 	m_filesNumber = packageArchive.size();
 	if (m_filesNumber == 0 ) {

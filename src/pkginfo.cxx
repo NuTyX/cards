@@ -156,14 +156,11 @@ void pkginfo::run()
                   << "U:"
                   << packageArchive.second.url()
                   << std::endl
+                  << "L:"
+                  << std::endl
+                  << packageArchive.second.license()
                   << "c:"
                   << packageArchive.second.collection()
-                  << std::endl
-                  << "G:"
-                  << packageArchive.second.group()
-                  << std::endl
-                  << "L:"
-                  << packageArchive.second.license()
                   << std::endl
                   << "P:"
                   << packageArchive.second.packager()

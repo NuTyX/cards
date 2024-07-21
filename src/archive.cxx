@@ -5,18 +5,8 @@
 archive::archive(const std::string& fileName)
     : m_fileName(fileName)
 {
-#ifdef DEBUG
-    std::cerr << "extractFileContent META" << std::endl;
-#endif
-    m_contentMeta = extractFileContent(METAFILE);
-#ifdef DEBUG
-    std::cerr << "extractFileContent MTREE" << std::endl;
-#endif
-    m_contentMtree = extractFileContent(MTREEFILE);
-#ifdef DEBUG
-    std::cerr << "extractFileContent INFO" << std::endl;
-#endif
-    m_contentInfo = extractFileContent(INFOFILE);
+    extractFileContent(m_contentMtree,MTREEFILE);
+    extractFileContent(m_contentMeta,METAFILE);
 
     if (m_contentMeta.size() == 0) {
         m_actualError = cards::CANNOT_FIND_META_FILE;
@@ -67,10 +57,7 @@ std::set<std::string> archive::setofFiles()
 }
 unsigned int long archive::size()
 {
-    if (m_contentMtree.size() != 0)
-        return m_contentMtree.size();
-    else
-        return 0;
+    return m_contentMtree.size();
 }
 void archive::list()
 {
@@ -82,9 +69,10 @@ void archive::list()
         }
     }
 }
-std::vector<std::string> archive::extractFileContent(const char* fileName)
+void archive::extractFileContent
+    (std::vector<std::string>& list
+    ,const char* fileName)
 {
-    std::vector<std::string> contentFile;
     struct archive* ar;
     struct archive_entry* ae;
 
@@ -103,27 +91,15 @@ std::vector<std::string> archive::extractFileContent(const char* fileName)
         const char* currentFile = archive_entry_pathname(ae);
         if (strcmp(currentFile, fileName) == 0) {
             entry_size = archive_entry_size(ae);
-            char* fC = (char*)Malloc(entry_size);
+            char* fC = (char*)malloc(entry_size);
             archive_read_data(ar, fC, entry_size);
-            fC[entry_size - 1] = '\0';
-            std::string s_contentFile = fC;
-            if (fC != nullptr) {
-                free(fC);
-                fC = nullptr;
-            }
-            contentFile = parseDelimitedVectorList(s_contentFile, '\n');
+            list = parseDelimitedVectorList(fC,'\n');
+            free(fC);
             break;
-        }
-        ++i;
-        if (i > 10) {
-            archive_read_close(ar);
-            FREE_ARCHIVE(ar);
-            return contentFile; // no need to go further, it didn't find it
         }
     }
     archive_read_close(ar);
     FREE_ARCHIVE(ar);
-    return contentFile;
 }
 void archive::getRunTimeDependenciesEpoch()
 {
@@ -163,13 +139,6 @@ void archive::printMeta()
 {
     for (auto i : m_contentMeta)
         std::cout << i << std::endl;
-}
-void archive::printInfo()
-{
-    if (m_contentInfo.size() != 0) {
-        for (auto i : m_contentInfo)
-            std::cout << i << std::endl;
-    }
 }
 std::string archive::getPackageName()
 {
@@ -238,9 +207,9 @@ std::string archive::arch()
 }
 std::string archive::version()
 {
-    for (auto version : m_contentMeta) {
-        if (version[0] == 'V') {
-            return version.substr(1);
+    for (auto s : m_contentMeta) {
+        if (s[0] == 'V') {
+            return s.substr(1);
             break;
         }
     }
@@ -248,9 +217,9 @@ std::string archive::version()
 }
 int archive::release()
 {
-    for (auto release : m_contentMeta) {
-        if (release[0] == 'r') {
-            return stoi(release.substr(1));
+    for (auto s : m_contentMeta) {
+        if (s[0] == 'r') {
+            return stoi(s.substr(1));
             break;
         }
     }
@@ -258,9 +227,9 @@ int archive::release()
 }
 std::string archive::url()
 {
-    for (auto url : m_contentMeta) {
-        if (url[0] == 'U') {
-            return url.substr(1);
+    for (auto s : m_contentMeta) {
+        if (s[0] == 'U') {
+            return s.substr(1);
             break;
         }
     }
@@ -268,9 +237,9 @@ std::string archive::url()
 }
 std::string archive::description()
 {
-    for (auto description : m_contentMeta) {
-        if (description[0] == 'D') {
-            return description.substr(1);
+    for (auto s : m_contentMeta) {
+        if (s[0] == 'D') {
+            return s.substr(1);
             break;
         }
     }
@@ -278,9 +247,9 @@ std::string archive::description()
 }
 std::string archive::group()
 {
-    for (auto group : m_contentMeta) {
-        if (group[0] == 'g') {
-            return group.substr(1);
+    for (auto s : m_contentMeta) {
+        if (s[0] == 'g') {
+            return s.substr(1);
             break;
         }
     }
@@ -288,9 +257,9 @@ std::string archive::group()
 }
 std::string archive::maintainer()
 {
-    for (auto maintainer : m_contentMeta) {
-        if (maintainer[0] == 'M') {
-            return maintainer.substr(1);
+    for (auto s : m_contentMeta) {
+        if (s[0] == 'M') {
+            return s.substr(1);
             break;
         }
     }
@@ -298,9 +267,9 @@ std::string archive::maintainer()
 }
 std::string archive::contributors()
 {
-    for (auto contributors : m_contentMeta) {
-        if (contributors[0] == 'C') {
-            return contributors.substr(1);
+    for (auto s : m_contentMeta) {
+        if (s[0] == 'C') {
+            return s.substr(1);
             break;
         }
     }
@@ -308,9 +277,9 @@ std::string archive::contributors()
 }
 std::string archive::packager()
 {
-    for (auto maintainer : m_contentMeta) {
-        if (maintainer[0] == 'P') {
-            return maintainer.substr(1);
+    for (auto s : m_contentMeta) {
+        if (s[0] == 'P') {
+            return s.substr(1);
             break;
         }
     }
@@ -318,9 +287,9 @@ std::string archive::packager()
 }
 std::string archive::collection()
 {
-    for (auto collection : m_contentMeta) {
-        if (collection[0] == 'c') {
-            return collection.substr(1);
+    for (auto s : m_contentMeta) {
+        if (s[0] == 'c') {
+            return s.substr(1);
             break;
         }
     }
