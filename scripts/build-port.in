@@ -1,41 +1,6 @@
 #!/usr/bin/env bash
 #  SPDX-License-Identifier: LGPL-2.1-or-later
 
-usage() {
-echo "
-Recommended use:
-
-You should mount the '$PROJECT' git as bind option (--bind) in your personal account
-
-Example if your personal account is 'tnut' and
-this chroot NuTyX is installed in '/mnt/lfs', proceed as follow
-
-1. clone this project as 'tnut' user:
-   cd ~
-   git clone git://github.com/NuTyX/$PROJECT.git
-
-2. your git is now in following directory:
-   '/home/tnut/$PROJECT'
-
-
-3. Delete this git in your chroot and create an empty folder
-    rm -r /mnt/lfs/root/$PROJECT
-    mkdir -p /mnt/lfs/root/$PROJECT
-
-4. Mount your '$PROJECT' git projet as bind option INTO your chroot
-    mount -o bind /home/tnut/$PROJECT /mnt/lfs/root/$PROJECT
-
-5. Make your git operation in 'tnut' user
-
-Option: you could add this alias into your chroot root .bashrc
-    alias $COLLECTION='_() { cd $GIT; bash scripts/$COLLECTION \$@; cd -; };_ \$@'
-
-It will make your life easier. To build any port from the collection $COLLECTION,
-you will just have to type:
-    $COLLECTION  <name_of_the_port>
-"
-
-}
 print_help()
 {
 	echo "usage: $COLLECTION [option]"
@@ -50,7 +15,6 @@ print_help()
 	echo "   -c,   --config              printout the configuration"
 	echo "   -h,   --help                print help and exit"
 	echo "   -v,   --version             print version and exit"
-	echo "   -u,   --usage               print the recommended way of using the '$COLLECTION' script"
 }
 list_ports() {
 	cd $PORT_BASE && find . -name Pkgfile -follow -printf "%h\n" | sed 's|^./||g' | sort
@@ -165,7 +129,6 @@ check_collection_exist() {
 parse_options() {
 	if [ $# -lt 1 ]; then
 		print_help
-		usage
 		exit 0
 	fi
 	while [ "$1" ]; do
@@ -226,10 +189,6 @@ PORT_BASE     : $PORT_BASE
 				echo "$COLLECTION $BUILD_PORT_VERSION"
                                 exit 0 ;;
 
-			-u|--usage)
-				usage
-				exit 0;;
-
 			*)
 				check_port_name $1
 				;;
@@ -273,7 +232,6 @@ check_user () {
 if [ "$UID" == "0" ] && [ -O scripts ] ; then
 	echo "your are 'root' account
 Means you are not suppose to 'git pull' this git project"
-	usage
 	echo "I quit for now
 
 "
