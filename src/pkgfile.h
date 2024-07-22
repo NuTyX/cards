@@ -147,6 +147,12 @@ public:
     std::string getPortVersion(const std::string& portName);
 
     /**
+     * return the folder of the port name
+     *
+     */
+    std::string getPortDir(const std::string& portName);
+
+    /**
      * return the release of the port name
      *
      */

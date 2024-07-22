@@ -216,6 +216,12 @@ std::string pkgfile::pkgfile::getPortVersion(const std::string& portName)
         parsePackagePkgfileFile();
     return m_listOfPackages[portName].version();
 }
+std::string pkgfile::pkgfile::getPortDir(const std::string& portName)
+{
+    if (m_listOfPackages.size() == 0)
+        parsePackagePkgfileFile();
+    return m_listOfPackages[portName].collection();
+}
 unsigned short int pkgfile::pkgfile::getPortRelease(const std::string& portName)
 {
     if (m_listOfPackages.size() == 0)
