@@ -8,20 +8,6 @@
 
 namespace cards {
 
-struct IndexLevel {
-    // The index Name of the depencency
-    unsigned int index;
-
-    // The level of the dependency:
-    // The level of dependency:
-    // 0: No dependency
-    // 1: some deps from level 0 dependencies
-    // 2: some deps from level 1 dependencies
-    // 3: ... 2  ...
-    // etc
-    int level;
-};
-
 class port : public pkg {
 
     // The index Name used to check
@@ -48,7 +34,7 @@ class port : public pkg {
     // This list validate all the dependencies
     // as they are pointing the actual name via
     // they index
-    std::vector<IndexLevel> m_indexlevel;
+    std::vector<unsigned int> m_indexes;
 
     std::set<std::string> m_dependencies;
 
@@ -91,13 +77,13 @@ public:
     {
         m_decrement = decrement;
     }
-    std::vector<IndexLevel> indexlevel()
+    std::vector<unsigned int> indexes()
     {
-        return m_indexlevel;
+        return m_indexes;
     }
-    void indexlevel(std::vector<IndexLevel>& indexlevel)
+    void indexes(std::vector<unsigned int>& indexes)
     {
-        m_indexlevel = indexlevel;
+        m_indexes = indexes;
     }
     std::set<std::string> dependencies()
     {
@@ -111,9 +97,7 @@ public:
 
 typedef std::map<std::string, cards::port> ports_t;
 
-
 class pkgfile {
-
 
     std::string m_configFileName;
     cards::conf m_config;

@@ -12,8 +12,7 @@ pkgfile::pkgfile(const std::string& fileName)
 void pkgfile::confirmDependencies()
 {
     for (auto& i : m_listOfPackages) {
-        std::vector<IndexLevel> indexlevelList;
-        IndexLevel indexlevel;
+        std::vector<unsigned int> indexes;
         unsigned int n = 1;
         for (auto j : i.second.dependencies()) {
             std::string s = getValueBeforeLast(j, '.');
@@ -21,9 +20,7 @@ void pkgfile::confirmDependencies()
                 if (i.second.index() == m_listOfPackages[s].index())
                     continue;
 
-                indexlevel.index = m_listOfPackages[s].index();
-                indexlevel.level = 0;
-                indexlevelList.push_back(indexlevel);
+                indexes.push_back(m_listOfPackages[s].index());
                 i.second.decount(n);
                 ++n;
             } else {
@@ -33,7 +30,7 @@ void pkgfile::confirmDependencies()
                 m_badDependencies.push_back(badDependency);
             }
         }
-        i.second.indexlevel(indexlevelList);
+        i.second.indexes(indexes);
     }
 }
 void pkgfile::parsePackagePkgfileFile()
@@ -156,14 +153,14 @@ void pkgfile::generate_level()
                 // Still some deps that need to be check
                 if (j.second.decount() > 0) {
                     // for all the deps of the package 'j''
-                    for (auto k : j.second.indexlevel()) {
+                    for (auto k : j.second.indexes()) {
                         // if the depname is the same as the name of the
                         // package we check the deps, ignore it
-                        if (k.index == j.second.index())
+                        if (k == j.second.index())
                             continue;
 
                         // if the package 'i' is found in the deps List
-                        if (k.index == i.second.index()) {
+                        if (k == i.second.index()) {
                             // we increment the 'decrement' variable
                             j.second.decrement(j.second.decrement() + 1);
                         }
