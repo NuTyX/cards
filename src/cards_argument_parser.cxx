@@ -311,8 +311,13 @@ It is used for the compilation of a port."),
 
     addOption(CMD_CREATE, OPT_DISABLE, false);
     addOption(CMD_CREATE, OPT_DRY, false);
-    addOption(CMD_CREATE, OPT_REMOVE, true);
+    addOption(CMD_CREATE, OPT_REMOVE, false);
     addOption(CMD_CREATE, OPT_ROOT, false);
+
+    addOption(CMD_CREATE_OLD, OPT_DISABLE, false);
+    addOption(CMD_CREATE_OLD, OPT_DRY, false);
+    addOption(CMD_CREATE_OLD, OPT_REMOVE, true);
+    addOption(CMD_CREATE_OLD, OPT_ROOT, false);
 
     addOption(CMD_SYNC, OPT_ROOT, false);
 
