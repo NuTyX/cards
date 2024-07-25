@@ -8,6 +8,8 @@
 #include "cards_remove.h"
 #include "cards_sync.h"
 #include "cards_upgrade.h"
+#include "sync.h"
+#include "create.h"
 #include "depends.h"
 #include "deptree.h"
 #include "file_download.h"
@@ -175,6 +177,20 @@ int main(int argc, char** argv)
                 string s = "";
                 throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
             }
+            if (cardsArgPars.isSet(CardsArgumentParser::OPT_CONFIG_FILE)) {
+				cards::sync sync(configFile);
+				sync.run();
+			} else {
+				cards::sync sync;
+				sync.run();
+			}
+            return EXIT_SUCCESS;
+
+        case ArgParser::CMD_SYNC_OLD:
+            if (getuid()) {
+                string s = "";
+                throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
+            }
             {
                 unique_ptr<cards_sync> i(new cards_sync(cardsArgPars));
                 i->run();
@@ -224,7 +240,7 @@ int main(int argc, char** argv)
         }
             return EXIT_SUCCESS;
 
-        case ArgParser::CMD_CREATE: {
+        case ArgParser::CMD_CREATE_OLD: {
             if ((!cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) && (!cardsArgPars.isSet(CardsArgumentParser::OPT_DRY))) {
                 cardsArgPars.printHelp("create");
                 return EXIT_SUCCESS;
@@ -247,6 +263,12 @@ int main(int argc, char** argv)
                 cardsArgPars.otherArguments()[0]));
         }
             return EXIT_SUCCESS;
+
+        case ArgParser::CMD_CREATE: {
+            cards::create create(cardsArgPars);
+            create.build(cardsArgPars.otherArguments()[0]);
+            return EXIT_SUCCESS;
+        }
 
         case ArgParser::CMD_LEVEL: {
             cards::level level;
