@@ -24,9 +24,14 @@ void pkgfile::confirmDependencies()
                 i.second.decount(n);
                 ++n;
             } else {
-                std::string badDependency = s;
+                std::string badDependency = "WARNING ";
+                badDependency += s;
                 badDependency += " from ";
                 badDependency += i.first;
+                badDependency += " (";
+                badDependency += i.second.collection();
+                badDependency += ") ";
+                badDependency += " NOT FOUND ...";
                 m_badDependencies.push_back(badDependency);
             }
         }
@@ -217,7 +222,7 @@ std::string pkgfile::pkgfile::getPortDir(const std::string& portName)
 {
     if (m_listOfPackages.size() == 0)
         parsePackagePkgfileFile();
-    return m_listOfPackages[portName].collection();
+    return m_listOfPackages[portName].collection() + "/" + portName;
 }
 unsigned short int pkgfile::pkgfile::getPortRelease(const std::string& portName)
 {
