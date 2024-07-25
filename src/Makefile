@@ -53,9 +53,11 @@ CARDSOBJECTS =	conf.o \
 		pkginfo.o \
 		pkginst.o \
 		pkgsync.o \
-        deptree.o \
+		deptree.o \
 		level.o \
 		depends.o \
+		sync.o \
+		create.o \
 		cards_create.o \
 		cards_sync.o \
 		cards_install.o \
@@ -65,7 +67,6 @@ CARDSOBJECTS =	conf.o \
 		cards_info.o \
 		cards_upgrade.o \
 		cards.o
-
 
 LIBOBJECTS =  conf.o \
 	system_utils.o \
@@ -85,6 +86,7 @@ LIBOBJECTS =  conf.o \
 	lock.o \
 	db.o \
 	cache.o \
+	sync.o \
 	runtime_dependencies_utils.o \
 	pkgdbh.o \
 	pkgadd.o \
@@ -122,6 +124,7 @@ HEADERS = define.h \
 	lock.h \
 	db.h  \
 	cache.h \
+	sync.h \
 	pkgfile.h \
 	pkgrepo.h \
 	repodwl.h \
