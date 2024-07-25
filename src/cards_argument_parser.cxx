@@ -58,6 +58,11 @@ the base system directory and the logfile directory."),
         "",
         ArgParser::NONE, 0, "");
 
+    addCommand(CMD_SYNC_OLD, "sync-old",
+        _("synchronize local and remote metadatas."),
+        "",
+        ArgParser::NONE, 0, "");
+
     addCommand(CMD_QUERY, "query",
         _("list owner of file(s) matching the query."),
         "",
@@ -319,7 +324,7 @@ It is used for the compilation of a port."),
     addOption(CMD_CREATE_OLD, OPT_REMOVE, true);
     addOption(CMD_CREATE_OLD, OPT_ROOT, false);
 
-    addOption(CMD_SYNC, OPT_ROOT, false);
+    addOption(CMD_SYNC, OPT_CONFIG_FILE, false);
 
     addOption(CardsArgumentParser::CMD_DEPENDS, OPT_INSTALLED, false);
     addOption(CardsArgumentParser::CMD_DEPENDS_OLD, OPT_INSTALLED, false);

@@ -53,6 +53,7 @@ public:
             CMD_FILES,
             CMD_LIST,
             CMD_SYNC,
+            CMD_SYNC_OLD,
             CMD_INFO,
             CMD_QUERY,
             CMD_SEARCH,
