@@ -810,48 +810,51 @@ add_meta_files() {
 	done
 }
 add_meta_to_archive() {
-	local NAME TAR SIZE_I DESC URL CONT PACK MAINT ARCH GROUP LICENSE
-	NAME="$(get_package_name $1)"
-	ARCH="$(get_package_arch $1)"
-	GROUP="$(echo $NAME|cut -d "." -f2)"
-	[ "$GROUP" == "$NAME" ] && unset GROUP
-	info  "Adding meta data to Archive $NAME"
+    local NAME TAR SIZE_I DESC URL CONT PACK MAINT ARCH GROUP LICENSE
+    NAME="$(get_package_name $1)"
+    ARCH="$(get_package_arch $1)"
+    GROUP="$(echo $NAME|cut -d "." -f2)"
+    [ "$GROUP" == "$NAME" ] && unset GROUP
+    info  "Adding meta data to Archive $NAME"
 
-	TAR="$PKGMK_WORK_DIR/tar"
-	mkdir -p $TAR
-	cd $TAR
-	DESC="none"
-	URL="none"
-	PACK="none"
-	MAINT="none"
-	CONT="none"
-	LICENSE="GPL"
+    TAR="$PKGMK_WORK_DIR/tar"
+    mkdir -p $TAR
+    cd $TAR
+    DESC="none"
+    URL="none"
+    PACK="none"
+    MAINT="none"
+    CONT="none"
+    LICENSE="GPL"
+    bsdtar xf $PKGMK_PACKAGE_DIR/$1
 
-	bsdtar xf $PKGMK_PACKAGE_DIR/$1
+    [ ! -z "$description" ] && DESC=$description
+    [ ! -z "$packager" ] && PACK=$packager
+    [ ! -z "$maintainer" ] && MAINT=$maintainer
+    [ ! -z "$contributors" ] && CONT=$contributors
+    [ ! -z "$url" ] && URL=$url
+    [ ! -z "$license" ]  && LICENSE=$license
 
-	[ ! -z "$description" ] && DESC=$description
-	[ ! -z "$packager" ] && PACK=$packager
-	[ ! -z "$maintainer" ] && MAINT=$maintainer
-	[ ! -z "$contributors" ] && CONT=$contributors
-	[ ! -z "$url" ] && URL=$url
-	[ ! -z "$license" ]  && LICENSE=$license
-
-	SIZE_I="$(du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1)"
+    SIZE_I="$(du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1)"
 
 	echo "N$NAME" > .META
-	echo "D$DESC" >> .META
-	echo "U$URL" >> .META
-	echo "C$CONT" >> .META
-	echo "M$MAINT" >> .META
-	echo "P$PACK" >> .META
-	echo "S$SIZE_I" >> .META
-	echo "V$version" >> .META
-	echo "r$release" >> .META
-	echo "B$PKGMK_BUILDVER" >> .META
-	echo "a$ARCH" >> .META
-	echo "L$LICENSE" >> .META
-	[ ! -z "$COLLECTION" ] && echo "c$COLLECTION" >> .META
-	[ ! -z "$GROUP" ] && echo "g$GROUP" >> .META
+    echo "V$version" >> .META
+    echo "r$release" >> .META
+    echo "S$SIZE_I" >> .META
+    echo "a$ARCH" >> .META
+
+    if [ -z "$GROUP" ]; then
+        echo "D$DESC" >> .META
+        echo "U$URL" >> .META
+        echo "C$CONT" >> .META
+        echo "M$MAINT" >> .META
+        echo "P$PACK" >> .META
+        echo "L$LICENSE" >> .META
+        echo "B$PKGMK_BUILDVER" >> .META
+        [ ! -z "$COLLECTION" ] && echo "c$COLLECTION" >> .META
+    fi
+
+    [ ! -z "$GROUP" ] && echo "g$GROUP" >> .META
 
 	# TODO improve the pkginfo --runtimedepfiles functionnality
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
