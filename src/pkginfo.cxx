@@ -144,31 +144,47 @@ void pkginfo::run()
 {
     if (m_metainfo) {
         std::pair<std::string, cards::db> packageArchive = openArchivePackage(m_packageArchiveName);
-        std::cout << packageArchive.first
+        std::cout << "@"
+                  << packageArchive.first
                   << ".cards-"
                   << packageArchive.second.version()
                   << "-"
                   << packageArchive.second.release()
                   << std::endl
-                  << "D:"
+                  << "D"
                   << packageArchive.second.description()
                   << std::endl
-                  << "U:"
+                  << "U"
                   << packageArchive.second.url()
                   << std::endl
-                  << "L:"
+                  << "L"
                   << packageArchive.second.license()
                   << std::endl
-                  << "c:"
+                  << "M"
+                  << packageArchive.second.maintainer()
+                  << std::endl
+                  << "C"
+                  << packageArchive.second.contributors()
+                  << std::endl
+                  << "c"
                   << packageArchive.second.collection()
                   << std::endl
-                  << "P:"
+                  << "g"
+                  << packageArchive.second.group()
+                  << std::endl
+                  << "P"
                   << packageArchive.second.packager()
                   << std::endl;
         if (packageArchive.second.dependencies().size() > 0) {
             for (auto i : packageArchive.second.dependencies())
-                std::cout << "R:"
+                std::cout << "R"
                           << i.first
+                          << std::endl;
+        }
+        if (packageArchive.second.categories().size() > 0) {
+            for (auto i : packageArchive.second.categories())
+                std::cout << "T"
+                          << i
                           << std::endl;
         }
     }
