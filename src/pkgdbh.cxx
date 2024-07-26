@@ -1198,6 +1198,7 @@ pkgdbh::openArchivePackage(const std::string& filename)
 	result.first = packageArchiveName;
 	result.second.description(packageArchive.description());
 	result.second.url(packageArchive.url());
+	result.second.contributors(packageArchive.contributors());
 	result.second.maintainer(packageArchive.maintainer());
 	result.second.packager(packageArchive.packager());
 	result.second.version(packageArchive.version());
@@ -1213,6 +1214,7 @@ pkgdbh::openArchivePackage(const std::string& filename)
 		result.second.files.insert(i);
 	}
 	result.second.dependencies(packageArchive.listofDependenciesBuildDate());
+	result.second.categories(packageArchive.listofCategories());
 	m_packageName = packageArchiveName;
 	return result;
 }
