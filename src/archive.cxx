@@ -128,6 +128,14 @@ void archive::getAliasList()
         }
     }
 }
+void archive::getCategoriesList()
+{
+    for (auto i : m_contentMeta) {
+        if (i[0] == 'T') {
+            m_categoriesList.insert(i.substr(1));
+        }
+    }
+}
 void archive::printDeps()
 {
     getRunTimeDependencies();
@@ -187,6 +195,11 @@ std::set<std::string> archive::listofAlias()
 {
     getAliasList();
     return m_aliasList;
+}
+std::set<std::string> archive::listofCategories()
+{
+    getCategoriesList();
+    return m_categoriesList;
 }
 std::set<std::pair<std::string, time_t>> archive::listofDependenciesBuildDate()
 {

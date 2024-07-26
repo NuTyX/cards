@@ -29,6 +29,7 @@ public:
 	std::set<std::string> setofFiles(); // return a order set of string
 	std::set<std::string> listofDependencies(); // return an order set of dependencies
 	std::set<std::string> listofAlias(); // return the alias list
+	std::set<std::string> listofCategories(); // return the categories list
 	std::set<std::pair<std::string, time_t>> listofDependenciesBuildDate(); // return an order set of dependencies,BuildDate
 	std::string arch(); // return the arch of the package
 	std::string version(); // return the version of the package
@@ -51,6 +52,7 @@ private:
 	void getRunTimeDependencies();
 	void getRunTimeDependenciesEpoch();
 	void getAliasList();
+	void getCategoriesList();
 
 	unsigned int long m_size;
 
@@ -64,6 +66,7 @@ private:
 	std::string m_packageArch;
 	std::set<std::string> m_filesList;
 	std::set<std::string> m_aliasList;
+	std::set<std::string> m_categoriesList;
 
 	cards::archive_error m_actualError;
 };
