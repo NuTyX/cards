@@ -542,6 +542,31 @@ bool findMD5sum(const std::string& fileName, unsigned char* result)
 	md5_finish( &ctx, result );
 	return true;
 }
+bool findSHA256sum(const std::string& fileName, unsigned char* result)
+{
+    EVP_MD_CTX *ctx;
+    const EVP_MD *md = EVP_get_digestbyname("SHA256");
+    unsigned char buffer[BUFSIZ];
+
+    FILE* f = fopen(fileName.c_str(), "rb");
+    if (!f)
+	return false;
+
+    ctx = EVP_MD_CTX_create();
+    EVP_DigestInit_ex(ctx, md, NULL);
+    int i = 0;
+    while( ( i = fread( buffer, 1, BUFSIZ, f ) ) > 0 )
+    {
+	if(i < 0)
+	    continue;
+
+	EVP_DigestUpdate(ctx, buffer, i);
+    }
+    fclose(f);
+    EVP_DigestFinal_ex(ctx, result, NULL);
+    EVP_MD_CTX_destroy(ctx);
+    return true;
+}
 bool checkMD5sum(const char * fileName, const char * MD5Sum)
 {
   bool same = true;

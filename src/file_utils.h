@@ -17,6 +17,8 @@
 #include <unistd.h>
 #include <utime.h>
 
+#include <openssl/evp.h>
+
 #define S_CARDS_MODE 0755
 
 #define WS_NONE 0
