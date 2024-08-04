@@ -441,19 +441,32 @@ void pkginfo::run()
                 m_actualError = cards::ERROR_ENUM_CANNOT_COMPILE_REGULAR_EXPRESSION;
                 treatErrors(m_arg);
             }
-            std::vector<std::pair<std::string, std::string>> result;
-            result.push_back(std::pair<std::string, std::string>(_("Package"), _("File")));
-            unsigned int width = result.begin()->first.length(); // Width of "Package"
-#ifdef DEBUG
-            std::cerr << m_arg << std::endl;
-#endif
+            struct info
+            {
+                std::string collection;
+                std::string file;
+            };
+            info Info;
+            std::vector<std::pair<std::string, info>> result;
+            Info.collection=_("Collection");
+            Info.file=_("File");
+            result.push_back(std::pair<std::string, info>(_("Package"),Info));
+            unsigned int width1 = result.begin()->second.collection.length(); // Width of "Collection"
+            unsigned int width2 = result.begin()->first.length(); // Width of "Package"
+
             for (auto i : m_listOfPackages) {
                 for (auto j : i.second.files) {
                     const std::string file('/' + j);
                     if (!regexec(&preg, file.c_str(), 0, 0, 0)) {
-                        result.push_back(std::pair<std::string, std::string>(i.first, j));
-                        if (i.first.length() > width) {
-                            width = i.first.length();
+                        info Info;
+                        Info.collection=i.second.collection();
+                        Info.file=j;
+                        result.push_back(std::pair<std::string, info>(i.first, Info));
+                        if (i.second.collection().length() > width1) {
+                            width1 = i.second.collection().length();
+                        }
+                        if (i.first.length() > width2) {
+                            width2 = i.first.length();
                         }
                     }
                 }
@@ -462,7 +475,13 @@ void pkginfo::run()
             regfree(&preg);
             if (result.size() > 1) {
                 for (auto i : result) {
-                    std::cout << std::left << std::setw(width + 2) << i.first << i.second << std::endl;
+                    std::cout << std::left
+                        << std::setw(width1 + 2)
+                        << i.second.collection
+                        << std::setw(width2 + 2)
+                        << i.first
+                        << i.second.file
+                        << std::endl;
                 }
             } else {
                 std::cout << m_utilName << _(": no owner(s) found") << std::endl;

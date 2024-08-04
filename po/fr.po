@@ -219,6 +219,9 @@ msgstr "Utilisation: "
 msgid " packages: "
 msgstr " paquets: "
 
+msgid "Collection"
+msgstr "Collection"
+
 msgid "Package"
 msgstr "Paquet"
 
