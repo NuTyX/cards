@@ -6,8 +6,10 @@ create::create(CardsArgumentParser& argParser)
     : pkgfile("/etc/cards.conf")
     , m_argParser(argParser)
     , m_tree(getListOfPackages())
+    , m_config("/etc/cards.conf")
 {
     parseArguments();
+    
 }
 void create::treatErrors(const std::string& s) const
 {
@@ -29,9 +31,79 @@ void create::treatErrors(const std::string& s) const
         break;
     }
 }
+void create::list(std::string& packageName)
+{
+    auto found = false;
+    for (auto i : m_list) {
+        if (packageName == i) {
+            found = true;
+        }
+    }
+    if (!found) {
+        m_list.insert(packageName);
+        if (m_tree[packageName].dependencies().size() > 0) {
+            for (auto n : m_tree[packageName].dependencies()) {
+                for (auto i : m_list)
+                    if (n == packageName)
+                        break;
+                list(n);
+            }
+        }
+    }
+}
+void create::installDependencies(std::string& packageName)
+{
+    auto level = m_tree[packageName].level();
+    unsigned int currentLevel = 0;
+    std::string packageArchiveName;
+    while (currentLevel < level) {
+        for (auto i : m_list) {
+            if (m_tree[i].level() == currentLevel)
+                m_dependencies.push_back(i);
+        }
+        ++currentLevel;
+    }
+    if (!m_dependencies.empty()) {
+        
+        pkgadd add("cards add");
+        for (auto i : m_dependencies) {
+            std::string name = basename(const_cast<char*>(i.c_str()));
+            if ( name == packageName)
+                break;
+            std::set<std::string> listofBinaries;
+            if (findDir(listofBinaries, i) != 0) {
+            m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
+                treatErrors(i);
+            }
+            for (auto j : listofBinaries) {
+                if ( j.find("cards.tar") == std::string::npos )
+                    continue;
+                packageArchiveName = i + "/" + j;
+                archive packageArchive(packageArchiveName.c_str());
+                if ( add.checkPackageNameExist(packageArchive.name()) )
+                    continue;
+                if ( m_config.groups().empty() ) {
+                    add.run();
+                    continue;
+                }
+                if ( packageArchive.group() == "" ) {
+                    add.run();
+                    continue;
+                }
+                for (auto k : m_config.groups()) {
+                    if ( packageArchive.group() == k ) {
+                        add.run();
+                        continue;
+                    }
+                }
+            }
+        }
+    }
+}
 void create::build(std::string packageName)
 {
-    cards::conf config("/etc/cards.conf");
+    list(packageName);
+    installDependencies(packageName);
     std::cout << "create of " << packageName << std::endl;
     std::string pkgdir = getPortDir(packageName);
     if (pkgdir == "") {
@@ -44,12 +116,12 @@ void create::build(std::string packageName)
     std::string packageFileName;
     int fdlog = -1;
 
-    if (config.logdir() != "") {
-        if (!createRecursiveDirs(config.logdir())) {
+    if (m_config.logdir() != "") {
+        if (!createRecursiveDirs(m_config.logdir())) {
             m_actualError = cards::ERROR_ENUM_CANNOT_CREATE_DIRECTORY;
-            treatErrors(config.logdir());
+            treatErrors(m_config.logdir());
         }
-        std::string logFile = config.logdir() + "/" + packageName + ".log";
+        std::string logFile = m_config.logdir() + "/" + packageName + ".log";
         unlink(logFile.c_str());
         fdlog = open(logFile.c_str(), O_APPEND | O_WRONLY | O_CREAT, 0666);
         if (fdlog == -1) {
@@ -60,7 +132,7 @@ void create::build(std::string packageName)
     message = commandName + pkgdir + " package(s)";
     std::cout << message << std::endl;
 
-    if (config.logdir() != "") {
+    if (m_config.logdir() != "") {
         write(fdlog, message.c_str(), message.length());
         time_t startTime;
         time(&startTime);
@@ -119,7 +191,7 @@ void create::build(std::string packageName)
         treatErrors("Pkgfile: " + s);
     }
 
-    if (config.logdir() != "") {
+    if (m_config.logdir() != "") {
         time_t endTime;
         time(&endTime);
         timestamp = ctime(&endTime);

@@ -6,16 +6,21 @@
 #include "error_treat.h"
 #include "pkgfile.h"
 #include "process.h"
+#include "pkgadd.h"
 
 namespace cards {
 
 class create : public pkgfile {
+    ports_t m_tree;
+    std::set<std::string> m_list;
+    std::vector<std::string> m_dependencies;
     const CardsArgumentParser& m_argParser;
     cards::ErrorEnum m_actualError;
-    ports_t m_tree;
+    cards::conf m_config;
 
     void treatErrors(const std::string& s) const;
     void list(std::string& packageName);
+    void installDependencies(std::string& packageName);
     void parseArguments();
 
 public:
