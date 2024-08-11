@@ -73,6 +73,11 @@ void pkgadd::preRun()
 	}
 	extractAndRunPREfromPackage(m_packageArchiveName);
 }
+void pkgadd::run(std::string& packageName)
+{
+	m_packageArchiveName=packageName;
+	run();
+}
 void pkgadd::run()
 {
 	// Get the list of installed packages

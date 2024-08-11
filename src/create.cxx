@@ -83,16 +83,16 @@ void create::installDependencies(std::string& packageName)
                 if ( add.checkPackageNameExist(packageArchive.name()) )
                     continue;
                 if ( m_config.groups().empty() ) {
-                    add.run();
+                    add.run(packageArchiveName);
                     continue;
                 }
                 if ( packageArchive.group() == "" ) {
-                    add.run();
+                    add.run(packageArchiveName);
                     continue;
                 }
                 for (auto k : m_config.groups()) {
                     if ( packageArchive.group() == k ) {
-                        add.run();
+                        add.run(packageArchiveName);
                         continue;
                     }
                 }
