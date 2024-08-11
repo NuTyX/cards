@@ -5,13 +5,15 @@ namespace cards {
 
 conf::conf()
 {
-	parseSystemConf();
+	m_filename = NUTYX_VERSION_FILE;
+	parseCardsconf();
 	m_filename = CARDS_CONF_FILE;
 	parseCardsconf();
 }
 conf::conf(const std::string& filename)
 {
-	parseSystemConf();
+	m_filename = NUTYX_VERSION_FILE;
+	parseCardsconf();
 	m_filename = filename;
 	parseCardsconf();
 }
@@ -57,9 +59,18 @@ void conf::parseCardsconf()
 				}
 				pos = DU.dir.rfind('/');
 				if (pos != std::string::npos) {
-					DU.collection = stripWhiteSpace(DU.dir.substr(pos+1));
+					DU.depot = stripWhiteSpace(DU.dir.substr(pos+1));
 				} else {
-					DU.collection = "";
+					DU.depot = "";
+				}
+				m_dirUrl.push_back(DU);
+			}
+			if (key == "path") {
+				std::string::size_type pos = val.rfind('/');
+				cards::DirUrl DU;
+				if (pos != std::string::npos) {
+					DU.depot = stripWhiteSpace(DU.dir.substr(pos+1));
+					DU.dir = DU.dir = stripWhiteSpace(val.substr(0,pos));
 				}
 				m_dirUrl.push_back(DU);
 			}
@@ -67,8 +78,8 @@ void conf::parseCardsconf()
 				m_logdir = val;
 			}
 			m_arch = getMachineType();
-      if ( m_arch== "" ) {
-        return;
+			if ( m_arch== "" ) {
+				return;
 			}
 			if ( (key == "locale") || (key == "group") ) {
 				m_groups.push_back(val);
@@ -103,7 +114,7 @@ void conf::parseCardsconf()
 		DirUrl DU;
 		for ( auto i : m_dirUrl) {
 			DU.dir=i.dir;
-			DU.collection=i.collection;
+			DU.depot=i.depot;
 			if ( i.url.size() == 0 ) {
 				DU.url=m_url;
 			} else {
@@ -123,11 +134,12 @@ void conf::parseCardsconf()
 			<< "Url: "
 			<< i.url
 			<< std::endl
-			<< "Collection: "
-			<< i.collection
+			<< "Depot: "
+			<< i.depot
 			<< std::endl;
 #endif
 }
+
 conf::~conf()
 {
 	//nothing todo ATM
@@ -138,7 +150,7 @@ std::vector<DirUrl> conf::dirUrl()
 	for (auto i : m_dirUrl) {
 		DirUrl du;
 		du.dir = i.dir;
-		du.collection = i.collection;
+		du.depot = i.depot;
 		if (i.url.size()==0) {
 			ret.push_back(du);
 			continue;
@@ -149,53 +161,10 @@ std::vector<DirUrl> conf::dirUrl()
 			+ "/"
 			+ version()
 			+ "/"
-			+ i.collection;
+			+ i.depot;
 		ret.push_back(du);
 	}
 	return ret;
-}
-void conf::parseSystemConf()
-{
-	FILE* fp = fopen(NUTYX_VERSION_FILE, "r");
-	if (!fp)
-		return;
-	const int length = BUFSIZ;
-	char line[length];
-	std::string s;
-	while (fgets(line, length, fp)) {
-		if (line[strlen(line)-1] == '\n' ) {
-			line[strlen(line)-1] = '\0';
-		}
-		s = line;
-
-		// strip comments
-		std::string::size_type pos = s.find('#');
-		if (pos != std::string::npos) {
-			s = s.substr(0,pos);
-		}
-
-		// whitespace separates
-		pos = s.find(' ');
-		if (pos == std::string::npos) {
-			// try with a tab
-			pos = s.find('\t');
-		}
-		if (pos != std::string::npos) {
-			std::string key = s.substr(0, pos);
-			std::string val = stripWhiteSpace(s.substr(pos));
-			if (key == "name") {
-				m_name = val;
-			}
-			if (key == "version") {
-				m_version = val;
-			}
-		}
-	}
-	fclose(fp);
-#ifdef DEBUG
-		std::cerr << "name: " << m_name << std::endl
-			<< "version: " << m_version << std::endl;
-#endif
 }
 std::string conf::url()
 {

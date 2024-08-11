@@ -31,7 +31,7 @@ void cards_depends::checkConfig()
     cards::conf m_config;
 
     for (auto DU : m_config.dirUrl()) {
-        if (findDir(m_filesList, DU.collection.c_str()) != 0) {
+        if (findDir(m_filesList, DU.depot.c_str()) != 0) {
             if (findDir(m_filesList, DU.dir.c_str()) != 0)
                 treatErrors(cards::ERROR_ENUM_CANNOT_READ_DIRECTORY, DU.dir);
         }

@@ -7,9 +7,10 @@
 namespace cards {
 
 struct DirUrl {
+	std::string path;
+	std::string depot;
 	std::string dir;
 	std::string url;
-	std::string collection;
 };
 
 class conf
