@@ -56,21 +56,13 @@ void conf::parseCardsconf()
 				} else {
 					DU.dir = stripWhiteSpace(val);
 					DU.url = "";
-				}
-				pos = DU.dir.rfind('/');
-				if (pos != std::string::npos) {
-					DU.depot = stripWhiteSpace(DU.dir.substr(pos+1));
+					pos = DU.dir.rfind('/');
+					if (pos != std::string::npos) {
+						DU.collection = stripWhiteSpace(DU.dir.substr(pos+1));
+						DU.depot = stripWhiteSpace(val.substr(0,pos));
+					}
 				} else {
-					DU.depot = "";
-				}
-				m_dirUrl.push_back(DU);
-			}
-			if (key == "path") {
-				std::string::size_type pos = val.rfind('/');
-				cards::DirUrl DU;
-				if (pos != std::string::npos) {
-					DU.depot = stripWhiteSpace(DU.dir.substr(pos+1));
-					DU.dir = DU.dir = stripWhiteSpace(val.substr(0,pos));
+					DU.collection = "";
 				}
 				m_dirUrl.push_back(DU);
 			}

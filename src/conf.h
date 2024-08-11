@@ -7,7 +7,7 @@
 namespace cards {
 
 struct DirUrl {
-	std::string path;
+	std::string collection;
 	std::string depot;
 	std::string dir;
 	std::string url;
