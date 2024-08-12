@@ -5,16 +5,16 @@ namespace cards {
 
 conf::conf()
 {
-	m_filename = NUTYX_VERSION_FILE;
-	parseCardsconf();
 	m_filename = CARDS_CONF_FILE;
+	parseCardsconf();
+	m_filename = NUTYX_VERSION_FILE;
 	parseCardsconf();
 }
 conf::conf(const std::string& filename)
 {
-	m_filename = NUTYX_VERSION_FILE;
-	parseCardsconf();
 	m_filename = filename;
+	parseCardsconf();
+	m_filename = NUTYX_VERSION_FILE;
 	parseCardsconf();
 }
 void conf::parseCardsconf()
@@ -22,10 +22,9 @@ void conf::parseCardsconf()
 	FILE* fp = fopen(m_filename.c_str(), "r");
 	if (!fp)
 		return;
-	const int length = BUFSIZ;
-	char line[length];
+	char line[BUFSIZ];
 	std::string s;
-	while (fgets(line, length, fp)) {
+	while (fgets(line, BUFSIZ, fp)) {
 		if (line[strlen(line)-1] == '\n' ) {
 			line[strlen(line)-1] = '\0';
 		}
@@ -59,12 +58,21 @@ void conf::parseCardsconf()
 					pos = DU.dir.rfind('/');
 					if (pos != std::string::npos) {
 						DU.collection = stripWhiteSpace(DU.dir.substr(pos+1));
-						DU.depot = stripWhiteSpace(val.substr(0,pos));
+						DU.depot = stripWhiteSpace(DU.dir.substr(0,pos));
 					}
-				} else {
-					DU.collection = "";
 				}
 				m_dirUrl.push_back(DU);
+			}
+			if (key == "collection") {
+				cards::DirUrl DU;
+				DU.collection = val;
+				m_dirUrl.push_back(DU);
+			}
+			if (key == "depot") {
+				m_depot = val;
+			}
+			if (key == "url") {
+				m_urls.push_back(val);
 			}
 			if (key == "logdir") {
 				m_logdir = val;
@@ -105,12 +113,13 @@ void conf::parseCardsconf()
 		std::vector<DirUrl> list;
 		DirUrl DU;
 		for ( auto i : m_dirUrl) {
+			DU.collection = i.collection;
 			DU.dir=i.dir;
 			DU.depot=i.depot;
 			if ( i.url.size() == 0 ) {
-				DU.url=m_url;
+				DU.url = m_url;
 			} else {
-				DU.url=i.url;
+				DU.url = i.url;
 			}
 			list.push_back(DU);
 		}
@@ -141,8 +150,18 @@ std::vector<DirUrl> conf::dirUrl()
 	std::vector<DirUrl> ret;
 	for (auto i : m_dirUrl) {
 		DirUrl du;
-		du.dir = i.dir;
-		du.depot = i.depot;
+
+		if (i.depot.size() == 0)
+			du.depot = depot();
+		else
+			du.depot = i.depot;
+
+		if (i.dir.size() == 0)
+			du.dir = du.depot
+				+ "/"
+				+ i.collection;
+		else
+			du.dir = i.dir;
 		if (i.url.size()==0) {
 			ret.push_back(du);
 			continue;
@@ -153,7 +172,7 @@ std::vector<DirUrl> conf::dirUrl()
 			+ "/"
 			+ version()
 			+ "/"
-			+ i.depot;
+			+ i.collection;
 		ret.push_back(du);
 	}
 	return ret;
@@ -186,6 +205,10 @@ std::string conf::arch()
 {
 	return m_arch;
 }
+std::string conf::depot()
+{
+	return m_depot;
+}
 std::string conf::logdir()
 {
 	return m_logdir;
@@ -193,6 +216,14 @@ std::string conf::logdir()
 std::vector<std::string> conf::groups()
 {
 	return m_groups;
+}
+std::vector<std::string> conf::collections()
+{
+	return m_collections;
+}
+std::vector<std::string> conf::depots()
+{
+	return m_depots;
 }
 std::vector<std::string> conf::baseDir()
 {
