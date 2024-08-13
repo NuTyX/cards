@@ -39,8 +39,8 @@ public:
 
 private:
 	std::string m_filename;
-	void parseSystemConf();
-	void parseCardsconf();
+	void consolidate(bool sys);
+	void parseConfig();
 	std::string m_name;
 	std::string m_version;
 	std::string m_arch;
@@ -62,6 +62,9 @@ private:
 	std::vector<std::string> m_archs;
 
 	std::vector<DirUrl> m_dirUrl;
+
+	std::vector<DirUrl> m_sysconf;
+	std::vector<DirUrl> m_userconf;
 };
 
 } // endof cards namespace

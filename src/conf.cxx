@@ -5,19 +5,62 @@ namespace cards {
 
 conf::conf()
 {
-	m_filename = CARDS_CONF_FILE;
-	parseCardsconf();
 	m_filename = NUTYX_VERSION_FILE;
-	parseCardsconf();
+	parseConfig();
+	consolidate(true);
+	m_filename = CARDS_CONF_FILE;
+	parseConfig();
+	consolidate(false);
 }
 conf::conf(const std::string& filename)
 {
-	m_filename = filename;
-	parseCardsconf();
 	m_filename = NUTYX_VERSION_FILE;
-	parseCardsconf();
+	parseConfig();
+	consolidate(true);
+	m_filename = filename;
+	parseConfig();
+	consolidate(false);
 }
-void conf::parseCardsconf()
+void conf::consolidate(bool sys)
+{
+	for (auto i : m_dirUrl) {
+		cards::DirUrl DU;
+		DU.collection = i.collection;
+		if (i.depot.size() == 0) {
+			if (depot().size() > 0)
+				DU.depot = depot();
+			else
+				DU.depot = ".";
+		} else
+			DU.depot = i.depot;
+
+		if (i.url.size() == 0) {
+			if (url().size() > 0)
+				DU.url = url();
+		} else
+			DU.url = i.url;
+
+		if (i.dir.size() == 0) {
+			DU.dir = DU.depot
+				+ "/"
+				+ DU.collection;
+		} else
+			DU.dir = i.dir;
+
+		if (sys)
+			m_sysconf.push_back(DU);
+		else
+			m_userconf.push_back(DU);
+	}
+	if (!sys) {
+		if (m_url.size() > 0) {
+			for (auto& i : m_sysconf)
+				i.url = m_url;
+		}
+	}
+	m_dirUrl.clear();
+}
+void conf::parseConfig()
 {
 	FILE* fp = fopen(m_filename.c_str(), "r");
 	if (!fp)
@@ -109,36 +152,6 @@ void conf::parseCardsconf()
 		}
 	}
 	fclose(fp);
-	if (m_url.size() > 0) {
-		std::vector<DirUrl> list;
-		DirUrl DU;
-		for ( auto i : m_dirUrl) {
-			DU.collection = i.collection;
-			DU.dir=i.dir;
-			DU.depot=i.depot;
-			if ( i.url.size() == 0 ) {
-				DU.url = m_url;
-			} else {
-				DU.url = i.url;
-			}
-			list.push_back(DU);
-		}
-		m_dirUrl.swap(list);
-	}
-#ifdef DEBUG
-	std::cerr << "name: " << m_name << std::endl
-		<< "version: " << m_version << std::endl;
-	for ( auto i : m_dirUrl)
-		std::cerr << "Dir: "
-			<< i.dir
-			<< std::endl
-			<< "Url: "
-			<< i.url
-			<< std::endl
-			<< "Depot: "
-			<< i.depot
-			<< std::endl;
-#endif
 }
 
 conf::~conf()
@@ -147,35 +160,10 @@ conf::~conf()
 }
 std::vector<DirUrl> conf::dirUrl()
 {
-	std::vector<DirUrl> ret;
-	for (auto i : m_dirUrl) {
-		DirUrl du;
-
-		if (i.depot.size() == 0)
-			du.depot = depot();
-		else
-			du.depot = i.depot;
-
-		if (i.dir.size() == 0)
-			du.dir = du.depot
-				+ "/"
-				+ i.collection;
-		else
-			du.dir = i.dir;
-		if (i.url.size()==0) {
-			ret.push_back(du);
-			continue;
-		}
-		du.url = i.url
-			+ "/"
-			+ arch()
-			+ "/"
-			+ version()
-			+ "/"
-			+ i.collection;
-		ret.push_back(du);
-	}
-	return ret;
+	if (m_userconf.size() > 0)
+		return m_userconf;
+	else
+		return m_sysconf;
 }
 std::string conf::url()
 {
