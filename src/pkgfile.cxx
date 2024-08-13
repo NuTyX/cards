@@ -42,25 +42,26 @@ void pkgfile::parsePackagePkgfileFile()
 {
     if (m_listOfPackages.size() > 0)
         return;
-    cards::conf m_config(m_configFileName);
+
     cards::port info;
     unsigned int index = 0;
     bool found = false;
+
     for (auto i : m_config.dirUrl()) {
         DIR* d;
         struct dirent* dir;
-        d = opendir(i.dir.c_str());
+        d = opendir(i.collection.c_str());
         if (d) {
             while ((dir = readdir(d)) != nullptr) {
                 if (dir->d_name[0] == '.')
                     continue;
 
                 std::string portName(dir->d_name);
-                std::string Pkgfile = i.dir + "/" + portName + PKG_RECEPT;
+                std::string Pkgfile = i.collection + "/" + portName + PKG_RECEPT;
                 if (!checkFileExist(Pkgfile))
                     continue;
 
-                info.collection(i.dir);
+                info.collection(i.collection);
                 info.release(1);
                 std::vector<std::string> pkgFileContent;
                 if (parseFile(pkgFileContent, Pkgfile.c_str()) != 0) {
