@@ -3,7 +3,7 @@
 #include "cards_info.h"
 
 cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& configFileName)
-	: pkginfo("cards info"),pkgrepo(configFileName), m_argParser(argParser)
+	: pkginfo("cards info"),repo(configFileName), m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
@@ -15,8 +15,6 @@ cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& 
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_INFO) ) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
 			getBinaryPackageInfo(m_argParser.otherArguments()[0]);
-		} else if (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) {
-			getPortInfo(m_argParser.otherArguments()[0]);
 		} else if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
 			std::set<std::string> sortedPackagesList = getListOfPackagesFromSet(m_argParser.otherArguments()[0]);;
 			if (sortedPackagesList.size() == 0)
@@ -52,8 +50,6 @@ cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& 
 			}
 			for ( auto i : sortedPackagesList) std::cout << i << std::endl;
 
-		} else if (m_argParser.isSet(CardsArgumentParser::OPT_PORTS)) {
-			getPortsList();
 		} else if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
 			std::set<std::string> sortedSetList;
 			std::set<cards::cache*> binaryList = getBinaryPackageSet();
