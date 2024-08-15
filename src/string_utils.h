@@ -15,42 +15,11 @@
 
 typedef std::map<std::string, std::string> alias_t;
 
-void *Malloc(size_t s);
-
 struct keyValue 
 {
 	std::string parameter;
 	std::string value;
 };
-
-/**
- * itemList is a list of char* dynamically allocated
- */
-typedef struct
-{
-	char **items;
-	unsigned int count;
-	unsigned int capacity;
-} itemList;
-
-/**
- * initItemList: Create an item List
- *
- */
-itemList *initItemList(void);
-
-/**
- * addItemToItemList: Add an item to an already created itemList
- *
- */
-void addItemToItemList(itemList *list, const char *item);
-
-/**
- * freeItemList: Destroy the itemList created and free the allocated memory
- *
- */
- 
-void freeItemList(itemList *list);
 
 /**
  * splitKeyValue: Split a string value into a keyValue structure

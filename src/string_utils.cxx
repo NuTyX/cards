@@ -4,61 +4,6 @@
 
 #include "string_utils.h"
 
-void *Malloc(size_t s)
-{
-	void *p;
-	if ( ! ( p = malloc(s) ) ) {
-		fprintf(stderr,"Failed to malloc\n");
-		if (errno) {
-			perror("malloc");
-			exit(EXIT_FAILURE);
-		}
-	}
-	return p;
-}
-
-
-itemList *initItemList(void)
-{
-	itemList *list = (itemList*)Malloc(sizeof *list);
-	list->count = 0;
-	list->capacity = 8;
-	list->items = (char **)Malloc(sizeof *list->items * list->capacity);
-	return list;
-}
-
-void addItemToItemList(itemList *list, const char *item)
-{
-	if (list->capacity == list->count) {
-		list->capacity = list->count * 2;
-		list->items = (char **)realloc( list->items, sizeof *list->items * list->capacity );
-		if (list->items == nullptr) {
-			printf("Cannot reallocate: %d", &list->items);
-			return;
-		}
-	}
-	list->items[ list->count ] = strdup(item);
-	++list->count;
-}
-
-void freeItemList(itemList *list)
-{
-	for (unsigned int i=0; i < list->count;i++) {
-		if (list->items[i] != nullptr) {
-			free(list->items[i]);
-			list->items[i] = nullptr;
-		}
-	}
-	if (list->items != nullptr) {
-		free(list->items);
-		list->items = nullptr;
-	}
-	if (list != nullptr) {
-		free(list);
-		list = nullptr;
-	}
-}
-
 keyValue splitKeyValue(std::string s, char delimiter)
 {
 	keyValue pv;
