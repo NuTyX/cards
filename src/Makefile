@@ -38,10 +38,9 @@ CARDSOBJECTS =	conf.o \
 		db.o \
 		cache.o \
 		pkgfile.o \
-		pkgrepo.o \
+		repo.o \
 		file_download.o \
 		repodwl.o \
-		compile_dependencies_utils.o \
 		argument_parser.o \
 		cards_argument_parser.o \
 		file_utils.o \
@@ -52,20 +51,16 @@ CARDSOBJECTS =	conf.o \
 		pkgrm.o \
 		pkginfo.o \
 		pkginst.o \
-		pkgsync.o \
 		deptree.o \
 		level.o \
 		depends.o \
 		sync.o \
 		create.o \
-		cards_create.o \
-		cards_sync.o \
 		cards_install.o \
 		cards_remove.o \
-		cards_depends.o \
 		cards_base.o \
 		cards_info.o \
-		cards_upgrade.o \
+		upgrade.o \
 		cards.o
 
 LIBOBJECTS =  conf.o \
@@ -77,7 +72,7 @@ LIBOBJECTS =  conf.o \
 	string_utils.o \
 	archive.o \
 	pkgfile.o \
-	pkgrepo.o \
+	repo.o \
 	repodwl.o \
 	file_download.o \
 	file_utils.o \
@@ -92,8 +87,7 @@ LIBOBJECTS =  conf.o \
 	pkgadd.o \
 	pkgrm.o \
 	pkginfo.o \
-	pkginst.o \
-	pkgsync.o
+	pkginst.o
 
 WEBOBJECTS =  conf.o \
 	system_utils.o \
@@ -102,7 +96,7 @@ WEBOBJECTS =  conf.o \
 	vector.o \
 	file_utils.o \
 	string_utils.o \
-	pkgrepo.o \
+	repo.o \
 	mysql.o \
 	pkg.o \
 	db.o \
@@ -126,7 +120,7 @@ HEADERS = define.h \
 	cache.h \
 	sync.h \
 	pkgfile.h \
-	pkgrepo.h \
+	repo.h \
 	repodwl.h \
 	file_download.h \
 	process.h \
@@ -136,7 +130,7 @@ HEADERS = define.h \
 	pkgrm.h \
 	pkginfo.h \
 	pkginst.h \
-	pkgsync.h
+	sync.h
 
 CONSOLEKIT_CFLAGS = -I/usr/include/ConsoleKit/ck-connector -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
 CONSOLEKIT_LIBS = -lck-connector -ldbus-1
