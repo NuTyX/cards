@@ -17,6 +17,7 @@ public:
 	sync(const std::string configFile);
 
 	void run();
+	void purge();
 	static const std::string DEFAULT_REPOFILE;
 };
 
