@@ -1,18 +1,5 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-#include <iostream>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <libgen.h>
-#include <dirent.h>
-#include <cstring>
-#include <cstdlib>
-
-#include "file_utils.h"
-#include "file_download.h"
-#include "pkgrepo.h"
 #include "cards_base.h"
 
 cards_base::cards_base(const CardsArgumentParser& argParser)

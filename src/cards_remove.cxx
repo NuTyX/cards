@@ -1,7 +1,6 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
 #include "cards_remove.h"
-#include "pkgrepo.h"
 
 cards_remove::cards_remove(const std::string& commandName,
 	const CardsArgumentParser& argParser,
