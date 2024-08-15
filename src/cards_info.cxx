@@ -82,48 +82,44 @@ cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& 
 		List = getRepoInfo();
 		buildSimpleDatabase();
 		for (auto i : List) {
-			for (auto j : i.basePackageList) {
+			for (auto j : i.packagesList) {
 				std::string::size_type pos;
-				pos = convertToLowerCase(j.categories).find(convertToLowerCase(m_argParser.otherArguments()[0]));
+				pos = i.collection.find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if  ( pos == std::string::npos )
-					pos = i.collection.find(convertToLowerCase(m_argParser.otherArguments()[0]));
+					pos = j.baseName().find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if  ( pos == std::string::npos )
-					pos = j.set.find(convertToLowerCase(m_argParser.otherArguments()[0]));
+					pos = convertToLowerCase(j.description()).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if  ( pos == std::string::npos )
-					pos = j.basePackageName.find(convertToLowerCase(m_argParser.otherArguments()[0]));
+					pos = convertToLowerCase(j.url()).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if  ( pos == std::string::npos )
-					pos = convertToLowerCase(j.description).find(convertToLowerCase(m_argParser.otherArguments()[0]));
+					pos = convertToLowerCase(j.packager()).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if  ( pos == std::string::npos )
-					pos = convertToLowerCase(j.url).find(convertToLowerCase(m_argParser.otherArguments()[0]));
-				if  ( pos == std::string::npos )
-					pos = convertToLowerCase(j.packager).find(convertToLowerCase(m_argParser.otherArguments()[0]));
-				if  ( pos == std::string::npos )
-					pos = convertToLowerCase(j.version).find(convertToLowerCase(m_argParser.otherArguments()[0]));
+					pos = convertToLowerCase(j.version()).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 				if ( pos != std::string::npos ) {
 					std::cout << "(" << i.collection << ") ";
-					if ( checkPackageNameExist(j.basePackageName) ) {
+					if ( checkPackageNameExist(j.baseName()) ) {
 						std::cout << GREEN;
 					}
-					std::cout << j.basePackageName
+					std::cout << j.baseName()
 						<< NORMAL
-						<< " " << j.version
-						<< " " << j.description
+						<< " " << j.version()
+						<< " " << j.description()
 						<< std::endl;
 					std::set<std::string> groupList;
-					groupList = parseDelimitedSetList(j.group," ");
+					groupList = parseDelimitedSetList(j.group()," ");
 					for ( auto k : groupList ) {
-						if ( k == j.basePackageName)
+						if ( k == j.baseName())
 							continue;
-						std::string name = j.basePackageName
+						std::string name = j.baseName()
 						+ "."
 						+ k;
 						std::cout << "(" << i.collection << ") ";
-						if ( checkPackageNameExist(name ))
+						if ( checkPackageNameExist(name))
 							std::cout << GREEN;
 						std::cout << name
 							<< NORMAL
-							<< " " << j.version
-							<< " " << j.description
+							<< " " << j.version()
+							<< " " << j.description()
 							<< std::endl;
 						name="";
 					}
@@ -131,12 +127,12 @@ cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& 
 				}
 				bool found = false;
 				std::set<std::string> groupList;
-				groupList = parseDelimitedSetList(j.group," ");
+				groupList = parseDelimitedSetList(j.group()," ");
 				for ( auto k : groupList ) {
-					if ( k == j.basePackageName)
+					if ( k == j.baseName())
 						continue;
 					if ( convertToLowerCase(m_argParser.otherArguments()[0]) == k ) {
-					std::string name = j.basePackageName
+					std::string name = j.baseName()
 						+ "."
 						+ k;
 					std::cout << "(" << i.collection << ") ";
@@ -145,8 +141,8 @@ cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& 
 					}
 					std::cout << name
 						<< NORMAL
-						<< " " << j.version
-						<< " " << j.description
+						<< " " << j.version()
+						<< " " << j.description()
 						<< std::endl;
 					name="";
 					found = true;
@@ -156,20 +152,20 @@ cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& 
 				if (found)
 					continue;
 				std::set<std::string> aliasList;
-				aliasList = parseDelimitedSetList(j.alias," ");
+				aliasList = j.alias();
 				for ( auto k : aliasList ) {
-					if ( k == j.basePackageName)
+					if ( k == j.baseName())
 						continue;
 					if ( convertToLowerCase(m_argParser.otherArguments()[0]) == k ) {
-						std::string name = j.basePackageName;
+						std::string name = j.baseName();
 						std::cout << "(" << i.collection << ") ";
 						if ( checkPackageNameExist(name )) {
 							std::cout << GREEN;
 						}
 					std::cout << name
 						<< NORMAL
-						<< " " << j.version
-						<< " " << j.description
+						<< " " << j.version()
+						<< " " << j.description()
 						<< std::endl;
 					name="";
 					found = true;

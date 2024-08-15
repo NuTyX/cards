@@ -31,6 +31,8 @@ public:
 	std::string signature();
 	std::string origin();
 	std::string branch();
+	std::string md5SUM();
+	std::string s_buildDate();
 	time_t build();
 
 	void description(const std::string& description);
@@ -77,6 +79,8 @@ private:
 	std::string m_origin;
 	std::string m_branch;
 
+	std::string m_md5SUM;
+	std::string m_s_buildDate;
 	time_t m_build;
 
 

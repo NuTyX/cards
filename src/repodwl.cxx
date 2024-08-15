@@ -12,8 +12,8 @@ void repodwl::downloadPortsPkgRepo(const std::string& packageName)
 	std::vector<InfoFile> downloadFilesList;
 	bool found = false;
 	for (auto portsDirectory : m_portsDirectoryList) {
-		for (auto basePackageInfo : portsDirectory.basePackageList) {
-			if ( basePackageInfo.basePackageName == packageName ) {
+		for (auto packageInfo : portsDirectory.packagesList) {
+			if ( packageInfo.baseName() == packageName ) {
 				/**
 				 *
 				 * We should check if the" + PKG_REPO of the port is available
@@ -23,20 +23,14 @@ void repodwl::downloadPortsPkgRepo(const std::string& packageName)
 				if ( portsDirectory.url.size() > 0 ) {
 					downloadFile.url = portsDirectory.url
 						+ "/"
-						+ basePackageInfo.basePackageName
+						+ packageInfo.baseName()
 						+ PKG_REPO;
 					downloadFile.dirname = portsDirectory.dir
 						+ "/"
-						+ basePackageInfo.basePackageName;
+						+ packageInfo.baseName();
 					downloadFile.filename = PKG_REPO;
-					downloadFile.md5sum = basePackageInfo.md5SUM;
+					downloadFile.md5sum = packageInfo.md5SUM();
 					downloadFilesList.push_back(downloadFile);
-#ifdef DEBUG
-					std::cerr << portsDirectory.dir
-						+ "/"
-						+ basePackageInfo.basePackageName
-						<< std::endl;
-#endif
 				}
 				found = true;
 				break;
@@ -51,112 +45,16 @@ void repodwl::downloadPortsPkgRepo(const std::string& packageName)
 }
 void repodwl::downloadPackageFileName(const std::string& packageName)
 {
-	std::string basePackageName = packageName;
-	std::string::size_type pos = packageName.find('.');
-	if (pos != std::string::npos) {
-		basePackageName=packageName.substr(0,pos);
-	}
-
-	bool found = false;
-	for (auto portsDirectory : m_portsDirectoryList) {
-		for (auto basePackageInfo : portsDirectory.basePackageList) {
-			if ( basePackageInfo.basePackageName == basePackageName) {
-#ifdef DEBUG
-				std::cerr << packageName << std::endl;
-#endif
-
-				for ( auto portFilesList : m_portFilesList) {
-					if (portFilesList.name == packageName) {
-						std::string url = portsDirectory.url
-							+ "/"
-							+ basePackageInfo.basePackageName
-							+ "/"
-							+ portFilesList.name
-							+ basePackageInfo.s_buildDate
-							+ portFilesList.arch
-							+ basePackageInfo.extention;
-						std::string dir = portsDirectory.dir
-							+ "/"
-							+ basePackageInfo.basePackageName;
-						std::string fileName = portFilesList.name
-							+ basePackageInfo.s_buildDate
-							+ portFilesList.arch
-							+ basePackageInfo.extention;
-#ifdef DEBUG
-							std::cerr << url << " "
-								<< dir << " "
-								<< fileName << " "
-								<< portFilesList.md5SUM << " "
-								<< std::endl;
-#endif
-						FileDownload FD(packageName + " " + getBasePackageVersion(getBasePackageName(packageName)) \
-							+ "-" + itos(getBasePackageRelease(getBasePackageName(packageName))),
-							url,dir,fileName,portFilesList.md5SUM,true);
-							break;
-					}
-				}
-				found=true;
-				break;
-			}
-		}
-		if (found)
-			break;
-	}
 }
 bool repodwl::checkBinaryExist(const std::string& packageName)
 {
 	parseCollectionPkgRepoFile();
 
-	std::string basePackageName = packageName;
 	std::string::size_type pos = packageName.find('.');
-	if (pos != std::string::npos)
-		basePackageName=packageName.substr(0,pos);
-#ifdef DEBUG
-	std::cerr << "basePackageName: " << basePackageName << std::endl;
-#endif
+	if (pos == std::string::npos) 
+		return false;
 
-	for (auto portsDirectory: m_portsDirectoryList) {
-#ifdef DEBUG
-		std::cerr << portsDirectory.url << " " <<  portsDirectory.dir << std::endl;
-#endif
-		for (auto basePackageInfo:portsDirectory.basePackageList) {
-#ifdef DEBUG
-			std::cerr << "basePackageInfo.basePackageName: "
-				<< basePackageInfo.basePackageName
-				<< ":"
-				<< basePackageInfo.s_buildDate
-				<<"."
-				<<  std::endl;
-#endif
-			if ( basePackageInfo.basePackageName == basePackageName ) {
-
-				for ( auto portFilesList: m_portFilesList) {
-#ifdef DEBUG
-					std::cerr << portFilesList.name << std::endl;
-#endif
-					if (portFilesList.name == packageName) {
-						m_packageFileName = portsDirectory.dir
-						+ "/"
-						+ basePackageInfo.basePackageName
-						+ "/"
-						+ packageName
-						+ basePackageInfo.s_buildDate
-						+ portFilesList.arch
-						+ basePackageInfo.extention;
-						m_packageFileNameSignature = portFilesList.md5SUM;
-#ifdef DEBUG
-						std::cerr << packageName
-							<< " is "
-							<< m_packageFileName
-							<< std::endl;
-#endif
-						return true;
-					}
-				}
-			}
-		}
-	}
-	return false;
+	return true;
 }
 std::string repodwl::getPackageFileName(const std::string& packageName)
 {

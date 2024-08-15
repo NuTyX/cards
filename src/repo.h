@@ -7,51 +7,16 @@
 #include "cache.h"
 #include "conf.h"
 
-
-struct PortFilesList {
-	std::string md5SUM;
-	std::string name;
-	std::string arch;
-};
-
 /**
- * representation of the .PKGREPO file which belong to the collection directory
+ * representation of the .REPO file which belong
+ * to the collection directory
  * define in the configuration file cards.conf.
  *
  */
-
-/*
- **************************************************
- * 73193bfc1cb30fe02a880ed088ed7590#1414192958#aalib#1.4rc5##n.a#n.a#n.a#n.a#.cards.tar.xz
- * 650ed499ce78791d45b91aaf7f91b445#1428615787#firefox#37.0.1#1#Standalone web browser from mozilla.org#http://www.mozilla.com/firefox/#n.a#pierre at nutyx dot org,tnut at nutyx dot org#.cards.tar.xz
- *************************************************
- */
-struct BasePackageInfo {
-	std::string md5SUM;
-	std::string s_buildDate;
-	std::string basePackageName;
-	std::string extention;
-	std::string version;
-	int release;
-	std::string description;
-	std::string categories;
-	std::string url;
-	std::string contributors;
-	std::string maintainer;
-	std::string packager;
-	std::string fileDate;
-	std::string alias;
-	std::string set;
-	std::string group;
-	time_t buildDate;
-	alias_t aliasList;
-	std::vector<PortFilesList> portFilesList;
-};
-
 struct PortsDirectory {
 	std::string dir;
 	std::string url;
-	std::vector<BasePackageInfo> basePackageList;
+	std::vector<cards::cache> packagesList;
 };
 /**
  * representation of the Repo mainly for the website
@@ -60,7 +25,7 @@ struct RepoInfo {
 	std::string branch;
 	std::string arch;
 	std::string collection;
-	std::vector<BasePackageInfo> basePackageList;
+	std::vector<cards::cache> packagesList;
 };
 
 class repo
@@ -145,8 +110,6 @@ protected:
  *
  **/
 	void parseCollectionPkgRepoFile();
-
-	std::vector<PortFilesList> m_portFilesList;
 
 	std::string m_configFileName;
 	cards::conf m_config;

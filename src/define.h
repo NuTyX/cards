@@ -51,7 +51,7 @@
 #define PKG_FILES "/files"
 #define PKG_META "META"
 #define PKG_RECEPT "/Pkgfile"
-#define PKG_REPO "/.PKGREPO"
+#define PKG_REPO "/.REPO"
 #define PKG_README "README"
 #define PKG_PRE_INSTALL ".PRE"
 #define PKG_POST_INSTALL ".POST"

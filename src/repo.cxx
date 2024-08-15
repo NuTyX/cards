@@ -54,110 +54,13 @@ void repo::parseCollectionPkgRepoFile()
 		}
 
 		for ( auto input : PkgRepoFileContent) {
-			BasePackageInfo basePkgInfo;
-			basePkgInfo.release = 1;
-			basePkgInfo.buildDate = 0;
-			if ( input.size() <  34 ) {
-				std::cerr << "missing info" << std::endl;
-				continue;
-			}
-			if ( ( input[32] != '#' ) || ( input[43] != '#' ) ) {
-				std::cerr << "wrong  info" << std::endl;
-				continue;
-			}
-			std::vector<std::string> infos;
-			split( input, '#', infos, 0,true);
-			if ( infos.size() > 0 ) {
-				if ( infos[0].size() > 0 ) {
-					basePkgInfo.md5SUM = infos[0];
-				}
-			}
-			if ( infos.size() > 1 ) {
-				if ( infos[1].size() > 0 ) {
-					basePkgInfo.s_buildDate = infos[1];
-					basePkgInfo.buildDate = strtoul(infos[1].c_str(),NULL,0);
-				}
-			}
-			if ( infos.size() > 2 ) {
-				if ( infos[2].size() > 0 ) {
-					basePkgInfo.basePackageName = infos[2];
-				}
-			}
-			if ( infos.size() > 3 ) {
-				if ( infos[3].size() > 0 ) {
-					basePkgInfo.version = infos[3];
-				}
-			}
-			if ( infos.size() > 4 ) {
-				if ( infos[4].size() > 0 ) {
-					basePkgInfo.release = atoi(infos[4].c_str());
-				}
-			}
-			if ( infos.size() > 5 ) {
-				if ( infos[5].size() > 0 ) {
-					basePkgInfo.description = infos[5];
-				}
-			}
-			if ( infos.size() > 6 ) {
-				if ( infos[6].size() > 0 ) {
-					basePkgInfo.url = infos[6];
-				}
-			}
-			if ( infos.size() > 7 ) {
-				if ( infos[7].size() > 0 ) {
-					basePkgInfo.maintainer = infos[7];
-				}
-			}
-			if ( infos.size() > 8 ) {
-				if ( infos[8].size() > 0 ) {
-					basePkgInfo.packager = infos[8];
-				}
-			}
-			if ( infos.size() > 9 ) {
-				if ( infos[9].size() > 0 ) {
-					basePkgInfo.extention = infos[9];
-				}
-			}
-			if ( infos.size() > 10 ) {
-				if ( infos[10].size() > 0 ) {
-					basePkgInfo.alias = infos[10];
-				}
-			}
-			if ( infos.size() > 11 ) {
-				if ( infos[11].size() > 0 ) {
-					basePkgInfo.group = infos[11];
-				}
-			}
-			if ( infos.size() > 12 ) {
-				if ( infos[12].size() > 0 ) {
-					basePkgInfo.contributors = infos[12];
-				}
-			}
-			if ( infos.size() > 13 ) {
-				if ( infos[13].size() > 0 ) {
-					basePkgInfo.set = infos[13];
-				}
-			}
-				if ( infos.size() > 14 ) {
-				if ( infos[14].size() > 0 ) {
-					basePkgInfo.categories = infos[14];
-				}
-			}
-			portsDirectory.basePackageList.push_back(basePkgInfo);
+			cards::cache PkgInfo;
+			PkgInfo.release(1);
+			PkgInfo.build(0);
+			portsDirectory.packagesList.push_back(PkgInfo);
 		}
 		m_portsDirectoryList.push_back(portsDirectory);
 	}
-#ifdef DEBUG
-	for (auto i : m_portsDirectoryList) {
-		for (auto j : i.basePackageList) {
-			std::cerr << i.url << " "<< i.dir << " "
-			<< j.basePackageName  << " "
-			<< j.version << " "
-			<< j.md5SUM <<  " "
-			<< j.s_buildDate << std::endl;
-		}
-	}
-#endif
 	m_parsePkgRepoCollectionFile = true;
 }
 std::set<std::string> repo::getListOfPackagesFromCollection
@@ -167,15 +70,6 @@ std::set<std::string> repo::getListOfPackagesFromCollection
 
 	std::set<std::string> listOfPackages;
 
-	for (auto i : m_portsDirectoryList) {
-		std::string baseDir = basename(const_cast<char*>(i.dir.c_str()));
-		if ( baseDir == collectionName) {
-			for (auto j : i.basePackageList) {
-				listOfPackages.insert(j.basePackageName);
-			}
-			return listOfPackages;
-		}
-	}
 	return listOfPackages;
 }
 std::set<std::string> repo::getListOfPackagesFromSet
@@ -186,11 +80,11 @@ std::set<std::string> repo::getListOfPackagesFromSet
 	std::set<std::string> listOfPackages;
 
 	for (auto i : m_portsDirectoryList) {
-		for (auto j : i.basePackageList) {
-			std::set<std::string> set = parseDelimitedSetList(j.set, " ");
+		for (auto j : i.packagesList) {
+			std::set<std::string> set = j.sets();
 			for (auto k : set) {
 				if (k == setName)
-					listOfPackages.insert(j.basePackageName);
+					listOfPackages.insert(j.baseName());
 				}
 		}
 	}
@@ -208,7 +102,7 @@ repo::getBinaryPackageSet()
 #ifdef DEBUG
 		std::cerr << i.dir << " " << i.url << std::endl;
 #endif
-		for (auto j : i.basePackageList) {
+		for (auto j : i.packagesList) {
 #ifdef DEBUG
 			std::cerr << j.basePackageName << " "
 				<< j.description << " "
@@ -217,17 +111,15 @@ repo::getBinaryPackageSet()
 			cards::cache* Pkg = new cards::cache();
 			std::set<std::string> sets;
 			std::string baseDir = basename(const_cast<char*>(i.dir.c_str()));
-			Pkg->name(j.basePackageName);
-			Pkg->version(j.version);
-			Pkg->description(j.description);
-			if ( ( j.set=="none ") || (j.set.size()==0 ) ||
-				 ( j.set=="none") )
+			Pkg->name(j.baseName());
+			Pkg->version(j.version());
+			Pkg->description(j.description());
+			if (j.sets().size()==0 )
 				Pkg->collection(baseDir);
 			else {
-				sets.insert(j.set);
-				Pkg->sets(sets);
+				Pkg->sets(j.sets());
 			}
-			Pkg->packager(j.packager);
+			Pkg->packager(j.packager());
 
 			m_packagesList.insert(Pkg);
 		}
@@ -258,7 +150,7 @@ std::vector<RepoInfo> repo::getRepoInfo()
 			ArchCollectionBasePackageList.collection="unknow";
 			ArchCollectionBasePackageList.arch="unknow";
 		}
-		ArchCollectionBasePackageList.basePackageList=i.basePackageList;
+		ArchCollectionBasePackageList.packagesList=i.packagesList;
 		List.push_back(ArchCollectionBasePackageList);
 	}
 	return List;
@@ -271,22 +163,19 @@ bool repo::getBinaryPackageInfo(const std::string& packageName)
 	// For each defined collection
 	for (auto i : m_portsDirectoryList) {
 		// For each directory found in this collection
-		for (auto j : i.basePackageList) {
-			if ( j.basePackageName == packageName ) {
+		for (auto j : i.packagesList) {
+			if ( j.baseName() == packageName ) {
 				found = true;
 				std::cout << _("Name           : ") << packageName << std::endl
-					<< _("Alias          : ") << j.alias << std::endl
-					<< _("Description    : ") << j.description << std::endl
-					<< _("Categories     : ") << j.categories << std::endl
-					<< _("Set            : ") << j.set << std::endl
-					<< _("Groups         : ") << j.group << std::endl
-					<< _("URL            : ") << j.url << std::endl
-					<< _("Version        : ") << j.version << std::endl
-					<< _("Release        : ") << j.release << std::endl
-					<< _("Maintainer(s)  : ") << j.maintainer << std::endl
-					<< _("Contributor(s) : ") << j.contributors << std::endl
-					<< _("Packager       : ") << j.packager << std::endl
-					<< _("Build date     : ") << getDateFromEpoch(j.buildDate) << std::endl
+					<< _("Description    : ") << j.description() << std::endl
+					<< _("Groups         : ") << j.group() << std::endl
+					<< _("URL            : ") << j.url() << std::endl
+					<< _("Version        : ") << j.version() << std::endl
+					<< _("Release        : ") << j.release() << std::endl
+					<< _("Maintainer(s)  : ") << j.maintainer() << std::endl
+					<< _("Contributor(s) : ") << j.contributors() << std::endl
+					<< _("Packager       : ") << j.packager() << std::endl
+					<< _("Build date     : ") << getDateFromEpoch(j.build()) << std::endl
 					<< _("Binary URL     : ") << i.url << std::endl
 					<< _("Local folder   : ") << i.dir << std::endl;
 				break;
@@ -308,9 +197,9 @@ std::string repo::getBasePackageName(const std::string& packageName)
 		basePackageName=packageName.substr(0,pos);
 	}
 	for (auto i : m_portsDirectoryList) {
-		for (auto j : i.basePackageList) {
-			if ( j.basePackageName == basePackageName ) {
-				return j.basePackageName;
+		for (auto j : i.packagesList) {
+			if ( j.baseName() == basePackageName ) {
+				return j.baseName();
 			}
 		}
 	}
@@ -321,9 +210,9 @@ std::string repo::getBasePackageVersion(const std::string& packageName)
 	parseCollectionPkgRepoFile();
 
 	for (auto i : m_portsDirectoryList) {
-		for (auto j : i.basePackageList) {
-			if ( j.basePackageName == packageName ) {
-					return j.version;
+		for (auto j : i.packagesList) {
+			if ( j.baseName() == packageName ) {
+					return j.version();
 			}
 		}
 	}
@@ -335,9 +224,9 @@ int repo::getBasePackageRelease (const std::string& packageName)
 
 	int release = 1;
 	for (auto i : m_portsDirectoryList) {
-		for (auto  j : i.basePackageList) {
-			if ( j.basePackageName == packageName ) {
-				return j.release;
+		for (auto  j : i.packagesList) {
+			if ( j.baseName() == packageName ) {
+				return j.release();
 			}
 		}
 	}
@@ -354,10 +243,10 @@ time_t repo::getBinaryBuildTime (const std::string& packageName)
 	time_t buildTime = 0;
 	bool found = false;
 	for (auto i : m_portsDirectoryList) {
-		for (auto j : i.basePackageList) {
-			if ( j.basePackageName == basePackageName ) {
+		for (auto j : i.packagesList) {
+			if ( j.baseName() == basePackageName ) {
 				found = true;
-				buildTime = j.buildDate;
+				buildTime = j.build();
 				break;
 			}
 			if (found)

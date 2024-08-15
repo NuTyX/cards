@@ -18,6 +18,7 @@ public:
 	bool toinstall();
 	bool toremove();
 	const std::string name();
+	const std::string baseName();
 	const std::string fileDate();
 	const std::string dirName();
 
@@ -26,6 +27,7 @@ public:
 	void unsetStatus(StatusEnum status);
 	void installed(bool installed);
 	void name(const std::string& name);
+	void baseName(const std::string& baseName);
 	void fileDate(const std::string& filedate);
 	void dirName(const std::string& dirname);
 
@@ -35,6 +37,7 @@ private:
 	unsigned int m_size;
 	bool m_installed;
 	std::string m_name;
+	std::string m_baseName;
 	std::string m_fileDate;
 	std::string m_dirName;
 

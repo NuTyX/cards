@@ -28,7 +28,7 @@ void cards_base::run(int argc, char** argv)
 
 	// For all the base packages list Directories
 	for ( auto i : config.baseDir()) {
-		// we get all the packages from the basePackageList directory
+		// we get all the packages from the packagesList directory
 		if ( findDir(basePackagesList, i) != 0 ) {
 			m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
 			treatErrors(i);

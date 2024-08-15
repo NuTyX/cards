@@ -91,7 +91,7 @@ std::set<std::string> Flcards_info::getListOfAvailablePackages()
 	std::set<std::string> ListOfAvailablePackages;
 	std::string packageNameVersion;
 	for (auto i : m_portsDirectoryList) {
-		for (auto j : i.basePackageList) {
+		for (auto j : i.packagesList) {
 			packageNameVersion = j.basePackageName + '\t'
 				+ j.version + '\t'
 				+ j.description + '\t';

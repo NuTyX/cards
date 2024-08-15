@@ -290,7 +290,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 	std::set<std::string> listOfPackages;
 	List = repoList.getRepoInfo();
 	for (auto i : List) {
-		for (auto j : i.basePackageList) {
+		for (auto j : i.packagesList) {
 			if ( arguments.type == "col" ) {
 				if ( convertToLowerCase(search) == i.collection ) {
 					if ( ( arguments.packageBranch != i.branch ) &&
