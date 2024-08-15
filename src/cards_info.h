@@ -3,7 +3,7 @@
 #pragma once
 
 #include "pkginfo.h"
-#include "pkgrepo.h"
+#include "repo.h"
 #include "cards_argument_parser.h"
 
 /**
@@ -14,7 +14,7 @@
  *
  */
 
-class cards_info: public pkginfo, public pkgrepo
+class cards_info: public pkginfo, public repo
 {
 	public:
 		/**
