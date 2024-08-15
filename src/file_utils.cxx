@@ -244,36 +244,6 @@ int copyFile( const char *  destFile, const char *  origFile)
 	fclose(outfile);
 	return 0;
 }
-int findDir(itemList* filesList, const char* path)
-{
-	DIR *d;
-	DIR *sd;
-	struct dirent *dir;
-	d = opendir(path);
-	char fullPath[MAXPATHLEN];
-	if (d) {
-		while ((dir = readdir(d)) != nullptr) {
-			if ( dir->d_name[0] != '.' ) { // ignore any .directories
-				sprintf(fullPath,"%s/%s",path,dir->d_name);
-				sd = opendir(fullPath);
-				/* want to make sure its not a regular file
-					maybe a beter way ?
-				*/
-				if (sd) {
-					addItemToItemList(filesList,fullPath);
-					closedir(sd);
-				} else {
-					std::cerr << "WARNING "<< fullPath << " is NOT a directory..."<< std::endl;
-				}
-			}
-		}
-		closedir(d);
-	} else { 
-		std::cerr << "Cannot open " << path << std::endl;
-		return -1;
-	}
-	return 0;
-}
 	
 int findDir(std::set<std::string>& filesList, const std::string& path)
 {
@@ -398,37 +368,6 @@ int findRecursiveFile(std::set<std::string>& filenameList, const char *filename,
 
 	if (dir) closedir(dir);
 	return res ? res : errno ? WALK_BADIO : WALK_OK;
-}
-int readFileStripSpace(itemList* fileContent, const char* fileName)
-{
-	FILE* fp = fopen(fileName, "r");
-	if (!fp)
-		return -1;
-	const int lenght = BUFSIZ;
-	char input[lenght];
-	while (fgets(input, lenght, fp)) {
-		input[strlen(input)-1] = '\0';
-		std::string inputS = input;
-		std::string stripString = stripWhiteSpace(inputS);
-		if (stripString.size() > 0)
-			addItemToItemList(fileContent,stripString.c_str());
-		}
-		fclose(fp);
-		return 0;	
-}
-int readFile(itemList* fileContent, const char* fileName)
-{
-	FILE* fp = fopen(fileName, "r");
-	if (!fp)
-		return -1;
-	const int length = BUFSIZ;
-	char input[length];
-	while (fgets(input, length, fp)) {
-		input[strlen(input)-1] = '\0';
-		addItemToItemList(fileContent,input);
-	}
-	fclose(fp);
-	return 0;
 }
 int parseFile(std::set<std::string>& fileContent, const char* fileName)
 {
