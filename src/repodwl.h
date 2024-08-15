@@ -3,9 +3,9 @@
 #pragma once
 
 #include "file_download.h"
-#include "pkgrepo.h"
+#include "repo.h"
 
-class repodwl: public pkgrepo {
+class repodwl: public repo {
 	std::string m_packageFileName;
 	std::string m_packageFileNameSignature;
 

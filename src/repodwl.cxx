@@ -3,7 +3,7 @@
 #include "repodwl.h"
 
 repodwl::repodwl(const char *fileName)
-	: pkgrepo(fileName)
+	: repo(fileName)
 {
 }
 void repodwl::downloadPortsPkgRepo(const std::string& packageName)
@@ -64,9 +64,6 @@ void repodwl::downloadPackageFileName(const std::string& packageName)
 #ifdef DEBUG
 				std::cerr << packageName << std::endl;
 #endif
-				if ( ! checkFileExist (portsDirectory.dir + "/" + basePackageInfo.basePackageName + PKG_REPO))
-					downloadPortsPkgRepo(basePackageInfo.basePackageName);
-				parsePackagePkgRepoFile(portsDirectory.dir + "/" + basePackageInfo.basePackageName + PKG_REPO);
 
 				for ( auto portFilesList : m_portFilesList) {
 					if (portFilesList.name == packageName) {
@@ -132,18 +129,6 @@ bool repodwl::checkBinaryExist(const std::string& packageName)
 				<<  std::endl;
 #endif
 			if ( basePackageInfo.basePackageName == basePackageName ) {
-				if ( ! checkFileExist ( portsDirectory.dir + "/" + basePackageInfo.basePackageName + PKG_REPO)) {
-					downloadPortsPkgRepo(basePackageInfo.basePackageName);
-				}
-				std::string pkgRepoFile= portsDirectory.dir
-					+ "/"
-					+ basePackageInfo.basePackageName
-					+ PKG_REPO;
-				std::string pkgReporMD5sum = basePackageInfo.md5SUM;
-				if ( ! checkMD5sum( pkgRepoFile.c_str(), pkgReporMD5sum.c_str())) {
-					downloadPortsPkgRepo(basePackageInfo.basePackageName);
-				}
-				parsePackagePkgRepoFile(pkgRepoFile);
 
 				for ( auto portFilesList: m_portFilesList) {
 #ifdef DEBUG
