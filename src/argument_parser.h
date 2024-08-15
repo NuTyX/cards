@@ -53,7 +53,6 @@ public:
             CMD_FILES,
             CMD_LIST,
             CMD_SYNC,
-            CMD_SYNC_OLD,
             CMD_INFO,
             CMD_QUERY,
             CMD_SEARCH,
@@ -62,14 +61,9 @@ public:
             CMD_DIFF,
             CMD_UPGRADE,
             CMD_CREATE,
-            CMD_CREATE_OLD,
-            CMD_DEPCREATE,
-            CMD_DEPENDS_OLD,
             CMD_DEPENDS,
             CMD_DEPTREE,
-            CMD_DEPTREE_OLD,
-            CMD_LEVEL,
-            CMD_LEVEL_OLD
+            CMD_LEVEL
         };
 
         /**

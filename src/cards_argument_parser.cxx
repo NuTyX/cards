@@ -58,11 +58,6 @@ the base system directory and the logfile directory."),
         "",
         ArgParser::NONE, 0, "");
 
-    addCommand(CMD_SYNC_OLD, "sync-old",
-        _("synchronize local and remote metadatas."),
-        "",
-        ArgParser::NONE, 0, "");
-
     addCommand(CMD_QUERY, "query",
         _("list owner of file(s) matching the query."),
         "",
@@ -125,12 +120,6 @@ It will delete all the downloads binaries which are located in the binaries sect
         _("If -p is passed, the list is checked against founds Pkgfile ports."),
         ArgParser::NONE, 0, "");
 
-    addCommand(CMD_DEPCREATE, "depcreate",
-        _("create a package AND it's dependencies from the recipe found in the ports."),
-        _("This command is used for the packager.\n\
-All the dependencies include the final package will be compiled."),
-        ArgParser::EQ, 1, _("<package>"));
-
     addCommand(CMD_LEVEL, "level",
         _("generate all the levels."),
         _("This command is used by the packager.\n\
@@ -145,19 +134,7 @@ It shows the list of the dependencies of the package.\n\
 It is used for the compilation of a port."),
         ArgParser::EQ, 1, _("<port>"));
 
-    addCommand(CMD_DEPENDS_OLD, "depends-old",
-        _("list the dependencies of the port."),
-        _("This command is used for the packager.\n\
-It shows the list of the dependencies of the package.\n\
-It is used for the compilation of a port."),
-        ArgParser::EQ, 1, _("<port>"));
-
     addCommand(CMD_DEPTREE, "deptree",
-        _("list the dependencies tree of the port."),
-        _("It's mainly use to know if they are no duplicate call of any dependency."),
-        ArgParser::EQ, 1, _("<port>"));
-
-    addCommand(CMD_DEPTREE_OLD, "deptree-old",
         _("list the dependencies tree of the port."),
         _("It's mainly use to know if they are no duplicate call of any dependency."),
         ArgParser::EQ, 1, _("<port>"));
@@ -170,22 +147,6 @@ If somes dependencies are missing, the command will abort.\n\
 A compilation logfile can be define in /etc/cards.conf as:\n\
 logdir /var/log/pkgbuild for example."),
         ArgParser::EQ, 1, _("<package>"));
-
-    addCommand(CMD_CREATE_OLD, "create-old",
-        _("create a package from the recipe found in the port."),
-        _("This command is used for the packager.\n\
-All the dependencies must be compiled, up to date and available for the creation of the final package.\n\
-If somes dependencies are missing, the command will abort.\n\
-A compilation logfile can be define in /etc/cards.conf as:\n\
-logdir /var/log/pkgbuild for example."),
-        ArgParser::EQ, 1, _("<package>"));
-
-    addCommand(CMD_LEVEL_OLD, "level-old",
-        _("generate all the levels."),
-        _("This command is used by the packager.\n\
-It allows to see which package depends on which dependency.\n\
-It is used for the compilation of a port."),
-        ArgParser::NONE, 0, "");
 
     OPT_NO_SYNC.init("no-sync",
         0,
@@ -285,13 +246,11 @@ It is used for the compilation of a port."),
 
     addOption(CMD_LIST, OPT_FULL, false);
     addOption(CMD_LIST, OPT_BINARIES, false);
-    addOption(CMD_LIST, OPT_PORTS, false);
     addOption(CMD_LIST, OPT_SETS, false);
     addOption(CMD_LIST, OPT_ROOT, false);
     addOption(CMD_LIST, OPT_CONFIG_FILE, false);
 
     addOption(CMD_INFO, OPT_BINARIES, false);
-    addOption(CMD_INFO, OPT_PORTS, false);
     addOption(CMD_INFO, OPT_SETS, false);
     addOption(CMD_INFO, OPT_ROOT, false);
     addOption(CMD_INFO, OPT_CONFIG_FILE, false);
@@ -319,16 +278,9 @@ It is used for the compilation of a port."),
     addOption(CMD_CREATE, OPT_REMOVE, false);
     addOption(CMD_CREATE, OPT_ROOT, false);
 
-    addOption(CMD_CREATE_OLD, OPT_DISABLE, false);
-    addOption(CMD_CREATE_OLD, OPT_DRY, false);
-    addOption(CMD_CREATE_OLD, OPT_REMOVE, true);
-    addOption(CMD_CREATE_OLD, OPT_ROOT, false);
-
     addOption(CMD_SYNC, OPT_CONFIG_FILE, false);
 
     addOption(CardsArgumentParser::CMD_DEPENDS, OPT_INSTALLED, false);
-    addOption(CardsArgumentParser::CMD_DEPENDS_OLD, OPT_INSTALLED, false);
 
     addOption(CardsArgumentParser::CMD_LEVEL, OPT_IGNORE, false);
-    addOption(CardsArgumentParser::CMD_LEVEL_OLD, OPT_IGNORE, false);
 }
