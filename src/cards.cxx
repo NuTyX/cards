@@ -1,13 +1,10 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
 #include "cards_base.h"
-#include "cards_create.h"
-#include "cards_depends.h"
 #include "cards_info.h"
 #include "cards_install.h"
 #include "cards_remove.h"
-#include "cards_sync.h"
-#include "cards_upgrade.h"
+#include "upgrade.h"
 #include "sync.h"
 #include "create.h"
 #include "depends.h"
@@ -15,7 +12,7 @@
 #include "file_download.h"
 #include "level.h"
 #include "pkginfo.h"
-#include "pkgrepo.h"
+#include "repo.h"
 #include "pkgrm.h"
 
 #include <cstdlib>
@@ -186,17 +183,6 @@ int main(int argc, char** argv)
 			}
             return EXIT_SUCCESS;
 
-        case ArgParser::CMD_SYNC_OLD:
-            if (getuid()) {
-                string s = "";
-                throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
-            }
-            {
-                unique_ptr<cards_sync> i(new cards_sync(cardsArgPars));
-                i->run();
-            }
-            return EXIT_SUCCESS;
-
         case ArgParser::CMD_LIST: {
             unique_ptr<cards_info> i(new cards_info(cardsArgPars, configFile.c_str()));
         }
@@ -235,35 +221,10 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_PURGE: {
-            unique_ptr<cards_sync> i(new cards_sync(cardsArgPars));
-            i->purge();
-        }
+			cards::sync sync;
+			sync.purge();
             return EXIT_SUCCESS;
-
-        case ArgParser::CMD_CREATE_OLD: {
-            if ((!cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) && (!cardsArgPars.isSet(CardsArgumentParser::OPT_DRY))) {
-                cardsArgPars.printHelp("create");
-                return EXIT_SUCCESS;
-            }
-            if (!cardsArgPars.isSet(CardsArgumentParser::OPT_DRY)) {
-                // go back to a base system
-                unique_ptr<cards_base> i(new cards_base(cardsArgPars));
-                i->run(argc, argv);
-            }
-            // get the list of the dependencies"
-            cards_depends CD(cardsArgPars);
-            vector<string> listOfDeps = CD.getDependencies();
-
-            if (!listOfDeps.empty())
-                unique_ptr<cards_install> i(new cards_install(cardsArgPars, configFile.c_str(), listOfDeps));
-
-            // compilation of the final port"
-            unique_ptr<cards_create> i(new cards_create(cardsArgPars,
-                configFile.c_str(),
-                cardsArgPars.otherArguments()[0]));
         }
-            return EXIT_SUCCESS;
-
         case ArgParser::CMD_CREATE: {
             cards::create create(cardsArgPars);
             create.build(cardsArgPars.otherArguments()[0]);
@@ -275,24 +236,11 @@ int main(int argc, char** argv)
             level.print();
             return EXIT_SUCCESS;
         }
-        case ArgParser::CMD_LEVEL_OLD: {
-            unique_ptr<cards_depends> i(new cards_depends(cardsArgPars));
-            i->level();
-        }
-            return EXIT_SUCCESS;
-
         case ArgParser::CMD_DEPENDS: {
             cards::depends depends;
             depends.print(cardsArgPars.otherArguments()[0]);
             return EXIT_SUCCESS;
         }
-
-        case ArgParser::CMD_DEPENDS_OLD: {
-            unique_ptr<cards_depends> i(new cards_depends(cardsArgPars));
-            i->showDependencies();
-        }
-            return EXIT_SUCCESS;
-
         case ArgParser::CMD_DEPTREE: {
             cards::deptree tree;
             std::cout << "  dependencies ( '-->' = listed already)"
@@ -300,28 +248,6 @@ int main(int argc, char** argv)
             tree.print(cardsArgPars.otherArguments()[0], "", 0);
             return EXIT_SUCCESS;
         }
-        case ArgParser::CMD_DEPTREE_OLD: {
-            unique_ptr<cards_depends> i(new cards_depends(cardsArgPars));
-            return i->deptree();
-        }
-            return EXIT_SUCCESS;
-
-        case ArgParser::CMD_DEPCREATE: {
-            // get the list of the dependencies
-            cards_depends CD(cardsArgPars);
-            vector<string> listOfPackages = CD.getNeededDependencies();
-            if (listOfPackages.empty()) {
-                cout << _("The package ")
-                     << cardsArgPars.otherArguments()[0]
-                     << _(" is already installed") << endl;
-                return EXIT_SUCCESS;
-            }
-
-            // create (compile and install) the List of deps (including the final package)
-            unique_ptr<cards_create> i(new cards_create(cardsArgPars,
-                configFile.c_str(), listOfPackages));
-        }
-            return EXIT_SUCCESS;
 
         default:
             cout << "not found" << endl;
