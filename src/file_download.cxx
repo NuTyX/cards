@@ -36,14 +36,14 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 		m_destinationFile.dirname = i->dirname;
 		m_downloadFileName = i->dirname + i->filename;
 		m_downloadProgress.name = i->filename;
-		m_MD5Sum = i->md5sum;
+		m_SHA256Sum = i->sha256sum;
 		createRecursiveDirs(i->dirname);
 		initFileToDownload(m_url,m_downloadFileName);
 		downloadFile();
-		if ( ! checkMD5sum() )
+		if ( ! checkSHA256sum() )
 			throw std::runtime_error (m_downloadFileName
 			+ " "
-			+ m_MD5Sum +": checksum error");
+			+ m_SHA256Sum +": checksum error");
 	}
 }
 
@@ -77,12 +77,12 @@ FileDownload::FileDownload(std::string url,
 FileDownload::FileDownload(std::string fileInfo,std::string url,
 	std::string dirName,
 	std::string fileName,
-	std::string MD5Sum,
+	std::string SHA256Sum,
 	bool progress)
   : m_fileInfo(fileInfo),
 		m_url(url),
 		m_downloadFileName(dirName+"/"+fileName),
-		m_MD5Sum(MD5Sum),
+		m_SHA256Sum(SHA256Sum),
 		m_progress(progress)
 {
   curl_global_init(CURL_GLOBAL_ALL);
@@ -101,8 +101,8 @@ FileDownload::FileDownload(std::string fileInfo,std::string url,
 		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
 	downloadFile();
-	if ( ! checkMD5sum() )
-		throw std::runtime_error (m_downloadFileName + " " + m_MD5Sum +": checksum error");
+	if ( ! checkSHA256sum() )
+		throw std::runtime_error (m_downloadFileName + " " + m_SHA256Sum +": checksum error");
 }
 
 void FileDownload::downloadFile()
@@ -136,8 +136,8 @@ void FileDownload::downloadFile()
 		std::cerr << curl_easy_strerror(m_curlCode) << std::endl;
 		throw std::runtime_error ( "\n\nURL   : " +
 		m_url + "\nFILE  : " +
-		m_downloadFileName + "\nMD5SUM: " +
-		m_MD5Sum +"\n\n !!! download failed !!! \n");
+		m_downloadFileName + "\nSHA256SUM: " +
+		m_SHA256Sum +"\n\n !!! download failed !!! \n");
 	}
 	if (m_destinationFile.stream) {
 		fclose(m_destinationFile.stream);
@@ -225,29 +225,9 @@ size_t FileDownload::writeToStreamHandle(void *buffer,
 	return static_cast<FileDownload*>(stream)->writeToStream(buffer,size,nmemb,stream);
 }
 
-bool FileDownload::checkMD5sum()
+bool FileDownload::checkSHA256sum()
 {
-	bool same = true;
-	unsigned char md5sum[16];
-
-	if ( findMD5sum(m_downloadFileName.c_str(),md5sum) ) {
-		static char hexNumbers[] = {'0','1','2','3','4','5','6','7',
-		                            '8','9','a','b','c','d','e','f'};
-
-		unsigned char high, low;
-		for (int i = 0; i < 16; ++i) {
-			high = (md5sum[i] & 0xF0) >> 4;
-			low = md5sum[i] & 0xF;
-			if ( *(m_MD5Sum.c_str()+2*i) - hexNumbers[high] ||
-				   *(m_MD5Sum.c_str()+2*i+1) - hexNumbers[low]) {
-				same = false;
-				break;
-			}
-		}
-	} else {
-		same = false;
-	}
-	return same;
+	return ::checkSHA256sum(m_downloadFileName.c_str(),m_SHA256Sum.c_str());
 }
 
 bool FileDownload::checkUpToDate()

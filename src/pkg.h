@@ -31,7 +31,7 @@ public:
 	std::string signature();
 	std::string origin();
 	std::string branch();
-	std::string md5SUM();
+	std::string sha256SUM();
 	std::string s_buildDate();
 	time_t build();
 

@@ -5,7 +5,6 @@
 #pragma once
 
 #include "conf.h"
-#include "md5.h"
 #include "string_utils.h"
 #include "vector.h"
 
@@ -39,7 +38,7 @@ struct InfoFile {
     std::string url;
     std::string filename;
     std::string dirname;
-    std::string md5sum;
+    std::string sha256sum;
     long int filetime;
     utimbuf acmodtime;
     FILE* stream;
@@ -65,5 +64,5 @@ int findRecursiveFile(std::set<std::string>& filenameList, const char* filename,
 int parseFile(std::set<std::string>& fileContent, const char* fileName);
 int parseFile(std::vector<std::string>& fileContent, const char* fileName);
 int parseFile(std::string& Depends, const char* key, const char* fileName);
-bool findMD5sum(const std::string& fileName, unsigned char* result);
-bool checkMD5sum(const char* fileName, const char* MD5Sum);
+bool findSHA256sum(const std::string& fileName, unsigned char* result);
+bool checkSHA256sum(const char* fileName, const char* SHA256Sum);

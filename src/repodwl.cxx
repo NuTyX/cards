@@ -29,7 +29,7 @@ void repodwl::downloadPortsPkgRepo(const std::string& packageName)
 						+ "/"
 						+ packageInfo.baseName();
 					downloadFile.filename = PKG_REPO;
-					downloadFile.md5sum = packageInfo.md5SUM();
+					downloadFile.sha256sum = packageInfo.sha256SUM();
 					downloadFilesList.push_back(downloadFile);
 				}
 				found = true;

@@ -85,7 +85,7 @@ bool checkFileSignature(const std::string& filename, const std::string& signatur
 	if (!checkFileExist(filename))
 		return false;
 
-	return checkMD5sum(filename.c_str(), signature.c_str());
+	return checkSHA256sum(filename.c_str(), signature.c_str());
 }
 bool checkFileEmpty(const std::string& filename)
 {
@@ -462,25 +462,6 @@ int parseFile(std::string& Depends, const char* key, const char* fileName)
 	fclose(fp);
 	return 0;
 }
-bool findMD5sum(const std::string& fileName, unsigned char* result)
-{
-	struct md5_context ctx;
-	unsigned char buffer[1000];
-
-	FILE* f = fopen(fileName.c_str(), "rb");
-	if (!f)
-		return false;
-	md5_starts( &ctx );
-	int i = 0;
-	while( ( i = fread( buffer, 1, sizeof( buffer ), f ) ) > 0 )
-	{
-		md5_update( &ctx, buffer, i );
-	}
-	fclose(f);
-
-	md5_finish( &ctx, result );
-	return true;
-}
 bool findSHA256sum(const std::string& fileName, unsigned char* result)
 {
     EVP_MD_CTX *ctx;
@@ -506,21 +487,21 @@ bool findSHA256sum(const std::string& fileName, unsigned char* result)
     EVP_MD_CTX_destroy(ctx);
     return true;
 }
-bool checkMD5sum(const char * fileName, const char * MD5Sum)
+bool checkSHA256sum(const char * fileName, const char * SHA256Sum)
 {
   bool same = true;
-  unsigned char md5sum[16];
+  unsigned char sha256sum[32];
 
-  if ( findMD5sum(fileName,md5sum) ) {
+  if ( findSHA256sum(fileName,sha256sum) ) {
     static char hexNumbers[] = {'0','1','2','3','4','5','6','7',
                                 '8','9','a','b','c','d','e','f'};
 
     unsigned char high, low;
-    for (int i = 0; i < 16; ++i) {
-      high = (md5sum[i] & 0xF0) >> 4;
-      low = md5sum[i] & 0xF;
-      if ( *(MD5Sum+2*i) - hexNumbers[high] ||
-           *(MD5Sum+2*i+1) - hexNumbers[low]) {
+    for (int i = 0; i < 32; ++i) {
+      high = (sha256sum[i] & 0xF0) >> 4;
+      low = sha256sum[i] & 0xF;
+      if ( *(SHA256Sum+2*i) - hexNumbers[high] ||
+           *(SHA256Sum+2*i+1) - hexNumbers[low]) {
         same = false;
         break;
       }
@@ -530,3 +511,4 @@ bool checkMD5sum(const char * fileName, const char * MD5Sum)
   }
   return same;
 }
+

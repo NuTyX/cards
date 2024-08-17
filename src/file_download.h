@@ -83,14 +83,14 @@ class FileDownload
 	 * \param url Complete downloading address including the file
 	 * \param dirName Destination folder
 	 * \param fileName file where to store the downloaded datas
-	 * \param MD5Sum Signature to use for checking the download file
+	 * \param SHA256Sum Signature to use for checking the download file
 	 * \param progress If true, show what's going on
 	 */
 	FileDownload(std::string fileInfo,
 		std::string url,
 		std::string dirName,
 		std::string fileName,
-		std::string MD5Sum,
+		std::string SHA256Sum,
 		bool progress);
 
 	/**
@@ -122,7 +122,7 @@ class FileDownload
 	/**
 	 * \return check if signature is OK
 	 */
-	bool checkMD5sum();
+	bool checkSHA256sum();
 
 	/**
 	 * download effectively the request file
@@ -173,8 +173,8 @@ class FileDownload
 	std::string	m_url;
 	std::string	m_downloadFileName;
 	std::string	m_fileInfo;
-	bool		m_checkMD5;
+	bool		m_checkSHA256;
 	bool		m_progress;
-	std::string	m_MD5Sum;
+	std::string	m_SHA256Sum;
 	static std::set<FileDownloadEvent*> m_arrCallBacks;
 };
