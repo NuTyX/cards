@@ -172,4 +172,26 @@ bool pkgrepo::checkPackageNameExist(const std::string& name)
 
 	return (m_listOfPackages.find(name) != m_listOfPackages.end());
 }
+std::string& pkgrepo::getPackageFileName(const std::string& name)
+{
+    if (m_listOfPackages.size() == 0)
+        parse();
+
+    m_packageFileName = m_listOfPackages[name].fileName();
+
+    return m_packageFileName;
+}
+std::string& pkgrepo::getPackageFileNameSignature(const std::string& name)
+{
+    if (m_listOfPackages.size() == 0)
+        parse();
+
+    if (m_listOfPackages[name].signature().size() == 0)
+        m_packageFileNameSignature = m_listOfPackages[name].sha256SUM();
+    else
+        m_packageFileNameSignature = m_listOfPackages[name].signature();
+
+    return m_packageFileNameSignature;
+}
+
 } // end of 'cards' namespace

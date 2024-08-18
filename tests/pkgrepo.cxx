@@ -3,17 +3,11 @@
 int main () {
 	cards::pkgrepo Repository("cards.conf");
 
-	for (auto p : Repository.getBinaryPackageList())
-		std::cout << p
+	std::cout << Repository.getBinaryPackageList().size()
 			<< std::endl;
 
-	std::string  package = Repository.getBinaryPackageInfo("gcc");
-
-	if (package.size() == 0)
-		std::cout << "Package not found"
-		<< std::endl;
-
-	std::cout << package;
+	std::cout << Repository.getPackageFileName("gcc")
+			<< std::endl;
 
 	return 0;
 }
