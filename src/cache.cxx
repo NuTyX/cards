@@ -40,9 +40,17 @@ const std::string cache::name()
 {
 	return m_name;
 }
+const std::string cache::fileName()
+{
+	return m_fileName;
+}
+void cache::fileName(const std::string& filename)
+{
+	m_fileName = filename;
+}
 void cache::dirName(const std::string& dirname)
 {
-	m_dirName=dirname;
+	m_dirName = dirname;
 }
 const std::string cache::dirName()
 {
@@ -50,7 +58,7 @@ const std::string cache::dirName()
 }
 void cache::fileDate(const std::string& filedate)
 {
-	m_fileDate=filedate;
+	m_fileDate = filedate;
 }
 const std::string cache::fileDate()
 {

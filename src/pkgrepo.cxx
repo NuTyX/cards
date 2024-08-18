@@ -87,6 +87,7 @@ void pkgrepo::parse()
 				if ( pos != std::string::npos) {
 					pkgName = p.substr(1,pos - 1);
 					info.version(p.substr(pos + 7));
+					info.fileName(p.substr(1));
 					pkgFound = true;
 				}
 			}
