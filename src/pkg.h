@@ -31,7 +31,7 @@ public:
 	std::string signature();
 	std::string origin();
 	std::string branch();
-	std::string sha256SUM();
+	const std::string sha256SUM();
 	std::string s_buildDate();
 	time_t build();
 
@@ -79,7 +79,7 @@ private:
 	std::string m_origin;
 	std::string m_branch;
 
-	std::string m_md5SUM;
+	std::string m_sh256SUM;
 	std::string m_s_buildDate;
 	time_t m_build;
 

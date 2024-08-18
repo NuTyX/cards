@@ -59,6 +59,10 @@ const std::string pkg::version()
 {
 	return m_version;
 }
+const std::string pkg::sha256SUM()
+{
+	return m_sh256SUM;
+}
 void pkg::release(unsigned short int release)
 {
 	m_release = release;
