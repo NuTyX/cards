@@ -1,28 +1,20 @@
 #include "../src/libcards.h"
 
 int main () {
-	pkgrepo Repository("cards.conf");
-	std::string Port = "gcc";
- 	std::cout << "PortDir of "
-		<< Port << ": "
-		<< Repository.getPortDir(Port)
-		<< std::endl;
-  std::cout << "BasePortName of "
-		<< Port << ": "
-		<< Repository.getBasePortName(Port)
-		<< std::endl;
-  std::cout << "PortVersion of "
-		<< Port << ": "
-		<< Repository.getPortRelease(Port)
-		<< std::endl;
-/*	for (auto i:Repository.getListOfPortsDirectory())
-		std::cout << i.dir
-			<< " : "
-			<< i.url
+	cards::pkgrepo Repository("cards.conf");
+
+	for (auto p : Repository.getBinaryPackageList())
+		std::cout << p
 			<< std::endl;
-*/
-	std::cout << Repository.getPortInfo(Port)
-			<< std::endl;
-  return 0;
+
+	std::string  package = Repository.getBinaryPackageInfo("gcc");
+
+	if (package.size() == 0)
+		std::cout << "Package not found"
+		<< std::endl;
+
+	std::cout << package;
+
+	return 0;
 }
 // vim:set ts=2 :

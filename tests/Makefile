@@ -5,63 +5,57 @@
 
 include ../Makefile.inc
 
-all: deplist deptree uname pkgdbh pkginst pkgrepo pkgfile string vector conf
+all: deplist deptree uname pkgdbh pkgrepo pkgfile string vector conf
 
 deplist:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
 	rm $@.o
 
 deptree:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
 	rm $@.o
 
 uname:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
 	rm $@.o
 
 pkgdbh:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
 	rm $@.o
 
 vector:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
 	rm $@.o
 
 string:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
 	rm $@.o
 
 conf:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
-	rm $@.o
-
-pkginst:
-	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
 	rm $@.o
 
 pkgrepo:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
 	rm $@.o
 
 pkgfile:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
-	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
 	rm $@.o
 
 
 clean:
 	rm -f deptree
 	rm -f deplist
-	rm -f pkginst
 	rm -f pkgrepo
 	rm -f pkgfile
 	rm -f pkgdbh

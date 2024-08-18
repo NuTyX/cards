@@ -36,6 +36,7 @@ CARDSOBJECTS =	conf.o \
 		db.o \
 		cache.o \
 		pkgfile.o \
+		pkgrepo.o \
 		repo.o \
 		file_download.o \
 		repodwl.o \
@@ -69,7 +70,7 @@ LIBOBJECTS =  conf.o \
 	string_utils.o \
 	archive.o \
 	pkgfile.o \
-	repo.o \
+	pkgrepo.o \
 	repodwl.o \
 	file_download.o \
 	file_utils.o \
@@ -115,6 +116,7 @@ HEADERS = define.h \
 	cache.h \
 	sync.h \
 	pkgfile.h \
+	pkgrepo.h \
 	repo.h \
 	repodwl.h \
 	file_download.h \
@@ -124,8 +126,7 @@ HEADERS = define.h \
 	pkgadd.h \
 	pkgrm.h \
 	pkginfo.h \
-	pkginst.h \
-	sync.h
+	pkginst.h
 
 CONSOLEKIT_CFLAGS = -I/usr/include/ConsoleKit/ck-connector -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
 CONSOLEKIT_LIBS = -lck-connector -ldbus-1
