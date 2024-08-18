@@ -9,7 +9,7 @@ pkgrepo::pkgrepo(const std::string& fileName)
 {
 }
 std::set<std::string>& pkgrepo::getBinaryPackageList() {
-	parseRepofile();
+	parse();
 	std::string packageName;
 	for (auto p : m_listOfPackages) {
 		packageName = "("
@@ -26,7 +26,7 @@ std::set<std::string>& pkgrepo::getBinaryPackageList() {
 }
 std::string& pkgrepo::getBinaryPackageInfo(const std::string& name)
 {
-	parseRepofile();
+	parse();
 	if (m_listOfPackages.find(name) != m_listOfPackages.end()) {
 		m_binaryPackageInfo = _("Name           : ")
 			+ name + '\n'
@@ -51,7 +51,7 @@ std::string& pkgrepo::getBinaryPackageInfo(const std::string& name)
 	}
 	return m_binaryPackageInfo;
 }
-void pkgrepo::parseRepofile()
+void pkgrepo::parse()
 {
 	if (m_listOfPackages.size() > 0)
 		return;
@@ -128,5 +128,47 @@ void pkgrepo::parseRepofile()
 		}
 	}
 }
+repo_t& pkgrepo::getListOfPackages()
+{
+    if (m_listOfPackages.size() == 0)
+        parse();
 
+    return m_listOfPackages;
+}
+std::set<std::string>& pkgrepo::getListOfPackagesFromSet(const std::string& name)
+{
+	if (m_listOfPackages.size() == 0)
+        parse();
+
+	for (auto p: m_listOfPackages) {
+		for (auto s : m_listOfPackages[p.first].sets()) {
+			if (s == name) {
+				m_binarySetList.insert(p.first);
+				break;
+			}
+		}
+	}
+
+	return m_binarySetList;
+}
+std::set<std::string>& pkgrepo::getListOfPackagesFromCollection(const std::string& name)
+{
+	if (m_listOfPackages.size() == 0)
+        parse();
+
+	for (auto p: m_listOfPackages) {
+		if (m_listOfPackages[p.first].collection() == name) {
+			m_binaryCollectionList.insert(p.first);
+		}
+	}
+
+	return m_binaryCollectionList;
+}
+bool pkgrepo::checkPackageNameExist(const std::string& name)
+{
+	if (m_listOfPackages.size() == 0)
+        parse();
+
+	return (m_listOfPackages.find(name) != m_listOfPackages.end());
+}
 } // end of 'cards' namespace

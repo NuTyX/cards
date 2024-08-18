@@ -16,8 +16,8 @@ cards_install::cards_install(const CardsArgumentParser& argParser,
 		if ( getListOfPackagesFromCollection(i).empty() &&
 			(! checkBinaryExist(i) )  && 
 			getListOfPackagesFromSet(i).empty() ){
-			m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_FOUND;
-			treatErrors(i);
+				m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_FOUND;
+				treatErrors(i);
 		}
 	}
 	cards::conf config(configFileName);

@@ -105,7 +105,7 @@ class pkgfile {
     std::vector<std::string> m_badDependencies;
     unsigned int m_level;
 
-    void parsePackagePkgfileFile();
+    void parse();
     void generate_level();
 
 public:
@@ -146,13 +146,13 @@ public:
      * return true if port name exist
      *
      */
-    bool checkPortExist(const std::string& portName) const;
+    bool checkPackageNameExist(const std::string& name);
 
     /**
      * return the list of found Packages
      *
      */
-    ports_t getListOfPackages();
+    ports_t& getListOfPackages();
 
     /**
      * return the list of bad Dependencies

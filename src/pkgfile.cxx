@@ -38,7 +38,7 @@ void pkgfile::confirmDependencies()
         i.second.indexes(indexes);
     }
 }
-void pkgfile::parsePackagePkgfileFile()
+void pkgfile::parse()
 {
     if (m_listOfPackages.size() > 0)
         return;
@@ -186,49 +186,57 @@ void pkgfile::generate_level()
         generate_level();
     }
 }
-ports_t pkgfile::getListOfPackages()
+ports_t& pkgfile::getListOfPackages()
 {
     if (m_listOfPackages.size() == 0)
-        parsePackagePkgfileFile();
+        parse();
+
     return m_listOfPackages;
 }
 std::vector<std::string> pkgfile::getBadDependencies()
 {
     if (m_listOfPackages.size() == 0)
-        parsePackagePkgfileFile();
+        parse();
+
     return m_badDependencies;
 }
 std::set<std::string> pkgfile::getDependencies(const std::string& portName)
 {
     std::set<std::string> deps;
     if (m_listOfPackages.size() == 0)
-        parsePackagePkgfileFile();
+        parse();
 
-    if (checkPortExist(portName))
+    if (checkPackageNameExist(portName))
         return m_listOfPackages[portName].dependencies();
 
     return deps;
 }
-bool pkgfile::checkPortExist(const std::string& portName) const
+bool pkgfile::checkPackageNameExist(const std::string& name)
 {
-    return (m_listOfPackages.find(portName) != m_listOfPackages.end());
+    if (m_listOfPackages.size() == 0)
+        parse();
+
+    return (m_listOfPackages.find(name) != m_listOfPackages.end());
 }
 std::string pkgfile::pkgfile::getPortVersion(const std::string& portName)
 {
     if (m_listOfPackages.size() == 0)
-        parsePackagePkgfileFile();
+        parse();
+
     return m_listOfPackages[portName].version();
 }
 std::string pkgfile::pkgfile::getPortDir(const std::string& portName)
 {
     if (m_listOfPackages.size() == 0)
-        parsePackagePkgfileFile();
+        parse();
+
     return m_listOfPackages[portName].collection() + "/" + portName;
 }
 unsigned short int pkgfile::pkgfile::getPortRelease(const std::string& portName)
 {
     if (m_listOfPackages.size() == 0)
-        parsePackagePkgfileFile();
+        parse();
+
     return m_listOfPackages[portName].release();
 }
 } // end of 'cards' namespace
