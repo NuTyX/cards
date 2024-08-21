@@ -32,6 +32,7 @@ public:
     virtual ~pkgrepo() { }
 
     bool                   checkPackageNameExist(const std::string& name);
+    bool                   checkBinaryExist(const std::string& name);
 
     std::string&           getPackageFileName(const std::string& name);
     std::string&           getPackageFileNameSignature(const std::string& name);

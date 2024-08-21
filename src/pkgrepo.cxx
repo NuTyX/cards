@@ -172,6 +172,10 @@ bool pkgrepo::checkPackageNameExist(const std::string& name)
 
 	return (m_listOfPackages.find(name) != m_listOfPackages.end());
 }
+bool pkgrepo::checkBinaryExist(const std::string& name)
+{
+	return checkPackageNameExist();
+}
 std::string& pkgrepo::getPackageFileName(const std::string& name)
 {
     if (m_listOfPackages.size() == 0)
