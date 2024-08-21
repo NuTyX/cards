@@ -40,6 +40,14 @@ const std::string cache::name()
 {
 	return m_name;
 }
+void cache::baseName(const std::string& name)
+{
+	m_name=name;
+}
+const std::string cache::baseName()
+{
+	return m_name;
+}
 const std::string cache::fileName()
 {
 	return m_fileName;
