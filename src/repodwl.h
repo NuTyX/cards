@@ -18,18 +18,6 @@ public:
 	repodwl(const char *fileName);
 
 /**
- * download the .PKGREPO of packageName
- *
- * Depends on: parsePkgRepoCollectionFile
- *
- * populate: nothing
- *
- * add: the .PKGREPO of the packageName port from the mirror
- *
- */
-	void downloadPortsPkgRepo(const std::string& packageName);
-
-/**
  * download the packagefileName
  *
  * Depends on: parsePkgRepoCollectionFile

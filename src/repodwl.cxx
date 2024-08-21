@@ -6,43 +6,6 @@ repodwl::repodwl(const char *fileName)
 	: repo(fileName)
 {
 }
-void repodwl::downloadPortsPkgRepo(const std::string& packageName)
-{
-	InfoFile downloadFile;
-	std::vector<InfoFile> downloadFilesList;
-	bool found = false;
-	for (auto portsDirectory : m_portsDirectoryList) {
-		for (auto packageInfo : portsDirectory.packagesList) {
-			if ( packageInfo.baseName() == packageName ) {
-				/**
-				 *
-				 * We should check if the" + PKG_REPO of the port is available
-				 * " + PKG_REPO file is /var/lib/pkg/depot/cli/alsa-lib/" + PKG_REPO
-				 *
-				 */
-				if ( portsDirectory.url.size() > 0 ) {
-					downloadFile.url = portsDirectory.url
-						+ "/"
-						+ packageInfo.baseName()
-						+ PKG_REPO;
-					downloadFile.dirname = portsDirectory.dir
-						+ "/"
-						+ packageInfo.baseName();
-					downloadFile.filename = PKG_REPO;
-					downloadFile.sha256sum = packageInfo.sha256SUM();
-					downloadFilesList.push_back(downloadFile);
-				}
-				found = true;
-				break;
-			}
-		}
-		if (found)
-			break;
-	}
-	if ( downloadFilesList.size() > 0 ) {
-		FileDownload FD(downloadFilesList,false);
-	}
-}
 void repodwl::downloadPackageFileName(const std::string& packageName)
 {
 }
