@@ -23,7 +23,7 @@ class pkgrepo {
     std::string           m_binaryPackageInfo;
     std::string           m_packageFileName;
     std::string           m_packageFileNameSignature;
-
+    std::string           m_packageVersion;
 
     void parse();
 
@@ -31,13 +31,17 @@ public:
     pkgrepo(const std::string& fileName);
     virtual ~pkgrepo() { }
 
-    bool                   checkPackageNameExist(const std::string& name);
     bool                   checkBinaryExist(const std::string& name);
+
+    time_t                 getBinaryBuildTime (const std::string& name);
 
     std::string&           getPackageFileName(const std::string& name);
     std::string&           getPackageFileNameSignature(const std::string& name);
     std::string&           getBinaryPackageInfo(const std::string& name);
+    std::string&           getPackageVersion(const std::string& name);
+     unsigned short int    getPackageRelease(const std::string& name);
 
+    std::vector<std::string> getListofGroups();
     std::set<std::string>& getBinaryPackageList();
     std::set<std::string>& getListOfPackagesFromSet(const std::string& name);
     std::set<std::string>& getListOfPackagesFromCollection(const std::string& name);

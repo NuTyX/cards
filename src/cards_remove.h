@@ -4,7 +4,7 @@
 
 #include "pkgrm.h"
 #include "cards_argument_parser.h"
-#include "repo.h"
+#include "pkgrepo.h"
 
 /**
  * \brief Cards remove class

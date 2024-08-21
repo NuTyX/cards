@@ -12,7 +12,7 @@
 #include "file_download.h"
 #include "level.h"
 #include "pkginfo.h"
-#include "repo.h"
+#include "pkgrepo.h"
 #include "pkgrm.h"
 
 #include <cstdlib>

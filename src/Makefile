@@ -37,9 +37,7 @@ CARDSOBJECTS =	conf.o \
 		cache.o \
 		pkgfile.o \
 		pkgrepo.o \
-		repo.o \
 		file_download.o \
-		repodwl.o \
 		argument_parser.o \
 		cards_argument_parser.o \
 		file_utils.o \
@@ -71,7 +69,6 @@ LIBOBJECTS =  conf.o \
 	archive.o \
 	pkgfile.o \
 	pkgrepo.o \
-	repodwl.o \
 	file_download.o \
 	file_utils.o \
 	process.o \
@@ -93,7 +90,7 @@ WEBOBJECTS =  conf.o \
 	vector.o \
 	file_utils.o \
 	string_utils.o \
-	repo.o \
+	pkgrepo.o \
 	mysql.o \
 	pkg.o \
 	db.o \
@@ -117,8 +114,6 @@ HEADERS = define.h \
 	sync.h \
 	pkgfile.h \
 	pkgrepo.h \
-	repo.h \
-	repodwl.h \
 	file_download.h \
 	process.h \
 	runtime_dependencies_utils.h \

@@ -6,7 +6,7 @@
 #include "cards_argument_parser.h"
 #include "file_utils.h"
 #include "file_download.h"
-#include "repo.h"
+#include "pkgrepo.h"
 
 
 class cards_base : public pkgdbh

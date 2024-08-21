@@ -19,10 +19,9 @@ cards_upgrade::cards_upgrade(const CardsArgumentParser& argParser,
 	if ( ! m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
 		m_Sync.run();
 	
-	parseCollectionPkgRepoFile();
 	buildSimpleDatabase();
 	std::set<std::string> listOfExistPackages;
-	for (auto i:m_listOfPackages) {
+	for (auto i:getListOfPackages()) {
 		if (checkBinaryExist(i.first)) {
 			listOfExistPackages.insert(i.first);
 		}
@@ -36,11 +35,11 @@ cards_upgrade::cards_upgrade(const CardsArgumentParser& argParser,
 		std::cout << j << std::endl;
 	}
 #endif
-	if (!m_config.groups().empty()) {
+	if (!getListofGroups().empty()) {
 		std::set<std::string> tmpList;
-		for (auto i: m_listOfPackages) {
-			for ( auto j :  m_config.groups() ) {
-					std::string packageName  = getBasePackageName(i.first) + "." + j;
+		for (auto i: getListOfPackages()) {
+			for ( auto j :  getListofGroups() ) {
+					std::string packageName  = i.first + "." + j;
 					if ( i.first == packageName )
 						continue;
 					if (checkBinaryExist(packageName)) {
@@ -59,7 +58,7 @@ cards_upgrade::cards_upgrade(const CardsArgumentParser& argParser,
 			}
 		}
 	}
-	for (auto i : m_listOfPackages) {
+	for (auto i : getListOfPackages()) {
 		if (!checkBinaryExist(i.first)) {
 			m_ListOfPackagesToDelete.insert(i.first);
 			continue;
@@ -167,8 +166,10 @@ void cards_upgrade::upgrade()
 				m_upgrade=false;
 			}
 		run();
-		std::string p = i.first + " " + getBasePackageVersion(getBasePackageName(i.first)) \
-    + "-" + itos(getBasePackageRelease(getBasePackageName(i.first)));
+		std::string p = i.first
+			+ " "
+			+ getPackageVersion(i.first);
+
 		syslog(LOG_INFO,"%s upgraded",p.c_str());
 		}
 		for (auto i : m_ListOfPackagesToDelete) {

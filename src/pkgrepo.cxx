@@ -165,16 +165,12 @@ std::set<std::string>& pkgrepo::getListOfPackagesFromCollection(const std::strin
 
 	return m_binaryCollectionList;
 }
-bool pkgrepo::checkPackageNameExist(const std::string& name)
+bool pkgrepo::checkBinaryExist(const std::string& name)
 {
 	if (m_listOfPackages.size() == 0)
         parse();
 
 	return (m_listOfPackages.find(name) != m_listOfPackages.end());
-}
-bool pkgrepo::checkBinaryExist(const std::string& name)
-{
-	return checkPackageNameExist();
 }
 std::string& pkgrepo::getPackageFileName(const std::string& name)
 {
@@ -197,5 +193,31 @@ std::string& pkgrepo::getPackageFileNameSignature(const std::string& name)
 
     return m_packageFileNameSignature;
 }
+std::vector<std::string> pkgrepo::getListofGroups()
+{
+	return m_config.groups();
+}
+time_t pkgrepo::getBinaryBuildTime (const std::string& name)
+{
 
+	if (m_listOfPackages.size() == 0)
+		parse();
+
+	return m_listOfPackages[name].build();
+}
+std::string& pkgrepo::getPackageVersion(const std::string& name)
+{
+	if (m_listOfPackages.size() == 0)
+		parse();
+
+	m_packageVersion = m_listOfPackages[name].version();
+	return m_packageVersion;
+}
+unsigned short int pkgrepo::getPackageRelease(const std::string& name)
+{
+	if (m_listOfPackages.size() == 0)
+		parse();
+
+	return m_listOfPackages[name].release();
+}
 } // end of 'cards' namespace
