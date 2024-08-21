@@ -2,9 +2,10 @@
 
 #include "pkginst.h"
 
+
 pkginst::pkginst
 	(const std::string& commandName,const char *configFileName)
-	: pkgadd(commandName), repodwl(configFileName)
+	: pkgadd(commandName), cards::pkgrepo(configFileName)
 {
 }
 void pkginst::generateDependencies
@@ -146,4 +147,7 @@ void pkginst::generateDependencies()
 		else std::cerr << "no deps founds" << std::endl;
 #endif
 	}
+}
+void pkginst::downloadPackageFileName(const std::string& packageName)
+{
 }
