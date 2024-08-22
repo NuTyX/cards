@@ -187,6 +187,12 @@ void pkginfo::run()
                           << i
                           << std::endl;
         }
+        if (packageArchive.second.sets().size() > 0) {
+			for (auto i : packageArchive.second.sets())
+				std::cout << "s"
+						<< i
+						<< std::endl;
+		}
     }
     if (m_archiveinfo) {
         std::pair<std::string, cards::db> packageArchive = openArchivePackage(m_packageArchiveName);

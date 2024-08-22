@@ -136,6 +136,14 @@ void archive::getCategoriesList()
         }
     }
 }
+void archive::getSetsList()
+{
+    for (auto i : m_contentMeta) {
+        if (i[0] == 's') {
+            m_setsList.insert(i.substr(1));
+        }
+    }
+}
 void archive::printDeps()
 {
     getRunTimeDependencies();
@@ -200,6 +208,11 @@ std::set<std::string> archive::listofCategories()
 {
     getCategoriesList();
     return m_categoriesList;
+}
+std::set<std::string> archive::listofSets()
+{
+    getSetsList();
+    return m_setsList;
 }
 std::set<std::pair<std::string, time_t>> archive::listofDependenciesBuildDate()
 {
