@@ -80,8 +80,10 @@ cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& 
 		run();		
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_SEARCH) ) {
+		bool found = false;
 		buildSimpleDatabase();
 		for (auto j : getListOfPackages()) {
+			found = false;
 			std::string::size_type pos;
 			pos = j.second.collection().find(convertToLowerCase(m_argParser.otherArguments()[0]));
 			if  (pos == std::string::npos)
@@ -95,81 +97,36 @@ cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& 
 			if  (pos == std::string::npos)
 				pos = convertToLowerCase(j.second.version()).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 			if (pos != std::string::npos) {
+				if (j.second.group().size() > 0) {
+					/*
+					 * TODO find a better algo
+					 */
+					if (j.second.group() == "devel")
+						found = true;
+					if (j.second.group() == "man")
+						found = true;
+					if (j.second.group() == "service")
+						found = true;
+					if (j.second.group() == "lib")
+						found = true;
+					if (j.second.group() == "doc")
+						found = true;
+				} else
+					found = true;
+
+				if (!found)
+					continue;
+
 				std::cout << "(" << j.second.collection() << ") ";
 			if (checkPackageNameExist(j.first)) {
 				std::cout << GREEN;
 			}
+
 			std::cout << j.first
 				<< NORMAL
 				<< " " << j.second.version()
 				<< " " << j.second.description()
 				<< std::endl;
-			std::set<std::string> groupList;
-			groupList = parseDelimitedSetList(j.second.group()," ");
-			for (auto k : groupList) {
-				if (k == j.first)
-					continue;
-				std::string name = j.first
-				+ "."
-				+ k;
-				std::cout << "(" << j.second.collection() << ") ";
-				if (checkPackageNameExist(name))
-					std::cout << GREEN;
-					std::cout << name
-						<< NORMAL
-						<< " " << j.second.version()
-						<< " " << j.second.description()
-						<< std::endl;
-					name="";
-				}
-				continue;
-			}
-			bool found = false;
-			std::set<std::string> groupList;
-			groupList = parseDelimitedSetList(j.second.group()," ");
-			for (auto k : groupList) {
-				if (k == j.first)
-					continue;
-				if (convertToLowerCase(m_argParser.otherArguments()[0]) == k) {
-					std::string name = j.first
-						+ "."
-						+ k;
-					std::cout << "(" << j.second.collection() << ") ";
-					if (checkPackageNameExist(name))
-						std::cout << GREEN;
-
-					std::cout << name
-						<< NORMAL
-						<< " " << j.second.version()
-						<< " " << j.second.description()
-						<< std::endl;
-					name="";
-					found = true;
-					continue;
-				}
-			}
-			if (found)
-				continue;
-			std::set<std::string> aliasList;
-			aliasList = j.second.alias();
-			for (auto k : aliasList) {
-				if (k == j.first)
-					continue;
-				if (convertToLowerCase(m_argParser.otherArguments()[0]) == k) {
-					std::string name = j.first;
-					std::cout << "(" << j.second.collection() << ") ";
-					if ( checkPackageNameExist(name )) {
-						std::cout << GREEN;
-					}
-					std::cout << name
-						<< NORMAL
-						<< " " << j.second.version()
-						<< " " << j.second.description()
-						<< std::endl;
-					name="";
-					found = true;
-					continue;
-				}
 			}
 		}
 	}
