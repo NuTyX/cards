@@ -116,7 +116,7 @@ void pkgrepo::parse()
 				if (p[0] == 'P')
 					info.packager(p.substr(1));
 			if (pkgFound)
-				if (p[0] == 'R') {
+				if (p[0] == 's') {
 					pkgSet.insert(p.substr(1));
 				}
 			if (pkgFound)
