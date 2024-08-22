@@ -44,7 +44,7 @@ public:
 	void version(const std::string& version);
 	void release(unsigned short int release);
 
-	void alias(std::set<std::string>& alias);
+	void alias(const std::set<std::string>& alias);
 	void sets(const std::set<std::string>& sets);
 	void categories(const std::set<std::string>& categories);
 

@@ -1216,6 +1216,7 @@ pkgdbh::openArchivePackage(const std::string& filename)
 	result.second.dependencies(packageArchive.listofDependenciesBuildDate());
 	result.second.categories(packageArchive.listofCategories());
 	result.second.sets(packageArchive.listofSets());
+	result.second.alias(packageArchive.listofAlias());
 	m_packageName = packageArchiveName;
 	return result;
 }

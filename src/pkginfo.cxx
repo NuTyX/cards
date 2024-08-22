@@ -175,6 +175,12 @@ void pkginfo::run()
                   << "P"
                   << packageArchive.second.packager()
                   << std::endl;
+        if (packageArchive.second.alias().size() > 0) {
+            for (auto i : packageArchive.second.alias())
+                std::cout << "A"
+                          << i
+                          << std::endl;
+        }
         if (packageArchive.second.dependencies().size() > 0) {
             for (auto i : packageArchive.second.dependencies())
                 std::cout << "R"
