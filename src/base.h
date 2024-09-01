@@ -8,13 +8,14 @@
 #include "file_download.h"
 #include "pkgrepo.h"
 
-
-class cards_base : public pkgdbh
+namespace cards {
+class base : public pkgdbh
 {
 	const CardsArgumentParser& m_argParser;
 
 public:
-	cards_base(const CardsArgumentParser& argParser);
+	base(const CardsArgumentParser& argParser);
 	void run(int argc, char** argv);
 	void printHelp() const;
 };
+}

@@ -55,7 +55,7 @@ CARDSOBJECTS =	conf.o \
 	create.o \
 	install.o \
 	remove.o \
-	cards_base.o \
+	base.o \
 	info.o \
 	upgrade.o \
 	cards.o

@@ -1,18 +1,21 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-#include "cards_base.h"
+#include "base.h"
 
-cards_base::cards_base(const CardsArgumentParser& argParser)
-	: pkgdbh("cards base"), m_argParser(argParser)
+namespace cards {
+
+base::base(const CardsArgumentParser& argParser)
+        : pkgdbh("cards base"),
+        m_argParser(argParser)
 {
-	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
-		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
-	else
-		m_root="/";
+    if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
+	m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
+    else
+	m_root="/";
 
-	getListOfPackagesNames(m_root); // Get the list of installed packages
+    getListOfPackagesNames(m_root); // Get the list of installed packages
 }
-void cards_base::run(int argc, char** argv)
+void base::run(int argc, char** argv)
 {
 	cards::conf config;
 
@@ -92,7 +95,7 @@ void cards_base::run(int argc, char** argv)
 		}
 	}
 }
-void cards_base::printHelp() const
+void base::printHelp() const
 {
 	std::cout << std::endl
 			<< "  You should have one or severall valid directories " << std::endl
@@ -106,4 +109,5 @@ void cards_base::printHelp() const
 			<< "options:" << std::endl
 			<< "   -R, --remove       remove all the packages found, use with care, check first the list without passing any options" << std::endl
 			<< "   -H, --info         print this help and exit" << std::endl;
+}
 }

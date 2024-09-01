@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-#include "cards_base.h"
+#include "base.h"
 #include "info.h"
 #include "install.h"
 #include "remove.h"
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
                 cardsArgPars.printHelp("base");
                 return EXIT_SUCCESS;
             }
-            unique_ptr<cards_base> i(new cards_base(cardsArgPars));
+            unique_ptr<cards::base> i(new cards::base(cardsArgPars));
             i->run(argc, argv);
         }
             return EXIT_SUCCESS;
