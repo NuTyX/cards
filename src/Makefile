@@ -25,40 +25,40 @@ TOOLSOBJECTS =	system_utils.o \
 		tools.o
 
 CARDSOBJECTS =	conf.o \
-		system_utils.o \
-		error_treat.o \
-		string.o \
-		vector.o \
-		string_utils.o \
-		archive.o \
-		pkg.o \
-		lock.o \
-		db.o \
-		cache.o \
-		pkgfile.o \
-		pkgrepo.o \
-		file_download.o \
-		argument_parser.o \
-		cards_argument_parser.o \
-		file_utils.o \
-		process.o \
-		runtime_dependencies_utils.o \
-		pkgdbh.o \
-		pkgadd.o \
-		pkgrm.o \
-		pkginfo.o \
-		pkginst.o \
-		deptree.o \
-		level.o \
-		depends.o \
-		sync.o \
-		create.o \
-		install.o \
-		cards_remove.o \
-		cards_base.o \
-		cards_info.o \
-		upgrade.o \
-		cards.o
+	system_utils.o \
+	error_treat.o \
+	string.o \
+	vector.o \
+	string_utils.o \
+	archive.o \
+	pkg.o \
+	lock.o \
+	db.o \
+	cache.o \
+	pkgfile.o \
+	pkgrepo.o \
+	file_download.o \
+	argument_parser.o \
+	cards_argument_parser.o \
+	file_utils.o \
+	process.o \
+	runtime_dependencies_utils.o \
+	pkgdbh.o \
+	pkgadd.o \
+	pkgrm.o \
+	pkginfo.o \
+	pkginst.o \
+	deptree.o \
+	level.o \
+	depends.o \
+	sync.o \
+	create.o \
+	install.o \
+	remove.o \
+	cards_base.o \
+	cards_info.o \
+	upgrade.o \
+	cards.o
 
 LIBOBJECTS =  conf.o \
 	system_utils.o \

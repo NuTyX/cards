@@ -3,7 +3,7 @@
 #include "cards_base.h"
 #include "cards_info.h"
 #include "install.h"
-#include "cards_remove.h"
+#include "remove.h"
 #include "upgrade.h"
 #include "sync.h"
 #include "create.h"
@@ -209,7 +209,7 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_REMOVE: {
-            unique_ptr<cards_remove> i(new cards_remove("cards remove", cardsArgPars, configFile.c_str()));
+            unique_ptr<cards::remove> i(new cards::remove("cards remove", cardsArgPars, configFile.c_str()));
         }
             return EXIT_SUCCESS;
 

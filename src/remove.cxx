@@ -1,8 +1,10 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-#include "cards_remove.h"
+#include "remove.h"
 
-cards_remove::cards_remove(const std::string& commandName,
+namespace cards {
+
+remove::remove(const std::string& commandName,
 	const CardsArgumentParser& argParser,
 	const char *configFileName)
 	: pkgrm(commandName),m_argParser(argParser)
@@ -149,4 +151,5 @@ cards_remove::cards_remove(const std::string& commandName,
 		name += i;
 		syslog(LOG_INFO,"%s",name.c_str());
 	}
+}
 }

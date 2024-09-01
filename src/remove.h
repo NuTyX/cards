@@ -6,6 +6,7 @@
 #include "cards_argument_parser.h"
 #include "pkgrepo.h"
 
+namespace cards {
 /**
  * \brief Cards remove class
  *
@@ -15,7 +16,7 @@
  */
 
 
-class cards_remove: public pkgrm
+class remove: public pkgrm
 {
         const CardsArgumentParser& m_argParser;
 
@@ -27,7 +28,8 @@ class cards_remove: public pkgrm
          * \param argParser CardsArgumentParser type
          * \param configFileName Specify the configuration file name to use
          */
-        cards_remove(const std::string& commandName,
+        remove(const std::string& commandName,
 	  const CardsArgumentParser& argParser,
 	  const char *configFileName);
 };
+}
