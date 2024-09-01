@@ -1,9 +1,10 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-#include "cards_install.h"
+#include "install.h"
 
+namespace cards {
 
-cards_install::cards_install(const CardsArgumentParser& argParser,
+install::install(const CardsArgumentParser& argParser,
 		const char *configFileName)
 	: pkginst("cards install",configFileName),m_argParser(argParser),
 		m_configFileName(configFileName)
@@ -79,7 +80,7 @@ cards_install::cards_install(const CardsArgumentParser& argParser,
 
 	}
 }
-cards_install::cards_install(const CardsArgumentParser& argParser,
+install::install(const CardsArgumentParser& argParser,
 	const char *configFileName,
 	const std::vector<std::string>& listOfPackages)
 	: pkginst("cards install",configFileName),m_argParser(argParser)
@@ -124,7 +125,7 @@ cards_install::cards_install(const CardsArgumentParser& argParser,
 		}
 	}
 }
-void cards_install::parseArguments()
+void install::parseArguments()
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
@@ -143,7 +144,7 @@ void cards_install::parseArguments()
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DISABLE))
 		m_runPrePost = false;
 }
-void cards_install::getLocalePackagesList()
+void install::getLocalePackagesList()
 {
 	std::string packageFileName;
 	cards::conf config(m_configFileName);
@@ -178,4 +179,5 @@ void cards_install::getLocalePackagesList()
 	for (auto i : m_dependenciesList )
 		std::cerr << i.first << " " << i.second << std::endl;
 #endif
+}
 }

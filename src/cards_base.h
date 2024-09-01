@@ -11,7 +11,6 @@
 
 class cards_base : public pkgdbh
 {
-private:
 	const CardsArgumentParser& m_argParser;
 
 public:

@@ -16,16 +16,14 @@
 
 class cards_info: public pkginfo, public cards::pkgrepo
 {
-	public:
-		/**
-		 * Default constructor
-		 * 
-		 * \param argParser CardsArgumentParser type
-		 * \param configFileName Specify the configuration file name to use
-		 */
-		cards_info(const CardsArgumentParser& argParser,const std::string& configFileName);
-			
-	private:
-		const CardsArgumentParser& m_argParser;
-};
+        const CardsArgumentParser& m_argParser;
 
+    public:
+        /**
+         * Default constructor
+         *
+         * \param argParser CardsArgumentParser type
+         * \param configFileName Specify the configuration file name to use
+         */
+        cards_info(const CardsArgumentParser& argParser,const std::string& configFileName);
+};

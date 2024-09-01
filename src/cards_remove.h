@@ -17,18 +17,17 @@
 
 class cards_remove: public pkgrm
 {
-	public:
-		/**
-		 * Default constructor
-		 * 
-		 * \param commandName Specify the used command name
-		 * \param argParser CardsArgumentParser type
-		 * \param configFileName Specify the configuration file name to use
-		 */
-		cards_remove(const std::string& commandName,
-		const CardsArgumentParser& argParser,
-		const char *configFileName);
+        const CardsArgumentParser& m_argParser;
 
-	private:
-		const CardsArgumentParser& m_argParser;
+    public:
+        /**
+         * Default constructor
+         *
+         * \param commandName Specify the used command name
+         * \param argParser CardsArgumentParser type
+         * \param configFileName Specify the configuration file name to use
+         */
+        cards_remove(const std::string& commandName,
+	  const CardsArgumentParser& argParser,
+	  const char *configFileName);
 };

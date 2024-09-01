@@ -2,7 +2,7 @@
 
 #include "cards_base.h"
 #include "cards_info.h"
-#include "cards_install.h"
+#include "install.h"
 #include "cards_remove.h"
 #include "upgrade.h"
 #include "sync.h"
@@ -204,7 +204,7 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_INSTALL: {
-            unique_ptr<cards_install> i(new cards_install(cardsArgPars, configFile.c_str()));
+            unique_ptr<cards::install> i(new cards::install(cardsArgPars, configFile.c_str()));
         }
             return EXIT_SUCCESS;
 

@@ -31,22 +31,22 @@ public:
     pkgrepo(const std::string& fileName);
     virtual ~pkgrepo() { }
 
-    bool                   checkBinaryExist(const std::string& name);
+    bool                     checkBinaryExist(const std::string& name);
 
-    time_t                 getBinaryBuildTime (const std::string& name);
+    time_t                   getBinaryBuildTime (const std::string& name);
 
-    std::string&           getPackageFileName(const std::string& name);
-    std::string&           getPackageFileNameSignature(const std::string& name);
-    std::string&           getBinaryPackageInfo(const std::string& name);
-    std::string&           getPackageVersion(const std::string& name);
-     unsigned short int    getPackageRelease(const std::string& name);
+    std::string&             getPackageFileName(const std::string& name);
+    std::string&             getPackageFileNameSignature(const std::string& name);
+    std::string&             getBinaryPackageInfo(const std::string& name);
+    std::string&             getPackageVersion(const std::string& name);
+    unsigned short int       getPackageRelease(const std::string& name);
 
     std::vector<std::string> getListofGroups();
-    std::set<std::string>& getBinaryPackageList();
-    std::set<std::string>& getListOfPackagesFromSet(const std::string& name);
-    std::set<std::string>& getListOfPackagesFromCollection(const std::string& name);
+    std::set<std::string>&   getBinaryPackageList();
+    std::set<std::string>&   getListOfPackagesFromSet(const std::string& name);
+    std::set<std::string>&   getListOfPackagesFromCollection(const std::string& name);
 
-    repo_t&                getListOfPackages();
+    repo_t&                  getListOfPackages();
 };
 
 } // end of 'cards' namespace

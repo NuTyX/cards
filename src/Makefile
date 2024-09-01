@@ -53,7 +53,7 @@ CARDSOBJECTS =	conf.o \
 		depends.o \
 		sync.o \
 		create.o \
-		cards_install.o \
+		install.o \
 		cards_remove.o \
 		cards_base.o \
 		cards_info.o \
