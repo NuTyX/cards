@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
 #include "cards_base.h"
-#include "cards_info.h"
+#include "info.h"
 #include "install.h"
 #include "remove.h"
 #include "upgrade.h"
@@ -160,12 +160,12 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_FILES: {
-            unique_ptr<cards_info> i(new cards_info(cardsArgPars, configFile.c_str()));
+            unique_ptr<cards::info> i(new cards::info(cardsArgPars, configFile.c_str()));
         }
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_SEARCH: {
-            unique_ptr<cards_info> i(new cards_info(cardsArgPars, configFile.c_str()));
+            unique_ptr<cards::info> i(new cards::info(cardsArgPars, configFile.c_str()));
         }
             return EXIT_SUCCESS;
 
@@ -184,17 +184,17 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_LIST: {
-            unique_ptr<cards_info> i(new cards_info(cardsArgPars, configFile.c_str()));
+            unique_ptr<cards::info> i(new cards::info(cardsArgPars, configFile.c_str()));
         }
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_QUERY: {
-            unique_ptr<cards_info> i(new cards_info(cardsArgPars, configFile.c_str()));
+            unique_ptr<cards::info> i(new cards::info(cardsArgPars, configFile.c_str()));
         }
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_INFO: {
-            unique_ptr<cards_info> i(new cards_info(cardsArgPars, configFile.c_str()));
+            unique_ptr<cards::info> i(new cards::info(cardsArgPars, configFile.c_str()));
         }
             return EXIT_SUCCESS;
 

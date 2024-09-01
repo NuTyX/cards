@@ -6,6 +6,7 @@
 #include "pkgrepo.h"
 #include "cards_argument_parser.h"
 
+namespace cards {
 /**
  * \brief Cards info class
  *
@@ -14,7 +15,7 @@
  *
  */
 
-class cards_info: public pkginfo, public cards::pkgrepo
+class info: public pkginfo, public cards::pkgrepo
 {
         const CardsArgumentParser& m_argParser;
 
@@ -25,5 +26,8 @@ class cards_info: public pkginfo, public cards::pkgrepo
          * \param argParser CardsArgumentParser type
          * \param configFileName Specify the configuration file name to use
          */
-        cards_info(const CardsArgumentParser& argParser,const std::string& configFileName);
+        info(const CardsArgumentParser& argParser,const std::string& configFileName);
 };
+
+
+}

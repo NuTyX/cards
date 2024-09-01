@@ -1,9 +1,14 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-#include "cards_info.h"
+#include "info.h"
 
-cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& configFileName)
-	: pkginfo("cards info"),cards::pkgrepo(configFileName), m_argParser(argParser)
+namespace cards {
+
+info::info(const CardsArgumentParser& argParser,
+		   const std::string& configFileName)
+		: pkginfo("cards info"),
+		  cards::pkgrepo(configFileName),
+		  m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
@@ -130,4 +135,6 @@ cards_info::cards_info(const CardsArgumentParser& argParser, const std::string& 
 			}
 		}
 	}
+}
+
 }
