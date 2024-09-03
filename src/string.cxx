@@ -79,7 +79,7 @@ void string::reserve(const unsigned int capacity) {
 
     m_capacity = capacity;
     m_value = (char*)realloc( m_value, sizeof m_value * m_capacity);
-    if ( m_value == NULL ) {
+    if ( m_value == nullptr ) {
         printf("Cannot reallocate m_items: %d", &m_value);
         return;
     }
