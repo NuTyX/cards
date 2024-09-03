@@ -4,8 +4,8 @@
 
 
 pkginst::pkginst
-	(const std::string& commandName,const char *configFileName)
-	: pkgadd(commandName), cards::pkgrepo(configFileName)
+	(const char *configFileName)
+	: cards::pkgrepo(configFileName)
 {
 }
 void pkginst::generateDependencies

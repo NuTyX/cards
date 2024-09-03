@@ -5,9 +5,10 @@
 #include "pkgadd.h"
 #include "pkgrepo.h"
 
-class pkginst : public pkgadd, public cards::pkgrepo {
+class pkginst : public cards::pkgrepo {
+	std::string m_packageName;
 public:
-	pkginst(const std::string& commandName, const char *configFileName);
+	pkginst(const char *configFileName);
 	void generateDependencies(const std::pair<std::string,time_t>& packageName);
 	void generateDependencies();
 	void downloadPackageFileName(const std::string& packageName);
