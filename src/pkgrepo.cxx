@@ -7,6 +7,7 @@ namespace cards {
 pkgrepo::pkgrepo(const std::string& fileName)
     : m_configFileName(fileName)
 {
+	parse();
 }
 std::set<std::string>& pkgrepo::getBinaryPackageList() {
 	parse();
