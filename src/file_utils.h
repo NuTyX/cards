@@ -59,7 +59,6 @@ void cleanupMetaFiles(const std::string& basedir);
 void removeFile(const std::string& basedir, const std::string& filename);
 int copyFile(const char* destFile, const char* origFile);
 int findDir(std::set<std::string>& filesList, const std::string& basedir);
-int findDir(cards::vector& filesList, const std::string& basedir);
 int findRecursiveFile(std::set<std::string>& filenameList, const char* filename, int spec);
 int parseFile(std::set<std::string>& fileContent, const char* fileName);
 int parseFile(std::vector<std::string>& fileContent, const char* fileName);

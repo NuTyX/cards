@@ -265,26 +265,6 @@ int findDir(std::set<std::string>& filesList, const std::string& path)
 	}
   return 0;
 }
-int findDir(cards::vector& filesList, const std::string& path)
-{
-    DIR* d;
-    struct dirent* dir;
-    d = opendir(path.c_str());
-    char fullPath[MAXPATHLEN];
-    if (d) {
-        while ((dir = readdir(d)) != nullptr) {
-            if (dir->d_name[0] != '.') { // ignore any .directories
-                sprintf(fullPath, "%s/%s", path.c_str(), dir->d_name);
-                filesList.push_back(fullPath);
-            }
-        }
-        closedir(d);
-    } else {
-        std::cerr << YELLOW << path << " not exist." << NORMAL << std::endl;
-        return -1;
-    }
-    return 0;
-}
 bool createRecursiveDirs(const std::string& path)
 {
   char opath[MAXPATHLEN];
