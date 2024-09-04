@@ -113,12 +113,6 @@ confirmation. It will download the binary package, check for any dependencies,
 download the dependencies. Onces all the dependencies are download.
 cards will install all the packages in the right order.
 
-
-.TP
-.B depcreate [\-\-margs] [\-\-aargs] [\-\-log] <package1> [<package2> ...]
-Ports scenario: compile and install the package and it's dependencies in the listed order including their dependencies.
-Note that outdated packages won't be updated.
-
 .TP
 .B remove <package>
 All scenarios: remove the <package>
