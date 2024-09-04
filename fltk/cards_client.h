@@ -29,7 +29,7 @@ namespace cards
      * This is a single instance (singleton) that ensure only one instance of cards library.
      *
      */
-    class cards_client : public pkginst
+    class cards_client : public pkgrepo
     {
         // Only cards_wrapper can own this class
         friend cards_wrapper;

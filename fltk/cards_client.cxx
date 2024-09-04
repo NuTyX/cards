@@ -8,9 +8,8 @@ namespace cards
 {
     /// Constructor
     cards_client::cards_client()
-        : pkginst("","/etc/cards.conf")
+        : pkgrepo("/etc/cards.conf")
     {
-        m_root="/";
         m_log = cards_logger::instance();
     }
 
