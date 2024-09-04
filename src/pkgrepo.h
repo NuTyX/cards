@@ -5,12 +5,13 @@
 #include "cache.h"
 #include "conf.h"
 #include "file_utils.h"
+#include "pkgadd.h"
 
 namespace cards {
 
 typedef std::map<std::string, cards::cache> repo_t;
 
-class pkgrepo {
+class pkgrepo : public pkgadd {
 
     std::string           m_configFileName;
     cards::conf           m_config;
@@ -25,11 +26,17 @@ class pkgrepo {
     std::string           m_packageFileNameSignature;
     std::string           m_packageVersion;
 
+    std::vector<std::pair<std::string,time_t>>
+                          m_dependenciesList;
     void parse();
 
 public:
     pkgrepo(const std::string& fileName);
     virtual ~pkgrepo() { }
+
+	void generateDependencies(const std::pair<std::string,time_t>& packageName);
+	void generateDependencies();
+	void downloadPackageFileName(const std::string& packageName);
 
     bool                     checkBinaryExist(const std::string& name);
 
@@ -45,6 +52,10 @@ public:
     std::set<std::string>&   getBinaryPackageList();
     std::set<std::string>&   getListOfPackagesFromSet(const std::string& name);
     std::set<std::string>&   getListOfPackagesFromCollection(const std::string& name);
+
+    std::vector<std::pair<std::string,time_t>>&
+                             getDependenciesList();
+    void                     addDependenciesList(std::pair<std::string,time_t>& name);
 
     repo_t&                  getListOfPackages();
 };

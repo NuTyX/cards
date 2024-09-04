@@ -4,18 +4,10 @@
 
 cards_upgrade::cards_upgrade(const CardsArgumentParser& argParser,
 	const char *configFileName)
-	: pkginst("cards upgrade",configFileName)
+	: cards::pkgrepo(configFileName)
 	, m_argParser(argParser)
 	, m_Sync(configFileName)
 {
-	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
-		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
-
-	if (m_root.empty())
-		m_root="/";
-	else
-		m_root=m_root+"/";
-	
 	if ( ! m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
 		m_Sync.run();
 	
@@ -157,7 +149,7 @@ void cards_upgrade::upgrade()
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
 		dry();
 	else if (! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
-		for (auto i : m_dependenciesList) {
+		for (auto i : getDependenciesList()) {
 			m_packageArchiveName=getPackageFileName(i.first);
 			m_force=true;
 			if (checkPackageNameExist(i.first)) {

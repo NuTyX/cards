@@ -43,7 +43,6 @@ CARDSOBJECTS =	conf.o \
 	pkgadd.o \
 	pkgrm.o \
 	pkginfo.o \
-	pkginst.o \
 	deptree.o \
 	level.o \
 	depends.o \
@@ -75,8 +74,7 @@ LIBOBJECTS =  conf.o \
 	pkgdbh.o \
 	pkgadd.o \
 	pkgrm.o \
-	pkginfo.o \
-	pkginst.o
+	pkginfo.o
 
 WEBOBJECTS =  conf.o \
 	system_utils.o \
@@ -111,8 +109,7 @@ HEADERS = define.h \
 	pkgdbh.h \
 	pkgadd.h \
 	pkgrm.h \
-	pkginfo.h \
-	pkginst.h
+	pkginfo.h
 
 CONSOLEKIT_CFLAGS = -I/usr/include/ConsoleKit/ck-connector -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
 CONSOLEKIT_LIBS = -lck-connector -ldbus-1

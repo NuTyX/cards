@@ -6,22 +6,11 @@ namespace cards {
 
 info::info(const CardsArgumentParser& argParser,
 		   const std::string& configFileName)
-		: pkginfo("cards info"),
-		  cards::pkgrepo(configFileName),
-		  m_argParser(argParser)
+		: cards::pkgrepo(configFileName)
+		, m_argParser(argParser)
 {
-	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
-		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
-
-	if (m_root.empty())
-		m_root="/";
-	else
-		m_root=m_root+"/";
-
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_INFO)) {
-		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
-			getBinaryPackageInfo(m_argParser.otherArguments()[0]);
-		} else if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
+		if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
 			std::set<std::string> sortedPackagesList = getListOfPackagesFromSet(m_argParser.otherArguments()[0]);;
 			if (sortedPackagesList.size() == 0)
 				sortedPackagesList = getListOfPackagesFromCollection(m_argParser.otherArguments()[0]);;
@@ -33,13 +22,20 @@ info::info(const CardsArgumentParser& argParser,
 					<< i
 					<< std::endl;
 		} else {
-			m_details_mode=1;
-			m_arg=m_argParser.otherArguments()[0];
-			run();
+			getBinaryPackageInfo(m_argParser.otherArguments()[0]);
 		}
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_LIST) ) {
-		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
+		if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
+			std::set<std::string> sortedSetList;
+			for (auto i : getListOfPackages())
+				if ( i.second.sets().size() > 0 ) {
+					for (auto s : i.second.sets())
+						sortedSetList.insert(s);
+				}
+			for (auto i : sortedSetList)
+				std::cout << i << std::endl;
+		} else {
 			std::set<std::string> sortedPackagesList;
 			for (auto i : getListOfPackages()) {
 				std::string s, _s;
@@ -57,32 +53,17 @@ info::info(const CardsArgumentParser& argParser,
 			}
 			for (auto i : sortedPackagesList)
 				std::cout << i << std::endl;
-
-		} else if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
-			std::set<std::string> sortedSetList;
-			for (auto i : getListOfPackages())
-				if ( i.second.sets().size() > 0 ) {
-					for (auto s : i.second.sets())
-						sortedSetList.insert(s);
-				}
-			for (auto i : sortedSetList)
-				std::cout << i << std::endl;
-		} else {
-			m_installed_mode=1;
-			if (m_argParser.isSet(CardsArgumentParser::OPT_FULL))
-				m_fulllist_mode=true;
-			run();
 		}
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_QUERY)) {
-		m_owner_mode=1;
-		m_arg=m_argParser.otherArguments()[0];
-		run();
+		/*
+		* FIXME
+		*/
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_FILES)) {
-		m_list_mode=1;
-		m_arg=m_argParser.otherArguments()[0];
-		run();		
+		/*
+		* FIXME
+		*/
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_SEARCH) ) {
 		bool found = false;

@@ -10,12 +10,11 @@ namespace cards {
 /**
  * \brief Cards info class
  *
- * This class takes care of printing out information about installed packages, 
- * availables packages on remote server or available ports that can be compiled.
+ * This class takes care of printing out information about availables packages.
  *
  */
 
-class info: public pkginfo, public cards::pkgrepo
+class info: public cards::pkgrepo
 {
         const CardsArgumentParser& m_argParser;
 

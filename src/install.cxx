@@ -6,8 +6,9 @@ namespace cards {
 
 install::install(const CardsArgumentParser& argParser,
 		const char *configFileName)
-	: pkginst("cards install",configFileName),m_argParser(argParser),
-		m_configFileName(configFileName)
+	: pkgrepo(configFileName)
+	, m_argParser(argParser)
+	, m_configFileName(configFileName)
 {
 	parseArguments();
 	for( auto i : m_argParser.otherArguments() ) {
@@ -62,7 +63,7 @@ install::install(const CardsArgumentParser& argParser,
 		}
 	}
 	getLocalePackagesList();
-	for ( auto i : m_dependenciesList ) {
+	for ( auto i : getDependenciesList() ) {
 		m_packageArchiveName = getPackageFileName(i.first);
 		archive packageArchive(m_packageArchiveName.c_str());
 		std::string name = packageArchive.name();
@@ -83,7 +84,8 @@ install::install(const CardsArgumentParser& argParser,
 install::install(const CardsArgumentParser& argParser,
 	const char *configFileName,
 	const std::vector<std::string>& listOfPackages)
-	: pkginst("cards install",configFileName),m_argParser(argParser)
+	: pkgrepo(configFileName)
+	, m_argParser(argParser)
 {
 	parseArguments();
 	cards::conf config(configFileName);
@@ -152,8 +154,8 @@ void install::getLocalePackagesList()
 	if (config.groups().empty())
 		return;
 	std::set<std::string> tmpList;
-	for ( auto i :  config.groups() ) {
-		for ( auto j :m_dependenciesList ) {
+	for (auto i : config.groups()) {
+		for (auto j : getDependenciesList()) {
 			std::string packageName  = j.first + "." + i;
 #ifdef DEBUG
 			std::cerr << packageName << std::endl;
@@ -173,7 +175,7 @@ void install::getLocalePackagesList()
 			PackageTime.second=0;
 			m_packageName = i;
 			generateDependencies();
-			m_dependenciesList.push_back(PackageTime);
+			addDependenciesList(PackageTime);
 		}
 #ifdef DEBUG
 	for (auto i : m_dependenciesList )

@@ -7,7 +7,7 @@
 
 namespace cards {
 
-class install: public pkginst
+class install: public pkgrepo
 {
         const CardsArgumentParser& m_argParser;
         void parseArguments();

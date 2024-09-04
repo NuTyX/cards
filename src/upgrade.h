@@ -6,7 +6,7 @@
 #include "pkginst.h"
 #include "cards_argument_parser.h"
 
-class cards_upgrade : public pkginst {
+class cards_upgrade : public cards::pkgrepo {
 
 	std::set<std::string>                   m_ListOfPackagesToDelete;
 	std::set<std::pair<std::string,time_t>> m_ListOfPackages;

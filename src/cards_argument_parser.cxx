@@ -250,9 +250,7 @@ logdir /var/log/pkgbuild for example."),
     addOption(CMD_LIST, OPT_ROOT, false);
     addOption(CMD_LIST, OPT_CONFIG_FILE, false);
 
-    addOption(CMD_INFO, OPT_BINARIES, false);
     addOption(CMD_INFO, OPT_SETS, false);
-    addOption(CMD_INFO, OPT_ROOT, false);
     addOption(CMD_INFO, OPT_CONFIG_FILE, false);
 
     addOption(CMD_DIFF, OPT_PORTS, false);

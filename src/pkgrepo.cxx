@@ -6,8 +6,138 @@ namespace cards {
 	
 pkgrepo::pkgrepo(const std::string& fileName)
     : m_configFileName(fileName)
+	, pkgadd("cards install")
 {
 	parse();
+}
+void pkgrepo::generateDependencies
+	(const std::pair<std::string,time_t>& packageName)
+{
+	m_packageName=packageName.first;
+	generateDependencies();
+}
+void pkgrepo::generateDependencies()
+{
+	std::vector< std::pair<std::string,time_t> > dependenciesWeMustAdd,depencenciestoSort;
+	std::pair<std::string,time_t> PackageTime;
+	PackageTime.first=m_packageName;
+	PackageTime.second=0;
+
+	/* Always insert the final package first (twice) */
+	dependenciesWeMustAdd.push_back(PackageTime);
+	dependenciesWeMustAdd.push_back(PackageTime);
+
+	std::vector< std::pair<std::string,time_t> >::iterator vit;
+	std::set< std::pair<std::string,time_t> >::iterator sit;
+	std::string packageNameSignature, packageName, packageFileName;
+
+	/* Main while loop */
+	while ( ! dependenciesWeMustAdd.empty() ) {
+		vit = dependenciesWeMustAdd.begin();
+		packageName = vit->first;
+		PackageTime = *vit;
+
+		/* Erase the current treated packageName */
+		dependenciesWeMustAdd.erase(vit);
+
+		std::set< std::pair<std::string,time_t> > directDependencies;
+		if ( getListOfPackages().find(packageName) != getListOfPackages().end() ) {
+			directDependencies = getListOfPackages()[packageName].dependencies();
+		} else {
+
+			/* The packageName is not found in the listOfPackages */
+
+			if ( checkBinaryExist(packageName)) {
+				/* The packageName binary is found.
+				 * Directs dependencies are not availables yes
+				 * We need to get PackageFileName of the packageName
+				 * And check it's signature
+				 */
+
+				packageFileName = getPackageFileName(packageName);
+				packageNameSignature = getPackageFileNameSignature(packageName);
+
+				/* archive PackageName exist
+				 * Let's see if we need to download it */
+
+			} else {
+				/*
+				 * FIXME
+				m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_EXIST;
+				treatErrors (packageName);
+				*/
+			}
+
+			/* If the binary archive is not yet downloaded or is corrupted */
+			if (!checkFileSignature(packageFileName, packageNameSignature)) {
+				/* Try to get it */
+				downloadPackageFileName(packageName);
+			}
+			directDependencies = getPackageDependencies(packageFileName);
+		}
+
+		/* If the package is not yet installed or not uptodate */
+		if (!checkPackageNameBuildDateSame(PackageTime))
+		{
+			/* checkPackageNameBuildDateSame is no then add it */
+			depencenciestoSort.push_back(PackageTime);
+		}
+
+		/* else checkPackageNameBuildDateSame is yes*/
+
+		for ( auto sit : directDependencies) {
+			if ( sit.first == PackageTime.first )
+				continue;
+			for ( vit = dependenciesWeMustAdd.begin(); vit != dependenciesWeMustAdd.end();++vit) {
+				if ( sit == *vit) {
+					dependenciesWeMustAdd.erase(vit);
+					break;
+				}
+			}
+		}
+		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
+			if ( PackageTime.first != sit->first ) {
+				if ( ! checkPackageNameBuildDateSame(*sit))
+					dependenciesWeMustAdd.push_back(*sit);
+			}
+		}
+	}
+
+	/* Let's revert the order of dependencies
+	 * We need the last founds (lower level) first
+	 */
+	bool found = false ;
+	for ( std::vector<std::pair<std::string,time_t>>::reverse_iterator vrit = depencenciestoSort.rbegin();
+		vrit != depencenciestoSort.rend();
+		++vrit) {
+		found = false ;
+		for (auto i : m_dependenciesList) {
+			if ( i.first == vrit->first) {
+				found = true ;
+				break;
+			}
+		}
+		if (!found) {
+			m_dependenciesList.push_back(*vrit);
+		}
+
+		/* else no deps founds */
+
+	}
+}
+void pkgrepo::downloadPackageFileName(const std::string& packageName)
+{
+	/* FIXME */
+}
+std::vector<std::pair<std::string,time_t>>&
+pkgrepo::getDependenciesList()
+{
+	return m_dependenciesList;
+}
+void pkgrepo::addDependenciesList
+	(std::pair<std::string,time_t>& name)
+{
+	m_dependenciesList.push_back(name);
 }
 std::set<std::string>& pkgrepo::getBinaryPackageList() {
 	parse();
