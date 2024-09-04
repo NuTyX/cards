@@ -22,7 +22,7 @@ info::info(const CardsArgumentParser& argParser,
 					<< i
 					<< std::endl;
 		} else {
-			getBinaryPackageInfo(m_argParser.otherArguments()[0]);
+			std::cout << getBinaryPackageInfo(m_argParser.otherArguments()[0]);
 		}
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_LIST) ) {
