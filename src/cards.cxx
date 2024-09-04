@@ -194,10 +194,9 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_INFO: {
-            unique_ptr<cards::info> i(new cards::info(cardsArgPars, configFile.c_str()));
-        }
+            cards::info info(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
-
+        }
         case ArgParser::CMD_DIFF: {
             unique_ptr<cards_upgrade> i(new cards_upgrade(cardsArgPars, configFile.c_str()));
         }
