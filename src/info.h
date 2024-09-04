@@ -14,7 +14,7 @@ namespace cards {
  *
  */
 
-class info: public cards::pkgrepo
+class info: public pkgrepo
 {
         const CardsArgumentParser& m_argParser;
 

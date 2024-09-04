@@ -6,21 +6,21 @@
 include ../Makefile.inc
 
 TOOLSOBJECTS =	system_utils.o \
-		error_treat.o \
-		string_utils.o \
-		archive.o \
-		file_utils.o \
-		process.o \
-		pkg.o \
-		db.o \
-		cache.o \
-		runtime_dependencies_utils.o \
-		lock.o \
-		pkgdbh.o \
-		pkgadd.o \
-		pkgrm.o \
-		pkginfo.o \
-		tools.o
+	error_treat.o \
+	string_utils.o \
+	archive.o \
+	file_utils.o \
+	process.o \
+	pkg.o \
+	db.o \
+	cache.o \
+	runtime_dependencies_utils.o \
+	lock.o \
+	pkgdbh.o \
+	pkgadd.o \
+	pkgrm.o \
+	pkginfo.o \
+	tools.o
 
 CARDSOBJECTS =	conf.o \
 	system_utils.o \

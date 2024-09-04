@@ -2,9 +2,11 @@
 
 #include "upgrade.h"
 
-cards_upgrade::cards_upgrade(const CardsArgumentParser& argParser,
+namespace cards {
+
+upgrade::upgrade(const CardsArgumentParser& argParser,
 	const char *configFileName)
-	: cards::pkgrepo(configFileName)
+	: pkgrepo(configFileName)
 	, m_argParser(argParser)
 	, m_Sync(configFileName)
 {
@@ -80,7 +82,7 @@ cards_upgrade::cards_upgrade(const CardsArgumentParser& argParser,
 					}
 				}
 				if ( ! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
-					upgrade();
+					run();
 			}
 		}
 	}
@@ -92,18 +94,18 @@ cards_upgrade::cards_upgrade(const CardsArgumentParser& argParser,
 		}
 	}
 }
-void cards_upgrade::size()
+void upgrade::size()
 {
 	std::cout << m_ListOfPackages.size() + m_ListOfPackagesToDelete.size() << std::endl;
 }
-void cards_upgrade::Isuptodate()
+void upgrade::Isuptodate()
 {
 	if ( ( m_ListOfPackages.size() == 0 ) && ( m_ListOfPackagesToDelete.size() == 0 ) )
 		std::cout << "no" << std::endl;
 	else
 		std::cout << "yes" << std::endl;
 }
-int cards_upgrade::Isdownload()
+int upgrade::Isdownload()
 {
 	std::string packageNameSignature, packageName, packageFileName;
 	for (auto i : m_ListOfPackages) {
@@ -115,7 +117,7 @@ int cards_upgrade::Isdownload()
 
 return EXIT_SUCCESS;
 }
-void cards_upgrade::dry()
+void upgrade::dry()
 {
 	if (m_ListOfPackages.size() > 1 )
 				std::cout << _("Packages")
@@ -142,7 +144,7 @@ void cards_upgrade::dry()
 					<< std::endl;
 
 }
-void cards_upgrade::upgrade()
+void upgrade::run()
 {
 	for (auto i : m_ListOfPackages) generateDependencies(i);
 
@@ -176,7 +178,7 @@ void cards_upgrade::upgrade()
 		summary();
 	}
 }
-void cards_upgrade::summary()
+void upgrade::summary()
 {
 	if (m_ListOfPackages.size() > 1 ) {
 		std::cout << std::endl;
@@ -200,4 +202,5 @@ void cards_upgrade::summary()
 	}
 	if (m_ListOfPackages.size() > 1 || m_ListOfPackagesToDelete.size() > 1 )
 		std::cout << std::endl;
+}
 }

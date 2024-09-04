@@ -160,15 +160,13 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_FILES: {
-            unique_ptr<cards::info> i(new cards::info(cardsArgPars, configFile.c_str()));
-        }
+            cards::info info(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
-
+        }
         case ArgParser::CMD_SEARCH: {
-            unique_ptr<cards::info> i(new cards::info(cardsArgPars, configFile.c_str()));
-        }
+            cards::info info(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
-
+        }
         case ArgParser::CMD_SYNC:
             if (getuid()) {
                 string s = "";
@@ -184,24 +182,21 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_LIST: {
-            unique_ptr<cards::info> i(new cards::info(cardsArgPars, configFile.c_str()));
-        }
+            cards::info info(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
-
+        }
         case ArgParser::CMD_QUERY: {
-            unique_ptr<cards::info> i(new cards::info(cardsArgPars, configFile.c_str()));
-        }
+            cards::info info(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
-
+        }
         case ArgParser::CMD_INFO: {
             cards::info info(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_DIFF: {
-            unique_ptr<cards_upgrade> i(new cards_upgrade(cardsArgPars, configFile.c_str()));
-        }
+            cards::upgrade upgrade(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
-
+        }
         case ArgParser::CMD_INSTALL: {
             unique_ptr<cards::install> i(new cards::install(cardsArgPars, configFile.c_str()));
         }
@@ -213,12 +208,12 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_UPGRADE: {
-            unique_ptr<cards_upgrade> i(new cards_upgrade(cardsArgPars, configFile.c_str()));
+            cards::upgrade upgrade(cardsArgPars, configFile.c_str());
             if (cardsArgPars.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
-                return i->Isdownload();
-        }
-            return EXIT_SUCCESS;
+                return upgrade.Isdownload();
 
+            return EXIT_SUCCESS;
+        }
         case ArgParser::CMD_PURGE: {
 			cards::sync sync;
 			sync.purge();

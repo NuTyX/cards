@@ -67,6 +67,7 @@ info::info(const CardsArgumentParser& argParser,
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_SEARCH) ) {
 		bool found = false;
+		m_root="/";
 		buildSimpleDatabase();
 		for (auto j : getListOfPackages()) {
 			found = false;
