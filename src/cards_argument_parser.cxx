@@ -65,15 +65,12 @@ the base system directory and the logfile directory."),
 
     addCommand(CMD_INFO, "info",
         _("print info about a package."),
-        _("If -p or -b are passed as optional arguments, it will be the info of a port or the info of a binary available in the depot."),
+        _("print details of an available package on the remote server."),
         ArgParser::EQ, 1, _("<package>"));
 
     addCommand(CMD_LIST, "list",
-        _("list installed packages by the user."),
-        _("If -p is passed as optional argument, it will list the local available ports.\n\
-If -b is passed as optional argument, it will list the remote available binaries.\n\
-If -F is passed as optional argument, it will list the automatically installed \n\
-packages as well."),
+        _("list packages."),
+        _("It will list available packages on the remote server."),
         ArgParser::NONE, 0, "");
 
     addCommand(CMD_SEARCH, "search",
@@ -237,17 +234,13 @@ logdir /var/log/pkgbuild for example."),
     addOption(CMD_UPGRADE, OPT_DOWNLOAD_READY, false);
     addOption(CMD_UPGRADE, OPT_DOWNLOAD_ONLY, false);
     addOption(CMD_UPGRADE, OPT_NO_SYNC, false);
-
     addOption(CMD_UPGRADE, OPT_SIZE, false);
     addOption(CMD_UPGRADE, OPT_CHECK, false);
     addOption(CMD_UPGRADE, OPT_DRY, false);
     addOption(CMD_UPGRADE, OPT_ROOT, false);
     addOption(CMD_UPGRADE, OPT_CONFIG_FILE, false);
 
-    addOption(CMD_LIST, OPT_FULL, false);
-    addOption(CMD_LIST, OPT_BINARIES, false);
     addOption(CMD_LIST, OPT_SETS, false);
-    addOption(CMD_LIST, OPT_ROOT, false);
     addOption(CMD_LIST, OPT_CONFIG_FILE, false);
 
     addOption(CMD_INFO, OPT_SETS, false);
