@@ -81,52 +81,6 @@ install::install(const CardsArgumentParser& argParser,
 
 	}
 }
-install::install(const CardsArgumentParser& argParser,
-	const char *configFileName,
-	const std::vector<std::string>& listOfPackages)
-	: pkgrepo(configFileName)
-	, m_argParser(argParser)
-{
-	parseArguments();
-	cards::conf config(configFileName);
-
-	buildCompleteDatabase(false);
-	m_upgrade=0;
-	m_force=0;
-	for (auto i : listOfPackages) {
-		std::string packageName = basename(const_cast<char*>(i.c_str()));
-		if ( packageName == m_argParser.otherArguments()[0])
-			break;
-		std::set<std::string> listofBinaries;
-		if (findDir(listofBinaries, i) != 0) {
-			m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
-			treatErrors(i);
-		}
-		for (auto j : listofBinaries ) {
-			if ( j.find("cards.tar") == std::string::npos )
-				continue;
-			m_packageArchiveName = i + "/" + j;
-			archive packageArchive(m_packageArchiveName.c_str());
-			std::string name = packageArchive.name();
-			if ( checkPackageNameExist(name) )
-				continue;
-			if ( config.groups().empty() ) {
-				run();
-				continue;
-			}
-			if ( packageArchive.group() == "" ) {
-				run();
-				continue;
-			}
-			for (auto k : config.groups()) {
-				if ( packageArchive.group() == k ) {
-					run();
-					continue;
-				}
-			}
-		}
-	}
-}
 void install::parseArguments()
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))

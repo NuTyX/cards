@@ -17,12 +17,5 @@ class install: public pkgrepo
     public:
         install(const CardsArgumentParser& argParser,
             const char *configFileName);
-
-        /* To install the dependencies of a package
-         * created with cards create command
-         */
-        install(const CardsArgumentParser& argParser,
-            const char *configFileName,
-            const std::vector<std::string>& listOfPackages);
 };
 }
