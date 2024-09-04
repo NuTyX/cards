@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "pkginst.h"
+#include "pkgrepo.h"
 #include "cards_argument_parser.h"
 
 namespace cards {

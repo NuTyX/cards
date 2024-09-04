@@ -3,7 +3,7 @@
 #pragma once
 
 #include "sync.h"
-#include "pkginst.h"
+#include "pkgrepo.h"
 #include "cards_argument_parser.h"
 
 class cards_upgrade : public cards::pkgrepo {
