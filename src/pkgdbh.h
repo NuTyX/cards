@@ -130,7 +130,6 @@ protected:
 
     void getFootprintPackage(std::string& filename);
 
-    std::string m_packageArchiveName;
     std::string m_packageName;
     std::string m_packageArchiveVersion;
     std::string m_packageArchiveRelease;

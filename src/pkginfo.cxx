@@ -108,9 +108,6 @@ void pkginfo::parseArguments(int argc, char** argv)
         else
             m_root = m_root + "/";
     }
-
-    m_packageArchiveName = m_arg;
-
     if (m_runtimedependencies_mode
             + m_footprint_mode
             + m_details_mode
@@ -143,83 +140,37 @@ void pkginfo::parseArguments(int argc, char** argv)
 void pkginfo::run()
 {
     if (m_metainfo) {
-        std::pair<std::string, cards::db> packageArchive = openArchivePackage(m_packageArchiveName);
+        archive package(m_arg);
         std::cout << "@"
-                  << packageArchive.first
+                  << package.name()
                   << ".cards-"
-                  << packageArchive.second.version()
+                  << package.version()
                   << "-"
-                  << packageArchive.second.release()
-                  << std::endl
-                  << "D"
-                  << packageArchive.second.description()
-                  << std::endl
-                  << "U"
-                  << packageArchive.second.url()
-                  << std::endl
-                  << "L"
-                  << packageArchive.second.license()
-                  << std::endl
-                  << "M"
-                  << packageArchive.second.maintainer()
-                  << std::endl
-                  << "C"
-                  << packageArchive.second.contributors()
-                  << std::endl
-                  << "c"
-                  << packageArchive.second.collection()
-                  << std::endl
-                  << "g"
-                  << packageArchive.second.group()
-                  << std::endl
-                  << "P"
-                  << packageArchive.second.packager()
+                  << package.release()
                   << std::endl;
-        if (packageArchive.second.alias().size() > 0) {
-            for (auto i : packageArchive.second.alias())
-                std::cout << "A"
-                          << i
-                          << std::endl;
-        }
-        if (packageArchive.second.dependencies().size() > 0) {
-            for (auto i : packageArchive.second.dependencies())
-                std::cout << "R"
-                          << i.first
-                          << std::endl;
-        }
-        if (packageArchive.second.categories().size() > 0) {
-            for (auto i : packageArchive.second.categories())
-                std::cout << "T"
-                          << i
-                          << std::endl;
-        }
-        if (packageArchive.second.sets().size() > 0) {
-			for (auto i : packageArchive.second.sets())
-				std::cout << "s"
-						<< i
-						<< std::endl;
-		}
+
+        package.printMeta();
     }
     if (m_archiveinfo) {
-        std::pair<std::string, cards::db> packageArchive = openArchivePackage(m_packageArchiveName);
-        std::string name = packageArchive.first + " : ";
+        archive package(m_arg);
+        std::string name = package.name() + " : ";
         std::cout
-            << name << _("Description    : ") << packageArchive.second.description() << std::endl
-            << name << _("Group          : ") << packageArchive.second.group() << std::endl
-            << name << _("URL            : ") << packageArchive.second.url() << std::endl
-            << name << _("License        : ") << packageArchive.second.license() << std::endl
-            << name << _("Contributor(s) : ") << packageArchive.second.contributors() << std::endl
-            << name << _("Packager(s)    : ") << packageArchive.second.packager() << std::endl
-            << name << _("Version        : ") << packageArchive.second.version() << std::endl
-            << name << _("Release        : ") << packageArchive.second.release() << std::endl
-            << name << _("Architecture   : ") << packageArchive.second.arch() << std::endl
-            << name << _("Build date     : ") << packageArchive.second.build() << std::endl;
-        if (packageArchive.second.dependencies().size() > 0) {
+            << name << _("Description    : ") << package.description() << std::endl
+            << name << _("Group          : ") << package.group() << std::endl
+            << name << _("URL            : ") << package.url() << std::endl
+            << name << _("License        : ") << package.license() << std::endl
+            << name << _("Contributor(s) : ") << package.contributors() << std::endl
+            << name << _("Packager       : ") << package.packager() << std::endl
+            << name << _("Version        : ") << package.version() << std::endl
+            << name << _("Release        : ") << package.release() << std::endl
+            << name << _("Architecture   : ") << package.arch() << std::endl
+            << name << _("Build date     : ") << package.buildn() << std::endl;
+        if (package.listofDependencies().size() > 0) {
             std::cout << name << _("Dependencies   : ");
-            for (auto i : packageArchive.second.dependencies())
-                std::cout << i.first << " ";
+            package.printDeps();
             std::cout << std::endl;
         }
+
     }
     /*
      *  Make footprint
@@ -262,21 +213,24 @@ void pkginfo::run()
             /*
              *  List package or file contents
              */
-            buildDatabase(true, false, false, false, "");
-            if ((!checkPackageNameExist(m_arg)) && (!checkPackageNameExist(m_arg))) {
-                m_actualError = cards::ERROR_ENUM_NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
-                treatErrors(m_arg);
-            }
-            buildDatabase(true, false, false, false, m_arg);
-            if (checkPackageNameExist(m_arg)) {
-                std::string arg = m_listOfAlias[m_arg];
-                for (auto f : m_listOfPackages[arg].files)
+            if (checkFileExist(m_arg)) {
+                archive package(m_arg);
+                for (auto f : package.setofFiles())
                     std::cout << f << std::endl;
-            } else if (checkFileExist(m_arg)) {
-                std::pair<std::string, cards::db> package = openArchivePackage(m_arg);
-                for (auto f : package.second.files)
-                    std::cout << f << std::endl;
+            } else {
+                buildDatabase(true, false, false, false, "");
+                if (!checkPackageNameExist(m_arg)) {
+                    m_actualError = cards::ERROR_ENUM_NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
+                    treatErrors(m_arg);
+                }
+                buildDatabase(true, false, false, false, m_arg);
+                if (checkPackageNameExist(m_arg)) {
+                    std::string arg = m_listOfAlias[m_arg];
+                    for (auto f : m_listOfPackages[arg].files)
+                        std::cout << f << std::endl;
+                }
             }
+
         } else if (m_runtimedependencies_mode) {
             /* 	Get runtimedependencies of the file found in the directory path
                     get the list of installed packages silently */

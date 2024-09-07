@@ -1165,9 +1165,8 @@ pkgdbh::getConflictsFilesList (const std::string& name, cards::db& info)
 std::pair<std::string, cards::db>
 pkgdbh::openArchivePackage(const std::string& filename)
 {
-	std::string packageArchiveName;
 	std::pair<std::string, cards::db> result;
-	archive packageArchive(filename.c_str());
+	archive packageArchive(filename);
 
 	std::string basename(filename, filename.rfind('/') + 1);
 	m_filesNumber = packageArchive.size();
@@ -1175,7 +1174,7 @@ pkgdbh::openArchivePackage(const std::string& filename)
 		m_actualError = cards::ERROR_ENUM_EMPTY_PACKAGE;
 		treatErrors(basename);
 	}
-	packageArchiveName = packageArchive.name();
+
 	if ( ( packageArchive.arch() != getMachineType() ) && ( packageArchive.arch() != "any" ) ) {
 		if ( m_root.size() > 1 ) { // means it's in a chroot environment ... probably
 			std::cerr << basename << ": Architecture is different. If "
@@ -1191,11 +1190,11 @@ pkgdbh::openArchivePackage(const std::string& filename)
 	m_packageArchiveCollection = packageArchive.collection();
 	m_packageArchiveVersion = packageArchive.version();
 	m_packageArchiveRelease = itos(packageArchive.release());
-	if (packageArchiveName.empty() ) {
+	if (packageArchive.name().empty() ) {
 		m_actualError = cards::ERROR_ENUM_CANNOT_DETERMINE_NAME_BUILDNR;
 		treatErrors(basename);
 	}
-	result.first = packageArchiveName;
+	result.first = packageArchive.name();
 	result.second.description(packageArchive.description());
 	result.second.url(packageArchive.url());
 	result.second.contributors(packageArchive.contributors());
@@ -1217,7 +1216,7 @@ pkgdbh::openArchivePackage(const std::string& filename)
 	result.second.categories(packageArchive.listofCategories());
 	result.second.sets(packageArchive.listofSets());
 	result.second.alias(packageArchive.listofAlias());
-	m_packageName = packageArchiveName;
+	m_packageName = packageArchive.name();
 	return result;
 }
 std::set< std::pair<std::string,time_t> >

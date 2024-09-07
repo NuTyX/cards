@@ -43,17 +43,19 @@ install::install(const CardsArgumentParser& argParser,
 			/*
 			 * It's a regular archive file
 			 */
-			m_packageArchiveName = i;
-			archive packageArchive(m_packageArchiveName.c_str());
-			std::string name = packageArchive.name();
-			if (checkPackageNameExist(name )) {
+
+			archive packageArchive(i);
+			if (checkPackageNameExist(packageArchive.name())) {
 				m_upgrade=1;
 			} else {
 				m_upgrade=0;
 			}
-			name = "(" + packageArchive.collection()+") " + name;
+
+			m_packageArchiveName = i;
 			run();
-			syslog(LOG_INFO,"%s",name.c_str());
+
+			std::string p = "(" + packageArchive.collection()+") " + packageArchive.name();
+			syslog(LOG_INFO,"%s",p.c_str());
 		} else {
 			/*
 			 * It's a normal package

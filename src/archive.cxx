@@ -148,7 +148,7 @@ void archive::printDeps()
 {
     getRunTimeDependencies();
     for (auto i : m_rtDependenciesList)
-        std::cout << i << std::endl;
+        std::cout << i << " ";
 }
 
 void archive::printMeta()
