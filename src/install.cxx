@@ -36,8 +36,8 @@ install::install(const CardsArgumentParser& argParser,
 			for (auto i : ListOfPackage ) {
 				if (checkPackageNameExist(i))
 					continue;
-				m_packageName = i;
-				generateDependencies();
+
+				generateDependencies(i);
 			}
 		} else if (checkRegularFile(i)) {
 			/*
@@ -60,8 +60,7 @@ install::install(const CardsArgumentParser& argParser,
 			/*
 			 * It's a normal package
 			 */
-			m_packageName = i;
-			generateDependencies();
+			generateDependencies(i);
 		}
 	}
 	getLocalePackagesList();
@@ -129,8 +128,8 @@ void install::getLocalePackagesList()
 			std::pair<std::string,time_t> PackageTime;
 			PackageTime.first=i;
 			PackageTime.second=0;
-			m_packageName = i;
-			generateDependencies();
+
+			generateDependencies(i);
 			addDependenciesList(PackageTime);
 		}
 #ifdef DEBUG

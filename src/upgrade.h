@@ -8,7 +8,7 @@
 
 namespace cards {
 
-class upgrade : public pkgrepo {
+class upgrade : public pkgrepo, public pkgadd {
 
 	std::set<std::string>                   m_ListOfPackagesToDelete;
 	std::set<std::pair<std::string,time_t>> m_ListOfPackages;

@@ -66,9 +66,10 @@ info::info(const CardsArgumentParser& argParser,
 		*/
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_SEARCH) ) {
-		bool found = false;
-		m_root="/";
-		buildSimpleDatabase();
+		bool   found = false;
+		pkgdbh dbh;
+
+		dbh.buildSimpleDatabase();
 		for (auto j : getListOfPackages()) {
 			found = false;
 			std::string::size_type pos;
@@ -105,7 +106,7 @@ info::info(const CardsArgumentParser& argParser,
 					continue;
 
 				std::cout << "(" << j.second.collection() << ") ";
-			if (checkPackageNameExist(j.first)) {
+			if (dbh.checkPackageNameExist(j.first)) {
 				std::cout << GREEN;
 			}
 
