@@ -11,11 +11,15 @@ namespace cards {
 
 typedef std::map<std::string, cards::cache> repo_t;
 
-class pkgrepo : public pkgadd {
+class pkgrepo {
 
+    std::string           m_packageName;
     std::string           m_configFileName;
     cards::conf           m_config;
     repo_t                m_listOfPackages;
+    packages_t            m_listOfRepoPackages;
+
+    pkgdbh                m_dbh;
 
     std::set<std::string> m_binarySetList;
     std::set<std::string> m_binaryCollectionList;
@@ -34,10 +38,13 @@ public:
     pkgrepo(const std::string& fileName);
     virtual ~pkgrepo() { }
 
-	void generateDependencies(const std::pair<std::string,time_t>& packageName);
-	void generateDependencies();
-	void downloadPackageFileName(const std::string& packageName);
+	void                     generateDependencies(const std::pair<std::string,time_t>& packageName);
+	void                     generateDependencies();
+	void                     generateDependencies(const std::string& packageName);
+	void                     downloadPackageFileName(const std::string& packageName);
 
+    std::set<std::pair<std::string,time_t>>
+                             getPackageDependencies (const std::string& filename);
     bool                     checkBinaryExist(const std::string& name);
 
     time_t                   getBinaryBuildTime (const std::string& name);

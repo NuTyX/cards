@@ -60,6 +60,14 @@ public:
     int getRelease(const std::string& name) const;
 
     void buildSimpleDatabase();
+
+    bool
+    checkPackageNameUptodate(archive& archiveName);
+    bool
+    checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName);
+    bool
+    checkPackageNameBuildDateSame(const std::pair<std::string, time_t>& dependencieNameBuild);
+
     bool checkPackageNameExist(const std::string& name) const;
     bool checkDependency(const std::string& name);
     void setDependency();
@@ -86,13 +94,6 @@ protected:
     void addPackageFilesRefsToDB(const std::string& name,
         const cards::db& info);
 
-    bool
-    checkPackageNameUptodate(archive& archiveName);
-    bool
-    checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName);
-    bool
-    checkPackageNameBuildDateSame(const std::pair<std::string, time_t>& dependencieNameBuild);
-
     /*
      * Remove the physical files after followings some rules
      */
@@ -110,9 +111,8 @@ protected:
     std::set<std::string>
     getConflictsFilesList(const std::string& name, cards::db& info);
 
-    // Tar.gz
+    // Archive Package handling
     std::pair<std::string, cards::db> openArchivePackage(const std::string& filename);
-    std::set<std::pair<std::string, time_t>> getPackageDependencies(const std::string& filename);
     void extractAndRunPREfromPackage(const std::string& filename);
     void installArchivePackage(const std::string& filename,
         const std::set<std::string>& keep_list,
@@ -146,7 +146,6 @@ protected:
     alias_t m_listOfAlias;
 
     packages_t m_listOfPackages;
-    packages_t m_listOfRepoPackages;
 
     std::set<std::pair<std::string, std::set<std::string>>> m_listOfPackagesWithDeps;
 

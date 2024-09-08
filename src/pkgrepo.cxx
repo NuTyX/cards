@@ -6,19 +6,25 @@ namespace cards {
 	
 pkgrepo::pkgrepo(const std::string& fileName)
     : m_configFileName(fileName)
-	, pkgadd("cards install")
 {
+	m_dbh.buildSimpleDatabase();
 	parse();
 }
 void pkgrepo::generateDependencies
 	(const std::pair<std::string,time_t>& packageName)
 {
-	m_packageName=packageName.first;
+	m_packageName = packageName.first;
+	generateDependencies();
+}
+void pkgrepo::generateDependencies
+	(const std::string& packageName)
+{
+	m_packageName = packageName;
 	generateDependencies();
 }
 void pkgrepo::generateDependencies()
 {
-	std::vector< std::pair<std::string,time_t> > dependenciesWeMustAdd,depencenciestoSort;
+	std::vector<std::pair<std::string,time_t>> dependenciesWeMustAdd,depencenciestoSort;
 	std::pair<std::string,time_t> PackageTime;
 	PackageTime.first=m_packageName;
 	PackageTime.second=0;
@@ -40,7 +46,7 @@ void pkgrepo::generateDependencies()
 		/* Erase the current treated packageName */
 		dependenciesWeMustAdd.erase(vit);
 
-		std::set< std::pair<std::string,time_t> > directDependencies;
+		std::set<std::pair<std::string,time_t>> directDependencies;
 		if ( getListOfPackages().find(packageName) != getListOfPackages().end() ) {
 			directDependencies = getListOfPackages()[packageName].dependencies();
 		} else {
@@ -77,7 +83,7 @@ void pkgrepo::generateDependencies()
 		}
 
 		/* If the package is not yet installed or not uptodate */
-		if (!checkPackageNameBuildDateSame(PackageTime))
+		if (!m_dbh.checkPackageNameBuildDateSame(PackageTime))
 		{
 			/* checkPackageNameBuildDateSame is no then add it */
 			depencenciestoSort.push_back(PackageTime);
@@ -97,7 +103,7 @@ void pkgrepo::generateDependencies()
 		}
 		for ( sit = directDependencies.begin(); sit != directDependencies.end();sit++) {
 			if ( PackageTime.first != sit->first ) {
-				if ( ! checkPackageNameBuildDateSame(*sit))
+				if (!m_dbh.checkPackageNameBuildDateSame(*sit))
 					dependenciesWeMustAdd.push_back(*sit);
 			}
 		}
@@ -259,6 +265,50 @@ void pkgrepo::parse()
 				}
 		}
 	}
+}
+std::set<std::pair<std::string,time_t>>
+pkgrepo::getPackageDependencies (const std::string& filename)
+{
+	archive                                 packageArchive(filename);
+	cards::db                               package;
+	std::set<std::pair<std::string,time_t>> packageNameDepsBuildTime;
+	std::set<std::pair<std::string,time_t>> packageNameDepsBuildTimeTemp;
+
+	/*
+	 * Begin of Direct Dependencies of packageArchive
+	 *
+	 * If the packageArchive is uptodate and installed
+	 * we don't need to go further. We return an empty
+	 * set<string, time_t> container
+	 *
+	 */
+	if (m_dbh.checkPackageNameUptodate(packageArchive))
+		return packageNameDepsBuildTime;
+
+	if (!packageArchive.listofDependencies().empty()) {
+		package.dependencies(packageArchive.listofDependenciesBuildDate());
+		m_listOfRepoPackages[packageArchive.name()] = package;
+	}
+
+	packageNameDepsBuildTimeTemp = package.dependencies();
+
+	for (auto it : packageNameDepsBuildTimeTemp ) {
+		/*
+		 * If 'it' package is actual and already present
+		 * do nothing and continue
+		 */
+		if (m_dbh.checkPackageNameBuildDateSame(it))
+			continue;
+		/*
+		 * Otherwise add it to the deps
+		 */
+		packageNameDepsBuildTime.insert(it);
+	}
+
+	if (!packageNameDepsBuildTime.empty())
+		m_listOfRepoPackages[packageArchive.name()].dependencies(packageNameDepsBuildTime);
+
+	return packageNameDepsBuildTime;
 }
 repo_t& pkgrepo::getListOfPackages()
 {
