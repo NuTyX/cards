@@ -87,6 +87,8 @@ protected:
         const cards::db& info);
 
     bool
+    checkPackageNameUptodate(archive& archiveName);
+    bool
     checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName);
     bool
     checkPackageNameBuildDateSame(const std::pair<std::string, time_t>& dependencieNameBuild);

@@ -909,7 +909,26 @@ void pkgdbh::resetDependency()
 {
 	m_dependency=false;
 }
-
+bool
+pkgdbh::checkPackageNameUptodate(archive& archiveName)
+{
+	std::set<std::string>::iterator it = m_listOfPackagesNames.find(archiveName.name());
+	if (it == m_listOfPackagesNames.end())
+		return false;
+	if (m_listOfPackages[archiveName.name()].version() !=  archiveName.version())
+		return false;
+	if (m_listOfPackages[archiveName.name()].release() !=  archiveName.release())
+		return false;
+	if (m_listOfPackages[archiveName.name()].build() < archiveName.buildn())
+		return false;
+	if (m_listOfPackages[archiveName.name()].collection() == "")
+		return true;
+	if (archiveName.collection() == "" )
+		return true;
+	if (m_listOfPackages[archiveName.name()].collection() != archiveName.collection())
+		return false;
+	return true;
+}
 bool
 pkgdbh::checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName)
 {
