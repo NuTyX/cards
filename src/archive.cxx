@@ -218,7 +218,7 @@ std::set<std::pair<std::string, time_t>> archive::listofDependenciesBuildDate()
 {
     std::pair<std::string, time_t> NameEpoch;
     NameEpoch.first = getPackageName();
-    NameEpoch.second = buildn();
+    NameEpoch.second = build();
     m_rtDependenciesEpochList.insert(NameEpoch);
     getRunTimeDependenciesEpoch();
     return m_rtDependenciesEpochList;
@@ -356,7 +356,7 @@ std::string archive::epochBuildDate()
     }
     return "";
 }
-time_t archive::buildn()
+time_t archive::build()
 {
     time_t epochVal = 0;
     for (auto epochSVal : m_contentMeta) {

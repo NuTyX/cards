@@ -47,7 +47,7 @@ public:
 	std::string group(); // return the group of the package
 	std::string namebuildn(); // return the name + epochvalue
 	std::string epochBuildDate(); // return the epochvalue in string format
-	time_t buildn(); // return the epoch value
+	time_t build(); // return the epoch value
 
 private:
 	void getRunTimeDependencies();

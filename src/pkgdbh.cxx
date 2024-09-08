@@ -919,7 +919,7 @@ pkgdbh::checkPackageNameUptodate(archive& archiveName)
 		return false;
 	if (m_listOfPackages[archiveName.name()].release() !=  archiveName.release())
 		return false;
-	if (m_listOfPackages[archiveName.name()].build() < archiveName.buildn())
+	if (m_listOfPackages[archiveName.name()].build() < archiveName.build())
 		return false;
 	if (m_listOfPackages[archiveName.name()].collection() == "")
 		return true;
@@ -1222,7 +1222,7 @@ pkgdbh::openArchivePackage(const std::string& filename)
 	result.second.version(packageArchive.version());
 	result.second.release(packageArchive.release());
 	result.second.arch(packageArchive.arch());
-	result.second.build(packageArchive.buildn());
+	result.second.build(packageArchive.build());
 	result.second.group(packageArchive.group());
 	result.second.collection(packageArchive.collection());
 	result.second.license(packageArchive.license());

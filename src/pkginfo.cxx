@@ -164,7 +164,7 @@ void pkginfo::run()
             << name << _("Version        : ") << package.version() << std::endl
             << name << _("Release        : ") << package.release() << std::endl
             << name << _("Architecture   : ") << package.arch() << std::endl
-            << name << _("Build date     : ") << package.buildn() << std::endl;
+            << name << _("Build date     : ") << package.build() << std::endl;
         if (package.listofDependencies().size() > 0) {
             std::cout << name << _("Dependencies   : ");
             package.printDeps();
