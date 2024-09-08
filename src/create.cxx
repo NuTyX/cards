@@ -76,7 +76,7 @@ void create::installDependencies(std::string& packageName)
                 treatErrors(i);
             }
             for (auto j : listofBinaries) {
-                if ( j.find("cards.tar") == std::string::npos )
+                if ( j.find(".cards-") == std::string::npos )
                     continue;
                 packageArchiveName = i + "/" + j;
                 archive packageArchive(packageArchiveName.c_str());
