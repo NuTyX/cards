@@ -111,7 +111,7 @@ int upgrade::Isdownload()
 	for (auto i : m_ListOfPackages) {
 		packageFileName = getPackageFileName(i.first);
 		packageNameSignature = getPackageFileNameSignature(packageName);
-		if ( ! checkFileSignature(packageFileName, packageNameSignature))
+		if ( ! checkFileHash(packageFileName, packageNameSignature))
 			return EXIT_FAILURE;
 	}
 
