@@ -36,14 +36,14 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 		m_destinationFile.dirname = i->dirname;
 		m_downloadFileName = i->dirname + i->filename;
 		m_downloadProgress.name = i->filename;
-		m_SHA256Sum = i->sha256sum;
+		m_hash = i->hash;
 		createRecursiveDirs(i->dirname);
 		initFileToDownload(m_url,m_downloadFileName);
 		downloadFile();
-		if ( ! checkSHA256sum() )
+		if ( ! checkHash() )
 			throw std::runtime_error (m_downloadFileName
 			+ " "
-			+ m_SHA256Sum +": checksum error");
+			+ m_hash +": checksum error");
 	}
 }
 
@@ -77,12 +77,12 @@ FileDownload::FileDownload(std::string url,
 FileDownload::FileDownload(std::string fileInfo,std::string url,
 	std::string dirName,
 	std::string fileName,
-	std::string SHA256Sum,
+	std::string hash,
 	bool progress)
   : m_fileInfo(fileInfo),
 		m_url(url),
 		m_downloadFileName(dirName+"/"+fileName),
-		m_SHA256Sum(SHA256Sum),
+		m_hash(hash),
 		m_progress(progress)
 {
   curl_global_init(CURL_GLOBAL_ALL);
@@ -101,8 +101,8 @@ FileDownload::FileDownload(std::string fileInfo,std::string url,
 		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
 	downloadFile();
-	if ( ! checkSHA256sum() )
-		throw std::runtime_error (m_downloadFileName + " " + m_SHA256Sum +": checksum error");
+	if ( ! checkHash() )
+		throw std::runtime_error (m_downloadFileName + " " + m_hash +": checksum error");
 }
 
 void FileDownload::downloadFile()
@@ -136,8 +136,8 @@ void FileDownload::downloadFile()
 		std::cerr << curl_easy_strerror(m_curlCode) << std::endl;
 		throw std::runtime_error ( "\n\nURL   : " +
 		m_url + "\nFILE  : " +
-		m_downloadFileName + "\nSHA256SUM: " +
-		m_SHA256Sum +"\n\n !!! download failed !!! \n");
+		m_downloadFileName + "\nHASH: " +
+		m_hash +"\n\n !!! download failed !!! \n");
 	}
 	if (m_destinationFile.stream) {
 		fclose(m_destinationFile.stream);
@@ -225,9 +225,9 @@ size_t FileDownload::writeToStreamHandle(void *buffer,
 	return static_cast<FileDownload*>(stream)->writeToStream(buffer,size,nmemb,stream);
 }
 
-bool FileDownload::checkSHA256sum()
+bool FileDownload::checkHash()
 {
-	return ::checkSHA256sum(m_downloadFileName.c_str(),m_SHA256Sum.c_str());
+	return ::checkHash(m_downloadFileName.c_str(),m_hash.c_str());
 }
 
 bool FileDownload::checkUpToDate()

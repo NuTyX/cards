@@ -77,20 +77,20 @@ class FileDownload
 		std::string fileName, bool progress);
 
 	/**
-	 * Download a file with the possibility of checking the signature of the file
+	 * Download a file with the possibility of checking the hashing of the file
 	 *
 	 * \param fileInfo Destination file
 	 * \param url Complete downloading address including the file
 	 * \param dirName Destination folder
 	 * \param fileName file where to store the downloaded datas
-	 * \param SHA256Sum Signature to use for checking the download file
+	 * \param hash Hash to use for checking the download file
 	 * \param progress If true, show what's going on
 	 */
 	FileDownload(std::string fileInfo,
 		std::string url,
 		std::string dirName,
 		std::string fileName,
-		std::string SHA256Sum,
+		std::string hash,
 		bool progress);
 
 	/**
@@ -120,9 +120,9 @@ class FileDownload
 	private:
 
 	/**
-	 * \return check if signature is OK
+	 * \return check if hashsum is OK
 	 */
-	bool checkSHA256sum();
+	bool checkHash();
 
 	/**
 	 * download effectively the request file
@@ -173,8 +173,8 @@ class FileDownload
 	std::string	m_url;
 	std::string	m_downloadFileName;
 	std::string	m_fileInfo;
-	bool		m_checkSHA256;
+	bool		m_checkHash;
 	bool		m_progress;
-	std::string	m_SHA256Sum;
+	std::string	m_hash;
 	static std::set<FileDownloadEvent*> m_arrCallBacks;
 };
