@@ -38,7 +38,7 @@ struct InfoFile {
     std::string url;
     std::string filename;
     std::string dirname;
-    std::string sha256sum;
+    std::string hash;
     long int filetime;
     utimbuf acmodtime;
     FILE* stream;
@@ -51,7 +51,7 @@ std::string getModifyTimeFile(const std::string& filename);
 bool checkFileExist(const std::string& filename);
 bool checkFileEmpty(const std::string& filename);
 bool checkRegularFile(const std::string& filename);
-bool checkFileSignature(const std::string& filename, const std::string& signature);
+bool checkFileHash(const std::string& filename, const std::string& hash);
 bool checkFilesEqual(const std::string& file1, const std::string& file2);
 bool checkPermissionsEqual(const std::string& file1, const std::string& file2);
 bool createRecursiveDirs(const std::string& pathname);
@@ -63,5 +63,5 @@ int findRecursiveFile(std::set<std::string>& filenameList, const char* filename,
 int parseFile(std::set<std::string>& fileContent, const char* fileName);
 int parseFile(std::vector<std::string>& fileContent, const char* fileName);
 int parseFile(std::string& Depends, const char* key, const char* fileName);
-bool findSHA256sum(const std::string& fileName, unsigned char* result);
-bool checkSHA256sum(const char* fileName, const char* SHA256Sum);
+bool findHash(const std::string& fileName, unsigned char* result);
+bool checkHash(const char* fileName, const char* hash);
