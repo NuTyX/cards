@@ -31,7 +31,7 @@ public:
 	std::string signature();
 	std::string origin();
 	std::string branch();
-	const std::string sha256SUM();
+	const std::string hash();
 	std::string s_buildDate();
 	time_t build();
 
@@ -53,6 +53,7 @@ public:
 	void arch(const std::string& arch);
 	void license(const std::string& license);
 	void signature(const std::string& signature);
+	void hash(const std::string& hash);
 	void origin(const std::string& origin);
 	void branch (const std::string& branch);
 	void build(time_t time);
@@ -79,7 +80,7 @@ private:
 	std::string m_origin;
 	std::string m_branch;
 
-	std::string m_sh256SUM;
+	std::string m_hash;
 	std::string m_s_buildDate;
 	time_t m_build;
 
