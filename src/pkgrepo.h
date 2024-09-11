@@ -28,6 +28,7 @@ class pkgrepo {
     std::string           m_binaryPackageInfo;
     std::string           m_packageFileName;
     std::string           m_packageFileNameSignature;
+    std::string           m_packageFileNameHash;
     std::string           m_packageVersion;
 
     std::vector<std::pair<std::string,time_t>>
@@ -51,6 +52,7 @@ public:
 
     std::string&             getPackageFileName(const std::string& name);
     std::string&             getPackageFileNameSignature(const std::string& name);
+    std::string&             getPackageFileNameHash(const std::string& name);
     std::string&             getBinaryPackageInfo(const std::string& name);
     std::string&             getPackageVersion(const std::string& name);
     unsigned short int       getPackageRelease(const std::string& name);

@@ -75,7 +75,7 @@ void pkgrepo::generateDependencies()
 			}
 
 			/* If the binary archive is not yet downloaded or is corrupted */
-			if (!checkFileSignature(packageFileName, packageNameSignature)) {
+			if (!checkFileHash(packageFileName, packageNameSignature)) {
 				/* Try to get it */
 				downloadPackageFileName(packageName);
 			}
@@ -362,15 +362,21 @@ std::string& pkgrepo::getPackageFileName(const std::string& name)
 
     return m_packageFileName;
 }
+std::string& pkgrepo::getPackageFileNameHash(const std::string& name)
+{
+    if (m_listOfPackages.size() == 0)
+        parse();
+
+     m_packageFileNameHash = m_listOfPackages[name].hash();
+
+    return m_packageFileNameHash;
+}
 std::string& pkgrepo::getPackageFileNameSignature(const std::string& name)
 {
     if (m_listOfPackages.size() == 0)
         parse();
 
-    if (m_listOfPackages[name].signature().size() == 0)
-        m_packageFileNameSignature = m_listOfPackages[name].sha256SUM();
-    else
-        m_packageFileNameSignature = m_listOfPackages[name].signature();
+    m_packageFileNameSignature = m_listOfPackages[name].signature();
 
     return m_packageFileNameSignature;
 }
