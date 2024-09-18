@@ -63,7 +63,8 @@ public:
             CMD_CREATE,
             CMD_DEPENDS,
             CMD_DEPTREE,
-            CMD_LEVEL
+            CMD_LEVEL,
+            CMD_KEYS
         };
 
         /**

@@ -31,6 +31,8 @@
 
 #define CARDS_CONF_FILE "/etc/cards.conf"
 #define NUTYX_VERSION_FILE "/var/lib/pkg/nutyx-version"
+#define PRIVATEKEY "/.private.key"
+#define PUBLICKEY "/.public.key"
 
 #define GIGA 1e9
 #define MEGA 1e6

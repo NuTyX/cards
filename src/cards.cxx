@@ -180,7 +180,16 @@ int main(int argc, char** argv)
 				sync.run();
 			}
             return EXIT_SUCCESS;
+        case ArgParser::CMD_KEYS: {
+            if (!getuid()) {
+                string s = "";
+                throw runtime_error(s + _(" this command should not be used under root"));
 
+            }
+            cards::pkgrepo pkgrepo(configFile.c_str());
+            pkgrepo.generateKeys();
+            return EXIT_SUCCESS;
+        }
         case ArgParser::CMD_LIST: {
             cards::info info(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;

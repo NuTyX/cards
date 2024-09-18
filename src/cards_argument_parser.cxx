@@ -145,6 +145,13 @@ A compilation logfile can be define in /etc/cards.conf as:\n\
 logdir /var/log/pkgbuild for example."),
         ArgParser::EQ, 1, _("<package>"));
 
+    addCommand(CMD_KEYS, "keys",
+        _("generate the keys pair ."),
+        _("This command is used to generate the keys needed for\n\
+signing and verifying the packages.\n\
+This command is normally used by the packager only."),
+        ArgParser::NONE, 0, "");
+
     OPT_NO_SYNC.init("no-sync",
         0,
         _("\t   Only upgrade what's possible."));
