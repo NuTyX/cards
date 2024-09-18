@@ -22,6 +22,7 @@ public:
 
 	std::string version();
 	std::string url();
+	std::string keypath();
 	std::string hostname();
 	std::string username();
 	std::string password();
@@ -46,6 +47,7 @@ private:
 	std::string m_arch;
 	std::string m_depot;
 	std::string m_url;
+	std::string m_keypath;
 
 	std::string m_dir;
 	std::string m_base;

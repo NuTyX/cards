@@ -120,6 +120,9 @@ void conf::parseConfig()
 			if (key == "logdir") {
 				m_logdir = val;
 			}
+			if (key == "keypath") {
+				m_keypath = val;
+			}
 			m_arch = getMachineType();
 			if ( m_arch== "" ) {
 				return;
@@ -168,6 +171,10 @@ std::vector<DirUrl> conf::dirUrl()
 std::string conf::url()
 {
 	return m_url;
+}
+std::string conf::keypath()
+{
+	return m_keypath;
 }
 std::string conf::hostname()
 {
