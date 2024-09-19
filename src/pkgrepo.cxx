@@ -9,6 +9,9 @@ pkgrepo::pkgrepo(const std::string& fileName)
 {
 	m_dbh.buildSimpleDatabase();
 	parse();
+	OpenSSL_add_all_digests();
+	OpenSSL_add_all_algorithms();
+	ERR_load_crypto_strings();
 }
 void pkgrepo::generateDependencies
 	(const std::pair<std::string,time_t>& packageName)
@@ -21,6 +24,58 @@ void pkgrepo::generateDependencies
 {
 	m_packageName = packageName;
 	generateDependencies();
+}
+bool pkgrepo::generateKeys()
+{
+	EVP_PKEY*     key = nullptr;
+	EVP_PKEY_CTX* ctx = nullptr;
+
+	ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_ED25519, nullptr);
+	if (!ctx)
+		throw std::runtime_error("Failed to create cipher context");
+
+	if (1 != EVP_PKEY_keygen_init(ctx)) {
+		EVP_PKEY_CTX_free(ctx);
+		throw std::runtime_error("Failed to initialize key generation");
+	}
+        if (1 != EVP_PKEY_generate(ctx, &key)) {
+            EVP_PKEY_CTX_free(ctx);
+		if (key)
+			EVP_PKEY_free(key);
+		throw std::runtime_error("Failed to generate the private key");
+	}
+	EVP_PKEY_CTX_free(ctx);
+
+	std::string keyfile(m_config.keypath());
+	keyfile += PRIVATEKEY;
+	FILE *f = fopen(keyfile.c_str(), "w");
+	if (!f) {
+		EVP_PKEY_free(key);
+		throw std::runtime_error("Failed to create file: " + keyfile);
+	}
+
+	if (PEM_write_PrivateKey(f, key, nullptr, nullptr, 0, nullptr, nullptr) == 0 ) {
+		EVP_PKEY_free(key);
+		fclose(f);
+		throw std::runtime_error("Failed to save the private key: " + keyfile);
+	}
+	fclose(f);
+	keyfile = ".";
+	keyfile += PUBLICKEY;
+
+	f = fopen(keyfile.c_str(), "w");
+	if (!f) {
+		EVP_PKEY_free(key);
+		throw std::runtime_error("Failed to create file: " + keyfile);
+	}
+	if (PEM_write_PUBKEY(f, key) == 0 ) {
+		EVP_PKEY_free(key);
+		fclose(f);
+		throw std::runtime_error("Failed to save the public key: " + keyfile);
+	}
+	fclose(f);
+	EVP_PKEY_free(key);
+	return true;
 }
 void pkgrepo::generateDependencies()
 {
@@ -406,5 +461,200 @@ unsigned short int pkgrepo::getPackageRelease(const std::string& name)
 		parse();
 
 	return m_listOfPackages[name].release();
+}
+bool pkgrepo::hash(const std::string& name)
+{
+	if (m_listOfPackages.size() == 0)
+		parse();
+
+	std::string filename(getPackageFileName(name));
+
+	EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
+
+	if (!mdctx) {
+		errors();
+		return false;
+	}
+
+	if (1 != EVP_DigestInit_ex(mdctx,EVP_sha512(), nullptr)) {
+		errors();
+		EVP_MD_CTX_free(mdctx);
+		return false;
+	}
+
+	std::ifstream file(filename,std::ios::binary);
+	if(!file.is_open()) {
+		std::cerr << "Failed to open file: "
+			<< filename
+			<< std::endl;
+		return false;
+	}
+
+	char buffer[BUFSIZ];
+
+	while (file.good())  {
+		file.read(buffer,BUFSIZ);
+		std::streamsize bytesRead = file.gcount();
+		if (bytesRead > 0) {
+			if ( 1 != EVP_DigestUpdate(mdctx, buffer, bytesRead)) {
+				errors();
+				return false;
+			}
+		}
+	}
+
+	if (file.bad()) {
+		std::cerr << "Error reading file: "
+			<< filename
+			<< std::endl;
+	}
+
+	unsigned char mdValue[EVP_MAX_MD_SIZE];
+	unsigned int  mdLength;
+
+	if ( 1 != EVP_DigestFinal_ex(mdctx, mdValue, &mdLength)) {
+		errors();
+		return false;
+	}
+
+	EVP_MD_CTX_free(mdctx);
+
+	std::ostringstream oss;
+	for ( unsigned int i = 0; i < mdLength; i++)
+		oss << std::hex
+			<< std::setw(2)
+			<< std::setfill('0')
+			<< static_cast<int>(mdValue[i]);
+
+	m_packageFileNameHash = oss.str();
+	return true;
+}
+bool pkgrepo::checkHash(const std::string& name)
+{
+	if (m_listOfPackages.size() == 0)
+		parse();
+
+	return convertToLowerCase(m_packageFileNameHash) == convertToLowerCase(m_listOfPackages[name].hash());
+
+}
+bool pkgrepo::sign(const std::string& name)
+{
+	EVP_PKEY* key = nullptr;
+	std::string keyfile(m_config.keypath());
+	keyfile += PRIVATEKEY;
+	const std::vector<unsigned char> data;
+
+
+	FILE* keyFileStream = fopen(keyfile.c_str(), "r");
+	if (!keyFileStream) {
+		throw std::runtime_error("Failed to open key file:" + keyfile);
+	}
+	key = PEM_read_PrivateKey(keyFileStream, nullptr, nullptr, nullptr);
+	fclose(keyFileStream);
+	if (!key)
+		throw std::runtime_error("Failed to load private key from PEM file");
+
+	if (EVP_PKEY_id(key) != EVP_PKEY_ED25519) {
+		EVP_PKEY_free(key);
+		throw std::runtime_error("Loaded key is not an ED25519 format key");
+	}
+
+	EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
+	if (!mdctx) {
+		errors();
+		EVP_PKEY_free(key);
+		return false;
+	}
+
+	if (1 != EVP_DigestSignInit(mdctx, nullptr, nullptr, nullptr, key)) {
+		errors();
+		EVP_MD_CTX_free(mdctx);
+		EVP_PKEY_free(key);
+		return false;
+	}
+
+	size_t sigLength = 0;
+	if (1 != EVP_DigestSign(mdctx, nullptr, &sigLength, data.data(), data.size())) {
+		errors();
+		EVP_MD_CTX_free(mdctx);
+		EVP_PKEY_free(key);
+		return false;
+	}
+
+	std::vector<unsigned char> signature(sigLength);
+	if (1 != EVP_DigestSign(mdctx, signature.data(), &sigLength, data.data(), data.size())) {
+		errors();
+		EVP_MD_CTX_free(mdctx);
+		EVP_PKEY_free(key);
+		return false;
+	}
+
+	EVP_MD_CTX_free(mdctx);
+	std::ostringstream oss;
+	for (auto b : signature) {
+		oss << std::hex
+			<< std::setw(2)
+			<< std::setfill('0')
+			<< static_cast<int>(b);
+	}
+	m_packageFileNameSignature = oss.str();
+
+	if (key)
+		EVP_PKEY_free(key);
+	EVP_cleanup();
+
+	return true;
+}
+bool pkgrepo::checkSign(const std::string& name)
+{
+	EVP_PKEY* key = nullptr;
+	std::string hash(m_listOfPackages[name].hash());
+
+	std::string keyfile(m_listOfPackages[name].dirName());
+	keyfile += PUBLICKEY;
+
+	std::vector<unsigned char> mesBytes(hash.length() / 2);
+	for (size_t i = 0; i < hash.length(); i += 2 )
+		mesBytes[i / 2] = static_cast<unsigned char>(std::stoi(hash.substr(i,2), nullptr, 16));
+
+	FILE* keyFileStream = fopen(keyfile.c_str(), "r");
+	if (!keyFileStream)
+		throw std::runtime_error("Failed to open key file:" + keyfile);
+
+	key = PEM_read_PUBKEY(keyFileStream, nullptr, nullptr, nullptr);
+	fclose(keyFileStream);
+	if (!key) {
+		throw std::runtime_error("Failed to load public key from PEM file");
+	}
+	if (EVP_PKEY_id(key) != EVP_PKEY_ED25519) {
+		EVP_PKEY_free(key);
+		throw std::runtime_error("Loaded key is not an ED25519 format key");
+	}
+	EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
+	if (!mdctx) {
+		errors();
+		return false;
+	}
+
+	if (1 != EVP_DigestVerifyInit(mdctx, nullptr, nullptr, nullptr, key)) {
+		errors();
+		EVP_MD_CTX_free(mdctx);
+		return false;
+	}
+
+	std::string signature = m_listOfPackages[name].signature();
+	std::vector<unsigned char> sigBytes(signature.length() / 2);
+	for (size_t i = 0; i < signature.length(); i += 2 )
+		sigBytes[i / 2] = static_cast<unsigned char>(std::stoi(signature.substr(i,2), nullptr, 16));
+
+	int verify = EVP_DigestVerify(mdctx, sigBytes.data(),sigBytes.size(), mesBytes.data(), mesBytes.size());
+	EVP_MD_CTX_free(mdctx);
+	EVP_PKEY_free(key);
+
+	return verify == 1;
+}
+void pkgrepo::errors()
+{
+	ERR_print_errors_fp(stderr);
 }
 } // end of 'cards' namespace

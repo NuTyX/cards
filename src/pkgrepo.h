@@ -7,46 +7,72 @@
 #include "file_utils.h"
 #include "pkgadd.h"
 
+#include <iomanip>
+
+#include <openssl/pem.h>
+#include <openssl/err.h>
+
 namespace cards {
 
 typedef std::map<std::string, cards::cache> repo_t;
 
 class pkgrepo {
 
-    std::string           m_packageName;
-    std::string           m_configFileName;
-    cards::conf           m_config;
-    repo_t                m_listOfPackages;
-    packages_t            m_listOfRepoPackages;
+    std::string              m_packageName;
+    std::string              m_configFileName;
+    cards::conf              m_config;
+    repo_t                   m_listOfPackages;
+    packages_t               m_listOfRepoPackages;
 
-    pkgdbh                m_dbh;
+    pkgdbh                   m_dbh;
 
-    std::set<std::string> m_binarySetList;
-    std::set<std::string> m_binaryCollectionList;
-    std::set<std::string> m_binaryPackageList;
+    std::set<std::string>    m_binarySetList;
+    std::set<std::string>    m_binaryCollectionList;
+    std::set<std::string>    m_binaryPackageList;
 
-    std::string           m_binaryPackageInfo;
-    std::string           m_packageFileName;
-    std::string           m_packageFileNameSignature;
-    std::string           m_packageFileNameHash;
-    std::string           m_packageVersion;
+    std::string              m_binaryPackageInfo;
+    std::string              m_packageFileName;
+    std::string              m_packageFileNameSignature;
+    std::string              m_packageFileNameHash;
+    std::string              m_packageVersion;
 
     std::vector<std::pair<std::string,time_t>>
-                          m_dependenciesList;
-    void parse();
+                             m_dependenciesList;
+
+    void                     parse();
+    void                     errors();
 
 public:
     pkgrepo(const std::string& fileName);
-    virtual ~pkgrepo() { }
+    virtual ~pkgrepo() { ERR_free_strings(); }
 
-	void                     generateDependencies(const std::pair<std::string,time_t>& packageName);
-	void                     generateDependencies();
-	void                     generateDependencies(const std::string& packageName);
-	void                     downloadPackageFileName(const std::string& packageName);
+    void                     generateDependencies(const std::pair<std::string,time_t>& packageName);
+    void                     generateDependencies();
+    void                     generateDependencies(const std::string& packageName);
+    void                     downloadPackageFileName(const std::string& packageName);
 
     std::set<std::pair<std::string,time_t>>
                              getPackageDependencies (const std::string& filename);
     bool                     checkBinaryExist(const std::string& name);
+
+    // Generate the hashsum for the archive file of the package name and store the result
+    // in the m_packageFileNameHash member variable
+    bool                     hash(const std::string& name);
+
+    // Generate the signature of the hashsum for the archive file of the package name
+    // and store the result in the m_packageFileNameSignature member variable
+    // The private key location is defined in cards.conf file.
+    bool                     sign(const std::string& name);
+
+    // Check the Hash and signature of the archive file of the package name
+    bool                     checkHash(const std::string& name);
+
+    // Check the signature of the archive file of the package name
+    // The public key location is at the root of the repository or collection
+    bool                     checkSign(const std::string& name);
+
+    // Generate the keys pair for signing and verifying the package archive hashing
+    bool                     generateKeys();
 
     time_t                   getBinaryBuildTime (const std::string& name);
 
