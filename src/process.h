@@ -7,7 +7,6 @@
 
 #include "string_utils.h"
 
-#include <list>
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>

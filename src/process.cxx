@@ -41,7 +41,7 @@ std::string process::args()
 int process::execute()
 {
     std::list<std::string> args;
-    split(m_arguments, ' ', args, 0, false);
+    args = parseDelimitedListList(m_arguments, ' ');
 
     const int argc = 1 + args.size() + 1; // app, args, NULL
 

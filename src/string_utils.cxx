@@ -229,6 +229,25 @@ const std::vector<std::string> parseDelimitedVectorList
 		v.push_back(b);
 	return v;
 }
+const std::list<std::string> parseDelimitedListList
+	(const std::string& s, const char& c)
+{
+	std::string b{""};
+	std::list<std::string> l;
+
+	for (auto n:s)
+	{
+		if(n != c) b+=n; else
+		if(n == c && b != "")
+		{
+			l.push_back(b);
+			b="";
+		}
+	}
+	if(b != "")
+		l.push_back(b);
+	return l;
+}
 std::string stripWhiteSpace(const std::string& s)
 {
 	if (s.empty())

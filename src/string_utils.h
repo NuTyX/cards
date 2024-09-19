@@ -10,6 +10,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <list>
 
 #include <sys/stat.h>
 
@@ -47,20 +48,25 @@ std::string sizeHumanRead(int value);
 
 /*param s the string to be searched, param delimiter the delimiter char 
 return the value after the first occurance of a delimiter */
-std::string getFirstValueOfKeyAfterDelim(const std::string& s, char delimiter);
+std::string getFirstValueOfKeyAfterDelim
+(const std::string& s, char delimiter);
 
 /* strip whitespace in the beginning and end of string, return a stripped string */
 std::string stripWhiteSpace(const std::string& s);
 
-/* populate a vector of string with delimited characters */
+/* populate a vector container of string with delimited characters */
 std::vector<std::string> parseDelimitedVectorList
 (const std::string& s, const char *delimiter);
 
-/* populate a vector of string with a delimited character */
+/* populate a vector container of string with a delimited character */
 const std::vector<std::string> parseDelimitedVectorList
 (const std::string& s, const char& c);
 
-/* populate a set of string with delimited characters */
+/* populate a list container of string with a delimited character */
+const std::list<std::string> parseDelimitedListList
+(const std::string& s, const char& c);
+
+/* populate a set container of string with delimited characters */
 std::set<std::string> parseDelimitedSetList
 (const std::string& s, const char *delimiter);
 
@@ -78,42 +84,3 @@ std::string convertToUpperCase(const std::string& s);
 
 std::string replaceAll
 ( std::string& in, const std::string& oldString, const std::string& newString );
-
-/**
-  Split a string into parts
-	param s string to be split
-	param del delimter
-	param startPos position to start at
-	param useEmpty include empty (whitespace only9 results in the result
-
-	return a list of string 
-*/
-template <class T>
-void split( const std::string& s, char del,
-            T& target,
-            int startPos, bool useEmpty )
-{
-	std::string line = s;
-	std::string ss;
-	std::string::size_type pos;
-	int offset = startPos;
-	while ( ( pos = line.find( del, offset ) ) != std::string::npos ) {
-		offset = 0;
-		if ( line[pos-1] == '\\'  ) {
-			line.erase(pos-1,1);
-			ss = ss + line.substr(0,pos);
-			line.erase(0,pos);
-			continue;
-		}
-		std::string val = line.substr( 0, pos );
-		if ( ( useEmpty || !stripWhiteSpace( val ).empty() ) ||
-			( ss.length() > 0 ) ) {
-			target.push_back( ss + val );
-		}
-		line.erase( 0, pos+1 );
-	}
-
-	if ( ( line.length() > 0 ) || ( ss.length() > 0 ) ) {
-		target.push_back( ss + line );
-	}
-}
