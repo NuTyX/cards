@@ -4,9 +4,7 @@
 
 #pragma once
 
-#include "conf.h"
 #include "string_utils.h"
-#include "vector.h"
 
 #include <dirent.h>
 #include <err.h>

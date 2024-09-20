@@ -1,11 +1,10 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 #pragma once
 
+#include "file_utils.h"
+
 #include <curl/curl.h>
 
-#include "string_utils.h"
-#include "file_utils.h"
-#include "pkgdbh.h"
 
 
 /**

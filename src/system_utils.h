@@ -12,7 +12,7 @@
 
 #include <libintl.h>
 #include <locale.h>
-#include <stdio.h>
+#include <cstdio>
 #include <sys/utsname.h>
 #include <syslog.h>
 

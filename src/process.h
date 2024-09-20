@@ -10,7 +10,6 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
-#include <cstdio>
 
 #include <unistd.h>
 #include <fcntl.h>
