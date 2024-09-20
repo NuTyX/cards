@@ -60,6 +60,9 @@ bool pkgrepo::generateKeys()
 		throw std::runtime_error("Failed to save the private key: " + keyfile);
 	}
 	fclose(f);
+	if (chmod(keyfile.c_str(),0600) == -1)
+		throw std::runtime_error("Failed to chmod key: " + keyfile + " to 0600");
+
 	keyfile = ".";
 	keyfile += PUBLICKEY;
 
@@ -115,8 +118,8 @@ void pkgrepo::generateDependencies()
 				 * And check it's signature
 				 */
 
-				packageFileName = getPackageFileName(packageName);
-				packageNameSignature = getPackageFileNameSignature(packageName);
+				packageFileName = fileName(packageName);
+				packageNameSignature = fileSignature(packageName);
 
 				/* archive PackageName exist
 				 * Let's see if we need to download it */
@@ -280,6 +283,7 @@ void pkgrepo::parse()
 					pkgName = p.substr(1,pos - 1);
 					info.version(p.substr(pos + 7));
 					info.fileName(p.substr(1));
+					info.dirName(i.depot + "/" + i.collection);
 					pkgFound = true;
 				}
 			}
@@ -408,7 +412,16 @@ bool pkgrepo::checkBinaryExist(const std::string& name)
 
 	return (m_listOfPackages.find(name) != m_listOfPackages.end());
 }
-std::string& pkgrepo::getPackageFileName(const std::string& name)
+std::string& pkgrepo::dirName(const std::string& name)
+{
+    if (m_listOfPackages.size() == 0)
+        parse();
+
+    m_packageDirName = m_listOfPackages[name].dirName();
+
+    return m_packageDirName;
+}
+std::string& pkgrepo::fileName(const std::string& name)
 {
     if (m_listOfPackages.size() == 0)
         parse();
@@ -417,7 +430,7 @@ std::string& pkgrepo::getPackageFileName(const std::string& name)
 
     return m_packageFileName;
 }
-std::string& pkgrepo::getPackageFileNameHash(const std::string& name)
+std::string& pkgrepo::fileHash(const std::string& name)
 {
     if (m_listOfPackages.size() == 0)
         parse();
@@ -426,7 +439,7 @@ std::string& pkgrepo::getPackageFileNameHash(const std::string& name)
 
     return m_packageFileNameHash;
 }
-std::string& pkgrepo::getPackageFileNameSignature(const std::string& name)
+std::string& pkgrepo::fileSignature(const std::string& name)
 {
     if (m_listOfPackages.size() == 0)
         parse();
@@ -447,7 +460,7 @@ time_t pkgrepo::getBinaryBuildTime (const std::string& name)
 
 	return m_listOfPackages[name].build();
 }
-std::string& pkgrepo::getPackageVersion(const std::string& name)
+std::string& pkgrepo::version(const std::string& name)
 {
 	if (m_listOfPackages.size() == 0)
 		parse();
@@ -455,39 +468,36 @@ std::string& pkgrepo::getPackageVersion(const std::string& name)
 	m_packageVersion = m_listOfPackages[name].version();
 	return m_packageVersion;
 }
-unsigned short int pkgrepo::getPackageRelease(const std::string& name)
+unsigned short int pkgrepo::release(const std::string& name)
 {
 	if (m_listOfPackages.size() == 0)
 		parse();
 
 	return m_listOfPackages[name].release();
 }
-bool pkgrepo::hash(const std::string& name)
+std::string& pkgrepo::hash(const std::string& name)
 {
 	if (m_listOfPackages.size() == 0)
 		parse();
 
-	std::string filename(getPackageFileName(name));
+	std::string filename(fileName(name));
 
 	EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
 
 	if (!mdctx) {
 		errors();
-		return false;
+		throw std::runtime_error("Failed to create digest context");
 	}
 
 	if (1 != EVP_DigestInit_ex(mdctx,EVP_sha512(), nullptr)) {
 		errors();
 		EVP_MD_CTX_free(mdctx);
-		return false;
+		throw std::runtime_error("Failed to init digest context");
 	}
 
 	std::ifstream file(filename,std::ios::binary);
 	if(!file.is_open()) {
-		std::cerr << "Failed to open file: "
-			<< filename
-			<< std::endl;
-		return false;
+		throw std::runtime_error("Failed to open file: " + filename);
 	}
 
 	char buffer[BUFSIZ];
@@ -498,15 +508,13 @@ bool pkgrepo::hash(const std::string& name)
 		if (bytesRead > 0) {
 			if ( 1 != EVP_DigestUpdate(mdctx, buffer, bytesRead)) {
 				errors();
-				return false;
+				throw std::runtime_error("Failed to update digest context");
 			}
 		}
 	}
 
 	if (file.bad()) {
-		std::cerr << "Error reading file: "
-			<< filename
-			<< std::endl;
+		throw std::runtime_error("Failed to read file: " + filename);
 	}
 
 	unsigned char mdValue[EVP_MAX_MD_SIZE];
@@ -514,7 +522,7 @@ bool pkgrepo::hash(const std::string& name)
 
 	if ( 1 != EVP_DigestFinal_ex(mdctx, mdValue, &mdLength)) {
 		errors();
-		return false;
+		throw std::runtime_error("Failed to finalize digest context");
 	}
 
 	EVP_MD_CTX_free(mdctx);
@@ -527,7 +535,7 @@ bool pkgrepo::hash(const std::string& name)
 			<< static_cast<int>(mdValue[i]);
 
 	m_packageFileNameHash = oss.str();
-	return true;
+	return m_packageFileNameHash;
 }
 bool pkgrepo::checkHash(const std::string& name)
 {
@@ -537,7 +545,7 @@ bool pkgrepo::checkHash(const std::string& name)
 	return convertToLowerCase(m_packageFileNameHash) == convertToLowerCase(m_listOfPackages[name].hash());
 
 }
-bool pkgrepo::sign(const std::string& name)
+std::string& pkgrepo::sign(const std::string& name)
 {
 	EVP_PKEY* key = nullptr;
 	std::string keyfile(m_config.keypath());
@@ -563,14 +571,14 @@ bool pkgrepo::sign(const std::string& name)
 	if (!mdctx) {
 		errors();
 		EVP_PKEY_free(key);
-		return false;
+		throw std::runtime_error("Failed to create digest context");
 	}
 
 	if (1 != EVP_DigestSignInit(mdctx, nullptr, nullptr, nullptr, key)) {
 		errors();
 		EVP_MD_CTX_free(mdctx);
 		EVP_PKEY_free(key);
-		return false;
+		throw std::runtime_error("Failed to init digest context");
 	}
 
 	size_t sigLength = 0;
@@ -578,7 +586,7 @@ bool pkgrepo::sign(const std::string& name)
 		errors();
 		EVP_MD_CTX_free(mdctx);
 		EVP_PKEY_free(key);
-		return false;
+		throw std::runtime_error("Failed to sign digest context");
 	}
 
 	std::vector<unsigned char> signature(sigLength);
@@ -586,7 +594,7 @@ bool pkgrepo::sign(const std::string& name)
 		errors();
 		EVP_MD_CTX_free(mdctx);
 		EVP_PKEY_free(key);
-		return false;
+		throw std::runtime_error("Failed to sign digest context (pass 2)");
 	}
 
 	EVP_MD_CTX_free(mdctx);
@@ -603,7 +611,7 @@ bool pkgrepo::sign(const std::string& name)
 		EVP_PKEY_free(key);
 	EVP_cleanup();
 
-	return true;
+	return m_packageFileNameSignature;
 }
 bool pkgrepo::checkSign(const std::string& name)
 {

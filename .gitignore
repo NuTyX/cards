@@ -29,3 +29,5 @@ documentation/latex
 *.layout
 *.cbp
 build/
+.PKEY
+*.key

@@ -61,7 +61,6 @@ LIBOBJECTS =  conf.o \
 	string_utils.o \
 	archive.o \
 	pkgfile.o \
-	pkgrepo.o \
 	file_download.o \
 	file_utils.o \
 	process.o \
@@ -74,7 +73,8 @@ LIBOBJECTS =  conf.o \
 	pkgdbh.o \
 	pkgadd.o \
 	pkgrm.o \
-	pkginfo.o
+	pkginfo.o \
+	pkgrepo.o
 
 WEBOBJECTS =  conf.o \
 	system_utils.o \
@@ -102,14 +102,14 @@ HEADERS = define.h \
 	cache.h \
 	sync.h \
 	pkgfile.h \
-	pkgrepo.h \
 	file_download.h \
 	process.h \
 	runtime_dependencies_utils.h \
 	pkgdbh.h \
 	pkgadd.h \
 	pkgrm.h \
-	pkginfo.h
+	pkginfo.h \
+	pkgrepo.h
 
 CONSOLEKIT_CFLAGS = -I/usr/include/ConsoleKit/ck-connector -I/usr/include/dbus-1.0 -I/usr/lib/dbus-1.0/include
 CONSOLEKIT_LIBS = -lck-connector -ldbus-1

@@ -31,6 +31,7 @@ class pkgrepo {
     std::set<std::string>    m_binaryPackageList;
 
     std::string              m_binaryPackageInfo;
+    std::string              m_packageDirName;
     std::string              m_packageFileName;
     std::string              m_packageFileNameSignature;
     std::string              m_packageFileNameHash;
@@ -57,12 +58,12 @@ public:
 
     // Generate the hashsum for the archive file of the package name and store the result
     // in the m_packageFileNameHash member variable
-    bool                     hash(const std::string& name);
+    std::string&             hash(const std::string& name);
 
     // Generate the signature of the hashsum for the archive file of the package name
     // and store the result in the m_packageFileNameSignature member variable
     // The private key location is defined in cards.conf file.
-    bool                     sign(const std::string& name);
+    std::string&             sign(const std::string& name);
 
     // Check the Hash and signature of the archive file of the package name
     bool                     checkHash(const std::string& name);
@@ -76,12 +77,13 @@ public:
 
     time_t                   getBinaryBuildTime (const std::string& name);
 
-    std::string&             getPackageFileName(const std::string& name);
-    std::string&             getPackageFileNameSignature(const std::string& name);
-    std::string&             getPackageFileNameHash(const std::string& name);
+    std::string&             dirName(const std::string& name);
+    std::string&             fileName(const std::string& name);
+    std::string&             fileSignature(const std::string& name);
+    std::string&             fileHash(const std::string& name);
     std::string&             getBinaryPackageInfo(const std::string& name);
-    std::string&             getPackageVersion(const std::string& name);
-    unsigned short int       getPackageRelease(const std::string& name);
+    std::string&             version(const std::string& name);
+    unsigned short int       release(const std::string& name);
 
     std::vector<std::string> getListofGroups();
     std::set<std::string>&   getBinaryPackageList();
