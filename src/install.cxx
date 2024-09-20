@@ -65,7 +65,7 @@ install::install(const CardsArgumentParser& argParser,
 	}
 	getLocalePackagesList();
 	for ( auto i : getDependenciesList() ) {
-		m_packageArchiveName = getPackageFileName(i.first);
+		m_packageArchiveName = fileName(i.first);
 		archive packageArchive(m_packageArchiveName.c_str());
 		std::string name = packageArchive.name();
 		if ( checkPackageNameExist(name )) {
@@ -116,7 +116,7 @@ void install::getLocalePackagesList()
 			std::cerr << packageName << std::endl;
 #endif
 			if (checkBinaryExist(packageName)) {
-				packageFileName = getPackageFileName(packageName);
+				packageFileName = fileName(packageName);
 				if ( ! checkFileExist(packageFileName) )
 					downloadPackageFileName(packageName);
 				tmpList.insert(packageName);

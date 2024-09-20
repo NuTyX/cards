@@ -109,8 +109,8 @@ int upgrade::Isdownload()
 {
 	std::string packageNameSignature, packageName, packageFileName;
 	for (auto i : m_ListOfPackages) {
-		packageFileName = getPackageFileName(i.first);
-		packageNameSignature = getPackageFileNameSignature(packageName);
+		packageFileName = fileName(i.first);
+		packageNameSignature = fileSignature(packageName);
 		if ( ! checkFileHash(packageFileName, packageNameSignature))
 			return EXIT_FAILURE;
 	}
@@ -152,7 +152,7 @@ void upgrade::run()
 		dry();
 	else if (! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
 		for (auto i : getDependenciesList()) {
-			m_packageArchiveName=getPackageFileName(i.first);
+			m_packageArchiveName=fileName(i.first);
 			m_force=true;
 			if (checkPackageNameExist(i.first)) {
 				m_upgrade=true;
@@ -162,7 +162,7 @@ void upgrade::run()
 		run();
 		std::string p = i.first
 			+ " "
-			+ getPackageVersion(i.first);
+			+ version(i.first);
 
 		syslog(LOG_INFO,"%s upgraded",p.c_str());
 		}

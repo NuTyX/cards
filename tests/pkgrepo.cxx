@@ -1,14 +1,19 @@
 #include "../src/libcards.h"
 
 int main () {
-	cards::pkgrepo Repository("cards.conf");
+    cards::pkgrepo pkgrepo("cards.conf");
 
-	std::cout << Repository.getBinaryPackageList().size()
-			<< std::endl;
+    std::cout << pkgrepo.fileName("gcc")
+        << std::endl;
 
-	std::cout << Repository.getPackageFileName("gcc")
-			<< std::endl;
+    std::cout << pkgrepo.hash("gcc")
+        << std::endl;
 
-	return 0;
+    std::cout << pkgrepo.sign(pkgrepo.hash("gcc"))
+        << std::endl;
+
+    std::cout << pkgrepo.dirName("gcc")
+        << std::endl;
+
+    return 0;
 }
-// vim:set ts=2 :
