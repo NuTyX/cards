@@ -81,8 +81,8 @@ void pkgrm::run()
 }
 void pkgrm::printHelp() const
 {
-	std::cout << USAGE << m_utilName << " [options] <package>" << std::endl
-	     << OPTIONS << std::endl
+	std::cout << HELP_USAGE << m_utilName << " [options] <package>" << std::endl
+	     << HELP_OPTIONS << std::endl
 	     << "  -r, --root <path>   "
 	     << _("specify alternative installation root") << std::endl
 	     << "  -v, --version       "

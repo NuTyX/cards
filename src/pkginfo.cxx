@@ -460,8 +460,8 @@ void pkginfo::finish()
 }
 void pkginfo::printHelp() const
 {
-    std::cout << USAGE << m_utilName << " [options]" << std::endl
-              << OPTIONS << std::endl
+    std::cout << HELP_USAGE << m_utilName << " [options]" << std::endl
+              << HELP_OPTIONS << std::endl
               << "  -i, --installed             "
               << _("list of installed packages") << std::endl
               << "  -n, --number                "

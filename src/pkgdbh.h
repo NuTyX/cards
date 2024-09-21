@@ -27,143 +27,148 @@ struct rule_t {
 };
 
 class pkgdbh {
-public:
-    explicit pkgdbh(const std::string& name);
-    explicit pkgdbh();
-    virtual ~pkgdbh();
 
-    /* Following methods can be redefined in derivated class */
-    virtual void parseArguments(int argc, char** argv);
-    virtual void run(int argc, char** argv);
-    virtual void run() {};
+    std::set<std::string>   m_runtimeLibrariesList;
+    std::set<std::string>   m_filesList;
+    std::set<std::string>   m_listOfPackagesNames;
 
-    virtual void printHelp() const {};
+    unsigned int            m_filesNumber;
+    unsigned int            m_installedFilesNumber;
 
-    virtual void progressInfo();
-    virtual void progressInfo(cards::ActionEnum action);
-    virtual void treatErrors(const std::string& s) const;
+    bool                    m_dependency;
+    bool                    m_DB_Empty;
+    bool                    m_miniDB_Empty;
 
-    void print_version() const;
-    std::set<std::string> getListOfPackagesNames();
-    std::string getDescription(const std::string& name) const;
-    std::string getVersion(const std::string& name) const;
-    std::string getCollection(const std::string& name) const;
-    std::string getSets(const std::string& name) const;
-    std::set<std::string> getSetOfSets(const std::string& name) const;
-    std::string getArch(const std::string& name) const;
-    std::string getLicense(const std::string& name) const;
-    std::string getCategories(const std::string& name) const;
-    std::set<std::string> getSetOfCategories(const std::string& name) const;
-    std::set<std::string> getSetOfFiles(const std::string& packageName);
+    void                    runLastPostInstall();
+    std::string             getSingleItem(const std::string& PackageName, const char i) const;
 
-    int getSize(const std::string& name) const;
-    int getRelease(const std::string& name) const;
-
-    void buildSimpleDatabase();
-
-    bool
-    checkPackageNameUptodate(archive& archiveName);
-    bool
-    checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName);
-    bool
-    checkPackageNameBuildDateSame(const std::pair<std::string, time_t>& dependencieNameBuild);
-
-    bool checkPackageNameExist(const std::string& name) const;
-    bool checkDependency(const std::string& name);
-    void setDependency();
-    void resetDependency();
-
-    unsigned int getFilesNumber();
-    unsigned int getInstalledFilesNumber();
-    std::set<std::string> getFilesList();
+    std::set<std::string>   getSetOfItems(const std::string& PackageName, const char i) const;
 
 protected:
     // Database
 
-    int getListOfPackagesNames(const std::string& path);
-    std::pair<std::string, cards::db> getInfosPackage(const std::string& packageName);
+    int                     getListOfPackagesNames(const std::string& path);
+    std::pair<std::string, cards::db>
+                            getInfosPackage(const std::string& packageName);
 
-    void buildSimpleDependenciesDatabase();
-    void buildCompleteDatabase(const bool& silent);
-    void buildDatabase(const bool& progress,
-        const bool& simple,
-        const bool& all,
-        const bool& files,
-        const std::string& packageName);
+    void                    buildSimpleDependenciesDatabase();
+    void                    buildCompleteDatabase(const bool& progress);
+    void                    buildDatabase(const bool& progress,
+                                const bool& simple,
+                                const bool& all,
+                                const bool& files,
+                                const std::string& packageName);
 
-    void addPackageFilesRefsToDB(const std::string& name,
-        const cards::db& info);
+    void                    addPackageFilesRefsToDB(const std::string& name,
+                                const cards::db& info);
 
-    /*
+    /**
      * Remove the physical files after followings some rules
      */
-    void removePackageFiles(const std::string& name);
-    void removePackageFiles(const std::string& name,
-        const std::set<std::string>& keep_list);
+    void                    removePackageFiles(const std::string& name);
+    void                    removePackageFiles(const std::string& name,
+                                const std::set<std::string>& keep_list);
 
-    /*
+    /**
      * Remove meta data about the removed package
      */
-    void removePackageFilesRefsFromDB(const std::string& name);
-    void removePackageFilesRefsFromDB(std::set<std::string> files,
-        const std::set<std::string>& keep_list);
+    void                    removePackageFilesRefsFromDB(const std::string& name);
+    void                    removePackageFilesRefsFromDB(std::set<std::string> files,
+                                const std::set<std::string>& keep_list);
 
-    std::set<std::string>
-    getConflictsFilesList(const std::string& name, cards::db& info);
+    std::set<std::string>   getConflictsFilesList(const std::string& name, cards::db& info);
 
     // Archive Package handling
-    std::pair<std::string, cards::db> openArchivePackage(const std::string& filename);
-    void extractAndRunPREfromPackage(const std::string& filename);
-    void installArchivePackage(const std::string& filename,
-        const std::set<std::string>& keep_list,
-        const std::set<std::string>& non_install_files);
+    std::pair<std::string, cards::db>
+                            openArchivePackage(const std::string& filename);
+    void                    extractAndRunPREfromPackage(const std::string& filename);
+    void                    installArchivePackage(const std::string& filename,
+                                const std::set<std::string>& keep_list,
+                                const std::set<std::string>& non_install_files);
 
-    /*
+    /**
      * The folder holding the meta datas is going to be create here
      */
-    void moveMetaFilesPackage(const std::string& name, cards::db& info);
+    void                    moveMetaFilesPackage(const std::string& name, cards::db& info);
 
-    void readRulesFile();
-    void getInstallRulesList(const std::vector<rule_t>& rules,
-        cards::rule_event_t event, std::vector<rule_t>& found) const;
+    void                    readRulesFile();
+    void                    getInstallRulesList(const std::vector<rule_t>& rules,
+                                cards::rule_event_t event, std::vector<rule_t>& found) const;
 
-    bool checkRuleAppliesToFile(const rule_t& rule,
-        const std::string& file);
+    bool                    checkRuleAppliesToFile(const rule_t& rule,
+                                const std::string& file);
 
-    void getFootprintPackage(std::string& filename);
+    void                    getFootprintPackage(std::string& filename);
 
-    std::string m_packageName;
-    std::string m_packageArchiveVersion;
-    std::string m_packageArchiveRelease;
-    std::string m_packageArchiveCollection;
-    std::string m_packageVersion;
-    std::string m_packageRelease;
-    std::string m_packageCollection;
-    std::string m_utilName;
-    std::string m_root;
-    std::vector<rule_t> m_actionRules;
-    std::set<std::pair<std::string, int>> m_postInstallList;
-    alias_t m_listOfAlias;
+    std::string             m_packageName;
+    std::string             m_packageArchiveVersion;
+    std::string             m_packageArchiveRelease;
+    std::string             m_packageArchiveCollection;
+    std::string             m_packageVersion;
+    std::string             m_packageRelease;
+    std::string             m_packageCollection;
+    std::string             m_utilName;
+    std::string             m_root;
+    std::vector<rule_t>     m_actionRules;
+    std::set<std::pair<std::string, int>>
+                            m_postInstallList;
+    alias_t                 m_listOfAlias;
 
-    packages_t m_listOfPackages;
+    packages_t              m_listOfPackages;
 
-    std::set<std::pair<std::string, std::set<std::string>>> m_listOfPackagesWithDeps;
+    std::set<std::pair<std::string, std::set<std::string>>>
+                            m_listOfPackagesWithDeps;
 
-    cards::ActionEnum m_actualAction;
-    cards::ErrorEnum m_actualError;
+    cards::ActionEnum       m_actualAction;
+    cards::ErrorEnum        m_actualError;
 
-private:
-    void runLastPostInstall();
-    std::string getSingleItem(const std::string& PackageName, const char i) const;
-    std::set<std::string> getSetOfItems(const std::string& PackageName, const char i) const;
-    std::set<std::string> m_runtimeLibrariesList;
-    std::set<std::string> m_filesList;
-    std::set<std::string> m_listOfPackagesNames;
-    unsigned int m_filesNumber;
-    unsigned int m_installedFilesNumber;
+public:
+    /**
+     * Constructors
+    */
+    explicit                pkgdbh(const std::string& name);
+    explicit                pkgdbh();
+    virtual                 ~pkgdbh();
 
-    bool m_dependency;
+    /**
+     *  Following methods can be redefined in derivated class
+     *
+     */
+    virtual void            parseArguments(int argc, char** argv);
+    virtual void            run(int argc, char** argv);
+    virtual void            run() {};
+    virtual void            printHelp() const {};
+    virtual void            progressInfo();
+    virtual void            progressInfo(cards::ActionEnum action);
+    virtual void            treatErrors(const std::string& s) const;
 
-    bool m_DB_Empty;
-    bool m_miniDB_Empty;
+    void                    print_version() const;
+    void                    buildSimpleDatabase();
+    void                    setDependency();
+    void                    resetDependency();
+
+    std::set<std::string>   getListOfPackagesNames();
+    std::string             getDescription(const std::string& name) const;
+    std::string             getVersion(const std::string& name) const;
+    std::string             getCollection(const std::string& name) const;
+    std::string             getSets(const std::string& name) const;
+    std::set<std::string>   getSetOfSets(const std::string& name) const;
+    std::string             getArch(const std::string& name) const;
+    std::string             getLicense(const std::string& name) const;
+    std::string             getCategories(const std::string& name) const;
+    std::set<std::string>   getSetOfCategories(const std::string& name) const;
+    std::set<std::string>   getSetOfFiles(const std::string& packageName);
+    std::set<std::string>   getFilesList();
+
+    unsigned int            getFilesNumber();
+    unsigned int            getInstalledFilesNumber();
+    unsigned int            getSize(const std::string& name) const;
+    unsigned int            getRelease(const std::string& name) const;
+
+    bool                    checkPackageNameUptodate(archive& archiveName);
+    bool                    checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName);
+    bool                    checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild);
+    bool                    checkPackageNameExist(const std::string& name) const;
+    bool                    checkDependency(const std::string& name);
+
 };

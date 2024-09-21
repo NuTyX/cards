@@ -184,8 +184,8 @@ void pkgadd::postRun()
 }
 void pkgadd::printHelp() const
 {
-	std::cout << USAGE << m_utilName << " [options] <file>" << std::endl
-	<< OPTIONS << std::endl
+	std::cout << HELP_USAGE << m_utilName << " [options] <file>" << std::endl
+	<< HELP_OPTIONS << std::endl
 	<< "  -i, --ignore        "
 	<< _("do not execute pre/post install scripts")
 	<< std::endl

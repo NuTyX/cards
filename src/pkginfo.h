@@ -12,27 +12,30 @@
 #include <sstream>
 
 class pkginfo : public pkgdbh {
+
+protected:
+    std::string     m_arg;
+    int             m_runtimedependencies_mode;
+    int             m_footprint_mode;
+    int             m_archiveinfo;
+    int             m_metainfo;
+    int             m_installed_mode;
+    int             m_number_mode;
+    int             m_list_mode;
+    int             m_owner_mode;
+    int             m_details_mode;
+    int             m_libraries_mode;
+    int             m_runtime_mode;
+    int             m_epoc;
+    bool            m_fulllist_mode;
+
 public:
     pkginfo(const std::string& commandName);
     pkginfo();
-    virtual void parseArguments(int argc, char** argv);
-    virtual void run();
-    virtual void finish();
-    virtual void printHelp() const;
 
-protected:
-    std::string m_arg;
-    int m_runtimedependencies_mode;
-    int m_footprint_mode;
-    int m_archiveinfo;
-    int m_metainfo;
-    int m_installed_mode;
-    int m_number_mode;
-    int m_list_mode;
-    int m_owner_mode;
-    int m_details_mode;
-    int m_libraries_mode;
-    int m_runtime_mode;
-    int m_epoc;
-    bool m_fulllist_mode;
+    virtual void    parseArguments(int argc, char** argv);
+    virtual void    run();
+    virtual void    finish();
+    virtual void    printHelp() const;
+
 };

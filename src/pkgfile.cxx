@@ -193,7 +193,7 @@ ports_t& pkgfile::getListOfPackages()
 
     return m_listOfPackages;
 }
-std::vector<std::string> pkgfile::getBadDependencies()
+std::vector<std::string>& pkgfile::badDependencies()
 {
     if (m_listOfPackages.size() == 0)
         parse();

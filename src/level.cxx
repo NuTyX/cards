@@ -23,7 +23,7 @@ void level::print()
         ++level;
         found = false;
     }
-    for (auto i : getBadDependencies())
+    for (auto i : badDependencies())
         std::cout << i
                   << std::endl;
 }

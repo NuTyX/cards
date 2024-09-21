@@ -288,31 +288,31 @@ void pkgrepo::parse()
 				}
 			}
 			if (pkgFound)
-				if (p[0] == 'D')
+				if (p[0] == DESCRIPTION)
 					info.description(p.substr(1));
 			if (pkgFound)
-				if (p[0] == 'U')
+				if (p[0] == URL)
 					info.url(p.substr(1));
 			if (pkgFound)
-				if (p[0] == 'L')
+				if (p[0] == LICENSE)
 					info.license(p.substr(1));
 			if (pkgFound)
-				if (p[0] == 'M')
+				if (p[0] == MAINTAINER)
 					info.maintainer(p.substr(1));
 			if (pkgFound)
-				if (p[0] == 'C')
+				if (p[0] == CONTRIBUTORS)
 					info.contributors(p.substr(1));
 			if (pkgFound)
-				if (p[0] == 'c')
+				if (p[0] == COLLECTION)
 					info.collection(p.substr(1));
 			if (pkgFound)
-				if (p[0] == 'g')
+				if (p[0] == GROUP)
 					info.group(p.substr(1));
 			if (pkgFound)
-				if (p[0] == 'P')
+				if (p[0] == PACKAGER)
 					info.packager(p.substr(1));
 			if (pkgFound)
-				if (p[0] == 's') {
+				if (p[0] == SETS) {
 					pkgSet.insert(p.substr(1));
 				}
 			if (pkgFound)

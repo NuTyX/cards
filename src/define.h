@@ -22,12 +22,12 @@
 #define WHITE "\033[1;37m"
 #define NORMAL "\033[1;0m"
 
-#define ACTION _("\033[1;33maction:\033[1;0m")
-#define USAGE _("\033[1;33musage: \033[1;0m")
-#define OPTIONS _("\033[1;33moptions\033[1;0m")
-#define REQUIRED _("\033[1;33mrequired\033[1;0m")
-#define DESCRIPTION _("\033[1;33mdescription: \033[1;0m")
-#define COMMAND _("\033[1;34mcommand\033[1;0m")
+#define HELP_ACTION _("\033[1;33maction:\033[1;0m")
+#define HELP_USAGE _("\033[1;33musage: \033[1;0m")
+#define HELP_OPTIONS _("\033[1;33moptions\033[1;0m")
+#define HELP_REQUIRED _("\033[1;33mrequired\033[1;0m")
+#define HELP_DESCRIPTION _("\033[1;33mdescription: \033[1;0m")
+#define HELP_COMMAND _("\033[1;34mcommand\033[1;0m")
 
 #define CARDS_CONF_FILE "/etc/cards.conf"
 #define NUTYX_VERSION_FILE "/var/lib/pkg/nutyx-version"
@@ -51,12 +51,32 @@
 #define PKG_DB_DIR "var/lib/pkg/DB/"
 
 #define PKG_FILES "/files"
-#define PKG_META "META"
+#define PKG_META "/META"
 #define PKG_RECEPT "/Pkgfile"
 #define PKG_REPO "/.REPO"
 #define PKG_README "README"
 #define PKG_PRE_INSTALL ".PRE"
 #define PKG_POST_INSTALL ".POST"
+
+// Package Attributes
+#define CONTRIBUTORS 'C'
+#define DESCRIPTION  'D'
+#define URL 'U'
+#define PACKAGER 'P'
+#define VERSION 'V'
+#define MAINTAINER 'M'
+#define BUILD 'B'
+#define LICENSE 'L'
+#define RELEASE 'r'
+#define ALIAS 'A'
+#define RUNTIME_DEPENDENCY 'R'
+#define SETS 's'
+#define SPACE 'S'
+#define GROUP 'g'
+#define COLLECTION 'c'
+#define CATEGORIES 'T'
+#define ARCHITECTURE 'a'
+
 
 #define PKG_REJECTED "var/lib/pkg/rejected"
 #define PKGADD_CONF "var/lib/pkg/pkgadd.conf"

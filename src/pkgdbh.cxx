@@ -286,7 +286,7 @@ std::set<std::string> pkgdbh::getListOfPackagesNames()
 }
 std::string pkgdbh::getSingleItem(const std::string& PackageName, const char i) const
 {
-	const std::string metaFile = m_root + PKG_DB_DIR + PackageName + '/' + PKG_META;
+	const std::string metaFile = m_root + PKG_DB_DIR + PackageName + PKG_META;
 	std::set<std::string> fileContent;
 	parseFile(fileContent,metaFile.c_str());
 	std::string item;
@@ -300,7 +300,7 @@ std::string pkgdbh::getSingleItem(const std::string& PackageName, const char i) 
 }
 std::set<std::string> pkgdbh::getSetOfItems(const std::string& PackageName, const char i) const
 {
-	const std::string metaFile = m_root + PKG_DB_DIR + PackageName + '/' + PKG_META;
+	const std::string metaFile = m_root + PKG_DB_DIR + PackageName + PKG_META;
 	std::set<std::string> fileContent;
 	parseFile(fileContent,metaFile.c_str());
 	std::set<std::string> setOfItems;
@@ -353,19 +353,19 @@ std::string pkgdbh::getLicense(const std::string& name) const
 {
 	return getSingleItem(name,'L');
 }
-int pkgdbh::getSize(const std::string& name) const
+unsigned int pkgdbh::getSize(const std::string& name) const
 {
 	std::string r = getSingleItem(name,'S');
 	return atoi(r.c_str());
 }
-int pkgdbh::getRelease(const std::string& name) const
+unsigned int pkgdbh::getRelease(const std::string& name) const
 {
 	std::string r = getSingleItem(name,'r');
 	return atoi(r.c_str());
 }
-/* Append to the "DB" the number of packages founds
- * (directory containing a file named files
- * */
+
+// Append to the "DB" the number of packages founds
+// (directory containing a file named files
 int pkgdbh::getListOfPackagesNames (const std::string& path)
 {
 	if (! m_listOfPackagesNames.empty())
@@ -387,7 +387,7 @@ int pkgdbh::getListOfPackagesNames (const std::string& path)
 	return m_listOfPackagesNames.size();
 }
 
-/* get details info of a package */
+// get details info of a package
 std::pair<std::string, cards::db>
 pkgdbh::getInfosPackage( const std::string& packageName )
 {
@@ -450,16 +450,12 @@ pkgdbh::buildDatabase(const bool& progress,
 		const std::string& packageName)
 {
 	using namespace cards;
-	/*
-	 * This part is done in every cases
-	 */
+
+          // This part is done in every cases
 	cleanupMetaFiles(m_root);
-	if (progress) {
+	if (progress)
 		progressInfo(ACTION_ENUM_DB_OPEN_START);
-	}
-#ifdef DEBUG
-	std::cerr << "m_root: " << m_root << std::endl;
-#endif
+
 	if (m_listOfPackagesNames.empty() )
 		getListOfPackagesNames (m_root);
 
@@ -470,13 +466,12 @@ pkgdbh::buildDatabase(const bool& progress,
 		const std::string metaFile = m_root
 		+ PKG_DB_DIR
 		+ name
-		+ '/'
 		+ PKG_META;
 		std::set<std::string> fileContent;
 		parseFile(fileContent,metaFile.c_str());
 		m_listOfAlias[name] = name;
 		for ( auto s : fileContent) {
-			if ( s[0] != 'A' )
+			if (s[0] != ALIAS)
 				break;
 			m_listOfAlias[s.substr(1)] = name;
 		}
@@ -508,41 +503,40 @@ pkgdbh::buildDatabase(const bool& progress,
 			const std::string metaFile = m_root
 			+ PKG_DB_DIR
 			+ pkgName
-			+ '/'
 			+ PKG_META;
 			std::set<std::string> fileContent;
 			parseFile(fileContent,metaFile.c_str());
 			m_listOfAlias[pkgName] = pkgName;
 			unsigned short flags = 0;
 			info.release(1);
-			for ( auto s : fileContent) {
-				if ( s[0] == 'B' ) {
+			for (auto s : fileContent) {
+				if (s[0] == BUILD) {
 					info.build(strtoul(s.substr(1).c_str(),nullptr,0));
 					flags++;
 				}
-				if ( s[0] == 'V' ) {
+				if (s[0] == VERSION){
 					info.version(s.substr(1));
 					flags=flags + 2;
 				}
-				if ( s[0] == 'c' ) {
+				if (s[0] == COLLECTION) {
 					info.collection(s.substr(1));
 					flags = flags + 4;
 				}
-				/* As a group is not always present we cannot
-				 * depend on a found one to break */
-				if ( s[0] == 'g' ) {
+				// As a group is not always present we cannot
+				// depend on a found one to break
+				if (s[0] == GROUP)
 					info.group(s.substr(1));
-				}
-				/* As a std::set is not always present we cannot
-				 * depen on a found one to break */
-				if ( s[0] == 's' ) {
+
+				// As a std::set is not always present we cannot
+				// depen on a found one to break
+				if (s[0] == SETS) {
 					sets.insert(s.substr(1));
 				}
-				if ( s[0] == 'r' ) {
+				if (s[0] == RELEASE) {
 					info.release(atoi(s.substr(1).c_str()));
 					flags = flags + 8;
 				}
-				if ( flags == 15 ) {
+				if (flags == 15) {
 					info.sets(sets);
 					m_listOfPackages[pkgName] = info;
 					break;
@@ -551,9 +545,7 @@ pkgdbh::buildDatabase(const bool& progress,
 		}
 	}
 	if (progress)
-	{
-		progressInfo(ACTION_ENUM_DB_OPEN_END);
-	}
+            progressInfo(ACTION_ENUM_DB_OPEN_END);
 }
 
 /**
@@ -566,15 +558,15 @@ pkgdbh::buildSimpleDependenciesDatabase()
 {
 	if (m_listOfPackagesNames.empty() )
 			getListOfPackagesNames (m_root);
-	for ( auto i : m_listOfPackagesNames) {
+
+	for (auto i : m_listOfPackagesNames) {
 		std::pair < std::string, std::set<std::string> > packageWithDeps;
 		packageWithDeps.first=i;
-		const std::string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
+		const std::string metaFile = m_root + PKG_DB_DIR + i + PKG_META;
 			std::set<std::string> fileContent;
 			parseFile(fileContent,metaFile.c_str());
-		for (auto attribute : fileContent) {
-			if ( attribute[0] == 'R' ) {
-				std::string s = attribute;
+		for (auto s : fileContent) {
+			if (s[0] == RUNTIME_DEPENDENCY) {
 				std::string dependency = s.substr(1,s.size()-11);
 				packageWithDeps.second.insert(dependency);
 			}
@@ -600,9 +592,10 @@ pkgdbh::buildSimpleDatabase()
 	if (m_miniDB_Empty) {
 		if (m_listOfPackagesNames.empty() )
 			getListOfPackagesNames (m_root);
+
 		for ( auto i : m_listOfPackagesNames) {
 			cards::db info;
-			const std::string metaFile = m_root + PKG_DB_DIR + i + '/' + PKG_META;
+			const std::string metaFile = m_root + PKG_DB_DIR + i + PKG_META;
 			std::set<std::string> fileContent;
 			parseFile(fileContent,metaFile.c_str());
 			info.release(1);
@@ -611,30 +604,30 @@ pkgdbh::buildSimpleDatabase()
 			std::set<std::string> alias;
 			m_listOfAlias[i] = i;
 			for (auto s : fileContent) {
-				if ( s[0] == 'c' ) {
+				if (s[0] == COLLECTION)
 					info.collection(s.substr(1));
-				}
-				if ( s[0] == 's' ) {
+
+				if (s[0] == SETS)
 					sets.insert(s.substr(1));
-				}
-				if ( s[0] == 'V' ) {
+
+				if (s[0] == VERSION)
 					info.version(s.substr(1));
-				}
-				if ( s[0] == 'r' ) {
+
+				if (s[0] == RELEASE)
 					info.release(atoi(s.substr(1).c_str()));
-				}
-				if ( s[0] == 'B' ) {
+
+				if (s[0] == BUILD)
 					info.build(strtoul(s.substr(1).c_str(),nullptr,0));
-				}
-				if ( s[0] == 'g' ) {
+
+				if (s[0] == GROUP)
 					info.group(s.substr(1));
-				}
-				if ( s[0] == 'A' ) {
+
+				if (s[0] == ALIAS)
 					alias.insert(s.substr(1));
-				}
-				if ( s[0] == 'P' ) {
+
+				if (s[0] == PACKAGER)
 					info.packager(s.substr(1));
-				}
+
 				if ( s[0] == 'd' ) {
 					if ( s == "d1" )
 						info.dependency(true);
@@ -658,28 +651,24 @@ pkgdbh::buildSimpleDatabase()
  /**
  * Populate the database with all details infos
  */
-void pkgdbh::buildCompleteDatabase(const bool& silent)
+void pkgdbh::buildCompleteDatabase(const bool& progress)
 {
 	using namespace cards;
 	cleanupMetaFiles(m_root);
 	if (m_DB_Empty) {
-		if (m_listOfPackagesNames.empty() )
+		if (m_listOfPackagesNames.empty())
 			getListOfPackagesNames (m_root);
 
-		if (!silent) {
+		if (progress)
 			progressInfo(ACTION_ENUM_DB_OPEN_START);
-		}
-#ifdef DEBUG
-		std::cerr << "m_root: " << m_root<< std::endl;
-#endif
 
 		for (auto i : m_listOfPackagesNames) {
-			if (!silent) {
+			if (progress)
 				progressInfo(ACTION_ENUM_DB_OPEN_RUN);
-			}
+
 			cards::db info;
 			const std::string metaFileDir = m_root + PKG_DB_DIR + i;
-			const std::string metaFile = metaFileDir + '/' + PKG_META;
+			const std::string metaFile = metaFileDir + PKG_META;
 			info.install( getEpochModifyTimeFile(metaFileDir) );
 			std::set<std::pair<std::string,time_t>> dependencies;
 			std::set<std::string> fileContent;
@@ -691,60 +680,60 @@ void pkgdbh::buildCompleteDatabase(const bool& silent)
 			info.dependency(false);
 			m_listOfAlias[i] = i;
 			for (auto s : fileContent) {
-				if ( s[0] == 'C' ) {
-					info.contributors( s.substr(1) );
+				if (s[0] == CONTRIBUTORS)
+					info.contributors(s.substr(1));
+
+				if (s[0] == DESCRIPTION)
+					info.description(s.substr(1)) ;
+
+				if (s[0] == BUILD)
+					info.build(strtoul(s.substr(1).c_str(),nullptr,0));
+
+				if (s[0] == URL)
+					info.url(s.substr(1));
+
+				if (s[0] == LICENSE)
+					info.license(s.substr(1));
+
+				if (s[0] == MAINTAINER)
+					info.maintainer(s.substr(1));
+
+				if (s[0] == PACKAGER)
+					info.packager( s.substr(1));
+
+				if (s[0] == VERSION)
+					info.version( s.substr(1));
+
+				if ( s[0] == RELEASE) {
+					info.release(atoi(s.substr(1).c_str()));
 				}
-				if ( s[0] == 'D' ) {
-					info.description( s.substr(1) );
-				}
-				if ( s[0] == 'B' ) {
-					info.build( strtoul(s.substr(1).c_str(),nullptr,0) );
-				}
-				if ( s[0] == 'U' ) {
-					info.url( s.substr(1) );
-				}
-				if ( s[0] == 'L' ) {
-					info.license( s.substr(1) );
-				}
-				if ( s[0] == 'M' ) {
-					info.maintainer( s.substr(1) );
-				}
-				if ( s[0] == 'P' ) {
-					info.packager( s.substr(1) );
-				}
-				if ( s[0] == 'V' ) {
-					info.version( s.substr(1) );
-				}
-				if ( s[0] == 'r' ) {
-					info.release( atoi(s.substr(1).c_str()) );
-				}
-				if ( s[0] == 'a' ) {
-					info.arch( s.substr(1) );
-				}
-				if ( s[0] == 'c' ) {
+				if (s[0] == ARCHITECTURE)
+					info.arch(s.substr(1));
+
+				if (s[0] == COLLECTION)
 					info.collection(s.substr(1));
-				}
-				if ( s[0] == 's' ) {
+
+				if ( s[0] == SETS ) {
 					sets.insert(s.substr(1));
 				}
-				if ( s[0] == 'g' ) {
+				if ( s[0] == GROUP ) {
 					info.group( s.substr(1) );
 				}
 				if ( s[0] == 'd' ) {
 					if ( s == "d1" )
 						info.dependency(true);
 				}
-				if ( s[0] == 'S' ) {
+				if (s[0] == SPACE) {
 					info.space( atoi(s.substr(1).c_str()) );
 				}
-				if ( s[0] == 'A' ) {
+				if (s[0] == ALIAS) {
 					alias.insert(s.substr(1));
 					m_listOfAlias[s.substr(1)] = i;
 				}
-				if ( s[0] == 'T' ) {
+				if (s[0] == CATEGORIES)
 					categories.insert(s.substr(1));
-				}
-				if ( s[0] == 'R' ) {
+
+				if (s[0] == RUNTIME_DEPENDENCY) {
 					std::pair<std::string,time_t > NameEpoch;
 					NameEpoch.first=s.substr(1,s.size()-11);
 					NameEpoch.second=strtoul((s.substr(s.size()-10)).c_str(),nullptr,0);
@@ -781,15 +770,9 @@ void pkgdbh::buildCompleteDatabase(const bool& silent)
 				}
 			}
 		}
-#ifdef DEBUG
-		std::cerr << std::endl;
-		std::cerr << m_listOfPackages.size()
-		<< " packages found in database " << std::endl;
-#endif
-		if (!silent)
-		{
+		if (progress)
 			progressInfo(ACTION_ENUM_DB_OPEN_END);
-		}
+
 		m_DB_Empty=false;
 	}
 }
@@ -802,20 +785,17 @@ void pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 
 	for (auto i: info.files)
 	{
-		if ( i[0] == '.' ) {
-#ifdef DEBUG
-			std::cout << "i: " << i << std::endl;
-#endif
+		if (i[0] == '.')
 			metaFilesList.insert(metaFilesList.end(), i );
-		}
+
 	}
 	for ( auto i : metaFilesList) info.files.erase(i);
 	removeFile ( m_root, "/.MTREE");
-	metaFilesList.insert(".META");
+	metaFilesList.insert(METAFILE);
 	std::set<std::string> fileContent;
-	if ( parseFile(fileContent,".META") == -1 ) {
+	if ( parseFile(fileContent,METAFILE) == -1 ) {
 		m_actualError = cards::ERROR_ENUM_CANNOT_FIND_FILE;
-		treatErrors(".META");
+		treatErrors(METAFILE);
 	}
 
 	mkdir(packagenamedir.c_str(),0755);
@@ -829,7 +809,7 @@ void pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 			m_actualError = cards::ERROR_ENUM_CANNOT_RENAME_FILE;
 			treatErrors( i + " to " + file);
 		}
-		if ( i == ".POST" ) {
+		if ( i == PKG_POST_INSTALL ) {
 			if (copyFile(i.c_str(), file.c_str()) == -1) {
 				m_actualError = cards::ERROR_ENUM_CANNOT_COPY_FILE;
 				treatErrors( file  + " to " + i);
@@ -837,7 +817,7 @@ void pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 		}
 	}
 	if (m_dependency) {
-		std::string file = packagenamedir + "/META";
+		std::string file = packagenamedir + PKG_META;
 		fileContent.insert("d1");
 		std::ofstream out(file);
 		for ( auto i: fileContent) out << i << std::endl;
@@ -1739,7 +1719,7 @@ void pkgdbh::getFootprintPackage(std::string& filename)
 
 void pkgdbh::print_version() const
 {
-	std::cout << m_utilName << " (cards) " << VERSION << std::endl;
+	std::cout << m_utilName << " (cards) " << PACKAGE_VERSION << std::endl;
 }
 
 unsigned int pkgdbh::getFilesNumber()

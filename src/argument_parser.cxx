@@ -344,22 +344,22 @@ std::string ArgParser::generateHelpForCommand(const std::string& command) const
 
 	const Command * const  cmd = cit->second;
 	std::string help = "";
-	help += ACTION;
+	help += HELP_ACTION;
 	help += "\n  " + cmd->shortInfo;
 	help += "\n\n";
-	help += USAGE;
+          help += HELP_USAGE;
 	help += "\n  " ;
 	help += BLUE + m_appName + " " + cmd->name + " ";
-	help += OPTIONS;
+	help += HELP_OPTIONS;
 	help += " " + cmd->otherArguments + "\n\n";
-	help += DESCRIPTION;
+	help += HELP_DESCRIPTION;
 	help += "\n  " + cmd->description;
 	help += "\n\n";
 
 
 	std::map<int, Option*>::const_iterator it = cmd->mandatoryOptions.begin();
 	if (it != cmd->mandatoryOptions.end()) {
-		help += REQUIRED;
+		help += HELP_REQUIRED;
 		help += ":\n";
 		for (; it != cmd->mandatoryOptions.end(); ++it) {
 			help += generateOptionString(it->second);
@@ -368,7 +368,7 @@ std::string ArgParser::generateHelpForCommand(const std::string& command) const
 
 	it = cmd->options.begin();
 	if (it != cmd->options.end()) {
-		help += OPTIONS;
+		help += HELP_OPTIONS;
 		help += ":\n";
 		for (; it != cmd->options.end(); ++it) {
 			help += generateOptionString(it->second);
@@ -412,14 +412,14 @@ std::string ArgParser::generateOptionString(Option* o) const
 std::string ArgParser::generateUsage() const
 {
 	std::string usage = getAppIdentification() +
-  	USAGE;
+  	HELP_USAGE;
 	usage += " ";
 	usage += BLUE + m_appName + " ";
-	usage += COMMAND;
+	usage += HELP_COMMAND;
 	usage += " ";
-	usage += OPTIONS;
+	usage += HELP_OPTIONS;
 	usage += _(" <arguments>\n\n Where ");
-	usage += COMMAND;
+	usage += HELP_COMMAND;
 	usage += _(" is one of the following:\n\n");
 
 	std::map<std::string, Command*>::const_iterator it;

@@ -12,7 +12,7 @@ class port : public pkg {
 
     // The index Name used to check
     // if dependencies is valid
-    unsigned int m_index;
+    unsigned int    m_index;
 
     // The level of dependency:
     // 0: No dependency
@@ -20,7 +20,7 @@ class port : public pkg {
     // 2: some deps from level 1 dependencies
     // 3: ... 2  ...
     // etc
-    int m_level;
+    int             m_level;
 
     // number of removed dependencies
     // when searching them
@@ -28,15 +28,17 @@ class port : public pkg {
 
     // number of dependencies that are still
     // need to be treated
-    int m_decount;
+    int             m_decount;
 
     // Dependencies made of index Name
     // This list validate all the dependencies
     // as they are pointing the actual name via
     // they index
-    std::vector<unsigned int> m_indexes;
+    std::vector<unsigned int>
+                    m_indexes;
 
-    std::set<std::string> m_dependencies;
+    std::set<std::string>
+                    m_dependencies;
 
 public:
     port()
@@ -99,14 +101,14 @@ typedef std::map<std::string, cards::port> ports_t;
 
 class pkgfile {
 
-    std::string m_configFileName;
-    cards::conf m_config;
-    ports_t m_listOfPackages;
-    std::vector<std::string> m_badDependencies;
-    unsigned int m_level;
+    std::string                 m_configFileName;
+    cards::conf                 m_config;
+    ports_t                     m_listOfPackages;
+    std::vector<std::string>    m_badDependencies;
+    unsigned int                m_level;
 
-    void parse();
-    void generate_level();
+    void                        parse();
+    void                        generate_level();
 
 public:
     pkgfile(const std::string& fileName);
@@ -116,49 +118,49 @@ public:
      * check that all the dependencies exist in each package
      *
      */
-    void confirmDependencies();
+    void                        confirmDependencies();
 
     /**
      * return the set of dependencies of the port name
      *
      */
-    std::set<std::string> getDependencies(const std::string& portName);
+    std::set<std::string>       getDependencies(const std::string& portName);
 
     /**
      * return the version of the port name
      *
      */
-    std::string getPortVersion(const std::string& portName);
+    std::string                getPortVersion(const std::string& portName);
 
     /**
      * return the folder of the port name
      *
      */
-    std::string getPortDir(const std::string& portName);
+    std::string                getPortDir(const std::string& portName);
 
     /**
      * return the release of the port name
      *
      */
-    unsigned short int getPortRelease(const std::string& portName);
+    unsigned short int          getPortRelease(const std::string& portName);
 
     /**
      * return true if port name exist
      *
      */
-    bool checkPackageNameExist(const std::string& name);
+    bool                        checkPackageNameExist(const std::string& name);
 
     /**
      * return the list of found Packages
      *
      */
-    ports_t& getListOfPackages();
+    ports_t&                    getListOfPackages();
 
     /**
      * return the list of bad Dependencies
      *
      */
-    std::vector<std::string> getBadDependencies();
+    std::vector<std::string>&   badDependencies();
 };
 
 } // end of 'cards' namespace
