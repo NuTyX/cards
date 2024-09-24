@@ -93,6 +93,7 @@ void archive::extractFileContent
             entry_size = archive_entry_size(ae);
             char* fC = (char*)malloc(entry_size);
             archive_read_data(ar, fC, entry_size);
+            fC[entry_size-1] = '\0';
             list = parseDelimitedVectorList(fC,'\n');
             free(fC);
             break;
@@ -341,7 +342,7 @@ std::string archive::builddate()
             break;
         }
     }
-    time_t ct = strtoul(buildtime.c_str(), NULL, 0);
+    time_t ct = strtoul(buildtime.c_str(), nullptr, 0);
     c_time_s = ctime(&ct);
     std::string build = c_time_s;
     return build;
@@ -361,7 +362,7 @@ time_t archive::build()
     time_t epochVal = 0;
     for (auto epochSVal : m_contentMeta) {
         if (epochSVal[0] == 'B') {
-            epochVal = strtoul((epochSVal.substr(1)).c_str(), NULL, 0);
+            epochVal = strtoul((epochSVal.substr(1)).c_str(), nullptr, 0);
             return epochVal;
             break;
         }
