@@ -3,6 +3,7 @@
 #pragma once
 
 #include "sync.h"
+#include "pkgadd.h"
 #include "pkgrepo.h"
 #include "cards_argument_parser.h"
 
