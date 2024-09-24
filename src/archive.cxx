@@ -116,7 +116,7 @@ void archive::getRunTimeDependenciesEpoch()
 void archive::getRunTimeDependencies()
 {
     for (auto dependency : m_contentMeta) {
-        if (dependency[0] == 'R') {
+        if (dependency[0] == RUNTIME_DEPENDENCY) {
             m_rtDependenciesList.insert(dependency.substr(1));
         }
     }
@@ -124,7 +124,7 @@ void archive::getRunTimeDependencies()
 void archive::getAliasList()
 {
     for (auto i : m_contentMeta) {
-        if (i[0] == 'A') {
+        if (i[0] == ALIAS) {
             m_aliasList.insert(i.substr(1));
         }
     }
@@ -132,7 +132,7 @@ void archive::getAliasList()
 void archive::getCategoriesList()
 {
     for (auto i : m_contentMeta) {
-        if (i[0] == 'T') {
+        if (i[0] == CATEGORIES) {
             m_categoriesList.insert(i.substr(1));
         }
     }
@@ -140,7 +140,7 @@ void archive::getCategoriesList()
 void archive::getSetsList()
 {
     for (auto i : m_contentMeta) {
-        if (i[0] == 's') {
+        if (i[0] == SETS) {
             m_setsList.insert(i.substr(1));
         }
     }
@@ -165,7 +165,7 @@ std::string archive::getPackageName()
         return "";
     }
     for (auto name : m_contentMeta) {
-        if (name[0] == 'N') {
+        if (name[0] == NAME) {
             return name.substr(1);
             break;
         }
@@ -182,7 +182,7 @@ std::string archive::getPackageArch()
         return "";
     }
     for (auto arch : m_contentMeta) {
-        if (arch[0] == 'a') {
+        if (arch[0] == ARCHITECTURE) {
             return arch.substr(1);
             break;
         }
@@ -235,7 +235,7 @@ std::string archive::arch()
 std::string archive::version()
 {
     for (auto s : m_contentMeta) {
-        if (s[0] == 'V') {
+        if (s[0] == VERSION) {
             return s.substr(1);
             break;
         }
@@ -245,7 +245,7 @@ std::string archive::version()
 int archive::release()
 {
     for (auto s : m_contentMeta) {
-        if (s[0] == 'r') {
+        if (s[0] == RELEASE) {
             return stoi(s.substr(1));
             break;
         }
@@ -255,7 +255,7 @@ int archive::release()
 std::string archive::url()
 {
     for (auto s : m_contentMeta) {
-        if (s[0] == 'U') {
+        if (s[0] == URL) {
             return s.substr(1);
             break;
         }
@@ -265,7 +265,7 @@ std::string archive::url()
 std::string archive::license()
 {
     for (auto s : m_contentMeta) {
-        if (s[0] == 'L') {
+        if (s[0] == LICENSE) {
             return s.substr(1);
             break;
         }
@@ -275,7 +275,7 @@ std::string archive::license()
 std::string archive::description()
 {
     for (auto s : m_contentMeta) {
-        if (s[0] == 'D') {
+        if (s[0] == DESCRIPTION) {
             return s.substr(1);
             break;
         }
@@ -285,7 +285,7 @@ std::string archive::description()
 std::string archive::group()
 {
     for (auto s : m_contentMeta) {
-        if (s[0] == 'g') {
+        if (s[0] == GROUP) {
             return s.substr(1);
             break;
         }
@@ -295,7 +295,7 @@ std::string archive::group()
 std::string archive::maintainer()
 {
     for (auto s : m_contentMeta) {
-        if (s[0] == 'M') {
+        if (s[0] == MAINTAINER) {
             return s.substr(1);
             break;
         }
@@ -305,7 +305,7 @@ std::string archive::maintainer()
 std::string archive::contributors()
 {
     for (auto s : m_contentMeta) {
-        if (s[0] == 'C') {
+        if (s[0] == CONTRIBUTORS) {
             return s.substr(1);
             break;
         }
@@ -315,7 +315,7 @@ std::string archive::contributors()
 std::string archive::packager()
 {
     for (auto s : m_contentMeta) {
-        if (s[0] == 'P') {
+        if (s[0] == PACKAGER) {
             return s.substr(1);
             break;
         }
@@ -325,7 +325,7 @@ std::string archive::packager()
 std::string archive::collection()
 {
     for (auto s : m_contentMeta) {
-        if (s[0] == 'c') {
+        if (s[0] == COLLECTION) {
             return s.substr(1);
             break;
         }
@@ -337,7 +337,7 @@ std::string archive::builddate()
     char* c_time_s;
     std::string buildtime;
     for (auto bt : m_contentMeta) {
-        if (buildtime[0] == 'B') {
+        if (buildtime[0] == BUILD) {
             buildtime = bt.substr(1);
             break;
         }
@@ -350,7 +350,7 @@ std::string archive::builddate()
 std::string archive::epochBuildDate()
 {
     for (auto epochSVal : m_contentMeta) {
-        if (epochSVal[0] == 'B') {
+        if (epochSVal[0] == BUILD) {
             return epochSVal.substr(1);
             break;
         }
@@ -361,7 +361,7 @@ time_t archive::build()
 {
     time_t epochVal = 0;
     for (auto epochSVal : m_contentMeta) {
-        if (epochSVal[0] == 'B') {
+        if (epochSVal[0] == BUILD) {
             epochVal = strtoul((epochSVal.substr(1)).c_str(), nullptr, 0);
             return epochVal;
             break;
