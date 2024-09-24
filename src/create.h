@@ -3,7 +3,6 @@
 
 #include "cards_argument_parser.h"
 #include "enum.h"
-#include "error_treat.h"
 #include "pkgfile.h"
 #include "process.h"
 #include "pkgadd.h"

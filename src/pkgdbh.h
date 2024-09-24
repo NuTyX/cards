@@ -128,6 +128,10 @@ public:
     */
     explicit                pkgdbh(const std::string& name);
     explicit                pkgdbh();
+
+    /**
+     * Destructor
+    */
     virtual                 ~pkgdbh();
 
     /**

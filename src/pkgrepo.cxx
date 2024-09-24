@@ -234,6 +234,9 @@ std::string& pkgrepo::getBinaryPackageInfo(const std::string& name)
 			+ _("URL            : ")
 			+ m_listOfPackages[name].url()
 			+ '\n'
+			+ _("License        : ")
+			+ m_listOfPackages[name].license()
+			+ '\n'
 			+ _("Version        : ")
 			+ m_listOfPackages[name].version()
 			+ '\n'
@@ -242,7 +245,23 @@ std::string& pkgrepo::getBinaryPackageInfo(const std::string& name)
 			+ '\n'
 			+ _("Packager       : ")
 			+ m_listOfPackages[name].packager()
+			+ '\n'
+			+ _("Contributor(s) : ")
+			+ m_listOfPackages[name].contributors()
+			+ '\n'
+			+ _("Arch           : ")
+			+ m_listOfPackages[name].arch()
 			+ '\n';
+		if (m_listOfPackages[name].dependencies().size() > 0 ) {
+			std::string dependencies;
+			for (auto d:m_listOfPackages[name].dependencies()) {
+				dependencies+=d.first;
+				dependencies+=" ";
+			}
+			m_binaryPackageInfo += _("Dependencies   : ");
+			m_binaryPackageInfo += dependencies;
+			m_binaryPackageInfo += '\n';
+		}
 	}
 	return m_binaryPackageInfo;
 }
@@ -276,6 +295,9 @@ void pkgrepo::parse()
 		std::string::size_type pos;
 		std::string pkgName;
 		std::set<std::string> pkgSet;
+        std::set<std::string> pkgAlias;
+        std::set<std::string> pkgCategories;
+		std::set<std::pair<std::string,time_t>> pkgDependencies;
 		for (auto p : repoFileContent) {
 			if (p[0] == '@')  {
 				pos = p.find(".cards-");
@@ -312,14 +334,37 @@ void pkgrepo::parse()
 				if (p[0] == PACKAGER)
 					info.packager(p.substr(1));
 			if (pkgFound)
-				if (p[0] == SETS) {
-					pkgSet.insert(p.substr(1));
+				if (p[0] == ARCHITECTURE)
+					info.arch(p.substr(1));
+			if (pkgFound)
+				if (p[0] == SPACE)
+					info.space(atoi(p.substr(1).c_str()));
+			if (pkgFound)
+				if (p[0] == SETS)
+                        pkgSet.insert(p.substr(1));
+            if (pkgFound)
+				if (p[0] == ALIAS)
+				    pkgAlias.insert(p.substr(1));
+            if (pkgFound)
+				if (p[0] == CATEGORIES)
+				    pkgCategories.insert(p.substr(1));
+			if (pkgFound)
+				if (p[0] == RUNTIME_DEPENDENCY) {
+					std::pair<std::string,time_t> dep;
+					dep.first = p.substr(1);
+					pkgDependencies.insert(dep);
 				}
 			if (pkgFound)
 				if (p.size() == 0) {
 					pkgFound = false;
+                    info.alias(pkgAlias);
 					info.sets(pkgSet);
+                    info.categories(pkgCategories);
+					info.dependencies(pkgDependencies);
+                    pkgAlias.clear();
 					pkgSet.clear();
+                    pkgCategories.clear();
+					pkgDependencies.clear();
 					m_listOfPackages[pkgName] = info;
 				}
 		}
@@ -475,13 +520,8 @@ unsigned short int pkgrepo::release(const std::string& name)
 
 	return m_listOfPackages[name].release();
 }
-std::string& pkgrepo::hash(const std::string& name)
+void pkgrepo::generateHash(const std::string& fileName)
 {
-	if (m_listOfPackages.size() == 0)
-		parse();
-
-	std::string filename(fileName(name));
-
 	EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
 
 	if (!mdctx) {
@@ -495,9 +535,9 @@ std::string& pkgrepo::hash(const std::string& name)
 		throw std::runtime_error("Failed to init digest context");
 	}
 
-	std::ifstream file(filename,std::ios::binary);
+	std::ifstream file(fileName,std::ios::binary);
 	if(!file.is_open()) {
-		throw std::runtime_error("Failed to open file: " + filename);
+		throw std::runtime_error("Failed to open file: " + fileName);
 	}
 
 	char buffer[BUFSIZ];
@@ -514,7 +554,7 @@ std::string& pkgrepo::hash(const std::string& name)
 	}
 
 	if (file.bad()) {
-		throw std::runtime_error("Failed to read file: " + filename);
+		throw std::runtime_error("Failed to read file: " + fileName);
 	}
 
 	unsigned char mdValue[EVP_MAX_MD_SIZE];
@@ -535,7 +575,17 @@ std::string& pkgrepo::hash(const std::string& name)
 			<< static_cast<int>(mdValue[i]);
 
 	m_packageFileNameHash = oss.str();
-	return m_packageFileNameHash;
+}
+std::string& pkgrepo::hash()
+{
+	return  m_packageFileNameHash;
+}
+void pkgrepo::hash(const std::string& packageName)
+{
+	if (m_listOfPackages.size() == 0)
+		parse();
+
+	m_listOfPackages[packageName].hash(m_packageFileNameHash);
 }
 bool pkgrepo::checkHash(const std::string& name)
 {
@@ -545,13 +595,14 @@ bool pkgrepo::checkHash(const std::string& name)
 	return convertToLowerCase(m_packageFileNameHash) == convertToLowerCase(m_listOfPackages[name].hash());
 
 }
-std::string& pkgrepo::sign(const std::string& name)
+void pkgrepo::generateSign(const std::string& hash)
 {
 	EVP_PKEY* key = nullptr;
 	std::string keyfile(m_config.keypath());
 	keyfile += PRIVATEKEY;
-	const std::vector<unsigned char> data;
-
+	std::vector<unsigned char> mesBytes(hash.length() / 2);
+	for (size_t i = 0; i < hash.length(); i += 2 )
+		mesBytes[i / 2] = static_cast<unsigned char>(std::stoi(hash.substr(i,2), nullptr, 16));
 
 	FILE* keyFileStream = fopen(keyfile.c_str(), "r");
 	if (!keyFileStream) {
@@ -582,7 +633,7 @@ std::string& pkgrepo::sign(const std::string& name)
 	}
 
 	size_t sigLength = 0;
-	if (1 != EVP_DigestSign(mdctx, nullptr, &sigLength, data.data(), data.size())) {
+	if (1 != EVP_DigestSign(mdctx, nullptr, &sigLength, mesBytes.data(), mesBytes.size())) {
 		errors();
 		EVP_MD_CTX_free(mdctx);
 		EVP_PKEY_free(key);
@@ -590,7 +641,7 @@ std::string& pkgrepo::sign(const std::string& name)
 	}
 
 	std::vector<unsigned char> signature(sigLength);
-	if (1 != EVP_DigestSign(mdctx, signature.data(), &sigLength, data.data(), data.size())) {
+	if (1 != EVP_DigestSign(mdctx, signature.data(), &sigLength, mesBytes.data(), mesBytes.size())) {
 		errors();
 		EVP_MD_CTX_free(mdctx);
 		EVP_PKEY_free(key);
@@ -611,7 +662,17 @@ std::string& pkgrepo::sign(const std::string& name)
 		EVP_PKEY_free(key);
 	EVP_cleanup();
 
+}
+std::string& pkgrepo::sign()
+{
 	return m_packageFileNameSignature;
+}
+void pkgrepo::sign(const std::string& packageName)
+{
+	if (m_listOfPackages.size() == 0)
+		parse();
+
+	m_listOfPackages[packageName].signature(m_packageFileNameSignature);
 }
 bool pkgrepo::checkSign(const std::string& name)
 {

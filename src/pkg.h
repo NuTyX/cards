@@ -55,7 +55,7 @@ public:
 	std::set<std::string>&	categories();
 	std::string& 			arch();
 	std::string& 			license();
-	std::string&			signature();
+	const std::string&		signature();
 	std::string&			origin();
 	std::string&			branch();
 	const std::string&		hash();

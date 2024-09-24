@@ -135,7 +135,7 @@ void pkg::signature(const std::string& signature)
 {
 	m_signature = signature;
 }
-std::string& pkg::signature()
+const std::string& pkg::signature()
 {
 	return m_signature;
 }

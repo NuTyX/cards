@@ -5,7 +5,7 @@
 #include "cache.h"
 #include "conf.h"
 #include "file_utils.h"
-#include "pkgadd.h"
+#include "pkgdbh.h"
 
 #include <iomanip>
 
@@ -58,12 +58,26 @@ public:
 
     // Generate the hashsum for the archive file of the package name and store the result
     // in the m_packageFileNameHash member variable
-    std::string&             hash(const std::string& name);
+    void                     generateHash(const std::string& packageName);
 
     // Generate the signature of the hashsum for the archive file of the package name
     // and store the result in the m_packageFileNameSignature member variable
     // The private key location is defined in cards.conf file.
-    std::string&             sign(const std::string& name);
+    void                     generateSign(const std::string& hash);
+
+    // Store the computed hash stored in m_packageFileNameHash
+    // into the database packageName hash property
+    void                    hash(const std::string& packageName);
+
+    // Store the computed signature stored in m_packageFileNameSignature
+    // into the database packageName signature property
+    void                    sign(const std::string& packageName);
+
+    // Return the m_packageNameFileNameHash value
+    std::string&            hash();
+
+    // Return the m_packageNameFileNameSignature value
+    std::string&            sign();
 
     // Check the Hash and signature of the archive file of the package name
     bool                     checkHash(const std::string& name);
