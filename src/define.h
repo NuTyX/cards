@@ -59,6 +59,7 @@
 #define PKG_POST_INSTALL ".POST"
 
 // Package Attributes
+#define NAME 'N'
 #define CONTRIBUTORS 'C'
 #define DESCRIPTION  'D'
 #define URL 'U'
