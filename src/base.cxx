@@ -5,8 +5,8 @@
 namespace cards {
 
 base::base(const CardsArgumentParser& argParser)
-        : pkgdbh("cards base"),
-        m_argParser(argParser)
+        : pkgdbh("cards base")
+        , m_argParser(argParser)
 {
     if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 	m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
@@ -17,7 +17,7 @@ base::base(const CardsArgumentParser& argParser)
 }
 void base::run(int argc, char** argv)
 {
-	cards::conf config;
+	cards::conf config(m_argParser.getOptionValue(CardsArgumentParser::OPT_CONFIG_FILE));
 
 	if (m_argParser.isSet(CardsArgumentParser::OPT_REMOVE)) {
 		if (getuid()) {
