@@ -1,19 +1,19 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
 #include "base.h"
-#include "info.h"
-#include "install.h"
-#include "remove.h"
-#include "upgrade.h"
-#include "sync.h"
 #include "create.h"
 #include "depends.h"
 #include "deptree.h"
 #include "file_download.h"
+#include "info.h"
+#include "install.h"
 #include "level.h"
 #include "pkginfo.h"
 #include "pkgrepo.h"
 #include "pkgrm.h"
+#include "remove.h"
+#include "sync.h"
+#include "upgrade.h"
 
 #include <cstdlib>
 #include <memory>
@@ -130,10 +130,20 @@ int main(int argc, char** argv)
 
             for (auto i : config.dirUrl()) {
                 index++;
-                cout << index << _(" Directory: ") << i.dir;
+                cout << index
+                     << _(" Directory: ")
+                     << i.depot
+                     << "/"
+                     << i.collection;
                 if (i.url != "")
                     cout << _(" from ")
-                         << i.url;
+                         << i.url
+                         << "/"
+                         << config.arch()
+                         << "/"
+                         << config.version()
+                         << "/"
+                         << i.collection;
                 cout << endl;
             }
             for (auto i : config.baseDir())
@@ -173,18 +183,17 @@ int main(int argc, char** argv)
                 throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
             }
             if (cardsArgPars.isSet(CardsArgumentParser::OPT_CONFIG_FILE)) {
-				cards::sync sync(configFile);
-				sync.run();
-			} else {
-				cards::sync sync;
-				sync.run();
-			}
+                cards::sync sync(configFile);
+                sync.run();
+            } else {
+                cards::sync sync;
+                sync.run();
+            }
             return EXIT_SUCCESS;
         case ArgParser::CMD_KEYS: {
             if (!getuid()) {
                 string s = "";
                 throw runtime_error(s + _(" this command should not be used under root"));
-
             }
             cards::pkgrepo pkgrepo(configFile.c_str());
             pkgrepo.generateKeys();
@@ -224,8 +233,8 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_PURGE: {
-			cards::sync sync;
-			sync.purge();
+            cards::sync sync;
+            sync.purge();
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_CREATE: {
