@@ -37,7 +37,7 @@ void sync::run()
 			+ collection.collection
 			+ "/"
 			+ m_repoFile,
-			collection.dir,
+			collection.depot + "/" + collection.collection,
 			m_repoFile, true);
 	}
 }
