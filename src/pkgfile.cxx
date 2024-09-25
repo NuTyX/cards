@@ -7,6 +7,7 @@ namespace cards {
 pkgfile::pkgfile(const std::string& fileName)
     : m_level(0)
     , m_configFileName(fileName)
+    , m_config(fileName)
 {
 }
 void pkgfile::confirmDependencies()
