@@ -60,6 +60,10 @@ public:
     // in the m_packageFileNameHash member variable
     void                     generateHash(const std::string& packageName);
 
+    // Generate the signature of the hashsum stored in the m_packageFileNameHash
+    // member variable
+    void                     generateSign();
+
     // Generate the signature of the hashsum for the archive file of the package name
     // and store the result in the m_packageFileNameSignature member variable
     // The private key location is defined in cards.conf file.

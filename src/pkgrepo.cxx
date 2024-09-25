@@ -6,6 +6,7 @@ namespace cards {
 	
 pkgrepo::pkgrepo(const std::string& fileName)
     : m_configFileName(fileName)
+	, m_config(fileName)
 {
 	m_dbh.buildSimpleDatabase();
 	parse();
@@ -274,12 +275,10 @@ void pkgrepo::parse()
 	
 
 	for (auto i : m_config.dirUrl()) {
-		std::string repoFile = i.depot 
-			+ "/"
-			+ i.collection
+		info.dirName(i.depot + "/" + i.collection);
+		std::string repoFile = info.dirName() 
 			+ PKG_REPO;
 
-		
 		info.collection(i.collection);
 		std::vector<std::string> repoFileContent;
 
@@ -305,7 +304,6 @@ void pkgrepo::parse()
 					pkgName = p.substr(1,pos - 1);
 					info.version(p.substr(pos + 7));
 					info.fileName(p.substr(1));
-					info.dirName(i.depot + "/" + i.collection);
 					pkgFound = true;
 				}
 			}
@@ -594,6 +592,10 @@ bool pkgrepo::checkHash(const std::string& name)
 
 	return convertToLowerCase(m_packageFileNameHash) == convertToLowerCase(m_listOfPackages[name].hash());
 
+}
+void pkgrepo::generateSign()
+{
+    generateSign(m_packageFileNameHash);
 }
 void pkgrepo::generateSign(const std::string& hash)
 {
