@@ -3,62 +3,12 @@
 #include "conf.h"
 namespace cards {
 
-conf::conf()
-{
-	m_filename = NUTYX_VERSION_FILE;
-	parseConfig();
-	consolidate(true);
-	m_filename = CARDS_CONF_FILE;
-	parseConfig();
-	consolidate(false);
-}
 conf::conf(const std::string& filename)
 {
-	m_filename = NUTYX_VERSION_FILE;
-	parseConfig();
-	consolidate(true);
 	m_filename = filename;
 	parseConfig();
-	consolidate(false);
-}
-void conf::consolidate(bool sys)
-{
-	for (auto i : m_dirUrl) {
-		cards::DirUrl DU;
-		DU.collection = i.collection;
-		if (i.depot.size() == 0) {
-			if (depot().size() > 0)
-				DU.depot = depot();
-			else
-				DU.depot = ".";
-		} else
-			DU.depot = i.depot;
-
-		if (i.url.size() == 0) {
-			if (url().size() > 0)
-				DU.url = url();
-		} else
-			DU.url = i.url;
-
-		if (i.dir.size() == 0) {
-			DU.dir = DU.depot
-				+ "/"
-				+ DU.collection;
-		} else
-			DU.dir = i.dir;
-
-		if (sys)
-			m_sysconf.push_back(DU);
-		else
-			m_userconf.push_back(DU);
-	}
-	if (!sys) {
-		if (m_url.size() > 0) {
-			for (auto& i : m_sysconf)
-				i.url = m_url;
-		}
-	}
-	m_dirUrl.clear();
+	m_filename = NUTYX_VERSION_FILE;
+	parseConfig();
 }
 void conf::parseConfig()
 {
@@ -72,6 +22,7 @@ void conf::parseConfig()
 			line[strlen(line)-1] = '\0';
 		}
 		s = line;
+		bool found = false;
 
 		// strip comments
 		std::string::size_type pos = s.find('#');
@@ -90,32 +41,51 @@ void conf::parseConfig()
 			std::string val = stripWhiteSpace(s.substr(pos));
 
 			if (key == "dir") {
+				std::string dir;
 				std::string::size_type pos = val.find('|');
 				cards::DirUrl DU;
 				if (pos != std::string::npos) {
-					DU.dir = stripWhiteSpace(val.substr(0,pos));
+					dir = stripWhiteSpace(val.substr(0,pos));
 					DU.url = stripWhiteSpace(val.substr(pos+1));
 				} else {
-					DU.dir = stripWhiteSpace(val);
+					dir = stripWhiteSpace(val);
 					DU.url = "";
-					pos = DU.dir.rfind('/');
-					if (pos != std::string::npos) {
-						DU.collection = stripWhiteSpace(DU.dir.substr(pos+1));
-						DU.depot = stripWhiteSpace(DU.dir.substr(0,pos));
+				}
+
+				pos = dir.rfind('/');
+
+				if (pos != std::string::npos) {
+					DU.collection = stripWhiteSpace(dir.substr(pos+1));
+					DU.depot = dir.substr(0,pos);
+				}
+				for (auto i : m_dirUrl) {
+					if (i.collection == DU.collection) {
+						found = true;
+						break;
 					}
 				}
-				m_dirUrl.push_back(DU);
+				if (!found)
+					m_dirUrl.push_back(DU);
 			}
 			if (key == "collection") {
 				cards::DirUrl DU;
 				DU.collection = val;
-				m_dirUrl.push_back(DU);
+				for (auto i : m_dirUrl) {
+					if (i.collection == DU.collection) {
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					m_dirUrl.push_back(DU);
 			}
 			if (key == "depot") {
-				m_depot = val;
+				if (m_depot.empty())
+					m_depot = val;
 			}
 			if (key == "url") {
-				m_urls.push_back(val);
+				if (m_url.empty())
+					m_url = val;
 			}
 			if (key == "logdir") {
 				m_logdir = val;
@@ -139,8 +109,6 @@ void conf::parseConfig()
 			if (key == "version") {
 				m_version = val;
 			}
-			if (key == "url")
-				m_url = val;
 			if (key == "hostname")
 				m_hostname = val;
 			if (key == "username")
@@ -155,6 +123,19 @@ void conf::parseConfig()
 		}
 	}
 	fclose(fp);
+	if (!m_url.empty()) {
+		for (auto& i : m_dirUrl) {
+			if (i.url.empty())
+				i.url = m_url;
+		}
+	}
+	if (!m_depot.empty()) {
+		for (auto& i : m_dirUrl) {
+			if (i.depot.empty())
+				i.depot = m_depot;
+		}
+	}
+
 }
 
 conf::~conf()
@@ -163,10 +144,7 @@ conf::~conf()
 }
 std::vector<DirUrl> conf::dirUrl()
 {
-	if (m_userconf.size() > 0)
-		return m_userconf;
-	else
-		return m_sysconf;
+	return m_dirUrl;
 }
 std::string conf::url()
 {
