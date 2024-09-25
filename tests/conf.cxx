@@ -9,7 +9,9 @@ int main () {
 			<< i.collection
 			<< "\ndir: "
 			<< i.dir
-			<< std::endl;
+			<< "\ndepot: "
+      << i.depot
+      << std::endl;
 	return 0;
 }
 // vim:set ts=2 :
