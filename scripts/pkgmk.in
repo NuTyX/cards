@@ -10,7 +10,7 @@ E_PKGFILE=2    # invalid Pkgfile
 E_DIR_PERM=3   # (source/build) directory missing or missing read/write permission
 E_DOWNLOAD=4   # error during download
 E_UNPACK=5     # error during unpacking of source file(s)
-E_MD5=6        # md5sum verification failed
+E_MD5=6        # signature verification failed
 E_FOOTPRINT=7  # footprint check failure
 E_BUILD=8      # error while running 'build() function'
 E_INSTALL=9    # error while installing the package via 'pkgadd'
@@ -1127,7 +1127,6 @@ clean() {
 	else
 		warning "$TARGETS not found"
 	fi
-	find $PKGMK_ROOT -name "*.md5sum" -exec rm -v {} \; 2> /dev/null
 	find $PKGMK_ROOT -name "*.footprint" -exec rm -v {} \; 2> /dev/null
 	unset TARGETS
 }
@@ -1214,11 +1213,6 @@ ALIAS GROUP CONTRIBUTORS SET CATEGORY
 			else
 				ALIAS=""
 			fi
-
-			[ -f $PKGMK_PACKAGE_DIR/../$PKGMK_REPO ] && sed -i "/#$name#/d" $PKGMK_PACKAGE_DIR/../$PKGMK_REPO
-			echo \
-"$(md5sum $PKGMK_PACKAGE_DIR/$PKGMK_REPO|cut -d " " -f1)#$BUILD_DATE#$name#$VERSION#$RELEASE#$DESCRIPTION#$URL#$MAINTAINER#$PACKAGER#$EXTENSION#$ALIAS#$GROUP#$CONTRIBUTORS#$SET#$CATEGORY" \
-			>> $PKGMK_PACKAGE_DIR/../$PKGMK_REPO
 		fi
 	fi
 }
@@ -1285,7 +1279,6 @@ print_help() {
 	echo "   -q,  --quiet               do not printout messages, usefull for -itd option"
 	echo "  -cs,  --check-syntax        do not build, only check package syntax"
 	echo "  -cv,  --show-version-only   do not build, only show the version of the port and exit"
-	echo "  -td,  --test-download       do not build, do not download, but test source file(s)"
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
 	echo " -itd,  --is-up-to-date       check if the version is the same as upstream sources"
@@ -1447,7 +1440,7 @@ main() {
 		echo "$version"
 		exit 0
 	fi
-	PKGMK_MD5SUM="$name.$(uname -m).md5sum"
+
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "$(dirname $PKGMK_WORK_DIR)"
@@ -1535,12 +1528,8 @@ main() {
 	else
 		info "$PKGMK_REPO file will be deleted"
 	fi
-	if [ "$PKGMK_UPDATE_REPO" != "yes" ]; then
-		info "PKGMK_UPDATE_REPO: $PKGMK_UPDATE_REPO"
-	fi
 
 	info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
-	info "PKGMK_IGNORE_MD5SUM: $PKGMK_IGNORE_MD5SUM"
 
 	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
 	if [ "$PKGMK_COMPRESS_PACKAGE" != "no" ]; then
@@ -1619,7 +1608,7 @@ main() {
 		cd $PKGMK_PACKAGE_DIR
 		get_packages_list
 		for TARGET in ${TARGETS[@]}; do
-			if [  "${TARGET:$((${#TARGET} - ${#PKGMK_PACKAGE_EXT} ))}" == "$PKGMK_PACKAGE_EXT" ]; then
+			if [ "$TARGET" == "${TARGET%.$PKGMK_COMPRESSION_MODE}" ]; then
 				compress_archive $TARGET
 			fi
 		done
@@ -1673,7 +1662,6 @@ PKGMK_WORK_DIR="$PWD/work"
 PKGMK_DOWNLOAD="no"
 PKGMK_IGNORE_FOOTPRINT="yes"
 PKGMK_IGNORE_NEW="yes"
-PKGMK_IGNORE_MD5SUM="yes"
 PKGMK_IGNORE_REPO="yes"
 PKGMK_IGNORE_COLLECTION="no"
 PKGMK_IGNORE_RUNTIMEDEPS="no"
