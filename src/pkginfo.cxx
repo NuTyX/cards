@@ -141,14 +141,6 @@ void pkginfo::run()
 {
     if (m_metainfo) {
         archive package(m_arg);
-        std::cout << "@"
-                  << package.name()
-                  << ".cards-"
-                  << package.version()
-                  << "-"
-                  << package.release()
-                  << std::endl;
-
         package.printMeta();
     }
     if (m_archiveinfo) {

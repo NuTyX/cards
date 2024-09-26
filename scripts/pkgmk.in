@@ -45,7 +45,7 @@ get_dependencies() {
 			for FILE in $(find $(dirname $DIR)/$COLLECTION/${NAME%.*}/ \
 				-name "${NAME}*$PKGMK_PACKAGE_EXT*"); do
 				PKGNAME=$(get_package_name $(basename $FILE))
-				[ "$(pkginfo -b $PKGNAME)"  != 0 ] && continue
+				[ "$($PKGMK_PKGINFO -b $PKGNAME)"  != 0 ] && continue
 				DEPENDENCIES[i]="$PKGNAME:$FILE"
 				i=$((i+1))
 			done
@@ -326,11 +326,11 @@ get_packages_list() {
 }
 make_footprint() {
 if ! (echo $TARGET| grep "kernel" >/dev/null); then
-	pkginfo --footprint $TARGET | \
+	$PKGMK_PKGINFO --footprint $TARGET | \
 		sed "s|\tlib/modules/$(uname -r)/|\tlib/modules/<kernel-version>/|g" | \
 		sort -k 3
 else
-	pkginfo --footprint $TARGET | sort -k 3
+	$PKGMK_PKGINFO --footprint $TARGET | sort -k 3
 fi
 }
 strip_files() {
@@ -753,7 +753,7 @@ add_meta_to_archive() {
 
 	# TODO improve the pkginfo --runtimedepfiles functionnality
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
-		for dep in $(pkginfo --runtimedepfiles $TAR|grep -v ^[A-Z]); do
+		for dep in $($PKGMK_PKGINFO --runtimedepfiles $TAR|grep -v ^[A-Z]); do
 			echo "R$dep" >> .META
 		done
 		# We don't want any .devel dependencies here
@@ -765,7 +765,7 @@ add_meta_to_archive() {
 					echo "R$rd${PKGMK_BUILDVER}" >> .META
 					continue
 				fi
-				if [ "$(pkginfo -b $rd)" == "0" ] || [ "$(pkginfo -b $rd)" == "" ]; then
+				if [ "$($PKGMK_PKGINFO -b $rd)" == "0" ] || [ "$($PKGMK_PKGINFO -b $rd)" == "" ]; then
 					error "Runtime dependency $rd not found, cannot continue"
 					clean
 					exit $E_DEPS;
@@ -778,12 +778,12 @@ add_meta_to_archive() {
 			if [ ! -z "$(echo ${!rds})" ]; then
 				info "Adding runtime deps to Archive $NAME"
 				for rd in $(echo ${!rds}); do
-					if [ "$(pkginfo -b $rd)" == "0" ] || [ "$(pkginfo -b $rd)" == "" ]; then
+					if [ "$($PKGMK_PKGINFO -b $rd)" == "0" ] || [ "$($PKGMK_PKGINFO -b $rd)" == "" ]; then
 						error "Runtime dependency $rd not found, cannot continue"
 						clean
 						exit $E_DEPS;
 					fi
-					echo "R$rd$(pkginfo -b $rd)" >> .META
+					echo "R$rd$($PKGMK_PKGINFO -b $rd)" >> .META
 				done
 			fi
 		fi
@@ -1099,7 +1099,7 @@ install_package() {
 }
 recursive() {
 	local ARGS FILE DIR
-#	[ -f $PKGMK_REPO ] && rm -v $PKGMK_REPO
+#	[ -f $PKGMK_REPO_FILE ] && rm -v $PKGMK_REPO_FILE
 
 	ARGS="$(echo "$@" | sed -e "s/--recursive//g" -e "s/-r//g")"
 
@@ -1165,55 +1165,16 @@ build_needed() {
 	echo $RESULT
 }
 update_collection_repo() {
-	local HEAD BUILD_DATE VERSION RELEASE DESCRIPTION URL MAINTAINER PACKAGER EXTENSION \
-ALIAS GROUP CONTRIBUTORS SET CATEGORY
-	if [ -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO ]; then
-		for i in $(tail -n +2  $PKGMK_PACKAGE_DIR/$PKGMK_REPO)
+	if [ -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE ]; then
+		sed -i "/^@$name.*/,/^$/d" $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+		for TARGET in $PKGMK_PACKAGE_DIR/${name}*${PKGMK_PACKAGE_EXT}*
 		do
-			if [ "$(echo $i|cut -d "#" -f3)" != "" ];then
-				for j in ${PKGMK_GROUPS[@]}; do
-					k=$(echo $i|cut -d "#" -f2|cut -d "." -f2)
-					[ $k == $j ] && \
-					GROUP="$k $GROUP"
-				done
-			fi
+			echo "@$(basename $TARGET)" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+			$PKGMK_PKGINFO -m $TARGET >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+			echo "" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
 		done
-		HEAD="$(head -1 $PKGMK_PACKAGE_DIR/$PKGMK_REPO)"
-		if [ "${HEAD:10:1}" = "#" ]; then
-			BUILD_DATE="$(echo $HEAD|cut -d "#" -f1)"
-			EXTENSION="$(echo $HEAD|cut -d "#" -f2)"
-			VERSION="$(echo $HEAD|cut -d "#" -f3)"
-			RELEASE="$(echo $HEAD|cut -d "#" -f4)"
-			DESCRIPTION="$(echo $HEAD|cut -d "#" -f5)"
-			URL="$(echo $HEAD|cut -d "#" -f6)"
-			MAINTAINER="$(echo $HEAD|cut -d "#" -f7)"
-			PACKAGER="$(echo $HEAD|cut -d "#" -f8)"
-			CONTRIBUTORS="$(echo $HEAD|cut -d "#" -f9)"
-			if [ ! -z "$categories" ]; then
-				for i in ${categories[@]}
-				do
-					CATEGORY="$i $CATEGORY"
-				done
-			else
-				CATEGORY=""
-			fi
-			if [ ! -z $set ]; then
-				for i in ${set[@]}
-				do
-					SET="$i $SET"
-				done
-			else
-				SET=""
-			fi
-			if [ ! -z $alias ]; then
-				for i in ${alias[@]}
-				do
-					ALIAS="$i $ALIAS"
-				done
-			else
-				ALIAS=""
-			fi
-		fi
+	else
+		info "$PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE not found"
 	fi
 }
 clean_repo_files() {
@@ -1283,13 +1244,13 @@ print_help() {
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
 	echo " -itd,  --is-up-to-date       check if the version is the same as upstream sources"
 	echo " -utd,  --up-to-date          do not build, only check if package is up to date"
-	echo "  -uc,  --update-collection   do not build, only update the $PKGMK_REPO file of the collection means from the parent directory"
+	echo "  -uc,  --update-collection   do not build, only update the $PKGMK_REPO_FILE file of the collection means from the parent directory"
 	echo "  -uf,  --update-footprint    update footprint using the result of the last build"
-	echo "  -ic,  --ignore-collection   build packages without update the $PKGMK_REPO file of the collection means from the parent directory"
+	echo "  -ic,  --ignore-collection   build packages without update the $PKGMK_REPO_FILE file of the collection means from the parent directory"
 	echo "  -if,  --ignore-footprint    build packages without checking footprint"
 	echo "  -in,  --ignore-new          build packages, ignore new files in a footprint missmatch"
 	echo "  -ns,  --no-strip            do not strip executable binaries or libraries"
-	echo "  -co,  --clean-only          do not build, only remove packages and downloaded files, update $PKGMK_REPO file"
+	echo "  -co,  --clean-only          do not build, only remove packages and downloaded files, update $PKGMK_REPO_FILE file"
 	echo "  -kw,  --keep-work           keep temporary working directory"
 	echo "  -po,  --pack-only           do not compile the sources, pack only what's in the \$PKG directory, means the build is done manually"
 	echo "  -cf,  --config-file <file>  use alternative configuration file"
@@ -1381,10 +1342,10 @@ main() {
 
 	. $PKGMK_CONFFILE
 
-	if ! ( $(which pkginfo > /dev/null) ); then
-		warning "pkginfo NOT FOUND, footprint ignored."
+	if ! ( $(which $PKGMK_PKGINFO > /dev/null) ); then
+		warning "$PKGMK_PKGINFO NOT FOUND, footprint ignored."
 		PKGMK_IGNORE_FOOTPRINT="yes"
-		warning "pkginfo NOT FOUND, runtime dependencies ignored."
+		warning "$PKGMK_PKGINFO NOT FOUND, runtime dependencies ignored."
 		PKGMK_IGNORE_RUNTIMEDEPS="yes"
 	fi
 
@@ -1526,7 +1487,7 @@ main() {
 	if [ "$PKGMK_IGNORE_REPO" != "yes" ]; then
 		info "PKGMK_IGNORE_REPO: $PKGMK_IGNORE_REPO"
 	else
-		info "$PKGMK_REPO file will be deleted"
+		info "$PKGMK_REPO_FILE file will be deleted"
 	fi
 
 	info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
@@ -1635,12 +1596,14 @@ export LC_ALL=POSIX
 
 readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
+readonly PKGMK_PKGINFO="pkginfo"
+
 PKGMK_ROOT="$PWD"
 
 PKGMK_PACKAGE_DIR="$PWD"
 PKGMK_BUILDVER="$(date +%s)"
 PKGMK_PACKAGE_EXT=".cards-"
-PKGMK_REPO=".PKGREPO"
+
 PKGMK_REPO_FILE=".REPO"
 PKGMK_ARCH="$(uname -m)"
 
