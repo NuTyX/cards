@@ -1,7 +1,7 @@
 #!/bin/bash
 #  Copyright (c) 2000 - 2005 Per Liden
 #  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
-#  Copyright (c) 2013 - 2023 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2013 - .... by NuTyX team (http://nutyx.org)
 
 ##
 # error codes
@@ -43,7 +43,7 @@ get_dependencies() {
 		for NAME in ${PKGMK_DEPENDS[@]}; do
 			[ ! -d $(dirname $DIR)/$COLLECTION/${NAME%.*} ] && continue
 			for FILE in $(find $(dirname $DIR)/$COLLECTION/${NAME%.*}/ \
-				-name "${NAME}*.$PKGMK_PACKAGE_EXT*"); do
+				-name "${NAME}*$PKGMK_PACKAGE_EXT*"); do
 				PKGNAME=$(get_package_name $(basename $FILE))
 				[ "$(pkginfo -b $PKGNAME)"  != 0 ] && continue
 				DEPENDENCIES[i]="$PKGNAME:$FILE"
@@ -115,18 +115,13 @@ check_pkgfile() {
 		error "Variable 'release' outside limit which is '99999999'"
 		exit $E_PKGFILE
 	fi
-	DESC_TEST="$(echo "${description}" | grep '#')"
-	if [ "$DESC_TEST" != "" ]; then
-		error "Variable 'description' contains the '#' illegal character"
+	if [ "${description}" == "" ]; then
+		error "Variable 'description' not initiated or not found in $PKGMK_PKGFILE."
 		exit $E_PKGFILE
 	fi
-
-	if [ "${description}" == "" ]; then
-		warning "Variable 'description' not initiated or not found in $PKGMK_PKGFILE."
-	fi
 	SIZE=${#description}
-	if [ $SIZE -gt 110 ];then
-		error "Variable 'description' length higher then 110 characters, please resize to 110 char ]"
+	if [ $SIZE -gt 255 ];then
+		error "Variable 'description' length higher then 255 characters, please resize to 255 char ]"
 		info "$description <== $SIZE characters"
 		exit $E_PKGFILE
 	fi
@@ -160,42 +155,10 @@ check_pkgfile() {
 	fi
 }
 get_package_name() {
-	local NAME EXT
-	if [  "${1:$((${#1} - ${#PKGMK_PACKAGE_EXT} ))}" == "$PKGMK_PACKAGE_EXT" ]; then
-		EXT=$PKGMK_PACKAGE_EXT
-	else
-		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
-	fi
-	NAME="$(echo $1|sed "s/$PKGMK_ARCH.$EXT//"|sed "s/any.$EXT//")"
-
-	echo "${NAME:0:$((${#NAME} - 10 ))}"
+	echo "${1/$PKGMK_PACKAGE_EXT*/}"
 }
-get_package_builddate() {
-	local NAME BUILD_DATE EXT
-	if [  "${1:$((${#1} - ${#PKGMK_PACKAGE_EXT} ))}" == "$PKGMK_PACKAGE_EXT" ]; then
-		EXT=$PKGMK_PACKAGE_EXT
-	else
-		EXT=$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE
-	fi
-	NAME="$(get_package_name $1)"
-	BUILD_DATE="$(echo $1|sed "s/$PKGMK_ARCH.$EXT//"|sed "s/any.$EXT//")"
-	echo "${BUILD_DATE:$((${#NAME}))}"
-}
-get_package_extension() {
-	local EXTENSION
-	if [  "${1:$((${#1} - ${#PKGMK_PACKAGE_EXT} ))}" == "$PKGMK_PACKAGE_EXT" ]; then
-		EXTENSION=".$PKGMK_PACKAGE_EXT"
-	else
-		EXTENSION=".$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
-	fi
-	echo $EXTENSION
-}
-get_package_arch() {
-	local NAME BUILD_DATE EXTENSION
-	NAME="$(get_package_name $1)"
-	BUILD_DATE="$(get_package_builddate $1)"
-	EXTENSION="$(get_package_extension $1)"
-	echo $1|sed "s/$NAME$BUILD_DATE//"|sed "s/$EXTENSION//"
+get_package_version() {
+	echo "${1##*$PKGMK_PACKAGE_EXT}"
 }
 get_categories() {
 	local FILE CANDIDATS CATEGORIES OLDIFS
@@ -352,26 +315,14 @@ unpack_source() {
 	done
 }
 get_packages_list() {
-	local i ARCH
+	local i
 	i=0
 	unset TARGETS
-	for ARCH in $PKGMK_ARCH any; do
-		for FILE in $(find $PKGMK_PACKAGE_DIR -name "${name}*$ARCH.$PKGMK_PACKAGE_EXT*"); do
-			TARGETS[i]="$(basename $FILE)"
-			i=$((i+1))
-		done
+	for FILE in $(find $PKGMK_PACKAGE_DIR -name "$name*$PKGMK_PACKAGE_EXT*"); do
+		TARGETS[i]="$(basename $FILE)"
+		i=$((i+1))
 	done
-}
-make_md5sum() {
-	local FILE LOCAL_FILENAMES
 
-	if [ "$source" ]; then
-		for FILE in ${source[@]}; do
-			LOCAL_FILENAMES="$LOCAL_FILENAMES $(get_filename $FILE)"
-		done
-
-		md5sum $LOCAL_FILENAMES | sed -e 's|  .*/|  |' | sort -k 2
-	fi
 }
 make_footprint() {
 if ! (echo $TARGET| grep "kernel" >/dev/null); then
@@ -381,57 +332,6 @@ if ! (echo $TARGET| grep "kernel" >/dev/null); then
 else
 	pkginfo --footprint $TARGET | sort -k 3
 fi
-}
-check_md5sum() {
-	local FILE="$PKGMK_WORK_DIR/.tmp"
-
-	cd $PKGMK_ROOT
-
-	if [ -f $PKGMK_MD5SUM ]; then
-		make_md5sum > $FILE.md5sum
-		sort -k 2 $PKGMK_MD5SUM > $FILE.md5sum.orig
-		diff -w -t -U 0 $FILE.md5sum.orig $FILE.md5sum | \
-			sed '/^@@/d' | \
-			sed '/^+++/d' | \
-			sed '/^---/d' | \
-			sed 's/^+/NEW       /g' | \
-			sed 's/^-/MISSING   /g' > $FILE.md5sum.diff
-		if [ -s $FILE.md5sum.diff ]; then
-			error "Md5sum mismatch found:"
-			cat $FILE.md5sum.diff >&2
-
-			if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-				rm -rf $PKGMK_WORK_DIR
-			fi
-
-			if [ "$PKGMK_CHECK_MD5SUM" = "yes" ]; then
-				error "Md5sum not ok."
-				exit $E_MD5
-			fi
-
-			error "Building '$TARGET' failed."
-			exit $E_MD5
-		fi
-	else
-		if [ "$PKGMK_CHECK_MD5SUM" = "yes" ]; then
-			if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-				rm -rf $PKGMK_WORK_DIR
-			fi
-			info "Md5sum not found."
-			exit $E_MD5
-		fi
-
-		warning "Md5sum not found, creating new."
-		make_md5sum > $PKGMK_MD5SUM
-	fi
-
-	if [ "$PKGMK_CHECK_MD5SUM" = "yes" ]; then
-		if [ "$PKGMK_KEEP_WORK" = "no" ]; then
-			rm -rf $PKGMK_WORK_DIR
-		fi
-		info "Md5sum ok."
-		exit 0
-	fi
 }
 strip_files() {
 	local FILE FILTER
@@ -550,10 +450,6 @@ make_work_dir() {
 	cd $PKGMK_ROOT
 	[ "$PKGMK_PACK_ONLY" == "yes" ] ||  rm -rf $PKGMK_WORK_DIR
 	mkdir -p $SRC $PKG
-
-	if [ "$PKGMK_IGNORE_MD5SUM" = "no" ]; then
-		check_md5sum
-	fi
 }
 lib32() {
 	CFLAGS="${CFLAGS} -m32"
@@ -572,7 +468,7 @@ pack_lib32() {
 	for DIR in usr/lib32 lib32; do
 		if [ -d $DIR ]; then
 			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} \
+			$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
 			$DIR || BUILD_SUCCESSFUL="no"
 			j=1
 		fi
@@ -587,7 +483,7 @@ pack_lib() {
 			fi
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -615,7 +511,7 @@ pack_devel() {
 		for SUBDIR in include lib/pkgconfig lib64/pkgconfig share/pkgconfig; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				rm -r $DIR/$SUBDIR
 				j=1
@@ -640,7 +536,7 @@ pack_doc() {
 		for SUBDIR in doc gtk-doc; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				j=1
 			fi
@@ -663,7 +559,7 @@ pack_man() {
 		for SUBDIR in info man; do
 			if [ -d $DIR/$SUBDIR  ]; then
 				bsdtar -r -f \
-				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
 				j=1
 			fi
@@ -684,7 +580,7 @@ pack_service() {
 	local DIR="etc/rc.d"
 	if [ -d $DIR ]; then
 		bsdtar -r -f \
-		$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
+		$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
 		$DIR || BUILD_SUCCESSFUL="no"
 		j=1
 	fi
@@ -810,9 +706,8 @@ add_meta_files() {
 	done
 }
 add_meta_to_archive() {
-    local NAME TAR SIZE_I DESC URL CONT PACK MAINT ARCH GROUP LICENSE
+    local NAME TAR SIZE_I DESC URL CONT PACK MAINT GROUP LICENSE
     NAME="$(get_package_name $1)"
-    ARCH="$(get_package_arch $1)"
     GROUP="$(echo $NAME|cut -d "." -f2)"
     [ "$GROUP" == "$NAME" ] && unset GROUP
     info  "Adding meta data to Archive $NAME"
@@ -841,7 +736,7 @@ add_meta_to_archive() {
     echo "V$version" >> .META
     echo "r$release" >> .META
     echo "S$SIZE_I" >> .META
-    echo "a$ARCH" >> .META
+    echo "a$PKGMK_ARCH" >> .META
 
     if [ -z "$GROUP" ]; then
         echo "D$DESC" >> .META
@@ -1004,8 +899,8 @@ build_package() {
 				exit $E_BUILD
 			fi
 
-			if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}* ]; then
-				rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}*
+			if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}* ]; then
+				rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}*
 			fi
 
 			cd $PKG
@@ -1071,8 +966,8 @@ build_package() {
 				fi
 			else
 				if [ "$1" != "$TARGET" ]; then
-					if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}* ]; then
-						rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}*
+					if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}* ]; then
+						rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}*
 					fi
 					pack_${group}
 				fi
@@ -1110,8 +1005,8 @@ build_package() {
 				for DIR in usr/share/locale/${group}* opt/*/share/locale/${group}*; do
 					if [ -d $DIR ]; then
 						if [ "$1" != "$TARGET" ]; then
-							bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT} \
-										$DIR || abort_on_build "${name}.${group}${PKGMK_BUILDVER}any.${PKGMK_PACKAGE_EXT}"
+							bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
+										$DIR || abort_on_build "${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release"
 						fi
 						rm -rf $DIR
 					fi
@@ -1129,7 +1024,7 @@ build_package() {
 			error "No files found in $PKG..."
 			exit $E_BUILD
    		fi
-		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_BUILDVER}${PKGMK_ARCH}.${PKGMK_PACKAGE_EXT} *
+		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_PACKAGE_EXT}$version-$release *
 		if [ $? = 0 ]; then
 			BUILD_SUCCESSFUL="yes"
 			if [ "$PKGMK_IGNORE_FOOTPRINT" == "yes" ]; then
@@ -1182,7 +1077,6 @@ install_package() {
 		exit $E_INSTALL
 	fi
 	for TARGET in ${TARGETS[@]}; do
-		if [ "$(get_package_arch $TARGET)" = "$PKGMK_ARCH" ] || [ "$(get_package_arch $TARGET)" = "any" ]; then
 			info "Installing '$TARGET'."
 
 			if [ "$PKGMK_INSTALL" = "install" ]; then
@@ -1201,7 +1095,6 @@ install_package() {
 				error "Installing '$TARGET' failed."
 				exit $E_INSTALL
 			fi
-		fi
 	done
 }
 recursive() {
@@ -1329,45 +1222,6 @@ ALIAS GROUP CONTRIBUTORS SET CATEGORY
 		fi
 	fi
 }
-update_repo() {
-	local FILE MD5SUM EXT
-	cd $PKGMK_ROOT
-	get_packages_list
-	if [ -z "$description"  ]; then
-		description="n.a."
-	else
-		if [ ! -z "$(echo $description|grep \#)" ]; then
-			description=$(echo $description|sed "s@#@\\\#@g")
-		fi
-	fi
-	[ -z "$url"  ] && url="n.a."
-	[ -z "$maintainer"  ] && maintainer="n.a."
-	[ -z "$packager"  ] && packager="n.a."
-	[ -z "$contributors" ] && contributors="none"
-	[ -z "$set" ] && set="none"
-	[ -z "$categories" ] && categories="none"
-	if [ ! -z $TARGETS ]; then
-		EXT="$(get_package_extension $TARGETS)"
-		echo -n "$(get_package_builddate $TARGETS)#$EXT#$version#$release" > $PKGMK_PACKAGE_DIR/$PKGMK_REPO
-		echo -n "#$description#$url#$maintainer#$packager#$contributors#$set#$categories" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO
-		printf "\n" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO
-		for TARGET in ${TARGETS[@]}; do
-			FILE="$(basename $TARGET)"
-			MD5SUM="$(md5sum $TARGET|cut -d " " -f1)"
-			echo "$MD5SUM#$(get_package_name $TARGET)#$(get_package_arch $TARGET|sed "s/-//")" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO
-		done
-		for FILE in  ${name}*
-		do
-			[ ! -f "$FILE" ] && break
-			if [ "${FILE:$((${#FILE} - ${#EXT} ))}" != "$EXT" ]; then
-				echo "$(md5sum $FILE|cut -d " " -f1)#$FILE" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO
-			fi
-		done
-	else
-		rm -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO
-	fi
-	echo "$(md5sum $PKGMK_PKGFILE|cut -d " " -f1)#$PKGMK_PKGFILE" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO
-}
 clean_repo_files() {
 	cd $PKGMK_ROOT
 	if [ -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO ]; then
@@ -1436,15 +1290,11 @@ print_help() {
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
 	echo " -itd,  --is-up-to-date       check if the version is the same as upstream sources"
 	echo " -utd,  --up-to-date          do not build, only check if package is up to date"
-	echo "  -ur,  --update-repo         do not build, only update the $PKGMK_REPO file"
 	echo "  -uc,  --update-collection   do not build, only update the $PKGMK_REPO file of the collection means from the parent directory"
 	echo "  -uf,  --update-footprint    update footprint using the result of the last build"
 	echo "  -ic,  --ignore-collection   build packages without update the $PKGMK_REPO file of the collection means from the parent directory"
 	echo "  -if,  --ignore-footprint    build packages without checking footprint"
 	echo "  -in,  --ignore-new          build packages, ignore new files in a footprint missmatch"
-	echo "  -um,  --update-md5sum       update md5sum"
-	echo "  -im,  --ignore-md5sum       build packages without checking md5sum"
-	echo "  -cm,  --check-md5sum        do not build, only check md5sum"
 	echo "  -ns,  --no-strip            do not strip executable binaries or libraries"
 	echo "  -co,  --clean-only          do not build, only remove packages and downloaded files, update $PKGMK_REPO file"
 	echo "  -kw,  --keep-work           keep temporary working directory"
@@ -1489,16 +1339,10 @@ parse_options() {
 				PKGMK_IGNORE_FOOTPRINT="yes" ;;
 			-in|--ignore-new)
 				PKGMK_IGNORE_NEW="yes" ;;
-			-um|--update-md5sum)
-				PKGMK_UPDATE_MD5SUM="yes" ;;
-			-im|--ignore-md5sum)
-				PKGMK_IGNORE_MD5SUM="yes" ;;
 			-ic|--ignore-collection)
 				PKGMK_IGNORE_COLLECTION="yes" ;;
 			-ir|--ignore-repo)
 				PKGMK_IGNORE_REPO="yes" ;;
-			-cm|--check-md5sum)
-				PKGMK_CHECK_MD5SUM="yes" ;;
 			-ns|--no-strip)
 				PKGMK_NO_STRIP="yes" ;;
 			-f|--force)
@@ -1612,7 +1456,7 @@ main() {
 
 	case $PKGMK_COMPRESSION_MODE in
 		gz|bz2|xz|zst)
-			TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
+			TARGET="$PKGMK_PACKAGE_DIR/${name}${PKGMK_PACKAGE_EXT}$version-$release"
 			;;
 		*)
 			error "Compression mode '$PKGMK_COMPRESSION_MODE' not supported"
@@ -1629,15 +1473,10 @@ main() {
 	if [ "$PKGMK_CLEAN_ONLY" = "yes" ]; then
 		clean
 		remove_source
-		update_repo
 		exit 0
 	fi
 	if [ "$PKGMK_UPDATE_COLLECTION" = "yes" ]; then
 		update_collection_repo
-		exit 0
-	fi
-	if [ "$PKGMK_UPDATE_REPO" = "yes" ]; then
-		update_repo
 		exit 0
 	fi
 	if [ "$PKGMK_UPDATE_FOOTPRINT" = "yes" ]; then
@@ -1658,14 +1497,6 @@ main() {
 		for i in ${DEPENDENCIES[@]};do
 			echo "$i"
 		done
-		exit 0
-	fi
-
-	if [ "$PKGMK_UPDATE_MD5SUM" = "yes" ]; then
-		download_source
-		check_file "$PKGMK_MD5SUM"
-		make_md5sum > $PKGMK_MD5SUM
-		info "Md5sum updated."
 		exit 0
 	fi
 
@@ -1749,8 +1580,8 @@ main() {
 	# From here on check the base package not any group
 	get_packages_list
 	if [ -z $TARGETS ]; then
-		TARGET="$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT.$PKGMK_COMPRESSION_MODE"
-		if [ "$(build_needed)" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
+		TARGET="$PKGMK_PACKAGE_DIR/${name}${PKGMK_PACKAGE_EXT}$version-$release"
+		if [ "$(build_needed)" = "no" ] && [ "$PKGMK_FORCE" = "no" ]; then
 			info "Package '$TARGET' is up to date."
 		else
 			[ "$PKGMK_PACK_ONLY" == "yes" ] ||  download_source
@@ -1759,8 +1590,8 @@ main() {
 	else
 		FOUND=false
 		for TARGET in ${TARGETS[@]}; do
-			if [ "$(build_needed)" = "no" ] && [ "$PKGMK_FORCE" = "no" ] && [ "$PKGMK_CHECK_MD5SUM" = "no" ]; then
-				if [ "$(get_package_arch $TARGET)" = "$PKGMK_ARCH" ]; then
+			if [ "$(build_needed)" = "no" ] && [ "$PKGMK_FORCE" = "no" ]; then
+				if [ "$(get_package_name $TARGET)" = "$name" ]; then
 					FOUND=true
 				fi
 				info "Package '$TARGET' is up to date."
@@ -1774,7 +1605,7 @@ main() {
 	if [ ! -z $FOUND ] ; then
 		if [ $FOUND != true ];  then
 			download_source
-			TARGET=$PKGMK_PACKAGE_DIR/${name}$PKGMK_BUILDVER$PKGMK_ARCH.$PKGMK_PACKAGE_EXT
+			TARGET=$PKGMK_PACKAGE_DIR/${name}${PKGMK_PACKAGE_EXT}$version-$release
 			BUILD_NEEDED="yes"
 		fi
 	fi
@@ -1795,9 +1626,6 @@ main() {
 	fi
 	if [ "$PKGMK_KEEP_SOURCES" != "yes" ]; then
 		remove_source
-	fi
-	if [ "$PKGMK_IGNORE_REPO" != "yes" ]; then
-		update_repo
 	fi
 	if [ "$PKGMK_IGNORE_COLLECTION" != "yes" ]; then
 		update_collection_repo
@@ -1822,15 +1650,14 @@ PKGMK_ROOT="$PWD"
 
 PKGMK_PACKAGE_DIR="$PWD"
 PKGMK_BUILDVER="$(date +%s)"
-PKGMK_PACKAGE_EXT="cards.tar"
+PKGMK_PACKAGE_EXT=".cards-"
 PKGMK_REPO=".PKGREPO"
 PKGMK_REPO_FILE=".REPO"
 PKGMK_ARCH="$(uname -m)"
 
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
-PKGMK_EXTRA_CONFFILE=".pkgmk.conf"
-PKGMK_MD5SUM=".md5sum"
+
 PKGMK_NOSTRIP=".nostrip"
 
 PKGMK_KEEP_SOURCES="no"
@@ -1872,9 +1699,6 @@ PKGMK_FORCE="no"
 PKGMK_KEEP_WORK="no"
 PKGMK_PACK_ONLY="no"
 PKGMK_KEEP_LA_LIBS="no"
-
-PKGMK_UPDATE_MD5SUM="no"
-PKGMK_CHECK_MD5SUM="no"
 
 main "$@"
 
