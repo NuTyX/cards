@@ -1164,20 +1164,21 @@ build_needed() {
 	fi
 	echo $RESULT
 }
-update_collection_repo() {
+update_repo_file() {
 	if [ -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE ]; then
 		sed -i "/^@$name.*/,/^$/d" $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
 		for TARGET in $PKGMK_PACKAGE_DIR/${name}*${PKGMK_PACKAGE_EXT}*
 		do
 			echo "@$(basename $TARGET)" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
 			$PKGMK_PKGINFO -m $TARGET >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+			echo H$(sha512sum $TARGET | cut -d " " -f1) >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
 			echo "" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
 		done
 	else
 		info "$PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE not found"
 	fi
 }
-clean_repo_files() {
+clean_repo_file() {
 	cd $PKGMK_ROOT
 	if [ -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO ]; then
 		rm $PKGMK_PACKAGE_DIR/$PKGMK_REPO
@@ -1244,9 +1245,9 @@ print_help() {
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
 	echo " -itd,  --is-up-to-date       check if the version is the same as upstream sources"
 	echo " -utd,  --up-to-date          do not build, only check if package is up to date"
-	echo "  -uc,  --update-collection   do not build, only update the $PKGMK_REPO_FILE file of the collection means from the parent directory"
+	echo "  -ur,  --update-repo         do not build, only update the $PKGMK_REPO_FILE file of the collection"
 	echo "  -uf,  --update-footprint    update footprint using the result of the last build"
-	echo "  -ic,  --ignore-collection   build packages without update the $PKGMK_REPO_FILE file of the collection means from the parent directory"
+	echo "  -ir,  --ignore-repo         build packages without update the $PKGMK_REPO_FILE file of the collection"
 	echo "  -if,  --ignore-footprint    build packages without checking footprint"
 	echo "  -in,  --ignore-new          build packages, ignore new files in a footprint missmatch"
 	echo "  -ns,  --no-strip            do not strip executable binaries or libraries"
@@ -1283,8 +1284,6 @@ parse_options() {
 				PKGMK_SOURCES_UP_TO_DATE="yes";;
 			-utd|--up-to-date)
 				PKGMK_UP_TO_DATE="yes" ;;
-			-uc|--update-collection)
-				PKGMK_UPDATE_COLLECTION="yes";;
 			-ur|--update-repo)
 				PKGMK_UPDATE_REPO="yes" ;;
 			-uf|--update-footprint)
@@ -1293,8 +1292,6 @@ parse_options() {
 				PKGMK_IGNORE_FOOTPRINT="yes" ;;
 			-in|--ignore-new)
 				PKGMK_IGNORE_NEW="yes" ;;
-			-ic|--ignore-collection)
-				PKGMK_IGNORE_COLLECTION="yes" ;;
 			-ir|--ignore-repo)
 				PKGMK_IGNORE_REPO="yes" ;;
 			-ns|--no-strip)
@@ -1405,7 +1402,6 @@ main() {
 	check_directory "$PKGMK_SOURCE_DIR"
 	check_directory "$PKGMK_PACKAGE_DIR"
 	check_directory "$(dirname $PKGMK_WORK_DIR)"
-
 	check_pkgfile
 
 	case $PKGMK_COMPRESSION_MODE in
@@ -1429,8 +1425,8 @@ main() {
 		remove_source
 		exit 0
 	fi
-	if [ "$PKGMK_UPDATE_COLLECTION" = "yes" ]; then
-		update_collection_repo
+	if [ "$PKGMK_UPDATE_REPO" = "yes" ]; then
+		update_repo_file
 		exit 0
 	fi
 	if [ "$PKGMK_UPDATE_FOOTPRINT" = "yes" ]; then
@@ -1577,14 +1573,14 @@ main() {
 	if [ "$PKGMK_KEEP_SOURCES" != "yes" ]; then
 		remove_source
 	fi
-	if [ "$PKGMK_IGNORE_COLLECTION" != "yes" ]; then
-		update_collection_repo
+	if [ "$PKGMK_IGNORE_REPO" != "yes" ]; then
+		update_repo_file
 	fi
 	if [ "$PKGMK_CLEAN" != "no" ]; then
 		clean
 		unset TARGETS
 		if [ "$PKGMK_IGNORE_REPO" == "yes" ];then
-			clean_repo_files
+			clean_repo_file
 		fi
 	fi
 	exit 0
@@ -1599,34 +1595,31 @@ readonly PKGMK_COMMAND="$0"
 readonly PKGMK_PKGINFO="pkginfo"
 
 PKGMK_ROOT="$PWD"
-
+PKGMK_SOURCE_DIR="$PWD"
 PKGMK_PACKAGE_DIR="$PWD"
-PKGMK_BUILDVER="$(date +%s)"
-PKGMK_PACKAGE_EXT=".cards-"
+PKGMK_WORK_DIR="$PWD/work"
 
 PKGMK_REPO_FILE=".REPO"
-PKGMK_ARCH="$(uname -m)"
-
 PKGMK_CONFFILE="/etc/pkgmk.conf"
 PKGMK_PKGFILE="Pkgfile"
 
+PKGMK_BUILDVER="$(date +%s)"
+PKGMK_PACKAGE_EXT=".cards-"
+PKGMK_ARCH="$(uname -m)"
+
 PKGMK_NOSTRIP=".nostrip"
 
-PKGMK_KEEP_SOURCES="no"
 PKGMK_CLEAN="yes"
 
 PKGMK_GROUPS=()
 PKGMK_LOCALES=()
 
 PKGMK_SOURCE_MIRRORS=()
-PKGMK_SOURCE_DIR="$PWD"
 
-PKGMK_WORK_DIR="$PWD/work"
 PKGMK_DOWNLOAD="no"
 PKGMK_IGNORE_FOOTPRINT="yes"
 PKGMK_IGNORE_NEW="yes"
 PKGMK_IGNORE_REPO="yes"
-PKGMK_IGNORE_COLLECTION="no"
 PKGMK_IGNORE_RUNTIMEDEPS="no"
 
 PKGMK_NO_STRIP="no"
@@ -1642,6 +1635,7 @@ PKGMK_RECURSIVE="no"
 
 PKGMK_TEST_DOWNLOAD_ONLY="no"
 PKGMK_DOWNLOAD_ONLY="no"
+PKGMK_KEEP_SOURCES="no"
 PKGMK_EXTRACT_ONLY="no"
 PKGMK_IGNORE_UNPACK="no"
 PKGMK_UP_TO_DATE="no"
