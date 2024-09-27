@@ -6,13 +6,8 @@ print_help()
 	echo "usage: $COLLECTION [option]"
 	echo "options:"
 	echo "   -a,   --all                 will build all the ports of the '$COLLECTION' collection in the right order"
-	echo "   -l,   --list                will list all the ports of the '$COLLECTION' collection in the right order"
-	echo "  -ru,   --remove-url          remove the URL part in /etc/cards.conf file for the '$COLLECTION' collection"
-	echo "  -cp,   --check-ports         check if new ports are available"
 	echo "  -cb,   --check-binaries      check if binaries are uptodate"
 	echo "   -d,   --dry                 check if binaries are different then the ports but dont build anything"
-	echo "   -s,   --sync                synchronise binaries from rsync server location"
-	echo "   -c,   --config              printout the configuration"
 	echo "   -h,   --help                print help and exit"
 	echo "   -v,   --version             print version and exit"
 }
@@ -21,6 +16,7 @@ list_ports() {
 }
 check_binaries()
 {
+	locale DIR
 	check_location
 	check_config_file
 	if [ ! -d ${BINARY_BASE} ]; then
@@ -30,88 +26,18 @@ check_binaries()
 		exit 1
 	fi
 	pushd ${BINARY_BASE} > /dev/null
-	for DIR in *
+	for DIR in $(ls|cut -d "." -f1|uniq)
 	do
-		if [ -d $DIR ]; then
-			if [ ! -d $PORT_BASE/$DIR ]; then
-				echo "'$DIR' should be removed and delete from the .PKGREPO file"
-				rm -vr $DIR
-				[ -f .PKGREPO ] && sed -i "/#$DIR#/d" .PKGREPO
-			else
-				rsync -au  --exclude="*cards.tar*" --exclude=".PKGREPO" --delete \
-					${PORT_BASE}/$DIR/ ${BINARY_BASE}/$DIR/
-			fi
+		if [ ! -d $PORT_BASE/$DIR ]; then
+			echo "'$DIR' packages should be removed and delete from the .REPO file"
+			for F in $(ls $DIR.*)
+			do
+				rm -v $F
+			done
+			sed -i "/^@$DIR.*/,/^$/d" $PKGMK_REPO_FILE
 		fi
 	done
 	cd - > /dev/null
-}
-check_ports()
-{
-	check_location
-	check_config_file
-	if [ ! -d ${PORT_BASE} ]; then
-		echo "The directory ${PORT_BASE} doesn't exist"
-		echo "Please fix your setting in /etc/cards.conf.d/$COLLECTION.conf file"
-		echo "Variable 'PORT_BASE'"
-		exit 1
-	fi
-	pushd ${PORT_BASE} > /dev/null
-	for DIR in *
-	do
-		if [ ! -d ${BINARY_BASE}/$DIR ] || [ ! -f ${BINARY_BASE}/$DIR/Pkgfile ]; then
-			echo "'$DIR' should be added"
-			rsync -av --delete ${PORT_BASE}/$DIR/ ${BINARY_BASE}/$DIR/
-		else
-			rsync -au  --exclude="*cards.tar*" --exclude=".PKGREPO" --delete \
-				${PORT_BASE}/$DIR/ ${BINARY_BASE}/$DIR/
-		fi
-		if [ ! -f ${BINARY_BASE}/$DIR/.PKGREPO ];then
-			echo "$DIR should be build"
-		fi
-	done
-	cd - > /dev/null
-}
-check_diff()
-{
-	check_location
-	check_config_file
-	ports_list=$(mktemp) || exit 1
-	binaries_list=$(mktemp) || exit 1
-	output=$(mktemp) || exit 1
-	output_sorted=$(mktemp) || exit 1
-	found="no"
-
-	cards list -p|grep "($BINARY_BASE)"|sed "s@($BINARY_BASE) @@" >> $binaries_list
-	list_ports >> $ports_list
-
-	for binary_package in $(cat $binaries_list | gawk '{ print $1 }'); do
-		binary_package_version=$(cat $binaries_list | grep "^$binary_package " | gawk '{ print $2 }'| cut -d "-" -f1)
-		binary_package_release=$(cat $binaries_list | grep "^$binary_package " | gawk '{ print $2 }'| cut -d "-" -f2)
-		if [ "$binary_package_version" == "" ]; then
-			base_binary_package=$(echo $binary_package | cut -d "-" -f1)
-			if [ "$base_binary_package" != "$binary_package" ]; then
-				binary_package_version=$(cat $binaries_list | grep "^$base_binary_package " | gawk '{ print $2 }'| cut -d "-" -f1)
-				binary_package_release=$(cat $binaries_list | grep "^$base_binary_package " | gawk '{ print $2 }'| cut -d "-" -f2)
-			fi
-		fi
-		binary_version=$(echo $binary_package_version-$binary_package_release)
-		package=$binary_package
-		if [ -f $PORT_BASE/$package/Pkgfile ]; then
-			base_package=$(echo $package | cut -d "-" -f1)
-			cd $PORT_BASE/$package
-			get_port_version
-			port_version=$version-$release
-			if [ "$binary_version" != "$port_version" ]; then
-				echo "$package $port_version $binary_version" >> $output
-				found="yes"
-			fi
-		fi
-	done
-	if [ "$found" = "yes" ]; then
-		echo "Name Port Compiled" >> $output_sorted
-		sort $output >> $output_sorted
-		column -t $output_sorted
-	fi
 }
 check_port_name() {
 	check_config_file
@@ -133,19 +59,9 @@ parse_options() {
 	fi
 	while [ "$1" ]; do
 		case $1 in
-			-l|--list)
-				check_ports
-				list_binaries
-				exit 0
-				;;
 			-a|--all)
-				check_ports
 				check_binaries
 				build_binaries
-				exit 0
-				;;
-			-cp|--check-ports)
-				check_ports
 				exit 0
 				;;
 			-cb|--check-binaries)
@@ -154,33 +70,10 @@ parse_options() {
 				;;
 			-cd|--check-diff|-d|--dry)
 				DRY="yes"
-				check_ports
 				check_binaries
 				build_binaries
 				exit 0
 				;;
-			-ru|--remove-url)
-				check_root
-				check_tools
-				check_config_file
-				remove_url
-				exit 0
-				;;
-			-s|--sync)
-				sync_binaries
-				exit 0;;
-			-c|--config)
-				check_root
-				check_tools
-				check_config_file
-				echo "Your config is:
-NuTyX name    : $RSYNC_NUTYX_NAME
-NuTyX version : $RSYNC_NUTYX_VERSION
-BINARY_BASE   : $BINARY_BASE
-PORT_BASE     : $PORT_BASE
-"
-				exit 0;;
-
 			-h|--help)
 				print_help
 				exit 0;;
@@ -248,11 +141,10 @@ get_binary_directory() {
 	fi
 }
 get_binary_version() {
-	local version release
-	cd $BINARY_BASE/$package
-	version=$(head -1 .PKGREPO|cut -d "#" -f3)
-	release=$(head -1 .PKGREPO|cut -d "#" -f4)
-	binary_version=$version-$release
+	local packageName
+	cd $BINARY_BASE/
+	packageName=$(cat .REPO|grep "^@$package.cards-*")
+	binary_version=$(echo $packageName|cut -d "-" -f2,3)
 }
 get_port_version() {
 	local port base_port PORTS_DIR tmprel
@@ -315,21 +207,6 @@ version 8.0
 		exit 1
 	fi
 }
-sync_binaries () {
-	check_tools
-	check_config_file
-	check_collection_exist
-	remove_url
-	rsync -av --delete ${RSYNC_SERVER}/${ARCH}/${RSYNC_NUTYX_VERSION}/$COLLECTION/ \
-	$BINARY_BASE/
-}
-remove_url () {
-	local URL
-	URL="$(cat /etc/cards.conf|grep \"^dir[ ]*${BINARY_BASE}|\"| cut -d '|' -s -f2)"
-	if [ ! -z "$URL" ]; then
-		sed -i "s@${BINARY_BASE}|${URL}@${BINARY_BASE}@" /etc/cards.conf
-	fi
-}
 build_binaries () {
 	local package port_version binary_version
 	if [ -n "$(cards level|grep WARNING|head -1)" ]; then
@@ -339,20 +216,7 @@ build_binaries () {
 	for i in $(cards level | grep ${BINARY_BASE}/|cut -d " " -f2)
 	do
 		package=$(basename $i)
-		if [  -z "$(ls ${BINARY_BASE}/$package/*$ARCH.cards.tar.xz 2>/dev/null )" ];then
-			cd $GIT
-			[ "$DRY" == "yes" ] && continue
-			bash scripts/$COLLECTION $package || exit 1
-			continue
-		fi
-		if [ ! -f ${BINARY_BASE}/$package/.PKGREPO ]; then
-			cd $GIT
-			[ "$DRY" == "yes" ] && continue
-			bash scripts/$COLLECTION $package || exit 1
-			continue
-		fi
-		if [ ! -z "$(diff ${BINARY_BASE}/$package/Pkgfile ${PORT_BASE}/$package/Pkgfile)" ]; then
-			echo " ${BINARY_BASE}/$package/Pkgfile AND ${PORT_BASE}/$package/Pkgfile are different ...WILL BUILD NEW.."
+		if [  -z "$(ls ${BINARY_BASE}/$package*.cards-* 2>/dev/null )" ];then
 			cd $GIT
 			[ "$DRY" == "yes" ] && continue
 			bash scripts/$COLLECTION $package || exit 1
@@ -360,7 +224,7 @@ build_binaries () {
 		fi
 		get_port_version
 		get_binary_version
-		if [ "$port_version" != "$binary_version" ]; then
+		if [ "$port_version" != "${binary_version%.*}" ]; then
 			echo "$package: Port: $port_version, Binary: $binary_version"
 			cd $GIT
 			[ "$DRY" == "yes" ] && continue
@@ -370,10 +234,6 @@ build_binaries () {
 		[ "$DRY" == "yes" ] || echo "WILL NOT BUILD '$package' AGAIN.."
 	done
 }
-list_binaries () {
-	cards level -I |grep ${BINARY_BASE}
-
-}
 main() {
 	check_tools
 	check_location
@@ -381,17 +241,11 @@ main() {
 	check_config_file
 	check_collection_exist
 	parse_options "$@"
-	rsync -av --exclude '.*.swp'  --exclude '*~' \
-	--exclude '*cards.tar*' --exclude '.PKGREPO' \
-	--delete-after ${PORT_BASE}/$1/ \
-	${BINARY_BASE}/$1/
-	chown -R 0:0 ${BINARY_BASE}/$1/
 	cards create -r $1
 }
 BUILD_PORT_VERSION=#VERSION#
 DRY="no"
 ARCH=$(uname -m)
-RSYNC_SERVER="rsync://downloads.nutyx.org/nutyx"
 COLLECTION="$(basename $0)"
 GIT="$PWD"
 PROJECT="$(basename $GIT)"
