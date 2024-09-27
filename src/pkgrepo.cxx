@@ -335,6 +335,12 @@ void pkgrepo::parse()
 				if (p[0] == ARCHITECTURE)
 					info.arch(p.substr(1));
 			if (pkgFound)
+				if (p[0] == HASHSUM)
+					info.hash(p.substr(1));
+			if (pkgFound)
+				if (p[0] == SIGNATURE)
+					info.signature(p.substr(1));
+			if (pkgFound)
 				if (p[0] == SPACE)
 					info.space(atoi(p.substr(1).c_str()));
 			if (pkgFound)

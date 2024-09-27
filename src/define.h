@@ -77,6 +77,8 @@
 #define COLLECTION 'c'
 #define CATEGORIES 'T'
 #define ARCHITECTURE 'a'
+#define HASHSUM 'H'
+#define SIGNATURE 'I'
 
 
 #define PKG_REJECTED "var/lib/pkg/rejected"
