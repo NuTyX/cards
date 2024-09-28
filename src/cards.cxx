@@ -2,6 +2,7 @@
 
 #include "base.h"
 #include "create.h"
+#include "dependent.h"
 #include "depends.h"
 #include "deptree.h"
 #include "file_download.h"
@@ -251,6 +252,11 @@ int main(int argc, char** argv)
         case ArgParser::CMD_DEPENDS: {
             cards::depends depends;
             depends.print(cardsArgPars.otherArguments()[0]);
+            return EXIT_SUCCESS;
+        }
+        case ArgParser::CMD_DEPENDENT: {
+            cards::dependent dependent;
+            dependent.print(cardsArgPars.otherArguments()[0]);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_DEPTREE: {

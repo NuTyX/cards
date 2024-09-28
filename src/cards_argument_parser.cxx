@@ -145,6 +145,13 @@ A compilation logfile can be define in /etc/cards.conf as:\n\
 logdir /var/log/pkgbuild for example."),
         ArgParser::EQ, 1, _("<package>"));
 
+    addCommand(CMD_DEPENDENT, "dependent",
+        _("list of ports using this port."),
+        _("This command is used for the packager.\n\
+It shows the list of the reversed dependencies of the package.\n\
+It is used when checking which port is using this port."),
+        ArgParser::EQ, 1, _("<port>"));
+
     addCommand(CMD_KEYS, "keys",
         _("generate the keys pair ."),
         _("This command is used to generate the keys needed for\n\

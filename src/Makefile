@@ -46,6 +46,7 @@ CARDSOBJECTS =	conf.o \
 	deptree.o \
 	level.o \
 	depends.o \
+	dependent.o \
 	sync.o \
 	create.o \
 	install.o \

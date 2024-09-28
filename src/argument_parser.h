@@ -64,6 +64,7 @@ public:
             CMD_DEPENDS,
             CMD_DEPTREE,
             CMD_LEVEL,
+            CMD_DEPENDENT,
             CMD_KEYS
         };
 
