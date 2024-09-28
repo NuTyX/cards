@@ -344,6 +344,9 @@ void pkgrepo::parse()
 				if (p[0] == SPACE)
 					info.space(atoi(p.substr(1).c_str()));
 			if (pkgFound)
+				if (p[0] == SIZE)
+					info.size(atoi(p.substr(1).c_str()));
+			if (pkgFound)
 				if (p[0] == SETS)
                         pkgSet.insert(p.substr(1));
             if (pkgFound)

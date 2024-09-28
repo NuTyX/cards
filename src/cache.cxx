@@ -12,11 +12,11 @@ cache::~cache()
 {
 	//nothing todo ATM
 }
-void cache::size(unsigned int size)
+void cache::size(unsigned int long size)
 {
 	m_size = size;
 }
-unsigned int cache::size()
+unsigned int long cache::size()
 {
 	return m_size;
 }

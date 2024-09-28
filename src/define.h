@@ -79,6 +79,7 @@
 #define ARCHITECTURE 'a'
 #define HASHSUM 'H'
 #define SIGNATURE 'I'
+#define SIZE 'i'
 
 
 #define PKG_REJECTED "var/lib/pkg/rejected"

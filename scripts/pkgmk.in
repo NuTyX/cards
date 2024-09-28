@@ -1170,7 +1170,8 @@ update_repo_file() {
 		for TARGET in $PKGMK_PACKAGE_DIR/${name}*${PKGMK_PACKAGE_EXT}*
 		do
 			echo "@$(basename $TARGET)" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
-			$PKGMK_PKGINFO -m $TARGET >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+			$PKGMK_PKGINFO -m $TARGET   >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+			echo i$(stat -c%s $TARGET)  >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
 			echo H$(sha512sum $TARGET | cut -d " " -f1) >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
 			echo "" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
 		done
@@ -1180,9 +1181,9 @@ update_repo_file() {
 }
 clean_repo_file() {
 	cd $PKGMK_ROOT
-	if [ -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO ]; then
-		rm $PKGMK_PACKAGE_DIR/$PKGMK_REPO
-		info "Removing $PKGMK_PACKAGE_DIR/$PKGMK_REPO"
+	if [ -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE ]; then
+		rm $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+		info "Removing $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE"
 	fi
 }
 check_sources_uptodate() {
@@ -1592,7 +1593,7 @@ export LC_ALL=POSIX
 
 readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
-readonly PKGMK_PKGINFO="pkginfo"
+PKGMK_PKGINFO="pkginfo"
 
 PKGMK_ROOT="$PWD"
 PKGMK_SOURCE_DIR="$PWD"

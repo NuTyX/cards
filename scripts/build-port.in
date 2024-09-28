@@ -11,12 +11,9 @@ print_help()
 	echo "   -h,   --help                print help and exit"
 	echo "   -v,   --version             print version and exit"
 }
-list_ports() {
-	cd $PORT_BASE && find . -name Pkgfile -follow -printf "%h\n" | sed 's|^./||g' | sort
-}
 check_binaries()
 {
-	locale DIR
+	locale name file
 	check_location
 	check_config_file
 	if [ ! -d ${BINARY_BASE} ]; then
@@ -26,15 +23,15 @@ check_binaries()
 		exit 1
 	fi
 	pushd ${BINARY_BASE} > /dev/null
-	for DIR in $(ls|cut -d "." -f1|uniq)
+	for name in $(ls|cut -d "." -f1|uniq)
 	do
-		if [ ! -d $PORT_BASE/$DIR ]; then
-			echo "'$DIR' packages should be removed and delete from the .REPO file"
-			for F in $(ls $DIR.*)
+		if [ ! -d $PORT_BASE/$name ]; then
+			echo "'$name' packages should be removed and delete from the .REPO file"
+			for file in $(ls $name.*)
 			do
-				rm -v $F
+				rm -v $file
 			done
-			sed -i "/^@$DIR.*/,/^$/d" $PKGMK_REPO_FILE
+			sed -i "/^@$name.*/,/^$/d" $PKGMK_REPO_FILE
 		fi
 	done
 	cd - > /dev/null
@@ -132,10 +129,10 @@ Means you are not suppose to 'git pull' this git project"
 fi
 }
 get_binary_directory() {
-	local DIR
-	DIR=$(cards config|grep Directory| cut -d " " -f3|grep ${COLLECTION}$|sed "s/\/${COLLECTION}$//"|head -1)
-	if [ ! -z ${DIR} ]; then
-		BINARY_DIR=${DIR}
+	local dir
+	dir=$(cards config|grep Directory| cut -d " " -f3|grep ${COLLECTION}$|sed "s/\/${COLLECTION}$//"|head -1)
+	if [ ! -z ${dir} ]; then
+		BINARY_DIR=${dir}
 	else
 		BINARY_DIR=${RSYNC_NUTYX_VERSION}
 	fi

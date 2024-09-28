@@ -142,63 +142,63 @@ conf::~conf()
 {
 	//nothing todo ATM
 }
-std::vector<DirUrl> conf::dirUrl()
+std::vector<DirUrl>& conf::dirUrl()
 {
 	return m_dirUrl;
 }
-std::string conf::url()
+std::string& conf::url()
 {
 	return m_url;
 }
-std::string conf::keypath()
+std::string& conf::keypath()
 {
 	return m_keypath;
 }
-std::string conf::hostname()
+std::string& conf::hostname()
 {
 	return m_hostname;
 }
-std::string conf::username()
+std::string& conf::username()
 {
 	return m_username;
 }
-std::string conf::password()
+std::string& conf::password()
 {
 	return m_password;
 }
-std::string conf::database()
+std::string& conf::database()
 {
 	return m_database;
 }
-std::string conf::version()
+std::string& conf::version()
 {
 	return m_version;
 }
-std::string conf::arch()
+std::string& conf::arch()
 {
 	return m_arch;
 }
-std::string conf::depot()
+std::string& conf::depot()
 {
 	return m_depot;
 }
-std::string conf::logdir()
+std::string& conf::logdir()
 {
 	return m_logdir;
 }
-std::vector<std::string> conf::groups()
+std::vector<std::string>& conf::groups()
 {
 	return m_groups;
 }
-std::vector<std::string> conf::collections()
+std::vector<std::string>& conf::collections()
 {
 	return m_collections;
 }
-std::vector<std::string> conf::depots()
+std::vector<std::string>& conf::depots()
 {
 	return m_depots;
 }
-std::vector<std::string> conf::baseDir()
+std::vector<std::string>& conf::baseDir()
 {
 	return m_baseDir;
 }

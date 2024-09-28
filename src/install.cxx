@@ -6,7 +6,7 @@ namespace cards {
 
 install::install(const CardsArgumentParser& argParser,
 		const char *configFileName)
-	: pkgrepo(configFileName)
+	: m_pkgrepo(configFileName)
 	, m_argParser(argParser)
 	, m_configFileName(configFileName)
 {
@@ -15,20 +15,19 @@ install::install(const CardsArgumentParser& argParser,
 		if (checkFileExist(i)) {
 			continue;
 		}
-		if ( getListOfPackagesFromCollection(i).empty() &&
-			(! checkBinaryExist(i) )  && 
-			getListOfPackagesFromSet(i).empty() ){
+		if ( m_pkgrepo.getListOfPackagesFromCollection(i).empty() &&
+			(! m_pkgrepo.checkBinaryExist(i) )  &&
+			m_pkgrepo.getListOfPackagesFromSet(i).empty() ){
 				m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_FOUND;
 				treatErrors(i);
 		}
 	}
-	cards::conf config(configFileName);
 
 	buildSimpleDatabase();
 	for( auto i : m_argParser.otherArguments() ) {
-		std::set<std::string> ListOfPackage = getListOfPackagesFromSet(i);
+		std::set<std::string> ListOfPackage = m_pkgrepo.getListOfPackagesFromSet(i);
 		if (ListOfPackage.empty() )
-			ListOfPackage = getListOfPackagesFromCollection(i);
+			ListOfPackage = m_pkgrepo.getListOfPackagesFromCollection(i);
 		if ( !ListOfPackage.empty() )  {
 			/*
 			* It's a collection or a set
@@ -37,7 +36,7 @@ install::install(const CardsArgumentParser& argParser,
 				if (checkPackageNameExist(i))
 					continue;
 
-				generateDependencies(i);
+				m_pkgrepo.generateDependencies(i);
 			}
 		} else if (checkRegularFile(i)) {
 			/*
@@ -60,12 +59,12 @@ install::install(const CardsArgumentParser& argParser,
 			/*
 			 * It's a normal package
 			 */
-			generateDependencies(i);
+			m_pkgrepo.generateDependencies(i);
 		}
 	}
 	getLocalePackagesList();
-	for ( auto i : getDependenciesList() ) {
-		m_packageArchiveName = fileName(i.first);
+	for ( auto i : m_pkgrepo.getDependenciesList() ) {
+		m_packageArchiveName = m_pkgrepo.fileName(i.first);
 		archive packageArchive(m_packageArchiveName.c_str());
 		std::string name = packageArchive.name();
 		if ( checkPackageNameExist(name )) {
@@ -110,15 +109,12 @@ void install::getLocalePackagesList()
 		return;
 	std::set<std::string> tmpList;
 	for (auto i : config.groups()) {
-		for (auto j : getDependenciesList()) {
+		for (auto j : m_pkgrepo.getDependenciesList()) {
 			std::string packageName  = j.first + "." + i;
-#ifdef DEBUG
-			std::cerr << packageName << std::endl;
-#endif
-			if (checkBinaryExist(packageName)) {
-				packageFileName = fileName(packageName);
+			if (m_pkgrepo.checkBinaryExist(packageName)) {
+				packageFileName = m_pkgrepo.fileName(packageName);
 				if ( ! checkFileExist(packageFileName) )
-					downloadPackageFileName(packageName);
+					m_pkgrepo.downloadPackageFileName(packageName);
 				tmpList.insert(packageName);
 			}
 		}
@@ -129,12 +125,8 @@ void install::getLocalePackagesList()
 			PackageTime.first=i;
 			PackageTime.second=0;
 
-			generateDependencies(i);
-			addDependenciesList(PackageTime);
+			m_pkgrepo.generateDependencies(i);
+			m_pkgrepo.addDependenciesList(PackageTime);
 		}
-#ifdef DEBUG
-	for (auto i : m_dependenciesList )
-		std::cerr << i.first << " " << i.second << std::endl;
-#endif
 }
 }

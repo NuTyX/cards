@@ -8,12 +8,15 @@
 
 namespace cards {
 
-class install: public pkgrepo, public pkgadd
+class install: public pkgadd
 {
+        std::string                m_configFileName;
+
+        cards::pkgrepo             m_pkgrepo;
         const CardsArgumentParser& m_argParser;
+
         void parseArguments();
         void getLocalePackagesList();
-        std::string m_configFileName;
 
     public:
         install(const CardsArgumentParser& argParser,

@@ -10,7 +10,7 @@ namespace cards {
 class cache: public db
 {
 	StatusEnum			m_status;
-	unsigned 			int m_size;
+	unsigned int long   m_size;
 	bool				m_installed;
 	std::string			m_name;
 	std::string			m_baseName;
@@ -21,7 +21,7 @@ class cache: public db
 public:
 	cache();
 	~cache();
-	unsigned int		size();
+	unsigned int long   size();
 	StatusEnum			status();
 	bool				installed();
 	bool				toinstall();
@@ -32,7 +32,7 @@ public:
 	const std::string&	fileDate();
 	const std::string&	dirName();
 
-	void				size(unsigned int size);
+	void				size(unsigned int long size);
 	void				setStatus(StatusEnum status);
 	void				unsetStatus(StatusEnum status);
 	void				installed(bool installed);

@@ -12,65 +12,89 @@
 #include <archive_entry.h>
 
 class archive {
-public:
-	archive(const std::string& fileName);
-	virtual ~archive();
 
-	virtual void treatErrors(const std::string& s) const;
+	unsigned int long        m_size;
 
-	void printDeps(); // Print Out the dependencies
-	void printMeta(); // Print Out the .META file
-	void list(); // list the files to stdio
+	std::string              m_fileName;
+	std::string              m_packageName;
+	std::string              m_packageArch;
 
-	std::string getPackageName();
-	std::string getPackageArch();
-	void extractFileContent(std::vector<std::string>& list, const char* fileName);
-	unsigned int long size(); // Numbers of files in the archive
-	std::set<std::string> setofFiles(); // return a order set of string
-	std::set<std::string> listofDependencies(); // return an order set of dependencies
-	std::set<std::string> listofAlias(); // return the alias list
-	std::set<std::string> listofCategories(); // return the categories list
-	std::set<std::string> listofSets(); // return the sets list
-	std::set<std::pair<std::string, time_t>> listofDependenciesBuildDate(); // return an order set of dependencies,BuildDate
-	std::string arch(); // return the arch of the package
-	std::string version(); // return the version of the package
-	int release(); // return the release of the package
-	std::string description(); // return the description	of the package
-	std::string url(); // return the url of the package
-	std::string contributors(); // return the Contributor(s) of the package
-	std::string maintainer(); // return the Maintainer(s) of the package
-	std::string collection(); // return the collection of the package
-	std::string license(); // return the collection of the package
-	std::string packager(); // return the Packager(s) of the package
-	std::string builddate(); // return the date like Mon Mar 24 10:16:00 2014
-	std::string name(); // return the name of the package
-	std::string group(); // return the group of the package
-	std::string namebuildn(); // return the name + epochvalue
-	std::string epochBuildDate(); // return the epochvalue in string format
-	time_t build(); // return the epoch value
+	std::vector<std::string> m_contentMtree;
+	std::vector<std::string> m_contentMeta;
 
-private:
+	std::set<std::string>    m_rtDependenciesList;
+	std::set<std::string>    m_filesList;
+	std::set<std::string>    m_aliasList;
+	std::set<std::string>    m_categoriesList;
+	std::set<std::string>    m_setsList;
+
+	cards::archive_error     m_actualError;
+
+	std::set<std::pair<std::string, time_t>>
+	                         m_rtDependenciesEpochList;
+
+
 	void getRunTimeDependencies();
 	void getRunTimeDependenciesEpoch();
 	void getAliasList();
 	void getCategoriesList();
 	void getSetsList();
 
-	unsigned int long m_size;
+public:
+	archive(const std::string& fileName);
+	virtual ~archive();
 
-	std::vector<std::string> m_contentMtree;
-	std::vector<std::string> m_contentMeta;
+	virtual void treatErrors(const std::string& s) const;
 
-	std::set<std::string> m_rtDependenciesList;
-	std::set<std::pair<std::string, time_t>> m_rtDependenciesEpochList;
-	std::string m_fileName;
-	std::string m_packageName;
-	std::string m_packageArch;
-	std::set<std::string> m_filesList;
-	std::set<std::string> m_aliasList;
-	std::set<std::string> m_categoriesList;
-	std::set<std::string> m_setsList;
+	// Print Out the dependencies
+	void printDeps();
 
-	cards::archive_error m_actualError;
+	// Print Out the .META file
+	void printMeta();
+
+	// list the files to stdio
+	void list();
+
+	std::string getPackageName();
+	std::string getPackageArch();
+	void extractFileContent(std::vector<std::string>& list, const char* fileName);
+
+	// Numbers of files in the archive
+	unsigned int long size();
+
+	std::set<std::string> setofFiles();
+	std::set<std::string> listofDependencies();
+	std::set<std::string> listofAlias();
+	std::set<std::string> listofCategories();
+	std::set<std::string> listofSets();
+
+	// return an order set of dependencies,BuildDate
+	std::set<std::pair<std::string, time_t>> listofDependenciesBuildDate();
+	std::string arch();
+	std::string version();
+	int         release();
+	std::string description();
+	std::string url();
+	std::string contributors();
+	std::string maintainer();
+	std::string collection();
+	std::string license();
+	std::string packager();
+
+	// return the date like Mon Mar 24 10:16:00 2014
+	std::string builddate();
+
+	std::string name();
+	std::string group();
+
+	// return the name + epochvalue
+	std::string namebuildn();
+
+	// return the epochvalue in string format
+	std::string epochBuildDate();
+
+	// return the epoch value
+	time_t build();
+
 };
 

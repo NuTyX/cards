@@ -9,12 +9,13 @@
 
 namespace cards {
 
-class upgrade : public pkgrepo, public pkgadd {
+class upgrade : public pkgadd {
 
 	std::set<std::string>                   m_ListOfPackagesToDelete;
 	std::set<std::pair<std::string,time_t>> m_ListOfPackages;
 	const CardsArgumentParser&              m_argParser;
-	cards::sync m_Sync;
+	cards::sync                             m_sync;
+	cards::pkgrepo                          m_pkgrepo;
 
 public:
 	/**

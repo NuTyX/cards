@@ -13,30 +13,7 @@ struct DirUrl {
 };
 
 class conf {
-public:
 
-    conf(const std::string& filename);
-    ~conf();
-
-    std::string version();
-    std::string url();
-    std::string keypath();
-    std::string hostname();
-    std::string username();
-    std::string password();
-    std::string database();
-
-    std::string arch();
-    std::string depot();
-    std::string logdir();
-    std::vector<std::string> groups();
-    std::vector<std::string> urls();
-    std::vector<std::string> depots();
-    std::vector<std::string> collections();
-    std::vector<DirUrl> dirUrl();
-    std::vector<std::string> baseDir();
-
-private:
     std::string m_filename;
     std::string m_name;
     std::string m_version;
@@ -44,7 +21,6 @@ private:
     std::string m_depot;
     std::string m_url;
     std::string m_keypath;
-
     std::string m_dir;
     std::string m_base;
     std::string m_logdir;
@@ -52,19 +28,41 @@ private:
     std::string m_hostname;
     std::string m_database;
     std::string m_password;
+
     std::vector<std::string> m_groups;
     std::vector<std::string> m_urls;
     std::vector<std::string> m_collections;
     std::vector<std::string> m_depots;
     std::vector<std::string> m_baseDir;
     std::vector<std::string> m_archs;
-
-    std::vector<DirUrl> m_dirUrl;
-
-    std::vector<DirUrl> m_sysconf;
-    std::vector<DirUrl> m_userconf;
+    std::vector<DirUrl>      m_dirUrl;
+    std::vector<DirUrl>      m_sysconf;
+    std::vector<DirUrl>      m_userconf;
 
     void parseConfig();
+
+public:
+
+    conf(const std::string& filename);
+    ~conf();
+
+    std::string& version();
+    std::string& url();
+    std::string& keypath();
+    std::string& hostname();
+    std::string& username();
+    std::string& password();
+    std::string& database();
+    std::string& arch();
+    std::string& depot();
+    std::string& logdir();
+
+    std::vector<std::string>& groups();
+    std::vector<std::string>& urls();
+    std::vector<std::string>& depots();
+    std::vector<std::string>& collections();
+    std::vector<DirUrl>&      dirUrl();
+    std::vector<std::string>& baseDir();
 };
 
 } // endof cards namespace

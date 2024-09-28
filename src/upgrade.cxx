@@ -6,17 +6,17 @@ namespace cards {
 
 upgrade::upgrade(const CardsArgumentParser& argParser,
 	const char *configFileName)
-	: pkgrepo(configFileName)
+	: m_pkgrepo(configFileName)
 	, m_argParser(argParser)
-	, m_Sync(configFileName)
+	, m_sync(configFileName)
 {
 	if ( ! m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
-		m_Sync.run();
+		m_sync.run();
 	
 	buildSimpleDatabase();
 	std::set<std::string> listOfExistPackages;
-	for (auto i:getListOfPackages()) {
-		if (checkBinaryExist(i.first)) {
+	for (auto i:m_pkgrepo.getListOfPackages()) {
+		if (m_pkgrepo.checkBinaryExist(i.first)) {
 			listOfExistPackages.insert(i.first);
 		}
 	}
@@ -29,14 +29,14 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 		std::cout << j << std::endl;
 	}
 #endif
-	if (!getListofGroups().empty()) {
+	if (!m_pkgrepo.getListofGroups().empty()) {
 		std::set<std::string> tmpList;
-		for (auto i: getListOfPackages()) {
-			for ( auto j :  getListofGroups() ) {
+		for (auto i: m_pkgrepo.getListOfPackages()) {
+			for ( auto j :  m_pkgrepo.getListofGroups() ) {
 					std::string packageName  = i.first + "." + j;
 					if ( i.first == packageName )
 						continue;
-					if (checkBinaryExist(packageName)) {
+					if (m_pkgrepo.checkBinaryExist(packageName)) {
 						tmpList.insert(packageName);
 					}
 			}
@@ -45,21 +45,21 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 			for ( auto i : tmpList) {
 				std::pair<std::string,time_t> packageNameBuildDate;
 				packageNameBuildDate.first = i;
-				packageNameBuildDate.second = getBinaryBuildTime(i);
+				packageNameBuildDate.second = m_pkgrepo.getBinaryBuildTime(i);
 				if (checkPackageNameBuildDateSame(packageNameBuildDate))
 					continue;
 				m_ListOfPackages.insert(packageNameBuildDate);
 			}
 		}
 	}
-	for (auto i : getListOfPackages()) {
-		if (!checkBinaryExist(i.first)) {
+	for (auto i : m_pkgrepo.getListOfPackages()) {
+		if (!m_pkgrepo.checkBinaryExist(i.first)) {
 			m_ListOfPackagesToDelete.insert(i.first);
 			continue;
 		}
 		std::pair<std::string,time_t> packageNameBuildDate;
 		packageNameBuildDate.first = i.first ;
-		packageNameBuildDate.second = getBinaryBuildTime(i.first);
+		packageNameBuildDate.second = m_pkgrepo.getBinaryBuildTime(i.first);
 		if ( checkPackageNameBuildDateSame(packageNameBuildDate)) {
 			continue;
 		}
@@ -109,8 +109,8 @@ int upgrade::Isdownload()
 {
 	std::string packageNameSignature, packageName, packageFileName;
 	for (auto i : m_ListOfPackages) {
-		packageFileName = fileName(i.first);
-		packageNameSignature = fileSignature(packageName);
+		packageFileName = m_pkgrepo.fileName(i.first);
+		packageNameSignature = m_pkgrepo.fileSignature(packageName);
 		if ( ! checkFileHash(packageFileName, packageNameSignature))
 			return EXIT_FAILURE;
 	}
@@ -146,13 +146,14 @@ void upgrade::dry()
 }
 void upgrade::run()
 {
-	for (auto i : m_ListOfPackages) generateDependencies(i);
+	for (auto i : m_ListOfPackages)
+		m_pkgrepo.generateDependencies(i);
 
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
 		dry();
 	else if (! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
-		for (auto i : getDependenciesList()) {
-			m_packageArchiveName=fileName(i.first);
+		for (auto i : m_pkgrepo.getDependenciesList()) {
+			m_packageArchiveName = m_pkgrepo.fileName(i.first);
 			m_force=true;
 			if (checkPackageNameExist(i.first)) {
 				m_upgrade=true;
@@ -162,7 +163,7 @@ void upgrade::run()
 		run();
 		std::string p = i.first
 			+ " "
-			+ version(i.first);
+			+ m_pkgrepo.version(i.first);
 
 		syslog(LOG_INFO,"%s upgraded",p.c_str());
 		}
@@ -174,7 +175,7 @@ void upgrade::run()
 			removePackageFiles(i);
 			syslog(LOG_INFO,"%s removed",i.c_str());
 		}
-		m_Sync.purge();
+		m_sync.purge();
 		summary();
 	}
 }
