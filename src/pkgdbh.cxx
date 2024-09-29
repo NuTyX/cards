@@ -278,7 +278,7 @@ void pkgdbh::progressInfo()
   }
 }
 
-std::set<std::string> pkgdbh::getListOfPackagesNames()
+std::set<std::string>& pkgdbh::getListOfPackagesNames()
 {
 	if (m_listOfPackagesNames.empty())
 		getListOfPackagesNames(m_root);

@@ -151,7 +151,7 @@ public:
     void                    setDependency();
     void                    resetDependency();
 
-    std::set<std::string>   getListOfPackagesNames();
+    std::set<std::string>&  getListOfPackagesNames();
     std::string             getDescription(const std::string& name) const;
     std::string             getVersion(const std::string& name) const;
     std::string             getCollection(const std::string& name) const;
