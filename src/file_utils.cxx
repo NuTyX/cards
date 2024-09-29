@@ -80,13 +80,6 @@ bool checkFileExist(const std::string& filename)
   struct stat buf;
   return !lstat(filename.c_str(), &buf);
 }
-bool checkFileHash(const std::string& filename, const std::string& hash)
-{
-	if (!checkFileExist(filename))
-		return false;
-
-	return checkHash(filename.c_str(), hash.c_str());
-}
 bool checkFileEmpty(const std::string& filename)
 {
   struct stat buf;
@@ -442,67 +435,5 @@ int parseFile(std::string& Depends, const char* key, const char* fileName)
 	}
 	fclose(fp);
 	return 0;
-}
-bool findHash(const std::string& fileName, unsigned char* result)
-{
-    EVP_MD_CTX   *ctx  = nullptr;
-    EVP_MD       *hash = nullptr;
-	unsigned char buffer[BUFSIZ];
-
-	ctx = EVP_MD_CTX_new();
-	if (ctx == nullptr)
-		return false;
-
-	hash = EVP_MD_fetch(nullptr, "SHA512", nullptr);
-    if (hash == nullptr)
-		return false;
-
-    FILE* f = fopen(fileName.c_str(), "rb");
-    if (!f)
-        return false;
-
-    if (!EVP_DigestInit_ex(ctx, hash, nullptr))
-        return false;
-
-    int i = 0;
-    while((i = fread(buffer, 1, BUFSIZ, f)) > 0)
-    {
-        if (i < 0)
-            continue;
-
-        if (!EVP_DigestUpdate(ctx, buffer, i))
-            return false;
-    }
-    fclose(f);
-    if (!EVP_DigestFinal_ex(ctx, result, nullptr))
-        return false;
-
-	EVP_MD_free(hash);
-    EVP_MD_CTX_free(ctx);
-    return true;
-}
-bool checkHash(const char * fileName, const char * hash)
-{
-  bool same = true;
-  unsigned char hashsum[64];
-
-  if (findHash(fileName, hashsum)) {
-    static char hexNumbers[] = {'0','1','2','3','4','5','6','7',
-                                '8','9','a','b','c','d','e','f'};
-
-    unsigned char high, low;
-    for (int i = 0; i < 64; ++i) {
-      high = (hashsum[i] & 0xF0) >> 4;
-      low = hashsum[i] & 0xF;
-      if ( *(hash+2*i) - hexNumbers[high] ||
-           *(hash+2*i+1) - hexNumbers[low]) {
-        same = false;
-        break;
-      }
-    }
-  } else {
-    same = false;
-  }
-  return same;
 }
 

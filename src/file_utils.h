@@ -14,8 +14,6 @@
 #include <unistd.h>
 #include <utime.h>
 
-#include <openssl/evp.h>
-
 #define S_CARDS_MODE 0755
 
 #define WS_NONE 0
@@ -61,5 +59,3 @@ int findRecursiveFile(std::set<std::string>& filenameList, const char* filename,
 int parseFile(std::set<std::string>& fileContent, const char* fileName);
 int parseFile(std::vector<std::string>& fileContent, const char* fileName);
 int parseFile(std::string& Depends, const char* key, const char* fileName);
-bool findHash(const std::string& fileName, unsigned char* result);
-bool checkHash(const char* fileName, const char* hash);
