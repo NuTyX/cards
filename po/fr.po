@@ -348,6 +348,17 @@ msgstr "Date du Pkgfile     : "
 msgid "Local folder   : "
 msgstr "Dossier local       : "
 
+msgid "Archive name   : "
+msgstr "Nom de l'archive    : "
+
+msgid "Hashsum        : "
+msgstr "Somme hash          : "
+
+msgid "Archive Size   : "
+msgstr "Taille de l'archive : "
+
+msgid "Signature      : "
+msgstr "Signature           : "
 
 msgid "Contributor(s) : "
 msgstr "Contributeur(s)     : "
@@ -642,6 +653,26 @@ Toutes les dépendances ainsi que le paquet final seront compilées."
 
 msgid "create a package from the recipe found in the port."
 msgstr "crée un paquet unique depuis la recette trouvée dans le port."
+
+msgid "list of ports using this port."
+msgstr "liste les ports utilisant ce port."
+
+msgid "This command is used for the packager.\n\
+It shows the list of the reversed dependencies of the package.\n\
+It is used when checking which port is using this port."
+msgstr "Cette commande est utilisée par l'empaqueteur.\n\
+Elle montre la liste des dépendances inversées du paquet.\n\
+Elle est utilisée pour vérifier quel port utilise ce port."
+
+msgid "generate the keys pair."
+msgstr "génère la paire de clés."
+
+msgid "This command is used to generate the keys needed for\n\
+signing and verifying the packages.\n\
+This command is normally used by the packager only."
+msgstr "Cette commande est utilisée pour générer les clés utilisées\n\
+pour la signature et la vérification des paquets.\n\
+Cette commande est normalement utilisée uniquement par le empaqueteur."
 
 msgid "remove archives from installed packages."
 msgstr "supprime les archives des paquets qui ont été installés."
