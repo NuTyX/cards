@@ -107,7 +107,8 @@ void conf::parseConfig()
 				m_name = val;
 			}
 			if (key == "version") {
-				m_version = val;
+				if (m_version.empty())
+					m_version = val;
 			}
 			if (key == "hostname")
 				m_hostname = val;
