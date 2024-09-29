@@ -14,6 +14,39 @@ pkgrepo::pkgrepo(const std::string& fileName)
 	OpenSSL_add_all_algorithms();
 	ERR_load_crypto_strings();
 }
+void pkgrepo::treatErrors(const std::string& s) const
+{
+    switch (m_actualError) {
+	case ERROR_ENUM_PRIVATE_KEY_PATH_NOT_DEFINE:
+		throw RunTimeErrorWithErrno(_("The path of the private key is not set: ") + s);
+		break;
+    case ERROR_ENUM_CANNOT_GENERATE_PRIVATE_KEY:
+        throw std::runtime_error(_("Failed to generate the private key: ") + s);
+        break;
+    case ERROR_ENUM_PACKAGE_NOT_EXIST:
+        throw std::runtime_error(_("The package ") + s + _(" is not existing"));
+        break;
+    case ERROR_ENUM_CANNOT_OPEN_FILE:
+        throw std::runtime_error(_("could not open ") + s);
+        break;
+    case ERROR_ENUM_CANNOT_PARSE_FILE:
+        throw std::runtime_error(_("could not parse ") + s);
+        break;
+    case ERROR_ENUM_CANNOT_READ_DIRECTORY:
+        throw RunTimeErrorWithErrno(_("could not read directory ") + s);
+        break;
+	case ERROR_ENUM_CANNOT_SAVE_PRIVATE_KEY:
+		throw RunTimeErrorWithErrno(_("Could not save the private key: ") + s);
+		break;
+	case ERROR_ENUM_CANNOT_SAVE_PUBLIC_KEY:
+		throw RunTimeErrorWithErrno(_("Could not save the public key: ") + s);
+		break;
+	case ERROR_ENUM_CANNOT_CHMOD_PRIVATE_KEY_TO_600:
+		throw RunTimeErrorWithErrno(_("Failed to chmod key: ") + s + _(" to 0600"));
+		break;
+    }
+}
+
 void pkgrepo::generateDependencies
 	(const std::pair<std::string,time_t>& packageName)
 {
@@ -26,10 +59,17 @@ void pkgrepo::generateDependencies
 	m_packageName = packageName;
 	generateDependencies();
 }
-bool pkgrepo::generateKeys()
+void pkgrepo::generateKeys()
 {
 	EVP_PKEY*     key = nullptr;
 	EVP_PKEY_CTX* ctx = nullptr;
+	std::string keyfile(m_config.keypath());
+	keyfile += PRIVATEKEY;
+
+	if(m_config.keypath().empty()) {
+		m_actualError = cards::ERROR_ENUM_PRIVATE_KEY_PATH_NOT_DEFINE;
+		treatErrors(keyfile);
+	}
 
 	ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_ED25519, nullptr);
 	if (!ctx)
@@ -43,43 +83,47 @@ bool pkgrepo::generateKeys()
             EVP_PKEY_CTX_free(ctx);
 		if (key)
 			EVP_PKEY_free(key);
-		throw std::runtime_error("Failed to generate the private key");
+
+		m_actualError = cards::ERROR_ENUM_CANNOT_GENERATE_PRIVATE_KEY;
+		treatErrors (keyfile);
 	}
 	EVP_PKEY_CTX_free(ctx);
 
-	std::string keyfile(m_config.keypath());
-	keyfile += PRIVATEKEY;
 	FILE *f = fopen(keyfile.c_str(), "w");
 	if (!f) {
 		EVP_PKEY_free(key);
-		throw std::runtime_error("Failed to create file: " + keyfile);
+		m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
+		treatErrors (keyfile);
 	}
 
 	if (PEM_write_PrivateKey(f, key, nullptr, nullptr, 0, nullptr, nullptr) == 0 ) {
 		EVP_PKEY_free(key);
 		fclose(f);
-		throw std::runtime_error("Failed to save the private key: " + keyfile);
+		m_actualError = cards::ERROR_ENUM_CANNOT_SAVE_PRIVATE_KEY;
+		treatErrors (keyfile);
 	}
 	fclose(f);
-	if (chmod(keyfile.c_str(),0600) == -1)
-		throw std::runtime_error("Failed to chmod key: " + keyfile + " to 0600");
-
+	if (chmod(keyfile.c_str(),0600) == -1) {
+		m_actualError = cards::ERROR_ENUM_CANNOT_CHMOD_PRIVATE_KEY_TO_600;
+		treatErrors (keyfile);
+	}
 	keyfile = ".";
 	keyfile += PUBLICKEY;
 
 	f = fopen(keyfile.c_str(), "w");
 	if (!f) {
 		EVP_PKEY_free(key);
-		throw std::runtime_error("Failed to create file: " + keyfile);
+		m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
+		treatErrors (keyfile);
 	}
 	if (PEM_write_PUBKEY(f, key) == 0 ) {
 		EVP_PKEY_free(key);
 		fclose(f);
-		throw std::runtime_error("Failed to save the public key: " + keyfile);
+		m_actualError = cards::ERROR_ENUM_CANNOT_SAVE_PUBLIC_KEY;
+		treatErrors (keyfile);
 	}
 	fclose(f);
 	EVP_PKEY_free(key);
-	return true;
 }
 void pkgrepo::generateDependencies()
 {
@@ -120,36 +164,38 @@ void pkgrepo::generateDependencies()
 				 * And check it's signature
 				 */
 
-				packageFileName = dirName(packageName) + "/" +fileName(packageName);
+				packageFileName = dirName(packageName) + "/" + fileName(packageName);
 				packageNameHash = fileHash(packageName);
 
 				/* archive PackageName exist
 				 * Let's see if we need to download it */
 
 			} else {
-				/*
-				 * FIXME
 				m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_EXIST;
 				treatErrors (packageName);
-				*/
 			}
 
-			/* If the binary archive is not yet downloaded or is corrupted */
-			if (!checkFileHash(packageFileName, packageNameHash)) {
-				/* Try to get it */
+			// If the binary archive is not yet downloaded
+			if (!checkFileExist(packageFileName))
+				downloadPackageFileName(packageName);
+			// m_packageFileNameHash contains hashsum of packageFileName
+			generateHash(packageFileName);
+			// we compare m_packageFileNameHash with the one stored in the database
+			if (!checkHash(packageName)) {
+				// Last try to get it.
 				downloadPackageFileName(packageName);
 			}
 			directDependencies = getPackageDependencies(packageFileName);
 		}
 
-		/* If the package is not yet installed or not uptodate */
+		// If the package is not yet installed or not uptodate
 		if (!m_dbh.checkPackageNameBuildDateSame(PackageTime))
 		{
-			/* checkPackageNameBuildDateSame is no then add it */
+			// checkPackageNameBuildDateSame is no then add it
 			depencenciestoSort.push_back(PackageTime);
 		}
 
-		/* else checkPackageNameBuildDateSame is yes*/
+		// else checkPackageNameBuildDateSame is yes
 
 		for ( auto sit : directDependencies) {
 			if ( sit.first == PackageTime.first )
@@ -169,9 +215,8 @@ void pkgrepo::generateDependencies()
 		}
 	}
 
-	/* Let's revert the order of dependencies
-	 * We need the last founds (lower level) first
-	 */
+	// Let's revert the order of dependencies
+	// We need the last founds (lower level) first
 	bool found = false ;
 	for ( std::vector<std::pair<std::string,time_t>>::reverse_iterator vrit = depencenciestoSort.rbegin();
 		vrit != depencenciestoSort.rend();
@@ -186,9 +231,7 @@ void pkgrepo::generateDependencies()
 		if (!found) {
 			m_dependenciesList.push_back(*vrit);
 		}
-
-		/* else no deps founds */
-
+		// else no deps founds
 	}
 }
 void pkgrepo::downloadPackageFileName(const std::string& packageName)
@@ -663,13 +706,20 @@ void pkgrepo::generateSign(const std::string& hash)
 	EVP_PKEY* key = nullptr;
 	std::string keyfile(m_config.keypath());
 	keyfile += PRIVATEKEY;
+
+	if(m_config.keypath().empty()) {
+		m_actualError = cards::ERROR_ENUM_PRIVATE_KEY_PATH_NOT_DEFINE;
+		treatErrors(keyfile);
+	}
+
 	std::vector<unsigned char> mesBytes(hash.length() / 2);
 	for (size_t i = 0; i < hash.length(); i += 2 )
 		mesBytes[i / 2] = static_cast<unsigned char>(std::stoi(hash.substr(i,2), nullptr, 16));
 
 	FILE* keyFileStream = fopen(keyfile.c_str(), "r");
 	if (!keyFileStream) {
-		throw std::runtime_error("Failed to open key file:" + keyfile);
+		m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
+		treatErrors (keyfile);
 	}
 	key = PEM_read_PrivateKey(keyFileStream, nullptr, nullptr, nullptr);
 	fclose(keyFileStream);
@@ -750,9 +800,10 @@ bool pkgrepo::checkSign(const std::string& name)
 		mesBytes[i / 2] = static_cast<unsigned char>(std::stoi(hash.substr(i,2), nullptr, 16));
 
 	FILE* keyFileStream = fopen(keyfile.c_str(), "r");
-	if (!keyFileStream)
-		throw std::runtime_error("Failed to open key file:" + keyfile);
-
+	if (!keyFileStream) {
+		m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
+		treatErrors (keyfile);
+	}
 	key = PEM_read_PUBKEY(keyFileStream, nullptr, nullptr, nullptr);
 	fclose(keyFileStream);
 	if (!key) {

@@ -10,12 +10,12 @@
 namespace cards {
 
 class create : public pkgfile {
-    ports_t m_tree;
-    std::set<std::string> m_list;
-    std::vector<std::string> m_dependencies;
+    ports_t                    m_tree;
+    std::set<std::string>      m_list;
+    std::vector<std::string>   m_dependencies;
     const CardsArgumentParser& m_argParser;
-    cards::ErrorEnum m_actualError;
-    cards::conf m_config;
+    cards::ErrorEnum           m_actualError;
+    cards::conf                m_config;
 
     void treatErrors(const std::string& s) const;
     void list(std::string& packageName);

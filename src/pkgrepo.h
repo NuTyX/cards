@@ -20,6 +20,7 @@ class pkgrepo {
 
     std::string              m_packageName;
     std::string              m_configFileName;
+    cards::ErrorEnum         m_actualError;
     cards::conf              m_config;
     repo_t                   m_listOfPackages;
     packages_t               m_listOfRepoPackages;
@@ -40,6 +41,7 @@ class pkgrepo {
     std::vector<std::pair<std::string,time_t>>
                              m_dependenciesList;
 
+    void                     treatErrors(const std::string& s) const;
     void                     parse();
     void                     errors();
 
@@ -54,11 +56,48 @@ public:
 
     std::set<std::pair<std::string,time_t>>
                              getPackageDependencies (const std::string& filename);
+
     bool                     checkBinaryExist(const std::string& name);
+
+    // To check the validity of an archive
+    //
+    // 1. generateHash(filename("gcc")); m_packageFileHash is set
+    //
+    // 2. checkHash("gcc"); m_packageFileHash is compared with the hash found in the DB
+    //
+    // Return True if matching.
 
     // Generate the hashsum for the archive file of the package name and store the result
     // in the m_packageFileNameHash member variable
     void                     generateHash(const std::string& packageName);
+
+    // Store the computed hash stored in m_packageFileNameHash
+    // into the database packageName hash property
+    void                    hash(const std::string& packageName);
+
+    // Check the Hash and signature of the archive file of the package name
+    bool                     checkHash(const std::string& name);
+
+    // Return the m_packageNameFileNameHash value
+    std::string&            hash();
+
+    // To generate hash and signature
+    //
+    // 1. std::string packageName = getName("gcc.cards-11.2-1.xz");
+    // 2. generateHash("gcc.cards-11.2-1.xz");  m_packageFileNameHash is set
+
+    // 3. hash(packageName);
+    // 4. generateSign(hash());
+    // 5. sign(packageName);
+
+    // OR
+
+    // 1. std::string packageName = getName("gcc.cards-11.2-1.xz");
+    // 2. generateHash("gcc.cards-11.2-1.xz"); m_packageFileNameHash is set
+    // 3. generateSign(); m_packageFileNameHas is used and signed
+    // 4. hash(packageName)
+    // 5. sign(packageName)
+    // Infos stored in the DB
 
     // Generate the signature of the hashsum stored in the m_packageFileNameHash
     // member variable
@@ -69,29 +108,19 @@ public:
     // The private key location is defined in cards.conf file.
     void                     generateSign(const std::string& hash);
 
-    // Store the computed hash stored in m_packageFileNameHash
-    // into the database packageName hash property
-    void                    hash(const std::string& packageName);
-
     // Store the computed signature stored in m_packageFileNameSignature
     // into the database packageName signature property
     void                    sign(const std::string& packageName);
 
-    // Return the m_packageNameFileNameHash value
-    std::string&            hash();
-
     // Return the m_packageNameFileNameSignature value
     std::string&            sign();
-
-    // Check the Hash and signature of the archive file of the package name
-    bool                     checkHash(const std::string& name);
 
     // Check the signature of the archive file of the package name
     // The public key location is at the root of the repository or collection
     bool                     checkSign(const std::string& name);
 
     // Generate the keys pair for signing and verifying the package archive hashing
-    bool                     generateKeys();
+    void                     generateKeys();
 
     time_t                   getBinaryBuildTime (const std::string& name);
 
