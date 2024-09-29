@@ -64,7 +64,7 @@ install::install(const CardsArgumentParser& argParser,
 	}
 	getLocalePackagesList();
 	for ( auto i : m_pkgrepo.getDependenciesList() ) {
-		m_packageArchiveName = m_pkgrepo.fileName(i.first);
+		m_packageArchiveName = m_pkgrepo.dirName(i.first) + "/" + m_pkgrepo.fileName(i.first);
 		archive packageArchive(m_packageArchiveName.c_str());
 		std::string name = packageArchive.name();
 		if ( checkPackageNameExist(name )) {
