@@ -4,7 +4,7 @@
 
 #include "cache.h"
 #include "conf.h"
-#include "file_utils.h"
+#include "dwl.h"
 #include "pkgdbh.h"
 
 #include <iomanip>

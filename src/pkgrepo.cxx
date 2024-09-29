@@ -94,7 +94,7 @@ void pkgrepo::generateDependencies()
 
 	std::vector< std::pair<std::string,time_t> >::iterator vit;
 	std::set< std::pair<std::string,time_t> >::iterator sit;
-	std::string packageNameSignature, packageName, packageFileName;
+	std::string packageNameHash, packageName, packageFileName;
 
 	/* Main while loop */
 	while ( ! dependenciesWeMustAdd.empty() ) {
@@ -106,11 +106,12 @@ void pkgrepo::generateDependencies()
 		dependenciesWeMustAdd.erase(vit);
 
 		std::set<std::pair<std::string,time_t>> directDependencies;
-		if ( getListOfPackages().find(packageName) != getListOfPackages().end() ) {
+		if ( m_listOfRepoPackages.find(packageName) != m_listOfRepoPackages.end() ) {
 			directDependencies = getListOfPackages()[packageName].dependencies();
 		} else {
 
 			/* The packageName is not found in the listOfPackages */
+
 
 			if ( checkBinaryExist(packageName)) {
 				/* The packageName binary is found.
@@ -119,8 +120,8 @@ void pkgrepo::generateDependencies()
 				 * And check it's signature
 				 */
 
-				packageFileName = fileName(packageName);
-				packageNameSignature = fileSignature(packageName);
+				packageFileName = dirName(packageName) + "/" +fileName(packageName);
+				packageNameHash = fileHash(packageName);
 
 				/* archive PackageName exist
 				 * Let's see if we need to download it */
@@ -134,7 +135,7 @@ void pkgrepo::generateDependencies()
 			}
 
 			/* If the binary archive is not yet downloaded or is corrupted */
-			if (!checkFileHash(packageFileName, packageNameSignature)) {
+			if (!checkFileHash(packageFileName, packageNameHash)) {
 				/* Try to get it */
 				downloadPackageFileName(packageName);
 			}
@@ -192,7 +193,12 @@ void pkgrepo::generateDependencies()
 }
 void pkgrepo::downloadPackageFileName(const std::string& packageName)
 {
-	/* FIXME */
+			dwl archive(m_listOfPackages[packageName].origin()
+			+ "/"
+			+ m_listOfPackages[packageName].fileName(),
+			m_listOfPackages[packageName].dirName(),
+			m_listOfPackages[packageName].fileName(),
+			true);
 }
 std::vector<std::pair<std::string,time_t>>&
 pkgrepo::getDependenciesList()
@@ -229,6 +235,9 @@ std::string& pkgrepo::getBinaryPackageInfo(const std::string& name)
 			+ _("Description    : ")
 			+ m_listOfPackages[name].description()
 			+ '\n'
+			+ _("Archive name   : ")
+			+ m_listOfPackages[name].fileName()
+			+ '\n'
 			+ _("Groups         : ")
 			+ m_listOfPackages[name].group()
 			+ '\n'
@@ -241,6 +250,26 @@ std::string& pkgrepo::getBinaryPackageInfo(const std::string& name)
 			+ _("Version        : ")
 			+ m_listOfPackages[name].version()
 			+ '\n'
+			+ _("Release        : ")
+			+ itos(m_listOfPackages[name].release())
+			+ '\n'
+			+ _("Build date     : ")
+			+ getDateFromEpoch(m_listOfPackages[name].build())
+			+ '\n'
+			+ _("Hashsum        : ")
+			+ m_listOfPackages[name].hash()
+			+ '\n'
+			+ _("Signature      : ")
+			+ m_listOfPackages[name].signature()
+			+ '\n'
+			+ _("Archive Size   : ")
+			+ sizeHumanRead(m_listOfPackages[name].size())
+			+ _("bytes")
+			+ '\n'
+			+ _("Installed Size : ")
+			+ sizeHumanRead(m_listOfPackages[name].space())
+			+ _("bytes")
+			+ '\n'
 			+ _("Maintainer(s)  : ")
 			+ m_listOfPackages[name].maintainer()
 			+ '\n'
@@ -252,6 +281,12 @@ std::string& pkgrepo::getBinaryPackageInfo(const std::string& name)
 			+ '\n'
 			+ _("Arch           : ")
 			+ m_listOfPackages[name].arch()
+			+ '\n'
+			+ _("Binary URL     : ")
+			+ m_listOfPackages[name].origin()
+			+ '\n'
+			+ _("Local folder   : ")
+			+ m_listOfPackages[name].dirName()
 			+ '\n';
 		if (m_listOfPackages[name].dependencies().size() > 0 ) {
 			std::string dependencies;
@@ -280,6 +315,13 @@ void pkgrepo::parse()
 			+ PKG_REPO;
 
 		info.collection(i.collection);
+		info.origin(i.url
+			+ "/"
+			+ getMachineType()
+			+ "/"
+			+ m_config.version()
+			+ "/"
+			+ i.collection);
 		std::vector<std::string> repoFileContent;
 
 		if (parseFile(repoFileContent, repoFile.c_str()) != 0) {
@@ -302,7 +344,6 @@ void pkgrepo::parse()
 				pos = p.find(".cards-");
 				if ( pos != std::string::npos) {
 					pkgName = p.substr(1,pos - 1);
-					info.version(p.substr(pos + 7));
 					info.fileName(p.substr(1));
 					pkgFound = true;
 				}
@@ -316,6 +357,15 @@ void pkgrepo::parse()
 			if (pkgFound)
 				if (p[0] == LICENSE)
 					info.license(p.substr(1));
+			if (pkgFound)
+				if (p[0] == VERSION)
+					info.version(p.substr(1));
+			if (pkgFound)
+				if (p[0] == RELEASE)
+					info.release(stoi(p.substr(1)));
+			if (pkgFound)
+				if (p[0] == BUILD)
+					info.build(strtoul(p.substr(1).c_str(),nullptr,0));
 			if (pkgFound)
 				if (p[0] == MAINTAINER)
 					info.maintainer(p.substr(1));
@@ -358,7 +408,9 @@ void pkgrepo::parse()
 			if (pkgFound)
 				if (p[0] == RUNTIME_DEPENDENCY) {
 					std::pair<std::string,time_t> dep;
-					dep.first = p.substr(1);
+					dep.first = p.substr(1,p.size()-11);
+// FIXME
+//					dep.second = strtoul(p.substr(p.size()-10).c_str(),nullptr,0);
 					pkgDependencies.insert(dep);
 				}
 			if (pkgFound)
