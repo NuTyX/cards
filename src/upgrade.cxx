@@ -107,11 +107,11 @@ void upgrade::Isuptodate()
 }
 int upgrade::Isdownload()
 {
-	std::string packageNameSignature, packageName, packageFileName;
+	std::string packageFileName;
 	for (auto i : m_ListOfPackages) {
 		packageFileName = m_pkgrepo.fileName(i.first);
-		packageNameSignature = m_pkgrepo.fileSignature(packageName);
-		if ( ! checkFileHash(packageFileName, packageNameSignature))
+		m_pkgrepo.checkHash(packageFileName);
+		if ( ! m_pkgrepo.checkHash(i.first))
 			return EXIT_FAILURE;
 	}
 
