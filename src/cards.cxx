@@ -194,7 +194,7 @@ int main(int argc, char** argv)
         case ArgParser::CMD_KEYS: {
             if (!getuid()) {
                 string s = "";
-                throw runtime_error(s + _(" this command should not be used under root"));
+                throw runtime_error(s + _(" this command should not be used under root."));
             }
             cards::pkgrepo pkgrepo(configFile.c_str());
             pkgrepo.generateKeys();
@@ -272,7 +272,7 @@ int main(int argc, char** argv)
             cout << cardsArgPars.getIdValue(cardsArgPars.command()) << endl;
         }
     } catch (runtime_error& e) {
-        cerr << "cards " << VERSION << " " << command << ": " << e.what() << endl;
+        cerr << "cards " << PACKAGE_VERSION << " " << command << ": " << e.what() << endl;
         return EXIT_FAILURE;
     }
 }

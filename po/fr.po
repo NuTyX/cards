@@ -150,6 +150,9 @@ msgstr " option manquante"
 msgid ": to many options"
 msgstr ": trop d'options"
 
+msgid " this command should not be used under root."
+msgstr " cette commande ne peut pas être utilisée en root."
+
 msgid " only root can install / upgrade / remove packages"
 msgstr " seul l'utilisateur root peut installer / mettre à jour / supprimer des paquets"
 
