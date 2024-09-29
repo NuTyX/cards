@@ -5,7 +5,7 @@
 #include "pkgdbh.h"
 #include "cards_argument_parser.h"
 #include "file_utils.h"
-#include "file_download.h"
+#include "dwl.h"
 #include "pkgrepo.h"
 
 namespace cards {

@@ -153,7 +153,7 @@ It is used when checking which port is using this port."),
         ArgParser::EQ, 1, _("<port>"));
 
     addCommand(CMD_KEYS, "keys",
-        _("generate the keys pair ."),
+        _("generate the keys pair."),
         _("This command is used to generate the keys needed for\n\
 signing and verifying the packages.\n\
 This command is normally used by the packager only."),

@@ -33,7 +33,7 @@ CARDSOBJECTS =	conf.o \
 	cache.o \
 	pkgfile.o \
 	pkgrepo.o \
-	file_download.o \
+	dwl.o \
 	argument_parser.o \
 	cards_argument_parser.o \
 	file_utils.o \
@@ -62,7 +62,7 @@ LIBOBJECTS =  conf.o \
 	string_utils.o \
 	archive.o \
 	pkgfile.o \
-	file_download.o \
+	dwl.o \
 	file_utils.o \
 	process.o \
 	pkg.o \
@@ -103,7 +103,7 @@ HEADERS = define.h \
 	cache.h \
 	sync.h \
 	pkgfile.h \
-	file_download.h \
+	dwl.h \
 	process.h \
 	runtime_dependencies_utils.h \
 	pkgdbh.h \

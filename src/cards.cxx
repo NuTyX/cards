@@ -5,7 +5,7 @@
 #include "dependent.h"
 #include "depends.h"
 #include "deptree.h"
-#include "file_download.h"
+#include "dwl.h"
 #include "info.h"
 #include "install.h"
 #include "level.h"
