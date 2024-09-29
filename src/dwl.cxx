@@ -1,21 +1,18 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-#include <iostream>
-#include "file_download.h"
-#include <fstream>
-#include <iterator>
+#include "dwl.h"
 
-FileDownloadEvent::FileDownloadEvent()
+dwlEvent::dwlEvent()
 {
-	FileDownload::SuscribeToEvents(this);
+	dwl::SuscribeToEvents(this);
 }
 
-FileDownloadEvent::~FileDownloadEvent()
+dwlEvent::~dwlEvent()
 {
-	FileDownload::UnSuscribeFromEvents(this);
+	dwl::UnSuscribeFromEvents(this);
 }
 
-FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
+dwl::dwl(std::vector<InfoFile> destinationFiles, bool progress)
 	: m_progress(progress)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -29,25 +26,21 @@ FileDownload::FileDownload(std::vector<InfoFile> downloadFiles,bool progress)
 	}
 	m_slist=nullptr;
 	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
-	for (std::vector<InfoFile>::const_iterator i = downloadFiles.begin(); i != downloadFiles.end();++i)
+	for (auto i : destinationFiles)
 	{
-		m_url = i->url;
-		m_destinationFile.filename = i->filename;
-		m_destinationFile.dirname = i->dirname;
-		m_downloadFileName = i->dirname + i->filename;
-		m_downloadProgress.name = i->filename;
-		m_hash = i->hash;
-		createRecursiveDirs(i->dirname);
+		m_url = i.url;
+		m_destinationFile.filename = i.filename;
+		m_destinationFile.dirname = i.dirname;
+		m_downloadFileName = i.dirname + i.filename;
+		m_downloadProgress.name = i.filename;
+		createRecursiveDirs(i.dirname);
 		initFileToDownload(m_url,m_downloadFileName);
-		downloadFile();
-		if ( ! checkHash() )
-			throw std::runtime_error (m_downloadFileName
-			+ " "
-			+ m_hash +": checksum error");
+
+		get();
 	}
 }
 
-FileDownload::FileDownload(std::string url,
+dwl::dwl(std::string url,
 	std::string dirName,
 	std::string fileName,
 	bool progress)
@@ -71,18 +64,17 @@ FileDownload::FileDownload(std::string url,
 	} else {
 		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
-	downloadFile();
+
+	get();
 }
 
-FileDownload::FileDownload(std::string fileInfo,std::string url,
+dwl::dwl(std::string fileInfo,std::string url,
 	std::string dirName,
 	std::string fileName,
-	std::string hash,
 	bool progress)
   : m_fileInfo(fileInfo),
 		m_url(url),
 		m_downloadFileName(dirName+"/"+fileName),
-		m_hash(hash),
 		m_progress(progress)
 {
   curl_global_init(CURL_GLOBAL_ALL);
@@ -100,12 +92,11 @@ FileDownload::FileDownload(std::string fileInfo,std::string url,
 	} else {
 		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
 	}
-	downloadFile();
-	if ( ! checkHash() )
-		throw std::runtime_error (m_downloadFileName + " " + m_hash +": checksum error");
+
+	get();
 }
 
-void FileDownload::downloadFile()
+void dwl::get()
 {
 	if (! m_progress)
 		rotatingCursor();
@@ -118,9 +109,9 @@ void FileDownload::downloadFile()
 	for the moment we never want to use server side cache
 	*/
 	curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, m_slist);
-	curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, &FileDownload::writeToStreamHandle);
+	curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, &dwl::writeToStreamHandle);
 	curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &m_destinationFile);
-	curl_easy_setopt(m_curl, CURLOPT_XFERINFOFUNCTION, &FileDownload::updateProgressHandle);
+	curl_easy_setopt(m_curl, CURLOPT_XFERINFOFUNCTION, &dwl::updateProgressHandle);
 	curl_easy_setopt(m_curl, CURLOPT_URL,m_url.c_str());
 	curl_easy_setopt(m_curl, CURLOPT_FOLLOWLOCATION,1L);
 	curl_easy_setopt(m_curl, CURLOPT_FAILONERROR,1L);
@@ -136,8 +127,7 @@ void FileDownload::downloadFile()
 		std::cerr << curl_easy_strerror(m_curlCode) << std::endl;
 		throw std::runtime_error ( "\n\nURL   : " +
 		m_url + "\nFILE  : " +
-		m_downloadFileName + "\nHASH: " +
-		m_hash +"\n\n !!! download failed !!! \n");
+		m_downloadFileName +"\n\n !!! download failed !!! \n");
 	}
 	if (m_destinationFile.stream) {
 		fclose(m_destinationFile.stream);
@@ -149,7 +139,7 @@ void FileDownload::downloadFile()
 	}
 }
 
-void FileDownload::initFileToDownload(std::string _url,
+void dwl::initFileToDownload(std::string _url,
 	std::string _file)
 {
   m_destinationFile.url = _url;
@@ -160,7 +150,7 @@ void FileDownload::initFileToDownload(std::string _url,
   m_downloadProgress.curl = m_curl;
 }
 
-size_t FileDownload::writeToStream(void *buffer,
+size_t dwl::writeToStream(void *buffer,
 	size_t size,
 	size_t nmemb,
 	void *stream)
@@ -175,7 +165,7 @@ size_t FileDownload::writeToStream(void *buffer,
 	return fwrite(buffer,size,nmemb,outputf->stream);
 }
 
-int FileDownload::updateProgress(void *p,
+int dwl::updateProgress(void *p,
 	curl_off_t dltotal,
 	curl_off_t dlnow,
 	curl_off_t ultotal,
@@ -199,7 +189,7 @@ int FileDownload::updateProgress(void *p,
 	sizeHumanRead(static_cast<int>(SpeedDownload)).c_str(),
 	static_cast<int>(static_cast<double>(dlnow)/static_cast<double>(dltotal) * 100 ),
 	static_cast<int>((dltotal - dlnow)/SpeedDownload));
-	FileDownloadState state;
+	dwlState state;
 	state.dlnow = static_cast<double>(dlnow);
 	state.dltotal = static_cast<double>(dltotal);
 	state.dlspeed = static_cast<double>(SpeedDownload);
@@ -208,53 +198,43 @@ int FileDownload::updateProgress(void *p,
 	return 0;
 }
 
-int FileDownload::updateProgressHandle(void *p,
+int dwl::updateProgressHandle(void *p,
 	curl_off_t dltotal,
 	curl_off_t dlnow,
 	curl_off_t ultotal,
 	curl_off_t ulnow)
 {
-	return static_cast<FileDownload*>(p)->updateProgress(p,dltotal,dlnow,ultotal,ulnow);
+	return static_cast<dwl*>(p)->updateProgress(p,dltotal,dlnow,ultotal,ulnow);
 }
 
-size_t FileDownload::writeToStreamHandle(void *buffer,
+size_t dwl::writeToStreamHandle(void *buffer,
 	size_t size,
 	size_t nmemb,
 	void *stream)
 {
-	return static_cast<FileDownload*>(stream)->writeToStream(buffer,size,nmemb,stream);
+	return static_cast<dwl*>(stream)->writeToStream(buffer,size,nmemb,stream);
 }
 
-bool FileDownload::checkHash()
-{
-	return ::checkHash(m_downloadFileName.c_str(),m_hash.c_str());
-}
+std::set<dwlEvent*> dwl::m_arrCallBacks;
 
-bool FileDownload::checkUpToDate()
-{
-	return true;
-}
-
-std::set<FileDownloadEvent*> FileDownload::m_arrCallBacks;
-
-void FileDownload::SendProgressEvent(FileDownloadState event)
+void dwl::SendProgressEvent(dwlState event)
 {
 	for (auto it : m_arrCallBacks)
 	{
-		it->OnFileDownloadProgressInfo(event);
+		it->OndwlProgressInfo(event);
 	}
 }
 
-void FileDownload::SuscribeToEvents(FileDownloadEvent* callback)
+void dwl::SuscribeToEvents(dwlEvent* callback)
 {
-	if ((FileDownload::m_arrCallBacks.find(callback)==FileDownload::m_arrCallBacks.end())
+	if ((dwl::m_arrCallBacks.find(callback)==dwl::m_arrCallBacks.end())
 		&& (callback!=nullptr))
-		FileDownload::m_arrCallBacks.insert(callback);
+		dwl::m_arrCallBacks.insert(callback);
 }
 
-void FileDownload::UnSuscribeFromEvents(FileDownloadEvent* callback)
+void dwl::UnSuscribeFromEvents(dwlEvent* callback)
 {
-	auto it =  FileDownload::m_arrCallBacks.find(callback);
-	if (it != FileDownload::m_arrCallBacks.end())
-		FileDownload::m_arrCallBacks.erase(it);
+	auto it =  dwl::m_arrCallBacks.find(callback);
+	if (it != dwl::m_arrCallBacks.end())
+		dwl::m_arrCallBacks.erase(it);
 }

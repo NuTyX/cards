@@ -3,7 +3,7 @@
 #pragma once
 
 #include "conf.h"
-#include "file_download.h"
+#include "dwl.h"
 
 namespace cards {
 class sync

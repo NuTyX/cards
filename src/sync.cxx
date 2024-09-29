@@ -28,7 +28,7 @@ void sync::run()
 		if (collection.url.size() == 0 ) {
 			continue;
 		}
-		FileDownload repo(collection.url
+		dwl repo(collection.url
 			+ "/"
 			+ config.arch()
 			+ "/"
