@@ -110,7 +110,8 @@ void install::getLocalePackagesList()
 	std::set<std::string> tmpList;
 	for (auto i : config.groups()) {
 		for (auto j : m_pkgrepo.getDependenciesList()) {
-			std::string packageName  = j.first + "." + i;
+			std::string name = j.first + "." + i;
+			std::string packageName  = m_pkgrepo.dirName(name) + "/" + m_pkgrepo.fileName(name);
 			if (m_pkgrepo.checkBinaryExist(packageName)) {
 				packageFileName = m_pkgrepo.fileName(packageName);
 				if ( ! checkFileExist(packageFileName) )

@@ -17,9 +17,9 @@ pkgrepo::pkgrepo(const std::string& fileName)
 void pkgrepo::treatErrors(const std::string& s) const
 {
     switch (m_actualError) {
-	case ERROR_ENUM_PRIVATE_KEY_PATH_NOT_DEFINE:
-		throw RunTimeErrorWithErrno(_("The path of the private key is not set: ") + s);
-		break;
+    case ERROR_ENUM_PRIVATE_KEY_PATH_NOT_DEFINE:
+        throw RunTimeErrorWithErrno(_("The path of the private key is not set: ") + s);
+        break;
     case ERROR_ENUM_CANNOT_GENERATE_PRIVATE_KEY:
         throw std::runtime_error(_("Failed to generate the private key: ") + s);
         break;
@@ -35,18 +35,17 @@ void pkgrepo::treatErrors(const std::string& s) const
     case ERROR_ENUM_CANNOT_READ_DIRECTORY:
         throw RunTimeErrorWithErrno(_("could not read directory ") + s);
         break;
-	case ERROR_ENUM_CANNOT_SAVE_PRIVATE_KEY:
-		throw RunTimeErrorWithErrno(_("Could not save the private key: ") + s);
-		break;
-	case ERROR_ENUM_CANNOT_SAVE_PUBLIC_KEY:
-		throw RunTimeErrorWithErrno(_("Could not save the public key: ") + s);
-		break;
-	case ERROR_ENUM_CANNOT_CHMOD_PRIVATE_KEY_TO_600:
-		throw RunTimeErrorWithErrno(_("Failed to chmod key: ") + s + _(" to 0600"));
-		break;
+    case ERROR_ENUM_CANNOT_SAVE_PRIVATE_KEY:
+        throw RunTimeErrorWithErrno(_("Could not save the private key: ") + s);
+        break;
+    case ERROR_ENUM_CANNOT_SAVE_PUBLIC_KEY:
+        throw RunTimeErrorWithErrno(_("Could not save the public key: ") + s);
+        break;
+    case ERROR_ENUM_CANNOT_CHMOD_PRIVATE_KEY_TO_600:
+        throw RunTimeErrorWithErrno(_("Failed to chmod key: ") + s + _(" to 0600"));
+        break;
     }
 }
-
 void pkgrepo::generateDependencies
 	(const std::pair<std::string,time_t>& packageName)
 {
@@ -127,8 +126,16 @@ void pkgrepo::generateKeys()
 }
 void pkgrepo::generateDependencies()
 {
-	std::vector<std::pair<std::string,time_t>> dependenciesWeMustAdd,depencenciestoSort;
+	std::string packageNameHash, packageName, packageFileName;
+
 	std::pair<std::string,time_t> PackageTime;
+
+	std::vector<std::pair<std::string,time_t>> dependenciesWeMustAdd,depencenciestoSort;
+
+	std::vector<std::pair<std::string,time_t> >::iterator vit;
+
+	std::set< std::pair<std::string,time_t> >::iterator sit;
+
 	PackageTime.first=m_packageName;
 	PackageTime.second=0;
 
@@ -136,9 +143,6 @@ void pkgrepo::generateDependencies()
 	dependenciesWeMustAdd.push_back(PackageTime);
 	dependenciesWeMustAdd.push_back(PackageTime);
 
-	std::vector< std::pair<std::string,time_t> >::iterator vit;
-	std::set< std::pair<std::string,time_t> >::iterator sit;
-	std::string packageNameHash, packageName, packageFileName;
 
 	/* Main while loop */
 	while ( ! dependenciesWeMustAdd.empty() ) {
@@ -388,6 +392,7 @@ void pkgrepo::parse()
 				if ( pos != std::string::npos) {
 					pkgName = p.substr(1,pos - 1);
 					info.fileName(p.substr(1));
+					info.group("");
 					pkgFound = true;
 				}
 			}
