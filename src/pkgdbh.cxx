@@ -932,13 +932,19 @@ pkgdbh::checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName)
 
 bool pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild)
 {
-	if (dependencieNameBuild.second == 0)
+	if (dependencieNameBuild.second == 0) {
+		std::cout << dependencieNameBuild.first << " have it's buildtime to " << dependencieNameBuild.second <<  std::endl;
 		return false;
+	}
 	std::set<std::string>::iterator it = m_listOfPackagesNames.find(dependencieNameBuild.first);
-	if (it == m_listOfPackagesNames.end())
+	if (it == m_listOfPackagesNames.end()) {
+		std::cout << dependencieNameBuild.first << " is not install" << std::endl;
 		return false;
-	if (m_listOfPackages[dependencieNameBuild.first].build() < dependencieNameBuild.second)
+	}
+	if (m_listOfPackages[dependencieNameBuild.first].build() < dependencieNameBuild.second) {
+		std::cout << dependencieNameBuild.first << " is newer" << std::endl;
 		return false;
+	}
 	return true;
 }
 /* Remove meta data about the removed package */

@@ -10,6 +10,7 @@
 #include <iterator>
 #include <string>
 
+#include <cstring>
 #include <libintl.h>
 #include <locale.h>
 #include <cstdio>
@@ -23,3 +24,11 @@ std::string getMachineType();
 
 void assertArgument(char** argv, int argc, int index);
 void rotatingCursor();
+
+class RunTimeErrorWithErrno : public std::runtime_error
+{
+	public:
+		explicit RunTimeErrorWithErrno(const std::string& msg) throw();
+		explicit RunTimeErrorWithErrno(const std::string& msg, int e) throw();
+};
+

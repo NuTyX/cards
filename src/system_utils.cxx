@@ -28,3 +28,11 @@ void assertArgument(char** argv, int argc, int index)
 	if (argc - 1 < index + 1)
 		throw std::runtime_error("option " + std::string(argv[index]) + " requires an argument");
 }
+RunTimeErrorWithErrno::RunTimeErrorWithErrno(const std::string& msg) throw()
+	: std::runtime_error(msg + std::string(": ") + strerror(errno))
+{
+}
+RunTimeErrorWithErrno::RunTimeErrorWithErrno(const std::string& msg, int e) throw()
+	: std::runtime_error(msg + std::string(": ") + strerror(e))
+{
+}
