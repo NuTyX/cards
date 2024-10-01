@@ -5,15 +5,14 @@
 
 include ../Makefile.inc
 
-TOOLSOBJECTS =	system_utils.o \
-	error_treat.o \
+TOOLSOBJECTS =	pkg.o \
+	db.o \
+	cache.o \
+	system_utils.o \
 	string_utils.o \
 	archive.o \
 	file_utils.o \
 	process.o \
-	pkg.o \
-	db.o \
-	cache.o \
 	runtime_dependencies_utils.o \
 	lock.o \
 	pkgdbh.o \
@@ -22,14 +21,13 @@ TOOLSOBJECTS =	system_utils.o \
 	pkginfo.o \
 	tools.o
 
-CARDSOBJECTS =	conf.o \
-	system_utils.o \
-	error_treat.o \
-	string_utils.o \
-	archive.o \
-	pkg.o \
-	lock.o \
+CARDSOBJECTS =	pkg.o \
 	db.o \
+	system_utils.o \
+	string_utils.o \
+	conf.o \
+	archive.o \
+	lock.o \
 	cache.o \
 	pkgfile.o \
 	pkgrepo.o \
@@ -56,19 +54,18 @@ CARDSOBJECTS =	conf.o \
 	upgrade.o \
 	cards.o
 
-LIBOBJECTS =  conf.o \
+LIBOBJECTS =  pkg.o \
+	db.o \
+	cache.o \
 	system_utils.o \
-	error_treat.o \
 	string_utils.o \
+	conf.o \
 	archive.o \
 	pkgfile.o \
 	dwl.o \
 	file_utils.o \
 	process.o \
-	pkg.o \
 	lock.o \
-	db.o \
-	cache.o \
 	sync.o \
 	runtime_dependencies_utils.o \
 	pkgdbh.o \
@@ -77,30 +74,28 @@ LIBOBJECTS =  conf.o \
 	pkginfo.o \
 	pkgrepo.o
 
-WEBOBJECTS =  conf.o \
+WEBOBJECTS = pkg.o \
+	db.o \
+	cache.o \
 	system_utils.o \
-	error_treat.o \
 	file_utils.o \
+	conf.o \
 	string_utils.o \
 	pkgrepo.o \
 	mysql.o \
-	pkg.o \
-	db.o \
-	cache.o \
 	webcards.o
 
-HEADERS = define.h \
+HEADERS = pkg.h \
+	db.h  \
+	define.h \
 	enum.h \
+	cache.h \
 	system_utils.h \
-	error_treat.h \
 	string_utils.h \
 	file_utils.h \
 	archive.h \
 	conf.h \
-	pkg.h \
 	lock.h \
-	db.h  \
-	cache.h \
 	sync.h \
 	pkgfile.h \
 	dwl.h \

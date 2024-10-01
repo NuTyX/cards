@@ -182,8 +182,10 @@ void pkgrepo::generateDependencies()
 			// If the binary archive is not yet downloaded
 			if (!checkFileExist(packageFileName))
 				downloadPackageFileName(packageName);
+
 			// m_packageFileNameHash contains hashsum of packageFileName
 			generateHash(packageFileName);
+
 			// we compare m_packageFileNameHash with the one stored in the database
 			if (!checkHash(packageName)) {
 				// Last try to get it.
@@ -535,7 +537,7 @@ std::set<std::string>& pkgrepo::getListOfPackagesFromSet(const std::string& name
 
 	for (auto p: m_listOfPackages) {
 		for (auto s : m_listOfPackages[p.first].sets()) {
-			if (s == name) {
+			if ((s == name) && (p.second.group() == "")) {
 				m_binarySetList.insert(p.first);
 				break;
 			}
@@ -550,7 +552,8 @@ std::set<std::string>& pkgrepo::getListOfPackagesFromCollection(const std::strin
         parse();
 
 	for (auto p: m_listOfPackages) {
-		if (m_listOfPackages[p.first].collection() == name) {
+		if ((m_listOfPackages[p.first].collection() == name) &&
+				(m_listOfPackages[p.first].group() == "")) {
 			m_binaryCollectionList.insert(p.first);
 		}
 	}
