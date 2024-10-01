@@ -62,7 +62,9 @@ install::install(const CardsArgumentParser& argParser,
 			m_pkgrepo.generateDependencies(i);
 		}
 	}
+
 	getLocalePackagesList();
+
 	for ( auto i : m_pkgrepo.getDependenciesList() ) {
 		m_packageArchiveName = m_pkgrepo.dirName(i.first) + "/" + m_pkgrepo.fileName(i.first);
 		archive packageArchive(m_packageArchiveName.c_str());
@@ -107,20 +109,21 @@ void install::getLocalePackagesList()
 
 	if (config.groups().empty())
 		return;
+
 	std::set<std::string> tmpList;
 	for (auto i : config.groups()) {
 		for (auto j : m_pkgrepo.getDependenciesList()) {
 			std::string name = j.first + "." + i;
 			std::string packageName  = m_pkgrepo.dirName(name) + "/" + m_pkgrepo.fileName(name);
-			if (m_pkgrepo.checkBinaryExist(packageName)) {
-				packageFileName = m_pkgrepo.fileName(packageName);
-				if ( ! checkFileExist(packageFileName) )
-					m_pkgrepo.downloadPackageFileName(packageName);
-				tmpList.insert(packageName);
+			if (m_pkgrepo.checkBinaryExist(name)) {
+				packageFileName = m_pkgrepo.fileName(name);
+				if ( ! checkFileExist(packageName) )
+					m_pkgrepo.downloadPackageFileName(name);
+				tmpList.insert(name);
 			}
 		}
 	}
-	if (tmpList.size() > 0 )
+	if (tmpList.size() > 0 ) {
 		for (auto i : tmpList) {
 			std::pair<std::string,time_t> PackageTime;
 			PackageTime.first=i;
@@ -129,5 +132,6 @@ void install::getLocalePackagesList()
 			m_pkgrepo.generateDependencies(i);
 			m_pkgrepo.addDependenciesList(PackageTime);
 		}
+	}
 }
 }
