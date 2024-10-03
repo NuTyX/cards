@@ -28,7 +28,7 @@ void sync::run()
 		if (collection.url.size() == 0 ) {
 			continue;
 		}
-		dwl repo(collection.url
+		cards::dwl repo(collection.url
 			+ "/"
 			+ config.arch()
 			+ "/"
