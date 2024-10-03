@@ -2,6 +2,8 @@
 
 #include "dwl.h"
 
+namespace cards {
+
 dwlEvent::dwlEvent()
 {
 	dwl::SuscribeToEvents(this);
@@ -237,4 +239,5 @@ void dwl::UnSuscribeFromEvents(dwlEvent* callback)
 	auto it =  dwl::m_arrCallBacks.find(callback);
 	if (it != dwl::m_arrCallBacks.end())
 		dwl::m_arrCallBacks.erase(it);
+}
 }

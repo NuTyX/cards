@@ -5,6 +5,7 @@
 
 #include <curl/curl.h>
 
+namespace cards {
 
 
 /**
@@ -174,3 +175,4 @@ class dwl
 		static void SuscribeToEvents(dwlEvent* callback);
 		static void UnSuscribeFromEvents(dwlEvent* callback);
 };
+}
