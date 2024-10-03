@@ -52,6 +52,7 @@ CARDSOBJECTS =	pkg.o \
 	base.o \
 	info.o \
 	upgrade.o \
+	repo.o \
 	cards.o
 
 LIBOBJECTS =  pkg.o \

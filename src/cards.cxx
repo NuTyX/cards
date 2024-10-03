@@ -13,6 +13,7 @@
 #include "pkgrepo.h"
 #include "pkgrm.h"
 #include "remove.h"
+#include "repo.h"
 #include "sync.h"
 #include "upgrade.h"
 
@@ -198,6 +199,14 @@ int main(int argc, char** argv)
             }
             cards::pkgrepo pkgrepo(configFile.c_str());
             pkgrepo.generateKeys();
+            return EXIT_SUCCESS;
+        }
+        case ArgParser::CMD_REPO: {
+            if (!getuid()) {
+                string s = "";
+                throw runtime_error(s + _(" this command should not be used under root."));
+            }
+            cards::repo repo(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_LIST: {

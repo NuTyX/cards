@@ -159,6 +159,14 @@ signing and verifying the packages.\n\
 This command is normally used by the packager only."),
         ArgParser::NONE, 0, "");
 
+    addCommand(CMD_REPO, "repo",
+        _("verify/generate locale repositories meta data."),
+        _("Without private key: this command is used to verify signatures of all the packages.\n\
+With a found private key: It will generate repositories meta data.\n\
+Location of the keys is defined in cards.conf file.\n\
+As for the generation, a private key is needed, it is used by the packager only."),
+        ArgParser::NONE, 0, "");
+
     OPT_NO_SYNC.init("no-sync",
         0,
         _("\t   Only upgrade what's possible."));

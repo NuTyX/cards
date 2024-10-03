@@ -318,20 +318,20 @@ msgstr "\t   Affiche cet aide"
 msgid "Name           : "
 msgstr "Nom                 : "
 
-msgid "Alias          : "
-msgstr "Aussi appelé        : "
+msgid "Alias          :"
+msgstr "Aussi appelé        :"
 
-msgid "Set            : "
-msgstr "Jeux de paquets     : "
+msgid "Sets           :"
+msgstr "Jeux de paquets     :"
 
-msgid "Categories     : "
-msgstr "Catégories          : "
+msgid "Categories     :"
+msgstr "Catégories          :"
 
 msgid "Group          : "
 msgstr "Groupe              : "
 
-msgid "Groups         : "
-msgstr "Groupes             : "
+msgid "Groups         :"
+msgstr "Groupes             :"
 
 msgid "Collection     : "
 msgstr "Collection          : "
@@ -612,6 +612,18 @@ msgstr "Cette commmande est utilisée par l'empaqueteur.\n\
 Elle affiche la liste des dépendances du paquet.\n\
 Elle est utilisée pour la compilation d'un port."
 
+msgid "verify/generate locale repositories meta data."
+msgstr "vérifie/génère les méta données des dépots."
+
+msgid "Without private key: this command is used to verify signatures of all the packages.\n\
+With a found private key: It will generate repositories meta data.\n\
+Location of the keys is defined in cards.conf file.\n\
+As for the generation, a private key is needed, it is used by the packager only."
+msgstr "Sans clé privée: cette commande est utilisée pour vérifier la signature de tous les paquets.\n\
+Avec une clé privée trouvée: elle va générer les méta données des dépots.\n\
+L'emplacement des clés est définie dans le fichier cards.conf.\n\
+Puisque la génération necessite une clé privée, elle est utilisée par l'empaqueteur uniquement."
+
 msgid "If -p is passed as optional argument, it will list the local available ports.\n\
 If -b is passed as optional argument, it will list the remote available binaries.\n\
 If -F is passed as optional argument, it will list the automatically installed \n\
@@ -649,11 +661,6 @@ It will delete all the downloads binaries which are located in the binaries sect
 msgstr "Cette commande peut-être utilisée si vous souhaitez récupérer de l'espace disque.\n\
 Elle va effacer toutes les archives téléchargées se trouvant dans les dossiers caches."
 
-msgid "This command is used for the packager.\n\
-All the dependencies include the final package will be compiled."
-msgstr "Cette commande est utilisée par l'empaqueteur.\n\
-Toutes les dépendances ainsi que le paquet final seront compilées."
-
 msgid "create a package from the recipe found in the port."
 msgstr "crée un paquet unique depuis la recette trouvée dans le port."
 
@@ -663,7 +670,7 @@ msgstr "liste les ports utilisant ce port."
 msgid "This command is used for the packager.\n\
 It shows the list of the reversed dependencies of the package.\n\
 It is used when checking which port is using this port."
-msgstr "Cette commande est utilisée par l'empaqueteur.\n\
+msgstr "Cette commande sert à l'empaqueteur.\n\
 Elle montre la liste des dépendances inversées du paquet.\n\
 Elle est utilisée pour vérifier quel port utilise ce port."
 
@@ -673,8 +680,8 @@ msgstr "génère la paire de clés."
 msgid "This command is used to generate the keys needed for\n\
 signing and verifying the packages.\n\
 This command is normally used by the packager only."
-msgstr "Cette commande est utilisée pour générer les clés utilisées\n\
-pour la signature et la vérification des paquets.\n\
+msgstr "Cette commande génère les clés pour la signature et \n\
+la vérification des paquets.\n\
 Cette commande est normalement utilisée uniquement par le empaqueteur."
 
 msgid "remove archives from installed packages."
