@@ -242,7 +242,7 @@ void pkgrepo::generateDependencies()
 }
 void pkgrepo::downloadPackageFileName(const std::string& packageName)
 {
-			dwl archive(m_listOfPackages[packageName].origin()
+			cards::dwl archive(m_listOfPackages[packageName].origin()
 			+ "/"
 			+ m_listOfPackages[packageName].fileName(),
 			m_listOfPackages[packageName].dirName(),
@@ -278,18 +278,54 @@ std::set<std::string>& pkgrepo::getBinaryPackageList() {
 std::string& pkgrepo::getBinaryPackageInfo(const std::string& name)
 {
 	parse();
+	std::string alias, categories, group, sets;
+
 	if (m_listOfPackages.find(name) != m_listOfPackages.end()) {
+        if (m_listOfPackages[name].group().size()>0) {
+			group = _("Group          : ");
+			group += m_listOfPackages[name].group();
+			group += '\n';
+		}
+        if (m_listOfPackages[name].alias().size()>0) {
+			alias = _("Alias          :");
+			for (auto i : m_listOfPackages[name].alias()) {
+				alias += " ";
+				alias += i;
+			}
+			alias += '\n';
+		}
+        if (m_listOfPackages[name].sets().size()>0) {
+			sets = _("Sets           :");
+			for (auto i : m_listOfPackages[name].sets()) {
+				sets += " ";
+				sets += i;
+			}
+			sets += '\n';
+		}
+        if (m_listOfPackages[name].categories().size()>0) {
+			categories = _("Categories     :");
+			for (auto i : m_listOfPackages[name].categories()) {
+				categories += " ";
+				categories += i;
+			}
+			categories += '\n';
+		}
 		m_binaryPackageInfo = _("Name           : ")
-			+ name + '\n'
+			+ name
+			+ '\n'
+			+ alias
 			+ _("Description    : ")
 			+ m_listOfPackages[name].description()
 			+ '\n'
 			+ _("Archive name   : ")
 			+ m_listOfPackages[name].fileName()
 			+ '\n'
-			+ _("Groups         : ")
-			+ m_listOfPackages[name].group()
+			+ group
+			+ categories
+			+ _("Collection     : ")
+			+ m_listOfPackages[name].collection()
 			+ '\n'
+			+ sets
 			+ _("URL            : ")
 			+ m_listOfPackages[name].url()
 			+ '\n'
@@ -459,8 +495,7 @@ void pkgrepo::parse()
 				if (p[0] == RUNTIME_DEPENDENCY) {
 					std::pair<std::string,time_t> dep;
 					dep.first = p.substr(1,p.size()-11);
-// FIXME
-//					dep.second = strtoul(p.substr(p.size()-10).c_str(),nullptr,0);
+					dep.second = strtoul(p.substr(p.size()-10).c_str(),nullptr,0);
 					pkgDependencies.insert(dep);
 				}
 			if (pkgFound)
