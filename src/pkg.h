@@ -32,34 +32,32 @@ class pkg
 	std::string 			m_branch;
 
 	std::string 			m_hash;
-	std::string 			m_s_buildDate;
 	time_t 					m_build;
 
 
 public:
 	pkg();
 	~pkg();
-	std::string& 			description();
-	std::string& 			url();
-	std::string& 			maintainer();
-	std::string& 			packager();
-	std::string& 			contributors();
+	const std::string&		description();
+	const std::string&		url();
+	const std::string& 		maintainer();
+	const std::string&		packager();
+	const std::string&		contributors();
 
 	const std::string& 		version();
 	unsigned short int 		release();
 
-	std::string& 			group();
-	std::string&			collection();
-	std::set<std::string>& 	alias();
-	std::set<std::string>& 	sets();
-	std::set<std::string>&	categories();
-	std::string& 			arch();
-	std::string& 			license();
+	const std::string& 		group();
+	const std::string&		collection();
+	const std::set<std::string>& 	alias();
+	const std::set<std::string>& 	sets();
+	const std::set<std::string>&	categories();
+	const std::string& 		arch();
+	const std::string& 		license();
 	const std::string&		signature();
-	std::string&			origin();
-	std::string&			branch();
+	const std::string&		origin();
+	const std::string&		branch();
 	const std::string&		hash();
-	std::string&			s_buildDate();
 	time_t					build();
 
 	void					description(const std::string& description);

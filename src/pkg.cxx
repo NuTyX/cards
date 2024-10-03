@@ -15,7 +15,7 @@ void pkg::description(const std::string& description)
 {
 	m_description = description;
 }
-std::string& pkg::description()
+const std::string& pkg::description()
 {
 	return m_description;
 }
@@ -23,7 +23,7 @@ void pkg::url(const std::string& url)
 {
 	m_url = url;
 }
-std::string& pkg::url()
+const std::string& pkg::url()
 {
 	return m_url;
 }
@@ -31,7 +31,7 @@ void pkg::maintainer(const std::string& maintainer)
 {
 	m_maintainer = maintainer;
 }
-std::string& pkg::maintainer()
+const std::string& pkg::maintainer()
 {
 	return m_maintainer;
 }
@@ -39,7 +39,7 @@ void pkg::packager(const std::string& packager)
 {
 	m_packager = packager;
 }
-std::string& pkg::packager()
+const std::string& pkg::packager()
 {
 	return m_packager;
 }
@@ -47,7 +47,7 @@ void pkg::contributors(const std::string& contributors)
 {
 	m_contributors = contributors;
 }
-std::string& pkg::contributors()
+const std::string& pkg::contributors()
 {
 	return m_contributors;
 }
@@ -79,7 +79,7 @@ void pkg::alias(const std::set<std::string>& alias)
 {
 	m_alias = alias;
 }
-std::set<std::string>& pkg::alias()
+const std::set<std::string>& pkg::alias()
 {
 	return m_alias;
 }
@@ -87,7 +87,7 @@ void pkg::group(const std::string& group)
 {
 	m_group = group;
 }
-std::string& pkg::group()
+const std::string& pkg::group()
 {
 	return m_group;
 }
@@ -95,7 +95,7 @@ void pkg::sets(const std::set<std::string>& sets)
 {
 	m_sets = sets;
 }
-std::set<std::string>& pkg::sets()
+const std::set<std::string>& pkg::sets()
 {
 	return m_sets;
 }
@@ -103,7 +103,7 @@ void pkg::collection(const std::string& collection)
 {
 	m_collection = collection;
 }
-std::string& pkg::collection()
+const std::string& pkg::collection()
 {
 	return m_collection;
 }
@@ -111,7 +111,7 @@ void pkg::categories(const std::set<std::string>& categories)
 {
 	m_categories = categories;
 }
-std::set<std::string>& pkg::categories()
+const std::set<std::string>& pkg::categories()
 {
 	return m_categories;
 }
@@ -119,7 +119,7 @@ void pkg::arch(const std::string& arch)
 {
 	m_arch = arch;
 }
-std::string& pkg::arch()
+const std::string& pkg::arch()
 {
 	return m_arch;
 }
@@ -127,7 +127,7 @@ void pkg::license(const std::string& license)
 {
 	m_license = license;
 }
-std::string& pkg::license()
+const std::string& pkg::license()
 {
 	return m_license;
 }
@@ -143,7 +143,7 @@ void pkg::origin(const std::string& origin)
 {
 	m_origin = origin;
 }
-std::string& pkg::origin()
+const std::string& pkg::origin()
 {
 	return m_origin;
 }
@@ -151,7 +151,7 @@ void pkg::branch(const std::string& branch)
 {
 	m_branch = branch;
 }
-std::string& pkg::branch()
+const std::string& pkg::branch()
 {
 	return m_branch;
 }
@@ -163,5 +163,4 @@ time_t pkg::build()
 {
 	return m_build;
 }
-
 } // end of cards namespace 
