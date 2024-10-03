@@ -34,8 +34,8 @@ OPTIONS
       -d, --diff
              Check what are the outdated packages
 
-      -s, --sync <package|collection>
-             Synchronize all the binaries of the <package|collection>.
+      -s, --sync <collection>
+             Synchronize all the binaries of the <collection>.
 
 MORE INFO
        mybld(8)
@@ -156,6 +156,8 @@ rsync_binaries () {
     exit 1
   fi
   if [ ! -z ${PARAM[0]} ]; then
+    echo "Sync unique package is not possible for the moment !!!"
+    exit 1
     echo "
 sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
 sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}/
