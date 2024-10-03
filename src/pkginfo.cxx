@@ -342,24 +342,24 @@ void pkginfo::run()
                 std::cout << _("Name           : ") << arg << std::endl
                           << _("Description    : ") << m_listOfPackages[arg].description() << std::endl;
                 if (m_listOfPackages[arg].alias().size() > 0) {
-                    std::cout << _("Alias          : ");
+                    std::cout << _("Alias          :");
                     for (auto a : m_listOfPackages[arg].alias())
-                        std::cout << a
-                                  << " ";
+                        std::cout << " "
+                                  << a;
                     std::cout << std::endl;
                 }
                 if (m_listOfPackages[arg].categories().size() > 0) {
-                    std::cout << _("Categories     : ");
+                    std::cout << _("Categories     :");
                     for (auto c : m_listOfPackages[arg].categories())
-                        std::cout << c
-                                  << " ";
+                        std::cout << " "
+                                  << c;
                     std::cout << std::endl;
                 }
                 if (m_listOfPackages[arg].sets().size() > 0) {
-                    std::cout << _("Set            : ");
+                    std::cout << _("Set            :");
                     for (auto s : m_listOfPackages[arg].sets())
-                        std::cout << s
-                                  << " ";
+                        std::cout << " "
+                                  << s;
                     std::cout << std::endl;
                 }
                 std::cout << _("Group          : ") << m_listOfPackages[arg].group() << std::endl
