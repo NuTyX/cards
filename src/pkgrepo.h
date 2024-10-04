@@ -115,7 +115,7 @@ public:
     // Return the m_packageNameFileNameSignature value
     std::string&            sign();
 
-    // Check the signature of the archive file of the package name
+    // Check the signature of the hashsum of an archive file of the package name
     // The public key location is at the root of the repository or collection
     bool                     checkSign(const std::string& name);
 

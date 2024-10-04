@@ -833,8 +833,13 @@ void pkgrepo::sign(const std::string& packageName)
 bool pkgrepo::checkSign(const std::string& name)
 {
 	EVP_PKEY* key = nullptr;
-	std::string hash(m_listOfPackages[name].hash());
 
+	// generated hashsum is stored in m_packageFileNameHash
+	generateHash(m_listOfPackages[name].dirName()
+            + "/"
+            + m_listOfPackages[name].fileName());
+
+	std::string hash(m_packageFileNameHash);
 	std::string keyfile(m_listOfPackages[name].dirName());
 	keyfile += PUBLICKEY;
 

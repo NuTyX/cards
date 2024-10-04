@@ -16,18 +16,18 @@ repo::repo(const CardsArgumentParser& argParser,
     unsigned int i = 0;
     if ((config.keypath().empty()) ||
         (!checkFileExist(keyfile))) {
-            
-            for (auto pkg : m_pkgrepo.getListOfPackages()) {
-                i++;
-                if (!m_pkgrepo.checkSign(pkg.first)) {
-                    std::cout << "Package "
-                            << pkg.first
-                            << ": Wrong signature !!!"
-                            << std::endl;
-                    break;
+        for (auto pkg : m_pkgrepo.getListOfPackages()) {
+            i++;
+            if (!m_pkgrepo.checkSign(pkg.first)) {
+                std::cout << "Package "
+                    << pkg.first
+                    << ": Wrong signature !!!"
+                    << std::endl;
+                break;
 
-                }
-	        }
+            }
+            rotatingCursor();
+        }
         std::cout << "All "
             << i
             << " packages checked"
