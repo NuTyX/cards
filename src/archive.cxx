@@ -151,7 +151,9 @@ void archive::printDeps()
     for (auto i : m_rtDependenciesList)
         std::cout << i << " ";
 }
-
+const std::vector<std::string>& archive::contentMeta() {
+    return m_contentMeta;
+}
 void archive::printMeta()
 {
     for (auto i : m_contentMeta)

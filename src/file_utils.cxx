@@ -224,11 +224,10 @@ int copyFile( const char *  destFile, const char *  origFile)
 	FILE * infile  = fopen(origFile,  "rb");
 	FILE * outfile = fopen(destFile, "wb");
 
-	const int length = BUFSIZ;
-	char buffer[length];
+	char buffer[BUFSIZ];
 
 	while (!feof(infile)) {
-		int n = fread(buffer, 1, length, infile);
+		int n = fread(buffer, 1, BUFSIZ, infile);
 		fwrite(buffer, 1, n, outfile);
 	}
 

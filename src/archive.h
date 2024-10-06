@@ -52,6 +52,9 @@ public:
 	// Print Out the .META file
 	void printMeta();
 
+	// Return Meta data
+	const std::vector<std::string>& contentMeta();
+
 	// list the files to stdio
 	void list();
 
