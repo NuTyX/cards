@@ -8,17 +8,19 @@
 #include "pkgdbh.h"
 
 class pkgrm : public pkgdbh {
+
+	void getDirectDependencies(std::string& name);
+
+protected:
+	void getListOfManInstalledPackages ();
+	std::set<std::string> m_listOfManInstalledPackages;
+	std::set<std::string> m_listofDependencies;
+
 public:
 	pkgrm(const std::string& commandName) : pkgdbh(commandName) {}
 	pkgrm();
 	void run();
 	void printHelp() const;
 
-protected:
-	void getListOfManInstalledPackages ();
-	std::set<std::string> m_listOfManInstalledPackages;
-	std::set<std::string> m_listofDependencies;
-private:
-	void getDirectDependencies(std::string& name);
 
 };
