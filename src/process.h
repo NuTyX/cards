@@ -27,6 +27,16 @@
 
 class process
 {
+	std::string m_application;
+	std::string m_arguments;
+	int         m_fileDescriptorLog;
+
+	int         exec(const int argc, char** argv);
+	int         execLog(const int argc, char** argv);
+
+	int         execShell(const char* shell);
+	int         execShellLog(const char* shell);
+
 public:
 	process();
 	process(const std::string& app,
@@ -59,15 +69,4 @@ public:
 		*/
 	std::string args();
 
-private:
-
-	int exec(const int argc, char** argv);
-	int execLog(const int argc, char** argv);
-
-	int execShell(const char* shell);
-	int execShellLog(const char* shell);
-
-	std::string m_application;
-	std::string m_arguments;
-	int m_fileDescriptorLog;
 };
