@@ -41,14 +41,13 @@ dwl::dwl(std::vector<InfoFile> destinationFiles, bool progress)
 		get();
 	}
 }
-
 dwl::dwl(std::string url,
 	std::string dirName,
 	std::string fileName,
 	bool progress)
 	: m_fileInfo(fileName),
 		m_url(url),
-		m_downloadFileName(dirName+"/"+fileName),
+		m_downloadFileName(dirName + "/" + fileName),
 		m_progress(progress)
 {
 
@@ -69,35 +68,6 @@ dwl::dwl(std::string url,
 
 	get();
 }
-
-dwl::dwl(std::string fileInfo,std::string url,
-	std::string dirName,
-	std::string fileName,
-	bool progress)
-  : m_fileInfo(fileInfo),
-		m_url(url),
-		m_downloadFileName(dirName+"/"+fileName),
-		m_progress(progress)
-{
-  curl_global_init(CURL_GLOBAL_ALL);
-  m_curl = curl_easy_init();
-  if (! m_curl)
-    throw std::runtime_error ("Curl error");
-
-	m_slist=nullptr;
-	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
-	createRecursiveDirs(dirName);
-
-  initFileToDownload(m_url, m_downloadFileName);
-	if ( progress ) {
-  	curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 0L);
-	} else {
-		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
-	}
-
-	get();
-}
-
 void dwl::get()
 {
 	if (! m_progress)

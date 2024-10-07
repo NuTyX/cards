@@ -137,22 +137,6 @@ class dwl
 
 		/**
 		* Constructor
-		* Download a file
-		*
-		* \param fileInfo Destination file
-		* \param url Complete downloading address including the file
-		* \param dirName Destination folder
-		* \param fileName file where to store the downloaded datas
-		* \param progress If true, show what's going on
-		*/
-		dwl(std::string fileInfo,
-			std::string url,
-			std::string dirName,
-			std::string fileName,
-			bool progress);
-
-		/**
-		* Constructor
 		* Download a list of InfoFile (a vector of InfoFile type)
 		* InfoFile consist of (amount other fields.. ) Name of the file and the signature of the file to download
 		*
