@@ -34,13 +34,13 @@ class pkgadd : public pkgdbh {
 						std::vector<rule_t>& found) const;
 
 	void 			getPostInstallRulesList(const std::vector<rule_t>& rules,
-		std::vector<rule_t>& found) const;
+						std::vector<rule_t>& found) const;
 
 protected:
 	std::string 	m_packageArchiveName;
-	bool 			m_runPrePost;
-	bool 			m_upgrade;
-	bool 			m_force;
+	bool 		m_runPrePost;
+	bool 		m_upgrade;
+	bool 		m_force;
 
 public:
 	/**
@@ -54,11 +54,10 @@ public:
 	 */
 	pkgadd(const std::string& commandName);
 
-	void			parseArguments(int argc, char** argv);
-	void			preRun();
-	void			postRun();
-	virtual void 	run();
-	void run(std::string&
-					packageName);
-	virtual void 	printHelp() const;
+	void		parseArguments(int argc, char** argv);
+	void		preRun();
+	void		postRun();
+	virtual void        run();
+	void                run(std::string& packageName);
+	virtual void        printHelp() const;
 };
