@@ -477,7 +477,7 @@ void pkgrepo::parse()
 				if (p[0] == SIGNATURE)
 					info.signature(p.substr(1));
 			if (pkgFound)
-				if (p[0] == SPACE)
+				if (p[0] == SIZE_I)
 					info.space(atoi(p.substr(1).c_str()));
 			if (pkgFound)
 				if (p[0] == SIZE)

@@ -723,7 +723,7 @@ void pkgdbh::buildCompleteDatabase(const bool& progress)
 					if ( s == "d1" )
 						info.dependency(true);
 				}
-				if (s[0] == SPACE) {
+				if (s[0] == SIZE_I) {
 					info.space( atoi(s.substr(1).c_str()) );
 				}
 				if (s[0] == ALIAS) {

@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 		util->run(argc, argv);
 
 	} catch (std::runtime_error& e) {
-		std::cerr << name <<  " " << VERSION << ": " << e.what() << std::endl;
+		std::cerr << name <<  " " << PACKAGE_VERSION << ": " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 

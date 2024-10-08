@@ -28,7 +28,6 @@ struct rule_t {
 
 class pkgdbh {
 
-    std::set<std::string>   m_runtimeLibrariesList;
     std::set<std::string>   m_filesList;
     std::set<std::string>   m_listOfPackagesNames;
 
