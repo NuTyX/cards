@@ -147,43 +147,43 @@ std::vector<DirUrl>& conf::dirUrl()
 {
 	return m_dirUrl;
 }
-std::string& conf::url()
+const std::string& conf::url()
 {
 	return m_url;
 }
-std::string& conf::keypath()
+const std::string& conf::keypath()
 {
 	return m_keypath;
 }
-std::string& conf::hostname()
+const std::string& conf::hostname()
 {
 	return m_hostname;
 }
-std::string& conf::username()
+const std::string& conf::username()
 {
 	return m_username;
 }
-std::string& conf::password()
+const std::string& conf::password()
 {
 	return m_password;
 }
-std::string& conf::database()
+const std::string& conf::database()
 {
 	return m_database;
 }
-std::string& conf::version()
+const std::string& conf::version()
 {
 	return m_version;
 }
-std::string& conf::arch()
+const std::string& conf::arch()
 {
 	return m_arch;
 }
-std::string& conf::depot()
+const std::string& conf::depot()
 {
 	return m_depot;
 }
-std::string& conf::logdir()
+const std::string& conf::logdir()
 {
 	return m_logdir;
 }

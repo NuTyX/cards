@@ -46,16 +46,16 @@ public:
     conf(const std::string& filename);
     ~conf();
 
-    std::string& version();
-    std::string& url();
-    std::string& keypath();
-    std::string& hostname();
-    std::string& username();
-    std::string& password();
-    std::string& database();
-    std::string& arch();
-    std::string& depot();
-    std::string& logdir();
+    const std::string& version();
+    const std::string& url();
+    const std::string& keypath();
+    const std::string& hostname();
+    const std::string& username();
+    const std::string& password();
+    const std::string& database();
+    const std::string& arch();
+    const std::string& depot();
+    const std::string& logdir();
 
     std::vector<std::string>& groups();
     std::vector<std::string>& urls();
