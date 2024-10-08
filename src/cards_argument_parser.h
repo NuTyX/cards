@@ -42,6 +42,6 @@ class CardsArgumentParser : public ArgParser
 
 		std::string getAppIdentification() const
 		{
-			return std::string("cards ")  + VERSION + "\n";
+			return std::string("cards ")  + PACKAGE_VERSION + "\n";
 		}
 };
