@@ -141,7 +141,7 @@ public:
                              getDependenciesList();
     void                     addDependenciesList(std::pair<std::string,time_t>& name);
 
-    repo_t&                  getListOfPackages();
+    const repo_t&                  getListOfPackages();
 };
 
 } // end of 'cards' namespace
