@@ -12,6 +12,8 @@ class sync
 	std::string m_root;
 	std::string m_configFile;
 
+	cards::conf m_config;
+
 public:
 	sync();
 	sync(const std::string configFile);

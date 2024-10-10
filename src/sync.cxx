@@ -5,34 +5,47 @@ namespace cards {
 
 const std::string sync::DEFAULT_REPOFILE = ".REPO";
 
-sync::sync() {
+sync::sync()
+	:m_config("/etc/cards.conf")
+{
     m_repoFile = DEFAULT_REPOFILE;
     m_root = "/";
     m_configFile = "/etc/cards.conf";
 }
 sync::sync(const std::string configFile)
-	: m_configFile(configFile) 
-	{
+	: m_root("/")
+	, m_configFile(configFile)
+	, m_config(m_root + m_configFile)
+{
     m_repoFile = DEFAULT_REPOFILE;
-    m_root = "/";
 }
 void sync::purge()
 {
-	/* TODO */
+	std::set<std::string> listOfFiles;
+	for (auto collection : m_config.dirUrl()) {
+		std::string path = collection.depot
+			+ "/"
+			+ collection.collection;
+
+		if (collection.url.size() == 0 )
+			continue;
+
+		findRecursiveFile(listOfFiles, path.c_str(),WS_DEFAULT);
+		for (auto file : listOfFiles)
+			remove(file.c_str());
+	}
 }
 void sync::run() 
 {
-	std::string configFile = m_root + m_configFile;
-	cards::conf config(configFile);
-	for (auto collection : config.dirUrl()) {
+	for (auto collection : m_config.dirUrl()) {
 		if (collection.url.size() == 0 ) {
 			continue;
 		}
 		cards::dwl repo(collection.url
 			+ "/"
-			+ config.arch()
+			+ m_config.arch()
 			+ "/"
-			+ config.version()
+			+ m_config.version()
 			+ "/"
 			+ collection.collection
 			+ "/"
