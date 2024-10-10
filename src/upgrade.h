@@ -11,11 +11,12 @@ namespace cards {
 
 class upgrade : public pkgadd {
 
-	std::set<std::string>                   m_ListOfPackagesToDelete;
-	std::set<std::pair<std::string,time_t>> m_ListOfPackages;
-	const CardsArgumentParser&              m_argParser;
-	cards::sync                             m_sync;
-	cards::pkgrepo                          m_pkgrepo;
+	std::set<std::string>                     m_ListOfPackagesToDelete;
+	std::set<std::pair<std::string, time_t>>  m_ListOfPackagesToUpdate;
+
+	const CardsArgumentParser&                m_argParser;
+	cards::sync                               m_sync;
+	cards::pkgrepo                            m_pkgrepo;
 
 public:
 	/**
@@ -44,7 +45,7 @@ public:
 	 */
 	void Isuptodate();
 	int  Isdownload();
-	void run();
+	void go();
 	void summary();
 };
 }
