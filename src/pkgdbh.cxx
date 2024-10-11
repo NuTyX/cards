@@ -8,14 +8,18 @@
 using __gnu_cxx::stdio_filebuf;
 
 pkgdbh::pkgdbh(const std::string& name)
-	: m_utilName(name), m_DB_Empty(true), m_miniDB_Empty(true)
+	: m_utilName(name)
+	, m_DB_Empty(true)
+	, m_miniDB_Empty(true)
 {
 	openlog(m_utilName.c_str(),LOG_CONS,LOG_LOCAL7);
 }
 pkgdbh::pkgdbh()
-	: m_utilName("pkgdbh"), m_DB_Empty(true), m_miniDB_Empty(true)
+	: m_utilName("pkgdbh")
+	, m_DB_Empty(true)
+	, m_miniDB_Empty(true)
+	, m_root("/")
 {
-	m_root="/";
 }
 pkgdbh::~pkgdbh()
 {
