@@ -10,6 +10,11 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 	, m_argParser(argParser)
 	, m_sync(configFileName)
 {
+	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
+		m_root = m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
+
+	m_root += "/";
+
 	if ( ! m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
 		m_sync.run();
 	
