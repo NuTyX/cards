@@ -347,10 +347,8 @@ remove_all() {
   for FOLDER in $ROOT/${1}/* ; do
     [ -d ${FOLDER} ] || continue
     ! mountpoint ${FOLDER} > /dev/null || continue
-    sudo rm -r $FOLDER || exit 1
+    sudo rm -d $FOLDER || exit 1
   done
-  find $ROOT/${VERSION}/${COLLECTION} -maxdepth 1 -type f -delete
-  rm -d $ROOT/${VERSION}/${COLLECTION} || exit 1
   echo "
 >>>   $ROOT/${1} cleanup successfully ...
 "
@@ -368,7 +366,6 @@ Answer should be 'y, Y or yes'
 
 error() {
   umount_all
-  remove_all ${1}
   exit 1
 }
 find_new_packager () {
@@ -878,11 +875,11 @@ else
 fi
 MOUNT_POINTS="$MOUNT_POINTS sources"
 
-mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts || error /${VERSION}/${COLLECTION}
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT/{${COLLECTION},scripts} || error /${VERSION}/${COLLECTION}
 sudo mount --bind $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/ ||\
  error "$ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}"
 
-MOUNT_POINTS="$MOUNT_POINTS $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}"
+MOUNT_POINTS="$MOUNT_POINTS root/$GIT/${COLLECTION}"
 
 
 ln -sv /usr/bin/build-port $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
@@ -893,7 +890,6 @@ sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="
 
 ding
 umount_all
-remove_all "/${VERSION}/${COLLECTION}"
 unset VERSION DEVEL
 
 # Don't try to commit if no specific package was build
