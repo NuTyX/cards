@@ -426,6 +426,7 @@ cards:
                 if (pos != std::string::npos) {
                     info.fileName(p.substr(1));
                     info.group("");
+                    info.baseName("");
                     pkgFound = true;
                 }
                 continue;
@@ -473,6 +474,7 @@ cards:
                     continue;
                 case GROUP:
                     info.group(p.substr(1));
+                    info.baseName(p.substr(1, p.size() - (info.group().size() + 1)));
                     continue;
                 case RUNTIME_DEPENDENCY:
                     dependency.first = pkgName;
@@ -888,5 +890,26 @@ bool pkgrepo::checkSign(const std::string& name)
 void pkgrepo::errors()
 {
     ERR_print_errors_fp(stderr);
+}
+std::set<std::string>& pkgrepo::getListOfPackagesFromGroup(const std::string& name)
+{
+    if (m_listOfPackages.size() == 0)
+        parse();
+
+    if (checkBinaryExist(name)) {
+        m_binaryGroupList.insert(m_listOfPackages[name].dirName()
+                + "/"
+                + m_listOfPackages[name].fileName());
+
+        for (auto p : m_listOfPackages) {
+            if (p.second.baseName() == name) {
+                m_binaryGroupList.insert(p.second.dirName()
+                + "/"
+                + p.second.fileName());
+            }
+        }
+    }
+
+    return m_binaryGroupList;
 }
 } // end of 'cards' namespace

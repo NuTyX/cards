@@ -29,6 +29,7 @@ class pkgrepo {
 
     std::set<std::string>    m_binarySetList;
     std::set<std::string>    m_binaryCollectionList;
+    std::set<std::string>    m_binaryGroupList;
     std::set<std::string>    m_binaryPackageList;
 
     std::string              m_binaryPackageInfo;
@@ -136,12 +137,13 @@ public:
     std::set<std::string>&   getBinaryPackageList();
     std::set<std::string>&   getListOfPackagesFromSet(const std::string& name);
     std::set<std::string>&   getListOfPackagesFromCollection(const std::string& name);
+    std::set<std::string>&   getListOfPackagesFromGroup(const std::string& name);
 
     std::vector<std::pair<std::string,time_t>>&
                              getDependenciesList();
     void                     addDependenciesList(std::pair<std::string,time_t>& name);
 
-    const repo_t&                  getListOfPackages();
+    const repo_t&            getListOfPackages();
 };
 
 } // end of 'cards' namespace

@@ -4,6 +4,7 @@ namespace cards {
 
 create::create(CardsArgumentParser& argParser)
     : pkgfile("/etc/cards.conf")
+    , pkgadd("cards create")
     , m_argParser(argParser)
     , m_tree(getListOfPackages())
     , m_config("/etc/cards.conf")
@@ -202,11 +203,38 @@ void create::build(std::string packageName)
         write(fdlog, "\n", 1);
     }
 
-    std::set<std::string> listOfPackages;
-    if (findDir(listOfPackages, pkgdir) != 0) {
-        m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
-        treatErrors(pkgdir);
+    cards::pkgrepo pkgrepo("/etc/cards.conf");
+
+    for (auto packageFile : pkgrepo.getListOfPackagesFromGroup(packageName)) {
+        archive packageArchive(packageFile);
+        std::string name = packageArchive.name();
+        std::string version = packageArchive.version();
+        message = "CREATED: " + name + " " + version;
+        m_upgrade = 0;
+        buildSimpleDatabase();
+		if (pkgdbh::checkPackageNameExist(name)) {
+			message = name + ": is ALLREADY installed";
+			m_upgrade = 1;
+		}
+        m_packageArchiveName = packageFile;
+        run();
+        std::cout << message << std::endl;
+        if (m_config.logdir() != "") {
+            write( fdlog, message.c_str(), message.length());
+            write( fdlog, "\n", 1 );
+        }
     }
+	if ( m_config.logdir() != "" ) {
+		time_t finishTime;
+		time(&finishTime);
+		timestamp = ctime(&finishTime);
+		timestamp = commandName + "finish " + timestamp;
+		write( fdlog, "\n", 1 );
+		write( fdlog, timestamp.c_str(), timestamp.length());
+		write( fdlog, "\n", 1 );
+		close ( fdlog );
+	}
+
 }
 void create::parseArguments()
 {

@@ -6,10 +6,11 @@
 #include "pkgfile.h"
 #include "process.h"
 #include "pkgadd.h"
+#include "pkgrepo.h"
 
 namespace cards {
 
-class create : public pkgfile {
+class create : public pkgfile, public pkgadd {
     ports_t                    m_tree;
     std::set<std::string>      m_list;
     std::vector<std::string>   m_dependencies;
