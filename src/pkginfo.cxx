@@ -226,7 +226,7 @@ void pkginfo::run()
         } else if (m_runtimedependencies_mode) {
             /* 	Get runtimedependencies of the file found in the directory path
                     get the list of installed packages silently */
-            buildCompleteDatabase(true);
+            buildCompleteDatabase(false);
             int Result;
             std::set<std::string> filenameList;
             Result = findRecursiveFile(filenameList, m_arg.c_str(), WS_DEFAULT);
@@ -279,7 +279,7 @@ void pkginfo::run()
              * Get the list of installed packages silently
              *
              */
-            buildCompleteDatabase(true);
+            buildCompleteDatabase(false);
             std::set<std::string> librariesList;
             int Result = -1;
             if (checkPackageNameExist(m_arg)) {
@@ -326,7 +326,7 @@ void pkginfo::run()
             /*
              *  get the buildtime of the package: return 0 if not found
              */
-            buildCompleteDatabase(true);
+            buildCompleteDatabase(false);
             if (checkPackageNameExist(m_arg)) {
                 std::cout << m_listOfPackages[m_arg].build() << std::endl;
             } else {
