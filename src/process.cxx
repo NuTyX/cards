@@ -149,7 +149,7 @@ int process::executeShell()
     return status;
 }
 
-int process::execShellLog(const char* SH)
+int process::execShellLog(const char* shell)
 {
     int status = 0;
 
@@ -163,7 +163,7 @@ int process::execShellLog(const char* SH)
         dup2(fdpipe[1], STDOUT_FILENO);
         dup2(fdpipe[1], STDERR_FILENO);
 
-        execl(SHELL, SHELL, "-c", (m_application + " " + m_arguments).c_str(), NULL);
+        execl(shell,shell, "-c", (m_application + " " + m_arguments).c_str(), NULL);
         _exit(EXIT_FAILURE);
     } else if (pid < 0) {
         // fork failed

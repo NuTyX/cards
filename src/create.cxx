@@ -143,6 +143,11 @@ void create::build(std::string packageName)
     }
 
     chdir(pkgdir.c_str());
+    std::string f = pkgdir + PKG_RECEPT;
+    if (!checkFileExist(f)) {
+         m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
+         treatErrors(f);
+    }
 
     std::string runscriptCommand = "sh";
     std::string cmd = "pkgmk";
