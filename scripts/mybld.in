@@ -347,7 +347,7 @@ remove_all() {
   for FOLDER in $ROOT/${1}/* ; do
     [ -d ${FOLDER} ] || continue
     ! mountpoint ${FOLDER} > /dev/null || continue
-    sudo rm -d $FOLDER || exit 1
+    sudo rm -r $FOLDER || exit 1
   done
   echo "
 >>>   $ROOT/${1} cleanup successfully ...
@@ -366,6 +366,7 @@ Answer should be 'y, Y or yes'
 
 error() {
   umount_all
+  remove_all ${1}
   exit 1
 }
 find_new_packager () {
@@ -611,7 +612,7 @@ if [[ -d "$ROOT/${VERSION}/${COLLECTION}" && "$CLEANUP" != "yes" ]]; then
 fi
 
 if [ "$CLEANUP" != "no" ]; then
-  MOUNT_POINTS="DEPOT LOGS sources"
+  MOUNT_POINTS="DEPOT LOGS sources root/$GIT/${COLLECTION}"
   umount_all
   remove_all "/${VERSION}/${COLLECTION}"
   [ "$CLEANUP" == "yes" ] && exit 0
