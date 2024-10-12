@@ -891,6 +891,7 @@ sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="
 
 ding
 umount_all
+remove_all "/${VERSION}/${COLLECTION}"
 unset VERSION DEVEL
 
 # Don't try to commit if no specific package was build
