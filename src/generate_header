@@ -1,0 +1,45 @@
+#!/bin/bash
+HEADER="libcards-test.h"
+
+echo "/*" > $HEADER
+cat ../LICENSE.GPL2 >> $HEADER
+echo "*/" >> $HEADER
+
+echo "#ifndef LIB_CARDS_INCLUDED
+#define LIB_CARDS_INCLUDED" >> $HEADER
+
+for file in pkg.h \
+	db.h  \
+	define.h \
+	enum.h \
+	cache.h \
+	system_utils.h \
+	string_utils.h \
+	file_utils.h \
+	archive.h \
+	conf.h \
+	lock.h \
+	sync.h \
+	pkgfile.h \
+	dwl.h \
+	process.h \
+	runtime_dependencies_utils.h \
+	pkgdbh.h \
+	pkgadd.h \
+	pkgrm.h \
+	pkginfo.h \
+	pkgrepo.h
+do
+    cat $file | grep -v '^#define SYSTEM_UTIL' \
+	|grep -v 'SPDX-License-Identifier' \
+	|grep -v '^#define ERROR'|grep -v '^#define MD5' \
+	|grep -v '^#define STRING'|grep -v '^#define ARCHIVE' \
+	|grep -v '^#define PKG'|grep -v '^#define RUNTIME' \
+	|grep -v '^#pragma'|grep -v '^#define CACHE' \
+	|grep -v '^#define FILE'|grep -v '^#define PROCESS' \
+	|grep -v '^#define DEPENDENCIES' \
+	|grep -v '^#include "'|grep -v '^#ifndef' \
+	|grep -v '^#endif /*'|grep -v '^//' >> $HEADER
+done
+
+echo "#endif" >> $HEADER
