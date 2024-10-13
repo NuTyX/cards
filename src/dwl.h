@@ -159,4 +159,4 @@ class dwl
 		static void SuscribeToEvents(dwlEvent* callback);
 		static void UnSuscribeFromEvents(dwlEvent* callback);
 };
-}
+} // end of 'cards' namespace
