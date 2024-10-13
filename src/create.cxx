@@ -242,5 +242,8 @@ void create::parseArguments()
         m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
         treatErrors("");
     }
+    if (m_root == "")
+        m_root = "/";
+
 }
 }
