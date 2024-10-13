@@ -474,7 +474,7 @@ cards:
                     continue;
                 case GROUP:
                     info.group(p.substr(1));
-                    info.baseName(p.substr(1, p.size() - (info.group().size() + 1)));
+                    info.baseName(pkgName.substr(0,pkgName.size() - p.size()));
                     continue;
                 case RUNTIME_DEPENDENCY:
                     dependency.first = pkgName;
