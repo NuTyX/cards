@@ -877,6 +877,8 @@ else
 fi
 MOUNT_POINTS="$MOUNT_POINTS sources"
 
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT
+
 sudo mount --bind $GIT_PROJ $ROOT/${VERSION}/${COLLECTION}/root/$GIT ||\
  error "$ROOT/${VERSION}/${COLLECTION}/root/$GIT"
 
@@ -891,7 +893,7 @@ echo 'running the command:
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
 
-rm -$ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
+rm $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
 
 ding
 umount_all
