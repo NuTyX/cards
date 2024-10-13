@@ -349,6 +349,7 @@ remove_all() {
     ! mountpoint ${FOLDER} > /dev/null || continue
     sudo rm -r $FOLDER || exit 1
   done
+  rm -d $ROOT/${1} || exit 1
   echo "
 >>>   $ROOT/${1} cleanup successfully ...
 "
@@ -612,7 +613,7 @@ if [[ -d "$ROOT/${VERSION}/${COLLECTION}" && "$CLEANUP" != "yes" ]]; then
 fi
 
 if [ "$CLEANUP" != "no" ]; then
-  MOUNT_POINTS="DEPOT LOGS sources root/$GIT/${COLLECTION}"
+  MOUNT_POINTS="DEPOT LOGS sources root/$GIT"
   umount_all
   remove_all "/${VERSION}/${COLLECTION}"
   [ "$CLEANUP" == "yes" ] && exit 0
@@ -876,11 +877,12 @@ else
 fi
 MOUNT_POINTS="$MOUNT_POINTS sources"
 
-mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT/{${COLLECTION},scripts} || error /${VERSION}/${COLLECTION}
-sudo mount --bind $GIT_PROJ/${COLLECTION}/ $ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}/ ||\
- error "$ROOT/${VERSION}/${COLLECTION}/root/$GIT/${COLLECTION}"
+sudo mount --bind $GIT_PROJ $ROOT/${VERSION}/${COLLECTION}/root/$GIT ||\
+ error "$ROOT/${VERSION}/${COLLECTION}/root/$GIT"
 
-MOUNT_POINTS="$MOUNT_POINTS root/$GIT/${COLLECTION}"
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts || error /${VERSION}/${COLLECTION}
+
+MOUNT_POINTS="$MOUNT_POINTS root/$GIT"
 
 
 ln -sv /usr/bin/build-port $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
@@ -888,6 +890,8 @@ ln -sv /usr/bin/build-port $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${CO
 echo 'running the command:
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
+
+rm -$ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
 
 ding
 umount_all
