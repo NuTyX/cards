@@ -10,13 +10,15 @@
 
 namespace cards {
 
-class create : public pkgfile, public pkgadd {
+class create : public pkgadd {
+    int                        m_fdlog;
     ports_t                    m_tree;
     std::set<std::string>      m_list;
     std::vector<std::string>   m_dependencies;
     const CardsArgumentParser& m_argParser;
     cards::ErrorEnum           m_actualError;
     cards::conf                m_config;
+    cards::pkgfile             m_pkgfile;
 
     void treatErrors(const std::string& s) const;
     void list(std::string& packageName);
@@ -25,7 +27,7 @@ class create : public pkgfile, public pkgadd {
 
 public:
     create(CardsArgumentParser& argParser);
-    ~create() {};
+    ~create();
     void build(std::string name);
 };
 }

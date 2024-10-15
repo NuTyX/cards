@@ -3,14 +3,37 @@
 namespace cards {
 
 create::create(CardsArgumentParser& argParser)
-    : pkgfile("/etc/cards.conf")
-    , pkgadd("cards create")
+    : pkgadd("cards create")
+    , m_pkgfile("/etc/cards.conf")
     , m_argParser(argParser)
-    , m_tree(getListOfPackages())
     , m_config("/etc/cards.conf")
+    , m_fdlog(-1)
 {
     parseArguments();
+    m_tree = m_pkgfile.getListOfPackages();
+
+    std::string packageName = argParser.otherArguments()[0];
+
+    if (m_config.logdir() != "") {
+        if (!createRecursiveDirs(m_config.logdir())) {
+            m_actualError = cards::ERROR_ENUM_CANNOT_CREATE_DIRECTORY;
+            treatErrors(m_config.logdir());
+        }
+        std::string logFile = m_config.logdir() + "/" + packageName + ".log";
+        unlink(logFile.c_str());
+        m_fdlog = open(logFile.c_str(), O_APPEND | O_WRONLY | O_CREAT, 0666);
+        if (m_fdlog == -1) {
+            m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
+            treatErrors(logFile);
+        }
+    }
+
     
+}
+create::~create()
+{
+    if (m_fdlog != -1)
+	    close(m_fdlog);
 }
 void create::treatErrors(const std::string& s) const
 {
@@ -54,6 +77,11 @@ void create::list(std::string& packageName)
 }
 void create::installDependencies(std::string& packageName)
 {
+    std::string message;
+    std::string commandName = "pkgadd ";
+
+    cards::pkgrepo pkgrepo("/etc/cards.conf");
+
     auto level = m_tree[packageName].level();
     unsigned int currentLevel = 0;
     std::string packageArchiveName;
@@ -65,39 +93,48 @@ void create::installDependencies(std::string& packageName)
         ++currentLevel;
     }
     if (!m_dependencies.empty()) {
-        
-        pkgadd add("cards add");
+        buildSimpleDatabase();
         for (auto i : m_dependencies) {
-            std::string name = basename(const_cast<char*>(i.c_str()));
-            if ( name == packageName)
+            std::string name;
+            if ( i == packageName)
                 break;
-            std::set<std::string> listofBinaries;
-            if (findDir(listofBinaries, i) != 0) {
-            m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
-                treatErrors(i);
-            }
-            for (auto j : listofBinaries) {
-                if ( j.find(".cards-") == std::string::npos )
-                    continue;
-                packageArchiveName = i + "/" + j;
-                archive packageArchive(packageArchiveName.c_str());
-                if ( add.checkPackageNameExist(packageArchive.name()) )
-                    continue;
-                if ( m_config.groups().empty() ) {
-                    add.run(packageArchiveName);
-                    continue;
-                }
-                if ( packageArchive.group() == "" ) {
-                    add.run(packageArchiveName);
-                    continue;
-                }
-                for (auto k : m_config.groups()) {
-                    if ( packageArchive.group() == k ) {
-                        add.run(packageArchiveName);
-                        continue;
+            for (auto packageFile : pkgrepo.getListOfPackagesFromGroup(i)) {
+                archive packageArchive(packageFile);
+
+                if (packageArchive.group().empty()) {
+                    if (checkPackageNameExist(packageArchive.name())) {
+                        m_upgrade = 1;
+                        commandName = "pkgadd -u ";
+                    } else {
+                        commandName = "pkgadd ";
+                    }
+                    message = commandName + packageFile;
+                    m_packageArchiveName = packageFile;
+                    if (!m_fdlog != -1) {
+                        write(m_fdlog, message.c_str(), message.length());
+                        write(m_fdlog, "\n", 1);
+                    }
+                    run();
+                } else {
+                    for (auto k : m_config.groups()) {
+                        if (packageArchive.group() == k ) {
+                            if (checkPackageNameExist(packageArchive.name())) {
+                                m_upgrade = 1;
+                                commandName = "pkgadd -u ";
+                            } else {
+                                commandName = "pkgadd ";
+                            }
+                            message = commandName + packageFile;
+                            m_packageArchiveName = packageFile;
+                            if (!m_fdlog != -1) {
+                                write(m_fdlog, message.c_str(), message.length());
+                                write(m_fdlog, "\n", 1);
+                            }
+                            run();
+                        }
                     }
                 }
-            }
+           }
         }
     }
 }
@@ -105,42 +142,29 @@ void create::build(std::string packageName)
 {
     list(packageName);
     installDependencies(packageName);
+    for (auto i : m_dependencies)
+        std::cout << i << std::endl;
+    return;
     std::cout << "create of " << packageName << std::endl;
-    std::string pkgdir = getPortDir(packageName);
-    if (pkgdir == "") {
+    std::string pkgdir = m_pkgfile.getPortDir(packageName);
+    if (pkgdir.empty()) {
         m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_FOUND;
         treatErrors(packageName);
     }
-    std::string timestamp;
+    std::string timestamp, message;
     std::string commandName = "cards create: ";
-    std::string message;
-    std::string packageFileName;
-    int fdlog = -1;
 
-    if (m_config.logdir() != "") {
-        if (!createRecursiveDirs(m_config.logdir())) {
-            m_actualError = cards::ERROR_ENUM_CANNOT_CREATE_DIRECTORY;
-            treatErrors(m_config.logdir());
-        }
-        std::string logFile = m_config.logdir() + "/" + packageName + ".log";
-        unlink(logFile.c_str());
-        fdlog = open(logFile.c_str(), O_APPEND | O_WRONLY | O_CREAT, 0666);
-        if (fdlog == -1) {
-            m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
-            treatErrors(logFile);
-        }
-    }
     message = commandName + pkgdir + " package(s)";
     std::cout << message << std::endl;
 
-    if (m_config.logdir() != "") {
-        write(fdlog, message.c_str(), message.length());
+    if (m_fdlog != -1) {
+        write(m_fdlog, message.c_str(), message.length());
         time_t startTime;
         time(&startTime);
         timestamp = ctime(&startTime);
         timestamp = " starting build " + timestamp;
-        write(fdlog, timestamp.c_str(), timestamp.length());
-        write(fdlog, "\n", 1);
+        write(m_fdlog, timestamp.c_str(), timestamp.length());
+        write(m_fdlog, "\n", 1);
     }
 
     chdir(pkgdir.c_str());
@@ -149,7 +173,7 @@ void create::build(std::string packageName)
     std::string cmd = "pkgmk";
     std::string args = "-d ";
 
-    process makeprocess(cmd, args, fdlog);
+    process makeprocess(cmd, args, m_fdlog);
     int result = 0;
     result = makeprocess.executeShell();
     std::string s = RED;
@@ -192,15 +216,17 @@ void create::build(std::string packageName)
         treatErrors("Pkgfile: " + s);
     }
 
-    if (m_config.logdir() != "") {
+    if (m_fdlog != -1) {
         time_t endTime;
         time(&endTime);
         timestamp = ctime(&endTime);
-        timestamp = commandName + "build done " + timestamp;
+        timestamp = commandName
+            + "build done "
+            + timestamp;
 
-        write(fdlog, "\n", 1);
-        write(fdlog, timestamp.c_str(), timestamp.length());
-        write(fdlog, "\n", 1);
+        write(m_fdlog, "\n", 1);
+        write(m_fdlog, timestamp.c_str(), timestamp.length());
+        write(m_fdlog, "\n", 1);
     }
 
     cards::pkgrepo pkgrepo("/etc/cards.conf");
@@ -209,10 +235,13 @@ void create::build(std::string packageName)
         archive packageArchive(packageFile);
         std::string name = packageArchive.name();
         std::string version = packageArchive.version();
-        message = "CREATED: " + name + " " + version;
+        message = "CREATED: "
+            + name
+            + " "
+            + version;
         m_upgrade = 0;
         buildSimpleDatabase();
-		if (pkgdbh::checkPackageNameExist(name)) {
+		if (checkPackageNameExist(name)) {
 			message = name + ": is ALLREADY installed";
 			m_upgrade = 1;
 		}
@@ -220,19 +249,18 @@ void create::build(std::string packageName)
         run();
         std::cout << message << std::endl;
         if (m_config.logdir() != "") {
-            write( fdlog, message.c_str(), message.length());
-            write( fdlog, "\n", 1 );
+            write(m_fdlog, message.c_str(), message.length());
+            write(m_fdlog, "\n", 1 );
         }
     }
-	if ( m_config.logdir() != "" ) {
+	if ( m_fdlog != -1 ) {
 		time_t finishTime;
 		time(&finishTime);
 		timestamp = ctime(&finishTime);
 		timestamp = commandName + "finish " + timestamp;
-		write( fdlog, "\n", 1 );
-		write( fdlog, timestamp.c_str(), timestamp.length());
-		write( fdlog, "\n", 1 );
-		close ( fdlog );
+		write(m_fdlog, "\n", 1 );
+		write(m_fdlog, timestamp.c_str(), timestamp.length());
+		write(m_fdlog, "\n", 1 );
 	}
 
 }
@@ -244,6 +272,5 @@ void create::parseArguments()
     }
     if (m_root == "")
         m_root = "/";
-
 }
 }
