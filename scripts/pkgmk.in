@@ -37,12 +37,11 @@ get_dependencies() {
 	[ -z $PKGMK_DEPENDS ] && return
 	info "Get dependencies ..."
 	local NAME COLLECTION PKGNAME DIR
-	DIR="$(dirname $PKGMK_ROOT)"
+	DIR="$(dirname $PKGMK_PACKAGE_DIR)"
 	i=0
 	for COLLECTION in ${PKGMK_COLLECTIONS[@]}; do
 		for NAME in ${PKGMK_DEPENDS[@]}; do
-			[ ! -d $(dirname $DIR)/$COLLECTION/${NAME%.*} ] && continue
-			for FILE in $(find $(dirname $DIR)/$COLLECTION/${NAME%.*}/ \
+			for FILE in $(find $DIR/$COLLECTION/ \
 				-name "${NAME}*$PKGMK_PACKAGE_EXT*"); do
 				PKGNAME=$(get_package_name $(basename $FILE))
 				[ "$($PKGMK_PKGINFO -b $PKGNAME)"  != 0 ] && continue
@@ -1186,19 +1185,6 @@ clean_repo_file() {
 		info "Removing $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE"
 	fi
 }
-check_sources_uptodate() {
-	local newversion
-	if  [ ! "$(which lynx)" ]; then
-		error "lynx is not installed, cannot check sources"
-		exit 0
-	fi
-	if [ "$(type -t uptodate)" == "function" ]; then
-		newversion="$(uptodate)"
-		if [ "$newversion" != "$version" ]; then
-			info "$name: $version -> $newversion"
-		fi
-	fi
-}
 check_build() {
 	local LIST
 	if [ "$PKGMK_KEEP_LA_LIBS" != "yes" ]; then
@@ -1244,7 +1230,6 @@ print_help() {
 	echo "  -cv,  --show-version-only   do not build, only show the version of the port and exit"
 	echo "  -do,  --download-only       do not build, only download missing source file(s)"
 	echo "  -eo,  --extract-only        do not build, only extract source file(s)"
-	echo " -itd,  --is-up-to-date       check if the version is the same as upstream sources"
 	echo " -utd,  --up-to-date          do not build, only check if package is up to date"
 	echo "  -ur,  --update-repo         do not build, only update the $PKGMK_REPO_FILE file of the collection"
 	echo "  -uf,  --update-footprint    update footprint using the result of the last build"
@@ -1281,8 +1266,6 @@ parse_options() {
 				PKGMK_EXTRACT_ONLY="yes" ;;
 			-cv|--show-version-only)
 				PKGMK_SHOW_VERSION="yes";;
-			-itd|--is-up-to-date)
-				PKGMK_SOURCES_UP_TO_DATE="yes";;
 			-utd|--up-to-date)
 				PKGMK_UP_TO_DATE="yes" ;;
 			-ur|--update-repo)
@@ -1435,6 +1418,7 @@ main() {
 		exit 0
 	fi
 	if [ "$PKGMK_CHECK_SYNTAX" = "yes" ]; then
+		info "PKGMK_PACKAGE_DIR: $PKGMK_PACKAGE_DIR"
 		info "description: $description"
 		info "url: $url"
 		info "packager: $packager"
@@ -1461,10 +1445,6 @@ main() {
 		make_work_dir
 		info "Extracting sources of package '${name}-$version'."
 		unpack_source
-		exit 0
-	fi
-	if [ "$PKGMK_SOURCES_UP_TO_DATE" = "yes" ]; then
-		check_sources_uptodate
 		exit 0
 	fi
 	# Print all informations
