@@ -11,7 +11,7 @@ install::install(const CardsArgumentParser& argParser,
 	, m_configFileName(configFileName)
 {
 	parseArguments();
-	for( auto i : m_argParser.otherArguments() ) {
+	for(auto i : m_argParser.otherArguments()) {
 		if (checkFileExist(i)) {
 			continue;
 		}
@@ -24,48 +24,42 @@ install::install(const CardsArgumentParser& argParser,
 	}
 
 	buildSimpleDatabase();
-	for( auto i : m_argParser.otherArguments() ) {
-		std::set<std::string> ListOfPackage = m_pkgrepo.getListOfPackagesFromSet(i);
-		if (ListOfPackage.empty() )
-			ListOfPackage = m_pkgrepo.getListOfPackagesFromCollection(i);
-		if ( !ListOfPackage.empty() )  {
-			/*
-			* It's a collection or a set
-			*/
-			for (auto i : ListOfPackage ) {
+	for(auto pkg : m_argParser.otherArguments()) {
+		std::set<std::string> SetOfPackages = m_pkgrepo.getListOfPackagesFromSet(pkg);
+		if (SetOfPackages.empty())
+			SetOfPackages = m_pkgrepo.getListOfPackagesFromCollection(pkg);
+
+		if (!SetOfPackages.empty())  {
+			// It's a collection or a set
+			for (auto i : SetOfPackages ) {
 				if (checkPackageNameExist(i))
 					continue;
 
 				m_pkgrepo.generateDependencies(i);
 			}
-		} else if (checkRegularFile(i)) {
-			/*
-			 * It's a regular archive file
-			 */
-
-			archive packageArchive(i);
+		} else if (checkRegularFile(pkg)) {
+			 // It's a regular archive file
+			archive packageArchive(pkg);
 			if (checkPackageNameExist(packageArchive.name())) {
 				m_upgrade=1;
 			} else {
 				m_upgrade=0;
 			}
 
-			m_packageArchiveName = i;
+			m_packageArchiveName = pkg;
 			run();
 
 			std::string p = "(" + packageArchive.collection()+") " + packageArchive.name();
 			syslog(LOG_INFO,"%s",p.c_str());
 		} else {
-			/*
-			 * It's a normal package
-			 */
-			m_pkgrepo.generateDependencies(i);
+			// It's a normal package
+			m_pkgrepo.generateDependencies(pkg);
 		}
 	}
 
 	getLocalePackagesList();
 
-	for ( auto i : m_pkgrepo.getDependenciesList() ) {
+	for (auto i : m_pkgrepo.getDependenciesList()) {
 		m_packageArchiveName = m_pkgrepo.dirName(i.first) + "/" + m_pkgrepo.fileName(i.first);
 		archive packageArchive(m_packageArchiveName.c_str());
 		std::string name = packageArchive.name();
