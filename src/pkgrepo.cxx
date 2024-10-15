@@ -137,17 +137,17 @@ void pkgrepo::generateDependencies()
     PackageTime.first = m_packageName;
     PackageTime.second = 0;
 
-    /* Always insert the final package first (twice) */
+    // Always insert the final package first (twice)
     dependenciesWeMustAdd.push_back(PackageTime);
     dependenciesWeMustAdd.push_back(PackageTime);
 
-    /* Main while loop */
+    // Main while loop
     while (!dependenciesWeMustAdd.empty()) {
         vit = dependenciesWeMustAdd.begin();
         packageName = vit->first;
         PackageTime = *vit;
 
-        /* Erase the current treated packageName */
+        // Erase the current treated packageName
         dependenciesWeMustAdd.erase(vit);
 
         std::set<std::pair<std::string, time_t>> directDependencies;
@@ -155,20 +155,18 @@ void pkgrepo::generateDependencies()
             directDependencies = m_listOfPackages[packageName].dependencies();
         } else {
 
-            /* The packageName is not found in the listOfPackages */
-
+            // The packageName is not found in the listOfPackages
             if (checkBinaryExist(packageName)) {
-                /* The packageName binary is found.
-                 * Directs dependencies are not availables yes
-                 * We need to get PackageFileName of the packageName
-                 * And check it's signature
-                 */
 
+                // The packageName binary is found.
+                // Directs dependencies are not yet availables
+                // We need to get PackageFileName of the packageName
+                // And check it's signature
                 packageFileName = dirName(packageName) + "/" + fileName(packageName);
                 packageNameHash = fileHash(packageName);
 
-                /* archive PackageName exist
-                 * Let's see if we need to download it */
+                // archive PackageName exist:
+                // Let's see if we need to download it.
 
             } else {
                 m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_EXIST;
@@ -573,6 +571,7 @@ const repo_t& pkgrepo::getListOfPackages()
 }
 std::set<std::string>& pkgrepo::getListOfPackagesFromSet(const std::string& name)
 {
+    m_binarySetList.clear();
     if (m_listOfPackages.size() == 0)
         parse();
 
@@ -589,6 +588,7 @@ std::set<std::string>& pkgrepo::getListOfPackagesFromSet(const std::string& name
 }
 std::set<std::string>& pkgrepo::getListOfPackagesFromCollection(const std::string& name)
 {
+    m_binaryCollectionList.clear();
     if (m_listOfPackages.size() == 0)
         parse();
 
