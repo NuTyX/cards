@@ -6,14 +6,14 @@ namespace cards {
 
 info::info(const CardsArgumentParser& argParser,
 		   const std::string& configFileName)
-		: cards::pkgrepo(configFileName)
-		, m_argParser(argParser)
+		: m_argParser(argParser)
+		, m_pkgrepo(configFileName)
 {
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_INFO)) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
-			std::set<std::string> sortedPackagesList = getListOfPackagesFromSet(m_argParser.otherArguments()[0]);;
+			std::set<std::string> sortedPackagesList = m_pkgrepo.getListOfPackagesFromSet(m_argParser.otherArguments()[0]);;
 			if (sortedPackagesList.size() == 0)
-				sortedPackagesList = getListOfPackagesFromCollection(m_argParser.otherArguments()[0]);;
+				sortedPackagesList = m_pkgrepo.getListOfPackagesFromCollection(m_argParser.otherArguments()[0]);;
 
 			for (auto i : sortedPackagesList)
 				std::cout << "("
@@ -22,13 +22,13 @@ info::info(const CardsArgumentParser& argParser,
 					<< i
 					<< std::endl;
 		} else {
-			std::cout << getBinaryPackageInfo(m_argParser.otherArguments()[0]);
+			std::cout << m_pkgrepo.getBinaryPackageInfo(m_argParser.otherArguments()[0]);
 		}
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_LIST) ) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {
 			std::set<std::string> sortedSetList;
-			for (auto i : getListOfPackages())
+			for (auto i : m_pkgrepo.getListOfPackages())
 				if ( i.second.sets().size() > 0 ) {
 					for (auto s : i.second.sets())
 						sortedSetList.insert(s);
@@ -37,7 +37,7 @@ info::info(const CardsArgumentParser& argParser,
 				std::cout << i << std::endl;
 		} else {
 			std::set<std::string> sortedPackagesList;
-			for (auto i : getListOfPackages()) {
+			for (auto i : m_pkgrepo.getListOfPackages()) {
 				std::string s, _s;
 				if ( i.second.sets().size()  > 0 ) {
 					for (auto s : i.second.sets())
@@ -70,7 +70,7 @@ info::info(const CardsArgumentParser& argParser,
 		pkgdbh dbh;
 
 		dbh.buildSimpleDatabase();
-		for (auto j : getListOfPackages()) {
+		for (auto j : m_pkgrepo.getListOfPackages()) {
 			found = false;
 			std::string::size_type pos;
 			pos = j.second.collection().find(convertToLowerCase(m_argParser.otherArguments()[0]));
