@@ -13,7 +13,7 @@ print_help()
 }
 check_binaries()
 {
-	locale name file
+	local name file
 	check_location
 	check_config_file
 	if [ ! -d ${BINARY_BASE} ]; then
