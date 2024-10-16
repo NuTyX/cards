@@ -893,6 +893,7 @@ void pkgrepo::errors()
 }
 std::set<std::string>& pkgrepo::getListOfPackagesFromGroup(const std::string& name)
 {
+    m_binaryGroupList.clear();
     if (m_listOfPackages.size() == 0)
         parse();
 
