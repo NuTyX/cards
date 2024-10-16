@@ -142,9 +142,7 @@ void create::build(std::string packageName)
 {
     list(packageName);
     installDependencies(packageName);
-    for (auto i : m_dependencies)
-        std::cout << i << std::endl;
-    return;
+
     std::cout << "create of " << packageName << std::endl;
     std::string pkgdir = m_pkgfile.getPortDir(packageName);
     if (pkgdir.empty()) {
