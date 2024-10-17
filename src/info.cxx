@@ -21,6 +21,11 @@ info::info(const CardsArgumentParser& argParser,
 					<< ") "
 					<< i
 					<< std::endl;
+		} else if(m_argParser.isSet(CardsArgumentParser::OPT_VERSION)) {
+			std::cout << m_pkgrepo.version(m_argParser.otherArguments()[0])
+				<< "-"
+				<< itos(m_pkgrepo.release(m_argParser.otherArguments()[0]))
+				<< std::endl;
 		} else {
 			std::cout << m_pkgrepo.getBinaryPackageInfo(m_argParser.otherArguments()[0]);
 		}

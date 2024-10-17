@@ -19,6 +19,7 @@ ArgParser::APOpt CardsArgumentParser::OPT_INSTALLED;
 ArgParser::APOpt CardsArgumentParser::OPT_BINARIES;
 ArgParser::APOpt CardsArgumentParser::OPT_PORTS;
 ArgParser::APOpt CardsArgumentParser::OPT_SETS;
+ArgParser::APOpt CardsArgumentParser::OPT_VERSION;
 
 ArgParser::APOpt CardsArgumentParser::OPT_DISABLE;
 ArgParser::APOpt CardsArgumentParser::OPT_IGNORE;
@@ -167,6 +168,10 @@ Location of the keys is defined in cards.conf file.\n\
 As for the generation, a private key is needed, it is used by the packager only."),
         ArgParser::NONE, 0, "");
 
+    OPT_VERSION.init("version",
+        'v',
+        _("\t   Only show the version of the package."));
+
     OPT_NO_SYNC.init("no-sync",
         0,
         _("\t   Only upgrade what's possible."));
@@ -267,6 +272,7 @@ As for the generation, a private key is needed, it is used by the packager only.
 
     addOption(CMD_INFO, OPT_SETS, false);
     addOption(CMD_INFO, OPT_CONFIG_FILE, false);
+    addOption(CMD_INFO, OPT_VERSION, false);
 
     addOption(CMD_DIFF, OPT_PORTS, false);
 
