@@ -1363,7 +1363,7 @@ main() {
 	fi
 	# Need to be set so that we can use the 'name' variable
 	name=$NAME
-	[ -f ../$PKGMK_EXTRA_CONFFILE ] && . ../$PKGMK_EXTRA_CONFFILE
+
 	# Need to reset
 	unset name
 	. $PKGMK_PKGFILE
@@ -1460,13 +1460,7 @@ main() {
 		info "PKGMK_KEEP_SOURCES: $PKGMK_KEEP_SOURCES"
 		info "PKGMK_CLEAN: $PKGMK_CLEAN"
 	fi
-
-	if [ "$PKGMK_IGNORE_REPO" != "yes" ]; then
-		info "PKGMK_IGNORE_REPO: $PKGMK_IGNORE_REPO"
-	else
-		info "$PKGMK_REPO_FILE file will be deleted"
-	fi
-
+	info "PKGMK_IGNORE_REPO: $PKGMK_IGNORE_REPO"
 	info "PKGMK_IGNORE_FOOTPRINT: $PKGMK_IGNORE_FOOTPRINT"
 
 	info "PKGMK_COMPRESS_PACKAGE: $PKGMK_COMPRESS_PACKAGE"
@@ -1600,7 +1594,7 @@ PKGMK_SOURCE_MIRRORS=()
 PKGMK_DOWNLOAD="no"
 PKGMK_IGNORE_FOOTPRINT="yes"
 PKGMK_IGNORE_NEW="yes"
-PKGMK_IGNORE_REPO="yes"
+PKGMK_IGNORE_REPO="no"
 PKGMK_IGNORE_RUNTIMEDEPS="no"
 
 PKGMK_NO_STRIP="no"
