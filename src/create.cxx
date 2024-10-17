@@ -53,6 +53,9 @@ void create::treatErrors(const std::string& s) const
     case ERROR_ENUM_CANNOT_READ_DIRECTORY:
         throw RunTimeErrorWithErrno(_("could not read directory ") + s);
         break;
+    case ERROR_ENUM_CANNOT_CHANGE_DIRECTORY:
+        throw RunTimeErrorWithErrno(_("could not change directory ") + s);
+        break;
     }
 }
 void create::list(std::string& packageName)
@@ -102,35 +105,29 @@ void create::installDependencies(std::string& packageName)
                 archive packageArchive(packageFile);
 
                 if (packageArchive.group().empty()) {
-                    if (checkPackageNameExist(packageArchive.name())) {
-                        m_upgrade = 1;
-                        commandName = "pkgadd -u ";
-                    } else {
+                    if (!checkPackageNameExist(packageArchive.name())) {
                         commandName = "pkgadd ";
+                        message = commandName + packageFile;
+                        m_packageArchiveName = packageFile;
+                        if (!m_fdlog != -1) {
+                            write(m_fdlog, message.c_str(), message.length());
+                            write(m_fdlog, "\n", 1);
+                        }
+                        run();
                     }
-                    message = commandName + packageFile;
-                    m_packageArchiveName = packageFile;
-                    if (!m_fdlog != -1) {
-                        write(m_fdlog, message.c_str(), message.length());
-                        write(m_fdlog, "\n", 1);
-                    }
-                    run();
                 } else {
                     for (auto k : m_config.groups()) {
                         if (packageArchive.group() == k ) {
-                            if (checkPackageNameExist(packageArchive.name())) {
-                                m_upgrade = 1;
-                                commandName = "pkgadd -u ";
-                            } else {
+                            if (!checkPackageNameExist(packageArchive.name())) {
                                 commandName = "pkgadd ";
+                                message = commandName + packageFile;
+                                m_packageArchiveName = packageFile;
+                                if (!m_fdlog != -1) {
+                                    write(m_fdlog, message.c_str(), message.length());
+                                    write(m_fdlog, "\n", 1);
+                                }
+                                run();
                             }
-                            message = commandName + packageFile;
-                            m_packageArchiveName = packageFile;
-                            if (!m_fdlog != -1) {
-                                write(m_fdlog, message.c_str(), message.length());
-                                write(m_fdlog, "\n", 1);
-                            }
-                            run();
                         }
                     }
                 }
@@ -164,8 +161,15 @@ void create::build(std::string packageName)
         write(m_fdlog, timestamp.c_str(), timestamp.length());
         write(m_fdlog, "\n", 1);
     }
+    char pwd[100];
+    std::cout << "Current Directory: "
+        << getcwd(pwd,100)
+        << std::endl;
 
-    chdir(pkgdir.c_str());
+    if (chdir(pkgdir.c_str())) {
+        m_actualError = cards::ERROR_ENUM_CANNOT_CHANGE_DIRECTORY;
+        treatErrors(pkgdir);
+    };
 
     std::string runscriptCommand = "sh";
     std::string cmd = "pkgmk";
