@@ -14,18 +14,13 @@ print_help()
 check_binaries()
 {
 	local name file
-	check_location
-	check_config_file
 	if [ ! -d ${BINARY_BASE} ]; then
 		echo "The directory ${BINARY_BASE} doesn't exist"
-		echo "Please fix your setting in /etc/cards.conf.d/$COLLECTION.conf file"
-		echo "Variable 'BINARY_BASE'"
 		exit 1
 	fi
-	pushd ${BINARY_BASE} > /dev/null
-	for name in $(ls|cut -d "." -f1|uniq)
+	for name in $(ls ${BINARY_BASE}|cut -d "." -f1|uniq)
 	do
-		if [ ! -d $PORT_BASE/$name ]; then
+		if [ ! -d $COLLECTION/$name ]; then
 			echo "'$name' packages should be removed and delete from the .REPO file"
 			for file in $(ls $name.*)
 			do
@@ -35,19 +30,6 @@ check_binaries()
 		fi
 	done
 	cd - > /dev/null
-}
-check_port_name() {
-	check_config_file
-	if [ ! -d "$PORT_BASE/$1" ]; then
-		echo "I dont know the port $1"
-		exit 1
-	fi
-}
-check_collection_exist() {
-	if [ ! -d "$COLLECTION" ]; then
-		echo "I dont know the collection $COLLECTION"
-		exit 1
-	fi
 }
 parse_options() {
 	if [ $# -lt 1 ]; then
@@ -65,7 +47,7 @@ parse_options() {
 				check_binaries
 				exit 0
 				;;
-			-cd|--check-diff|-d|--dry)
+			-d|--dry)
 				DRY="yes"
 				check_binaries
 				build_binaries
@@ -77,142 +59,46 @@ parse_options() {
 
 			-v|--version)
 				echo "$COLLECTION $BUILD_PORT_VERSION"
-                                exit 0 ;;
+                exit 0 ;;
 
 			*)
-				check_port_name $1
+				if [ ! -d "$COLLECTION/$1" ]; then
+					echo "I dont know the port $1"
+					exit 1
+				fi
 				;;
 
 		esac
 		shift
 	done
 }
-check_tools () {
-	if ! ( $(which cards > /dev/null) ); then
-		echo "'cards' not available"
-		exit 1
-	fi
-	if ! ( $(which pkgmk > /dev/null) ); then
-		echo "'cards.devel' not available"
-		exit 1
-	fi
-	if ! ( $(which rsync > /dev/null) ); then
-		echo "'rsync' not available"
-		exit 1
-	fi
-	if ! ( $(which gawk > /dev/null) ); then
-		echo "'gawk' not available"
-		exit 1
-	fi
-}
-check_root () {
-	if [ ! "$UID" == "0" ]; then
-		echo "You are not 'root'"
-		exit 1
-	fi
-}
-check_location () {
-if [ ! -d .git ] && [ ! -d scripts ]; then
-	echo "Make shure you are at the root of the git"
-	echo "Your are in: $GIT"
-	exit 1
-fi
-}
-check_user () {
-if [ "$UID" == "0" ] && [ -O scripts ] ; then
-	echo "your are 'root' account
-Means you are not suppose to 'git pull' this git project"
-	echo "I quit for now
-
-"
-	exit 1
-fi
-}
-get_binary_directory() {
-	local dir
-	dir=$(cards config|grep Directory| cut -d " " -f3|grep ${COLLECTION}$|sed "s/\/${COLLECTION}$//"|head -1)
-	if [ ! -z ${dir} ]; then
-		BINARY_DIR=${dir}
-	else
-		BINARY_DIR=${RSYNC_NUTYX_VERSION}
-	fi
-}
-get_binary_version() {
-	local packageName
-	cd $BINARY_BASE/
-	packageName=$(cat .REPO|grep "^@$package.cards-*")
-	binary_version=$(echo $packageName|cut -d "-" -f2,3)
-}
 get_port_version() {
 	local port base_port PORTS_DIR tmprel
-	port=/$PORT_BASE/$package
-	PORTS_DIR=$PORT_BASE
+	port=$COLLECTION/$package
+	PORTS_DIR=$COLLECTION
 	base_port=$(echo $package | cut -d "-" -f1)
-	cd $port
 	unset version
 	release=1
-	. Pkgfile
+	. $port/Pkgfile
 	[ ! -z $release ] && tmprel=$release
 	if [ -z $version ] && [ "$base_port" != "$package" ] ; then
 		if [ -f $PORTS_DIR/$base_port/Pkgfile ]; then
 			cd $PORTS_DIR/$base_port
 			. Pkgfile
+			cd - > /dev/null
 		fi
 	fi
 	[ ! -z $tmprel ] && release=$tmprel
 	port_version="$version-$release"
 }
-check_config_file () {
-	get_binary_directory
-	if [ ! -f /etc/cards.conf.d/$COLLECTION.conf ] ; then
-		echo "Create $COLLECTION.conf file"
-		[ ! -d /etc/cards.conf.d ] && mkdir -p /etc/cards.conf.d
-		echo "PORT_BASE=$GIT/$COLLECTION
-BINARY_BASE=${BINARY_DIR}/$COLLECTION" > /etc/cards.conf.d/$COLLECTION.conf
-	fi
-
-	. /etc/cards.conf.d/$COLLECTION.conf || exit 1
-
-	[ ! -d $BINARY_BASE ] && mkdir -p $BINARY_BASE
-	if [  "$BINARY_BASE" == "$PORT_BASE" ]; then
-		echo "Correct your $COLLECTION.conf file
-BINARY_BASE and PORT_BASE should NEVER be equal
-BINARY_BASE=$BINARY_BASE
-PORT_BASE=$PORT_BASE
-I quit for now
-"
-		exit 1
-	fi
-	if [ -f /var/lib/pkg/nutyx-version ]; then
-		RSYNC_NUTYX_VERSION=$(cat /var/lib/pkg/nutyx-version|grep version|sed "s/version //"| sed "s/ //g")
-		RSYNC_NUTYX_NAME=$(cat /var/lib/pkg/nutyx-version|grep name|sed "s/name //"| sed "s/ //g")
-	else
-		echo "/var/lib/pkg/nutyx-version file not exist
-I quit for now
-"
-		exit 1
-	fi
-	if [ -z $RSYNC_NUTYX_VERSION ]; then
-		echo "Dont know the version you want to rsync
-Check the /var/lib/pkg/nutyx-version, should have a
-line like:
-
-name houaphan
-version 8.0
-
-"
-		exit 1
-	fi
-}
 build_binaries () {
-	local package port_version binary_version
+	local package
 	if [ -n "$(cards level|grep WARNING|head -1)" ]; then
 		cards level
 		exit 1;
 	fi
-	for i in $(cards level | grep ${BINARY_BASE}/|cut -d " " -f2)
+	for package in $(cards level | grep " $COLLECTION/"|cut -d "/" -f2)
 	do
-		package=$(basename $i)
 		if [  -z "$(ls ${BINARY_BASE}/$package*.cards-* 2>/dev/null )" ];then
 			cd $GIT
 			[ "$DRY" == "yes" ] && continue
@@ -220,8 +106,8 @@ build_binaries () {
 			continue
 		fi
 		get_port_version
-		get_binary_version
-		if [ "$port_version" != "${binary_version%.*}" ]; then
+		binary_version=$(cards info -v $package)
+		if [ "$port_version" != "${binary_version}" ]; then
 			echo "$package: Port: $port_version, Binary: $binary_version"
 			cd $GIT
 			[ "$DRY" == "yes" ] && continue
@@ -232,18 +118,32 @@ build_binaries () {
 	done
 }
 main() {
-	check_tools
-	check_location
-	check_user
-	check_config_file
-	check_collection_exist
+	if [ ! -d .git ] && [ ! -d scripts ]; then
+		echo "Make shure you are at the root of the git"
+		echo "Your are in: $GIT"
+		exit 1
+	fi
+	if [ "$UID" == "0" ] && [ -O scripts ] ; then
+		echo "your are 'root' account
+Means you are not suppose to 'git pull' this git project"
+		echo "I quit for now
+
+"
+		exit 1
+	fi
+	if [ ! -d "$COLLECTION" ]; then
+		echo "I dont know the collection $COLLECTION"
+		exit 1
+	fi
 	parse_options "$@"
 	cards create -r $1
 }
+PKGMK_REPO_FILE=.REPO
 BUILD_PORT_VERSION=#VERSION#
 DRY="no"
 ARCH=$(uname -m)
 COLLECTION="$(basename $0)"
 GIT="$PWD"
 PROJECT="$(basename $GIT)"
+BINARY_BASE=/DEPOT/$COLLECTION
 main "$@"
