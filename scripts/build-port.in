@@ -73,26 +73,15 @@ parse_options() {
 	done
 }
 get_port_version() {
-	local port base_port PORTS_DIR tmprel
-	port=$COLLECTION/$package
-	PORTS_DIR=$COLLECTION
-	base_port=$(echo $package | cut -d "-" -f1)
 	unset version
-	release=1
-	. $port/Pkgfile
-	[ ! -z $release ] && tmprel=$release
-	if [ -z $version ] && [ "$base_port" != "$package" ] ; then
-		if [ -f $PORTS_DIR/$base_port/Pkgfile ]; then
-			cd $PORTS_DIR/$base_port
-			. Pkgfile
-			cd - > /dev/null
-		fi
-	fi
-	[ ! -z $tmprel ] && release=$tmprel
-	port_version="$version-$release"
+ 	unset release
+	. $COLLECTION/$package/Pkgfile
+	[ -z $release ] && release=1
+	echo "$version-$release"
 }
 build_binaries () {
 	local package
+ 	cd $GIT
 	if [ -n "$(cards level|grep WARNING|head -1)" ]; then
 		cards level
 		exit 1;
@@ -100,18 +89,16 @@ build_binaries () {
 	for package in $(cards level | grep " $COLLECTION/"|cut -d "/" -f2)
 	do
 		if [  -z "$(ls ${BINARY_BASE}/$package*.cards-* 2>/dev/null )" ];then
-			cd $GIT
 			[ "$DRY" == "yes" ] && continue
-			bash scripts/$COLLECTION $package || exit 1
+			cards create -r $package || exit 1
 			continue
 		fi
-		get_port_version
+		port_version=$(get_port_version $package)
 		binary_version=$(cards info -v $package)
 		if [ "$port_version" != "${binary_version}" ]; then
 			echo "$package: Port: $port_version, Binary: $binary_version"
-			cd $GIT
 			[ "$DRY" == "yes" ] && continue
-			bash scripts/$COLLECTION $package || exit 1
+			cards create $package || exit 1
 			continue
 		fi
 		[ "$DRY" == "yes" ] || echo "WILL NOT BUILD '$package' AGAIN.."
@@ -121,14 +108,6 @@ main() {
 	if [ ! -d .git ] && [ ! -d scripts ]; then
 		echo "Make shure you are at the root of the git"
 		echo "Your are in: $GIT"
-		exit 1
-	fi
-	if [ "$UID" == "0" ] && [ -O scripts ] ; then
-		echo "your are 'root' account
-Means you are not suppose to 'git pull' this git project"
-		echo "I quit for now
-
-"
 		exit 1
 	fi
 	if [ ! -d "$COLLECTION" ]; then
