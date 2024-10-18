@@ -120,9 +120,7 @@ main() {
 PKGMK_REPO_FILE=.REPO
 BUILD_PORT_VERSION=#VERSION#
 DRY="no"
-ARCH=$(uname -m)
 COLLECTION="$(basename $0)"
 GIT="$PWD"
-PROJECT="$(basename $GIT)"
 BINARY_BASE=/DEPOT/$COLLECTION
 main "$@"

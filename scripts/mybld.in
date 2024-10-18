@@ -70,13 +70,6 @@ check_download_sources() {
 
 	done
 }
-check_root() {
-  if [ "$UID" == "0" ]; then
-    echo "The 'root' account is not allow to building packages"
-    exit 1
-  fi
-}
-
 generate_Pkgfile() {
   if [ ! -d ${COLLECTION} ]; then
     echo  "
@@ -270,7 +263,7 @@ parse_arguments() {
       PARAM+=($1);;
 
     -p|--pause)
-      PAUSE=" && export PATH=/root/$GIT/scripts:$PATH && printf \"You are now in the chroot.\n\
+      PAUSE=" && export PATH=/$GIT/scripts:$PATH && printf \"You are now in the chroot.\n\
 Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
 
     -I|--init)
@@ -464,7 +457,7 @@ PKGMK_COMPRESSION_MODE=\"$PKGMK_COMPRESSION_MODE\""
 }
 setup_base_config() {
   [ -z "$BASE" ] && CARDS_CONF+="
-base /DEPOT/$1"
+base /$GIT/$1"
 }
 setup_cards_conf() {
   CARDS_CONF="group devel
@@ -506,7 +499,7 @@ dir /DEPOT/$i"
   if [ ! -z "$BASE" ]; then
     for i in ${BASE[@]}; do
       CARDS_CONF+="
-base /DEPOT/$i"
+base /$GIT/$i"
     done
   fi
   CARDS_CONF+="
@@ -517,15 +510,36 @@ logdir /LOGS"
 ########################################################################
 # BEGIN HERE
 ########################################################################
+if [ "$UID" == "0" ]; then
+    echo "
+>>> The 'root' account is not allow to use $(basename ${0})
+"
+    exit 1
+fi
 
-check_root
 [ -f $HOME/.mybld ] && source $HOME/.mybld
 [ -z "$ROOTMOUNT" ] && ROOTMOUNT="$HOME/www"
 [ -z "$ROOT" ] && ROOT="$HOME/mybld"
 [ -z "$URL" ] && URL="rsync://download.nutyx.org/nutyx"
 [ -z "$EDITOR" ] && EDITOR="vi"
 [ -z "$COLLECTIONS" ] && COLLECTIONS=(gui cli base)
+[ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
 
+GIT_PROJ=$(pwd)
+GIT="root/$(basename $GIT_PROJ)"
+CLEANUP="no"
+
+if [ -z "$GIT_PROJ" ]; then
+  error "Git root: ${GIT_PROJ} empty"
+  exit 1
+fi
+
+if [ ! -d .git ]; then
+  echo "
+>>> No Git project found in '"$GIT_PROJ"', The '.git' folder not exist.
+"
+  exit 1
+fi
 if [ -z "${1}" ]; then
   echo "
 >>> At least one argument is mandatory
@@ -550,25 +564,6 @@ if ! ( $(which $EDITOR > /dev/null) ); then
 "
   exit 1
 fi
-if [ ! -d .git ]; then
-  echo "
->>> No Git project found in '"$(pwd)"', The '.git' folder not exist.
-"
-  exit 1
-fi
-
-[ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
-
-GIT_PROJ=$(pwd)
-
-if [ -z "$GIT_PROJ" ]; then
-  error "Git root: ${GIT_PROJ} empty"
-  exit 1
-fi
-
-GIT=$(basename $GIT_PROJ)
-
-CLEANUP="no"
 
 parse_arguments "$@"
 find_version
@@ -663,7 +658,7 @@ fi
 setup_cards_conf
 
 DEVEL="cards.devel \
-&& cd /root/$GIT \
+&& cd /$GIT \
 $PAUSE \
 && bash scripts/$COLLECTION"
 
@@ -877,23 +872,23 @@ else
 fi
 MOUNT_POINTS="$MOUNT_POINTS sources"
 
-mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/$GIT
 
-sudo mount --bind $GIT_PROJ $ROOT/${VERSION}/${COLLECTION}/root/$GIT ||\
- error "$ROOT/${VERSION}/${COLLECTION}/root/$GIT"
+sudo mount --bind $GIT_PROJ $ROOT/${VERSION}/${COLLECTION}/$GIT ||\
+ error "$ROOT/${VERSION}/${COLLECTION}/$GIT"
 
-mkdir -p $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts || error /${VERSION}/${COLLECTION}
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/$GIT/scripts || error /${VERSION}/${COLLECTION}
 
-MOUNT_POINTS="$MOUNT_POINTS root/$GIT"
+MOUNT_POINTS="$MOUNT_POINTS $GIT"
 
 
-ln -sv /usr/bin/build-port $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
+ln -sv /usr/bin/build-port $ROOT/${VERSION}/${COLLECTION}/$GIT/scripts/${COLLECTION}
 
 echo 'running the command:
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
 
-rm $ROOT/${VERSION}/${COLLECTION}/root/$GIT/scripts/${COLLECTION}
+rm $ROOT/${VERSION}/${COLLECTION}/$GIT/scripts/${COLLECTION}
 
 ding
 umount_all
