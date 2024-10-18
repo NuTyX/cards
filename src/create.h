@@ -12,6 +12,7 @@ namespace cards {
 
 class create : public pkgadd {
     int                        m_fdlog;
+    std::string                m_portsDir;
     ports_t                    m_tree;
     std::set<std::string>      m_list;
     std::vector<std::string>   m_dependencies;

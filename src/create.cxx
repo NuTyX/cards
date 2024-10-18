@@ -9,6 +9,9 @@ create::create(CardsArgumentParser& argParser)
     , m_config("/etc/cards.conf")
     , m_fdlog(-1)
 {
+    char pwd[MAXPATHLEN];
+    m_portsDir = getcwd(pwd,MAXPATHLEN);
+
     parseArguments();
     m_tree = m_pkgfile.getListOfPackages();
 
@@ -140,16 +143,18 @@ void create::build(std::string packageName)
     list(packageName);
     installDependencies(packageName);
 
-    std::cout << "create of " << packageName << std::endl;
-    std::string pkgdir = m_pkgfile.getPortDir(packageName);
-    if (pkgdir.empty()) {
+    if (m_pkgfile.getPortDir(packageName).empty()) {
         m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_FOUND;
         treatErrors(packageName);
     }
+
+    m_portsDir += "/";
+    m_portsDir += m_pkgfile.getPortDir(packageName);
+
     std::string timestamp, message;
     std::string commandName = "cards create: ";
 
-    message = commandName + pkgdir + " package(s)";
+    message = commandName + packageName + " package(s)";
     std::cout << message << std::endl;
 
     if (m_fdlog != -1) {
@@ -161,14 +166,10 @@ void create::build(std::string packageName)
         write(m_fdlog, timestamp.c_str(), timestamp.length());
         write(m_fdlog, "\n", 1);
     }
-    char pwd[100];
-    std::cout << "Current Directory: "
-        << getcwd(pwd,100)
-        << std::endl;
 
-    if (chdir(pkgdir.c_str())) {
+    if (chdir(m_portsDir.c_str())) {
         m_actualError = cards::ERROR_ENUM_CANNOT_CHANGE_DIRECTORY;
-        treatErrors(pkgdir);
+        treatErrors(m_portsDir);
     };
 
     std::string runscriptCommand = "sh";
