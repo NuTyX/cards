@@ -660,23 +660,23 @@ setup_cards_conf
 DEVEL="cards.devel \
 && cd /$GIT \
 $PAUSE \
-&& bash scripts/$COLLECTION"
+&& cards create"
 
 [ -z "${PARAM[0]}" ] && CHROOT="ncurses readline bash"
 [ -z "$PACKAGES_LIST" ] || CHROOT="ncurses readline bash"
 
 if [ ! -z ${PACKAGES_LIST} ]; then
    if [ "$DIFF" == "yes" ];then
-      DEVEL="$DEVEL -d"
+      DEVEL="$DEVEL $COLLECTION -d"
    else
-      DEVEL="$DEVEL -a"
+      DEVEL="$DEVEL $COLLECTION"
    fi
 else
   if [ -z "${PARAM[0]}" ]; then
     if [ "$DIFF" == "yes" ];then
-      DEVEL="$DEVEL -d"
+      DEVEL="$DEVEL $COLLECTION -d"
     else
-      DEVEL="$DEVEL -a"
+      DEVEL="$DEVEL $COLLECTION"
     fi
   else
     DEVEL="$DEVEL ${PARAM[0]}"
@@ -877,18 +877,12 @@ mkdir -p $ROOT/${VERSION}/${COLLECTION}/$GIT
 sudo mount --bind $GIT_PROJ $ROOT/${VERSION}/${COLLECTION}/$GIT ||\
  error "$ROOT/${VERSION}/${COLLECTION}/$GIT"
 
-mkdir -p $ROOT/${VERSION}/${COLLECTION}/$GIT/scripts || error /${VERSION}/${COLLECTION}
 
 MOUNT_POINTS="$MOUNT_POINTS $GIT"
-
-
-ln -sv /usr/bin/build-port $ROOT/${VERSION}/${COLLECTION}/$GIT/scripts/${COLLECTION}
 
 echo 'running the command:
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
 sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
-
-rm $ROOT/${VERSION}/${COLLECTION}/$GIT/scripts/${COLLECTION}
 
 ding
 umount_all
