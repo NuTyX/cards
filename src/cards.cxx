@@ -249,7 +249,6 @@ int main(int argc, char** argv)
         }
         case ArgParser::CMD_CREATE: {
             cards::create create(cardsArgPars);
-            create.build(cardsArgPars.otherArguments()[0]);
             return EXIT_SUCCESS;
         }
 
