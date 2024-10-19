@@ -15,14 +15,16 @@ create::create(CardsArgumentParser& argParser)
     parseArguments();
     m_tree = m_pkgfile.getListOfPackages();
 
-    std::string packageName = argParser.otherArguments()[0];
-
     if (m_config.logdir() != "") {
         if (!createRecursiveDirs(m_config.logdir())) {
             m_actualError = cards::ERROR_ENUM_CANNOT_CREATE_DIRECTORY;
             treatErrors(m_config.logdir());
         }
-        std::string logFile = m_config.logdir() + "/" + packageName + ".log";
+        std::string logFile = m_config.logdir()
+            + "/"
+            + argParser.otherArguments()[0]
+            + ".log";
+
         unlink(logFile.c_str());
         m_fdlog = open(logFile.c_str(), O_APPEND | O_WRONLY | O_CREAT, 0666);
         if (m_fdlog == -1) {
@@ -30,13 +32,36 @@ create::create(CardsArgumentParser& argParser)
             treatErrors(logFile);
         }
     }
-
-    
 }
 create::~create()
 {
     if (m_fdlog != -1)
 	    close(m_fdlog);
+}
+bool create::isACollection()
+{
+    DIR* d;
+    struct dirent* dir;
+    d = opendir(m_argParser.otherArguments()[0].c_str());
+    if (d)
+        return true;
+
+    return false;
+}
+void create::parseArguments()
+{
+    if (getuid()) {
+        m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+        treatErrors("");
+    }
+    if (m_root == "")
+        m_root = "/";
+
+    cards::pkgfile pkgfile("/etc/cards.conf");
+    if (isACollection())
+        buildCollection();
+    else
+        buildBinary(m_argParser.otherArguments()[0]);
 }
 void create::treatErrors(const std::string& s) const
 {
@@ -60,6 +85,29 @@ void create::treatErrors(const std::string& s) const
         throw RunTimeErrorWithErrno(_("could not change directory ") + s);
         break;
     }
+}
+void create::checkBinaries()
+{
+    bool found = false;
+    cards::pkgrepo pkgrepo("/etc/cards.conf");
+    cards::pkgfile pkgfile("/etc/cards.conf");
+
+    for (auto i : pkgrepo.getListOfPackages()) {
+        if (pkgfile.checkPackageNameExist(i.second.baseName())) {
+            found = true;
+            continue;
+        } else {
+            std::cout << i.second.fileName()
+                << " package should be removed and delete from the .REPO file."
+                << std::endl;
+            removeFile(i.second.dirName(),i.second.fileName());
+        }
+    }
+    // TODO
+    // When all the obsolets binaries are remove
+    // We need to clean up the meta data
+    // probably firing cards repo sometime in the process
+    // with the collection as argument would be the easiest way
 }
 void create::list(std::string& packageName)
 {
@@ -138,7 +186,31 @@ void create::installDependencies(std::string& packageName)
         }
     }
 }
-void create::build(std::string packageName)
+void create::buildCollection()
+{
+    checkBinaries();
+    cards::pkgrepo pkgrepo("/etc/cards.conf");
+    cards::level level;
+    for (auto i : level.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
+        if (!pkgrepo.checkBinaryExist(i)) {
+            buildBinary(i);
+            continue;
+        }
+        if (pkgrepo.version(i) != level.getPortVersion(i)) {
+            buildBinary(i);
+            continue;
+        }
+        if (pkgrepo.release(i) != level.getPortRelease(i)) {
+            buildBinary(i);
+            continue;
+        }
+        std::cout << "WILL NOT BUILD "
+            << i
+            << "AGAIN.."
+            << std::endl;
+    }
+}
+void create::buildBinary(std::string packageName)
 {
     list(packageName);
     installDependencies(packageName);
@@ -266,14 +338,5 @@ void create::build(std::string packageName)
 		write(m_fdlog, "\n", 1 );
 	}
 
-}
-void create::parseArguments()
-{
-    if (getuid()) {
-        m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-        treatErrors("");
-    }
-    if (m_root == "")
-        m_root = "/";
 }
 }

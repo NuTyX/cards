@@ -4,6 +4,7 @@
 #include "cards_argument_parser.h"
 #include "enum.h"
 #include "pkgfile.h"
+#include "level.h"
 #include "process.h"
 #include "pkgadd.h"
 #include "pkgrepo.h"
@@ -21,14 +22,18 @@ class create : public pkgadd {
     cards::conf                m_config;
     cards::pkgfile             m_pkgfile;
 
+    bool isACollection();
+
     void treatErrors(const std::string& s) const;
     void list(std::string& packageName);
     void installDependencies(std::string& packageName);
     void parseArguments();
+    void checkBinaries();
+    void buildCollection();
+    void buildBinary(std::string packageName);
 
 public:
     create(CardsArgumentParser& argParser);
     ~create();
-    void build(std::string name);
 };
 }
