@@ -10,6 +10,16 @@ pkgfile::pkgfile(const std::string& fileName)
     , m_config(fileName)
 {
 }
+bool pkgfile::checkCollectionNameExist(const std::string& collectionName)
+{
+    DIR* d;
+    struct dirent* dir;
+    d = opendir(collectionName.c_str());
+    if (d)
+        return true;
+
+    return false;
+}
 void pkgfile::confirmDependencies()
 {
     for (auto& i : m_listOfPackages) {

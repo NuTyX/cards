@@ -151,6 +151,11 @@ public:
     bool                        checkPackageNameExist(const std::string& name);
 
     /**
+     * return true if it's collection
+     *
+     */
+    bool                        checkCollectionNameExist(const std::string& name);
+    /**
      * return the list of found Packages
      *
      */
