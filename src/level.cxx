@@ -27,5 +27,12 @@ void level::print()
         std::cout << i
                   << std::endl;
 }
-
+std::vector<std::string>& level::getListOfPackagesFromCollection(std::string collectionName)
+{
+    for (auto i : m_tree) {
+        if (i.second.collection() == collectionName)
+            m_listOfPackages.push_back(i.first);
+    }
+    return m_listOfPackages;
+}
 } // endof cards namespace

@@ -6,7 +6,8 @@
 namespace cards {
 class level : public pkgfile
 {
-    ports_t m_tree;
+    std::vector<std::string>   m_listOfPackages;
+    ports_t                    m_tree;
 
 public:
     level()
@@ -15,6 +16,7 @@ public:
 
     ~level() {};
     void print();
+    std::vector<std::string>& getListOfPackagesFromCollection(std::string collectionName);
 };
 
 }  // endof cards namespace
