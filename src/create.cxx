@@ -32,6 +32,10 @@ create::create(CardsArgumentParser& argParser)
             treatErrors(logFile);
         }
     }
+    if (isACollection())
+        buildCollection();
+    else
+        buildBinary(m_argParser.otherArguments()[0]);
 }
 create::~create()
 {
@@ -56,12 +60,6 @@ void create::parseArguments()
     }
     if (m_root == "")
         m_root = "/";
-
-    cards::pkgfile pkgfile("/etc/cards.conf");
-    if (isACollection())
-        buildCollection();
-    else
-        buildBinary(m_argParser.otherArguments()[0]);
 }
 void create::treatErrors(const std::string& s) const
 {
@@ -88,19 +86,25 @@ void create::treatErrors(const std::string& s) const
 }
 void create::checkBinaries()
 {
-    bool found = false;
     cards::pkgrepo pkgrepo("/etc/cards.conf");
     cards::pkgfile pkgfile("/etc/cards.conf");
 
-    for (auto i : pkgrepo.getListOfPackages()) {
-        if (pkgfile.checkPackageNameExist(i.second.baseName())) {
-            found = true;
+    for (auto i : pkgrepo.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
+        if (pkgfile.checkPackageNameExist(i)) {
             continue;
         } else {
-            std::cout << i.second.fileName()
+            std::cout << "Package: "
+                << i
                 << " package should be removed and delete from the .REPO file."
                 << std::endl;
-            removeFile(i.second.dirName(),i.second.fileName());
+            if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
+                std::cout << "Remove : "
+                    << pkgrepo.dirName(i)
+                    << "/"
+                    << pkgrepo.fileName(i)
+                    << std::endl;
+            else
+                removeFile(pkgrepo.dirName(i),pkgrepo.fileName(i));
         }
     }
     // TODO
@@ -131,9 +135,7 @@ void create::list(std::string& packageName)
 }
 void create::installDependencies(std::string& packageName)
 {
-    std::string message;
-    std::string commandName = "pkgadd ";
-
+    std::string message, commandName;
     cards::pkgrepo pkgrepo("/etc/cards.conf");
 
     auto level = m_tree[packageName].level();
@@ -157,7 +159,7 @@ void create::installDependencies(std::string& packageName)
 
                 if (packageArchive.group().empty()) {
                     if (!checkPackageNameExist(packageArchive.name())) {
-                        commandName = "pkgadd ";
+                        commandName = "ADD: ";
                         message = commandName + packageFile;
                         m_packageArchiveName = packageFile;
                         if (!m_fdlog != -1) {
@@ -170,7 +172,7 @@ void create::installDependencies(std::string& packageName)
                     for (auto k : m_config.groups()) {
                         if (packageArchive.group() == k ) {
                             if (!checkPackageNameExist(packageArchive.name())) {
-                                commandName = "pkgadd ";
+                                commandName = "ADD: ";
                                 message = commandName + packageFile;
                                 m_packageArchiveName = packageFile;
                                 if (!m_fdlog != -1) {
@@ -193,20 +195,52 @@ void create::buildCollection()
     cards::level level;
     for (auto i : level.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
         if (!pkgrepo.checkBinaryExist(i)) {
+            std::cout << i
+                << "===> SHOULD BE BUILD !"
+                << std::endl;
+
+            if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
+                continue;
             buildBinary(i);
             continue;
         }
         if (pkgrepo.version(i) != level.getPortVersion(i)) {
+            std::cout << i
+                <<": Binary: "
+                << pkgrepo.version(i)
+                << ", Port: "
+                << level.getPortVersion(i)
+                << "===> SHOULD BE BUILD !"
+                << std::endl;
+
+            if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
+                continue;
             buildBinary(i);
             continue;
         }
         if (pkgrepo.release(i) != level.getPortRelease(i)) {
+            std::cout << i
+                << ": Binary: "
+                << pkgrepo.version(i)
+                << "-"
+                << pkgrepo.release(i)
+                << ", Port: "
+                << level.getPortVersion(i)
+                << "-"
+                << level.getPortRelease(i)
+                << "===> SHOULD BE BUILD !"
+                << std::endl;
+
+            if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
+                continue;
             buildBinary(i);
             continue;
         }
+        if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
+            continue;
         std::cout << "WILL NOT BUILD "
             << i
-            << "AGAIN.."
+            << " AGAIN..."
             << std::endl;
     }
 }
@@ -220,8 +254,9 @@ void create::buildBinary(std::string packageName)
         treatErrors(packageName);
     }
 
-    m_portsDir += "/";
-    m_portsDir += m_pkgfile.getPortDir(packageName);
+    std::string pkgdir = m_portsDir
+        + "/"
+        + m_pkgfile.getPortDir(packageName);
 
     std::string timestamp, message;
     std::string commandName = "cards create: ";
@@ -239,9 +274,9 @@ void create::buildBinary(std::string packageName)
         write(m_fdlog, "\n", 1);
     }
 
-    if (chdir(m_portsDir.c_str())) {
+    if (chdir(pkgdir.c_str())) {
         m_actualError = cards::ERROR_ENUM_CANNOT_CHANGE_DIRECTORY;
-        treatErrors(m_portsDir);
+        treatErrors(pkgdir);
     };
 
     std::string runscriptCommand = "sh";
