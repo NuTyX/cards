@@ -263,7 +263,7 @@ parse_arguments() {
       PARAM+=($1);;
 
     -p|--pause)
-      PAUSE=" && export PATH=/$GIT/scripts:$PATH && printf \"You are now in the chroot.\n\
+      PAUSE=" && printf \"You are now in the chroot.\n\
 Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
 
     -I|--init)
@@ -667,14 +667,14 @@ $PAUSE \
 
 if [ ! -z ${PACKAGES_LIST} ]; then
    if [ "$DIFF" == "yes" ];then
-      DEVEL="$DEVEL $COLLECTION -d"
+      DEVEL="$DEVEL $COLLECTION --dry"
    else
       DEVEL="$DEVEL $COLLECTION"
    fi
 else
   if [ -z "${PARAM[0]}" ]; then
     if [ "$DIFF" == "yes" ];then
-      DEVEL="$DEVEL $COLLECTION -d"
+      DEVEL="$DEVEL $COLLECTION --dry"
     else
       DEVEL="$DEVEL $COLLECTION"
     fi
