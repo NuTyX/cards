@@ -15,7 +15,6 @@ all: pkgmk build-port mybld cards resolve-libs libcards.pc
 
 install: all
 	install -D -m0644 ding.wav ${SOUNDDIR}/ding.wav
-	install -D -m0755 build-port $(USRBINDIR)/build-port
 	install -D -m0755 mybld $(BINDIR)/mybld
 	install -D -m0755 resolve-libs $(BINDIR)/resolve-libs
 	install -D -m0755 pkgmk $(USRBINDIR)/pkgmk
@@ -26,7 +25,6 @@ install: all
 
 clean:
 	rm -f pkgmk
-	rm -f build-port
 	rm -f mybld
 	rm -f resolve-libs
 	rm -f cards
