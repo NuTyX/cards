@@ -325,11 +325,11 @@ get_packages_list() {
 }
 make_footprint() {
 if ! (echo $TARGET| grep "kernel" >/dev/null); then
-	$PKGMK_PKGINFO --footprint $TARGET | \
+	$PKGMK_PKGINFO --footprint $PKGMK_PACKAGE_DIR/$TARGET | \
 		sed "s|\tlib/modules/$(uname -r)/|\tlib/modules/<kernel-version>/|g" | \
 		sort -k 3
 else
-	$PKGMK_PKGINFO --footprint $TARGET | sort -k 3
+	$PKGMK_PKGINFO --footprint $PKGMK_PACKAGE_DIR/$TARGET | sort -k 3
 fi
 }
 strip_files() {
@@ -1130,7 +1130,6 @@ clean() {
 	unset TARGETS
 }
 update_footprint() {
-	cd $PKGMK_PACKAGE_DIR
 	if [ -z $TARGETS ]; then
 		get_packages_list
 		if [ -z $TARGETS ]; then
@@ -1139,7 +1138,7 @@ update_footprint() {
 		fi
 	fi
 	for TARGET in ${TARGETS[@]}; do
-		if [ ! -f $TARGET ]; then
+		if [ ! -f $PKGMK_PACKAGE_DIR/$TARGET ]; then
 			error "Unable to update footprint. File '$TARGET' not found."
 			exit $E_FOOTPRINT
 		fi
@@ -1592,7 +1591,7 @@ PKGMK_LOCALES=()
 PKGMK_SOURCE_MIRRORS=()
 
 PKGMK_DOWNLOAD="no"
-PKGMK_IGNORE_FOOTPRINT="yes"
+PKGMK_IGNORE_FOOTPRINT="no"
 PKGMK_IGNORE_NEW="yes"
 PKGMK_IGNORE_REPO="no"
 PKGMK_IGNORE_RUNTIMEDEPS="no"
