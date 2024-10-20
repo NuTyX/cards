@@ -30,6 +30,7 @@ class create : public pkgadd {
     void parseArguments();
     void checkBinaries();
     void buildCollection();
+    void base();
     void buildBinary(std::string packageName);
 
 public:

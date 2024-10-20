@@ -15,23 +15,6 @@ create::create(CardsArgumentParser& argParser)
     parseArguments();
     m_tree = m_pkgfile.getListOfPackages();
 
-    if (m_config.logdir() != "") {
-        if (!createRecursiveDirs(m_config.logdir())) {
-            m_actualError = cards::ERROR_ENUM_CANNOT_CREATE_DIRECTORY;
-            treatErrors(m_config.logdir());
-        }
-        std::string logFile = m_config.logdir()
-            + "/"
-            + argParser.otherArguments()[0]
-            + ".log";
-
-        unlink(logFile.c_str());
-        m_fdlog = open(logFile.c_str(), O_APPEND | O_WRONLY | O_CREAT, 0666);
-        if (m_fdlog == -1) {
-            m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
-            treatErrors(logFile);
-        }
-    }
     if (isACollection())
         buildCollection();
     else
@@ -41,6 +24,37 @@ create::~create()
 {
     if (m_fdlog != -1)
 	    close(m_fdlog);
+}
+void create::base()
+{
+    std::vector<std::string> list;
+    buildSimpleDatabase();
+    for ( auto i : m_listOfPackages) {
+        if (i.second.collection() == "base")
+            continue;
+        // TODO fix this bug !!!
+        if (i.second.collection().empty())
+            continue;
+
+        list.push_back(i.first);
+    }
+    for (auto i : list) {
+        m_packageName = i;
+        cards::lock Lock(m_root, true);
+
+	    // Get the list of installed packages
+	    getListOfPackagesNames(m_root);
+
+	    // Retrieve info about all the packages
+	    buildCompleteDatabase(false);
+
+        // Remove metadata about the package removed
+	    removePackageFilesRefsFromDB(m_packageName);
+
+        // Remove the files on hd
+	    removePackageFiles(m_packageName);
+
+    }
 }
 bool create::isACollection()
 {
@@ -246,17 +260,23 @@ void create::buildCollection()
 }
 void create::buildBinary(std::string packageName)
 {
-    list(packageName);
-    installDependencies(packageName);
+    if (m_config.logdir() != "") {
+        if (!createRecursiveDirs(m_config.logdir())) {
+            m_actualError = cards::ERROR_ENUM_CANNOT_CREATE_DIRECTORY;
+            treatErrors(m_config.logdir());
+        }
+        std::string logFile = m_config.logdir()
+            + "/"
+            + packageName
+            + ".log";
 
-    if (m_pkgfile.getPortDir(packageName).empty()) {
-        m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_FOUND;
-        treatErrors(packageName);
+        unlink(logFile.c_str());
+        m_fdlog = open(logFile.c_str(), O_APPEND | O_WRONLY | O_CREAT, 0666);
+        if (m_fdlog == -1) {
+            m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
+            treatErrors(logFile);
+        }
     }
-
-    std::string pkgdir = m_portsDir
-        + "/"
-        + m_pkgfile.getPortDir(packageName);
 
     std::string timestamp, message;
     std::string commandName = "cards create: ";
@@ -273,6 +293,19 @@ void create::buildBinary(std::string packageName)
         write(m_fdlog, timestamp.c_str(), timestamp.length());
         write(m_fdlog, "\n", 1);
     }
+
+    base();
+    list(packageName);
+    installDependencies(packageName);
+
+    if (m_pkgfile.getPortDir(packageName).empty()) {
+        m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_FOUND;
+        treatErrors(packageName);
+    }
+
+    std::string pkgdir = m_portsDir
+        + "/"
+        + m_pkgfile.getPortDir(packageName);
 
     if (chdir(pkgdir.c_str())) {
         m_actualError = cards::ERROR_ENUM_CANNOT_CHANGE_DIRECTORY;
