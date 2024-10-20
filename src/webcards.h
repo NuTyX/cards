@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "repo.h"
+#include "pkgrepo.h"
 #include "mysql.h"
 
 #include <ctime>
