@@ -260,7 +260,7 @@ void create::buildCollection()
         for (auto lib : pkgrepo.getLibs(i)) {
             found = false;
             int level = 0;
-            while (level < pkgfile.getLevel(i)) {
+            while (level <= pkgfile.getLevel(i)) {
                 std::cout << "level :"
                     << level
                     << std::endl;
@@ -287,10 +287,9 @@ void create::buildCollection()
                     if (found)
                         break;
                 }
-                if (found) {
-                    level++;
+                if (found)
                     break;
-                }
+                level++;
             }
             if (!found) {
                 missingSharedLib = lib;
