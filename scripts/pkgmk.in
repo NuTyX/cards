@@ -314,7 +314,7 @@ unpack_source() {
 	done
 }
 get_packages_list() {
-	local i
+	local i FILE
 	i=0
 	unset TARGETS
 	for FILE in $(find $PKGMK_PACKAGE_DIR -name "$name*$PKGMK_PACKAGE_EXT*"); do
@@ -400,7 +400,7 @@ compress_manpages() {
 check_footprint() {
 	local TARGET FILE="$PKGMK_WORK_DIR/.tmp"
 
-	cd $PKGMK_PACKAGE_DIR
+	cd $PKGMK_ROOT
 	if [ -z $TARGETS ]; then
 		get_packages_list
 		if [ -z $TARGETS ]; then
@@ -408,33 +408,39 @@ check_footprint() {
 		fi
 	fi
 	for TARGET in ${TARGETS[@]}; do
-		if [ -f $TARGET ]; then
+		if [ -f $PKGMK_PACKAGE_DIR/$TARGET ]; then
 			PKGMK_FOOTPRINT="$(get_package_name $TARGET)".footprint
 			make_footprint > $FILE.footprint
 			if [ -f $PKGMK_FOOTPRINT ]; then
 				sort -k 3 $PKGMK_FOOTPRINT > $FILE.footprint.orig
 				diff -w -t -U 0 $FILE.footprint.orig $FILE.footprint | \
 					sed '/^@@/d' | \
+					sed '/^.META/d' | \
+					sed '/^.README/d' | \
+					sed '/^.PRE/d' | \
+					sed '/^.POST/d' | \
+					sed '/^.FILE/d' | \
+					sed '/^.MTREE/d' | \
 					sed '/^+++/d' | \
 					sed '/^---/d' | \
 					sed 's/^+/NEW       /g' | \
 					sed 's/^-/MISSING   /g' > $FILE.footprint.diff
-			if [ -s $FILE.footprint.diff ]; then
-				if [ "$PKGMK_IGNORE_NEW" = "yes" ]; then
-					mv $FILE.footprint $PKGMK_FOOTPRINT
-					warning "Footprint mismatch found:"
-				else
-					error "Footprint mismatch found:"
-					BUILD_SUCCESSFUL="no"
+				if [ -s $FILE.footprint.diff ]; then
+					if [ "$PKGMK_IGNORE_NEW" = "yes" ]; then
+						mv $FILE.footprint $PKGMK_FOOTPRINT
+						warning "Footprint mismatch in $TARGET found:"
+					else
+						error "Footprint mismatch in $TARGET found:"
+						BUILD_SUCCESSFUL="no"
+					fi
+					cat $FILE.footprint.diff >&2
 				fi
-				cat $FILE.footprint.diff >&2
+			else
+				warning "Footprint not found, creating new."
+				mv $FILE.footprint $PKGMK_FOOTPRINT
 			fi
 		else
-			warning "Footprint not found, creating new."
-			mv $FILE.footprint $PKGMK_FOOTPRINT
-		fi
-		else
-			error "Package '$TARGET' was not found."
+			error "Package '$PKGMK_PACKAGE_DIR/$TARGET' was not found."
 			BUILD_SUCCESSFUL="no"
 		fi
 	done
@@ -1148,8 +1154,6 @@ update_footprint() {
 		PKGMK_FOOTPRINT="$(get_package_name $TARGET)".footprint
 		check_file "$PKGMK_FOOTPRINT"
 		make_footprint > $PKGMK_FOOTPRINT
-		touch $TARGET
-
 		info "Footprint updated for $TARGET"
 	done
 }
