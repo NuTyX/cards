@@ -27,6 +27,7 @@ class pkgrepo {
 
     pkgdbh                   m_dbh;
 
+    std::set<std::string>    m_binaryLibsList;
     std::set<std::string>    m_binarySetList;
     std::set<std::string>    m_binaryCollectionList;
     std::set<std::string>    m_binaryGroupList;
@@ -134,6 +135,7 @@ public:
     unsigned short int       release(const std::string& name);
 
     std::vector<std::string> getListofGroups();
+    std::set<std::string>    getLibs(const std::string& name);
     std::set<std::string>&   getBinaryPackageList();
     std::set<std::string>&   getListOfPackagesFromSet(const std::string& name);
     std::set<std::string>&   getListOfPackagesFromCollection(const std::string& name);

@@ -74,6 +74,7 @@
 #define COLLECTION 'c'
 #define GROUP 'g'
 #define RUNTIME_DEPENDENCY 'R'
+#define SHARED_LIB 'l'
 #define ALIAS 'A'
 #define SETS 's'
 #define CATEGORIES 'T'

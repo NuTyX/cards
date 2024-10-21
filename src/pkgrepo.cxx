@@ -416,6 +416,7 @@ cards:
         std::set<std::string> pkgSet;
         std::set<std::string> pkgAlias;
         std::set<std::string> pkgCategories;
+        std::set<std::string> pkgLibs;
         std::set<std::pair<std::string, time_t>> pkgDependencies;
         std::pair<std::string, time_t> dependency;
         for (auto p : repoFileContent) {
@@ -474,6 +475,9 @@ cards:
                     info.group(p.substr(1));
                     info.baseName(pkgName.substr(0,pkgName.size() - p.size()));
                     continue;
+                case SHARED_LIB:
+                    pkgLibs.insert(p.substr(1));
+                    continue;
                 case RUNTIME_DEPENDENCY:
                     dependency.first = pkgName;
                     if (p.size() > 14) {
@@ -504,6 +508,7 @@ cards:
             }
             if (p.size() == 0) {
                 pkgFound = false;
+                info.libs(pkgLibs);
                 info.alias(pkgAlias);
                 info.sets(pkgSet);
                 info.categories(pkgCategories);
@@ -912,5 +917,12 @@ std::set<std::string>& pkgrepo::getListOfPackagesFromGroup(const std::string& na
     }
 
     return m_binaryGroupList;
+}
+std::set<std::string> pkgrepo::getLibs(const std::string& name)
+{
+    if (m_listOfPackages.size() == 0)
+        parse();
+
+    return m_listOfPackages[name].libs();
 }
 } // end of 'cards' namespace
