@@ -250,4 +250,23 @@ unsigned short int pkgfile::pkgfile::getPortRelease(const std::string& portName)
 
     return m_listOfPackages[portName].release();
 }
+int pkgfile::pkgfile::getLevel(const std::string& portName)
+{
+    if (m_listOfPackages.size() == 0)
+        parse();
+
+    return m_listOfPackages[portName].level();
+}
+std::vector<std::string>& pkgfile::pkgfile::getListOfPackagesFromCollection(std::string collectionName)
+{
+    if (m_listOfPackages.size() == 0)
+        parse();
+
+    for (auto i : m_listOfPackages) {
+        if (i.second.collection() == collectionName)
+            m_listOfPackagesFromCollection.push_back(i.first);
+    }
+    return m_listOfPackagesFromCollection;
+}
+
 } // end of 'cards' namespace

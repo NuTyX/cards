@@ -104,6 +104,7 @@ class pkgfile {
     std::string                 m_configFileName;
     cards::conf                 m_config;
     ports_t                     m_listOfPackages;
+    std::vector<std::string>    m_listOfPackagesFromCollection;
     std::vector<std::string>    m_badDependencies;
     unsigned int                m_level;
 
@@ -115,10 +116,19 @@ public:
     virtual ~pkgfile() { }
 
     /**
+     * Get the level of the portName
+     *
+     */
+    int                        getLevel(const std::string& portName);
+
+    /**
      * check that all the dependencies exist in each package
      *
      */
     void                        confirmDependencies();
+
+
+    std::vector<std::string>&   getListOfPackagesFromCollection(std::string collectionName);
 
     /**
      * return the set of dependencies of the port name
