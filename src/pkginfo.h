@@ -16,6 +16,7 @@ class pkginfo : public pkgdbh {
 protected:
     std::string     m_arg;
     int             m_runtimedependencies_mode;
+    int             m_runtimelibs_mode;
     int             m_footprint_mode;
     int             m_archiveinfo;
     int             m_metainfo;

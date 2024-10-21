@@ -8,6 +8,7 @@
 pkginfo::pkginfo(const std::string& commandName)
     : pkgdbh(commandName)
     , m_runtimedependencies_mode(0)
+    , m_runtimelibs_mode(0)
     , m_footprint_mode(0)
     , m_archiveinfo(0)
     , m_installed_mode(0)
@@ -94,6 +95,12 @@ void pkginfo::parseArguments(int argc, char** argv)
             m_runtimedependencies_mode += 1;
             m_arg = argv[i + 1];
             i++;
+        } else if (option == "--runtimelibs") {
+            assertArgument(argv, argc, i);
+            m_runtimelibs_mode += 1;
+            m_arg = argv[i + 1];
+            i++;
+
         } else if (option == "-b" || option == "--buildtime") {
             assertArgument(argv, argc, i);
             m_epoc += 1;
@@ -109,6 +116,7 @@ void pkginfo::parseArguments(int argc, char** argv)
             m_root = m_root + "/";
     }
     if (m_runtimedependencies_mode
+            + m_runtimelibs_mode
             + m_footprint_mode
             + m_details_mode
             + m_installed_mode
@@ -126,6 +134,7 @@ void pkginfo::parseArguments(int argc, char** argv)
         treatErrors(m_arg);
     }
     if (m_runtimedependencies_mode
+            + m_runtimelibs_mode
             + m_footprint_mode
             + m_installed_mode
             + m_archiveinfo
@@ -223,6 +232,22 @@ void pkginfo::run()
                 }
             }
 
+        } else if (m_runtimelibs_mode) {
+            buildCompleteDatabase(false);
+            int Result;
+            std::set<std::string> filenameList;
+            Result = findRecursiveFile(filenameList, m_arg.c_str(), WS_DEFAULT);
+            /*
+             * get the list of libraries for all the possible files
+             */
+            std::set<std::string> librariesList;
+            for (auto i : filenameList)
+                Result = getRuntimeLibrariesList(librariesList, i);
+
+            for (auto i : librariesList)
+                std::cout << i << std::endl;
+
+            std::cout<< std::endl;
         } else if (m_runtimedependencies_mode) {
             /* 	Get runtimedependencies of the file found in the directory path
                     get the list of installed packages silently */
@@ -282,6 +307,8 @@ void pkginfo::run()
             buildCompleteDatabase(false);
             std::set<std::string> librariesList;
             int Result = -1;
+            std::cout << "Librairies"<< std::endl;
+
             if (checkPackageNameExist(m_arg)) {
                 for (auto i : m_listOfPackages[m_arg].files) {
                     std::string filename('/' + i);
@@ -478,6 +505,8 @@ void pkginfo::printHelp() const
               << _("return on a single line all the runtime dependencies") << std::endl
               << "  --runtimedepfiles <path>    "
               << _("return on a single line all the runtime dependencies for the files found in the <path>") << std::endl
+              << "  --runtimelibs <path>    "
+              << _("return all the runtime libraries for the files found in the <path>") << std::endl
               << "  -r, --root <path>           "
               << _("specify alternative installation root") << std::endl
               << "  -v, --version               "
