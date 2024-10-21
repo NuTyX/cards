@@ -206,11 +206,11 @@ void create::buildCollection()
 {
     checkBinaries();
     cards::pkgrepo pkgrepo("/etc/cards.conf");
-    cards::level level;
-    for (auto i : level.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
+    cards::pkgfile pkgfile("/etc/cards.conf");
+    for (auto i : pkgfile.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
         if (!pkgrepo.checkBinaryExist(i)) {
             std::cout << i
-                << "===> SHOULD BE BUILD !"
+                << " ===> SHOULD BE BUILD !"
                 << std::endl;
 
             if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
@@ -218,13 +218,13 @@ void create::buildCollection()
             buildBinary(i);
             continue;
         }
-        if (pkgrepo.version(i) != level.getPortVersion(i)) {
+        if (pkgrepo.version(i) != pkgfile.getPortVersion(i)) {
             std::cout << i
                 <<": Binary: "
                 << pkgrepo.version(i)
                 << ", Port: "
-                << level.getPortVersion(i)
-                << "===> SHOULD BE BUILD !"
+                << pkgfile.getPortVersion(i)
+                << " ===> SHOULD BE BUILD !"
                 << std::endl;
 
             if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
@@ -232,17 +232,17 @@ void create::buildCollection()
             buildBinary(i);
             continue;
         }
-        if (pkgrepo.release(i) != level.getPortRelease(i)) {
+        if (pkgrepo.release(i) != pkgfile.getPortRelease(i)) {
             std::cout << i
                 << ": Binary: "
                 << pkgrepo.version(i)
                 << "-"
                 << pkgrepo.release(i)
                 << ", Port: "
-                << level.getPortVersion(i)
+                << pkgfile.getPortVersion(i)
                 << "-"
-                << level.getPortRelease(i)
-                << "===> SHOULD BE BUILD !"
+                << pkgfile.getPortRelease(i)
+                << " ===> SHOULD BE BUILD !"
                 << std::endl;
 
             if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
@@ -250,12 +250,70 @@ void create::buildCollection()
             buildBinary(i);
             continue;
         }
-        if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
-            continue;
-        std::cout << "WILL NOT BUILD "
-            << i
-            << " AGAIN..."
-            << std::endl;
+        // Last chance for build i package
+        // We check if all the runtime libs are still existing
+        // We search through all the packages per level
+        // And for each packages we search through each librairies
+        // for a matching one.
+        bool found = true;
+        std::string missingSharedLib;
+        for (auto lib : pkgrepo.getLibs(i)) {
+            found = false;
+            int level = 0;
+            while (level < pkgfile.getLevel(i)) {
+                std::cout << "level :"
+                    << level
+                    << std::endl;
+                for (auto pkg : pkgfile.getListOfPackages()) {
+                    if (!pkgrepo.checkBinaryExist(pkg.first))
+                        continue;
+                    if (pkg.second.level() != level)
+                        continue;
+                    for (auto deplib : pkgrepo.getLibs(pkg.first) ) {
+                        if (deplib == lib) {
+                            std::cout << "Package :"
+                                << i
+                                << " shared lib "
+                                << lib
+                                << " found in "
+                                << pkg.first
+                                << ": "
+                                << deplib
+                                << std::endl;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        break;
+                }
+                if (found) {
+                    level++;
+                    break;
+                }
+            }
+            if (!found) {
+                missingSharedLib = lib;
+                break;
+            }
+        }
+        if (!found) {
+            std::cout << i
+                << " package:"
+                << missingSharedLib
+                << " SHARE LIBRARY is not found !!!"
+                << std::endl;
+            std::cout << i
+                << " ===> SHOULD BE BUILD !"
+                << std::endl;
+        } else {
+            if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
+                continue;
+            std::cout << "WILL NOT BUILD "
+                << i
+                << " AGAIN..."
+                << std::endl;
+        }
     }
 }
 void create::buildBinary(std::string packageName)
