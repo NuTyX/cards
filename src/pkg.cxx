@@ -75,6 +75,14 @@ unsigned short int pkg::release()
 {
 	return m_release;
 }
+void pkg::libs(const std::set<std::string>& libs)
+{
+	m_libs = libs;
+}
+const std::set<std::string>& pkg::libs()
+{
+	return m_libs;
+}
 void pkg::alias(const std::set<std::string>& alias)
 {
 	m_alias = alias;

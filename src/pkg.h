@@ -19,6 +19,7 @@ class pkg
 	std::string 			m_version;
 	unsigned short int 		m_release;
 
+	std::set<std::string>   m_libs;
 	std::set<std::string> 	m_alias;
 	std::set<std::string> 	m_sets;
 	std::set<std::string> 	m_categories;
@@ -49,6 +50,7 @@ public:
 
 	const std::string& 		group();
 	const std::string&		collection();
+	const std::set<std::string>&    libs();
 	const std::set<std::string>& 	alias();
 	const std::set<std::string>& 	sets();
 	const std::set<std::string>&	categories();
@@ -69,6 +71,7 @@ public:
 	void					version(const std::string& version);
 	void					release(unsigned short int release);
 
+	void					libs(const std::set<std::string>& libs);
 	void					alias(const std::set<std::string>& alias);
 	void					sets(const std::set<std::string>& sets);
 	void					categories(const std::set<std::string>& categories);
