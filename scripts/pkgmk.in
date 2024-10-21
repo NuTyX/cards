@@ -786,6 +786,9 @@ add_meta_to_archive() {
 				done
 			fi
 		fi
+		for lib in $($PKGMK_PKGINFO --runtimelibs $TAR|grep -v ^[A-Z]); do
+			echo "l$lib" >> .META
+		done
 	fi
 	if [ ! -z $alias ]; then
 		info "Adding Alias to Archive $NAME"
