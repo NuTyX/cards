@@ -314,10 +314,11 @@ unpack_source() {
 	done
 }
 get_packages_list() {
-	local i FILE
+	local i FILE FILTER
+	FILTER=${PKGMK_PACKAGE_EXT##*.}
 	i=0
 	unset TARGETS
-	for FILE in $(find $PKGMK_PACKAGE_DIR -name "$name*$PKGMK_PACKAGE_EXT*"); do
+	for FILE in $(find $PKGMK_PACKAGE_DIR -name "$name.*${FILTER}*"); do
 		TARGETS[i]="$(basename $FILE)"
 		i=$((i+1))
 	done
@@ -401,11 +402,9 @@ check_footprint() {
 	local TARGET FILE="$PKGMK_WORK_DIR/.tmp"
 
 	cd $PKGMK_ROOT
+	get_packages_list
 	if [ -z $TARGETS ]; then
-		get_packages_list
-		if [ -z $TARGETS ]; then
-			error "Unable to update footprint"
-		fi
+		error "Unable to update footprint"
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ -f $PKGMK_PACKAGE_DIR/$TARGET ]; then
@@ -842,7 +841,7 @@ compress_archive() {
 		gz) gzip -9 $1;;
 		bz2) bzip2 -9  $1;;
 		xz)  xz -z $PKGMK_COMPRESSION_OPTS $1;;
-		zst) zstd $PKGMK_COMPRESSION_OPTS $1;;
+		zst) zstd --rm $PKGMK_COMPRESSION_OPTS $1;;
 	esac
 }
 build_package() {
@@ -1170,19 +1169,18 @@ build_needed() {
 	echo $RESULT
 }
 update_repo_file() {
-	if [ -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE ]; then
-		sed -i "/^@$name.*/,/^$/d" $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
-		for TARGET in $PKGMK_PACKAGE_DIR/${name}*${PKGMK_PACKAGE_EXT}*
-		do
-			echo "@$(basename $TARGET)" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
-			$PKGMK_PKGINFO -m $TARGET   >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
-			echo i$(stat -c%s $TARGET)  >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
-			echo H$(sha512sum $TARGET | cut -d " " -f1) >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
-			echo "" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
-		done
-	else
-		info "$PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE not found"
-	fi
+	touch  $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+	sed -i "/^@$name.*/,/^$/d" $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+	for TARGET in $PKGMK_PACKAGE_DIR/${name}*${PKGMK_PACKAGE_EXT}*
+	do
+		echo "@$(basename $TARGET)" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+		$PKGMK_PKGINFO -m $TARGET   >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+		echo i$(stat -c%s $TARGET)  >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+		echo H$(sha512sum $TARGET | cut -d " " -f1) >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+		echo "" >> $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+	done
+
+	zstd -9 $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
 }
 clean_repo_file() {
 	cd $PKGMK_ROOT
