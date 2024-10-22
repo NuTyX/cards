@@ -260,10 +260,7 @@ void create::buildCollection()
         for (auto lib : pkgrepo.getLibs(i)) {
             found = false;
             int level = 0;
-            while (level <= pkgfile.getLevel(i)) {
-                std::cout << "level :"
-                    << level
-                    << std::endl;
+            while (level < pkgfile.getLevel(i)) {
                 for (auto pkg : pkgfile.getListOfPackages()) {
                     if (!pkgrepo.checkBinaryExist(pkg.first))
                         continue;
