@@ -1170,7 +1170,7 @@ build_needed() {
 }
 update_repo_file() {
 	touch $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
-	touch $PKG_PACKAGE_DIR/$PKGMK_FILES_FILE
+	touch $PKGMK_PACKAGE_DIR/$PKGMK_FILES_FILE
 
 	sed -i "/^@$name.*/,/^$/d" $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
 	sed -i "/^@$name.*/,/^$/d" $PKGMK_PACKAGE_DIR/$PKGMK_FILES_FILE
@@ -1187,8 +1187,8 @@ update_repo_file() {
 		echo "" >> $PKGMK_PACKAGE_DIR/$PKGMK_FILES_FILE
 	done
 
-	zstd -9 $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
-	zstd -9 $PKGMK_PACKAGE_DIR/$PKGMK_FILES_FILE
+	zstd -9 -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+	zstd -9 -f $PKGMK_PACKAGE_DIR/$PKGMK_FILES_FILE
 }
 clean_repo_file() {
 	cd $PKGMK_ROOT
