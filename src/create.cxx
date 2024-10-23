@@ -268,9 +268,8 @@ void create::buildCollection()
                         continue;
                     for (auto deplib : pkgrepo.getLibs(pkg.first) ) {
                         if (deplib == lib) {
-                            std::cout << "Package :"
-                                << i
-                                << " shared lib "
+                            std::cout << i
+                                << ": shared lib "
                                 << lib
                                 << " found in "
                                 << pkg.first
@@ -295,7 +294,7 @@ void create::buildCollection()
         }
         if (!found) {
             std::cout << i
-                << " package:"
+                << ": "
                 << missingSharedLib
                 << " SHARE LIBRARY is not found !!!"
                 << std::endl;

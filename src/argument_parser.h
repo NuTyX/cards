@@ -57,7 +57,6 @@ public:
             CMD_QUERY,
             CMD_SEARCH,
             CMD_PURGE,
-            CMD_BASE,
             CMD_DIFF,
             CMD_UPGRADE,
             CMD_CREATE,

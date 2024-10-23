@@ -44,11 +44,6 @@ The locale which are going to be installed, the architecture of your machine,\n\
 the base system directory and the logfile directory."),
         ArgParser::NONE, 0, "");
 
-    addCommand(CMD_BASE, "base",
-        _("return to a basic system."),
-        _("It will REMOVE ALL THE PACKAGES not listed in the base system list directory."),
-        ArgParser::NONE, 0, "");
-
     addCommand(CMD_FILES, "files",
         _("list the file(s) of the installed <package>."),
         "",

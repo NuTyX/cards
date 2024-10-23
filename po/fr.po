@@ -547,15 +547,6 @@ msgstr "supprime le paquet installé."
 msgid "If -a it will remove the sub-package as well."
 msgstr "Si -a, supprime également les sous-paquets."
 
-msgid "return to a base system."
-msgstr "retourne sur un système de base"
-
-msgid "You need to have a valid 'base' directory"
-msgstr "Vous devez avoir un dosssier 'base' valide"
-
-msgid "configured in the /etc/cards.conf file otherwise the command will abort."
-msgstr "configuré dans le fichier /etc/cards.conf sinon la commande sera avortée."
-
 msgid "shows help about cards."
 msgstr "affiche l'aide de cards."
 
@@ -805,9 +796,6 @@ msgstr "\nDIFFERENCES / MISE A JOUR / NETTOYAGE"
 
 msgid "\nINSTALL, UPDATE and REMOVAL"
 msgstr "\nINSTALLER, REMPLACER et SUPPRIMER"
-
-msgid "\nBASE SYSTEM"
-msgstr "\nSYSTEME DE BASE"
 
 msgid "Your system is up to date."
 msgstr "Votre système est à jour."

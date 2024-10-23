@@ -841,7 +841,7 @@ compress_archive() {
 		gz) gzip -9 $1;;
 		bz2) bzip2 -9  $1;;
 		xz)  xz -z $PKGMK_COMPRESSION_OPTS $1;;
-		zst) zstd --rm $PKGMK_COMPRESSION_OPTS $1;;
+		zst) zstd --rm -q $PKGMK_COMPRESSION_OPTS $1;;
 	esac
 }
 build_package() {
@@ -1187,8 +1187,8 @@ update_repo_file() {
 		echo "" >> $PKGMK_PACKAGE_DIR/$PKGMK_FILES_FILE
 	done
 
-	zstd -9 -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
-	zstd -9 -f $PKGMK_PACKAGE_DIR/$PKGMK_FILES_FILE
+	zstd -9 -q -f $PKGMK_PACKAGE_DIR/$PKGMK_REPO_FILE
+	zstd -9 -q -f $PKGMK_PACKAGE_DIR/$PKGMK_FILES_FILE
 }
 clean_repo_file() {
 	cd $PKGMK_ROOT

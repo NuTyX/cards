@@ -1,6 +1,5 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-#include "base.h"
 #include "create.h"
 #include "dependent.h"
 #include "depends.h"
@@ -117,13 +116,6 @@ int main(int argc, char** argv)
                  << _("remove the installed package.") << endl
                  << "                             "
                  << _("If -a it will remove the sub-package as well.") << endl;
-            cout << GREEN << _("\nBASE SYSTEM") << NORMAL << endl;
-            cout << BLUE << "  base" << NORMAL << " -r                    "
-                 << _("return to a base system.") << endl
-                 << "                             "
-                 << _("You need to have a valid 'base' directory") << endl
-                 << "                             "
-                 << _("configured in the /etc/cards.conf file otherwise the command will abort.") << endl;
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_CONFIG: {
@@ -158,16 +150,6 @@ int main(int argc, char** argv)
                 cout << _("log directory: ")
                      << config.logdir() << endl;
             }
-        }
-            return EXIT_SUCCESS;
-
-        case ArgParser::CMD_BASE: {
-            if ((!cardsArgPars.isSet(CardsArgumentParser::OPT_REMOVE)) && (!cardsArgPars.isSet(CardsArgumentParser::OPT_DRY))) {
-                cardsArgPars.printHelp("base");
-                return EXIT_SUCCESS;
-            }
-            unique_ptr<cards::base> i(new cards::base(cardsArgPars));
-            i->run(argc, argv);
         }
             return EXIT_SUCCESS;
 

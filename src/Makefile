@@ -49,7 +49,6 @@ CARDSOBJECTS =	pkg.o \
 	create.o \
 	install.o \
 	remove.o \
-	base.o \
 	info.o \
 	upgrade.o \
 	repo.o \
