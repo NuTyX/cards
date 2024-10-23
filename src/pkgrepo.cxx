@@ -507,6 +507,9 @@ cards:
                 }
             }
             if (p.size() == 0) {
+                if ( (info.collection().size() == 0) &&
+                        (info.baseName().size() > 0) )
+                    info.collection(m_listOfPackages[info.baseName()].collection());
                 pkgFound = false;
                 info.libs(pkgLibs);
                 info.alias(pkgAlias);
