@@ -26,9 +26,6 @@ remove::remove(const std::string& commandName,
 			treatErrors(i);
 		}
 	}
-	if (basePackagesList.empty())
-		throw std::runtime_error(_("No package found for the base System") );
-
 	// Retrieve info about all the packages
 	buildCompleteDatabase(false);
 

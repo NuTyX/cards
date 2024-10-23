@@ -29,7 +29,7 @@ class remove: public pkgrm
          * \param configFileName Specify the configuration file name to use
          */
         remove(const std::string& commandName,
-	  const CardsArgumentParser& argParser,
-	  const char *configFileName);
+	        const CardsArgumentParser& argParser,
+	        const char *configFileName);
 };
 }
