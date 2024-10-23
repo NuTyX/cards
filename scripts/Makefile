@@ -5,7 +5,7 @@
 
 include ../Makefile.inc
 
-all: pkgmk build-port mybld cards resolve-libs libcards.pc
+all: pkgmk mybld cards resolve-libs libcards.pc
 
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@

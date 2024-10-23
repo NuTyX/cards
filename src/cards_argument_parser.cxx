@@ -282,11 +282,6 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_INSTALL, OPT_NOLOGENTRY, false);
     addOption(CMD_INSTALL, OPT_CONFIG_FILE, false);
 
-    addOption(CMD_BASE, OPT_DRY, false);
-    addOption(CMD_BASE, OPT_REMOVE, false);
-    addOption(CMD_BASE, OPT_ROOT, false);
-    addOption(CMD_BASE, OPT_CONFIG_FILE, false);
-
     addOption(CMD_CREATE, OPT_DRY, false);
     addOption(CMD_CREATE, OPT_REMOVE, false);
     addOption(CMD_CREATE, OPT_ROOT, false);
