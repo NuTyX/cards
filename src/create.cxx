@@ -32,9 +32,6 @@ void create::base()
     for ( auto i : m_listOfPackages) {
         if (i.second.collection() == "base")
             continue;
-        // TODO fix this bug !!!
-        if (i.second.collection().empty())
-            continue;
 
         list.push_back(i.first);
     }
@@ -268,14 +265,6 @@ void create::buildCollection()
                         continue;
                     for (auto deplib : pkgrepo.getLibs(pkg.first) ) {
                         if (deplib == lib) {
-                            std::cout << i
-                                << ": shared lib "
-                                << lib
-                                << " found in "
-                                << pkg.first
-                                << ": "
-                                << deplib
-                                << std::endl;
                             found = true;
                             break;
                         }
@@ -294,12 +283,12 @@ void create::buildCollection()
         }
         if (!found) {
             std::cout << i
-                << ": "
+                << ": WARNING "
                 << missingSharedLib
                 << " SHARE LIBRARY is not found !!!"
                 << std::endl;
             std::cout << i
-                << " ===> SHOULD BE BUILD !"
+                << " ===> MAYBE NEEDS TO BE REBUILD !"
                 << std::endl;
         } else {
             if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
