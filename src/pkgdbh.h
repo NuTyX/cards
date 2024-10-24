@@ -51,12 +51,6 @@ protected:
                             getInfosPackage(const std::string& packageName);
 
     void                    buildSimpleDependenciesDatabase();
-    void                    buildCompleteDatabase(const bool& progress);
-    void                    buildDatabase(const bool& progress,
-                                const bool& simple,
-                                const bool& all,
-                                const bool& files,
-                                const std::string& packageName);
 
     void                    addPackageFilesRefsToDB(const std::string& name,
                                 const cards::db& info);
@@ -146,7 +140,7 @@ public:
     virtual void            treatErrors(const std::string& s) const;
 
     void                    print_version() const;
-    void                    buildSimpleDatabase();
+    void                    buildDatabase(const bool& progress, const bool& files);
     void                    setDependency();
     void                    resetDependency();
 
