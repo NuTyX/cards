@@ -23,7 +23,7 @@ install::install(const CardsArgumentParser& argParser,
 		}
 	}
 
-	buildSimpleDatabase();
+	buildDatabase(false, false);
 	for(auto pkg : m_argParser.otherArguments()) {
 		std::set<std::string> SetOfPackages = m_pkgrepo.getListOfPackagesFromSet(pkg);
 		if (SetOfPackages.empty())

@@ -65,7 +65,7 @@ void pkgrm::run()
 	getListOfPackagesNames(m_root);
 
 	// Retrieve info about all the packages
-	buildCompleteDatabase(false);
+	buildDatabase(false, true);
 
 	if (!checkPackageNameExist(m_packageName)) {
 			m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_INSTALL;

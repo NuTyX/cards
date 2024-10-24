@@ -8,7 +8,7 @@ pkgrepo::pkgrepo(const std::string& fileName)
     : m_configFileName(fileName)
     , m_config(fileName)
 {
-    m_dbh.buildSimpleDatabase();
+    m_dbh.buildDatabase(false, false);
     parse();
     OpenSSL_add_all_digests();
     OpenSSL_add_all_algorithms();
@@ -384,7 +384,6 @@ void pkgrepo::parse()
     if (m_listOfPackages.size() > 0)
         return;
 
-cards:
     cache info;
 
     for (auto i : m_config.dirUrl()) {

@@ -27,7 +27,7 @@ remove::remove(const std::string& commandName,
 		}
 	}
 	// Retrieve info about all the packages
-	buildCompleteDatabase(false);
+	buildDatabase(false, true);
 
 	std::set< std::pair<std::string,std::string> > listOfPackagesToRemove;
 	std::pair<std::string,std::string> PackageToRemove;

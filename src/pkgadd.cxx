@@ -84,7 +84,7 @@ void pkgadd::run()
 	getListOfPackagesNames(m_root);
 
 	// Retrieving info about all the packages
-	buildCompleteDatabase(false);
+	buildDatabase(false, true);
 
 	// Reading the archiving to find a list of files
 	std::pair<std::string, cards::db> package = openArchivePackage(m_packageArchiveName);

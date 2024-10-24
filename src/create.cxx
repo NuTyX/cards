@@ -28,7 +28,7 @@ create::~create()
 void create::base()
 {
     std::vector<std::string> list;
-    buildSimpleDatabase();
+    buildDatabase(false, false);
     for ( auto i : m_listOfPackages) {
         if (i.second.collection() == "base")
             continue;
@@ -46,7 +46,7 @@ void create::base()
 	    getListOfPackagesNames(m_root);
 
 	    // Retrieve info about all the packages
-	    buildCompleteDatabase(false);
+	    buildDatabase(false, true);
 
         // Remove metadata about the package removed
 	    removePackageFilesRefsFromDB(m_packageName);
@@ -163,7 +163,7 @@ void create::installDependencies(std::string& packageName)
         ++currentLevel;
     }
     if (!m_dependencies.empty()) {
-        buildSimpleDatabase();
+        buildDatabase(false, false);
         for (auto i : m_dependencies) {
             std::string name;
             if ( i == packageName)
@@ -436,7 +436,7 @@ void create::buildBinary(std::string packageName)
             + " "
             + version;
         m_upgrade = 0;
-        buildSimpleDatabase();
+        buildDatabase(false, false);
 		if (checkPackageNameExist(name)) {
 			message = name + ": is ALLREADY installed";
 			m_upgrade = 1;
