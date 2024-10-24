@@ -107,6 +107,14 @@ const std::set<std::string>& pkg::sets()
 {
 	return m_sets;
 }
+void pkg::baseName(const std::string& name)
+{
+	m_baseName=name;
+}
+const std::string& pkg::baseName()
+{
+	return m_baseName;
+}
 void pkg::collection(const std::string& collection)
 {
 	m_collection = collection;

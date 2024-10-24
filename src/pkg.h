@@ -17,15 +17,16 @@ class pkg
 	std::string 			m_contributors;
 
 	std::string 			m_version;
-	unsigned short int 		m_release;
+	unsigned short int		m_release;
 
 	std::set<std::string>   m_libs;
 	std::set<std::string> 	m_alias;
 	std::set<std::string> 	m_sets;
 	std::set<std::string> 	m_categories;
 
-	std::string 			m_group;
-	std::string 			m_collection;
+	std::string				m_group;
+	std::string				m_baseName;
+	std::string				m_collection;
 	std::string 			m_arch;
 	std::string 			m_license;
 	std::string 			m_signature;
@@ -48,7 +49,8 @@ public:
 	const std::string& 		version();
 	unsigned short int 		release();
 
-	const std::string& 		group();
+	const std::string&		group();
+	const std::string&		baseName();
 	const std::string&		collection();
 	const std::set<std::string>&    libs();
 	const std::set<std::string>& 	alias();
@@ -77,6 +79,7 @@ public:
 	void					categories(const std::set<std::string>& categories);
 
 	void					collection(const std::string& collection);
+	void					baseName(const std::string& baseName);
 	void					group(const std::string& group);
 	void					arch(const std::string& arch);
 	void					license(const std::string& license);
