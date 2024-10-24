@@ -737,23 +737,35 @@ add_meta_to_archive() {
     SIZE_I="$(du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1)"
 
 	echo "N$NAME" > .META
-    echo "V$version" >> .META
-    echo "r$release" >> .META
-    echo "S$SIZE_I" >> .META
-    echo "a$PKGMK_ARCH" >> .META
+	echo "V$version" >> .META
+	echo "r$release" >> .META
+	echo "S$SIZE_I" >> .META
+	echo "c$COLLECTION" >> .META
 
-    if [ -z "$GROUP" ]; then
-        echo "D$DESC" >> .META
-        echo "U$URL" >> .META
-        echo "C$CONT" >> .META
-        echo "M$MAINT" >> .META
-        echo "P$PACK" >> .META
-        echo "L$LICENSE" >> .META
-        echo "B$PKGMK_BUILDVER" >> .META
-        [ ! -z "$COLLECTION" ] && echo "c$COLLECTION" >> .META
+	if [ -z "$GROUP" ]; then
+		echo "D$DESC" >> .META
+		echo "U$URL" >> .META
+		echo "C$CONT" >> .META
+		echo "M$MAINT" >> .META
+		echo "P$PACK" >> .META
+		echo "L$LICENSE" >> .META
+		echo "a$PKGMK_ARCH" >> .META
+		echo "B$PKGMK_BUILDVER" >> .META
+	else
+	    echo "g$GROUP" >> .META
+		rds=("run_$GROUP[@]")
+		if [ ! -z "$(echo ${!rds})" ]; then
+			info "Adding runtime deps to Archive $NAME"
+			for rd in $(echo ${!rds}); do
+				if [ "$($PKGMK_PKGINFO -b $rd)" == "0" ] || [ "$($PKGMK_PKGINFO -b $rd)" == "" ]; then
+					error "Runtime dependency $rd not found, cannot continue"
+					clean
+					exit $E_DEPS;
+				fi
+				echo "R$rd$($PKGMK_PKGINFO -b $rd)" >> .META
+			done
+		fi
     fi
-
-    [ ! -z "$GROUP" ] && echo "g$GROUP" >> .META
 
 	# TODO improve the pkginfo --runtimedepfiles functionnality
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
@@ -776,20 +788,6 @@ add_meta_to_archive() {
 				fi
 				echo "R$rd$(pkginfo -b $rd)" >> .META
 			done
-		fi
-		if [ ! -z "$GROUP" ]; then
-			rds=("run_$GROUP[@]")
-			if [ ! -z "$(echo ${!rds})" ]; then
-				info "Adding runtime deps to Archive $NAME"
-				for rd in $(echo ${!rds}); do
-					if [ "$($PKGMK_PKGINFO -b $rd)" == "0" ] || [ "$($PKGMK_PKGINFO -b $rd)" == "" ]; then
-						error "Runtime dependency $rd not found, cannot continue"
-						clean
-						exit $E_DEPS;
-					fi
-					echo "R$rd$($PKGMK_PKGINFO -b $rd)" >> .META
-				done
-			fi
 		fi
 		for lib in $($PKGMK_PKGINFO --runtimelibs $TAR|grep -v ^[A-Z]); do
 			echo "l$lib" >> .META
