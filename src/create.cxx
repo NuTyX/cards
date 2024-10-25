@@ -28,7 +28,7 @@ create::~create()
 void create::base()
 {
     std::vector<std::string> list;
-    buildDatabase(false, false);
+    buildDatabase(false, true);
     for ( auto i : m_listOfPackages) {
         if (i.second.collection() == "base")
             continue;
@@ -39,17 +39,11 @@ void create::base()
         m_packageName = i;
         cards::lock Lock(m_root, true);
 
-	    // Get the list of installed packages
-	    getListOfPackagesNames(m_root);
-
-	    // Retrieve info about all the packages
-	    buildDatabase(false, true);
-
         // Remove metadata about the package removed
-	    removePackageFilesRefsFromDB(m_packageName);
+        removePackageFilesRefsFromDB(m_packageName);
 
         // Remove the files on hd
-	    removePackageFiles(m_packageName);
+        removePackageFiles(m_packageName);
 
     }
 }
@@ -160,7 +154,7 @@ void create::installDependencies(std::string& packageName)
         ++currentLevel;
     }
     if (!m_dependencies.empty()) {
-        buildDatabase(false, false);
+
         for (auto i : m_dependencies) {
             std::string name;
             if ( i == packageName)
@@ -425,7 +419,7 @@ void create::buildBinary(std::string packageName)
             + " "
             + version;
         m_upgrade = 0;
-        buildDatabase(false, false);
+
 		if (checkPackageNameExist(name)) {
 			message = name + ": is ALLREADY installed";
 			m_upgrade = 1;
