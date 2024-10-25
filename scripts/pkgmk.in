@@ -741,6 +741,7 @@ add_meta_to_archive() {
 	echo "r$release" >> .META
 	echo "S$SIZE_I" >> .META
 	echo "c$COLLECTION" >> .META
+	echo "a$PKGMK_ARCH" >> .META
 
 	if [ -z "$GROUP" ]; then
 		echo "D$DESC" >> .META
@@ -749,7 +750,6 @@ add_meta_to_archive() {
 		echo "M$MAINT" >> .META
 		echo "P$PACK" >> .META
 		echo "L$LICENSE" >> .META
-		echo "a$PKGMK_ARCH" >> .META
 		echo "B$PKGMK_BUILDVER" >> .META
 	else
 	    echo "g$GROUP" >> .META
