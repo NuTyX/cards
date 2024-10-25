@@ -36,7 +36,6 @@ class pkgdbh {
 
     bool                    m_dependency;
     bool                    m_DB_Empty;
-    bool                    m_miniDB_Empty;
 
     void                    runLastPostInstall();
     std::string             getSingleItem(const std::string& PackageName, const char i) const;
