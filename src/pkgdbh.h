@@ -165,6 +165,7 @@ public:
     bool                    checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName);
     bool                    checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild);
     bool                    checkPackageNameExist(const std::string& name) const;
+    bool                    checkFileNameExist(const std::string& name);
     bool                    checkDependency(const std::string& name);
 
 };

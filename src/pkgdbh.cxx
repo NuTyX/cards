@@ -742,6 +742,21 @@ bool pkgdbh::checkPackageNameExist(const std::string& name) const
 {
 	return (m_listOfAlias.find(name) != m_listOfAlias.end());
 }
+bool pkgdbh::checkFileNameExist(const std::string& name)
+{
+	if (m_DB_Empty)
+		buildDatabase(false,true);
+
+	bool found = false;
+	std::string::size_type pos;
+	for (auto i : m_listOfPackages) {
+		for (auto j : i.second.files) {
+			if (j.find(name) != pos)
+				return true;
+		}
+	}
+	return false;
+}
 bool pkgdbh::checkDependency(const std::string& name)
 {
 	if  ( checkPackageNameExist(name) )
