@@ -317,33 +317,40 @@ interrupted() {
 trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
 
 umount_all() {
-  for FOLDER in $MOUNT_POINTS ; do
-    [ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ] || continue
-    if mountpoint $ROOT/${VERSION}/${COLLECTION}/${FOLDER} > /dev/null;then
-      sudo umount -R $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
-    fi
-    rm -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
-  done
+	for FOLDER in $MOUNT_POINTS ; do
+		if mountpoint $ROOT/${VERSION}/${COLLECTION}/${FOLDER};then
+			sudo umount -R $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+			sudo rm -d      $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+		fi
+	done
 }
 
 remove_all() {
-  for FOLDER in $MOUNT_POINTS ; do
-    [ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ] && exit 1
-  done
-  [ -z $ROOT/${1} ] && exit 1
-  [ ! -d $ROOT/${1} ] && exit 0
-  for i in run sys proc dev/pts dev/shm dev; do
-    [ -d $ROOT/${1}/${i} ] || continue
-    mountpoint $ROOT/${1}/${i} > /dev/null || continue
-    sudo umount -R $ROOT/${1}/${i} || exit 1
-  done
-  for FOLDER in $ROOT/${1}/* ; do
-    [ -d ${FOLDER} ] || continue
-    ! mountpoint ${FOLDER} > /dev/null || continue
-    sudo rm -r $FOLDER || exit 1
-  done
-  rm -d $ROOT/${1} || exit 1
-  echo "
+	for FOLDER in $MOUNT_POINTS; do
+		if [ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ]; then
+		       echo "$ROOT/${VERSION}/${COLLECTION}/${FOLDER} is a directory"
+		       exit 1
+		fi
+	done
+	if [ -z $ROOT/${1} ]; then
+	       	exit 1
+	fi
+	if [ ! -d $ROOT/${1} ]; then
+	       	exit 0
+	fi
+	for i in run sys proc dev/pts dev/shm dev; do
+		[ -d $ROOT/${1}/${i} ] || continue
+		mountpoint $ROOT/${1}/${i} > /dev/null || continue
+		sudo umount -R $ROOT/${1}/${i} || exit 1
+
+	done
+	for FOLDER in $ROOT/${1}/* ; do
+		[ -d ${FOLDER} ] || continue
+		! mountpoint ${FOLDER} > /dev/null || continue
+		sudo rm -r $FOLDER || exit 1
+  	done
+	rm -d $ROOT/${1} || exit 1
+	echo "
 >>>   $ROOT/${1} cleanup successfully ...
 "
 }
@@ -526,7 +533,7 @@ fi
 [ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
 
 GIT_PROJ=$(pwd)
-GIT="root/$(basename $GIT_PROJ)"
+GIT="mybld/$(basename $GIT_PROJ)"
 CLEANUP="no"
 
 if [ -z "$GIT_PROJ" ]; then
@@ -608,7 +615,7 @@ if [[ -d "$ROOT/${VERSION}/${COLLECTION}" && "$CLEANUP" != "yes" ]]; then
 fi
 
 if [ "$CLEANUP" != "no" ]; then
-  MOUNT_POINTS="DEPOT LOGS sources root/$GIT"
+  MOUNT_POINTS="DEPOT LOGS sources $GIT"
   umount_all
   remove_all "/${VERSION}/${COLLECTION}"
   [ "$CLEANUP" == "yes" ] && exit 0
