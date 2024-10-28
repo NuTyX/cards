@@ -27,17 +27,24 @@ create::~create()
 }
 void create::base()
 {
+    bool found = false;
     std::vector<std::string> list;
     buildDatabase(false, true);
     for ( auto i : m_listOfPackages) {
-        if (i.second.collection() == "base")
-            continue;
-
-        list.push_back(i.first);
+        for (auto j : i.second.sets()) {
+            if (j == "chroot")
+                found = true;
+            if (j == "devel")
+                found = true;
+        }
+        if (!found) {
+            list.push_back(i.first);
+        }
+        found = false;
     }
+    cards::lock Lock(m_root, true);
     for (auto i : list) {
         m_packageName = i;
-        cards::lock Lock(m_root, true);
 
         // Remove metadata about the package removed
         removePackageFilesRefsFromDB(m_packageName);
@@ -153,10 +160,8 @@ void create::installDependencies(std::string& packageName)
         }
         ++currentLevel;
     }
-    if (!m_dependencies.empty()) {
-
+    if (! m_dependencies.empty()) {
         for (auto i : m_dependencies) {
-            std::string name;
             if ( i == packageName)
                 break;
             for (auto packageFile : pkgrepo.getListOfPackagesFromGroup(i)) {
@@ -241,8 +246,9 @@ void create::buildCollection()
             buildBinary(i);
             continue;
         }
-        // Last chance for build i package
-        // We check if all the runtime libs are still existing
+        // Last chance for build the i package
+        // We check if runtime libs are installed, then
+        // we check if all the runtime libs are still existing.
         // We search through all the packages per level
         // And for each packages we search through each librairies
         // for a matching one.
@@ -271,18 +277,21 @@ void create::buildCollection()
                 level++;
             }
             if (!found) {
-                missingSharedLib = lib;
-                break;
+                if (checkFileNameExist(lib)) {
+                    found = true;
+                }
+                if (!found) {
+                    missingSharedLib = lib;
+                    break;
+                }
             }
         }
         if (!found) {
-            std::cout << i
-                << ": WARNING "
+            std::cout << "==> MAYBE NEEDS TO BE REBUILD "
+                << i
+                << ": "
                 << missingSharedLib
-                << " SHARE LIBRARY is not found !!!"
-                << std::endl;
-            std::cout << i
-                << " ===> MAYBE NEEDS TO BE REBUILD !"
+                << " SHARE LIBRARY is not found !!! "
                 << std::endl;
         } else {
             if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
