@@ -751,8 +751,9 @@ bool pkgdbh::checkFileNameExist(const std::string& name)
 	std::string::size_type pos;
 	for (auto i : m_listOfPackages) {
 		for (auto j : i.second.files) {
-			if (j.find(name) != pos)
+			if (j.find(name) != std::string::npos) {
 				return true;
+			}
 		}
 	}
 	return false;
@@ -872,6 +873,7 @@ void pkgdbh::removePackageFiles(const std::string& name)
 {
 	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
+	m_listOfAlias.erase(name);
 	m_packageName =  name ;
 
 #ifdef DEBUG
@@ -908,6 +910,7 @@ void pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 {
 	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
+	m_listOfAlias.erase(name);
 	m_packageName =  name ;
 #ifdef DEBUG
 	std::cerr << "Removing package phase 1 (all files in package):" << std::endl;
