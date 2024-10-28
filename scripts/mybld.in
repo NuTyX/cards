@@ -263,6 +263,7 @@ parse_arguments() {
       PARAM+=($1);;
 
     -p|--pause)
+      MANUAL="yes"
       PAUSE=" && printf \"You are now in the chroot.\n\
 Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
 
@@ -320,7 +321,7 @@ umount_all() {
 	for FOLDER in $MOUNT_POINTS ; do
 		if mountpoint $ROOT/${VERSION}/${COLLECTION}/${FOLDER};then
 			sudo umount -R $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
-			sudo rm -d      $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+			sudo rm -d     $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 		fi
 	done
 }
@@ -663,30 +664,30 @@ fi
 
 
 setup_cards_conf
-
-DEVEL="cards.devel \
-&& cd /$GIT \
-$PAUSE \
-&& cards create"
+CORE="chroot devel cards.devel"
+DEVEL="&& cd /$GIT \
+$PAUSE "
 
 [ -z "${PARAM[0]}" ] && CHROOT="ncurses readline bash"
 [ -z "$PACKAGES_LIST" ] || CHROOT="ncurses readline bash"
-
-if [ ! -z ${PACKAGES_LIST} ]; then
-   if [ "$DIFF" == "yes" ];then
-      DEVEL="$DEVEL $COLLECTION --dry"
-   else
-      DEVEL="$DEVEL $COLLECTION"
-   fi
-else
-  if [ -z "${PARAM[0]}" ]; then
+if [ -z $MANUAL ]; then
+  DEVEL+="&& cards create"
+  if [ ! -z ${PACKAGES_LIST} ]; then
     if [ "$DIFF" == "yes" ];then
       DEVEL="$DEVEL $COLLECTION --dry"
     else
       DEVEL="$DEVEL $COLLECTION"
     fi
   else
-    DEVEL="$DEVEL ${PARAM[0]}"
+    if [ -z "${PARAM[0]}" ]; then
+      if [ "$DIFF" == "yes" ];then
+        DEVEL="$DEVEL $COLLECTION --dry"
+      else
+        DEVEL="$DEVEL $COLLECTION"
+      fi
+    else
+      DEVEL="$DEVEL ${PARAM[0]}"
+    fi
   fi
 fi
 
@@ -715,13 +716,14 @@ echo ""
 echo " COLLECTION: $COLLECTION"
 echo "GIT Project: $GIT_PROJ"
 echo "    VERSION: $VERSION"
+echo "       CORE: $CORE"
 echo "      DEVEL: $DEVEL "
 echo "     CHROOT: $CHROOT"
-echo "The command: KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t"
+echo "The command: KERNEL="NONE" CORE="$CORE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t"
 echo ""
 echo " install-nutyx:
  =============="
-KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t
+KERNEL="NONE" CORE="$CORE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t
 echo ""
 
 if [ -z "$PACKAGES_LIST" ]; then
@@ -888,13 +890,17 @@ sudo mount --bind $GIT_PROJ $ROOT/${VERSION}/${COLLECTION}/$GIT ||\
 MOUNT_POINTS="$MOUNT_POINTS $GIT"
 
 echo 'running the command:
-sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
-sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
+sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" CORE="$CORE" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
+sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" CORE="$CORE" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
 
-ding
+[ -z $MANUAL ] && ding
 umount_all
 remove_all "/${VERSION}/${COLLECTION}"
 unset VERSION DEVEL
+
+if [ ! -z $MANUAL ]; then
+  exit 0
+fi
 
 # Don't try to commit if no specific package was build
 if [ -z "${PARAM[0]}" ]; then
