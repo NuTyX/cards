@@ -42,7 +42,7 @@ get_dependencies() {
 	i=0
 	for COLLECTION in ${PKGMK_COLLECTIONS[@]}; do
 		for NAME in ${PKGMK_DEPENDS[@]}; do
-			for FILE in $(find $DIR/$COLLECTIONmore \
+			for FILE in $(find $DIR/$COLLECTION/ \
 			-name "${NAME}.*${FILTER}*"); do
 				PKGNAME=$(get_package_name $(basename $FILE))
 				[ "$($PKGMK_PKGINFO -b $PKGNAME)"  != 0 ] && continue
