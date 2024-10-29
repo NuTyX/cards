@@ -34,15 +34,16 @@ have_function() {
 	declare -f "$1" >/dev/null
 }
 get_dependencies() {
+	local FILTER NAME COLLECTION PKGNAME DIR
 	[ -z $PKGMK_DEPENDS ] && return
 	info "Get dependencies ..."
-	local NAME COLLECTION PKGNAME DIR
+	FILTER=${PKGMK_PACKAGE_EXT##*.}
 	DIR="$(dirname $PKGMK_PACKAGE_DIR)"
 	i=0
 	for COLLECTION in ${PKGMK_COLLECTIONS[@]}; do
 		for NAME in ${PKGMK_DEPENDS[@]}; do
-			for FILE in $(find $DIR/$COLLECTION/ \
-				-name "${NAME}*$PKGMK_PACKAGE_EXT*"); do
+			for FILE in $(find $DIR/$COLLECTIONmore \
+			-name "${NAME}.*${FILTER}*"); do
 				PKGNAME=$(get_package_name $(basename $FILE))
 				[ "$($PKGMK_PKGINFO -b $PKGNAME)"  != 0 ] && continue
 				DEPENDENCIES[i]="$PKGNAME:$FILE"
