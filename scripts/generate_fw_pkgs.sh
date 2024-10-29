@@ -36,7 +36,6 @@ sed -i "s@bnx2x:@bnx2x -@" WHENCE.in
 sed -i "s@Driver:Atheros@Driver: Atheros@" WHENCE.in
 sed -i "s/^Driver /Driver:/" WHENCE.in
 
-
 rm -f List List.sort List.uniq
 rm -r $ROOT/*-firmware
 
@@ -79,6 +78,10 @@ source=(WHENCE
 build() {
 
 cd linux-firmware-\$version
+
+# delete this python check as long we don't know what's missing here
+sed -i "/check_whence.py/d" copy-firmware.sh
+
 cp ../WHENCE .
 make DESTDIR=\$PKG FIRMWAREDIR=/lib/firmware install
 
