@@ -159,6 +159,7 @@ void create::installDependencies(std::string& packageName)
     std::string message, commandName;
     cards::pkgrepo pkgrepo("/etc/cards.conf");
 
+    m_dependencies.clear();
     auto level = m_tree[packageName].level();
     unsigned int currentLevel = 0;
     std::string packageArchiveName;
@@ -349,6 +350,7 @@ void create::buildBinary(std::string packageName)
     }
 
     base();
+    m_list.clear();
     list(packageName);
     installDependencies(packageName);
 
