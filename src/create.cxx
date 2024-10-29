@@ -13,6 +13,11 @@ create::create(CardsArgumentParser& argParser)
     m_portsDir = getcwd(pwd,MAXPATHLEN);
 
     parseArguments();
+    if (!checkFileExist(m_root + "tmp/setup")) {
+        m_actualError = cards::ERROR_ENUM_NOT_IN_CHROOT;
+        treatErrors(m_root + "tmp/setup");
+    }
+
     m_tree = m_pkgfile.getListOfPackages();
 
     if (isACollection())
@@ -93,6 +98,10 @@ void create::treatErrors(const std::string& s) const
         break;
     case ERROR_ENUM_CANNOT_CHANGE_DIRECTORY:
         throw RunTimeErrorWithErrno(_("could not change directory ") + s);
+        break;
+    case ERROR_ENUM_NOT_IN_CHROOT:
+        throw RunTimeErrorWithErrno(_("You are not in chroot mode. The file ") + s
+        + _(" is not found"));
         break;
     }
 }
