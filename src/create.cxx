@@ -224,6 +224,18 @@ void create::buildCollection()
             buildBinary(i);
             continue;
         }
+        if (!checkFileExist(pkgrepo.dirName(i)
+            + "/"
+            + pkgrepo.fileName(i))) {
+            std::cout << i
+                << " ===> SHOULD BE BUILD !"
+                << std::endl;
+
+            if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
+                continue;
+            buildBinary(i);
+            continue;
+        }
         if (pkgrepo.version(i) != pkgfile.getPortVersion(i)) {
             std::cout << i
                 <<": Binary: "
