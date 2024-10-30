@@ -262,20 +262,31 @@ std::vector<std::string>& pkgfile::pkgfile::getListOfPackagesFromCollection(std:
     if (m_listOfPackages.size() == 0)
         parse();
 
+    unsigned int level, levelMax;
+    level = 0;
+    levelMax = 0;
+
     bool found = false;
-    unsigned int level = 0;
     while (true) {
+        for (auto i : m_listOfPackages)
+            if (i.second.level() == level)
+                found = true;
+        if (!found)
+            break;
+
+        ++level;
+        found = false;
+    }
+    levelMax = level;
+    level = 0;
+    while (level <= levelMax) {
         for (auto i : m_listOfPackages) {
             if ((i.second.collection() == collectionName) &&
                 (i.second.level() == level)) {
                 m_listOfPackagesFromCollection.push_back(i.first);
-                found = true;
             }
         }
-        if (!found)
-            break;
         level++;
-        found = false;
     }
     return m_listOfPackagesFromCollection;
 }
