@@ -213,6 +213,7 @@ void create::buildCollection()
     checkBinaries();
     cards::pkgrepo pkgrepo("/etc/cards.conf");
     cards::pkgfile pkgfile("/etc/cards.conf");
+    std::string ArchiveFile;
     for (auto i : pkgfile.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
         if (!pkgrepo.checkBinaryExist(i)) {
             std::cout << i
@@ -224,9 +225,10 @@ void create::buildCollection()
             buildBinary(i);
             continue;
         }
-        if (!checkFileExist(pkgrepo.dirName(i)
+        ArchiveFile = pkgrepo.dirName(i)
             + "/"
-            + pkgrepo.fileName(i))) {
+            + pkgrepo.fileName(i);
+        if (!checkFileExist(ArchiveFile)) {
             std::cout << i
                 << " ===> SHOULD BE BUILD !"
                 << std::endl;
@@ -302,10 +304,19 @@ void create::buildCollection()
                 if (checkFileNameExist(lib)) {
                     found = true;
                 }
-                if (!found) {
+            }
+            if (!found) {
+                archive Archive(ArchiveFile);
+                for (auto i : Archive.setofFiles()) {
+                    if (i.find(lib) != std::string::npos) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (!found) {
                     missingSharedLib = lib;
                     break;
-                }
             }
         }
         if (!found) {
