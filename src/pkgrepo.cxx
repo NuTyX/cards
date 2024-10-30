@@ -519,6 +519,7 @@ void pkgrepo::parse()
                 pkgSet.clear();
                 pkgCategories.clear();
                 pkgDependencies.clear();
+                pkgLibs.clear();
                 m_listOfPackages[pkgName] = info;
                 continue;
             }
