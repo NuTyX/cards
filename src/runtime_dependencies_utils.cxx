@@ -218,11 +218,11 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 				edyn < dynamics_section_32bits + dynamic_size_32bits;
 				edyn ++)
 		{
-			if (edyn->d_tag != DT_NEEDED)
+			if (edyn->d_tag == DT_NULL)
 				break;
 			
-			if (edyn->d_tag == DT_NEEDED) /* if it's a lib */
-			{
+			if ((edyn->d_tag == DT_NEEDED) ||
+					(edyn->d_tag == DT_SONAME)) {  /* if it's a lib */
 				if ( ( dynamic_strings != NULL ) && ( offset <  dynamic_strings_length) )
 				{
 					name = dynamic_strings + edyn->d_un.d_val;
@@ -352,8 +352,9 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 #endif
 			if (edyn->d_tag == DT_NULL)
 				break;
-			if (edyn->d_tag == DT_NEEDED) /* if it's a lib */
-			{
+
+			if ((edyn->d_tag == DT_NEEDED) ||
+					(edyn->d_tag == DT_SONAME)) {  /* if it's a lib */
 				if ( ( dynamic_strings != NULL ) && ( offset <	dynamic_strings_length) )
 				{
 					name = dynamic_strings + edyn->d_un.d_val;
