@@ -280,26 +280,23 @@ void create::buildCollection()
         std::string missingSharedLib;
         for (auto lib : pkgrepo.getLibs(i)) {
             found = false;
-            int level = 0;
-            while (level < pkgfile.getLevel(i)) {
-                for (auto pkg : pkgfile.getListOfPackages()) {
-                    if (!pkgrepo.checkBinaryExist(pkg.first))
-                        continue;
-                    if (pkg.second.level() != level)
-                        continue;
-                    for (auto deplib : pkgrepo.getLibs(pkg.first) ) {
-                        if (deplib == lib) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found)
+            for (auto pkg : pkgfile.getListOfPackages()) {
+                if (!pkgrepo.checkBinaryExist(pkg.first))
+                    continue;
+
+                if (pkg.first == i)
+                    continue;
+
+                for (auto deplib : pkgrepo.getLibs(pkg.first) ) {
+                    if (deplib == lib) {
+                        found = true;
                         break;
+                    }
                 }
                 if (found)
                     break;
-                level++;
             }
+
             if (!found) {
                 if (checkFileNameExist(lib)) {
                     found = true;
