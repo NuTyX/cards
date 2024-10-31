@@ -1343,6 +1343,9 @@ void pkgdbh::readRulesFile()
 			}
 		}
 		in.close();
+	} else {
+		m_actualError = cards::ERROR_ENUM_CANNOT_FIND_FILE;
+		treatErrors(filename);
 	}
 #ifdef DEBUG
 	std::cerr << "Configuration:" << std::endl;

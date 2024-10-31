@@ -8,8 +8,6 @@
 pkgrm::pkgrm ()
 	: pkgdbh("pkgrm")
 {
-	// Checking the rules
-	readRulesFile();
 }
 void pkgrm::getListOfManInstalledPackages ()
 {
@@ -66,6 +64,8 @@ void pkgrm::run()
 
 	// Retrieve info about all the packages
 	buildDatabase(false, true);
+
+	readRulesFile();
 
 	if (!checkPackageNameExist(m_packageName)) {
 			m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_INSTALL;

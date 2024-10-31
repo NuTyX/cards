@@ -11,9 +11,6 @@ pkgadd::pkgadd()
 	m_upgrade(false),
 	m_force(false)
 {
-	// Checking the rules
-	readRulesFile();
-
 }
 pkgadd::pkgadd(const std::string& commandName)
 	: pkgdbh(commandName),
@@ -21,9 +18,6 @@ pkgadd::pkgadd(const std::string& commandName)
 	m_upgrade(false),
 	m_force(false)
 {
-	// Checking the rules
-	readRulesFile();
-
 }
 void pkgadd::parseArguments(int argc, char** argv)
 {
