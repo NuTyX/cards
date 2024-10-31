@@ -125,7 +125,8 @@ void create::checkBinaries()
                     << pkgrepo.fileName(i)
                     << std::endl;
             else
-                removeFile(pkgrepo.dirName(i),pkgrepo.fileName(i));
+                removeFile(pkgrepo.dirName(i),
+                    pkgrepo.dirName(i) + "/" + pkgrepo.fileName(i));
         }
     }
     // TODO
