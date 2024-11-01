@@ -30,6 +30,8 @@ ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
 ArgParser::APOpt CardsArgumentParser::OPT_ROOT;
 ArgParser::APOpt CardsArgumentParser::OPT_CONFIG_FILE;
 
+ArgParser::APOpt CardsArgumentParser::OPT_NAMES;
+
 CardsArgumentParser::CardsArgumentParser()
 {
     addCommand(CMD_HELP, "help",
@@ -224,7 +226,7 @@ As for the generation, a private key is needed, it is used by the packager only.
         _("   Ignore WARNINGS and list the level anyway."));
 
     OPT_NOLOGENTRY.init("nolog",
-        'n',
+        0,
         _("    don't add a log entry for this install set."));
 
     OPT_DISABLE.init("disable",
@@ -251,6 +253,10 @@ As for the generation, a private key is needed, it is used by the packager only.
         true,
         _("<file>"));
 
+    OPT_NAMES.init("name",
+        'n',
+        _("\t   Search only in the name of the package."));
+
     addOption(CMD_CONFIG, OPT_CONFIG_FILE, false);
 
     addOption(CMD_UPGRADE, OPT_DOWNLOAD_READY, false);
@@ -268,6 +274,8 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_INFO, OPT_SETS, false);
     addOption(CMD_INFO, OPT_CONFIG_FILE, false);
     addOption(CMD_INFO, OPT_VERSION, false);
+
+    addOption(CMD_SEARCH, OPT_NAMES, false);
 
     addOption(CMD_DIFF, OPT_PORTS, false);
 

@@ -764,6 +764,9 @@ msgstr "\t   Vérifie si il y a des mise à jour disponible."
 msgid "\t   Only check if all binaries that are needed are downloaded."
 msgstr "\t   Vérifie uniquement si tous les binaires nécessaires sont téléchargés."
 
+msgid "\t   Search only in the name of the package."
+msgstr "\t   Recherche uniquement dans le nom du paquet."
+
 msgid "Only download the binaries that are needed to be upgraded."
 msgstr "Télécharge uniquement les binaires nécessaires pour la mise à jour."
 

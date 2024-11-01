@@ -71,6 +71,7 @@ info::info(const CardsArgumentParser& argParser,
 		*/
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_SEARCH) ) {
+
 		bool   found = false;
 		pkgdbh dbh;
 
@@ -78,6 +79,24 @@ info::info(const CardsArgumentParser& argParser,
 		for (auto j : m_pkgrepo.getListOfPackages()) {
 			found = false;
 			std::string::size_type pos;
+
+			if (m_argParser.isSet(CardsArgumentParser::OPT_NAMES)) {
+				if ( j.first.find(convertToLowerCase(m_argParser.otherArguments()[0])) == std::string::npos)
+					continue;
+
+				std::cout << "(" << j.second.collection() << ") ";
+				if (dbh.checkPackageNameExist(j.first)) {
+					std::cout << GREEN;
+				}
+
+				std::cout << j.first
+					<< NORMAL
+					<< " " << j.second.version()
+					<< " " << j.second.description()
+					<< std::endl;
+				continue;
+			}
+
 			pos = j.second.collection().find(convertToLowerCase(m_argParser.otherArguments()[0]));
 			if  (pos == std::string::npos)
 				pos = j.first.find(convertToLowerCase(m_argParser.otherArguments()[0]));
@@ -104,22 +123,22 @@ info::info(const CardsArgumentParser& argParser,
 						found = true;
 					if (j.second.group() == "doc")
 						found = true;
-				} else
+				} else {
 					found = true;
-
+				}
 				if (!found)
 					continue;
 
 				std::cout << "(" << j.second.collection() << ") ";
-			if (dbh.checkPackageNameExist(j.first)) {
-				std::cout << GREEN;
-			}
+				if (dbh.checkPackageNameExist(j.first)) {
+					std::cout << GREEN;
+				}
 
-			std::cout << j.first
-				<< NORMAL
-				<< " " << j.second.version()
-				<< " " << j.second.description()
-				<< std::endl;
+				std::cout << j.first
+					<< NORMAL
+					<< " " << j.second.version()
+					<< " " << j.second.description()
+					<< std::endl;
 			}
 		}
 	}

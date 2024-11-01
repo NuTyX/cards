@@ -41,6 +41,8 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APOpt OPT_ROOT;
 		static ArgParser::APOpt OPT_CONFIG_FILE;
 
+		static ArgParser::APOpt OPT_NAMES;
+
 		std::string getAppIdentification() const
 		{
 			return std::string("cards ")  + PACKAGE_VERSION + "\n";
