@@ -32,12 +32,21 @@ repo::repo(const CardsArgumentParser& argParser,
     } else {
         struct stat buf;
         std::string::size_type pos;
-
+        bool found = false;
         for (auto dir :config.dirUrl()) {
+            if (m_argParser.otherArguments().size() > 0 ) {
+                if ( dir.collection != m_argParser.otherArguments()[0]) {
+                    found = false;
+                    continue;
+                }
+            }
+
+            found = true;
             std::set<std::string> listOfFiles;
             std::string path = dir.depot
                 + "/"
                 + dir.collection;
+
             std::string repofile = path + PKG_REPO_META;
             std::cout << "Generating "
                 << repofile
@@ -94,12 +103,64 @@ repo::repo(const CardsArgumentParser& argParser,
             }
             fclose(fp);
             std::cout << std::endl;
+            compress(repofile);
+            if (m_argParser.otherArguments().size() > 0 )
+                break;
         }
-        std::cout << "All "
-            << m_pkgrepo.getListOfPackages().size()
-            << " packages signed"
-            << std::endl;
+        if (m_argParser.otherArguments().size() == 0)
+            std::cout << "All "
+                << m_pkgrepo.getListOfPackages().size()
+                << " packages signed"
+                << std::endl;
+        else
+            if (!found) {
+                std::cerr << "Collection: "
+                    << m_argParser.otherArguments()[0]
+                    << " does not exist !!"
+                    << std::endl;
+            }
     }
 
 }
+void repo::compress(const std::string fileName) {
+
+    std::ifstream inFile(fileName, std::ios::binary);
+    if (!inFile)
+        std::cerr << "Cannot open file: "
+            << fileName
+            << std::endl;
+
+    inFile.seekg(0,std::ios::end);
+    size_t inSize = inFile.tellg();
+    inFile.seekg(0,std::ios::beg);
+
+    std::vector<char> inData(inSize);
+    inFile.read(inData.data(), inSize);
+    inFile.close();
+
+    // Find Out the requested size
+    size_t compressSize = ZSTD_compressBound(inSize);
+    std::vector<char> compressData(compressSize);
+
+    // Compression
+    size_t result = ZSTD_compress(compressData.data(), compressSize, inData.data(), inSize, 12);
+    if (ZSTD_isError(result))
+        std::cerr << "Compression error: "
+            << ZSTD_getErrorName(result)
+            << std::endl;
+
+    std::ofstream outFile(fileName + ".zst", std::ios::binary);
+
+    if (!outFile)
+        std::cerr << "Cannot open file: "
+            << fileName
+            << ".zst"
+            << std::endl;
+
+    outFile.write(compressData.data(), result);
+    outFile.close();
+
+}
+
+
 }

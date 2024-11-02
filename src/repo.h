@@ -4,6 +4,8 @@
 #include "cards_argument_parser.h"
 #include "pkgrepo.h"
 
+#include <zstd.h>
+
 namespace cards {
 
 class repo
@@ -12,6 +14,7 @@ class repo
 
         cards::pkgrepo             m_pkgrepo;
         const CardsArgumentParser& m_argParser;
+        void                       compress(const std::string fileName);
 
     public:
         repo(const CardsArgumentParser& argParser,
