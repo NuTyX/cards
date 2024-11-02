@@ -389,7 +389,7 @@ void pkgrepo::parse()
     for (auto i : m_config.dirUrl()) {
         info.dirName(i.depot + "/" + i.collection);
         std::string repoFile = info.dirName()
-            + PKG_REPO;
+            + PKG_REPO_META;
 
         info.collection(i.collection);
         info.origin(i.url
@@ -524,6 +524,37 @@ void pkgrepo::parse()
                 continue;
             }
         }
+        repoFile = i.depot
+            + "/"
+		    + i.collection
+		    + PKG_REPO_FILES;
+        repoFileContent.clear();
+		if (parseFile(repoFileContent,repoFile.c_str()) != 0) {
+            std::cerr << "Cannot read the file: "
+                      << repoFile
+                      << std::endl
+                      << "... continue with next"
+                      << std::endl;
+            continue;
+		}
+        pkgFound = false;
+		for ( auto p : repoFileContent) {
+			if (p[0] == '@') {
+                pos = p.find(".cards-");
+				if (pos != std::string::npos) {
+                    pkgName = p.substr(1,pos-1);
+					pkgFound = true;
+					continue;
+				}
+			}
+			if (pkgFound) {
+				if (p.size() > 0) {
+					m_listOfPackages[pkgName].files.insert(p);
+				} else {
+					pkgFound = false;
+				}
+			}
+		}
     }
 }
 std::set<std::pair<std::string, time_t>>

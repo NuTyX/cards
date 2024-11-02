@@ -61,14 +61,66 @@ info::info(const CardsArgumentParser& argParser,
 		}
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_QUERY)) {
-		/*
-		* FIXME
-		*/
+		regex_t preg;
+        if (regcomp(&preg, m_argParser.otherArguments()[0].c_str(), REG_EXTENDED | REG_NOSUB)) {
+			throw std::runtime_error(_("error compiling regular expression '")
+				+ m_argParser.otherArguments()[0]
+				+ _("', aborting"));
+		}
+        struct info
+        {
+            std::string collection;
+            std::string file;
+        };
+        info Info;
+        std::vector<std::pair<std::string, info>> result;
+        Info.collection=_("Collection");
+        Info.file=_("File");
+        result.push_back(std::pair<std::string, info>(_("Package"),Info));
+        unsigned int width1 = result.begin()->second.collection.length(); // Width of "Collection"
+        unsigned int width2 = result.begin()->first.length(); // Width of "Package"
+
+		for (auto i : m_pkgrepo.getListOfPackages()) {
+			for (auto j : i.second.files) {
+				const std::string file('/' + j);
+				if (!regexec(&preg, file.c_str(), 0, 0, 0)) {
+					info Info;
+					Info.collection = i.second.collection();
+					Info.file = j;
+					result.push_back(std::pair<std::string, info>(i.first, Info));
+					if (i.second.collection().length() > width1) {
+						width1 = i.second.collection().length();
+					}
+					if (i.first.length() > width2) {
+						width2 = i.first.length();
+					}
+				}
+			}
+		}
+		regfree(&preg);
+        if (result.size() > 1) {
+            for (auto i : result) {
+                std::cout << std::left
+                    << std::setw(width1 + 2)
+                    << i.second.collection
+                    << std::setw(width2 + 2)
+                    << i.first
+                    << i.second.file
+                    << std::endl;
+                }
+        } else {
+                std::cout << _(": no owner(s) found") << std::endl;
+        }
+
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_FILES)) {
-		/*
-		* FIXME
-		*/
+
+		for (auto i : m_pkgrepo.getListOfPackages()) {
+			if (m_argParser.otherArguments()[0] == i.first) {
+					for (auto f : i.second.files)
+						std::cout << f << std::endl;
+		}
+	}
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_SEARCH) ) {
 

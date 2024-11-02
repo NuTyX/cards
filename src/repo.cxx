@@ -38,7 +38,7 @@ repo::repo(const CardsArgumentParser& argParser,
             std::string path = dir.depot
                 + "/"
                 + dir.collection;
-            std::string repofile = path + PKG_REPO;
+            std::string repofile = path + PKG_REPO_META;
             std::cout << "Generating "
                 << repofile
                 << std::endl;
