@@ -163,7 +163,7 @@ This command is normally used by the packager only."),
 With a found private key: It will generate repositories meta data.\n\
 Location of the keys is defined in cards.conf file.\n\
 As for the generation, a private key is needed, it is used by the packager only."),
-        ArgParser::NONE, 0, "");
+        ArgParser::MIN, 0, "");
 
     OPT_VERSION.init("version",
         'v',
