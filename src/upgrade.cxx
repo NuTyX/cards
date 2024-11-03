@@ -32,8 +32,12 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 
 	for (auto i : m_listOfPackages) {
 		if (!m_pkgrepo.checkBinaryExist(i.first)) {
-			m_ListOfPackagesToDelete.insert(i.first);
-			continue;
+			// If it's not automatically installed
+			// We don't need to remove it automatically
+			if(i.second.dependency()) {
+				m_ListOfPackagesToDelete.insert(i.first);
+				continue;
+			}
 		}
 		std::pair<std::string,time_t> packageNameBuildDate;
 		packageNameBuildDate.first = i.first ;
