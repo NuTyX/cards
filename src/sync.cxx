@@ -55,7 +55,7 @@ void sync::run()
 			+ m_pkgRepoFile
 			+ ".zst",
 			collection.depot + "/" + collection.collection,
-			m_pkgRepoFile, false);
+			m_pkgRepoFile + ".zst", false);
 
 		uncompress(collection.depot + "/"
 					+ collection.collection
@@ -73,7 +73,7 @@ void sync::run()
 			+ m_pkgFilesFile
 			+ ".zst",
 			collection.depot + "/" + collection.collection,
-			m_pkgFilesFile, false);
+			m_pkgFilesFile + ".zst", false);
 
 		uncompress(collection.depot + "/"
 					+ collection.collection
