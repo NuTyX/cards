@@ -143,7 +143,7 @@ void repo::compress(const std::string fileName) {
     std::vector<char> compressData(compressSize);
 
     // Compression
-    size_t result = ZSTD_compress(compressData.data(), compressSize, inData.data(), inSize, 12);
+    size_t result = ZSTD_compress(compressData.data(), compressSize, inData.data(), inSize, 19);
     if (ZSTD_isError(result))
         std::cerr << "Compression error: "
             << ZSTD_getErrorName(result)
