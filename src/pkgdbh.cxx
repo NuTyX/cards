@@ -388,17 +388,6 @@ int pkgdbh::getListOfPackagesNames (const std::string& path)
 #endif
 	return m_listOfPackagesNames.size();
 }
-
-// get details info of a package
-std::pair<std::string, cards::db>
-pkgdbh::getInfosPackage( const std::string& packageName )
-{
-	std::pair<std::string, cards::db> result;
-
-	result.first = packageName;
-	return result;
-}
-
 std::set<std::string>
 pkgdbh::getSetOfFiles( const std::string& packageName )
 {

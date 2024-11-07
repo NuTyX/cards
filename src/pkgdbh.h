@@ -46,8 +46,6 @@ protected:
     // Database
 
     int                     getListOfPackagesNames(const std::string& path);
-    std::pair<std::string, cards::db>
-                            getInfosPackage(const std::string& packageName);
 
     void                    buildSimpleDependenciesDatabase();
 
