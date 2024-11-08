@@ -327,26 +327,26 @@ remove_all() {
 		       exit 1
 		fi
 	done
-	if [ -z $ROOT/${1} ]; then
+	if [ -z $ROOT/${VERSION}/${COLLECTION} ]; then
 	       	exit 1
 	fi
-	if [ ! -d $ROOT/${1} ]; then
+	if [ ! -d $ROOT/${VERSION}/${COLLECTION} ]; then
 	       	exit 0
 	fi
 	for i in run sys proc dev/pts dev/shm dev; do
-		[ -d $ROOT/${1}/${i} ] || continue
+		[ -d $ROOT/${VERSION}/${COLLECTION}/${i} ] || continue
 		mountpoint $ROOT/${1}/${i} > /dev/null || continue
 		sudo umount -R $ROOT/${1}/${i} || exit 1
 
 	done
-	for FOLDER in $ROOT/${1}/* ; do
+	for FOLDER in $ROOT/${VERSION}/${COLLECTION}/* ; do
 		[ -d ${FOLDER} ] || continue
 		! mountpoint ${FOLDER} > /dev/null || continue
 		sudo rm -r $FOLDER || exit 1
   	done
-	rm -d $ROOT/${1} || exit 1
+	rm -d $ROOT/${VERSION}/${COLLECTION} || exit 1
 	echo "
->>>   $ROOT/${1} cleanup successfully ...
+>>>   $ROOT/${VERSION}/${COLLECTION} cleanup successfully ...
 "
 }
 
@@ -356,13 +356,14 @@ answer() {
     echo "
 Answer should be 'y, Y or yes'
 "
-    error "$ROOT/${VERSION}/${COLLECTION}"
+    exit 1
   fi
 }
 
 error() {
+  echo ">>> ERROR: $1"
   umount_all
-  remove_all ${1}
+  remove_all
   exit 1
 }
 find_new_packager () {
@@ -713,6 +714,7 @@ echo "    VERSION: $VERSION"
 echo "       CORE: $CORE"
 echo "      DEVEL: $DEVEL "
 echo "     CHROOT: $CHROOT"
+echo "  ROOTMOUNT: $ROOTMOUNT"
 echo "The command: KERNEL="NONE" CORE="$CORE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t"
 echo ""
 echo " install-nutyx:
@@ -844,9 +846,10 @@ if [ "$CHECK" == "yes" ]; then
 "
    exit 0
 fi
-mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error "cannot create $ROOT/${VERSION}/${COLLECTION}/DEPOT  directory"
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
-  sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/DEPOT || error /${VERSION}/${COLLECTION}
+  sudo mount -v --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/DEPOT || \
+  error "mounting ${ROOTMOUNT}/$(uname -m)/${VERSION}"
   if [ -z "${PARAM[0]}" ]; then
      if [ ! -f $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.PKGREPO ]; then
         sudo mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}
@@ -854,38 +857,41 @@ if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
      fi
   fi
 else
-  error /${VERSION}/${COLLECTION}
+  error "${ROOTMOUNT}/$(uname -m)/${VERSION} not exist."
 fi
 MOUNT_POINTS="DEPOT"
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/LOGS
 if [ -d ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} ];then
-  sudo mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/LOGS || error /${VERSION}/${COLLECTION}
+  sudo mount -v --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/LOGS || \
+  error "mounting ${ROOTMOUNT}/logs/$(uname -m)/${VERSION}"
 else
-  error /${VERSION}/${COLLECTION}
+  error "${ROOTMOUNT}/logs/$(uname -m)/${VERSION} not existing"
 fi
 MOUNT_POINTS="$MOUNT_POINTS LOGS"
 
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
 if [ -d ${ROOTMOUNT}/sources ]; then
-  sudo mount --bind ${ROOTMOUNT}/sources $ROOT/${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
+  sudo mount -v --bind ${ROOTMOUNT}/sources $ROOT/${VERSION}/${COLLECTION}/sources || \
+  error "mounting ${ROOTMOUNT}/sources"
 else
-  error /${VERSION}/${COLLECTION}
+  error "${ROOTMOUNT}/sources not existing"
 fi
 MOUNT_POINTS="$MOUNT_POINTS sources"
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/$GIT
 
-sudo mount --bind $GIT_PROJ $ROOT/${VERSION}/${COLLECTION}/$GIT ||\
- error "$ROOT/${VERSION}/${COLLECTION}/$GIT"
+sudo mount -v --bind $GIT_PROJ $ROOT/${VERSION}/${COLLECTION}/$GIT || \
+error "mounting $GIT_PROJ"
 
 
 MOUNT_POINTS="$MOUNT_POINTS $GIT"
 
 echo 'running the command:
-sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" CORE="$CORE" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}'
-sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" CORE="$CORE" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || error /${VERSION}/${COLLECTION}
+sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" CORE="$CORE" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx'
+sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" CORE="$CORE" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || \
+error "sudo KERNEL=\"NONE\" CHROOT=\"$CHROOT\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" CORE=\"$CORE\" DEPOT=\"/DEPOT\" DEVEL=\"$DEVEL\" install-nutyx"
 
 [ -z $MANUAL ] && ding
 umount_all
