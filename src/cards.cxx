@@ -140,8 +140,6 @@ int main(int argc, char** argv)
                          << i.collection;
                 cout << endl;
             }
-            for (auto i : config.baseDir())
-                cout << _("Base System list directory: ") << i << endl;
             cout << _("Binaries : ")
                  << config.arch() << endl;
             for (auto i : config.groups())

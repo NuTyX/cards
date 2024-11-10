@@ -19,13 +19,6 @@ remove::remove(const std::string& commandName,
 
 	cards::conf config(configFileName);
 
-	std::set<std::string> basePackagesList;
-	for (auto i : config.baseDir()) {
-		if ( findDir(basePackagesList, i) != 0 ) {
-			m_actualError = cards::ERROR_ENUM_CANNOT_READ_DIRECTORY;
-			treatErrors(i);
-		}
-	}
 	// Retrieve info about all the packages
 	buildDatabase(false, true);
 
@@ -93,15 +86,11 @@ remove::remove(const std::string& commandName,
 	}
 	for ( auto i : listOfPackagesToRemove ) {
 		bool found = false;
-		for (auto j : basePackagesList) {
-			if ( i.first == j) {
-				found = true;
-				break;
-			}
-		}
+		if (i.second == "base")
+			found = true;
 		if ( found && !m_argParser.isSet(CardsArgumentParser::OPT_ALL)){
 				std::cout << "The package '" << i.first
-					<< "' is in the base list" << std::endl;
+					<< "' is in the base collection" << std::endl;
 				std::cout << "   specify -a to remove it anyway" << std::endl;
 				continue;
 		}

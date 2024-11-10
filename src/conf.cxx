@@ -100,9 +100,6 @@ void conf::parseConfig()
 			if ( (key == "locale") || (key == "group") ) {
 				m_groups.push_back(val);
 			}
-			if (key == "base") {
-				m_baseDir.push_back(val);
-			}
 			if (key == "name") {
 				m_name = val;
 			}
@@ -198,10 +195,6 @@ std::vector<std::string>& conf::collections()
 std::vector<std::string>& conf::depots()
 {
 	return m_depots;
-}
-std::vector<std::string>& conf::baseDir()
-{
-	return m_baseDir;
 }
 } // end of cards namespace
 

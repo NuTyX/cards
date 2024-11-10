@@ -22,7 +22,6 @@ class conf {
     std::string m_url;
     std::string m_keypath;
     std::string m_dir;
-    std::string m_base;
     std::string m_logdir;
     std::string m_username;
     std::string m_hostname;
@@ -33,7 +32,6 @@ class conf {
     std::vector<std::string> m_urls;
     std::vector<std::string> m_collections;
     std::vector<std::string> m_depots;
-    std::vector<std::string> m_baseDir;
     std::vector<std::string> m_archs;
     std::vector<DirUrl>      m_dirUrl;
     std::vector<DirUrl>      m_sysconf;
@@ -62,7 +60,6 @@ public:
     std::vector<std::string>& depots();
     std::vector<std::string>& collections();
     std::vector<DirUrl>&      dirUrl();
-    std::vector<std::string>& baseDir();
 };
 
 } // endof cards namespace
