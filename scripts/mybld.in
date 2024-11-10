@@ -458,10 +458,6 @@ PKGMK_COMPRESSION_OPTS=\"$PKGMK_COMPRESSION_OPTS\"
 PKGMK_COMPRESS_PACKAGE=\"$PKGMK_COMPRESS_PACKAGE\"
 PKGMK_COMPRESSION_MODE=\"$PKGMK_COMPRESSION_MODE\""
 }
-setup_base_config() {
-  [ -z "$BASE" ] && CARDS_CONF+="
-base /$GIT/$1"
-}
 setup_cards_conf() {
   CARDS_CONF="group devel
 group lib"
@@ -481,30 +477,20 @@ group lib"
     if [ $FOUND == "yes" ];then
       CARDS_CONF+="
 dir /DEPOT/$i"
-      setup_base_config "$i"
       continue
     fi
     if [ $COLLECTION == $i-extra ]; then
       CARDS_CONF+="
 dir /DEPOT/$i-extra
 dir /DEPOT/$i"
-      setup_base_config "$i-extra"
-      setup_base_config "$i"
       FOUND="yes"
     fi
     if  [ $COLLECTION == $i ]; then
       CARDS_CONF+="
 dir /DEPOT/$i"
-      setup_base_config "$i"
       FOUND="yes"
     fi
   done
-  if [ ! -z "$BASE" ]; then
-    for i in ${BASE[@]}; do
-      CARDS_CONF+="
-base /$GIT/$i"
-    done
-  fi
   CARDS_CONF+="
 logdir /LOGS"
 }
@@ -848,7 +834,7 @@ if [ "$CHECK" == "yes" ]; then
 fi
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error "cannot create $ROOT/${VERSION}/${COLLECTION}/DEPOT  directory"
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
-  sudo mount -v --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/DEPOT || \
+  sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/DEPOT || \
   error "mounting ${ROOTMOUNT}/$(uname -m)/${VERSION}"
   if [ -z "${PARAM[0]}" ]; then
      if [ ! -f $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.PKGREPO ]; then
@@ -863,7 +849,7 @@ MOUNT_POINTS="DEPOT"
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/LOGS
 if [ -d ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} ];then
-  sudo mount -v --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/LOGS || \
+  sudo mount --bind ${ROOTMOUNT}/logs/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/LOGS || \
   error "mounting ${ROOTMOUNT}/logs/$(uname -m)/${VERSION}"
 else
   error "${ROOTMOUNT}/logs/$(uname -m)/${VERSION} not existing"
@@ -873,7 +859,7 @@ MOUNT_POINTS="$MOUNT_POINTS LOGS"
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
 if [ -d ${ROOTMOUNT}/sources ]; then
-  sudo mount -v --bind ${ROOTMOUNT}/sources $ROOT/${VERSION}/${COLLECTION}/sources || \
+  sudo mount --bind ${ROOTMOUNT}/sources $ROOT/${VERSION}/${COLLECTION}/sources || \
   error "mounting ${ROOTMOUNT}/sources"
 else
   error "${ROOTMOUNT}/sources not existing"
@@ -882,8 +868,8 @@ MOUNT_POINTS="$MOUNT_POINTS sources"
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/$GIT
 
-sudo mount -v --bind $GIT_PROJ $ROOT/${VERSION}/${COLLECTION}/$GIT || \
-error "mounting $GIT_PROJ"
+sudo mount --bind ${GIT_PROJ} $ROOT/${VERSION}/${COLLECTION}/$GIT || \
+error "mounting ${GIT_PROJ}"
 
 
 MOUNT_POINTS="$MOUNT_POINTS $GIT"
