@@ -52,6 +52,8 @@ protected:
     void                    addPackageFilesRefsToDB(const std::string& name,
                                 const cards::db& info);
 
+    void                    addPackagesFilesRefsToDB();
+    void                    addPackagesMetaRefsToDB();
     /**
      * Remove the physical files after followings some rules
      */

@@ -682,6 +682,68 @@ void pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 	}
 	progressInfo(cards::ACTION_ENUM_PKG_MOVE_META_END);
 }
+void pkgdbh::addPackagesFilesRefsToDB()
+{
+	// TODO find a way to switch from cards 2.x to cards 3.x
+	const std::string dbFilesList = "/var/lib/pkg/db/.files";
+	const std::string dbFilesList_new = dbFilesList + ".imcomplete_transaction";
+	const std::string dbFilesList_bak = dbFilesList + ".backup";
+
+	if (unlink(dbFilesList_new.c_str()) == -1 && errno != ENOENT) {
+		m_actualError = cards::ERROR_ENUM_CANNOT_REMOVE_FILE;
+		treatErrors(dbFilesList_new);
+	}
+
+	int fd_new = creat(dbFilesList_new.c_str(),0644);
+	if (fd_new == -1)
+	{
+		m_actualError = cards::ERROR_ENUM_CANNOT_CREATE_FILE;
+		treatErrors(dbFilesList_new);
+	}
+
+	stdio_filebuf<char> dbFileListbuf_new(fd_new, std::ios::out, getpagesize());
+	std::ostream dbNew(&dbFileListbuf_new);
+
+	for ( auto i : m_listOfPackages) {
+		if (!i.second.files.empty()) {
+			dbNew << "@" << i.first << "-" << i.second.version() << "\n";
+			copy(i.second.files.begin(),i.second.files.end(), std::ostream_iterator<std::string>(dbNew,"\n"));
+			dbNew << "\n";
+		}
+	}
+
+	dbNew.flush();
+
+	if (!dbNew) {
+		m_actualError = cards::ERROR_ENUM_CANNOT_SYNCHRONIZE;
+		treatErrors(dbFilesList_new);
+	}
+
+	if (fsync(fd_new) == -1)
+	{
+		m_actualError = cards::ERROR_ENUM_CANNOT_SYNCHRONIZE;
+		treatErrors(dbFilesList_new);
+	}
+
+	if (unlink(dbFilesList_bak.c_str()) == -1 && errno != ENOENT) {
+		m_actualError = cards::ERROR_ENUM_CANNOT_REMOVE_FILE;
+		treatErrors(dbFilesList_bak);
+	}
+
+	if (link(dbFilesList.c_str(), dbFilesList_bak.c_str()) == -1) {
+		m_actualError = cards::ERROR_ENUM_CANNOT_REMOVE_FILE;
+		treatErrors(dbFilesList_bak);
+	}
+
+	if (rename(dbFilesList_new.c_str(), dbFilesList.c_str()) == -1) {
+		m_actualError = cards::ERROR_ENUM_CANNOT_REMOVE_FILE;
+		treatErrors(dbFilesList_new + " to " + dbFilesList);
+	}
+}
+void pkgdbh::addPackagesMetaRefsToDB()
+{
+         // TODO find a way to switch from cards 2.x to cards 3.x
+}
 void pkgdbh::addPackageFilesRefsToDB(const std::string& name, const cards::db& info)
 {
 
