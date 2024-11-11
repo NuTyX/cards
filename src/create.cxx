@@ -172,6 +172,7 @@ void create::installDependencies(std::string& packageName)
         ++currentLevel;
     }
     if (! m_dependencies.empty()) {
+        chdir(m_root.c_str());
         for (auto i : m_dependencies) {
             if ( i == packageName)
                 break;
@@ -450,6 +451,8 @@ void create::buildBinary(std::string packageName)
     }
 
     cards::pkgrepo pkgrepo("/etc/cards.conf");
+
+    chdir(m_root.c_str());
 
     for (auto packageFile : pkgrepo.getListOfPackagesFromGroup(packageName)) {
         archive packageArchive(packageFile);
