@@ -95,11 +95,8 @@ void pkgadd::run()
 	std::set<std::string> non_install_files = applyInstallRules(package.first,
 		package.second, m_actionRules);
 	if (!m_upgrade) {
-#ifdef DEBUG
-		std::cerr << "Run extractAndRunPREfromPackage without upgrade"
-			<< std::endl;
-#endif
-		if (m_runPrePost) preRun();
+		if (m_runPrePost)
+			preRun();
 	}
 	std::set<std::string> conflicting_files = getConflictsFilesList(package.first,
 		package.second);
@@ -124,14 +121,12 @@ void pkgadd::run()
 
 	std::set<std::string> keep_list;
 	if (m_upgrade) {
-#ifdef DEBUG
-		std::cerr << "Run extractAndRunPREfromPackage with upgrade"
-			<< std::endl;
-#endif
-
-		if ( checkDependency(package.first) )
+		if (checkDependency(package.first))
 			setDependency ();
-		if (m_runPrePost) preRun();
+
+		if (m_runPrePost)
+			preRun();
+
 		cards::lock Lock(m_root, true);
 		// Remove metadata about the package removed
 		removePackageFilesRefsFromDB(package.first);
