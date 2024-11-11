@@ -67,11 +67,6 @@ void pkgadd::preRun()
 	}
 	extractAndRunPREfromPackage(m_packageArchiveName);
 }
-void pkgadd::run(std::string& packageName)
-{
-	m_packageArchiveName=packageName;
-	run();
-}
 void pkgadd::run()
 {
 	// Get the list of installed packages
@@ -119,7 +114,7 @@ void pkgadd::run()
 			removePackageFilesRefsFromDB(conflicting_files, keep_list);
 		} else {
 			for (auto f : conflicting_files)
-				std::cerr << f ;
+				std::cerr << f << std::endl;
 /*			copy(conflicting_files.begin(), conflicting_files.end(),
 				std::ostream_iterator<std::string>(std::cerr, "\n")); */
 			m_actualError = cards::ERROR_ENUM_LISTED_FILES_ALLREADY_INSTALLED;

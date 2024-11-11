@@ -58,6 +58,5 @@ public:
 	void		preRun();
 	void		postRun();
 	virtual void        run();
-	void                run(std::string& packageName);
 	virtual void        printHelp() const;
 };
