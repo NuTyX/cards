@@ -460,7 +460,8 @@ PKGMK_COMPRESSION_MODE=\"$PKGMK_COMPRESSION_MODE\""
 }
 setup_cards_conf() {
   CARDS_CONF="group devel
-group lib"
+group lib
+depot /DEPOT"
   FOUND="no"
   MYCOLLECTION="${COLLECTION%-extra}"
   for i in "${COLLECTIONS[@]}"
@@ -476,18 +477,18 @@ group lib"
     [ -z $i ] && continue
     if [ $FOUND == "yes" ];then
       CARDS_CONF+="
-dir /DEPOT/$i"
+collection $i"
       continue
     fi
     if [ $COLLECTION == $i-extra ]; then
       CARDS_CONF+="
-dir /DEPOT/$i-extra
-dir /DEPOT/$i"
+collection $i-extra
+collection $i"
       FOUND="yes"
     fi
     if  [ $COLLECTION == $i ]; then
       CARDS_CONF+="
-dir /DEPOT/$i"
+collection $i"
       FOUND="yes"
     fi
   done
