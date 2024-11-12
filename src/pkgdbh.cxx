@@ -178,6 +178,9 @@ void pkgdbh::treatErrors(const std::string& s) const
 		case ERROR_ENUM_PACKAGE_IN_USE:
 			throw std::runtime_error(_("The package ") + s + _(" is in use"));
 			break;
+		case ERROR_ENUM_NOT_IN_CHROOT:
+			throw std::runtime_error(_("You are not in chroot mode. The ") + s + _(" is not found"));
+			break;
 	}
 }
 void pkgdbh::progressInfo(cards::ActionEnum action)
@@ -477,7 +480,7 @@ void pkgdbh::buildDatabase(const bool& progress, const bool& files)
 		std::set<std::string> sets;
 		std::set<std::string> alias;
 		parseFile(fileContent,metaFile.c_str());
-		info.release(0);
+		info.release(1);
 		info.dependency(false);
 		m_listOfAlias[i] = i;
 		for (auto s : fileContent) {
@@ -558,6 +561,10 @@ void pkgdbh::buildDatabase(const bool& progress, const bool& files)
 			if ( s == "d1" )
 				info.dependency(true);
 		}
+/*
+		TODO
+		This need to be review
+		Can be that the base package is never installed.
 
 		if ((info.url().size() == 0) &&
 				(info.baseName().size() > 0) )
@@ -594,7 +601,7 @@ void pkgdbh::buildDatabase(const bool& progress, const bool& files)
 		if ((info.arch().size() == 0) &&
 				(info.baseName().size() > 0) )
 			info.arch(m_listOfPackages[info.baseName()].arch());
-
+*/
 		info.alias(alias);
 		info.sets(sets);
 		info.categories(categories);
