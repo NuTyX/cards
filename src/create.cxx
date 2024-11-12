@@ -78,33 +78,6 @@ void create::parseArguments()
     if (m_root == "")
         m_root = "/";
 }
-void create::treatErrors(const std::string& s) const
-{
-    switch (m_actualError) {
-    case ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE:
-        throw std::runtime_error(s + _(" only root can install / upgrade / remove packages"));
-        break;
-    case ERROR_ENUM_PACKAGE_NOT_FOUND:
-        throw std::runtime_error(_("The package ") + s + _(" is not found"));
-        break;
-    case ERROR_ENUM_CANNOT_OPEN_FILE:
-        throw std::runtime_error(_("could not open ") + s);
-        break;
-    case ERROR_ENUM_CANNOT_PARSE_FILE:
-        throw std::runtime_error(_("could not parse ") + s);
-        break;
-    case ERROR_ENUM_CANNOT_READ_DIRECTORY:
-        throw RunTimeErrorWithErrno(_("could not read directory ") + s);
-        break;
-    case ERROR_ENUM_CANNOT_CHANGE_DIRECTORY:
-        throw RunTimeErrorWithErrno(_("could not change directory ") + s);
-        break;
-    case ERROR_ENUM_NOT_IN_CHROOT:
-        throw RunTimeErrorWithErrno(_("You are not in chroot mode. The file ") + s
-        + _(" is not found"));
-        break;
-    }
-}
 void create::checkBinaries()
 {
     cards::pkgrepo pkgrepo("/etc/cards.conf");
