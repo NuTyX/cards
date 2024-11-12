@@ -24,7 +24,6 @@ class create : public pkgadd {
 
     bool isACollection();
 
-    void treatErrors(const std::string& s) const;
     void list(std::string& packageName);
     void installDependencies(std::string& packageName);
     void parseArguments();
