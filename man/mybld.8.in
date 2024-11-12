@@ -78,7 +78,7 @@ Set the editor you want to use.
 .br
 Default: vi
 .TP
-\fBCHROOT=()\fp
+\fBCHROOT=()\fP
 Only relevant when install-nutyx script passing argument KERNEL=none. Set the list of packages to be install prior install-nutyx script enter into chroot. This list of packages will be added to the default ones.
 .br
 Default: not set
@@ -97,11 +97,6 @@ Default: $HOME/www
 Set the URL where all the binaries packages should be sync from. It's also possible to specify a folder as URL.
 .br
 Default: rsync://download.nutyx.org/nutyx
-.TP
-\fBBASE=()\fP
-Set the collections to keep after each successfully build. This variable is an array like BASE=(base cli gui)
-.br
-Default: not set
 
 .SH CONFIGURATION OF THE HOST NuTyX
 
