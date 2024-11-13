@@ -43,6 +43,10 @@ Default: '\fBfoo\fP/work', where \fBfoo\fP is the directory of the Pkgfile.
 Additional options for wget(1), which is used by pkgmk to download all files.
 .br
 .TP
+\fBPKGMK_CURL_OPTS='STRING'\fP
+Additional options for curl(1), which is used by pkgmk to download all files.
+.br
+.TP
 \fBPKGMK_DOWNLOAD='STRING'\fP
 If set to 'yes', pkgmk will download the source archives if necessary.
 .br
@@ -64,7 +68,7 @@ If set to 'no', pkgmk will strip built binaries.
 Default: 'no'
 .TP
 \fBPKGMK_IGNORE_REPO='STRING'\fP
-Option to disable the generation of the .PKGREPO file locate in the port directory. If set to "no" it will generate this file. It will be then possible to install via the \fBcards install\fP command if the variable \fBPKGMK_IGNORE_COLLECTION\fP is also set to "no". Only set to "no"  if you plan to use your port via the \fBcards install\fP command.
+Option to disable the generation of the .REPO file locate in the port directory. If set to "no" it will generate this file. It will be then possible to install via the \fBcards install\fP command if the variable \fBPKGMK_IGNORE_COLLECTION\fP is also set to "no". Only set to "no"  if you plan to use your port via the \fBcards install\fP command.
 .br
 Default: 'yes'
 .TP
@@ -74,7 +78,7 @@ Option to disable the extraction of the source codes of the package. You need to
 Default: 'no'
 .TP
 \fBPKGMK_IGNORE_COLLECTION='STRING'\fP
-Option to deactivate the generation of the .PKGREPO file located in the parent directory. If set to "no" it will be possible to install via the \fBcards install\fP command your own packages from your own ports. You allow mixed content of official binaries and your own binaries. This method is not recommended.
+Option to deactivate the generation of the .REPO file located in the parent directory. If set to "no" it will be possible to install via the \fBcards install\fP command your own packages from your own ports. You allow mixed content of official binaries and your own binaries. This method is not recommended.
 .br
 Default: 'yes'
 .TP
@@ -120,12 +124,6 @@ If set, pkgmk will try to split the produced package into groups. Each group is 
 Default: '()' No sub package will be produced except if define in the Pkgfile
 Possible values: '(lib devel man doc service)'
 .TP
-\fBPKGMK_PACK_SOURCE_DIR='STRING'\fP
-Set directory for the sources files group package.
-.br
-Default: '/var/lib/pkg/src/\fBfoo\fP', where \fBfoo\fP is the directory name of the base package.
-
-.TP
 \fBPKGMK_LOCALES=('STRING1' .. 'STRINGN')
 If set, pkgmk will try to produced the specified locales. Each locale is define in this variable.
 .br
@@ -134,6 +132,6 @@ Default: '(fr)'
 pkgmk(8)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
-pkgmk (cards) is Copyright (c)  2013-2021 Thierry Nuttens NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is Copyright (c)  2013-2024 Thierry Nuttens NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

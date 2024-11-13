@@ -37,20 +37,17 @@ Do not build, only download missing source file(s).
 .B "\-eo, \-\-extract-only"
 Extract only the sources file(s), do not build anything.
 .TP
-.B "\-cv, \-\-show-version-only"
+.B "\-cs, \-\-check-syntax"
+Do not build, only check the Pkgfile package syntax.
+.TP
+.B "\-sv, \-\-show-version-only"
 Do not build, only print the version of the package.
 .TP
 .B "\-utd, \-\-up\-to\-date"
 Do not build, only check if the package is up to date.
 .TP
-.B "\-uc, \-\-update\-collection"
-Do not build, only update the .PKGREPO file of the collection located in the parent directory.
-.TP
-.B "\-ic, \-\-ignore\-collection"
-Build package without update the .PKGREPO file of the collection located in the parent directory.
-.TP
 .B "\-ur, \-\-update\-repo"
-Do not build, only update the .PKGREPO file of the port.
+Do not build, only update the .REPO file of the collection.
 .TP
 .B "\-uf, \-\-update\-footprint"
 Update footprint and treat last build as successful.
@@ -61,11 +58,8 @@ Build package without checking footprint.
 .B "\-in, \-\-ignore\-new"
 Build package, ignore new files in a footprint mismatch.
 .TP
-.B "\-um, \-\-update\-md5sum"
-Update md5sum using the current source files.
-.TP
-.B "\-im, \-\-ignore\-md5sum"
-Build package without checking md5sum first.
+.B "\-ir, \-\-ignore\-repo"
+Build the package without updating the .REPO file of the collection.
 .TP
 .B "\-ns, \-\-no\-strip"
 Do not strip executable binaries or libraries.
@@ -78,6 +72,10 @@ Remove the (previously built) package and the downloaded source files.
 .TP
 .B "\-kw, \-\-keep-work"
 Keep temporary working directory.
+.TP
+.B "\-po, \-\-pack-only"
+Do not compile the sources, pack only what's in $PKG directory,
+means the build is existing and done manually.
 .TP
 .B "\-cf, \-\-config\-file <file>"
 Use alternative configuration file (default is /etc/pkgmk.conf).
@@ -95,10 +93,7 @@ Package build description.
 .B ".footprint"
 Package footprint (used for regression testing).
 .TP
-.B ".md5sum"
-MD5 checksum of source files.
-.TP
-.B ".PKGREPO"
+.B ".REPO"
 Information for installing the package with cards
 .TP
 .B "/etc/pkgmk.conf"
@@ -127,7 +122,7 @@ An error occured during the download of source files.
 An error occured during unpacking of source files.
 .TP
 .B 6
-An md5sum mismatch occured.
+A hash mismatch occured.
 .TP
 .B 7
 A footprint mismatch occured.
@@ -141,9 +136,9 @@ An error occured while installing the package via pkgadd.
 .B 10
 An error occured while searching the runtime dependencies via 'pkginfo -b'
 .SH SEE ALSO
-pkgmk.conf(5), pkgadd(8), pkgrm(8), pkginfo(8), rejmerge(8), wget(1)
+pkgmk.conf(5), pkgadd(8), pkgrm(8), pkginfo(8), rejmerge(8), curl(1)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2013 CRUX team (http://crux.nu).
-pkgmk (cards) is Copyright (c)  2013-2020 NuTyX and Copyright (c)  2013-2020 NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is Copyright (c)  2013-2024 NuTyX and Copyright (c)  2013-2024 NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

@@ -137,6 +137,6 @@ Thierry Nuttens <tnut@nutyx.org>
 .SH "SEE ALSO"
 cards.conf(5), pkgmk(8), pkgadd(8), pkginfo(8), ports(8), pkgmk.conf(5)
 .SH COPYRIGHT
-mybld (cards) is Copyright (c)  2020 NuTyX and Copyright (c)  2020 NuTyX team (http://www.nutyx.org).
+mybld (cards) is Copyright (c)  2020 - 2024 NuTyX and Copyright (c)  2020 - 2024 NuTyX team (http://www.nutyx.org).
 mybld (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

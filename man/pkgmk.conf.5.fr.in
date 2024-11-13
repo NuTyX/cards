@@ -38,6 +38,10 @@ Défaut: '\fBfoo\fP/work', où \fBfoo\fP est le dossier du Pkgfile.
 Options additionnelles pour wget(1), qui est utilisée par pkgmk pkgmk pour télécharger tous les fichiers.
 .br
 .TP
+\fBPKGMK_CURL_OPTS='STRING'\fP
+Options additionnelles pour curl(1), qui est utilisée par pkgmk pkgmk pour télécharger tous les fichiers.
+.br
+.TP
 \fBPKGMK_DOWNLOAD='STRING'\fP
 Si défini comme 'yes', pkgmk va télécharger les sources si necessaire.
 .br
@@ -59,7 +63,7 @@ Si défini comme 'no', pkgmk va supprimé les symboles de test dans les paquets 
 Défaut: 'no'
 .TP
 \fBPKGMK_IGNORE_REPO='STRING'\fP
-Option pour déactiver la génération du fichier .PKGREPO se trouvant dans le dossier du port. Si changer à "no", le fichier sera généré. Il sera alors possible d'installer via la commande \fBcards install\fP si la variable \fBPKGMK_IGNORE_COLLECTION\fP est également ajustée à "no". A ne changer que si vous décidez d'installer vos port via la commande \fBcards install\fP.
+Option pour déactiver la génération du fichier .REPO se trouvant dans le dossier du port. Si changer à "no", le fichier sera généré. Il sera alors possible d'installer via la commande \fBcards install\fP si la variable \fBPKGMK_IGNORE_COLLECTION\fP est également ajustée à "no". A ne changer que si vous décidez d'installer vos port via la commande \fBcards install\fP.
 .br
 Défaut: 'yes'
 .TP
@@ -69,7 +73,7 @@ Option pour déactiver l'extraction des sources du code de votre paquet. Vous de
 Défaut: 'no'
 .TP
 \fBPKGMK_IGNORE_COLLECTION='STRING'\fP
-Option pour déactiver la génération du fichier .PKGREPO se trouvant dans le dossier parent. A changer sur "no" si vous souhaitez installer via la commande \fBcards install\fP vos propres paquets compilés dans vos ports. Vous permettez ainsi le mélange des binaires officiels et de vos propres binaires. Cette méthode n'est pas recommandée.
+Option pour déactiver la génération du fichier .REPO se trouvant dans le dossier parent. A changer sur "no" si vous souhaitez installer via la commande \fBcards install\fP vos propres paquets compilés dans vos ports. Vous permettez ainsi le mélange des binaires officiels et de vos propres binaires. Cette méthode n'est pas recommandée.
 .br
 Défaut: 'yes'
 .TP
@@ -115,11 +119,6 @@ Si défini, pkgmk fera une tentative de séparation du paquet produit en sous gr
 Défaut: '()' Aucun sous paquet ne sera produit, sauf si défini dans le Pkgfile
 Valeurs possibles: '(lib devel man doc service)'
 .TP
-\fBPKGMK_PACK_SOURCE_DIR='STRING'\fP
-Défini le dossier pour l'emplacement des sources dans le sous-paquet sources.
-.br
-Défaut: '/var/lib/pkg/src/\fBfoo\fP', où \fBfoo\fP est le dossier du nom du paquet de base.
-.TP
 \fBPKGMK_LOCALES=('STRING1' .. 'STRINGN')
 Si défini, pkgmk fera une tentative de produire les locales définies. Chaque locale est définie dans cette variable.
 .br
@@ -128,6 +127,6 @@ Défaut: '(fr)'
 pkgmk(8)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2010 CRUX team (http://crux.nu).
-pkgmk (cards)  2013-2020 Thierry Nuttens NuTyX team (http://www.nutyx.org).
+pkgmk (cards)  2013-2024 Thierry Nuttens NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

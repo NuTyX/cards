@@ -24,6 +24,9 @@ Cherche et construits les paquets trouvé dans le dossier courant.
 .B "\-d, \-\-download"
 Télécharge les fichiers sources manquants.
 .TP
+.B "\-sv, \-\-show\-version\-only"
+Ne construit pas, affiche la version du port uniquement.
+.TP
 .B "\-do, \-\-download\-only"
 Ne construit pas, télécharge uniquement les fichiers sources manquants.
 .TP
@@ -36,14 +39,8 @@ Ne construit pas, affiche uniquement la version du port.
 .B "\-utd, \-\-up\-to\-date"
 Ne construit pas, vérifie uniquement si le paquet est à jour.
 .TP
-.B "\-uc, \-\-update\-collection"
-Met à jour le fichier .PKGREPO de la collection, cad le fichier .PKGREPO qui se trouve dans le dossier parent.
-.TP
-.B "\-ic, \-\-ignore\-collection"
-Construit le paquet sans mettre à jour le fichier .PKGREPO de la collection, cad le fichier .PKGREPO qui se trouve dans le dossier parent.
-.TP
 .B "\-ur, \-\-update\-repo"
-Met à jour le fichier .PKGREPO du paquet.
+Ne construit rien, met seulement à jour le fichier .REPO de la collection.
 .TP
 .B "\-uf, \-\-update\-footprint"
 Met à jour la signature footprint et considère la dernière construction comme valable.
@@ -54,11 +51,8 @@ Construit le paquet sans vérifier la signature footprint.
 .B "\-in, \-\-ignore\-new"
 Construit le paquet, ignore les nouveaux fichiers trouvés dans une erreur de signature footprint.
 .TP
-.B "\-um, \-\-update\-md5sum"
-Met à jour la somme md5 en utilisant les fichiers sources actuels.
-.TP
-.B "\-im, \-\-ignore\-md5sum"
-Construit le paquet sans vérifier la somme md5 au préalable.
+.B "\-ir, \-\-ignore\-repo"
+Construit le paquet, ignore la mise à jour du fichier .REPO de la collection.
 .TP
 .B "\-ns, \-\-no\-strip"
 Ne supprimes pas les symboles de tests dans les binaires our librairies à la fin de la construction du paquetDo not strip executable binaries or libshtraries.
@@ -88,10 +82,7 @@ Description de la recette d'un paquet.
 .B ".footprint"
 La signature footprint du paquet (used for regression testing).
 .TP
-.B ".md5sum"
-Somme MD5 des fichiers sources.
-.TP
-.B ".PKGREPO"
+.B ".REPO"
 Information pour installer le paquet via cards
 .TP
 .B "/etc/pkgmk.conf"
@@ -120,7 +111,7 @@ Une erreur s'est produite durant le téléchargement des fichiers sources.
 Une erreur s'est produite pendant l'extraction des fichiers sources.
 .TP
 .B 6
-Une erreur de somme MD5 s'est produite.
+Une erreur de hashage s'est produite.
 .TP
 .B 7
 Une erreur de signature footprint s'est produite.
@@ -134,9 +125,9 @@ Une erreur s'est produite durant l'installation du paquet  via pkgadd.
 .B 10
 Une erreur s'est produite pendant la recherche des dépendances runtime via la commande 'pkginfo -b'
 .SH VOIR AUSSI
-pkgmk.conf(5), pkgadd(8), pkgrm(8), pkginfo(8), rejmerge(8), wget(1)
+pkgmk.conf(5), pkgadd(8), pkgrm(8), pkginfo(8), rejmerge(8), curl(1)
 .SH COPYRIGHT
 pkgmk (pkgutils) is Copyright (c) 2000-2005 Per Liden and Copyright (c) 2006-2010 CRUX team (http://crux.nu).
-pkgmk (cards) is Copyright (c)  2013-2020 NuTyX and Copyright (c)  2013-2020 NuTyX team (http://www.nutyx.org).
+pkgmk (cards) is Copyright (c)  2013-2024 NuTyX and Copyright (c)  2013-2024 NuTyX team (http://www.nutyx.org).
 pkgmk (cards) is licensed through the GNU General Public License.
 Read the COPYING file for the complete license.

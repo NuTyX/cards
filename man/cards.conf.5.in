@@ -17,38 +17,23 @@ It might look like this:
 ###
 # cards.conf
 
-# root directories
+# depot
+depot /home/thierry/rolling
 
-dir /usr/ports/xfce4-extra
-dir /usr/ports/xfce4
-dir /usr/ports/gui
-dir /usr/ports/cli
-dir /usr/ports/base
-
-dir /var/lib/pkg/repo/kde5-extra|http://downloads.nutyx.org/x86_64/development/
-dir /var/lib/pkg/repo/kde5|http://downloads.nutyx.org/folder1/folder2/development/
-dir /var/lib/pkg/repo/xfce4-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/repo/xfce4|http://downloads.nutyx.org
-dir /var/lib/pkg/repo/gui-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/repo/gui|http://downloads.nutyx.org
-dir /var/lib/pkg/repo/cli-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/repo/cli|http://downloads.nutyx.org
-dir /var/lib/pkg/repo/base|http://downloads.nutyx.org
-
+# collections
+collection gui-extra
+collection gui
+collection cli-extra
+collection cli
+collection base
 
 # write a log file
-
 logdir /var/log/pkgbuild
 
 # group or locale
-
 group fr
 group man
 group devel
-
-# base system
-
-base /usr/ports/base
 .fi
 
 .LP
@@ -61,10 +46,10 @@ Every line can contain one configuration option. The format of the lines
 is
 .B <key> <value>.
 The valid keys are
-.B dir
+.B collection
 The value for 
-.B dir 
-is a directory, or a directory|an URL
+.B collection
+is a directory.
 
 .LP
 The log options are

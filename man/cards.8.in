@@ -58,8 +58,8 @@ able to return to a base system in case of compiling for a bot build to make sur
 
 In this scenario, cards basically installing and upgrading packages, using
 the script pkgmk. It deals with the ports. Additionally, you don't have to be in the port's
-directory to call cards. cards will search for the respective port
-itself in a list of directories specified in cards.conf. This
+directory to call cards. As long you are at the root of the collections, cards will search
+for the respective port itself in a list of collections specified in cards.conf. This
 allows you to just install or update a package, without caring where
 it actually is located on your file system.
 
@@ -120,13 +120,9 @@ All scenarios: remove the <package>
 .TP
 .B config
 All scenarios: print the actual configuration of cards. It shows the order of ports and binaries directories,
-the base directory containing all the package which should be keep when a
-.B cards base -r
-command is given. It shows also the arch defined (i686, x86_64, etc), the locale which going to be installed with the
+It shows also the arch defined (i686, x86_64, etc), the locale which going to be installed with the
 .B cards install
 command, and the defined log directory which will be used by the
-.B cards depcreate
-and
 .B cards create
 commands.
 
@@ -195,13 +191,6 @@ Use -I if you have WARNING about <dependencies> from <port> NOT FOUND ... or fix
 .B create -r <package>
 Bot scenario: only used in the bot server. It goes back to a base system, install all the dependencies
 from the founded binaries and then compile and installed the final package.
-
-.TP
-.B base -r
-All scenarios: return to a minimalist base system. This command should be only used when you compile your own package or it is a bot server.
-It actually check whats are the packages found in the 'base directories' define in the
-.B /etc/cards.conf
-file. If no directory are defined, this command will abort.
 
 .TP
 .B purge
@@ -291,12 +280,7 @@ See man cards.conf(5) and pkgmk.conf(5)
 .B Binaries scenario:
 .TP
 .B cards install irssi
-download the binary from the mirror, check for dependencies,
-
-.B Ports scenario:
-.TP
-.B cards install irssi
-download the binary from the mirror, check for dependencies, downloads the dependencies, install them and then install irssi, with one simple command
+download the binary from the mirror, check for dependencies
 
 .TP
 .B cards install -u openssl
@@ -311,12 +295,8 @@ Search in the metadata packages containing 'browser' in they name or description
 
 .B Ports scenario:
 .TP
-.B cards depcreate mplayer
-downloads the sources, compile and install all the dependencies of mplayer and mplayer.
-
-.TP
-.B cards info -p kdelibs
-show info about kdelibs port.
+.B cards create mplayer
+downloads the sources, install all the dependencies of mplayer and compile mplayer.
 
 
 .SH "AUTHORS"
