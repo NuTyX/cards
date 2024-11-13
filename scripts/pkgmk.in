@@ -1276,7 +1276,7 @@ parse_options() {
 				PKGMK_DOWNLOAD_ONLY="yes" ;;
 			-eo|--extract-only)
 				PKGMK_EXTRACT_ONLY="yes" ;;
-			-cv|--show-version-only)
+			-sv|--show-version-only)
 				PKGMK_SHOW_VERSION="yes";;
 			-utd|--up-to-date)
 				PKGMK_UP_TO_DATE="yes" ;;
