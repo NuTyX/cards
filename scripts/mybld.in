@@ -313,7 +313,7 @@ trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
 
 umount_all() {
 	for FOLDER in $MOUNT_POINTS ; do
-		if mountpoint $ROOT/${VERSION}/${COLLECTION}/${FOLDER};then
+		if mountpoint -q $ROOT/${VERSION}/${COLLECTION}/${FOLDER}; then
 			sudo umount -R $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 			sudo rm -d     $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 		fi
@@ -335,13 +335,13 @@ remove_all() {
 	fi
 	for i in run sys proc dev/pts dev/shm dev; do
 		[ -d $ROOT/${VERSION}/${COLLECTION}/${i} ] || continue
-		mountpoint $ROOT/${1}/${i} > /dev/null || continue
+		mountpoint -q $ROOT/${1}/${i}  || continue
 		sudo umount -R $ROOT/${1}/${i} || exit 1
 
 	done
 	for FOLDER in $ROOT/${VERSION}/${COLLECTION}/* ; do
 		[ -d ${FOLDER} ] || continue
-		! mountpoint ${FOLDER} > /dev/null || continue
+		! mountpoint -q ${FOLDER} || continue
 		sudo rm -r $FOLDER || exit 1
   	done
 	rm -d $ROOT/${VERSION}/${COLLECTION} || exit 1

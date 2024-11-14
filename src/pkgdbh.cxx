@@ -1354,13 +1354,13 @@ void pkgdbh::readRulesFile()
 					|| !strcmp(event, "SCHEMAS") || !strcmp(event, "DESKTOP_DB")) {
 
 					rule_t rule;
-					if (!strcmp(event, "cards::UPGRADE"))
+					if (!strcmp(event, "UPGRADE"))
 						rule.event = cards::UPGRADE;
-					if (!strcmp(event, "cards::INSTALL"))
+					if (!strcmp(event, "INSTALL"))
 						rule.event = cards::INSTALL;
-					if (!strcmp(event, "cards::INFO"))
+					if (!strcmp(event, "INFO"))
 						rule.event = cards::INFO;
-					if (!strcmp(event, "cards::LDCONF"))
+					if (!strcmp(event, "LDCONF"))
 						rule.event = cards::LDCONF;
 					if (!strcmp(event, "FONTS"))
 						rule.event = cards::FONTS;
