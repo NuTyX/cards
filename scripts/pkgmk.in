@@ -613,8 +613,8 @@ build() {
 				mkdir build
 				cd    build
 				meson setup --prefix=/usr \
-                                      --buildtype=release \
-                                      ../$name-$version
+					--buildtype=release \
+					../$name-$version
 				ninja
 				DESTDIR=$PKG ninja install;;
 
@@ -622,22 +622,22 @@ build() {
 				cd $name-$version
 				./autogen.sh
 				./configure --prefix=/usr \
-                                            --disable-static
-                                make
-                                make DESTDIR=$PKG install;;
+					--disable-static
+				make
+				make DESTDIR=$PKG install;;
 
 			autoreconf)
 				cd $name-$version
-                                autoreconf -fiv
-                                ./configure --prefix=/usr \
-                                            --disable-static
-                                make
-                                make DESTDIR=$PKG install;;
+				autoreconf -fiv
+				./configure --prefix=/usr \
+					--disable-static
+				make
+				make DESTDIR=$PKG install;;
 
 			autotools)
 				cd $name-$version
 				./configure --prefix=/usr \
-                                            --disable-static
+					--disable-static
 				make
 				make DESTDIR=$PKG install;;
 
@@ -648,14 +648,14 @@ build() {
 
 			python3)
 				cd ${_name}-$version
-				 python3 setup.py build
-				 python3 setup.py install --prefix=/usr --root=$PKG;;
+				python3 setup.py build
+				python3 setup.py install --prefix=/usr --root=$PKG;;
 
 			xorg)
 				cd ${_name}-$version
 				./configure --prefix=/usr \
-				--sysconfdir=/etc \
-				--localstatedir=/var --disable-static
+					--sysconfdir=/etc \
+					--localstatedir=/var --disable-static
 				make
 				make DESTDIR=$PKG install;;
 
@@ -675,7 +675,10 @@ build() {
 				mkdir build
 				cd    build
 				cmake -DCMAKE_INSTALL_PREFIX=/usr  \
+					-DCMAKE_INSTALL_LIBEXECDIR=libexec \
 					-DCMAKE_BUILD_TYPE=Release \
+					-DCMAKE_INSTALL_LIBDIR=lib \
+					-DBUILD_QT5=OFF            \
 					-DBUILD_TESTING=OFF        \
 					-Wno-dev \
 					../$name-$version
@@ -1613,7 +1616,7 @@ PKGMK_IGNORE_RUNTIMEDEPS="no"
 PKGMK_NO_STRIP="no"
 
 PKGMK_COMPRESSION_MODE="xz"
-PKGMK_COMPRESSION_OPTS="-9 --threads=$(getconf _NPROCESSORS_ONLN)"
+PKGMK_COMPRESSION_OPTS="-19 --threads=$(getconf _NPROCESSORS_ONLN)"
 [ "$PKGMK_ARCH"=="i686" ] && PKGMK_COMPRESSION_OPTS="-9"
 
 PKGMK_COMPRESS_PACKAGE="no"
