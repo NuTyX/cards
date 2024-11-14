@@ -40,16 +40,27 @@ install::install(const CardsArgumentParser& argParser,
 		} else if (checkRegularFile(pkg)) {
 			 // It's a regular archive file
 			archive packageArchive(pkg);
+			std::string p;
 			if (checkPackageNameExist(packageArchive.name())) {
+				p = "Upgrade ";
 				m_upgrade=1;
 			} else {
+				p = "";
 				m_upgrade=0;
 			}
 
 			m_packageArchiveName = pkg;
 			run();
 
-			std::string p = "(" + packageArchive.collection()+") " + packageArchive.name();
+			p += "("
+				+ packageArchive.collection()
+				+ ") "
+				+ packageArchive.name()
+				+ "-"
+				+ packageArchive.version()
+				+ "-"
+				+ itos(packageArchive.release());
+
 			syslog(LOG_INFO,"%s",p.c_str());
 		} else {
 			// It's a normal package
@@ -62,15 +73,24 @@ install::install(const CardsArgumentParser& argParser,
 	for (auto i : m_pkgrepo.getDependenciesList()) {
 		m_packageArchiveName = m_pkgrepo.dirName(i.first) + "/" + m_pkgrepo.fileName(i.first);
 		archive packageArchive(m_packageArchiveName.c_str());
-		std::string name = packageArchive.name();
+		std::string name;
 		if ( checkPackageNameExist(name )) {
 			m_upgrade=1;
+			name = "Upgrade ";
 		} else {
+			name = "";
 			m_upgrade=0;
 		}
 		if (i.second > 0)
 			setDependency();
-		name = "(" + packageArchive.collection()+") " + name;
+		name += "("
+			+ packageArchive.collection()
+			+ ") "
+			+ name
+			+ "-"
+			+ packageArchive.version()
+			+ "-"
+			+itos(packageArchive.release());
 		run();
 		if (!m_argParser.isSet(CardsArgumentParser::OPT_NOLOGENTRY))
 			syslog(LOG_INFO,"%s",name.c_str());
