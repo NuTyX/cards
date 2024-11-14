@@ -44,6 +44,18 @@ void sync::run()
 		if (collection.url.size() == 0 ) {
 			continue;
 		}
+		cards::dwl key(collection.url
+			+ "/"
+			+ m_config.arch()
+			+ "/"
+			+ m_config.version()
+			+ "/"
+			+ collection.collection
+			+ "/"
+			+ PUBLICKEY,
+			collection.depot + "/" + collection.collection,
+			PUBLICKEY, false);
+
 		cards::dwl repo(collection.url
 			+ "/"
 			+ m_config.arch()
