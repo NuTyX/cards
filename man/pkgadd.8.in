@@ -35,7 +35,7 @@ Print version and exit.
 .B "\-h, \-\-help"
 Print help and exit.
 .SH CONFIGURATION
-\fBpkgadd\fP is configured by the file \fI/etc/pkgadd.conf\fP. This file can contain rules, that are built out of three fragments: \fIevent\fP, \fIpattern\fP and \fIaction\fP. The event describes in what kind of situation this rule applies. Currently there are two types of events: \fBUPGRADE\fP and \fBINSTALL\fP. \fBUPGRADE\fP rules are applied when a package is installed over an existing version, and \fBINSTALL\fP rules are applied in any case. The pattern is a regular expression. The action applicable to both the \fBUPGRADE\fP and \fBINSTALL\fP event is \fBYES\fP and \fBNO\fP. More than one rule of the same
+\fBpkgadd\fP is configured by the file \fI/var/lib/pkg/pkgadd.conf\fP. This file can contain rules, that are built out of three fragments: \fIevent\fP, \fIpattern\fP and \fIaction\fP. The event describes in what kind of situation this rule applies. Currently there are two types of events: \fBUPGRADE\fP and \fBINSTALL\fP. \fBUPGRADE\fP rules are applied when a package is installed over an existing version, and \fBINSTALL\fP rules are applied in any case. The pattern is a regular expression. The action applicable to both the \fBUPGRADE\fP and \fBINSTALL\fP event is \fBYES\fP and \fBNO\fP. More than one rule of the same
 event type is allowed, in which case the first rule will have the lowest priority and the last rule
 will have the highest priority. Example:
 
@@ -56,7 +56,7 @@ If pkgadd finds that a specific file should not be upgraded it will install it u
 The user is then free to examine/use/remove that file manually.
 .SH FILES
 .TP
-.B "/etc/pkgadd.conf"
+.B "/var/lib/pkg/pkgadd.conf"
 Configuration file.
 .SH SEE ALSO
 pkgrm(8), pkginfo(8), pkgmk(8), rejmerge(8)
