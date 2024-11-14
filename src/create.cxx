@@ -14,7 +14,7 @@ create::create(CardsArgumentParser& argParser)
 
     parseArguments();
     if (!checkFileExist(m_root + "tmp/setup")) {
-        m_actualError = cards::ERROR_ENUM_NOT_IN_CHROOT;
+        m_actualError = ERROR_ENUM_NOT_IN_CHROOT;
         treatErrors(m_root + "tmp/setup");
     }
 
@@ -255,23 +255,28 @@ void create::buildCollection()
         std::string missingSharedLib;
         for (auto lib : pkgrepo.getLibs(i)) {
             found = false;
-            for (auto pkg : pkgfile.getListOfPackages()) {
-                if (!pkgrepo.checkBinaryExist(pkg.first))
-                    continue;
+            int level = 0;
+            while (level < pkgfile.getLevel(i)) {
+                for (auto pkg : pkgfile.getListOfPackages()) {
+                    if (!pkgrepo.checkBinaryExist(pkg.first))
+                        continue;
 
-                if (pkg.first == i)
-                    continue;
+                    if (pkg.second.level() != level)
+                        continue;
 
-                for (auto deplib : pkgrepo.getLibs(pkg.first) ) {
-                    if (deplib == lib) {
-                        found = true;
-                        break;
+                    for (auto deplib : pkgrepo.getLibs(pkg.first) ) {
+                        if (deplib == lib) {
+                            found = true;
+                            break;
+                        }
                     }
+                    if (found)
+                        break;
                 }
                 if (found)
                     break;
+                level++;
             }
-
             if (!found) {
                 if (checkFileNameExist(lib)) {
                     found = true;
@@ -312,7 +317,7 @@ void create::buildBinary(std::string packageName)
 {
     if (m_config.logdir() != "") {
         if (!createRecursiveDirs(m_config.logdir())) {
-            m_actualError = cards::ERROR_ENUM_CANNOT_CREATE_DIRECTORY;
+            m_actualError = ERROR_ENUM_CANNOT_CREATE_DIRECTORY;
             treatErrors(m_config.logdir());
         }
         std::string logFile = m_config.logdir()
@@ -323,7 +328,7 @@ void create::buildBinary(std::string packageName)
         unlink(logFile.c_str());
         m_fdlog = open(logFile.c_str(), O_APPEND | O_WRONLY | O_CREAT, 0666);
         if (m_fdlog == -1) {
-            m_actualError = cards::ERROR_ENUM_CANNOT_OPEN_FILE;
+            m_actualError = ERROR_ENUM_CANNOT_OPEN_FILE;
             treatErrors(logFile);
         }
     }
@@ -350,7 +355,7 @@ void create::buildBinary(std::string packageName)
     installDependencies(packageName);
 
     if (m_pkgfile.getPortDir(packageName).empty()) {
-        m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_FOUND;
+        m_actualError = ERROR_ENUM_PACKAGE_NOT_FOUND;
         treatErrors(packageName);
     }
 
@@ -359,7 +364,7 @@ void create::buildBinary(std::string packageName)
         + m_pkgfile.getPortDir(packageName);
 
     if (chdir(pkgdir.c_str())) {
-        m_actualError = cards::ERROR_ENUM_CANNOT_CHANGE_DIRECTORY;
+        m_actualError = ERROR_ENUM_CANNOT_CHANGE_DIRECTORY;
         treatErrors(pkgdir);
     };
 
@@ -406,7 +411,7 @@ void create::buildBinary(std::string packageName)
 
     if (result > 0) {
         s += NORMAL;
-        m_actualError = cards::ERROR_ENUM_CANNOT_PARSE_FILE;
+        m_actualError = ERROR_ENUM_CANNOT_PARSE_FILE;
         treatErrors("Pkgfile: " + s);
     }
 

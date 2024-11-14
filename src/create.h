@@ -18,7 +18,6 @@ class create : public pkgadd {
     std::set<std::string>      m_list;
     std::vector<std::string>   m_dependencies;
     const CardsArgumentParser& m_argParser;
-    cards::ErrorEnum           m_actualError;
     cards::conf                m_config;
     cards::pkgfile             m_pkgfile;
 
