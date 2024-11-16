@@ -44,6 +44,9 @@ void pkgrepo::treatErrors(const std::string& s) const
     case ERROR_ENUM_CANNOT_CHMOD_PRIVATE_KEY_TO_600:
         throw RunTimeErrorWithErrno(_("Failed to chmod key: ") + s + _(" to 0600"));
         break;
+    case ERROR_ENUM_WRONG_SIGNATURE:
+        throw RunTimeErrorWithErrno(_("Package: ") + s + _(" have a wrong signature."));
+        break;
     }
 }
 void pkgrepo::generateDependencies(const std::pair<std::string, time_t>& packageName)
@@ -185,6 +188,11 @@ void pkgrepo::generateDependencies()
                 // Last try to get it.
                 downloadPackageFileName(packageName);
             }
+            if (!checkSign(packageName)) {
+                m_actualError = cards::ERROR_ENUM_WRONG_SIGNATURE;
+                treatErrors(packageName);
+            }
+
             directDependencies = getPackageDependencies(packageFileName);
         }
 

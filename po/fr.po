@@ -234,6 +234,12 @@ msgstr "<paquet>"
 msgid "Packages"
 msgstr "Paquets"
 
+msgid "Package: "
+msgstr "Paquet: "
+
+msgid " have a wrong signature."
+msgstr " a une fausse signature."
+
 msgid "<package> | <collection>"
 msgstr "<paquet> | <collection>"
 

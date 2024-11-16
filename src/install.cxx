@@ -40,12 +40,11 @@ install::install(const CardsArgumentParser& argParser,
 		} else if (checkRegularFile(pkg)) {
 			 // It's a regular archive file
 			archive packageArchive(pkg);
-			std::string p;
+			std::string p = "";
 			if (checkPackageNameExist(packageArchive.name())) {
 				p = "Upgrade ";
 				m_upgrade=1;
 			} else {
-				p = "";
 				m_upgrade=0;
 			}
 
@@ -73,27 +72,26 @@ install::install(const CardsArgumentParser& argParser,
 	for (auto i : m_pkgrepo.getDependenciesList()) {
 		m_packageArchiveName = m_pkgrepo.dirName(i.first) + "/" + m_pkgrepo.fileName(i.first);
 		archive packageArchive(m_packageArchiveName.c_str());
-		std::string name;
-		if ( checkPackageNameExist(name )) {
+		std::string p = "";
+		if (checkPackageNameExist(packageArchive.name())) {
 			m_upgrade=1;
-			name = "Upgrade ";
+			p = "Upgrade ";
 		} else {
-			name = "";
 			m_upgrade=0;
 		}
 		if (i.second > 0)
 			setDependency();
-		name += "("
+		p += "("
 			+ packageArchive.collection()
 			+ ") "
-			+ name
+			+ packageArchive.name()
 			+ "-"
 			+ packageArchive.version()
 			+ "-"
 			+itos(packageArchive.release());
 		run();
 		if (!m_argParser.isSet(CardsArgumentParser::OPT_NOLOGENTRY))
-			syslog(LOG_INFO,"%s",name.c_str());
+			syslog(LOG_INFO,"%s",p.c_str());
 
 	}
 }
