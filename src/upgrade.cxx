@@ -36,8 +36,8 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 			// We don't need to remove it automatically
 			if(i.second.dependency()) {
 				m_ListOfPackagesToDelete.insert(i.first);
-				continue;
 			}
+			continue;
 		}
 		std::pair<std::string,time_t> packageNameBuildDate;
 		packageNameBuildDate.first = i.first ;
@@ -138,7 +138,6 @@ void upgrade::go()
 
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
 		dry();
-
 	else if (! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
 		for (auto i : m_pkgrepo.getDependenciesList()) {
 			m_packageArchiveName = m_pkgrepo.dirName(i.first)
