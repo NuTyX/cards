@@ -94,10 +94,10 @@ void pkgadd::run()
 
 	std::set<std::string> non_install_files = applyInstallRules(package.first,
 		package.second, m_actionRules);
-	if (!m_upgrade) {
-		if (m_runPrePost)
-			preRun();
-	}
+
+	if (m_runPrePost)
+		preRun();
+
 	std::set<std::string> conflicting_files = getConflictsFilesList(package.first,
 		package.second);
 	if (!conflicting_files.empty()) {
@@ -122,10 +122,7 @@ void pkgadd::run()
 	std::set<std::string> keep_list;
 	if (m_upgrade) {
 		if (checkDependency(package.first))
-			setDependency ();
-
-		if (m_runPrePost)
-			preRun();
+			setDependency();
 
 		cards::lock Lock(m_root, true);
 		// Remove metadata about the package removed

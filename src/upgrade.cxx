@@ -18,7 +18,7 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 	if ( ! m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
 		m_sync.run();
 	
-	buildDatabase(false, false);
+	buildDatabase(false, true);
 	std::set<std::string> listOfExistPackages;
 	for (auto i:m_listOfPackages) {
 		if (m_pkgrepo.checkBinaryExist(i.first)) {
