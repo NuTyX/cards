@@ -142,7 +142,6 @@ void install::getLocalePackagesList()
 			PackageTime.second=0;
 
 			m_pkgrepo.generateDependencies(i);
-			m_pkgrepo.addDependenciesList(PackageTime);
 		}
 	}
 }

@@ -128,20 +128,15 @@ void pkgrepo::generateKeys()
 void pkgrepo::generateDependencies()
 {
     std::string packageNameHash, packageName, packageFileName;
-
     std::pair<std::string, time_t> PackageTime;
-
     std::vector<std::pair<std::string, time_t>> dependenciesWeMustAdd, depencenciestoSort;
-
     std::vector<std::pair<std::string, time_t>>::iterator vit;
-
     std::set<std::pair<std::string, time_t>>::iterator sit;
 
     PackageTime.first = m_packageName;
     PackageTime.second = 0;
 
-    // Always insert the final package first (twice)
-    dependenciesWeMustAdd.push_back(PackageTime);
+    // Insert the final package
     dependenciesWeMustAdd.push_back(PackageTime);
 
     // Main while loop
@@ -157,7 +152,6 @@ void pkgrepo::generateDependencies()
         if (m_listOfRepoPackages.find(packageName) != m_listOfRepoPackages.end()) {
             directDependencies = m_listOfPackages[packageName].dependencies();
         } else {
-
             // The packageName is not found in the listOfPackages
             if (checkBinaryExist(packageName)) {
 
@@ -167,15 +161,13 @@ void pkgrepo::generateDependencies()
                 // And check it's signature
                 packageFileName = dirName(packageName) + "/" + fileName(packageName);
                 packageNameHash = fileHash(packageName);
-
-                // archive PackageName exist:
-                // Let's see if we need to download it.
-
             } else {
                 m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_EXIST;
                 treatErrors(packageName);
             }
 
+            // archive PackageName exist:
+            // Let's see if we need to download it.
             // If the binary archive is not yet downloaded
             if (!checkFileExist(packageFileName))
                 downloadPackageFileName(packageName);
