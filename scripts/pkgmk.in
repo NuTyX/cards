@@ -743,6 +743,7 @@ add_meta_to_archive() {
 	echo "N$NAME" > .META
 	echo "V$version" >> .META
 	echo "r$release" >> .META
+	echo "B$PKGMK_BUILDVER" >> .META
 	echo "S$SIZE_I" >> .META
 	echo "c$COLLECTION" >> .META
 	echo "a$PKGMK_ARCH" >> .META
@@ -754,7 +755,6 @@ add_meta_to_archive() {
 		echo "M$MAINT" >> .META
 		echo "P$PACK" >> .META
 		echo "L$LICENSE" >> .META
-		echo "B$PKGMK_BUILDVER" >> .META
 	else
 		echo "g$GROUP" >> .META
 	fi
