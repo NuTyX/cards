@@ -11,6 +11,7 @@ pkginfo::pkginfo(const std::string& commandName)
     , m_runtimelibs_mode(0)
     , m_footprint_mode(0)
     , m_archiveinfo(0)
+    , m_metainfo(0)
     , m_installed_mode(0)
     , m_number_mode(0)
     , m_list_mode(0)
@@ -145,6 +146,11 @@ void pkginfo::parseArguments(int argc, char** argv)
         m_actualError = cards::ERROR_ENUM_TOO_MANY_OPTIONS;
         treatErrors(m_arg);
     }
+}
+void pkginfo::list()
+{
+    m_root="/";
+    m_installed_mode = 1;
 }
 void pkginfo::run()
 {

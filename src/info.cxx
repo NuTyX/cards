@@ -40,7 +40,10 @@ info::info(const CardsArgumentParser& argParser,
 				}
 			for (auto i : sortedSetList)
 				std::cout << i << std::endl;
-		} else {
+
+			return;
+		}
+		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
 			std::set<std::string> sortedPackagesList;
 			for (auto i : m_pkgrepo.getListOfPackages()) {
 				std::string s, _s;
@@ -58,7 +61,16 @@ info::info(const CardsArgumentParser& argParser,
 			}
 			for (auto i : sortedPackagesList)
 				std::cout << i << std::endl;
+
+			return;
 		}
+		std::cout << "List of installed Packages: "
+			<< std::endl
+			<< std::endl;
+		pkginfo pkginfo("cards info");
+		pkginfo.list();
+		pkginfo.run();
+		return;
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_QUERY)) {
 		regex_t preg;

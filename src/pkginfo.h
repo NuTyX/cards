@@ -35,6 +35,7 @@ public:
     pkginfo();
 
     virtual void    parseArguments(int argc, char** argv);
+    void            list();
     virtual void    run();
     virtual void    finish();
     virtual void    printHelp() const;
