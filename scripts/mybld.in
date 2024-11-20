@@ -142,6 +142,7 @@ fi
 $PLAY /usr/share/sounds/cards/ding.wav &
 }
 rsync_binaries () {
+  local options="-avd --no-r --delete"
   if [ -z "$VERSION" ]; then
     echo "
 >>>     VERSION is not SET
@@ -150,12 +151,14 @@ rsync_binaries () {
   fi
   if [ ! -z ${PARAM[0]} ]; then
     echo "
-rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*  \\
+rsync $options \
+$URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*  \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 "
     echo -n "  OK ? (y) : "
     answer
-    rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.* \
+    rsync $options \
+$URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.* \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     exit 0
   fi
@@ -164,26 +167,34 @@ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     echo "
 sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
-rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+rsync $options \
+$URL/$(uname -m)/$VERSION/$COLLECTION/ \
+$ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 "
     echo -n "  OK ? (y) : "
     answer
     sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
-    rsync -av --delete $URL/$(uname -m)/$VERSION/$COLLECTION/ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+    rsync $options \
+$URL/$(uname -m)/$VERSION/$COLLECTION/ \
+$ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     exit 0
   fi
 
   echo "
 mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
 sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
-rsync -av --delete $URL/$(uname -m)/$VERSION/ $ROOTMOUNT/$(uname -m)/$VERSION/
+rsync $options \
+$URL/$(uname -m)/$VERSION/ \
+$ROOTMOUNT/$(uname -m)/$VERSION/
 "
   echo -n "  OK ? (y) : "
   answer
   mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
   sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
-  rsync -av --delete $URL/$(uname -m)/$VERSION/ $ROOTMOUNT/$(uname -m)/$VERSION/
+  rsync $options \
+$URL/$(uname -m)/$VERSION/ \
+$ROOTMOUNT/$(uname -m)/$VERSION/
   exit 0
 }
 
