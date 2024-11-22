@@ -20,6 +20,7 @@ class create : public pkgadd {
     const CardsArgumentParser& m_argParser;
     cards::conf                m_config;
     cards::pkgfile             m_pkgfile;
+    cards::pkgrepo             m_pkgrepo;
 
     bool isACollection();
 
@@ -30,6 +31,8 @@ class create : public pkgadd {
     void buildCollection();
     void base();
     void buildBinary(std::string packageName);
+    void core();
+    void getLocalePackagesList();
 
 public:
     create(CardsArgumentParser& argParser);

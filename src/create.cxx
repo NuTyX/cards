@@ -4,6 +4,7 @@ namespace cards {
 
 create::create(CardsArgumentParser& argParser)
     : pkgadd("cards create")
+    , m_pkgrepo("/etc/cards.conf")
     , m_pkgfile("/etc/cards.conf")
     , m_argParser(argParser)
     , m_config("/etc/cards.conf")
@@ -20,6 +21,8 @@ create::create(CardsArgumentParser& argParser)
 
     m_tree = m_pkgfile.getListOfPackages();
 
+    core();
+
     if (isACollection())
         buildCollection();
     else
@@ -29,6 +32,64 @@ create::~create()
 {
     if (m_fdlog != -1)
 	    close(m_fdlog);
+}
+void create::core()
+{
+    for (auto i : m_pkgrepo.getListOfPackagesFromSet("chroot")) {
+        if (checkPackageNameExist(i))
+			continue;
+        m_pkgrepo.generateDependencies(i);
+    }
+    for (auto i : m_pkgrepo.getListOfPackagesFromSet("devel")) {
+        if (checkPackageNameExist(i))
+			continue;
+        m_pkgrepo.generateDependencies(i);
+    }
+    m_pkgrepo.generateDependencies("cards.devel");
+    getLocalePackagesList();
+
+	for (auto i : m_pkgrepo.getDependenciesList()) {
+		m_packageArchiveName = m_pkgrepo.dirName(i.first) + "/" + m_pkgrepo.fileName(i.first);
+		archive packageArchive(m_packageArchiveName.c_str());
+		if (checkPackageNameExist(packageArchive.name()))
+            continue;
+
+		if (i.second > 0)
+			setDependency();
+
+		run();
+    }
+}
+void create::getLocalePackagesList()
+{
+	std::string packageFileName;
+	cards::conf config(m_config);
+
+	if (config.groups().empty())
+		return;
+
+	std::set<std::string> tmpList;
+	for (auto i : config.groups()) {
+		for (auto j : m_pkgrepo.getDependenciesList()) {
+			std::string name = j.first + "." + i;
+			if (m_pkgrepo.checkBinaryExist(name)) {
+				std::string packageName  = m_pkgrepo.dirName(name) + "/" + m_pkgrepo.fileName(name);
+				packageFileName = m_pkgrepo.fileName(name);
+				if (!checkFileExist(packageName))
+					m_pkgrepo.downloadPackageFileName(name);
+				tmpList.insert(name);
+			}
+		}
+	}
+	if (tmpList.size() > 0 ) {
+		for (auto i : tmpList) {
+			std::pair<std::string,time_t> PackageTime;
+			PackageTime.first=i;
+			PackageTime.second=0;
+
+			m_pkgrepo.generateDependencies(i);
+		}
+	}
 }
 void create::base()
 {
