@@ -167,24 +167,27 @@ void pkgrepo::generateDependencies()
             }
 
             // archive PackageName exist:
-            // Let's see if we need to download it.
-            // If the binary archive is not yet downloaded
-            if (!checkFileExist(packageFileName))
-                downloadPackageFileName(packageName);
+            // Let's see if we need to download it
+            // if the binary archive is not yet downloaded
+            // Make no sense to download if no url exist
+            if (m_config.url().size() > 0) {
+                if (!checkFileExist(packageFileName))
+                    downloadPackageFileName(packageName);
+                // m_packageFileNameHash contains
+                // the hashsum of packageFileName
+                generateHash(packageFileName);
 
-            // m_packageFileNameHash contains hashsum of packageFileName
-            generateHash(packageFileName);
-
-            // we compare m_packageFileNameHash with the one stored in the database
-            if (!checkHash(packageName)) {
-                // Last try to get it.
-                downloadPackageFileName(packageName);
+                // we compare m_packageFileNameHash
+                // with the one stored in the database
+                if (!checkHash(packageName)) {
+                    // Last try to get it.
+                    downloadPackageFileName(packageName);
+                }
+                if (!checkSign(packageName)) {
+                    m_actualError = cards::ERROR_ENUM_WRONG_SIGNATURE;
+                    treatErrors(packageName);
+                }
             }
-            if (!checkSign(packageName)) {
-                m_actualError = cards::ERROR_ENUM_WRONG_SIGNATURE;
-                treatErrors(packageName);
-            }
-
             directDependencies = getPackageDependencies(packageFileName);
         }
 
