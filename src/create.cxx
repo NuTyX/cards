@@ -23,6 +23,8 @@ create::create(CardsArgumentParser& argParser)
 
     core();
 
+    chdir(m_portsDir.c_str());
+
     if (isACollection())
         buildCollection();
     else
