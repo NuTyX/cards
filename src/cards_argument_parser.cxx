@@ -22,6 +22,8 @@ ArgParser::APOpt CardsArgumentParser::OPT_SETS;
 ArgParser::APOpt CardsArgumentParser::OPT_VERSION;
 
 ArgParser::APOpt CardsArgumentParser::OPT_DISABLE;
+ArgParser::APOpt CardsArgumentParser::OPT_NO_META;
+
 ArgParser::APOpt CardsArgumentParser::OPT_IGNORE;
 ArgParser::APOpt CardsArgumentParser::OPT_NOLOGENTRY;
 
@@ -213,6 +215,10 @@ As for the generation, a private key is needed, it is used by the packager only.
         0,
         _("\t   Not doing the action. Only simulate (if possible) what will be done."));
 
+    OPT_NO_META.init("no-meta",
+        0,
+        _("\t   Do not tracks meta-datas of installed packages."));
+
     OPT_REMOVE.init("remove",
         'r',
         _("   Remove the packages founds, use with care."));
@@ -293,6 +299,7 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_INSTALL, OPT_CONFIG_FILE, false);
 
     addOption(CMD_CREATE, OPT_DRY, false);
+    addOption(CMD_CREATE, OPT_NO_META, false);
     addOption(CMD_CREATE, OPT_REMOVE, false);
     addOption(CMD_CREATE, OPT_ROOT, false);
 

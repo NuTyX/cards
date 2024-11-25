@@ -20,11 +20,6 @@ class pkgadd : public pkgdbh {
 					getKeepFileList(const std::set<std::string>& files,
 						const std::vector<rule_t>& rules);
 
-	std::set<std::string>
-					applyInstallRules(const std::string& name,
-						cards::db& info,
-						const std::vector<rule_t>& rules);
-
 	void			applyPostInstallRules(const std::string& name,
 						cards::db& info,
 						const std::vector<rule_t>& rules);
@@ -38,9 +33,13 @@ class pkgadd : public pkgdbh {
 
 protected:
 	std::string 	m_packageArchiveName;
-	bool 		m_runPrePost;
-	bool 		m_upgrade;
-	bool 		m_force;
+	bool 			m_runPrePost;
+	bool 			m_upgrade;
+	bool 			m_force;
+	std::set<std::string>
+					applyInstallRules(const std::string& name,
+						cards::db& info,
+						const std::vector<rule_t>& rules);
 
 public:
 	/**

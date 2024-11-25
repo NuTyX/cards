@@ -33,6 +33,7 @@ class create : public pkgadd {
     void buildBinary(std::string packageName);
     void core();
     void getLocalePackagesList();
+    void run();
 
 public:
     create(CardsArgumentParser& argParser);

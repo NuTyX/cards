@@ -115,7 +115,8 @@ void create::base()
         m_packageName = i;
 
         // Remove metadata about the package removed
-        removePackageFilesRefsFromDB(m_packageName);
+        if(!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
+            removePackageFilesRefsFromDB(m_packageName);
 
         // Remove the files on hd
         removePackageFiles(true, m_packageName);
@@ -245,6 +246,48 @@ void create::installDependencies(std::string& packageName)
            }
         }
     }
+}
+void create::run()
+{
+	// Reading the archiving to find a list of files
+	std::pair<std::string, cards::db> package = openArchivePackage(m_packageArchiveName);
+
+	readRulesFile();
+
+	std::set<std::string> non_install_files = applyInstallRules(package.first,
+		package.second, m_actionRules);
+
+	preRun();
+
+	std::set<std::string> conflicting_files = getConflictsFilesList(package.first,
+		package.second);
+	if (!conflicting_files.empty()) {
+		for (auto f : conflicting_files)
+			std::cerr << f << std::endl;
+
+		m_actualError = cards::ERROR_ENUM_LISTED_FILES_ALLREADY_INSTALLED;
+		treatErrors(package.first);
+	}
+
+	std::set<std::string> keep_list;
+
+    if(!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
+	    cards::lock Lock(m_root, true);
+
+
+	installArchivePackage(false, m_packageArchiveName,
+		keep_list, non_install_files);
+
+    if(!m_argParser.isSet(CardsArgumentParser::OPT_NO_META)) {
+	    // Add the metadata about the package to the DB
+	    moveMetaFilesPackage(package.first,package.second);
+
+	    // Add the info about the files to the DB
+	    addPackageFilesRefsToDB(package.first, package.second);
+    }
+
+	postRun();
+
 }
 void create::buildCollection()
 {
