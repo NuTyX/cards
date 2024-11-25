@@ -76,7 +76,7 @@ void pkgrm::run()
 	removePackageFilesRefsFromDB(m_packageName);
 
 	// Remove the files on hd
-	removePackageFiles(m_packageName);
+	removePackageFiles(false,m_packageName);
 
 }
 void pkgrm::printHelp() const

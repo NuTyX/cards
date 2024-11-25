@@ -162,7 +162,7 @@ void upgrade::go()
 			getListOfPackagesNames(m_root);
 			buildDatabase(false, true);
 			removePackageFilesRefsFromDB(i);
-			removePackageFiles(i);
+			removePackageFiles(true,i);
 			syslog(LOG_INFO,"%s removed",i.c_str());
 		}
 		m_sync.purge();

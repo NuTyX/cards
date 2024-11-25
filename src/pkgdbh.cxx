@@ -928,7 +928,8 @@ void pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 }
 
 /* Remove the physical files after followings some rules */
-void pkgdbh::removePackageFiles(const std::string& name)
+void pkgdbh::removePackageFiles(const bool& progress,
+				const std::string& name)
 {
 	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
@@ -952,17 +953,22 @@ void pkgdbh::removePackageFiles(const std::string& name)
 	std::cerr << std::endl;
 #endif
 
-	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_START);
+	if (progress)
+		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_START);
+
 	// Delete the files from bottom to up to make sure we delete the contents of any folder before
 	for (std::set<std::string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
-		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_RUN);
+		if (progress)
+			progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_RUN);
+
 		const std::string filename = m_root + *i;
 		if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
 			const char* msg = strerror(errno);
 			std::cerr << m_utilName << ": could not remove " << filename << ": " << msg << std::endl;
 		}
 	}
-	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
+	if (progress)
+		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
 }
 
 void pkgdbh::removePackageFiles(const std::string& name, const std::set<std::string>& keep_list)

@@ -118,7 +118,7 @@ void create::base()
         removePackageFilesRefsFromDB(m_packageName);
 
         // Remove the files on hd
-        removePackageFiles(m_packageName);
+        removePackageFiles(true, m_packageName);
 
     }
 }
