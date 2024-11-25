@@ -133,7 +133,7 @@ void pkgadd::run()
 	{
 		cards::lock Lock(m_root, true);
 		// Installation progressInfo of the files on the HD
-		installArchivePackage(m_packageArchiveName,
+		installArchivePackage(false, m_packageArchiveName,
 			keep_list, non_install_files);
 
 		// Add the metadata about the package to the DB

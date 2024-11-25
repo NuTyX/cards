@@ -1221,7 +1221,9 @@ void pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 	chdir(buf);
 }
 void pkgdbh::installArchivePackage
-	(const std::string& filename, const std::set<std::string>& keep_list,
+	(const bool& progress,
+	const std::string& filename,
+	const std::set<std::string>& keep_list,
 	const std::set<std::string>& non_install_list)
 {
 	struct archive* archive;
@@ -1244,11 +1246,15 @@ void pkgdbh::installArchivePackage
 #ifdef DEBUG
 	std::cout << "absm_root: " <<  absm_root  << " and m_root: " << m_root<< std::endl;
 #endif
-	progressInfo(cards::ACTION_ENUM_PKG_INSTALL_START);
+	if (progress)
+		progressInfo(cards::ACTION_ENUM_PKG_INSTALL_START);
+
 	for (m_installedFilesNumber = 0; archive_read_next_header(archive, &entry) ==
 	     ARCHIVE_OK; ++m_installedFilesNumber) {
 
-		progressInfo(cards::ACTION_ENUM_PKG_INSTALL_RUN);
+		if(progress)
+			progressInfo(cards::ACTION_ENUM_PKG_INSTALL_RUN);
+
 		std::string archive_filename = archive_entry_pathname(entry);
 		std::string reject_dir = trimFileName(absm_root + std::string("/") + std::string(PKG_REJECTED));
 		std::string original_filename = trimFileName(absm_root + std::string("/") + archive_filename);
@@ -1306,7 +1312,9 @@ void pkgdbh::installArchivePackage
 				std::cout << m_utilName << ": rejecting " << archive_filename << ", keeping existing version" << std::endl;
 		}
 	}
-	progressInfo(cards::ACTION_ENUM_PKG_INSTALL_END);
+	if(progress)
+		progressInfo(cards::ACTION_ENUM_PKG_INSTALL_END);
+
 	if (m_installedFilesNumber == 0) {
 		if (archive_errno(archive) == 0)
 		{

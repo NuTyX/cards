@@ -74,7 +74,8 @@ protected:
     std::pair<std::string, cards::db>
                             openArchivePackage(const std::string& filename);
     void                    extractAndRunPREfromPackage(const std::string& filename);
-    void                    installArchivePackage(const std::string& filename,
+    void                    installArchivePackage(const bool& progress,
+                                const std::string& filename,
                                 const std::set<std::string>& keep_list,
                                 const std::set<std::string>& non_install_files);
 
