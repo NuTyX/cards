@@ -112,7 +112,7 @@ namespace cards
             removePackageFilesRefsFromDB(pack);
 
             // Remove the files on hd
-            removePackageFiles(pack);
+            removePackageFiles(true, pack);
         }
     }
 
