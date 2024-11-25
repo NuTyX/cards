@@ -21,10 +21,10 @@ create::create(CardsArgumentParser& argParser)
 
     m_tree = m_pkgfile.getListOfPackages();
 
-    core();
-
-    chdir(m_portsDir.c_str());
-
+    if (!m_argParser.isSet(CardsArgumentParser::OPT_DRY)) {
+        core();
+        chdir(m_portsDir.c_str());
+    }
     if (isACollection())
         buildCollection();
     else
