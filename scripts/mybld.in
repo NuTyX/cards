@@ -10,9 +10,6 @@ OPTIONS
       -c, --cleanup <collection>
               Clean the /<version>/<collection> folder in a safety way.
 
-      -R, --runtime <dependency package>
-              Return the list of package depending on the <dependency package>.
-
       -A, --ask
               Ask for confirmation.
 
@@ -237,25 +234,6 @@ parse_arguments() {
       fi
       PARAM+=($1);;
 
-    -R|--runtime)
-      RUNTIME="yes"
-      shift
-      if [ -z ${1} ]; then
-        echo "
->>> You need to specify a runtime dependancy package name
-"
-        exit 1
-      fi
-      PARAM+=($1)
-      find_collection
-      if [ -z "${COLLECTION}" ]; then
-        echo "
->>> WARNING package '${PARAM[0]}' not found in any collection
-"
-      fi
-      find_runtime ${1}
-      exit 0;;
-
     -i|--increment)
       INCREMENT="yes"
       shift
@@ -428,11 +406,6 @@ find_collection () {
   [ -z $COLLECTION ] || unset PARAM
 }
 
-find_runtime () {
-  for i in $(find ${ROOTMOUNT}/$(uname -m)/${VERSION}/ -name "*$(uname -m).cards*"); do
-    LANG=C pkginfo -a $i|grep "${1}"|grep "Dependencies"|cut -d ":" -f1
-  done
-}
 setup_pkgmk_conf() {
 [ -z  "$PKGMK_GROUPS" ] && PKGMK_GROUPS="devel man doc service"
 [ -z  "$PKGMK_KEEP_SOURCES" ] && PKGMK_KEEP_SOURCES="yes"
