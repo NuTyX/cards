@@ -653,13 +653,10 @@ if ! [ -O "$ROOT/$VERSION" ]; then
   exit 1
 fi
 
-
 setup_cards_conf
 DEVEL="cd /$GIT \
 $PAUSE "
 
-[ -z "${PARAM[0]}" ] && CHROOT="ncurses readline bash"
-[ -z "$PACKAGES_LIST" ] || CHROOT="ncurses readline bash"
 if [ -z $MANUAL ]; then
   DEVEL+="&& cards create"
   if [ ! -z ${PACKAGES_LIST} ]; then
@@ -707,13 +704,12 @@ echo " COLLECTION: $COLLECTION"
 echo "GIT Project: $GIT_PROJ"
 echo "    VERSION: $VERSION"
 echo "      DEVEL: $DEVEL "
-echo "     CHROOT: $CHROOT"
 echo "  ROOTMOUNT: $ROOTMOUNT"
-echo "The command: KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t"
+echo "The command: KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" DEPOT=\"/DEPOT\" DEVEL=\"$DEVEL\" install-nutyx -t"
 echo ""
 echo " install-nutyx:
  =============="
-KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t
+KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx -t
 echo ""
 
 if [ -z "$PACKAGES_LIST" ]; then
@@ -883,9 +879,9 @@ error "mounting ${GIT_PROJ}"
 MOUNT_POINTS="$MOUNT_POINTS $GIT"
 
 echo 'running the command:
-sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx'
-sudo KERNEL="NONE" CHROOT="$CHROOT" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || \
-error "sudo KERNEL=\"NONE\" CHROOT=\"$CHROOT\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" DEPOT=\"/DEPOT\" DEVEL=\"$DEVEL\" install-nutyx"
+sudo KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" DEPOT=\"/DEPOT\" DEVEL=\"$DEVEL\" install-nutyx'
+sudo KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx || \
+error "sudo KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" DEPOT=\"/DEPOT\" DEVEL=\"$DEVEL\" install-nutyx"
 
 [ -z $MANUAL ] && ding
 umount_all
