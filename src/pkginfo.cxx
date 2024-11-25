@@ -152,6 +152,12 @@ void pkginfo::list()
     m_root="/";
     m_installed_mode = 1;
 }
+void pkginfo::details(const std::string& packageName)
+{
+    m_root="/";
+    m_details_mode = 1;
+    m_arg = packageName;
+}
 void pkginfo::run()
 {
     if (m_metainfo) {

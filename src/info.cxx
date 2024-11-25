@@ -21,14 +21,23 @@ info::info(const CardsArgumentParser& argParser,
 					<< ") "
 					<< i
 					<< std::endl;
-		} else if(m_argParser.isSet(CardsArgumentParser::OPT_VERSION)) {
+			return;
+		}
+		if(m_argParser.isSet(CardsArgumentParser::OPT_VERSION)) {
 			std::cout << m_pkgrepo.version(m_argParser.otherArguments()[0])
 				<< "-"
 				<< itos(m_pkgrepo.release(m_argParser.otherArguments()[0]))
 				<< std::endl;
-		} else {
-			std::cout << m_pkgrepo.getBinaryPackageInfo(m_argParser.otherArguments()[0]);
+			return;
 		}
+		if(m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
+			std::cout << m_pkgrepo.getBinaryPackageInfo(m_argParser.otherArguments()[0]);
+			return;
+		}
+		pkginfo pkginfo("cards info");
+		pkginfo.details(m_argParser.otherArguments()[0]);
+		pkginfo.run();
+		return;
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_LIST) ) {
 		if (m_argParser.isSet(CardsArgumentParser::OPT_SETS)) {

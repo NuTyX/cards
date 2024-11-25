@@ -272,6 +272,7 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_LIST, OPT_SETS, false);
     addOption(CMD_LIST, OPT_CONFIG_FILE, false);
 
+    addOption(CMD_INFO, OPT_BINARIES, false);
     addOption(CMD_INFO, OPT_SETS, false);
     addOption(CMD_INFO, OPT_CONFIG_FILE, false);
     addOption(CMD_INFO, OPT_VERSION, false);

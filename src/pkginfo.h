@@ -36,6 +36,7 @@ public:
 
     virtual void    parseArguments(int argc, char** argv);
     void            list();
+    void            details(const std::string& packageName);
     virtual void    run();
     virtual void    finish();
     virtual void    printHelp() const;
