@@ -410,7 +410,7 @@ setup_pkgmk_conf() {
 [ -z  "$PKGMK_GROUPS" ] && PKGMK_GROUPS="devel man doc service"
 [ -z  "$PKGMK_KEEP_SOURCES" ] && PKGMK_KEEP_SOURCES="yes"
 [ -z  "$PKGMK_WORK_DIR" ] && PKGMK_WORK_DIR="/tmp/work"
-[ -z  "$PKGMK_COMPRESSION_OPTS" ] && PKGMK_COMPRESSION_OPTS="-9 --threads=$(getconf _NPROCESSORS_ONLN)"
+[ -z  "$PKGMK_COMPRESSION_OPTS" ] && PKGMK_COMPRESSION_OPTS="-19 --threads=$(getconf _NPROCESSORS_ONLN)"
 [ -z  "$PKGMK_COMPRESS_PACKAGE" ] && PKGMK_COMPRESS_PACKAGE="yes"
 [ -z  "$PKGMK_COMPRESSION_MODE" ] && PKGMK_COMPRESSION_MODE="zst"
 [ -z  "$PKGMK_LOCALES" ] && PKGMK_LOCALES="af an ar as az be bg \
