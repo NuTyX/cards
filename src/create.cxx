@@ -284,7 +284,8 @@ void create::run()
 
 	    // Add the info about the files to the DB
 	    addPackageFilesRefsToDB(package.first, package.second);
-    }
+    } else
+	    m_listOfPackages[package.first] = package.second;
 
 	postRun();
 
