@@ -23,9 +23,7 @@ class CardsArgumentParser : public ArgParser
 
 		static ArgParser::APOpt OPT_INSTALLED;
 		static ArgParser::APOpt OPT_BINARIES;
-		static ArgParser::APOpt OPT_PORTS;
 		static ArgParser::APOpt OPT_SETS;
-		static ArgParser::APOpt OPT_VERSION;
 
 		static ArgParser::APOpt OPT_IGNORE;
 		static ArgParser::APOpt OPT_NOLOGENTRY;
@@ -36,8 +34,6 @@ class CardsArgumentParser : public ArgParser
 
 		static ArgParser::APOpt OPT_DRY;
 		static ArgParser::APOpt OPT_REMOVE;
-		static ArgParser::APOpt OPT_ALL;
-		static ArgParser::APOpt OPT_LEVEL_SILENCE;
 
 		static ArgParser::APOpt OPT_ROOT;
 		static ArgParser::APOpt OPT_CONFIG_FILE;

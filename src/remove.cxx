@@ -86,12 +86,9 @@ remove::remove(const std::string& commandName,
 	}
 	for ( auto i : listOfPackagesToRemove ) {
 		bool found = false;
-		if (i.second == "base")
-			found = true;
-		if ( found && !m_argParser.isSet(CardsArgumentParser::OPT_ALL)){
-				std::cout << "The package '" << i.first
-					<< "' is in the base collection" << std::endl;
-				std::cout << "   specify -a to remove it anyway" << std::endl;
+		if (i.second == "base") {
+			std::cout << "The package '" << i.first
+				<< "' is in the base collection" << std::endl;
 				continue;
 		}
 		m_packageName = i.first;

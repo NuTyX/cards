@@ -13,18 +13,14 @@ ArgParser::APOpt CardsArgumentParser::OPT_FORCE;
 ArgParser::APOpt CardsArgumentParser::OPT_UPDATE;
 
 ArgParser::APOpt CardsArgumentParser::OPT_DRY;
-ArgParser::APOpt CardsArgumentParser::OPT_ALL;
 
 ArgParser::APOpt CardsArgumentParser::OPT_INSTALLED;
 ArgParser::APOpt CardsArgumentParser::OPT_BINARIES;
-ArgParser::APOpt CardsArgumentParser::OPT_PORTS;
 ArgParser::APOpt CardsArgumentParser::OPT_SETS;
-ArgParser::APOpt CardsArgumentParser::OPT_VERSION;
 
 ArgParser::APOpt CardsArgumentParser::OPT_DISABLE;
 ArgParser::APOpt CardsArgumentParser::OPT_NO_META;
 
-ArgParser::APOpt CardsArgumentParser::OPT_IGNORE;
 ArgParser::APOpt CardsArgumentParser::OPT_NOLOGENTRY;
 
 ArgParser::APOpt CardsArgumentParser::OPT_REMOVE;
@@ -95,9 +91,7 @@ If -f is passed as optional argument, it will force the install means overwrite 
     addCommand(CMD_REMOVE, "remove",
         _("remove one or more packages or a complete collection."),
         _("It can remove one or more packages.\n\
-If you want to remove a package from the base list, \
-you should pass the -a argument. \n\
-If you specify an existing collection, all packages  \
+If you specify an existing collection, all packages \
 that belong to this collection will be deleted."),
         ArgParser::MIN, 1, _("<package> | <collection>"));
 
@@ -114,7 +108,7 @@ It will delete all the downloads binaries which are located in the binaries sect
 
     addCommand(CMD_DIFF, "diff",
         _("list outdated packages."),
-        _("If -p is passed, the list is checked against founds Pkgfile ports."),
+        _("An outdated package is a installed package older then the one in the depot."),
         ArgParser::NONE, 0, "");
 
     addCommand(CMD_LEVEL, "level",
@@ -167,10 +161,6 @@ Location of the keys is defined in cards.conf file.\n\
 As for the generation, a private key is needed, it is used by the packager only."),
         ArgParser::MIN, 0, "");
 
-    OPT_VERSION.init("version",
-        'v',
-        _("\t   Only show the version of the package."));
-
     OPT_NO_SYNC.init("no-sync",
         0,
         _("\t   Only upgrade what's possible."));
@@ -203,10 +193,6 @@ As for the generation, a private key is needed, it is used by the packager only.
         'b',
         _(" Available binaries in depot server."));
 
-    OPT_PORTS.init("ports",
-        'p',
-        _("    Local available ports."));
-
     OPT_SETS.init("sets",
         'S',
         _("     Available sets of packages in depot server."));
@@ -222,14 +208,6 @@ As for the generation, a private key is needed, it is used by the packager only.
     OPT_REMOVE.init("remove",
         'r',
         _("   Remove the packages founds, use with care."));
-
-    OPT_ALL.init("all",
-        'a',
-        _("\t   Remove the package(s) even if they are in the base list."));
-
-    OPT_IGNORE.init("ignore",
-        'I',
-        _("   Ignore WARNINGS and list the level anyway."));
 
     OPT_NOLOGENTRY.init("nolog",
         0,
@@ -281,13 +259,9 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_INFO, OPT_BINARIES, false);
     addOption(CMD_INFO, OPT_SETS, false);
     addOption(CMD_INFO, OPT_CONFIG_FILE, false);
-    addOption(CMD_INFO, OPT_VERSION, false);
 
     addOption(CMD_SEARCH, OPT_NAMES, false);
 
-    addOption(CMD_DIFF, OPT_PORTS, false);
-
-    addOption(CMD_REMOVE, OPT_ALL, false);
     addOption(CMD_REMOVE, OPT_ROOT, false);
     addOption(CMD_REMOVE, OPT_CONFIG_FILE, false);
 
@@ -300,12 +274,8 @@ As for the generation, a private key is needed, it is used by the packager only.
 
     addOption(CMD_CREATE, OPT_DRY, false);
     addOption(CMD_CREATE, OPT_NO_META, false);
-    addOption(CMD_CREATE, OPT_REMOVE, false);
     addOption(CMD_CREATE, OPT_ROOT, false);
 
     addOption(CMD_SYNC, OPT_CONFIG_FILE, false);
 
-    addOption(CardsArgumentParser::CMD_DEPENDS, OPT_INSTALLED, false);
-
-    addOption(CardsArgumentParser::CMD_LEVEL, OPT_IGNORE, false);
 }
