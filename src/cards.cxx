@@ -48,55 +48,46 @@ int main(int argc, char** argv)
             cout << GREEN << _("\nINFORMATION") << NORMAL << endl;
             cout << BLUE << "  help                       "
                  << NORMAL << _("show this help") << endl;
-            cout << BLUE << "  list [-F][-b][-p]          "
+            cout << BLUE << "  list" << NORMAL << " [-b][-S]              "
                  << NORMAL << _("list of installed packages") << endl
                  << "                             "
                  << _("Available binaries in depot.") << endl
                  << "                             "
-                 << _("Available ports.") << endl;
-
-            cout << BLUE << _("  info") << NORMAL << " [-b][-p] <package>    "
+                 << _("Available sets of packages.") << endl;
+            cout << BLUE << "  info" << NORMAL << " [-b][-S] <package>    "
                  << _("print info about install package") << endl
                  << "                             "
                  << _("Available binaries in depot.") << endl
                  << "                             "
-                 << _("Available ports.") << endl;
+                 << _("Available sets of packages.") << endl;
             cout << BLUE << "  config" << NORMAL << "                     "
                  << _("show the configuration of your ")
                  << cardsArgPars.appName() << endl;
-            cout << BLUE << "  level [-I]" << NORMAL << "                 "
+            cout << BLUE << "  level" << NORMAL << "                      "
                  << _("show all the ports founds. The list is showned by order of compilation")
-                 << endl
-                 << "                             "
-                 << _("If -I it will ignore the WARNING about NOT FOUND <dependencies> from <port>")
                  << endl;
             cout << GREEN << _("\nPORTS SPECIFIC SCENARIO") << NORMAL << endl;
-            cout << BLUE << "  depends" << NORMAL << " [-i] <port>        "
+            cout << BLUE << "  depends" << NORMAL << "   <port>           "
                  << _("show dependencies for the port in compilation order.")
-                 << endl
-                 << "                             "
-                 << _("If -i it will shows the installed dependencies as well.")
                  << endl;
             cout << BLUE << "  deptree" << NORMAL << "   <port>           "
                  << _("show dependencies in a tree.") << endl;
-            cout << BLUE << "  depcreate" << NORMAL << " <port>           "
-                 << _("compile and install the port and its dependencies.")
-                 << endl;
             cout << BLUE << "  create" << NORMAL << "    <port>           "
                  << _("install all the dependencies from binaries and then compile the port.")
                  << endl;
-
             cout << GREEN << _("\nDIFFERENCES / UPGRADE / CLEANUP") << NORMAL << endl;
-            cout << BLUE << "  diff" << NORMAL << " [-p]                  "
-                 << _("list outdated packages.") << endl
-                 << "                             list outdated ports" << endl;
+            cout << BLUE << "  diff" << NORMAL << "                       "
+                 << _("list outdated packages.") << endl;
             cout << BLUE << "  upgrade" << NORMAL << "                    "
                  << _("upgrade outdated packages.") << endl;
             cout << BLUE << "  purge" << NORMAL << "                      "
                  << _("cleanup downloaded binaries in cache.") << endl;
             cout << GREEN << _("\nSEARCHING") << NORMAL << endl;
-            cout << BLUE << "  search" << NORMAL << " <expr>              "
+            cout << BLUE << "  search" << NORMAL << " [-n] <expr>         "
                  << _("show port names or description containing 'expr'")
+                 << endl
+                 << "                             "
+                 << _("If -n it will search in the name of the available packages only.")
                  << endl;
             cout << BLUE << "  query" << NORMAL << "  <file>              "
                  << _("list owner of file(s) matching the query.") << endl;
@@ -112,10 +103,8 @@ int main(int argc, char** argv)
                  << _("If -u it will upgrade the installed package.") << endl
                  << "                             "
                  << _("If -f it will force the installation in case of files conflicts.") << endl;
-            cout << BLUE << "  remove" << NORMAL << " [-a] <package>      "
-                 << _("remove the installed package.") << endl
-                 << "                             "
-                 << _("If -a it will remove the sub-package as well.") << endl;
+            cout << BLUE << "  remove" << NORMAL << "      <package>      "
+                 << _("remove the installed package.") << endl;
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_CONFIG: {
