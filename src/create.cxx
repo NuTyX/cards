@@ -98,7 +98,7 @@ void create::base()
     bool found = false;
     std::vector<std::string> list;
     buildDatabase(false, true);
-    for ( auto i : m_listOfPackages) {
+    for (auto i : m_listOfPackages) {
         for (auto j : i.second.sets()) {
             if (j == "chroot")
                 found = true;
@@ -110,17 +110,17 @@ void create::base()
         }
         found = false;
     }
-    cards::lock Lock(m_root, true);
+    if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
+        cards::lock Lock(m_root, true);
     for (auto i : list) {
         m_packageName = i;
 
         // Remove metadata about the package removed
-        if(!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
+        if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
             removePackageFilesRefsFromDB(m_packageName);
 
         // Remove the files on hd
         removePackageFiles(true, m_packageName);
-
     }
 }
 bool create::isACollection()
@@ -271,14 +271,14 @@ void create::run()
 
 	std::set<std::string> keep_list;
 
-    if(!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
+    if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
 	    cards::lock Lock(m_root, true);
 
 
 	installArchivePackage(false, m_packageArchiveName,
 		keep_list, non_install_files);
 
-    if(!m_argParser.isSet(CardsArgumentParser::OPT_NO_META)) {
+    if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META)) {
 	    // Add the metadata about the package to the DB
 	    moveMetaFilesPackage(package.first,package.second);
 
@@ -546,11 +546,16 @@ void create::buildBinary(std::string packageName)
             + name
             + " "
             + version;
-        m_upgrade = 0;
 
 		if (checkPackageNameExist(name)) {
 			message = name + ": is ALLREADY installed";
-			m_upgrade = 1;
+
+            // Remove metadata about the package removed
+            if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
+                removePackageFilesRefsFromDB(m_packageName);
+
+            // Remove the files on hd
+            removePackageFiles(true, m_packageName);
 		}
         m_packageArchiveName = packageFile;
         run();
