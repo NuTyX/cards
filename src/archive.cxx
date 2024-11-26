@@ -19,6 +19,8 @@ archive::archive(const std::string& fileName)
     m_packageName = getPackageName();
     m_packageArch = getPackageArch();
     for (auto fileName : m_contentMtree) {
+        if (fileName[0] == '.')
+            continue;
         m_filesList.insert(fileName);
     }
 }
