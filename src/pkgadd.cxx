@@ -128,7 +128,7 @@ void pkgadd::run()
 		// Remove metadata about the package removed
 		removePackageFilesRefsFromDB(package.first);
 		keep_list = getKeepFileList(package.second.files, m_actionRules);
-		removePackageFiles(package.first, keep_list);
+		removePackageFiles(false,package.first, keep_list);
 	}
 	{
 		cards::lock Lock(m_root, true);

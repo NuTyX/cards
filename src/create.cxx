@@ -20,6 +20,7 @@ create::create(CardsArgumentParser& argParser)
     }
 
     m_tree = m_pkgfile.getListOfPackages();
+    buildDatabase(false, true);
 
     if (!m_argParser.isSet(CardsArgumentParser::OPT_DRY)) {
         core();
@@ -58,7 +59,6 @@ void create::core()
 
 		if (i.second > 0)
 			setDependency();
-
 		run();
     }
 }
@@ -97,7 +97,6 @@ void create::base()
 {
     bool found = false;
     std::vector<std::string> list;
-    buildDatabase(false, true);
     for (auto i : m_listOfPackages) {
         for (auto j : i.second.sets()) {
             if (j == "chroot")
@@ -120,7 +119,7 @@ void create::base()
             removePackageFilesRefsFromDB(m_packageName);
 
         // Remove the files on hd
-        removePackageFiles(true, m_packageName);
+        removePackageFiles(false, m_packageName);
     }
 }
 bool create::isACollection()
@@ -145,10 +144,9 @@ void create::parseArguments()
 void create::checkBinaries()
 {
     cards::pkgrepo pkgrepo("/etc/cards.conf");
-    cards::pkgfile pkgfile("/etc/cards.conf");
 
     for (auto i : pkgrepo.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
-        if (pkgfile.checkPackageNameExist(i)) {
+        if (m_pkgfile.checkPackageNameExist(i)) {
             continue;
         } else {
             std::cout << "Package: "
@@ -270,12 +268,22 @@ void create::run()
 	}
 
 	std::set<std::string> keep_list;
+	if (m_upgrade) {
+		if (checkDependency(package.first))
+			setDependency();
+
+		cards::lock Lock(m_root, true);
+		// Remove metadata about the package removed
+		removePackageFilesRefsFromDB(package.first);
+		keep_list = getKeepFileList(package.second.files, m_actionRules);
+		removePackageFiles(false, package.first, keep_list);
+	}
 
     if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
 	    cards::lock Lock(m_root, true);
 
 
-	installArchivePackage(false, m_packageArchiveName,
+    installArchivePackage(false, m_packageArchiveName,
 		keep_list, non_install_files);
 
     if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META)) {
@@ -284,9 +292,13 @@ void create::run()
 
 	    // Add the info about the files to the DB
 	    addPackageFilesRefsToDB(package.first, package.second);
-    } else
+    } else {
+        removeFile (m_root, "/.MTREE");
+        removeFile (m_root, "/.META");
+        removeFile (m_root, "/.PRE");
+        removeFile (m_root, "/.POST");
 	    m_listOfPackages[package.first] = package.second;
-
+    }
 	postRun();
 
 }
@@ -550,16 +562,11 @@ void create::buildBinary(std::string packageName)
 
 		if (checkPackageNameExist(name)) {
 			message = name + ": is ALLREADY installed";
-
-            // Remove metadata about the package removed
-            if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
-                removePackageFilesRefsFromDB(m_packageName);
-
-            // Remove the files on hd
-            removePackageFiles(true, m_packageName);
+            m_upgrade = 1;
 		}
         m_packageArchiveName = packageFile;
         run();
+        m_upgrade = 0;
         std::cout << message << std::endl;
         if (m_config.logdir() != "") {
             write(m_fdlog, message.c_str(), message.length());
