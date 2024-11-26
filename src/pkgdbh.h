@@ -59,7 +59,8 @@ protected:
      */
     void                    removePackageFiles(const bool& progress,
                                 const std::string& name);
-    void                    removePackageFiles(const std::string& name,
+    void                    removePackageFiles(const bool& progress,
+                                const std::string& name,
                                 const std::set<std::string>& keep_list);
 
     /**

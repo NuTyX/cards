@@ -971,7 +971,9 @@ void pkgdbh::removePackageFiles(const bool& progress,
 		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
 }
 
-void pkgdbh::removePackageFiles(const std::string& name, const std::set<std::string>& keep_list)
+void pkgdbh::removePackageFiles(const bool& progress,
+		const std::string& name,
+		const std::set<std::string>& keep_list)
 {
 	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
@@ -1004,9 +1006,11 @@ void pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 #endif
 
 	// Delete the files
-	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_START);
+	if (progress)
+		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_START);
 	for (std::set<std::string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
-		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_RUN);
+		if (progress)
+			progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_RUN);
 		const std::string filename = m_root + *i;
 		if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
 			if (errno == ENOTEMPTY)
@@ -1015,7 +1019,8 @@ void pkgdbh::removePackageFiles(const std::string& name, const std::set<std::str
 			std::cerr << m_utilName << ": could not remove " << filename << ": " << msg << std::endl;
 		}
 	}
-	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
+	if (progress)
+		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
 }
 
 void pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list)
