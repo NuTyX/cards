@@ -10,6 +10,7 @@ using __gnu_cxx::stdio_filebuf;
 pkgdbh::pkgdbh(const std::string& name)
 	: m_utilName(name)
 	, m_DB_Empty(true)
+	, m_progress(false)
 {
 	openlog(m_utilName.c_str(),LOG_CONS,LOG_LOCAL7);
 }
@@ -17,6 +18,7 @@ pkgdbh::pkgdbh()
 	: m_utilName("pkgdbh")
 	, m_DB_Empty(true)
 	, m_root("/")
+	, m_progress(false)
 {
 }
 pkgdbh::~pkgdbh()
@@ -35,6 +37,8 @@ void pkgdbh::parseArguments(int argc, char** argv)
 			assertArgument(argv, argc, i);
 			m_root = argv[i + 1];
 			i++;
+		} else if (option == "-p" || option == "--progress") {
+			m_progress = true;
 		} else if (option[0] == '-' || !m_packageName.empty()) {
 			m_actualError = cards::ERROR_ENUM_INVALID_OPTION;
 			treatErrors(option);
@@ -190,7 +194,11 @@ void pkgdbh::progressInfo(cards::ActionEnum action)
 }
 void pkgdbh::progressInfo()
 {
-	using namespace cards;
+  if (!m_progress)
+	return;
+
+  using namespace cards;
+
   static int j=0;
   switch (m_actualAction)
   {
@@ -450,10 +458,9 @@ pkgdbh::buildSimpleDependenciesDatabase()
 		m_listOfPackagesWithDeps.insert(packageWithDeps);
 	}
 }
- /**
- * Populate the database with all details infos
- */
-void pkgdbh::buildDatabase(const bool& progress, const bool& files)
+
+ // Populate the database with all details infos
+void pkgdbh::buildDatabase(const bool& files)
 {
 	using namespace cards;
 	cleanupMetaFiles(m_root);
@@ -463,12 +470,10 @@ void pkgdbh::buildDatabase(const bool& progress, const bool& files)
 	if (m_listOfPackagesNames.empty())
 		getListOfPackagesNames (m_root);
 
-	if (progress)
-		progressInfo(ACTION_ENUM_DB_OPEN_START);
+	progressInfo(ACTION_ENUM_DB_OPEN_START);
 
 	for (auto i : m_listOfPackagesNames) {
-		if (progress)
-			progressInfo(ACTION_ENUM_DB_OPEN_RUN);
+		progressInfo(ACTION_ENUM_DB_OPEN_RUN);
 
 		cards::db info;
 		const std::string metaFileDir = m_root + PKG_DB_DIR + i;
@@ -633,11 +638,9 @@ void pkgdbh::buildDatabase(const bool& progress, const bool& files)
 
 		m_listOfPackages[i] = info;
 
-		if (progress)
-			progressInfo(ACTION_ENUM_DB_OPEN_END);
-
 		m_DB_Empty=false;
 	}
+	progressInfo(ACTION_ENUM_DB_OPEN_END);
 }
 void pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 {
@@ -804,7 +807,7 @@ bool pkgdbh::checkPackageNameExist(const std::string& name) const
 bool pkgdbh::checkFileNameExist(const std::string& name)
 {
 	if (m_DB_Empty)
-		buildDatabase(false,true);
+		buildDatabase(true);
 
 	bool found = false;
 	std::string::size_type pos;
@@ -928,8 +931,7 @@ void pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 }
 
 /* Remove the physical files after followings some rules */
-void pkgdbh::removePackageFiles(const bool& progress,
-				const std::string& name)
+void pkgdbh::removePackageFiles(const std::string& name)
 {
 	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
@@ -953,13 +955,11 @@ void pkgdbh::removePackageFiles(const bool& progress,
 	std::cerr << std::endl;
 #endif
 
-	if (progress)
-		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_START);
+	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_START);
 
 	// Delete the files from bottom to up to make sure we delete the contents of any folder before
 	for (std::set<std::string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
-		if (progress)
-			progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_RUN);
+		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_RUN);
 
 		const std::string filename = m_root + *i;
 		if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
@@ -967,12 +967,10 @@ void pkgdbh::removePackageFiles(const bool& progress,
 			std::cerr << m_utilName << ": could not remove " << filename << ": " << msg << std::endl;
 		}
 	}
-	if (progress)
-		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
+	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
 }
 
-void pkgdbh::removePackageFiles(const bool& progress,
-		const std::string& name,
+void pkgdbh::removePackageFiles(const std::string& name,
 		const std::set<std::string>& keep_list)
 {
 	m_filesList = m_listOfPackages[name].files;
@@ -1006,11 +1004,9 @@ void pkgdbh::removePackageFiles(const bool& progress,
 #endif
 
 	// Delete the files
-	if (progress)
-		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_START);
+	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_START);
 	for (std::set<std::string>::const_reverse_iterator i = m_filesList.rbegin(); i != m_filesList.rend(); ++i) {
-		if (progress)
-			progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_RUN);
+		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_RUN);
 		const std::string filename = m_root + *i;
 		if (checkFileExist(filename) && remove(filename.c_str()) == -1) {
 			if (errno == ENOTEMPTY)
@@ -1019,8 +1015,7 @@ void pkgdbh::removePackageFiles(const bool& progress,
 			std::cerr << m_utilName << ": could not remove " << filename << ": " << msg << std::endl;
 		}
 	}
-	if (progress)
-		progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
+	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
 }
 
 void pkgdbh::removePackageFilesRefsFromDB(std::set<std::string> files, const std::set<std::string>& keep_list)
@@ -1232,8 +1227,7 @@ void pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 	chdir(buf);
 }
 void pkgdbh::installArchivePackage
-	(const bool& progress,
-	const std::string& filename,
+	(const std::string& filename,
 	const std::set<std::string>& keep_list,
 	const std::set<std::string>& non_install_list)
 {
@@ -1254,17 +1248,13 @@ void pkgdbh::installArchivePackage
 		}
 	chdir(m_root.c_str());
 	absm_root = getcwd(buf, sizeof(buf));
-#ifdef DEBUG
-	std::cout << "absm_root: " <<  absm_root  << " and m_root: " << m_root<< std::endl;
-#endif
-	if (progress)
-		progressInfo(cards::ACTION_ENUM_PKG_INSTALL_START);
+
+	progressInfo(cards::ACTION_ENUM_PKG_INSTALL_START);
 
 	for (m_installedFilesNumber = 0; archive_read_next_header(archive, &entry) ==
 	     ARCHIVE_OK; ++m_installedFilesNumber) {
 
-		if(progress)
-			progressInfo(cards::ACTION_ENUM_PKG_INSTALL_RUN);
+		progressInfo(cards::ACTION_ENUM_PKG_INSTALL_RUN);
 
 		std::string archive_filename = archive_entry_pathname(entry);
 		std::string reject_dir = trimFileName(absm_root + std::string("/") + std::string(PKG_REJECTED));
@@ -1323,8 +1313,7 @@ void pkgdbh::installArchivePackage
 				std::cout << m_utilName << ": rejecting " << archive_filename << ", keeping existing version" << std::endl;
 		}
 	}
-	if(progress)
-		progressInfo(cards::ACTION_ENUM_PKG_INSTALL_END);
+	progressInfo(cards::ACTION_ENUM_PKG_INSTALL_END);
 
 	if (m_installedFilesNumber == 0) {
 		if (archive_errno(archive) == 0)
@@ -1421,9 +1410,6 @@ void pkgdbh::readRulesFile()
 			}
 		}
 		in.close();
-	} else {
-		m_actualError = cards::ERROR_ENUM_CANNOT_FIND_FILE;
-		treatErrors(filename);
 	}
 #ifdef DEBUG
 	std::cerr << "Configuration:" << std::endl;

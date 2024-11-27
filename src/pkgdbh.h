@@ -57,10 +57,8 @@ protected:
     /**
      * Remove the physical files after followings some rules
      */
-    void                    removePackageFiles(const bool& progress,
-                                const std::string& name);
-    void                    removePackageFiles(const bool& progress,
-                                const std::string& name,
+    void                    removePackageFiles(const std::string& name);
+    void                    removePackageFiles(const std::string& name,
                                 const std::set<std::string>& keep_list);
 
     /**
@@ -76,8 +74,7 @@ protected:
     std::pair<std::string, cards::db>
                             openArchivePackage(const std::string& filename);
     void                    extractAndRunPREfromPackage(const std::string& filename);
-    void                    installArchivePackage(const bool& progress,
-                                const std::string& filename,
+    void                    installArchivePackage(const std::string& filename,
                                 const std::set<std::string>& keep_list,
                                 const std::set<std::string>& non_install_files);
 
@@ -95,6 +92,7 @@ protected:
 
     void                    getFootprintPackage(std::string& filename);
 
+    bool                    m_progress;
     std::string             m_packageName;
     std::string             m_packageArchiveVersion;
     std::string             m_packageArchiveRelease;
@@ -142,7 +140,7 @@ public:
     virtual void            treatErrors(const std::string& s) const;
 
     void                    print_version() const;
-    void                    buildDatabase(const bool& progress, const bool& files);
+    void                    buildDatabase(const bool& files);
     void                    setDependency();
     void                    resetDependency();
 
