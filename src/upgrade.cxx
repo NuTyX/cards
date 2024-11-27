@@ -14,11 +14,12 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 		m_root = m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
 
 	m_root += "/";
+	m_progress = true;
 
 	if ( ! m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
 		m_sync.run();
 	
-	buildDatabase(false, true);
+	buildDatabase(true);
 	std::set<std::string> listOfExistPackages;
 	for (auto i:m_listOfPackages) {
 		if (m_pkgrepo.checkBinaryExist(i.first)) {
@@ -160,9 +161,9 @@ void upgrade::go()
 		for (auto i : m_ListOfPackagesToDelete) {
 			cards::lock Lock(m_root,true);
 			getListOfPackagesNames(m_root);
-			buildDatabase(false, true);
+			buildDatabase(true);
 			removePackageFilesRefsFromDB(i);
-			removePackageFiles(true,i);
+			removePackageFiles(i);
 			syslog(LOG_INFO,"%s removed",i.c_str());
 		}
 		m_sync.purge();

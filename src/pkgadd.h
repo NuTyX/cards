@@ -52,9 +52,9 @@ public:
 	 */
 	pkgadd(const std::string& commandName);
 
-	void		parseArguments(int argc, char** argv);
-	void		preRun();
-	void		postRun();
+	void				parseArguments(int argc, char** argv);
+	void				preRun();
+	void				postRun();
 	virtual void        run();
 	virtual void        printHelp() const;
 };

@@ -8,7 +8,7 @@ pkgrepo::pkgrepo(const std::string& fileName)
     : m_configFileName(fileName)
     , m_config(fileName)
 {
-    m_dbh.buildDatabase(false, false);
+    m_dbh.buildDatabase(false);
     parse();
     OpenSSL_add_all_digests();
     OpenSSL_add_all_algorithms();

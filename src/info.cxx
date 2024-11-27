@@ -141,7 +141,7 @@ info::info(const CardsArgumentParser& argParser,
 		bool   found = false;
 		pkgdbh dbh;
 
-		dbh.buildDatabase(false, false);
+		dbh.buildDatabase(false);
 		for (auto j : m_pkgrepo.getListOfPackages()) {
 			found = false;
 			std::string::size_type pos;

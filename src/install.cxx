@@ -10,6 +10,7 @@ install::install(const CardsArgumentParser& argParser,
 	, m_argParser(argParser)
 	, m_configFileName(configFileName)
 {
+	m_progress = true;
 	parseArguments();
 	for(auto i : m_argParser.otherArguments()) {
 		if (checkFileExist(i)) {
@@ -23,7 +24,7 @@ install::install(const CardsArgumentParser& argParser,
 		}
 	}
 
-	buildDatabase(false, true);
+	buildDatabase(true);
 	for(auto pkg : m_argParser.otherArguments()) {
 		std::set<std::string> SetOfPackages = m_pkgrepo.getListOfPackagesFromSet(pkg);
 		if (SetOfPackages.empty())

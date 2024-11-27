@@ -19,8 +19,10 @@ create::create(CardsArgumentParser& argParser)
         treatErrors(m_root + "tmp/setup");
     }
 
+    m_progress = true;
+
     m_tree = m_pkgfile.getListOfPackages();
-    buildDatabase(false, true);
+    buildDatabase(true);
 
     if (!m_argParser.isSet(CardsArgumentParser::OPT_DRY)) {
         core();
@@ -119,7 +121,7 @@ void create::base()
             removePackageFilesRefsFromDB(m_packageName);
 
         // Remove the files on hd
-        removePackageFiles(false, m_packageName);
+        removePackageFiles(m_packageName);
     }
 }
 bool create::isACollection()
@@ -276,14 +278,14 @@ void create::run()
 		// Remove metadata about the package removed
 		removePackageFilesRefsFromDB(package.first);
 		keep_list = getKeepFileList(package.second.files, m_actionRules);
-		removePackageFiles(false, package.first, keep_list);
+		removePackageFiles(package.first, keep_list);
 	}
 
     if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
 	    cards::lock Lock(m_root, true);
 
 
-    installArchivePackage(false, m_packageArchiveName,
+    installArchivePackage(m_packageArchiveName,
 		keep_list, non_install_files);
 
     if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META)) {

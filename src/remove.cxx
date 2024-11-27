@@ -17,10 +17,12 @@ remove::remove(const std::string& commandName,
 	else
 		m_root=m_root+"/";
 
+	m_progress = true;
+
 	cards::conf config(configFileName);
 
 	// Retrieve info about all the packages
-	buildDatabase(false, true);
+	buildDatabase(true);
 
 	std::set< std::pair<std::string,std::string> > listOfPackagesToRemove;
 	std::pair<std::string,std::string> PackageToRemove;
