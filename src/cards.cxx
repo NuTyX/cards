@@ -70,10 +70,19 @@ int main(int argc, char** argv)
             cout << BLUE << "  depends" << NORMAL << "   <port>           "
                  << _("show dependencies for the port in compilation order.")
                  << endl;
+            cout << BLUE << "  dependent" << NORMAL << " <port>           "
+                 << _("show reverse dependencies list that needs the port")
+                 << endl;
             cout << BLUE << "  deptree" << NORMAL << "   <port>           "
                  << _("show dependencies in a tree.") << endl;
+            cout << BLUE << "  keys" << NORMAL << "                       "
+                 << _("generates the keys pair for the signature of the packages")
+                 << endl;
             cout << BLUE << "  create" << NORMAL << "    <port>           "
                  << _("install all the dependencies from binaries and then compile the port.")
+                 << endl;
+            cout << BLUE << "  repo" << NORMAL <<   "      [collection]     "
+                 << _("check or signing a collection of packages depending if a private key is present.")
                  << endl;
             cout << GREEN << _("\nDIFFERENCES / UPGRADE / CLEANUP") << NORMAL << endl;
             cout << BLUE << "  diff" << NORMAL << "                       "
