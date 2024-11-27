@@ -203,7 +203,7 @@ void pkginfo::run()
             /*
              *  List installed packages
              */
-            buildDatabase(false,false);
+            buildDatabase(false);
             for (auto i : m_listOfPackages) {
                 if (m_fulllist_mode) {
                     if (i.second.dependency() == true)
@@ -231,7 +231,7 @@ void pkginfo::run()
                 for (auto f : package.setofFiles())
                     std::cout << f << std::endl;
             } else {
-                buildDatabase(false,true);
+                buildDatabase(true);
                 if (!checkPackageNameExist(m_arg)) {
                     m_actualError = cards::ERROR_ENUM_NOT_INSTALL_PACKAGE_NEITHER_PACKAGE_FILE;
                     treatErrors(m_arg);
@@ -244,7 +244,7 @@ void pkginfo::run()
             }
 
         } else if (m_runtimelibs_mode) {
-            buildDatabase(false,false);
+            buildDatabase(false);
             int Result;
             std::set<std::string> filenameList;
             Result = findRecursiveFile(filenameList, m_arg.c_str(), WS_DEFAULT);
@@ -262,7 +262,7 @@ void pkginfo::run()
         } else if (m_runtimedependencies_mode) {
             /* 	Get runtimedependencies of the file found in the directory path
                     get the list of installed packages silently */
-            buildDatabase(false, true);
+            buildDatabase(true);
             int Result;
             std::set<std::string> filenameList;
             Result = findRecursiveFile(filenameList, m_arg.c_str(), WS_DEFAULT);
@@ -315,7 +315,7 @@ void pkginfo::run()
              * Get the list of installed packages silently
              *
              */
-            buildDatabase(false, true);
+            buildDatabase(true);
             std::set<std::string> librariesList;
             int Result = -1;
             std::cout << "Librairies"<< std::endl;
@@ -364,7 +364,7 @@ void pkginfo::run()
             /*
              *  get the buildtime of the package: return 0 if not found
              */
-            buildDatabase(false, false);
+            buildDatabase(false);
             if (checkPackageNameExist(m_arg)) {
                 std::cout << m_listOfPackages[m_arg].build() << std::endl;
             } else {
@@ -374,7 +374,7 @@ void pkginfo::run()
             /*
              *  get all details of a package
              */
-            buildDatabase(false, false);
+            buildDatabase(false);
             if (checkPackageNameExist(m_arg)) {
                 std::string arg = m_listOfAlias[m_arg];
                 std::cout << _("Name           : ") << arg << std::endl
@@ -433,7 +433,7 @@ void pkginfo::run()
             /*
              * List owner(s) of file or directory
              */
-            buildDatabase(false, true);
+            buildDatabase(true);
             regex_t preg;
             if (regcomp(&preg, m_arg.c_str(), REG_EXTENDED | REG_NOSUB)) {
                 m_actualError = cards::ERROR_ENUM_CANNOT_COMPILE_REGULAR_EXPRESSION;

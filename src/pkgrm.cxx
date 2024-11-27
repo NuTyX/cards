@@ -63,7 +63,7 @@ void pkgrm::run()
 	getListOfPackagesNames(m_root);
 
 	// Retrieve info about all the packages
-	buildDatabase(false, true);
+	buildDatabase(true);
 
 	readRulesFile();
 
@@ -76,17 +76,20 @@ void pkgrm::run()
 	removePackageFilesRefsFromDB(m_packageName);
 
 	// Remove the files on hd
-	removePackageFiles(false,m_packageName);
+	removePackageFiles(m_packageName);
 
 }
 void pkgrm::printHelp() const
 {
 	std::cout << HELP_USAGE << m_utilName << " [options] <package>" << std::endl
-	     << HELP_OPTIONS << std::endl
-	     << "  -r, --root <path>   "
-	     << _("specify alternative installation root") << std::endl
-	     << "  -v, --version       "
-	     << _("print version and exit") << std::endl
-	     << "  -h, --help          "
-	     << _("print help and exit") << std::endl;
+	    << HELP_OPTIONS << std::endl
+		<< "  -p, --progress      "
+		<< _("shows progress info")
+		<< std::endl
+	    << "  -r, --root <path>   "
+	    << _("specify alternative installation root") << std::endl
+	    << "  -v, --version       "
+	    << _("print version and exit") << std::endl
+	    << "  -h, --help          "
+	    << _("print help and exit") << std::endl;
 }

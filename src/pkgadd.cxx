@@ -33,6 +33,8 @@ void pkgadd::parseArguments(int argc, char** argv)
 			m_upgrade = true;
 		} else if (option == "-f" || option == "--force") {
 			m_force = true;
+		} else if (option == "-p" || option == "--progress") {
+			m_progress = true;
 		} else if (option[0] == '-' || !m_packageArchiveName.empty()) {
 			m_actualError = cards::ERROR_ENUM_INVALID_OPTION;
 			treatErrors(option);
@@ -73,7 +75,7 @@ void pkgadd::run()
 	getListOfPackagesNames(m_root);
 
 	// Retrieving info about all the packages
-	buildDatabase(false, true);
+	buildDatabase(true);
 
 	// Reading the archiving to find a list of files
 	std::pair<std::string, cards::db> package = openArchivePackage(m_packageArchiveName);
@@ -128,12 +130,12 @@ void pkgadd::run()
 		// Remove metadata about the package removed
 		removePackageFilesRefsFromDB(package.first);
 		keep_list = getKeepFileList(package.second.files, m_actionRules);
-		removePackageFiles(false,package.first, keep_list);
+		removePackageFiles(package.first, keep_list);
 	}
 	{
 		cards::lock Lock(m_root, true);
 		// Installation progressInfo of the files on the HD
-		installArchivePackage(false, m_packageArchiveName,
+		installArchivePackage(m_packageArchiveName,
 			keep_list, non_install_files);
 
 		// Add the metadata about the package to the DB
@@ -175,6 +177,9 @@ void pkgadd::printHelp() const
 	<< std::endl
 	<< "  -f, --force         "
 	<< _("force install, overwrite conflicting files")
+	<< std::endl
+	<< "  -p, --progress      "
+	<< _("shows progress info")
 	<< std::endl
 	<< "  -r, --root <path>   "
 	<< _("specify alternative installation root")
