@@ -17,7 +17,7 @@ namespace cards
     std::set<std::string> cards_client::ListOfInstalledPackages()
     {
         getListOfPackagesNames (m_root);
-        buildDatabase(true, true);
+        buildDatabase(true);
         std::set<std::string> ListOfInstalledPackages;
         for (auto i : m_listOfPackages)
         {
@@ -40,7 +40,7 @@ namespace cards
         getListOfPackagesNames(m_root);
 
         // Retrieve info about all the packages
-        buildDatabase(false, true);
+        buildDatabase(true);
 
         m_log->log(_("Resolve package dependencies..."));
         for (auto pack:pPackageList)
@@ -87,7 +87,7 @@ namespace cards
         // Get the list of installed packages
         getListOfPackagesNames(m_root);
         // Retrieve info about all the packages
-        buildDatabase(false, true);
+        buildDatabase(true);
 
         cards_client Cards;
         std::set<std::string> basePackagesList;

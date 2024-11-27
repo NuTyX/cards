@@ -49,7 +49,7 @@ std::set<std::string> Flcards_info::getListOfInstalledPackages()
 	m_progressBar->value(0);
 
 	getListOfPackagesNames (m_root);
-	buildDatabase(false,false);
+	buildDatabase(false);
 
 	delete m_progressBar;
 	delete m_window;
