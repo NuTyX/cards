@@ -9,7 +9,7 @@
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Progress.H>
 
-class Flcards_info : public pkgdbh, public pkgrepo {
+class Flcards_info : public pkgdbh {
 public:
 	Flcards_info (const std::string& configFile);
 	~Flcards_info() {}

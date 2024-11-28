@@ -41,7 +41,7 @@ namespace cards
          *
          * \return pointer of the singleton
          */
-    static cards_wrapper*  instance();
+        static cards_wrapper*  instance();
 
         /**
          * \brief Kill the singleton

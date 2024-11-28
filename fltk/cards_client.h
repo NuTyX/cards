@@ -29,10 +29,14 @@ namespace cards
      * This is a single instance (singleton) that ensure only one instance of cards library.
      *
      */
-    class cards_client : public pkgrepo
+    class cards_client : public pkgadd
     {
         // Only cards_wrapper can own this class
         friend cards_wrapper;
+
+        pkgrepo         m_pkgrepo;
+        cards_logger*   m_log;
+        std::vector<cards_clientEvents*> m_arrCallback;
 
     protected:
         /**
@@ -87,12 +91,7 @@ namespace cards
          */
         void unsubscribeFromEvents(cards_clientEvents* pCallBack);
 
-    protected:
         void progressInfo();
 
-    private:
-        cards_logger* m_log;
-        void getLocalePackagesList();
-        std::vector<cards_clientEvents*> m_arrCallback;
     };
 }

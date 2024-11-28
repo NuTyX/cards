@@ -77,7 +77,7 @@ void ProgressBox::OnProgressInfo(int percent)
     Fl::unlock();
 }
 
-void ProgressBox::OnFileDownloadProgressInfo(FileDownloadState state)
+void ProgressBox::OnFileDownloadProgressInfo(cards::dwlState state)
 {
     Fl::lock();
     if (m_fileProgress!=nullptr)

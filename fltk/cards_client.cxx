@@ -8,9 +8,11 @@ namespace cards
 {
     /// Constructor
     cards_client::cards_client()
-        : pkgrepo("/etc/cards.conf")
+        : pkgadd("")
+        , m_pkgrepo("/etc/cards.conf")
     {
         m_log = cards_logger::instance();
+        m_root = "/";
     }
 
     /// Get a string list of installed packages
@@ -46,12 +48,13 @@ namespace cards
         for (auto pack:pPackageList)
         {
             m_packageName = pack;
-            generateDependencies();
+            m_pkgrepo.generateDependencies();
         }
-        getLocalePackagesList();
-        for ( auto i : m_dependenciesList )
+        for ( auto i : m_pkgrepo.getDependenciesList() )
         {
-            m_packageArchiveName = getPackageFileName(i.first);
+            m_packageArchiveName = m_pkgrepo.dirName(i.first)
+                + "/"
+                + m_pkgrepo.fileName(i.first);
             archive packageArchive(m_packageArchiveName.c_str());
             std::string name = packageArchive.name();
             if ( checkPackageNameExist(name ))
@@ -91,12 +94,6 @@ namespace cards
 
         cards_client Cards;
         std::set<std::string> basePackagesList;
-        cards::conf config(Cards.m_configFileName);
-
-        for (auto it : config.baseDir())
-        {
-            findDir(basePackagesList,it);
-        }
 
         for (auto pack:pPackageList)
         {
@@ -106,41 +103,12 @@ namespace cards
                 m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_INSTALL;
                 treatErrors(pack);
             }
-            if (basePackagesList.find(pack) != basePackagesList.end())
-		continue;
+
             // Remove metadata about the package removed
             removePackageFilesRefsFromDB(pack);
 
             // Remove the files on hd
-            removePackageFiles(true, pack);
-        }
-    }
-
-    /// Fill m_dependenciesList with LocalPackageList
-    void cards_client::getLocalePackagesList()
-    {
-        if (m_config.groups().empty()) return;
-        std::set<std::string> tmpList;
-        for ( auto i :  m_config.groups() )
-        {
-            for ( auto j :m_dependenciesList )
-            {
-                std::string packageName  = j.first + "." + i;
-                if (checkBinaryExist(packageName))
-                {
-                    setPackageFileName(packageName);
-                    if ( ! checkFileExist(getPackageFileName(packageName)) ) downloadPackageFileName(packageName);
-                    tmpList.insert(packageName);
-                }
-            }
-        }
-        if (tmpList.size() > 0 ) {
-			for (auto i : tmpList) {
-               std::pair<std::string,time_t> PackageTime;
-               PackageTime.first=i;
-               PackageTime.second=0;
-               m_dependenciesList.push_back(PackageTime);
-            }
+            removePackageFiles(pack);
         }
     }
 

@@ -206,8 +206,8 @@ namespace cards
         {
             try
             {
-                pkgsync Sync;
-                Sync.run();
+                cards::sync sync;
+                sync.run();
             }
             catch (std::exception& e)
             {
@@ -281,18 +281,18 @@ namespace cards
     {
         m_job_running =true;
         cards_client Cards;
+        cards::pkgrepo pkgrepo("/etc/cards.conf");
         // First pass get all package available
         m_ClearPackagesList();
-        std::set<cards::cache*> AvailablePackages = Cards.getBinaryPackageSet();
         std::set<std::string> InstalledPackages = Cards.ListOfInstalledPackages();
-        for (auto i : AvailablePackages)
+        for (auto i : pkgrepo.getListOfPackages())
         {
            cards::cache* Pack = new cards::cache();
-           Pack->collection(i->collection());
-           Pack->name(i->name());
-           Pack->description(i->description());
-           Pack->version(i->version());
-           Pack->packager(i->packager());
+           Pack->collection(i.second.collection());
+           Pack->name(i.first);
+           Pack->description(i.second.description());
+           Pack->version(i.second.version());
+           Pack->packager(i.second.packager());
            if (InstalledPackages.find(Pack->name()) != InstalledPackages.end())
            Pack->setStatus(STATUS_ENUM_INSTALLED);
            m_arrPackages.push_back(Pack);
@@ -354,7 +354,7 @@ namespace cards
 
     std::string cards_wrapper::getCardsVersion()
     {
-        return std::string(VERSION);
+        return std::string(PACKAGE_VERSION);
     }
 
     /** Check if the application is curently running as root

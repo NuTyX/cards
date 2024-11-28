@@ -11,19 +11,20 @@
 #include <FL/Fl_Progress.H>
 
 
-class ProgressBox : public Fl_Double_Window, public cards::cards_event_handler, public FileDownloadEvent
+class ProgressBox : public Fl_Double_Window, public cards::cards_event_handler, public cards::dwlEvent
 {
-public:
-    ProgressBox (cards::CW_ACTIONS action);
-    ~ProgressBox ();
+    Fl_Progress* m_jobProgress;
+    Fl_Progress* m_fileProgress;
+    cards::cards_wrapper* m_cards;
+
 protected:
     void OnDoJobListFinished (const cards::CEH_RC rc);
     void OnSyncFinished(const cards::CEH_RC rc);
     void OnProgressInfo(int percent);
-    void OnFileDownloadProgressInfo(FileDownloadState state);
-static void Callback(Fl_Widget*,void* pInstance);
-private:
-    Fl_Progress* m_jobProgress;
-    Fl_Progress* m_fileProgress;
-    cards::cards_wrapper* m_cards;
+    void OnFileDownloadProgressInfo(cards::dwlState state);
+    static void Callback(Fl_Widget*,void* pInstance);
+
+public:
+    ProgressBox (cards::CW_ACTIONS action);
+    ~ProgressBox ();
 };

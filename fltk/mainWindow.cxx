@@ -8,7 +8,7 @@ using namespace cards;
 
 /// Constructor of the main window
 mainWindow::mainWindow() :
-    Fl_Double_Window(900,900,VERSION)
+    Fl_Double_Window(900,900,PACKAGE_VERSION)
 {
 /*
  *cards_logger is broken
