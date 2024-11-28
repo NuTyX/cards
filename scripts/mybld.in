@@ -631,7 +631,7 @@ DEVEL="cd /$GIT \
 $PAUSE "
 
 if [ -z $MANUAL ]; then
-  DEVEL+="&& cards create --no-meta"
+  DEVEL+="&& cards create"
   if [ ! -z ${PACKAGES_LIST} ]; then
     if [ "$DIFF" == "yes" ];then
       DEVEL="$DEVEL $COLLECTION --dry"
