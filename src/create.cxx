@@ -145,9 +145,7 @@ void create::parseArguments()
 }
 void create::checkBinaries()
 {
-    cards::pkgrepo pkgrepo("/etc/cards.conf");
-
-    for (auto i : pkgrepo.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
+    for (auto i : m_pkgrepo.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
         if (m_pkgfile.checkPackageNameExist(i)) {
             continue;
         } else {
@@ -157,13 +155,15 @@ void create::checkBinaries()
                 << std::endl;
             if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
                 std::cout << "Remove : "
-                    << pkgrepo.dirName(i)
+                    << m_pkgrepo.dirName(i)
                     << "/"
-                    << pkgrepo.fileName(i)
+                    << m_pkgrepo.fileName(i)
                     << std::endl;
             else
-                removeFile(pkgrepo.dirName(i),
-                    pkgrepo.dirName(i) + "/" + pkgrepo.fileName(i));
+                removeFile(m_pkgrepo.dirName(i),
+                    m_pkgrepo.dirName(i)
+                    + "/"
+                    + m_pkgrepo.fileName(i));
         }
     }
     // TODO
@@ -195,7 +195,6 @@ void create::list(std::string& packageName)
 void create::installDependencies(std::string& packageName)
 {
     std::string message, commandName;
-    cards::pkgrepo pkgrepo("/etc/cards.conf");
 
     m_dependencies.clear();
     auto level = m_tree[packageName].level();
@@ -213,7 +212,7 @@ void create::installDependencies(std::string& packageName)
         for (auto i : m_dependencies) {
             if ( i == packageName)
                 break;
-            for (auto packageFile : pkgrepo.getListOfPackagesFromGroup(i)) {
+            for (auto packageFile : m_pkgrepo.getListOfPackagesFromGroup(i)) {
                 archive packageArchive(packageFile);
 
                 if (packageArchive.group().empty()) {
@@ -299,6 +298,7 @@ void create::run()
         removeFile (m_root, "/.META");
         removeFile (m_root, "/.PRE");
         removeFile (m_root, "/.POST");
+        removeFile (m_root, "/.README");
 	    m_listOfPackages[package.first] = package.second;
     }
 	postRun();
@@ -307,11 +307,9 @@ void create::run()
 void create::buildCollection()
 {
     checkBinaries();
-    cards::pkgrepo pkgrepo("/etc/cards.conf");
-    cards::pkgfile pkgfile("/etc/cards.conf");
     std::string ArchiveFile;
-    for (auto i : pkgfile.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
-        if (!pkgrepo.checkBinaryExist(i)) {
+    for (auto i : m_pkgfile.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
+        if (!m_pkgrepo.checkBinaryExist(i)) {
             std::cout << i
                 << " ===> SHOULD BE BUILD !"
                 << std::endl;
@@ -321,9 +319,9 @@ void create::buildCollection()
             buildBinary(i);
             continue;
         }
-        ArchiveFile = pkgrepo.dirName(i)
+        ArchiveFile = m_pkgrepo.dirName(i)
             + "/"
-            + pkgrepo.fileName(i);
+            + m_pkgrepo.fileName(i);
         if (!checkFileExist(ArchiveFile)) {
             std::cout << i
                 << " ===> SHOULD BE BUILD !"
@@ -334,12 +332,12 @@ void create::buildCollection()
             buildBinary(i);
             continue;
         }
-        if (pkgrepo.version(i) != pkgfile.getPortVersion(i)) {
+        if (m_pkgrepo.version(i) != m_pkgfile.getPortVersion(i)) {
             std::cout << i
                 <<": Binary: "
-                << pkgrepo.version(i)
+                << m_pkgrepo.version(i)
                 << ", Port: "
-                << pkgfile.getPortVersion(i)
+                << m_pkgfile.getPortVersion(i)
                 << " ===> SHOULD BE BUILD !"
                 << std::endl;
 
@@ -348,16 +346,16 @@ void create::buildCollection()
             buildBinary(i);
             continue;
         }
-        if (pkgrepo.release(i) != pkgfile.getPortRelease(i)) {
+        if (m_pkgrepo.release(i) != m_pkgfile.getPortRelease(i)) {
             std::cout << i
                 << ": Binary: "
-                << pkgrepo.version(i)
+                << m_pkgrepo.version(i)
                 << "-"
-                << pkgrepo.release(i)
+                << m_pkgrepo.release(i)
                 << ", Port: "
-                << pkgfile.getPortVersion(i)
+                << m_pkgfile.getPortVersion(i)
                 << "-"
-                << pkgfile.getPortRelease(i)
+                << m_pkgfile.getPortRelease(i)
                 << " ===> SHOULD BE BUILD !"
                 << std::endl;
 
@@ -374,18 +372,18 @@ void create::buildCollection()
         // for a matching one.
         bool found = true;
         std::string missingSharedLib;
-        for (auto lib : pkgrepo.getLibs(i)) {
+        for (auto lib : m_pkgrepo.getLibs(i)) {
             found = false;
             int level = 0;
-            while (level < pkgfile.getLevel(i)) {
-                for (auto pkg : pkgfile.getListOfPackages()) {
-                    if (!pkgrepo.checkBinaryExist(pkg.first))
+            while (level < m_pkgfile.getLevel(i)) {
+                for (auto pkg : m_pkgfile.getListOfPackages()) {
+                    if (!m_pkgrepo.checkBinaryExist(pkg.first))
                         continue;
 
                     if (pkg.second.level() != level)
                         continue;
 
-                    for (auto deplib : pkgrepo.getLibs(pkg.first) ) {
+                    for (auto deplib : m_pkgrepo.getLibs(pkg.first) ) {
                         if (deplib == lib) {
                             found = true;
                             break;
@@ -401,6 +399,17 @@ void create::buildCollection()
             if (!found) {
                 if (checkFileNameExist(lib)) {
                     found = true;
+                }
+            }
+            if (!found) {
+                std::string iLib = i + ".lib";
+                if (m_pkgrepo.checkBinaryExist(iLib)) {
+                    for (auto deplib : m_pkgrepo.getLibs(iLib)) {
+                        if (deplib == lib) {
+                            found = true;
+                            break;
+                        }
+                    }
                 }
             }
             if (!found) {
