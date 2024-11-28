@@ -213,12 +213,6 @@ pkgadd::getKeepFileList(const std::set< std::string>& files, const std::vector<r
 		}
 	}
 
-#ifdef DEBUG
-	std::cerr << "Keep list:" << std::endl;
-	for (auto j : keep_list)
-		std::cerr << "   " << j << std::endl;
-	std::cerr << std::endl;
-#endif
 	return keep_list;
 }
 

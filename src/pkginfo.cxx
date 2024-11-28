@@ -266,19 +266,13 @@ void pkginfo::run()
             int Result;
             std::set<std::string> filenameList;
             Result = findRecursiveFile(filenameList, m_arg.c_str(), WS_DEFAULT);
-            /*
-             * get the list of libraries for all the possible files
-             */
+
+            // get the list of libraries for all the possible files
             std::set<std::string> librariesList;
             for (auto i : filenameList)
                 Result = getRuntimeLibrariesList(librariesList, i);
-                /*
-                 * Get the own package for all the elf files dependencies libraries
-                 */
-#ifdef DEBUG
-            for (auto i : librariesList)
-                std::cerr << i << std::endl;
-#endif
+
+            // Get the own package for all the elf files dependencies libraries
             if ((librariesList.size() > 0) && (Result > -1)) {
                 std::set<std::string> runtimeList;
                 for (auto i : librariesList) {
@@ -299,9 +293,6 @@ void pkginfo::run()
                     }
                 }
                 if (runtimeList.size() > 0) {
-#ifdef DEBUG
-                    std::cerr << "Number of libraries found: " << runtimeList.size() << std::endl;
-#endif
                     unsigned int s = 1;
                     for (auto i : runtimeList) {
                         std::cout << i << std::endl;
@@ -311,10 +302,7 @@ void pkginfo::run()
                 }
             }
         } else if (m_libraries_mode + m_runtime_mode > 0) {
-            /*
-             * Get the list of installed packages silently
-             *
-             */
+            // Get the list of installed packages silently
             buildDatabase(true);
             std::set<std::string> librariesList;
             int Result = -1;
@@ -361,9 +349,7 @@ void pkginfo::run()
                 }
             }
         } else if (m_epoc) {
-            /*
-             *  get the buildtime of the package: return 0 if not found
-             */
+            //  get the buildtime of the package: return 0 if not found
             buildDatabase(false);
             if (checkPackageNameExist(m_arg)) {
                 std::cout << m_listOfPackages[m_arg].build() << std::endl;
@@ -371,9 +357,7 @@ void pkginfo::run()
                 std::cout << "0" << std::endl;
             }
         } else if (m_details_mode) {
-            /*
-             *  get all details of a package
-             */
+            // get all details of a package
             buildDatabase(false);
             if (checkPackageNameExist(m_arg)) {
                 std::string arg = m_listOfAlias[m_arg];
@@ -430,9 +414,7 @@ void pkginfo::run()
                 }
             }
         } else if (m_owner_mode) {
-            /*
-             * List owner(s) of file or directory
-             */
+            // List owner(s) of file or directory
             buildDatabase(true);
             regex_t preg;
             if (regcomp(&preg, m_arg.c_str(), REG_EXTENDED | REG_NOSUB)) {

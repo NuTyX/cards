@@ -77,7 +77,6 @@ void pkgrm::run()
 
 	// Remove the files on hd
 	removePackageFiles(m_packageName);
-
 }
 void pkgrm::printHelp() const
 {
