@@ -378,25 +378,17 @@ unsigned int pkgdbh::getRelease(const std::string& name) const
 }
 
 // Append to the "DB" the number of packages founds
-// (directory containing a file named files
+// directory containing a file named files
 int pkgdbh::getListOfPackagesNames (const std::string& path)
 {
 	if (! m_listOfPackagesNames.empty())
 		return m_listOfPackagesNames.size();
 
 	const std::string pathdb =  m_root + PKG_DB_DIR;
-#ifdef DEBUG
-	std::cerr << "pathdb: " << pathdb << std::endl;
-#endif
 	if ( findDir(m_listOfPackagesNames, pathdb) != 0 ) {
 		m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 		treatErrors(pathdb);
 	}
-#ifdef DEBUG
-	std::cerr << "Number of Packages: "
-		<< m_listOfPackagesNames.size()
-		<< std::endl;
-#endif
 	return m_listOfPackagesNames.size();
 }
 std::set<std::string>
@@ -878,21 +870,18 @@ pkgdbh::checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName)
 bool pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild)
 {
 	if (dependencieNameBuild.second == 0) {
-//		std::cout << dependencieNameBuild.first << " have it's buildtime to " << dependencieNameBuild.second <<  std::endl;
 		return false;
 	}
 	std::set<std::string>::iterator it = m_listOfPackagesNames.find(dependencieNameBuild.first);
 	if (it == m_listOfPackagesNames.end()) {
-//		std::cout << dependencieNameBuild.first << " is not install" << std::endl;
 		return false;
 	}
 	if (m_listOfPackages[dependencieNameBuild.first].build() < dependencieNameBuild.second) {
-//		std::cout << dependencieNameBuild.first << " is newer" << std::endl;
 		return false;
 	}
 	return true;
 }
-/* Remove meta data about the removed package */
+// Remove meta data about the removed package
 void pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 {
 	if ( checkPackageNameExist(name)){
@@ -916,21 +905,15 @@ void pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 				const char* msg = strerror(errno);
 					std::cerr << m_utilName << ": could not remove " << filename << ": " << msg << std::endl;
 				}
-#ifdef DEBUG
-				std::cerr  << "File: " << filename << " is removed"<< std::endl;
-#endif
 			}
 	}
 	if( remove(packagenamedir.c_str()) == -1) {
 		const char* msg = strerror(errno);
 		std::cerr << m_utilName << ": could not remove " << packagenamedir << ": " << msg << std::endl;
 	}
-#ifdef DEBUG
-	std::cerr  << "Directory: " << packagenamedir << " is removed"<< std::endl;
-#endif
 }
 
-/* Remove the physical files after followings some rules */
+// Remove the physical files after followings some rules
 void pkgdbh::removePackageFiles(const std::string& name)
 {
 	m_filesList = m_listOfPackages[name].files;
@@ -1422,10 +1405,6 @@ void pkgdbh::runLastPostInstall()
 {
 	if ( m_postInstallList.size() > 0 ) {
 		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_START);
-#ifdef DEBUG
-		for (auto i : m_postInstallList)
-			std::cerr << i.second << " " << i.first << std::endl;
-#endif
 		process p;
 		std::string args;
 		for (auto i : m_postInstallList)
