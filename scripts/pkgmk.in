@@ -55,6 +55,7 @@ get_dependencies() {
 remove_dependencies() {
 	if [ ! -z $DEPENDENCIES ];then
 		for i in ${DEPENDENCIES[@]}; do
+			info "pkgrm $i"
 			pkgrm $(echo $i|cut -d ":" -f1)
 		done
 	fi
@@ -878,6 +879,7 @@ build_package() {
 
 		if [ ! -z $DEPENDENCIES ];then
 			for i in ${DEPENDENCIES[@]}; do
+				info "pkgadd $i"
 				pkgadd $(echo $i|cut -d ":" -f2)
 			done
 		fi
