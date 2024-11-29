@@ -7,13 +7,13 @@
 
 using namespace cards;
 
-sort_column::sort_column (int col, int reverse)
+sort_table_column::sort_table_column (int col, int reverse)
 {
     m_col = col;
     m_reverse= reverse;
 }
 
-bool sort_column::operator() (const Row &a, const Row &b)
+bool sort_table_column::operator() (const Row &a, const Row &b)
 {
     const char *ap = ( m_col < (int)a.cols.size() ) ? a.cols[m_col].c_str() : "",
     *bp = ( m_col < (int)b.cols.size() ) ? b.cols[m_col].c_str() : "";
@@ -56,15 +56,15 @@ table_base::table_base(int x, int y, int w, int h, const char *l)
 }
 
 /// Sort a column up or down
-void table_base::sortColumn(int col, int reverse)
+void table_base::sort_column(int col, int reverse)
 {
 	 // FIXME find out why std prefix is not needed here
-    std::sort(m_rowdata.begin(), m_rowdata.end(), sort_column(col, reverse));
+    std::sort(m_rowdata.begin(), m_rowdata.end(), sort_table_column(col, reverse));
     redraw();
 }
 
 /// Draw sort arrow
-void table_base::drawSortArrow(int X, int Y, int W, int H)
+void table_base::draw_sort_arrow(int X, int Y, int W, int H)
 {
     int xlft = X+(W-6)-8;
     int xctr = X+(W-6)-4;
@@ -92,7 +92,7 @@ void table_base::drawSortArrow(int X, int Y, int W, int H)
 }
 
 /// Handle drawing all cells in table
-void table_base::drawCell(TableContext context, int R, int C, int X, int Y, int W, int H)
+void table_base::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
     switch ( context )
     {
@@ -107,7 +107,7 @@ void table_base::drawCell(TableContext context, int R, int C, int X, int Y, int 
                     fl_draw(colTitle[C].c_str(), X+2,Y,W,H, FL_ALIGN_CENTER, 0, 0); // +2=pad left
                     if ( C == m_sort_lastcol )
                     {
-                        drawSortArrow(X,Y,W,H);
+                        draw_sort_arrow(X,Y,W,H);
                     }
                 }
             }

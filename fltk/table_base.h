@@ -30,13 +30,13 @@ public:
 };
 
 // Class for handling the sorting column using std::sort
-class sort_column
+class sort_table_column
 {
 private:
     int m_col, m_reverse;
 
 public:
-    sort_column (int col, int reverse);
+    sort_table_column (int col, int reverse);
     bool operator() (const Row &a, const Row &b);
 };
 
@@ -83,10 +83,10 @@ protected:
     std::vector<std::string> colTitle;
 
     // table cell drawing
-    void drawCell(TableContext context, int R=0, int C=0, int X=0, int Y=0, int W=0, int H=0);
+    void draw_cell(TableContext context, int R=0, int C=0, int X=0, int Y=0, int W=0, int H=0);
     // sort the table by a column
-    void sortColumn(int col, int reverse=0);
-    void drawSortArrow(int X, int Y, int W, int H);
+    void sort_column(int col, int reverse=0);
+    void draw_sort_arrow(int X, int Y, int W, int H);
 
     void OnDoJobListFinished (const cards::CEH_RC rc);
     void OnRefreshPackageFinished (const cards::CEH_RC rc);
