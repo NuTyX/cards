@@ -22,23 +22,25 @@ delete the chroot. All the commands should be issue from the root of your git pr
 .B "\-I, \-\-init"
 Create the 3 mounting points \fBsources\fP, \fBLOGS\fP and \fBDEPOT\fP folders and the root folder defined by the version.
 By default, the folder is named \fB/rolling\fP in your $HOME.
+
 .TP
 .B "\-s, \-\-sync <collection>|<package>"
 Synchronise the packages \fBDEPOT\fP folders with the one from the default remote server.
 If a <collection> is specified, it will sync this <collection> only.
 If a <package> is specified, it will sync this <package> only.
+
 .TP
 .B "\-c, \-\-cleanup"
 Cleanup the folders created by the tool. It umount properly the 3 mountpoint and then delete all the files in a safety way.
-.TP
-.B "\-R, \-\-runtime <dependency package name>"
-Return the list of packages depending on the <dependency package name>.
+
 .TP
 .B "\-p, \-\-pause
 Make a pause before starting compilation. Usefull for tracking down issues.
+
 .TP
 .B "\-A, \-\-ask"
 Ask for a confirmation before proceed.
+
 .TP
 .B "\-n, \-\-new <collection/<package> [version] [description]"
 Create a new <collection>/<package> and fillup the username, email, [version] [description]
@@ -119,7 +121,7 @@ And we need to get all the binaries locally and used them, we need to rsync them
 .TP
 We assume you already clone the git project associate to the binaries
 .TP
-You need about 5 Gbytes of free space to store the availables binaries from the NuTyX mirror. ($ROOTMOUNT/<arch>/<version>), Also be aware that $ROOTMOUNT/sources will continuously grow.
+You need about 15 Gbytes of free space to store the availables binaries from the NuTyX mirror. ($ROOTMOUNT/<arch>/<version>), Also be aware that $ROOTMOUNT/sources will continuously grow.
 .TP
 The installed NuTyX should ALWAYS be under $ROOT/rolling or $ROOT/<version>. Where <version> is a valid version.
 .TP
@@ -135,7 +137,7 @@ BASE=(base cli gui)
 .SH "AUTHORS"
 Thierry Nuttens <tnut@nutyx.org>
 .SH "SEE ALSO"
-cards.conf(5), pkgmk(8), pkgadd(8), pkginfo(8), ports(8), pkgmk.conf(5)
+cards.conf(5), pkgmk(8), pkgadd(8), pkginfo(8), pkgmk.conf(5)
 .SH COPYRIGHT
 mybld (cards) is Copyright (c)  2020 - 2024 NuTyX and Copyright (c)  2020 - 2024 NuTyX team (http://www.nutyx.org).
 mybld (cards) is licensed through the GNU General Public License.

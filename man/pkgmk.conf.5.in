@@ -93,9 +93,9 @@ Option to activate the compression of the package produced.
 Default: 'no'
 .TP
 \fBPKGMK_COMPRESSION_MODE='STRING'\fP
-Option to select the mode used to compress the packages. Valid strings are gz, bz2 and xz.
+Option to select the mode used to compress the packages. Valid strings are gz, bz2, xz and zst.
 .br
-Default: 'xz'
+Default: 'zst'
 .TP
 \fBPKGMK_KEEP_SOURCES='STRING'\fP
 If set to 'yes', pkgmk will keep the sources codes of the build. If 'no', they will be delete after a successfull build.

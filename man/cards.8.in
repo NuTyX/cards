@@ -53,25 +53,18 @@ able to return to a base system in case of compiling for a bot build to make sur
 
 .SH "SCENARIOS"
 
-
-.B ports
-
-In this scenario, cards basically installing and upgrading packages, using
-the script pkgmk. It deals with the ports. Additionally, you don't have to be in the port's
-directory to call cards. As long you are at the root of the collections, cards will search
-for the respective port itself in a list of collections specified in cards.conf. This
-allows you to just install or update a package, without caring where
-it actually is located on your file system.
-
 .B binaries
 
 In another more classical scenario, cards will install, upgrade binaries packages available
 from the define mirror specified in cards.conf. In this scenario, cards deals with packages
 and subpackages. For example the glibc package is separate in glibc, glibc.devel, glibc.man, glibc.fr, and so on.
-For this reason, it is
-.B NOT
-recommended to mixte both scenarios unless you knows exactly what you are doing and are able to
-interpret the errors messages when compiling your ports with binaries dependencies.
+
+
+.B build
+
+In this scenario, cards is basically building and installing upgrading packages, using
+the script mybld. It deals with the ports. As long you are at the root of the collections,
+cards will search for the respective port itself in a list of collections specified in cards.conf.
 
 .PP
 
@@ -99,7 +92,7 @@ non-option argument passed. This is very similar to
 
 
 .TP
-.B install [\-\-margs] <package1> [<package2> ...] | <collection name>
+.B install <package1> [<package2> ...] | <collection name> | <set name>
 Binaries scenario: install all packages. It will download the binary package,
 check for any dependencies, download the dependencies. Onces all the dependencies
 are download. cards will install all the packages in the right order. If it's a
@@ -130,9 +123,6 @@ commands.
 .B diff [-p]
 Binaries scenario: show differences between installed packages and binaries available on the mirror.
 
-Ports scenario: If option [-p|--ports] is given, it will shows differences between installed packages
-and ports in the ports tree.
-
 .TP
 .B search <expr>
 Search in the binaries for
@@ -153,7 +143,7 @@ as file name in the database.
 .B info [-p] [-b] <package>
 if passed with -b option, print available info about the binary
 .B package
-if passed with -p option, print available info about the port
+if passed with -S option, print available Sets of
 .B package
 if no option is passed, print available info about the installed
 .B package
@@ -161,7 +151,7 @@ if no option is passed, print available info about the installed
 .TP
 .B depends <package>
 Ports scenario: print a recursive list of dependencies to install the package passed
-as argument. if option -i is passed, it shows all the dependencies, included the installed ones.
+as argument.
 
 .TP
 .B deptree <package>
@@ -183,14 +173,10 @@ Binaries scenario: synchronize local and remote metadatas from the mirror define
 .B /etc/cards.conf.
 
 .TP
-.B level [-I]
-Ports scenario: print all the ports available in the order of compilation (per level).
-Use -I if you have WARNING about <dependencies> from <port> NOT FOUND ... or fix the prob if you can.
-
-.TP
-.B create -r <package>
-Bot scenario: only used in the bot server. It goes back to a base system, install all the dependencies
-from the founded binaries and then compile and installed the final package.
+.B create  <package>
+Ports scenario: only used in the bot server. It must be launch from a chrooted NuTyX,
+via the mybld command. It will install all the dependencies from the founded binaries
+and then build the final package.
 
 .TP
 .B purge
@@ -228,7 +214,7 @@ command
 .TP
 .B -n
 dry mode in
-.B cards create, cards base
+.B cards create
 commands. It does not make the action but only shows what will happens
 
 .TP
@@ -295,11 +281,12 @@ Search in the metadata packages containing 'browser' in they name or description
 
 .B Ports scenario:
 .TP
-.B cards create mplayer
-downloads the sources, install all the dependencies of mplayer and compile mplayer.
+.B mybld mplayer
+This command will install a bare NuTyX, install all the dependencies of mplayer
+and build the package 'mplayer'.
 
 
 .SH "AUTHORS"
 Thierry Nuttens <tnut@nutyx.org>
 .SH "SEE ALSO"
-cards.conf(5), pkgmk(8), pkgadd(8), pkginfo(8), ports(8), pkgmk.conf(5), mybld(8)
+cards.conf(5), pkgmk(8), pkgadd(8), pkginfo(8), pkgmk.conf(5), mybld(8)

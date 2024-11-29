@@ -88,9 +88,9 @@ Option pour activer la compresssion du paquet produit.
 Défaut: 'no'
 .TP
 \fBPKGMK_COMPRESSION_MODE='STRING'\fP
-Option pour sélectionner le mode de compression des paquets binaires. Valeurs de chaîne possibles sont: gz, bz2 et xz.
+Option pour sélectionner le mode de compression des paquets binaires. Valeurs de chaîne possibles sont: gz, bz2, xz et zst.
 .br
-Défaut: 'xz'
+Défaut: 'zst'
 .TP
 \fBPKGMK_KEEP_SOURCES='STRING'\fP
 Si défini comme 'yes', pkgmk garde les sources du paquet dans tous les cas, si 'no' ceux-ci sont supprimés après une construction réussie.
