@@ -6,9 +6,10 @@ namespace cards {
 
 upgrade::upgrade(const CardsArgumentParser& argParser,
 	const char *configFileName)
-	: m_pkgrepo(configFileName)
-	, m_argParser(argParser)
+	: m_argParser(argParser)
 	, m_sync(configFileName)
+	, m_pkgrepo(configFileName)
+	, m_config(configFileName)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root = m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
@@ -29,6 +30,30 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 	if ( listOfExistPackages.empty() ) {
 		m_actualError = cards::ERROR_ENUM_CANNOT_FIND_DEPOT;
 		treatErrors("");
+	}
+
+	if (!m_config.groups().empty()) {
+		std::set<std::string> tmpList;
+		for (auto i : m_listOfPackages) {
+			if (!i.second.group().empty())
+				continue;
+
+			for ( auto j : m_config.groups() ) {
+				std::string packageName  = i.first + "." + j;
+				if (m_pkgrepo.checkBinaryExist(packageName))
+					tmpList.insert(packageName);
+			}
+		}
+		if (tmpList.size() > 0) {
+			for (auto i : tmpList) {
+				std::pair<std::string,time_t> packageNameBuildDate;
+				packageNameBuildDate.first = i;
+				packageNameBuildDate.second = m_pkgrepo.getBinaryBuildTime(i);
+				if (checkPackageNameBuildDateSame(packageNameBuildDate))
+					continue;
+				m_ListOfPackagesToUpdate.insert(packageNameBuildDate);
+			}
+		}
 	}
 
 	for (auto i : m_listOfPackages) {

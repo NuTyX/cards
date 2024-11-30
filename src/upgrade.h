@@ -17,6 +17,7 @@ class upgrade : public pkgadd {
 	const CardsArgumentParser&                m_argParser;
 	cards::sync                               m_sync;
 	cards::pkgrepo                            m_pkgrepo;
+	cards::conf                               m_config;
 
 public:
 	/**
