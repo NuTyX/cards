@@ -120,14 +120,15 @@ command, and the defined log directory which will be used by the
 commands.
 
 .TP
-.B diff [-p]
+.B diff
 Binaries scenario: show differences between installed packages and binaries available on the mirror.
 
 .TP
-.B search <expr>
+.B search [-n] <expr>
 Search in the binaries for
 .B expr
 in their categories, collections, set, name, description, URL, packager and version.
+If option -n is passed, it will search in the name of the package only.
 
 .TP
 .B files <package>
@@ -140,11 +141,11 @@ Search in all installed package for files matching the
 as file name in the database.
 
 .TP
-.B info [-p] [-b] <package>
+.B info [-S] [-b] <package>
 if passed with -b option, print available info about the binary
 .B package
 if passed with -S option, print available Sets of
-.B package
+.B packages
 if no option is passed, print available info about the installed
 .B package
 
@@ -159,12 +160,8 @@ print a tree of the dependencies of the package
 .B package.
 
 .TP
-.B list [\-p|\-b]
-List installed packages. If option -p is passed, it shows a list of ports available in the ports tree.
-It's basically the same as
-.B ports \-l
-but looks in all directories specified in
-.B /etc/cards.conf.
+.B list [\-S|\-b]
+List installed packages. If option -S is passed, it shows a list of available set of packages available.
 If option -b is passed, it shows a list of binaries available in the miror server.
 
 .TP
@@ -212,16 +209,10 @@ Shows installed package in
 command
 
 .TP
-.B -n
+.B --dry
 dry mode in
 .B cards create
 commands. It does not make the action but only shows what will happens
-
-.TP
-.B -a
-remove all the sub packages as well if they exists in
-.B cards remove
-command
 
 .TP
 .B -b
@@ -232,30 +223,10 @@ command. List available binaries in
 command.
 
 .TP
-.B -p
-print info about the port in
-.B cards info
-command. List available ports in
-.B cards list
-command. List the difference of versions between installed packages and available one in the ports in
-.B cards diff
-command.
-
-.TP
-.B -I
-ignore error and list the level anyway in
-.B cards level
-command.
-
-.TP
 .B -u
 update the binary package in
 .B cards install
 command.
-
-.TP
-.B -r
-remove all the packages which are not belong to a base system defined in the cards.conf file
 
 .SH "CONFIGURATION"
 .TP
