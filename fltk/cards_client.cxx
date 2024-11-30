@@ -31,9 +31,10 @@ namespace cards
     /// Install a package list
     void cards_client::InstallPackages(const std::set<std::string>& pPackageList)
     {
-        if (pPackageList.size() == 0) return;
+        if (pPackageList.size() == 0)
+            return;
         std::string message = _("sudo cards install");
-        for (auto pack:pPackageList)
+        for (auto pack : pPackageList)
         {
             message += _(" ") + pack;
         }
@@ -45,12 +46,11 @@ namespace cards
         buildDatabase(true);
 
         m_log->log(_("Resolve package dependencies..."));
-        for (auto pack:pPackageList)
+        for (auto pack : pPackageList)
         {
-            m_packageName = pack;
-            m_pkgrepo.generateDependencies();
+            m_pkgrepo.generateDependencies(pack);
         }
-        for ( auto i : m_pkgrepo.getDependenciesList() )
+        for (auto i : m_pkgrepo.getDependenciesList() )
         {
             m_packageArchiveName = m_pkgrepo.dirName(i.first)
                 + "/"
