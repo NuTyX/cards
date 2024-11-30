@@ -611,13 +611,12 @@ build() {
 	else
 		case $build in
 			meson)
-				mkdir build
-				cd    build
-				meson setup --prefix=/usr \
-					--buildtype=release \
-					../$name-$version
-				ninja
-				DESTDIR=$PKG ninja install;;
+				meson setup --prefix /usr \
+					--buildtype plain     \
+					$name-$version builddir
+				meson compile -C   builddir
+				DESTDIR=$PKG \
+				meson install -C   builddir;;
 
 			autogen)
 				cd $name-$version
