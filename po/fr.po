@@ -487,6 +487,9 @@ msgstr "affiche cet aide"
 msgid "Available binaries in depot."
 msgstr "Binaires disponibles dans les dépots."
 
+msgid "Available sets of packages."
+msgstr "Jeux de paquets disponibles."
+
 msgid "Available ports."
 msgstr "Ports disponibles."
 
@@ -505,6 +508,12 @@ msgstr "Si -I il ignore les WARNING à propos des dépendances non trouvées du 
 msgid "show dependencies for the port in compilation order."
 msgstr "affiche les dépendances du port par ordre de compilation"
 
+msgid "show reverse dependencies list that needs the port."
+msgstr "affiche la liste des dépendances inverses qui utilisent le port."
+
+msgid "generates the keys pair for the signature of the packages."
+msgstr "génère la paire de clés pour la signature des paquets"
+
 msgid "If -i it will shows the installed dependencies as well."
 msgstr "Si -i affiche également les dépendances déjà installées."
 
@@ -516,6 +525,9 @@ msgstr "compile et installe le port et ses dependances."
 
 msgid "install all the dependencies from binaries and then compile the port."
 msgstr "installe toutes les dépendances depuis les binaires et compile le port à la fin."
+
+msgid "check or signing a collection of packages depending if a private key is present."
+msgstr "vérifie ou signe une collection de paquets en fonction de la présence d'une clé privée."
 
 msgid "list outdated packages."
 msgstr "liste les paquets obsolètes."
@@ -791,8 +803,8 @@ msgstr "<config>"
 msgid "This command can upgrade at onces alls your installed out of date packages."
 msgstr "Cette commande permet de mettre à jour tous vos paquets installés et obsolètes."
 
-msgid "\nPORTS SPECIFIC SCENARIO"
-msgstr "\nSCENARIO SPECIFIQUE AUX PORTS"
+msgid "\nBUILDING PACKAGES SPECIFIC SCENARIO"
+msgstr "\nSCENARIO SPECIFIQUE A LA CONSTRUCTION DES PAQUETS"
 
 msgid "\nSEARCHING"
 msgstr "\nRECHERCHE"

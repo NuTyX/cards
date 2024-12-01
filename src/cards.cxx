@@ -66,17 +66,17 @@ int main(int argc, char** argv)
             cout << BLUE << "  level" << NORMAL << "                      "
                  << _("show all the ports founds. The list is showned by order of compilation")
                  << endl;
-            cout << GREEN << _("\nPORTS SPECIFIC SCENARIO") << NORMAL << endl;
+            cout << GREEN << _("\nBUILDING PACKAGES SPECIFIC SCENARIO") << NORMAL << endl;
             cout << BLUE << "  depends" << NORMAL << "   <port>           "
                  << _("show dependencies for the port in compilation order.")
                  << endl;
             cout << BLUE << "  dependent" << NORMAL << " <port>           "
-                 << _("show reverse dependencies list that needs the port")
+                 << _("show reverse dependencies list that needs the port.")
                  << endl;
             cout << BLUE << "  deptree" << NORMAL << "   <port>           "
                  << _("show dependencies in a tree.") << endl;
             cout << BLUE << "  keys" << NORMAL << "                       "
-                 << _("generates the keys pair for the signature of the packages")
+                 << _("generates the keys pair for the signature of the packages.")
                  << endl;
             cout << BLUE << "  create" << NORMAL << "    <port>           "
                  << _("install all the dependencies from binaries and then compile the port.")
