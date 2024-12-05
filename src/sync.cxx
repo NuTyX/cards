@@ -7,12 +7,12 @@ const std::string sync::DEFAULT_PKG_REPO = ".REPO";
 const std::string sync::DEFAULT_PKG_FILES = ".FILES";
 
 sync::sync()
-	:m_config("/etc/cards.conf")
+	: m_root("/")
+	, m_config("/etc/cards.conf")
+    , m_configFile("/etc/cards.conf")
 {
     m_pkgRepoFile = DEFAULT_PKG_REPO;
     m_pkgFilesFile = DEFAULT_PKG_FILES;
-    m_root = "/";
-    m_configFile = "/etc/cards.conf";
 }
 sync::sync(const std::string configFile)
 	: m_root("/")

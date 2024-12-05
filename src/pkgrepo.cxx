@@ -933,11 +933,15 @@ void pkgrepo::errors()
 {
     ERR_print_errors_fp(stderr);
 }
+
+// We needs to parse again, this function is use
+// for installing fresh build packages in create object
 std::set<std::string>& pkgrepo::getListOfPackagesFromGroup(const std::string& name)
 {
     m_binaryGroupList.clear();
-    if (m_listOfPackages.size() == 0)
-        parse();
+    m_listOfPackages.clear();
+
+    parse();
 
     if (checkBinaryExist(name)) {
         m_binaryGroupList.insert(m_listOfPackages[name].dirName()
