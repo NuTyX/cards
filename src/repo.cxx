@@ -5,7 +5,7 @@
 namespace cards {
 
 repo::repo(const CardsArgumentParser& argParser,
-            const char *configFileName)
+            const std::string& configFileName)
             : m_argParser(argParser)
             , m_configFileName(configFileName)
             , m_pkgrepo(configFileName)

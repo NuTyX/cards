@@ -18,6 +18,7 @@ class repo
 
     public:
         repo(const CardsArgumentParser& argParser,
-            const char *configFileName);
+            const std::string& configFileName);
 };
 }
+
