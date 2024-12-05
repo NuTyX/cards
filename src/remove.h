@@ -30,6 +30,6 @@ class remove: public pkgrm
          */
         remove(const std::string& commandName,
 	        const CardsArgumentParser& argParser,
-	        const char *configFileName);
+	        const std::string& configFileName);
 };
 }

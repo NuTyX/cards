@@ -6,16 +6,12 @@ namespace cards {
 
 remove::remove(const std::string& commandName,
 	const CardsArgumentParser& argParser,
-	const char *configFileName)
+	const std::string& configFileName)
 	: pkgrm(commandName),m_argParser(argParser)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
-		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
-
-	if (m_root.empty())
-		m_root="/";
-	else
-		m_root=m_root+"/";
+		m_root = m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT)
+			+ m_root;
 
 	m_progress = true;
 
