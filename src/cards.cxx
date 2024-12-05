@@ -27,7 +27,8 @@ int main(int argc, char** argv)
     setlocale(LC_ALL, "");
     bindtextdomain(GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
     textdomain(GETTEXT_PACKAGE);
-    string configFile = "/etc/cards.conf";
+    string root = "/";
+    string configFile =  root + "etc/cards.conf";
     try {
         CardsArgumentParser cardsArgPars;
         cardsArgPars.parse(argc, argv);
@@ -36,8 +37,12 @@ int main(int argc, char** argv)
         cout << cardsArgPars.getIdValue() << endl;
         cout << cardsArgPars.getCmdValue() << endl;
 #endif
+        if (cardsArgPars.isSet(CardsArgumentParser::OPT_ROOT))
+            root = cardsArgPars.getOptionValue(CardsArgumentParser::OPT_ROOT)
+                + root;
         if (cardsArgPars.isSet(CardsArgumentParser::OPT_CONFIG_FILE))
-            configFile = cardsArgPars.getOptionValue(CardsArgumentParser::OPT_CONFIG_FILE);
+            configFile = root
+                + cardsArgPars.getOptionValue(CardsArgumentParser::OPT_CONFIG_FILE);
 
         switch (cardsArgPars.getCmdValue()) {
         case ArgParser::CMD_HELP:
@@ -175,7 +180,7 @@ int main(int argc, char** argv)
                 string s = "";
                 throw runtime_error(s + _(" this command should not be used under root."));
             }
-            cards::pkgrepo pkgrepo(configFile.c_str());
+            cards::pkgrepo pkgrepo(configFile);
             pkgrepo.generateKeys();
             return EXIT_SUCCESS;
         }
@@ -184,37 +189,37 @@ int main(int argc, char** argv)
                 string s = "";
                 throw runtime_error(s + _(" this command should not be used under root."));
             }
-            cards::repo repo(cardsArgPars, configFile.c_str());
+            cards::repo repo(cardsArgPars, configFile);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_LIST: {
-            cards::info info(cardsArgPars, configFile.c_str());
+            cards::info info(cardsArgPars, configFile);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_QUERY: {
-            cards::info info(cardsArgPars, configFile.c_str());
+            cards::info info(cardsArgPars, configFile);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_INFO: {
-            cards::info info(cardsArgPars, configFile.c_str());
+            cards::info info(cardsArgPars, configFile);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_DIFF: {
-            cards::upgrade upgrade(cardsArgPars, configFile.c_str());
+            cards::upgrade upgrade(cardsArgPars, configFile);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_INSTALL: {
-            unique_ptr<cards::install> i(new cards::install(cardsArgPars, configFile.c_str()));
+            unique_ptr<cards::install> i(new cards::install(cardsArgPars, configFile));
         }
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_REMOVE: {
-            unique_ptr<cards::remove> i(new cards::remove("cards remove", cardsArgPars, configFile.c_str()));
+            unique_ptr<cards::remove> i(new cards::remove("cards remove", cardsArgPars, configFile));
         }
             return EXIT_SUCCESS;
 
         case ArgParser::CMD_UPGRADE: {
-            cards::upgrade upgrade(cardsArgPars, configFile.c_str());
+            cards::upgrade upgrade(cardsArgPars, configFile);
             if (cardsArgPars.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
                 return upgrade.Isdownload();
 

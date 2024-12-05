@@ -66,14 +66,13 @@ void create::core()
 }
 void create::getLocalePackagesList()
 {
-	std::string packageFileName;
-	cards::conf config(m_config);
-
-	if (config.groups().empty())
+	if (m_config.groups().empty())
 		return;
 
+	std::string packageFileName;
+
 	std::set<std::string> tmpList;
-	for (auto i : config.groups()) {
+	for (auto i : m_config.groups()) {
 		for (auto j : m_pkgrepo.getDependenciesList()) {
 			std::string name = j.first + "." + i;
 			if (m_pkgrepo.checkBinaryExist(name)) {
@@ -140,8 +139,6 @@ void create::parseArguments()
         m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
         treatErrors("");
     }
-    if (m_root == "")
-        m_root = "/";
 }
 void create::checkBinaries()
 {
@@ -558,11 +555,9 @@ void create::buildBinary(std::string packageName)
         write(m_fdlog, "\n", 1);
     }
 
-    cards::pkgrepo pkgrepo("/etc/cards.conf");
-
     chdir(m_root.c_str());
 
-    for (auto packageFile : pkgrepo.getListOfPackagesFromGroup(packageName)) {
+    for (auto packageFile : m_pkgrepo.getListOfPackagesFromGroup(packageName)) {
         archive packageArchive(packageFile);
         std::string name = packageArchive.name();
         std::string version = packageArchive.version();
