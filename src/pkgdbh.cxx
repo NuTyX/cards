@@ -11,14 +11,15 @@ pkgdbh::pkgdbh(const std::string& name)
 	: m_utilName(name)
 	, m_DB_Empty(true)
 	, m_progress(false)
+	, m_root("/")
 {
 	openlog(m_utilName.c_str(),LOG_CONS,LOG_LOCAL7);
 }
 pkgdbh::pkgdbh()
 	: m_utilName("pkgdbh")
 	, m_DB_Empty(true)
-	, m_root("/")
 	, m_progress(false)
+	, m_root("/")
 {
 }
 pkgdbh::~pkgdbh()
@@ -35,7 +36,7 @@ void pkgdbh::parseArguments(int argc, char** argv)
 		std::string option(argv[i]);
 		if (option == "-r" || option == "--root") {
 			assertArgument(argv, argc, i);
-			m_root = argv[i + 1];
+			m_root = argv[i + 1] + m_root;
 			i++;
 		} else if (option == "-p" || option == "--progress") {
 			m_progress = true;
@@ -46,10 +47,6 @@ void pkgdbh::parseArguments(int argc, char** argv)
 			m_packageName = option;
 		}
 	}
-	if (m_root.empty())
-		m_root="/";
-	else
-		m_root=m_root+"/";
 }
 void pkgdbh::run(int argc, char** argv)
 {

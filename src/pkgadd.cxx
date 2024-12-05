@@ -25,7 +25,7 @@ void pkgadd::parseArguments(int argc, char** argv)
 		std::string option(argv[i]);
 		if (option == "-r" || option == "--root") {
 			assertArgument(argv, argc, i);
-			m_root = argv[i + 1];
+			m_root = argv[i + 1] + m_root;
 			i++;
 		} else if (option == "-i" || option == "--ignore") {
 			m_runPrePost = false;
@@ -46,10 +46,6 @@ void pkgadd::parseArguments(int argc, char** argv)
 		m_actualError = cards::ERROR_ENUM_OPTION_MISSING;
 		treatErrors("");
 	}
-	if (m_root.empty())
-		m_root="/";
-	else
-		m_root=m_root+"/";
 
 	// Check UID
 	if (getuid())

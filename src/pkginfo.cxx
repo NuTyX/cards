@@ -45,7 +45,7 @@ void pkginfo::parseArguments(int argc, char** argv)
         std::string option(argv[i]);
         if (option == "-r" || option == "--root") {
             assertArgument(argv, argc, i);
-            m_root = argv[i + 1];
+            m_root = argv[i + 1] + m_root;
             i++;
         } else if (option == "-i" || option == "--installed") {
             m_installed_mode += 1;
@@ -111,10 +111,6 @@ void pkginfo::parseArguments(int argc, char** argv)
             m_actualError = cards::ERROR_ENUM_INVALID_OPTION;
             treatErrors(option);
         }
-        if (m_root.empty())
-            m_root = "/";
-        else
-            m_root = m_root + "/";
     }
     if (m_runtimedependencies_mode
             + m_runtimelibs_mode
@@ -149,12 +145,10 @@ void pkginfo::parseArguments(int argc, char** argv)
 }
 void pkginfo::list()
 {
-    m_root="/";
     m_installed_mode = 1;
 }
 void pkginfo::details(const std::string& packageName)
 {
-    m_root="/";
     m_details_mode = 1;
     m_arg = packageName;
 }
@@ -378,7 +372,7 @@ void pkginfo::run()
                     std::cout << std::endl;
                 }
                 if (m_listOfPackages[arg].sets().size() > 0) {
-                    std::cout << _("Set            :");
+                    std::cout << _("Sets           :");
                     for (auto s : m_listOfPackages[arg].sets())
                         std::cout << " "
                                   << s;
