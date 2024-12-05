@@ -5,7 +5,7 @@
 namespace cards {
 
 install::install(const CardsArgumentParser& argParser,
-		const char *configFileName)
+		const std::string& configFileName)
 	: m_pkgrepo(configFileName)
 	, m_argParser(argParser)
 	, m_configFileName(configFileName)
@@ -99,11 +99,9 @@ install::install(const CardsArgumentParser& argParser,
 void install::parseArguments()
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
-		m_root=m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
-	if (m_root.empty())
-		m_root="/";
-	else
-		m_root=m_root+"/";
+		m_root = m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT)
+			+ m_root;
+
 	if (getuid()) {
 		m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");

@@ -20,6 +20,6 @@ class install: public pkgadd
 
     public:
         install(const CardsArgumentParser& argParser,
-            const char *configFileName);
+            const std::string& configFileName);
 };
 }
