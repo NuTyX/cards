@@ -553,6 +553,9 @@ msgstr "synchronise les metadonnées locales et distantes "
 msgid "install the binary found on the mirror."
 msgstr "installe le binaire trouvé sur le serveur."
 
+msgid "If -n it will search in the name of the available packages only."
+msgstr "Si -n, la recherche se fait dans le nom des paquets disponibles uniquement."
+
 msgid "If -u it will upgrade the installed package."
 msgstr "Si -u, met à jour le paquet installé."
 
