@@ -12,20 +12,12 @@ namespace cards
         , m_pkgrepo("/etc/cards.conf")
     {
         m_log = cards_logger::instance();
-        m_root = "/";
     }
 
     /// Get a string list of installed packages
     std::set<std::string> cards_client::ListOfInstalledPackages()
     {
-        getListOfPackagesNames (m_root);
-        buildDatabase(true);
-        std::set<std::string> ListOfInstalledPackages;
-        for (auto i : m_listOfPackages)
-        {
-            ListOfInstalledPackages.insert(i.first);
-        }
-        return ListOfInstalledPackages;
+        return getListOfPackagesNames();
     }
 
     /// Install a package list

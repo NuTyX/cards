@@ -6,7 +6,6 @@
 Flcards_info::Flcards_info(const std::string& configFileName)
 	: pkgdbh("")
 {
-	m_root="/";
 }
 void Flcards_info::progressInfo()
 {
