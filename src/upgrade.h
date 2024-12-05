@@ -25,7 +25,7 @@ public:
 	 *  Constructor
 	 */
 	upgrade(const CardsArgumentParser& argParser,
-		const char *configFileName);
+		const std::string& configFileName);
 
 	void upgradePackages();
 	/**

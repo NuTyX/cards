@@ -5,7 +5,7 @@
 namespace cards {
 
 upgrade::upgrade(const CardsArgumentParser& argParser,
-	const char *configFileName)
+	const std::string& configFileName)
 	: m_argParser(argParser)
 	, m_sync(configFileName)
 	, m_pkgrepo(configFileName)
@@ -14,7 +14,6 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root = m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
 
-	m_root += "/";
 	m_progress = true;
 
 	if ( ! m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
