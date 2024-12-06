@@ -368,6 +368,29 @@ find_new_packager () {
   -e "s/$newpackagername//g" -e "s/ /,/g" -e "s/\(,\)\1\+/\1/g" \
   -e "s/\b\(.\)/\u\1/g" -e "s/^,//g" -e "s/,$//g")"
 }
+find_set () {
+  local i=0 p c s n
+  for c in base cli cli-extra gui gui-extra
+  do
+     for n in $c/*/Pkgfile
+     do
+         . $n
+         [ -z $set ] && continue
+         [ "$version" == "${PARAM[1]}" ] && continue
+         for s in ${set[@]}
+         do
+            if [ "$s" == "${PARAM[0]}" ]; then
+                PACKAGES_LIST[i]="$(dirname $n)"
+                i=$((i+1))
+            fi
+         done
+         unset set
+     done
+     [ -z $PACKAGES_LIST ] || COLLECTION=$c
+     [ -z  $COLLECTION ] || return
+  done
+  add_collection_to_packagelist
+}
 find_version () {
   local i=0 p c n
   #TODO consider 'mycollection' 'mycollection-extra' if exists
@@ -382,6 +405,10 @@ find_version () {
      [ -z $PACKAGES_LIST ] || COLLECTION=$c
      [ -z  $COLLECTION ] || return
   done
+  add_collection_to_packagelist
+}
+add_collection_to_packagelist () {
+  local i n p
   i=0
   for n in ${PACKAGES_LIST[@]}
   do
@@ -418,8 +445,6 @@ bs ca cs cy da de el es fi fr ga gl gn he hi hr hu ia id is it \
 ja ka kk km kn ko lt lv mk ml mr ms my nl nn oc or pa pt pl rm \
 ro ru rw si sq sk sl sr sv ta te th tr uk ur uz vi xh zh"
 
-
-
   PKGMK_CONF='
 export CFLAGS="-O2 -pipe"
 export CXXFLAGS="${CFLAGS}"
@@ -428,7 +453,6 @@ PKGMK_CLEAN="no"
 PKGMK_SOURCE_DIR="/sources"
 PKGMK_IGNORE_REPO="no"
 PKGMK_IGNORE_RUNTIMEDEPS="no"'
-
 
   PKGMK_CONF+="
 PKGMK_LOCALES=($PKGMK_LOCALES)
@@ -539,6 +563,7 @@ fi
 
 parse_arguments "$@"
 find_version
+[ -z "$PACKAGES_LIST" ] && find_set
 
 if [ "$INIT" == "yes" ]; then
   create_folders
@@ -847,7 +872,6 @@ mkdir -p $ROOT/${VERSION}/${COLLECTION}/$GIT
 
 sudo mount --bind ${GIT_PROJ} $ROOT/${VERSION}/${COLLECTION}/$GIT || \
 error "mounting ${GIT_PROJ}"
-
 
 MOUNT_POINTS="$MOUNT_POINTS $GIT"
 
