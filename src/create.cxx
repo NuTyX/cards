@@ -556,6 +556,7 @@ void create::buildBinary(std::string packageName)
     }
 
     chdir(m_root.c_str());
+    m_pkgrepo.refresh();
 
     for (auto packageFile : m_pkgrepo.getListOfPackagesFromGroup(packageName)) {
         archive packageArchive(packageFile);

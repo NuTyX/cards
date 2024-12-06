@@ -382,6 +382,11 @@ std::string& pkgrepo::getBinaryPackageInfo(const std::string& name)
     }
     return m_binaryPackageInfo;
 }
+void pkgrepo::refresh()
+{
+    m_listOfPackages.clear();
+    parse();
+}
 void pkgrepo::parse()
 {
     if (m_listOfPackages.size() > 0)
@@ -606,16 +611,14 @@ pkgrepo::getPackageDependencies(const std::string& filename)
 }
 const repo_t& pkgrepo::getListOfPackages()
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     return m_listOfPackages;
 }
 std::set<std::string>& pkgrepo::getListOfPackagesFromSet(const std::string& name)
 {
     m_binarySetList.clear();
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     for (auto p : m_listOfPackages) {
         for (auto s : m_listOfPackages[p.first].sets()) {
@@ -631,8 +634,7 @@ std::set<std::string>& pkgrepo::getListOfPackagesFromSet(const std::string& name
 std::set<std::string>& pkgrepo::getListOfPackagesFromCollection(const std::string& name)
 {
     m_binaryCollectionList.clear();
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     for (auto p : m_listOfPackages) {
         if ((m_listOfPackages[p.first].collection() == name) && (m_listOfPackages[p.first].group() == "")) {
@@ -644,15 +646,13 @@ std::set<std::string>& pkgrepo::getListOfPackagesFromCollection(const std::strin
 }
 bool pkgrepo::checkBinaryExist(const std::string& name)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     return (m_listOfPackages.find(name) != m_listOfPackages.end());
 }
 std::string& pkgrepo::dirName(const std::string& name)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     m_packageDirName = m_listOfPackages[name].dirName();
 
@@ -660,8 +660,7 @@ std::string& pkgrepo::dirName(const std::string& name)
 }
 std::string& pkgrepo::fileName(const std::string& name)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     m_packageFileName = m_listOfPackages[name].fileName();
 
@@ -669,8 +668,7 @@ std::string& pkgrepo::fileName(const std::string& name)
 }
 std::string& pkgrepo::fileHash(const std::string& name)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     m_packageFileNameHash = m_listOfPackages[name].hash();
 
@@ -678,8 +676,7 @@ std::string& pkgrepo::fileHash(const std::string& name)
 }
 std::string& pkgrepo::fileSignature(const std::string& name)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     m_packageFileNameSignature = m_listOfPackages[name].signature();
 
@@ -692,23 +689,20 @@ std::vector<std::string> pkgrepo::getListofGroups()
 time_t pkgrepo::getBinaryBuildTime(const std::string& name)
 {
 
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     return m_listOfPackages[name].build();
 }
 std::string& pkgrepo::version(const std::string& name)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     m_packageVersion = m_listOfPackages[name].version();
     return m_packageVersion;
 }
 unsigned short int pkgrepo::release(const std::string& name)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     return m_listOfPackages[name].release();
 }
@@ -774,15 +768,13 @@ std::string& pkgrepo::hash()
 }
 void pkgrepo::hash(const std::string& packageName)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     m_listOfPackages[packageName].hash(m_packageFileNameHash);
 }
 bool pkgrepo::checkHash(const std::string& name)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     return convertToLowerCase(m_packageFileNameHash) == convertToLowerCase(m_listOfPackages[name].hash());
 }
@@ -870,8 +862,7 @@ std::string& pkgrepo::sign()
 }
 void pkgrepo::sign(const std::string& packageName)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     m_listOfPackages[packageName].signature(m_packageFileNameSignature);
 }
@@ -939,7 +930,6 @@ void pkgrepo::errors()
 std::set<std::string>& pkgrepo::getListOfPackagesFromGroup(const std::string& name)
 {
     m_binaryGroupList.clear();
-    m_listOfPackages.clear();
 
     parse();
 
@@ -961,8 +951,7 @@ std::set<std::string>& pkgrepo::getListOfPackagesFromGroup(const std::string& na
 }
 std::set<std::string> pkgrepo::getLibs(const std::string& name)
 {
-    if (m_listOfPackages.size() == 0)
-        parse();
+    parse();
 
     return m_listOfPackages[name].libs();
 }

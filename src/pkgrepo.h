@@ -75,7 +75,7 @@ public:
 
     // Store the computed hash stored in m_packageFileNameHash
     // into the database packageName hash property
-    void                    hash(const std::string& packageName);
+    void                     hash(const std::string& packageName);
 
     // Check the Hash and signature of the archive file of the package name
     bool                     checkHash(const std::string& name);
@@ -124,6 +124,7 @@ public:
     // Generate the keys pair for signing and verifying the package archive hashing
     void                     generateKeys();
 
+    void                     refresh();
     time_t                   getBinaryBuildTime (const std::string& name);
 
     std::string&             dirName(const std::string& name);
