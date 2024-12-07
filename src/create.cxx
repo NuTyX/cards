@@ -24,6 +24,8 @@ create::create(CardsArgumentParser& argParser)
     m_tree = m_pkgfile.getListOfPackages();
     buildDatabase(true);
 
+	readRulesFile();
+
     if (!m_argParser.isSet(CardsArgumentParser::OPT_DRY)) {
         core();
         chdir(m_portsDir.c_str());
@@ -247,8 +249,6 @@ void create::run()
 {
 	// Reading the archiving to find a list of files
 	std::pair<std::string, cards::db> package = openArchivePackage(m_packageArchiveName);
-
-	readRulesFile();
 
 	std::set<std::string> non_install_files = applyInstallRules(package.first,
 		package.second, m_actionRules);

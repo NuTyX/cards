@@ -1309,9 +1309,8 @@ void pkgdbh::installArchivePackage
 	}
 	FREE_ARCHIVE(archive);
 }
-void pkgdbh::readRulesFile()
+const void pkgdbh::readRulesFile()
 {
-	m_actionRules.clear();
 	unsigned int linecount = 0;
 	const std::string filename = m_root + PKGADD_CONF;
 	std::ifstream in(filename.c_str());

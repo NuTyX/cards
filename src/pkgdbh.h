@@ -83,7 +83,7 @@ protected:
      */
     void                    moveMetaFilesPackage(const std::string& name, cards::db& info);
 
-    void                    readRulesFile();
+    const void              readRulesFile();
     void                    getInstallRulesList(const std::vector<rule_t>& rules,
                                 cards::rule_event_t event, std::vector<rule_t>& found) const;
 
