@@ -149,13 +149,13 @@ rsync_binaries () {
   if [ ! -z ${PARAM[0]} ]; then
     echo "
 rsync $options \
-$URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*  \
+${RSYNC_URL}/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*  \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 "
     echo -n "  OK ? (y) : "
     answer
     rsync $options \
-$URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.* \
+${RSYNC_URL}/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.* \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     exit 0
   fi
@@ -165,7 +165,7 @@ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 rsync $options \
-$URL/$(uname -m)/$VERSION/$COLLECTION/ \
+${RSYNC_URL}/$(uname -m)/$VERSION/$COLLECTION/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 "
     echo -n "  OK ? (y) : "
@@ -173,7 +173,7 @@ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     rsync $options \
-$URL/$(uname -m)/$VERSION/$COLLECTION/ \
+${RSYNC_URL}/$(uname -m)/$VERSION/$COLLECTION/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     exit 0
   fi
@@ -182,7 +182,7 @@ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
 sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
 rsync $options \
-$URL/$(uname -m)/$VERSION/ \
+${RSYNC_URL}/$(uname -m)/$VERSION/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/
 "
   echo -n "  OK ? (y) : "
@@ -190,7 +190,7 @@ $ROOTMOUNT/$(uname -m)/$VERSION/
   mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
   sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
   rsync $options \
-$URL/$(uname -m)/$VERSION/ \
+${RSYNC_URL}/$(uname -m)/$VERSION/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/
   exit 0
 }
@@ -520,6 +520,7 @@ fi
 [ -z "$EDITOR" ] && EDITOR="vi"
 [ -z "$COLLECTIONS" ] && COLLECTIONS=(gui cli base)
 [ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
+RSYNC_URL="$URL"
 
 GIT_PROJ=$(pwd)
 GIT="mybld/$(basename $GIT_PROJ)"
