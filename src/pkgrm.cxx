@@ -11,14 +11,13 @@ pkgrm::pkgrm ()
 }
 void pkgrm::getListOfManInstalledPackages ()
 {
-	// Get the list of installed packages
-	getListOfPackagesNames(m_root);
+	buildSimpleDependenciesDatabase();
 
 	for ( auto i : m_listOfPackages) {
 		if ( i.second.dependency() == false )
 			m_listOfManInstalledPackages.insert(i.first);
 	}
-	buildSimpleDependenciesDatabase();
+
 	for ( auto i : m_listOfManInstalledPackages ) {
 		getDirectDependencies(i);
 	}
@@ -58,9 +57,6 @@ void pkgrm::run()
 	}
 
 	cards::lock Lock(m_root, true);
-
-	// Get the list of installed packages
-	getListOfPackagesNames(m_root);
 
 	// Retrieve info about all the packages
 	buildDatabase(true);

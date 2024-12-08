@@ -184,7 +184,6 @@ void upgrade::go()
 		}
 		for (auto i : m_ListOfPackagesToDelete) {
 			cards::lock Lock(m_root,true);
-			getListOfPackagesNames(m_root);
 			buildDatabase(true);
 			removePackageFilesRefsFromDB(i);
 			removePackageFiles(i);
