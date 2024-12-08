@@ -38,14 +38,13 @@ class pkgdbh {
     bool                    m_DB_Empty;
 
     void                    runLastPostInstall();
+    void                    getListOfPackagesNames();
     std::string             getSingleItem(const std::string& PackageName, const char i) const;
 
     std::set<std::string>   getSetOfItems(const std::string& PackageName, const char i) const;
 
 protected:
     // Database
-
-    int                     getListOfPackagesNames(const std::string& path);
 
     void                    buildSimpleDependenciesDatabase();
 
@@ -144,7 +143,7 @@ public:
     void                    setDependency();
     void                    resetDependency();
 
-    std::set<std::string>&  getListOfPackagesNames();
+    std::set<std::string>&  getSetOfPackagesNames();
     std::string             getDescription(const std::string& name) const;
     std::string             getVersion(const std::string& name) const;
     std::string             getCollection(const std::string& name) const;
@@ -155,9 +154,10 @@ public:
     std::string             getCategories(const std::string& name) const;
     std::set<std::string>   getSetOfCategories(const std::string& name) const;
     std::set<std::string>   getSetOfFiles(const std::string& packageName);
-    std::set<std::string>   getFilesList();
+    std::set<std::string>   getSetOfFiles();
 
-    unsigned int            getFilesNumber();
+    const unsigned int      getNumberOfPackages();
+    const unsigned int      getNumberOfFiles();
     unsigned int            getInstalledFilesNumber();
     unsigned int            getSize(const std::string& name) const;
     unsigned int            getRelease(const std::string& name) const;

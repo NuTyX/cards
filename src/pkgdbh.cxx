@@ -288,10 +288,10 @@ void pkgdbh::progressInfo()
   }
 }
 
-std::set<std::string>& pkgdbh::getListOfPackagesNames()
+std::set<std::string>& pkgdbh::getSetOfPackagesNames()
 {
 	if (m_listOfPackagesNames.empty())
-		getListOfPackagesNames(m_root);
+		getListOfPackagesNames();
 	return m_listOfPackagesNames;
 }
 std::string pkgdbh::getSingleItem(const std::string& PackageName, const char i) const
@@ -376,20 +376,19 @@ unsigned int pkgdbh::getRelease(const std::string& name) const
 
 // Append to the "DB" the number of packages founds
 // directory containing a file named files
-int pkgdbh::getListOfPackagesNames (const std::string& path)
+void pkgdbh::getListOfPackagesNames()
 {
 	if (! m_listOfPackagesNames.empty())
-		return m_listOfPackagesNames.size();
+		return;
 
 	const std::string pathdb =  m_root + PKG_DB_DIR;
-	if ( findDir(m_listOfPackagesNames, pathdb) != 0 ) {
+	if (findDir(m_listOfPackagesNames, pathdb) != 0) {
 		m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 		treatErrors(pathdb);
 	}
-	return m_listOfPackagesNames.size();
 }
 std::set<std::string>
-pkgdbh::getSetOfFiles( const std::string& packageName )
+pkgdbh::getSetOfFiles(const std::string& packageName)
 {
 	std::string name = m_listOfAlias[packageName];
 	std::set<std::string> packageFiles;
@@ -430,7 +429,7 @@ void
 pkgdbh::buildSimpleDependenciesDatabase()
 {
 	if (m_listOfPackagesNames.empty() )
-			getListOfPackagesNames (m_root);
+			getListOfPackagesNames();
 
 	for (auto i : m_listOfPackagesNames) {
 		std::pair < std::string, std::set<std::string> > packageWithDeps;
@@ -457,7 +456,7 @@ void pkgdbh::buildDatabase(const bool& files)
 		return;
 
 	if (m_listOfPackagesNames.empty())
-		getListOfPackagesNames (m_root);
+		getListOfPackagesNames();
 
 	progressInfo(ACTION_ENUM_DB_OPEN_START);
 
@@ -1313,7 +1312,7 @@ const void pkgdbh::readRulesFile()
 {
 	unsigned int linecount = 0;
 	const std::string filename = m_root + PKGADD_CONF;
-	std::ifstream in(filename.c_str());
+	std::ifstream in(filename);
 
 	if (in) {
 		while (!in.eof()) {
@@ -1655,16 +1654,22 @@ void pkgdbh::print_version() const
 	std::cout << m_utilName << " (cards) " << PACKAGE_VERSION << std::endl;
 }
 
-unsigned int pkgdbh::getFilesNumber()
+const unsigned int pkgdbh::getNumberOfPackages()
 {
-    return m_filesNumber;
-}
+	if (m_listOfPackagesNames.empty())
+		getListOfPackagesNames();
 
+    return m_listOfPackagesNames.size();
+}
+const unsigned int pkgdbh::getNumberOfFiles()
+{
+	return m_filesNumber;
+}
 unsigned int pkgdbh::getInstalledFilesNumber()
 {
     return m_installedFilesNumber;
 }
-std::set<std::string> pkgdbh::getFilesList()
+std::set<std::string> pkgdbh::getSetOfFiles()
 {
 	return m_filesList;
 }
