@@ -149,13 +149,13 @@ rsync_binaries () {
   if [ ! -z ${PARAM[0]} ]; then
     echo "
 rsync $options \
-${RSYNC_URL}/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*  \
+$URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*  \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 "
     echo -n "  OK ? (y) : "
     answer
     rsync $options \
-${RSYNC_URL}/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.* \
+$URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.* \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     exit 0
   fi
@@ -165,7 +165,7 @@ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 rsync $options \
-${RSYNC_URL}/$(uname -m)/$VERSION/$COLLECTION/ \
+$URL/$(uname -m)/$VERSION/$COLLECTION/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 "
     echo -n "  OK ? (y) : "
@@ -173,7 +173,7 @@ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     rsync $options \
-${RSYNC_URL}/$(uname -m)/$VERSION/$COLLECTION/ \
+$URL/$(uname -m)/$VERSION/$COLLECTION/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
     exit 0
   fi
@@ -182,7 +182,7 @@ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
 sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
 rsync $options \
-${RSYNC_URL}/$(uname -m)/$VERSION/ \
+$URL/$(uname -m)/$VERSION/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/
 "
   echo -n "  OK ? (y) : "
@@ -190,7 +190,7 @@ $ROOTMOUNT/$(uname -m)/$VERSION/
   mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/
   sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/
   rsync $options \
-${RSYNC_URL}/$(uname -m)/$VERSION/ \
+$URL/$(uname -m)/$VERSION/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/
   exit 0
 }
@@ -369,14 +369,13 @@ find_new_packager () {
   -e "s/\b\(.\)/\u\1/g" -e "s/^,//g" -e "s/,$//g")"
 }
 find_set () {
-  local i=0 p c s n
+  local i=0 c n set s
   for c in base cli cli-extra gui gui-extra
   do
      for n in $c/*/Pkgfile
      do
-         . $n
+         set=$(. $n; echo $set)
          [ -z $set ] && continue
-         [ "$version" == "${PARAM[1]}" ] && continue
          for s in ${set[@]}
          do
             if [ "$s" == "${PARAM[0]}" ]; then
@@ -392,15 +391,17 @@ find_set () {
   add_collection_to_packagelist
 }
 find_version () {
-  local i=0 p c n
+  local i=0 p c n version
   #TODO consider 'mycollection' 'mycollection-extra' if exists
   for c in base cli cli-extra gui gui-extra
   do
-     #FIXME version="1.2.4" or version='1.2.3' doesn't work
-     for n in $(grep -wl version="${PARAM[0]}"$ $c/*/Pkgfile)
+     for n in $c/*/Pkgfile
      do
-        PACKAGES_LIST[i]="$(dirname $n)"
-        i=$((i+1))
+        version=$(. $n; echo $version)
+        if [ $version == "${PARAM[0]}" ]; then
+            PACKAGES_LIST[i]="$(dirname $n)"
+            i=$((i+1))
+        fi
      done
      [ -z $PACKAGES_LIST ] || COLLECTION=$c
      [ -z  $COLLECTION ] || return
@@ -520,7 +521,6 @@ fi
 [ -z "$EDITOR" ] && EDITOR="vi"
 [ -z "$COLLECTIONS" ] && COLLECTIONS=(gui cli base)
 [ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
-RSYNC_URL="$URL"
 
 GIT_PROJ=$(pwd)
 GIT="mybld/$(basename $GIT_PROJ)"
@@ -563,9 +563,11 @@ if ! ( $(which $EDITOR > /dev/null) ); then
 fi
 
 parse_arguments "$@"
-find_version
-[ -z "$PACKAGES_LIST" ] && find_set
 
+if [ ! -z ${PARAM[1]} ];then
+  find_version
+  [ -z "$PACKAGES_LIST" ] && find_set
+fi
 if [ "$INIT" == "yes" ]; then
   create_folders
   exit 0
