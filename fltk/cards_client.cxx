@@ -17,7 +17,7 @@ namespace cards
     /// Get a string list of installed packages
     std::set<std::string> cards_client::ListOfInstalledPackages()
     {
-        return getListOfPackagesNames();
+        return getSetOfPackagesNames();
     }
 
     /// Install a package list
@@ -31,8 +31,6 @@ namespace cards
             message += _(" ") + pack;
         }
         m_log->log(message);
-        // Get the list of installed packages
-        getListOfPackagesNames(m_root);
 
         // Retrieve info about all the packages
         buildDatabase(true);
@@ -79,8 +77,7 @@ namespace cards
         m_log->log(message);
 
         cards::lock Lock(m_root, true);
-        // Get the list of installed packages
-        getListOfPackagesNames(m_root);
+
         // Retrieve info about all the packages
         buildDatabase(true);
 
@@ -113,16 +110,16 @@ namespace cards
 			{
 			case cards::ACTION_ENUM_DB_OPEN_RUN:
 			{
-				i = j / ( getListOfPackagesNames("") / 100);
+				i = j / ( getNumberOfPackages() / 100);
 				Value = i;
 				j++;
 				break;
 			}
 			case cards::ACTION_ENUM_PKG_INSTALL_RUN:
 			{
-				if (getFilesNumber() > 100)
+				if (getNumberOfFiles() > 100)
 				{
-					i= getInstalledFilesNumber() / ( getFilesNumber() /100);
+					i= getInstalledFilesNumber() / ( getNumberOfFiles() /100);
 					Value = i;
 				} else {
 					Value = j;
@@ -137,7 +134,7 @@ namespace cards
 			}
 			case cards::ACTION_ENUM_RM_PKG_FILES_RUN:
 			{
-					unsigned int l = getFilesList().size();
+					unsigned int l = getNumberOfFiles();
 					if ( l > 100 )
 					{
 						i = j / ( l / 100);

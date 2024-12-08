@@ -11,16 +11,16 @@ void Flcards_info::progressInfo()
 {
 
 	static int j = 0;
-	int i,n;
-	n = getListOfPackagesNames("");
-	switch ( m_actualAction )
+	unsigned int i, n;
+	n = getNumberOfPackages();
+	switch (m_actualAction)
 	{
 		case cards::ACTION_ENUM_DB_OPEN_START:
 			m_progressBar->value(0);
 			break;
 		case cards::ACTION_ENUM_DB_OPEN_RUN:
 			if (n >100) {
-				i = j / ( n / 100);
+				i = j /(n / 100);
 				m_progressBar->value(i);
 			}
 			j++;
@@ -47,7 +47,6 @@ std::set<std::string> Flcards_info::getListOfInstalledPackages()
 	m_window->show();
 	m_progressBar->value(0);
 
-	getListOfPackagesNames (m_root);
 	buildDatabase(false);
 
 	delete m_progressBar;
@@ -61,8 +60,8 @@ std::set<std::string> Flcards_info::getListOfInstalledPackages()
 			<< std::endl;
 #endif
 		packageDetails = i.first + '\t'
-			+ i.second.version + '\t'
-			+ i.second.description + '\t';
+			+ i.second.version() + '\t'
+			+ i.second.description() + '\t';
 
 		ListOfInstalledPackages.insert(packageDetails);
 	}
@@ -85,17 +84,15 @@ std::set<std::string> Flcards_info::getListOfAvailablePackages()
 	m_window->show();
 	m_progressBar->value(0);
 
-	parsePkgRepoCollectionFile();
+	cards::pkgrepo pkgrepo("/etc/cards");
 
 	std::set<std::string> ListOfAvailablePackages;
 	std::string packageNameVersion;
-	for (auto i : m_portsDirectoryList) {
-		for (auto j : i.packagesList) {
-			packageNameVersion = j.basePackageName + '\t'
-				+ j.version + '\t'
-				+ j.description + '\t';
-			ListOfAvailablePackages.insert(packageNameVersion);
-		}
+	for (auto i : pkgrepo.getListOfPackages()) {
+		packageNameVersion = i.first + '\t'
+			+ i.second.version() + '\t'
+			+ i.second.description() + '\t';
+		ListOfAvailablePackages.insert(packageNameVersion);
 	}
 	delete m_progressBar;
 	delete m_window;
