@@ -67,9 +67,6 @@ void pkgadd::preRun()
 }
 void pkgadd::run()
 {
-	// Get the list of installed packages
-	getListOfPackagesNames(m_root);
-
 	// Retrieving info about all the packages
 	buildDatabase(true);
 

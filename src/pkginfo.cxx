@@ -185,14 +185,15 @@ void pkginfo::run()
     if (m_footprint_mode) {
         getFootprintPackage(m_arg);
     } else if (m_number_mode) {
-        std::cout << getListOfPackagesNames(m_root) << std::endl;
+        buildDatabase(false);
+        std::cout << m_listOfPackages.size() << std::endl;
     } else {
         /*
          *  Modes that require the database to be opened
          *
          */
         cards::lock Lock(m_root, false);
-        getListOfPackagesNames(m_root);
+
         if (m_installed_mode) {
             /*
              *  List installed packages
