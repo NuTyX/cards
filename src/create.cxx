@@ -386,6 +386,14 @@ void create::buildCollection()
                             break;
                         }
                     }
+                    std::string libPackage = pkg.first + ".lib";
+                    if (m_pkgrepo.checkBinaryExist(libPackage)) {
+                        for (auto deplib : m_pkgrepo.getLibs(libPackage))
+                            if (deplib == lib) {
+                                found = true;
+                                break;
+                            }
+                    }
                     if (found)
                         break;
                 }
