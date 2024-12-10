@@ -135,7 +135,8 @@ public:
     std::string&             version(const std::string& name);
     unsigned short int       release(const std::string& name);
 
-    std::vector<std::string> getListofGroups();
+    std::vector<std::string> getListOfGroups();
+    std::set<std::string>&   getListOfFiles(const std::string& name);
     std::set<std::string>    getLibs(const std::string& name);
     std::set<std::string>&   getBinaryPackageList();
     std::set<std::string>&   getListOfPackagesFromSet(const std::string& name);

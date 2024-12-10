@@ -682,7 +682,7 @@ std::string& pkgrepo::fileSignature(const std::string& name)
 
     return m_packageFileNameSignature;
 }
-std::vector<std::string> pkgrepo::getListofGroups()
+std::vector<std::string> pkgrepo::getListOfGroups()
 {
     return m_config.groups();
 }
@@ -954,5 +954,10 @@ std::set<std::string> pkgrepo::getLibs(const std::string& name)
     parse();
 
     return m_listOfPackages[name].libs();
+}
+std::set<std::string>& pkgrepo::getListOfFiles(const std::string& name)
+{
+    parse();
+    return m_listOfPackages[name].files;
 }
 } // end of 'cards' namespace
