@@ -399,6 +399,7 @@ void create::buildCollection()
                 }
                 if (found)
                     break;
+
                 level++;
             }
             if (!found) {
@@ -418,9 +419,10 @@ void create::buildCollection()
                 }
             }
             if (!found) {
-                archive Archive(ArchiveFile);
-                for (auto i : Archive.setofFiles()) {
-                    if (i.find(lib) != std::string::npos) {
+                // Last chance to find the lib.
+                // In the list of files of the 'i' package
+                for (auto file : m_pkgrepo.getListOfFiles(i)) {
+                    if (file.find(lib) != std::string::npos) {
                         found = true;
                         break;
                     }
