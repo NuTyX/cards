@@ -207,6 +207,9 @@ msgstr " n'existe pas"
 msgid " is in use"
 msgstr " est utilisé"
 
+msgid "You are not in chroot mode. The file "
+msgstr "Vous n'êtes pas en mode chroot. Le fichier "
+
 msgid " is a runtime dependency for "
 msgstr " est une dépendance de fonctionnement pour "
 

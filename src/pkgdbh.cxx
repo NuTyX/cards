@@ -180,7 +180,7 @@ void pkgdbh::treatErrors(const std::string& s) const
 			throw std::runtime_error(_("The package ") + s + _(" is in use"));
 			break;
 		case ERROR_ENUM_NOT_IN_CHROOT:
-			throw std::runtime_error(_("You are not in chroot mode. The ") + s + _(" is not found"));
+			throw std::runtime_error(_("You are not in chroot mode. The file ") + s + _(" is not found"));
 			break;
 	}
 }
