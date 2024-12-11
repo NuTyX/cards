@@ -1310,6 +1310,8 @@ void pkgdbh::installArchivePackage
 }
 const void pkgdbh::readRulesFile()
 {
+	if (m_actionRules.size() > 0)
+		return;
 	unsigned int linecount = 0;
 	const std::string filename = m_root + PKGADD_CONF;
 	std::ifstream in(filename);
