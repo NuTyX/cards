@@ -10,6 +10,35 @@ pkgfile::pkgfile(const std::string& fileName)
     , m_config(fileName)
 {
 }
+std::string pkgfile::getVariable(const std::string& file , const std::string& variable)
+{
+    std::string command = ". " + file + " >/dev/null 2>&1; echo \"$" + variable + "\"";
+
+    std::vector<char> buffer(128);
+    std::string value;
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe)
+        std::cerr <<  "Failed to open pipe\n";
+
+    // Read the command output
+    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr)
+        value += buffer.data();
+
+    int ret = pclose(pipe);
+    if (ret != 0)
+      std::cerr << " Command failed with return code: "
+        << std::to_string(ret)
+        << std::endl;
+
+    if (!value.empty()) {
+        if (value.back() == '\n')
+            value.pop_back();
+    } else
+        std::cout << "something wrong with the value\n";
+
+
+    return value;
+}
 bool pkgfile::checkCollectionNameExist(const std::string& collectionName)
 {
     DIR* d;
@@ -135,6 +164,10 @@ void pkgfile::parse()
                             s = s + line + " ";
                     }
                 }
+                // when install-nutyx will install bash
+                // we can use this good idea
+                // and probably generate a full value with echo $version-$release
+                // info.version(getVariable(Pkgfile, "version"));
                 info.dependencies(parseDelimitedSetList(s, " "));
                 info.index(index);
                 m_listOfPackages[portName] = info;

@@ -110,6 +110,8 @@ class pkgfile {
 
     void                        parse();
     void                        generate_level();
+    std::string                 getVariable(const std::string& file,
+        const std::string& name);
 
 public:
     pkgfile(const std::string& fileName);
