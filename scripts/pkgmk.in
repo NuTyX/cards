@@ -759,7 +759,6 @@ add_meta_to_archive() {
 		echo "g$GROUP" >> .META
 	fi
 
-	# TODO improve the pkginfo --runtimedepfiles functionnality
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
 		for dep in $($PKGMK_PKGINFO --runtimedepfiles $TAR|grep -v ^[A-Z]); do
 			echo "R$dep" >> .META
@@ -796,9 +795,11 @@ add_meta_to_archive() {
 			fi
 		fi
 	fi
-	for lib in $($PKGMK_PKGINFO --runtimelibs $TAR|grep -v ^[A-Z]); do
-		echo "l$lib" >> .META
-	done
+	if [ "$PKGMK_IGNORE_RUNTIMELIBS" == "no" ];then
+		for lib in $($PKGMK_PKGINFO --runtimelibs $TAR|grep -v ^[A-Z]); do
+			echo "l$lib" >> .META
+		done
+	fi
 	if [ ! -z $alias ]; then
 		info "Adding Alias to Archive $NAME"
 		for al in ${alias[@]}; do
@@ -1111,7 +1112,6 @@ install_package() {
 }
 recursive() {
 	local ARGS FILE DIR
-#	[ -f $PKGMK_REPO_FILE ] && rm -v $PKGMK_REPO_FILE
 
 	ARGS="$(echo "$@" | sed -e "s/--recursive//g" -e "s/-r//g")"
 
@@ -1613,6 +1613,7 @@ PKGMK_IGNORE_FOOTPRINT="no"
 PKGMK_IGNORE_NEW="yes"
 PKGMK_IGNORE_REPO="no"
 PKGMK_IGNORE_RUNTIMEDEPS="no"
+PKGMK_IGNORE_RUNTIMELIBS="no"
 
 PKGMK_NO_STRIP="no"
 
