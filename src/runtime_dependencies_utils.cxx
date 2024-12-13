@@ -226,7 +226,7 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 				if ( ( dynamic_strings != NULL ) && ( offset <  dynamic_strings_length) )
 				{
 					name = dynamic_strings + edyn->d_un.d_val;
-					if ( name != NULL )
+					if ( name != NULL  && name[strlen(name)-1] != '.')
 						runtimeLibrariesList.insert(name);
 				}
 			}
@@ -358,7 +358,8 @@ int getRuntimeLibrariesList(std::set<std::string>& runtimeLibrariesList,
 				if ( ( dynamic_strings != NULL ) && ( offset <	dynamic_strings_length) )
 				{
 					name = dynamic_strings + edyn->d_un.d_val;
-					runtimeLibrariesList.insert(name);
+					if (name[strlen(name)-1] != '.')
+						runtimeLibrariesList.insert(name);
 				}
 			}
 		}
