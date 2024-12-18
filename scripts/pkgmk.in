@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#  SPDX-License-Identifier: LGPL-2.1-or-later
 #  Copyright (c) 2000 - 2005 Per Liden
 #  Copyright (c) 2006 - 2013 by CRUX team (http://crux.nu)
 #  Copyright (c) 2013 - .... by NuTyX team (http://nutyx.org)
@@ -641,11 +642,6 @@ build() {
 				make
 				make DESTDIR=$PKG install;;
 
-			python2)
-				cd ${_name}-$version
-				python2 setup.py build
-				python2 setup.py install --prefix=/usr --root=$PKG;;
-
 			python3)
 				cd ${_name}-$version
 				python3 setup.py build
@@ -660,31 +656,28 @@ build() {
 				make DESTDIR=$PKG install;;
 
 			kde5|cmake)
-				mkdir build
-				cd    build
-				cmake -DCMAKE_INSTALL_PREFIX=/usr  \
-					-DCMAKE_BUILD_TYPE=Release \
-					-DCMAKE_INSTALL_LIBDIR=lib   \
-					-DBUILD_TESTING=OFF        \
-					-Wno-dev \
-					../$name-$version
-				make
-				make DESTDIR=$PKG install;;
+				cmake -B build \
+				-S $name-$version \
+				-DCMAKE_INSTALL_PREFIX=/usr \
+				-DCMAKE_BUILD_TYPE=Release \
+				-DCMAKE_INSTALL_LIBDIR=lib \
+				-DBUILD_TESTING=OFF \
+				-Wno-dev
+
+				cmake --build build
+				DESTDIR="$PKG" cmake --install build;;
 
 			kde6)
-				mkdir build
-				cd    build
-				cmake -DCMAKE_INSTALL_PREFIX=/usr  \
-					-DCMAKE_INSTALL_LIBEXECDIR=libexec \
-					-DCMAKE_BUILD_TYPE=Release \
-					-DCMAKE_INSTALL_LIBDIR=lib \
-					-DBUILD_QT5=OFF            \
-					-DBUILD_TESTING=OFF        \
-					-Wno-dev \
-					../$name-$version
-				make
-				make DESTDIR=$PKG install;;
+				cmake -B build  -S $name-$version \
+					-DCMAKE_INSTALL_PREFIX=/usr   \
+					-DCMAKE_BUILD_TYPE=Release    \
+					-DCMAKE_INSTALL_LIBDIR=lib    \
+					-DBUILD_QT5=OFF               \
+					-DBUILD_TESTING=OFF           \
+					-Wno-dev
 
+				cmake --build build
+				DESTDIR=$PKG cmake --install build;;
 
 			*)
 				echo "$(basename $PKGMK_COMMAND): function build invalid build type"

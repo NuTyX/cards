@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#  SPDX-License-Identifier: LGPL-2.1-or-later
 #  Copyright (c) 2016 - 2024 by NuTyX team (http://nutyx.org)
 
 usage () {
@@ -249,6 +250,7 @@ parse_arguments() {
       PARAM+=($1);;
 
     -p|--pause)
+      VERBOSE="yes"
       MANUAL="yes"
       PAUSE="&& printf \"You are now in the chroot.\n\
 Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
@@ -694,15 +696,16 @@ setup_pkgmk_conf
 export DEVEL VERSION
 [ "$VERBOSE" == "yes" ] || QUIET="-q"
 
-if [ -f $HOME/.mybld ];then
-  echo " $HOME/.mybld:
+if [ ! -z $VERBOSE ]; then
+  if [ -f $HOME/.mybld ];then
+    echo " $HOME/.mybld:
  =================================
 "
-  cat $HOME/.mybld
-else
-  echo "====> Config file $HOME/.mybld not found"
-fi
-echo "
+    cat $HOME/.mybld
+  else
+    echo "====> Config file $HOME/.mybld not found"
+  fi
+  echo "
 pkgmk.conf:
 ===========
 $PKGMK_CONF
@@ -719,7 +722,7 @@ $CARDS_CONF
 running the command: sudo KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" \
 DEPOT=\"/DEPOT\" DEVEL=\"$DEVEL\" install-nutyx $QUIET
 "
-
+fi
 if [ -z "$PACKAGES_LIST" ]; then
   if [ ! -z "${PARAM[1]}" ]; then
     find_new_packager
