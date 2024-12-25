@@ -47,11 +47,21 @@ repo::repo(const CardsArgumentParser& argParser,
                 + "/"
                 + dir.collection;
 
-            std::string repofile = path + PKG_REPO_META;
+            std::string repometa = path + PKG_REPO_META;
+            std::string repofile = path + PKG_REPO_FILES;
             std::cout << "Generating "
+                << repometa
+                << " and "
                 << repofile
                 << std::endl;
 
+            FILE* mp = fopen(repometa.c_str(),"w");
+            if (!mp) {
+                std::cout << "Cannot open "
+                    << repometa
+                    << std::endl;
+                return;
+            }
             FILE* fp = fopen(repofile.c_str(),"w");
             if (!fp) {
                 std::cout << "Cannot open "
@@ -74,36 +84,50 @@ repo::repo(const CardsArgumentParser& argParser,
                         + file.substr( pos + 1 );
 
                 file += "\n";
-                fwrite(file.c_str(),1, file.size(),fp);
+                fwrite(file.c_str(),1, file.size(),mp);
+                fwrite(file.c_str(),1,file.size(),fp);
                 for (auto meta : a.contentMeta()) {
                     meta += "\n";
-                    fwrite(meta.c_str(),1,meta.size(),fp);
+                    fwrite(meta.c_str(),1,meta.size(),mp);
                 }
+                for (auto file : a.setofFiles()) {
+                    file += "\n";
+                    fwrite(file.c_str(),1,file.size(),fp);
+                }
+                file = "\n";
+                fwrite(file.c_str(),1, file.size(),fp);
 
                 m_pkgrepo.generateSign();
                 file = HASHSUM
                     + m_pkgrepo.hash()
                     + "\n";
-                fwrite(file.c_str(),1, file.size(),fp);
+                fwrite(file.c_str(),1, file.size(),mp);
 
                 file = SIGNATURE
                     + m_pkgrepo.sign()
                     + "\n";
-                fwrite(file.c_str(),1, file.size(),fp);
+                fwrite(file.c_str(),1, file.size(),mp);
 
                 file = SIZE
                     + itos(buf.st_size)
                     + "\n";
-                fwrite(file.c_str(),1, file.size(),fp);
+                fwrite(file.c_str(),1, file.size(),mp);
 
                 file = "\n";
-                fwrite(file.c_str(),1, file.size(),fp);
+                fwrite(file.c_str(),1, file.size(),mp);
 
                 rotatingCursor();
             }
             fclose(fp);
+            fclose(mp);
             std::cout << std::endl;
+            std::cout << "Compressing "
+                << repometa
+                << " and "
+                << repofile
+                << std::endl;
             compress(repofile);
+            compress(repometa);
             if (m_argParser.otherArguments().size() > 0 )
                 break;
         }
