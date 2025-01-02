@@ -8,16 +8,28 @@
 #include "cards_argument_parser.h"
 
 namespace cards {
+	struct m_package {
+		std::string description;
+		std::string collection;
+		time_t installed_build;
+		time_t available_build;
+		std::string installed_version;
+		std::string available_version;
+		unsigned int installed_space;
+		unsigned int available_space;
+		UpgradeEnum status;
+
+	};
 
 class upgrade : public pkgadd {
 
-	std::set<std::string>                     m_ListOfPackagesToDelete;
-	std::set<std::pair<std::string, time_t>>  m_ListOfPackagesToUpdate;
-
-	const CardsArgumentParser&                m_argParser;
-	cards::sync                               m_sync;
-	cards::pkgrepo                            m_pkgrepo;
-	cards::conf                               m_config;
+	std::set<std::string>                    m_ListOfPackagesToDelete;
+	std::set<std::pair<std::string, time_t>> m_ListOfPackagesToUpdate;
+	std::map<std::string, m_package>         m_ListOfPackagesToDeal;
+	const CardsArgumentParser&               m_argParser;
+	cards::sync                              m_sync;
+	cards::pkgrepo                           m_pkgrepo;
+	cards::conf                              m_config;
 
 public:
 	/**
@@ -33,6 +45,7 @@ public:
 	 * Show the packages that should be update without upgrade them
 	 */
 	void dry();
+	void info();
 	
 	/**
 	 *

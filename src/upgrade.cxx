@@ -16,7 +16,7 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 
 	m_progress = true;
 
-	if ( ! m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
+	if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC))
 		m_sync.run();
 	
 	buildDatabase(true);
@@ -26,7 +26,7 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 			listOfExistPackages.insert(i.first);
 		}
 	}
-	if ( listOfExistPackages.empty() ) {
+	if (listOfExistPackages.empty()) {
 		m_actualError = cards::ERROR_ENUM_CANNOT_FIND_DEPOT;
 		treatErrors("");
 	}
@@ -65,22 +65,36 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 			continue;
 		}
 		std::pair<std::string,time_t> packageNameBuildDate;
+		m_package packageNameToDeal;
 		packageNameBuildDate.first = i.first ;
+		packageNameToDeal.description = i.second.description();
+		packageNameToDeal.available_space = i.second.space();
+		packageNameToDeal.collection = i.second.collection();
+		packageNameToDeal.installed_build = m_listOfPackages[i.first].build();
+		packageNameToDeal.available_build = m_pkgrepo.getBinaryBuildTime(i.first);
+		packageNameToDeal.installed_version = m_listOfPackages[i.first].version()
+			+ "-"
+			+ itos(m_listOfPackages[i.first].release());
+		packageNameToDeal.available_version = m_pkgrepo.version(i.first)
+			+ "-"
+			+ itos(m_pkgrepo.release(i.first));
+
 		packageNameBuildDate.second = m_pkgrepo.getBinaryBuildTime(i.first);
-		if ( checkPackageNameBuildDateSame(packageNameBuildDate)) {
+		if (checkPackageNameBuildDateSame(packageNameBuildDate)) {
 			continue;
 		}
+		m_ListOfPackagesToDeal[i.first]= packageNameToDeal;
 		m_ListOfPackagesToUpdate.insert(packageNameBuildDate);
 	}
-	if ( m_argParser.getCmdValue() == ArgParser::CMD_UPGRADE) {
-		if ( m_argParser.isSet(CardsArgumentParser::OPT_CHECK))
+	if (m_argParser.getCmdValue() == ArgParser::CMD_UPGRADE) {
+		if (m_argParser.isSet(CardsArgumentParser::OPT_CHECK))
 			Isuptodate();
-		if ( m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
+		if (m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
 			size();
 		if ( (! m_argParser.isSet(CardsArgumentParser::OPT_SIZE)) &&
-				(! m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) ) {
-			if ( m_ListOfPackagesToUpdate.size() == 0  &&
-				( m_ListOfPackagesToDelete.size() == 0 ) ) {
+				(! m_argParser.isSet(CardsArgumentParser::OPT_CHECK))) {
+			if (m_ListOfPackagesToUpdate.size() == 0  &&
+				(m_ListOfPackagesToDelete.size() == 0)) {
 					std::cout << _("Your system is up to date.") << std::endl;
 			} else {
 				if (! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
@@ -89,17 +103,17 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 						treatErrors("");
 					}
 				}
-				if ( ! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
+				if (!m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
 					go();
 			}
 		}
 	}
-	if ( m_argParser.getCmdValue() == ArgParser::CMD_DIFF) {
-		if ( ( m_ListOfPackagesToUpdate.size() == 0 )
-			&& ( m_ListOfPackagesToDelete.size() == 0 ) ) {
+	if (m_argParser.getCmdValue() == ArgParser::CMD_DIFF) {
+		if ((m_ListOfPackagesToUpdate.size() == 0)
+			&& (m_ListOfPackagesToDelete.size() == 0)) {
 				std::cout << _("Your system is up to date.") << std::endl;
 		} else {
-			dry();
+			info();
 		}
 	}
 }
@@ -111,8 +125,8 @@ void upgrade::size()
 }
 void upgrade::Isuptodate()
 {
-	if ( ( m_ListOfPackagesToUpdate.size() == 0 )
-		&& ( m_ListOfPackagesToDelete.size() == 0 ) )
+	if ((m_ListOfPackagesToUpdate.size() == 0)
+		&& (m_ListOfPackagesToDelete.size() == 0))
 			std::cout << "no" << std::endl;
 	else
 		std::cout << "yes" << std::endl;
@@ -129,29 +143,111 @@ int upgrade::Isdownload()
 
 return EXIT_SUCCESS;
 }
+void upgrade::info()
+{
+    unsigned int width1 = 2; // Default width of "Name"
+	unsigned int width2 = 4; // Default width of "Version"
+	std::string name = _("Name:");
+	if (name.length() > width1)
+		width1 = name.length();
+	std::string installed = _("Installed:");
+	if (installed.length() > width2)
+		width2 = installed.length();
+
+	std::cout << std::endl;
+
+	for (auto i: m_ListOfPackagesToDelete)
+		if (i.length() > width1)
+			width1 = i.length();
+
+	for (auto i : m_ListOfPackagesToDeal) {
+		if (i.first.length() > width1)
+			width1 = i.first.length();
+		if (i.second.installed_version.length() > width2)
+			width2 = i.second.installed_version.length();
+	}
+
+	std::cout << std::left
+                << std::setw(width1)
+				<< name
+				<< " "
+				<< _("To remove:")
+				<< std::endl;
+
+	for (auto i: m_ListOfPackagesToDelete)
+		std::cout << std::left
+            << std::setw(width1)
+			<< i
+			<< " "
+			<< _("Yes")
+			<< std::endl;
+
+	std::cout << std::endl;
+
+	std::cout << std::left
+        << std::setw(width1)
+		<< name
+		<< " "
+		<< _("Status:")
+		<< std::endl;
+
+	for (auto i : m_ListOfPackagesToDeal)
+		if (i.second.installed_version ==
+			i.second.available_version)
+			std::cout << std::left
+                << std::setw(width1)
+				<< i.first
+				<< " "
+				<< (i.second.available_build - i.second.installed_build)/(24*60*60)
+				<< _(" day(s)")
+				<< std::endl;
+
+	std::cout << std::endl;
+
+	std::cout << std::left
+                << std::setw(width1)
+				<< name
+				<< std::setw(width2)
+				<< installed
+				<< " "
+				<< _("Available:")
+				<< std::endl;
+
+	for (auto i : m_ListOfPackagesToDeal)
+		if (i.second.installed_version !=
+			i.second.available_version)
+			std::cout << std::left
+                << std::setw(width1)
+				<< i.first
+				<< std::setw(width2)
+				<< i.second.installed_version
+				<< " "
+				<< i.second.available_version
+				<< std::endl;
+}
 void upgrade::dry()
 {
-	if (m_ListOfPackagesToUpdate.size() > 1 )
+	if (m_ListOfPackagesToUpdate.size() > 1)
 				std::cout << _("Packages")
 					<< ": ";
-	if (m_ListOfPackagesToUpdate.size() == 1 )
+	if (m_ListOfPackagesToUpdate.size() == 1)
 				std::cout << _("Package")
 					<< " : ";
-	for (auto i : m_ListOfPackagesToUpdate )
+	for (auto i : m_ListOfPackagesToUpdate)
 		std::cout << "'"
 			<< i.first
 			<< "' ";
-	if (m_ListOfPackagesToUpdate.size() > 0 )
+	if (m_ListOfPackagesToUpdate.size() > 0)
 				std::cout << _("will be replaced when you upgrade your NuTyX.")
 					<< std::endl;
 
-	if (m_ListOfPackagesToDelete.size() > 1 )
+	if (m_ListOfPackagesToDelete.size() > 1)
 				std::cout << _("Packages") << ": ";
-	if (m_ListOfPackagesToDelete.size() == 1 )
+	if (m_ListOfPackagesToDelete.size() == 1)
 				std::cout << _("Package") << " : ";
 	for (auto i: m_ListOfPackagesToDelete)
 			std::cout << "'" << i << "' ";
-	if (m_ListOfPackagesToDelete.size() > 0 )
+	if (m_ListOfPackagesToDelete.size() > 0)
 				std::cout << _("will be removed when you upgrade your NuTyX.")
 					<< std::endl;
 
@@ -217,7 +313,7 @@ void upgrade::summary()
 		std::cout << _("have been removed from your NuTyX.") << std::endl;
 	}
 	if (m_ListOfPackagesToUpdate.size() > 1
-		|| m_ListOfPackagesToDelete.size() > 1 )
+		|| m_ListOfPackagesToDelete.size() > 1)
 		std::cout << std::endl;
 }
 }

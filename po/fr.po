@@ -324,6 +324,27 @@ msgstr "Pas trouvé"
 msgid "\t   Print this help message"
 msgstr "\t   Affiche cet aide"
 
+msgid "Name:"
+msgstr "Nom:"
+
+msgid "Installed:"
+msgstr "Installé:"
+
+msgid "Available:"
+msgstr "Disponible:"
+
+msgid "To remove:"
+msgstr "A supprimer:"
+
+msgid "Status:"
+msgstr "Etat:"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid " day(s)"
+msgstr " jour(s)"
+
 msgid "Name           : "
 msgstr "Nom                 : "
 

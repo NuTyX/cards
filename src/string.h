@@ -12,6 +12,7 @@ class string {
     char *m_value;
     unsigned int m_capacity;
     unsigned int m_size;
+
     void init();
 
 public:
