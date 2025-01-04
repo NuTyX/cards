@@ -113,7 +113,7 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 			&& (m_ListOfPackagesToDelete.size() == 0)) {
 				std::cout << _("Your system is up to date.") << std::endl;
 		} else {
-			info();
+			show();
 		}
 	}
 }
@@ -143,7 +143,7 @@ int upgrade::Isdownload()
 
 return EXIT_SUCCESS;
 }
-void upgrade::info()
+void upgrade::show()
 {
     unsigned int width1 = 2; // Default width of "Name"
 	unsigned int width2 = 4; // Default width of "Version"
@@ -225,41 +225,14 @@ void upgrade::info()
 				<< i.second.available_version
 				<< std::endl;
 }
-void upgrade::dry()
-{
-	if (m_ListOfPackagesToUpdate.size() > 1)
-				std::cout << _("Packages")
-					<< ": ";
-	if (m_ListOfPackagesToUpdate.size() == 1)
-				std::cout << _("Package")
-					<< " : ";
-	for (auto i : m_ListOfPackagesToUpdate)
-		std::cout << "'"
-			<< i.first
-			<< "' ";
-	if (m_ListOfPackagesToUpdate.size() > 0)
-				std::cout << _("will be replaced when you upgrade your NuTyX.")
-					<< std::endl;
-
-	if (m_ListOfPackagesToDelete.size() > 1)
-				std::cout << _("Packages") << ": ";
-	if (m_ListOfPackagesToDelete.size() == 1)
-				std::cout << _("Package") << " : ";
-	for (auto i: m_ListOfPackagesToDelete)
-			std::cout << "'" << i << "' ";
-	if (m_ListOfPackagesToDelete.size() > 0)
-				std::cout << _("will be removed when you upgrade your NuTyX.")
-					<< std::endl;
-
-}
 void upgrade::go()
 {
 	for (auto i : m_ListOfPackagesToUpdate)
 		m_pkgrepo.generateDependencies(i);
 
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DRY))
-		dry();
-	else if (! m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
+		show();
+	else if (!m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
 		for (auto i : m_pkgrepo.getDependenciesList()) {
 			m_packageArchiveName = m_pkgrepo.dirName(i.first)
 				+ "/"

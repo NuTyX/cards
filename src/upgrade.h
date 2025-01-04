@@ -44,8 +44,7 @@ public:
 	 *
 	 * Show the packages that should be update without upgrade them
 	 */
-	void dry();
-	void info();
+	void show();
 	
 	/**
 	 *
