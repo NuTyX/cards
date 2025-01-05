@@ -41,9 +41,9 @@ void sync::purge()
 void sync::run() 
 {
 	for (auto collection : m_config.dirUrl()) {
-		if (collection.url.size() == 0 ) {
+		if (collection.url.size() == 0 )
 			continue;
-		}
+
 		cards::dwl key(collection.url
 			+ "/"
 			+ m_config.arch()
