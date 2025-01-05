@@ -658,6 +658,11 @@ std::string& pkgrepo::dirName(const std::string& name)
 
     return m_packageDirName;
 }
+unsigned int pkgrepo::getSpace(const std::string& name)
+{
+    parse();
+    return m_listOfPackages[name].space();
+}
 std::string& pkgrepo::fileName(const std::string& name)
 {
     parse();

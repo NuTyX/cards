@@ -16,6 +16,19 @@ namespace cards {
 
 typedef std::map<std::string, cards::cache> repo_t;
 
+struct m_package {
+	std::string description;
+	std::string collection;
+	time_t installed_build;
+	time_t available_build;
+	std::string installed_version;
+	std::string available_version;
+	unsigned int installed_space;
+	unsigned int available_space;
+	UpgradeEnum status;
+
+};
+
 class pkgrepo {
 
     std::string              m_packageName;
@@ -132,6 +145,7 @@ public:
     std::string&             fileSignature(const std::string& name);
     std::string&             fileHash(const std::string& name);
     std::string&             getBinaryPackageInfo(const std::string& name);
+    unsigned int             getSpace(const std::string& name);
     std::string&             version(const std::string& name);
     unsigned short int       release(const std::string& name);
 
