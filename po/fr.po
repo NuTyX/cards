@@ -553,8 +553,11 @@ msgstr "installe toutes les dépendances depuis les binaires et compile le port 
 msgid "check or signing a collection of packages depending if a private key is present."
 msgstr "vérifie ou signe une collection de paquets en fonction de la présence d'une clé privée."
 
-msgid "list outdated packages."
-msgstr "liste les paquets obsolètes."
+msgid "shows available updates."
+msgstr "affiche les mise à jour disponibles."
+
+msgid "Shows Out of date, Obsolet, Rebuild, Conflict, Replace packages available."
+msgstr "Affiche les paquets disponibles qu'ils soient périmés, Obsolètes, reconstruits, en conflit ou remplaçables."
 
 msgid "upgrade outdated packages."
 msgstr "met à jour les paquets obsolètes."
@@ -610,14 +613,26 @@ msgstr "retour à un système de base."
 msgid "It will REMOVE ALL THE PACKAGES not listed in the base system list directory."
 msgstr "Va SUPPRIMER TOUS LES PAQUETS qui ne sont pas dans la liste des dossiers définis dans le répertoire de base."
 
-msgid "list the file(s) of the installed <package>."
-msgstr "Affiche le(s) fichier(s) du <paquet> installé."
+msgid "list the file(s) of the <package>."
+msgstr "Affiche le(s) fichier(s) du <paquet>."
 
 msgid "synchronize local and remote metadatas."
 msgstr "synchronise les metadonnées locales et distantes."
 
 msgid "print info about a package."
 msgstr "affiche les informations d'un paquet"
+
+msgid "print all details of a package like version, size, description, etc."
+msgstr "affiche tous les détails d'un paquet tel que la version, la taille, la description, etc."
+
+msgid "list all packages."
+msgstr "affiche une liste de tous les paquets"
+
+msgid "It will list available packages."
+msgstr "Affiche une liste de tous les paquets disponibles."
+
+msgid "     Available sets of packages in depot server."
+msgstr "     Jeux de paquets disponibles sur le serveur de dépot."
 
 msgid "If -p or -b are passed as optional arguments, it will be the info of a port or the info of a binary available in the depot."
 msgstr "Si un argument -p ou -b est utilisé, ce seront les informations d'un port ou les informations d'un binaire disponible sur le dépot."
@@ -811,6 +826,9 @@ msgstr "\t   Vérifie uniquement si tous les binaires nécessaires sont téléch
 
 msgid "\t   Search only in the name of the package."
 msgstr "\t   Recherche uniquement dans le nom du paquet."
+
+msgid "\t   Don't upgrade local metadata (not recommended)."
+msgstr "\t   Ne pas mettre les metadonnées locales à jour (déconseillé)."
 
 msgid "Only download the binaries that are needed to be upgraded."
 msgstr "Télécharge uniquement les binaires nécessaires pour la mise à jour."
