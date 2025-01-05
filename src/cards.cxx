@@ -14,6 +14,7 @@
 #include "remove.h"
 #include "repo.h"
 #include "sync.h"
+#include "diff.h"
 #include "upgrade.h"
 
 #include <cstdlib>
@@ -205,6 +206,10 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_DIFF: {
+            cards::diff diff(cardsArgPars, configFile);
+            return EXIT_SUCCESS;
+        }
+        case ArgParser::CMD_UPGRADE: {
             cards::upgrade upgrade(cardsArgPars, configFile);
             return EXIT_SUCCESS;
         }
@@ -217,15 +222,7 @@ int main(int argc, char** argv)
             unique_ptr<cards::remove> i(new cards::remove("cards remove", cardsArgPars, configFile));
         }
             return EXIT_SUCCESS;
-
-        case ArgParser::CMD_UPGRADE: {
-            cards::upgrade upgrade(cardsArgPars, configFile);
-            if (cardsArgPars.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
-                return upgrade.Isdownload();
-
-            return EXIT_SUCCESS;
-        }
-        case ArgParser::CMD_PURGE: {
+       case ArgParser::CMD_PURGE: {
             cards::sync sync;
             sync.purge();
             return EXIT_SUCCESS;

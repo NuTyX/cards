@@ -40,12 +40,11 @@ CardsArgumentParser::CardsArgumentParser()
     addCommand(CMD_CONFIG, "config",
         _("print info about cards configuration."),
         _("It can show the defined Directories where alls the packages are located.\n\
-The locale which are going to be installed, the architecture of your machine,\n\
-the base system directory and the logfile directory."),
+The locale which are going to be installed, the architecture of your machine."),
         ArgParser::NONE, 0, "");
 
     addCommand(CMD_FILES, "files",
-        _("list the file(s) of the installed <package>."),
+        _("list the file(s) of the <package>."),
         "",
         ArgParser::EQ, 1, _("<package>"));
 
@@ -61,12 +60,12 @@ the base system directory and the logfile directory."),
 
     addCommand(CMD_INFO, "info",
         _("print info about a package."),
-        _("print details of an available package on the remote server."),
+        _("print all details of a package like version, size, description, etc."),
         ArgParser::EQ, 1, _("<package>"));
 
     addCommand(CMD_LIST, "list",
-        _("list packages."),
-        _("It will list available packages on the remote server."),
+        _("list all packages."),
+        _("It will list available packages."),
         ArgParser::NONE, 0, "");
 
     addCommand(CMD_SEARCH, "search",
@@ -107,8 +106,8 @@ It will delete all the downloads binaries which are located in the binaries sect
         ArgParser::NONE, 0, "");
 
     addCommand(CMD_DIFF, "diff",
-        _("list outdated packages."),
-        _("An outdated package is a installed package older then the one in the depot."),
+        _("shows available updates."),
+        _("Shows Out of date, Obsolet, Rebuild, Conflict, Replace packages available."),
         ArgParser::NONE, 0, "");
 
     addCommand(CMD_LEVEL, "level",
@@ -163,7 +162,7 @@ As for the generation, a private key is needed, it is used by the packager only.
 
     OPT_NO_SYNC.init("no-sync",
         0,
-        _("\t   Only upgrade what's possible."));
+        _("\t   Don't upgrade local metadata (not recommended)."));
 
     OPT_DOWNLOAD_READY.init("ready",
         0,
@@ -248,9 +247,12 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_UPGRADE, OPT_NO_SYNC, false);
     addOption(CMD_UPGRADE, OPT_SIZE, false);
     addOption(CMD_UPGRADE, OPT_CHECK, false);
-    addOption(CMD_UPGRADE, OPT_DRY, false);
     addOption(CMD_UPGRADE, OPT_ROOT, false);
     addOption(CMD_UPGRADE, OPT_CONFIG_FILE, false);
+
+    addOption(CMD_DIFF, OPT_SIZE, false);
+    addOption(CMD_DIFF, OPT_CHECK, false);
+    addOption(CMD_DIFF, OPT_NO_SYNC, false);
 
     addOption(CMD_LIST, OPT_BINARIES, false);
     addOption(CMD_LIST, OPT_SETS, false);
