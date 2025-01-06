@@ -23,6 +23,25 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 	
 	buildDatabase(true);
 
+	if (m_diff.ratio() > 20) {
+		if(!m_argParser.isSet(CardsArgumentParser::OPT_PROCEED)) {
+			m_diff.summary();
+			std::cout << std::endl
+				<< _("Number of obsolets packages (")
+				<< m_diff.ratio()
+				<< " %) "
+				<< _("is high !!!\n\n\
+Use the command: ")
+				<< BLUE
+				<< "cards diff"
+				<< WHITE
+				<< "|more"
+				<< NORMAL
+				<< _(" for more details.\n\n");
+			return;
+		}
+
+	}
 	std::set<std::string> listOfExistPackages;
 	for (auto i:m_listOfPackages) {
 		if (m_pkgrepo.checkBinaryExist(i.first)) {

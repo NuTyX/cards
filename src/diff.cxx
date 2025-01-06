@@ -66,9 +66,10 @@ diff::diff(const CardsArgumentParser& argParser,
 				packageNameToDeal.available_build = m_pkgrepo.getBinaryBuildTime(i.first);
 			}
 		} else {
-			++m_packagesObsolet;
-			packageNameToDeal.status = STATUS_ENUM_UPG_OBSOLET;
-
+			if(i.second.dependency()) {
+				++m_packagesObsolet;
+				packageNameToDeal.status = STATUS_ENUM_UPG_OBSOLET;
+			}
 		}
 		m_listOfPackagesToDeal[i.first]= packageNameToDeal;
 	}
@@ -80,15 +81,42 @@ diff::diff(const CardsArgumentParser& argParser,
 			std::cout << "yes\n";
 		else
 			std::cout << "no\n";
-	} else
-		if (size() > 0)
-			showInfo();
-		else
-			std::cout << _("Your system is up to date.")
-				<< std::endl;
+	}
+}
+const unsigned int diff::ratio()
+{
+	auto p = ((float)m_packagesOK/m_listOfPackages.size())*100;
+	return 100 - (int)p;
+}
+void diff::summary()
+{
+	std::cout << std::endl
+		<< _("Number of Packages: ")
+		<< m_listOfPackages.size()
+		<< std::endl;
+	std::cout << _("Untouched Packages: ")
+		<< m_packagesOK
+		<< std::endl;
+	std::cout << _("Out of Date Packages (different version): ")
+		<< m_packagesOutOfDate
+		<< std::endl;
+	std::cout << _("Rebuild Packages (newer build date): ")
+		<< m_packagesNewBuild
+		<< std::endl;
+	std::cout << _("Obsolet Packages (will be removed): ")
+		<< m_packagesObsolet
+		<< std::endl;
+	std::cout << _("Conflict Packages (will be removed): ")
+		<< m_packagesConflict
+		<< std::endl;
 }
 void diff::showInfo()
 {
+	if (size() == 0) {
+		std::cout << _("Your system is up to date.")
+			<< std::endl;
+		return;
+	}
     unsigned int width1 = 2; // Default width of "Name"
 	unsigned int width2 = 4; // Default width of "Version"
 	std::string name = _("Name:");
@@ -97,8 +125,6 @@ void diff::showInfo()
 	std::string installed = _("Installed:");
 	if (installed.length() > width2)
 		width2 = installed.length();
-
-	std::cout << std::endl;
 
 	for (auto i : m_listOfPackagesToDeal) {
 		if (i.first.length() > width1)
@@ -109,12 +135,17 @@ void diff::showInfo()
 	}
 	++width1;
 	++width2;
-
-	std::cout<< _("Untouched Packages: ")
+	std::cout << std::endl
+		<< _("Number of Packages: ")
+		<< m_listOfPackages.size()
+		<< std::endl;
+	std::cout << std::endl
+		<< _("Untouched Packages: ")
 		<< m_packagesOK
 		<< std::endl;
 
-	std::cout << _("Out of Date Packages (different version): ")
+	std::cout << std::endl
+		<< _("Out of Date Packages (different version): ")
 		<< m_packagesOutOfDate
 		<< std::endl;
 
@@ -137,13 +168,44 @@ void diff::showInfo()
 		<< i.second.available_version
 		<< std::endl;
 	}
-	std::cout << _("Obsolet Packages (will be removed): ")
-		<< m_packagesObsolet
-		<< std::endl;
-	
-	std::cout<< _("Rebuild Packages (newer build date): ")
+	std::cout << std::endl
+		<< _("Rebuild Packages (newer build date): ")
 		<< m_packagesNewBuild
 		<< std::endl;
+	for (auto i : m_listOfPackagesToDeal){
+		if (i.second.status != STATUS_ENUM_UPG_NEWBUILD)
+			continue;
+		std::cout << std::left
+			<< std::setw(width1)
+			<< i.first
+			<< std::endl;
+	}
+	std::cout << std::endl
+		<< _("Obsolet Packages (will be removed): ")
+		<< m_packagesObsolet
+		<< std::endl;
+	for (auto i : m_listOfPackagesToDeal){
+		if (i.second.status != STATUS_ENUM_UPG_OBSOLET)
+			continue;
+		std::cout << std::left
+			<< std::setw(width1)
+			<< i.first
+			<< std::endl;
+	}
+	if (ratio() > 20) {
+		std::cout << std::endl
+			<< _("Number of obsolets packages (")
+			<< ratio()
+			<< " %) "
+			<< _("is high !!!\n\n\
+Use the command: ")
+			<< BLUE
+			<< "cards upgrade"
+			<< WHITE
+			<< " --proceed"
+			<< NORMAL
+			<< _(" when you're ready to upgrade your system.\n\n");		
+	}
 }
 const unsigned int diff::packagesObsolet() {
 	return m_packagesObsolet;
@@ -170,4 +232,5 @@ const unsigned int diff::size() {
 		+ m_packagesOutOfDate
 		+ m_packagesNewBuild;
 }
+
 }

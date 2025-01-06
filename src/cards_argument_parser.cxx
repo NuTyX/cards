@@ -4,6 +4,7 @@
 
 ArgParser::APOpt CardsArgumentParser::OPT_DOWNLOAD_ONLY;
 ArgParser::APOpt CardsArgumentParser::OPT_DOWNLOAD_READY;
+ArgParser::APOpt CardsArgumentParser::OPT_PROCEED;
 ArgParser::APOpt CardsArgumentParser::OPT_CHECK;
 ArgParser::APOpt CardsArgumentParser::OPT_SIZE;
 ArgParser::APOpt CardsArgumentParser::OPT_NO_SYNC;
@@ -160,41 +161,67 @@ Location of the keys is defined in cards.conf file.\n\
 As for the generation, a private key is needed, it is used by the packager only."),
         ArgParser::MIN, 0, "");
 
-    OPT_NO_SYNC.init("no-sync",
-        0,
-        _("\t   Don't upgrade local metadata (not recommended)."));
-
-    OPT_DOWNLOAD_READY.init("ready",
-        0,
-        _("\t   Only check if all binaries that are needed are downloaded."));
-
-    OPT_DOWNLOAD_ONLY.init("download-only",
-        0,
-        _("Only download the binaries that are needed to be upgraded."));
-
     OPT_FULL.init("full",
         'F',
         _("\t   Full list, including automatically installed packages."));
+
+    OPT_SETS.init("sets",
+        'S',
+        _("     Available sets of packages in depot server."));
 
     OPT_FORCE.init("force",
         'f',
         _("\t   Force install, overwrite conflicting files."));
 
-    OPT_UPDATE.init("upgrade",
-        'u',
-        _("  Upgrade the package with the same name."));
+    OPT_BINARIES.init("binaries",
+        'b',
+        _(" Available binaries in depot server."));
+
+    OPT_CHECK.init("check",
+        'c',
+        _("\t   Check if they are some updates."));
+
+    OPT_DISABLE.init("disable",
+        'd',
+        _("  Ignore Pre and Post install scripts."));
 
     OPT_INSTALLED.init("installed",
         'i',
         _("Included the allready installed packages in the list."));
 
-    OPT_BINARIES.init("binaries",
-        'b',
-        _(" Available binaries in depot server."));
+    OPT_NAMES.init("name",
+        'n',
+        _("\t   Search only in the name of the package."));
 
-    OPT_SETS.init("sets",
-        'S',
-        _("     Available sets of packages in depot server."));
+    OPT_PROCEED.init("proceed",
+        'p',
+        _("  Proceed with upgrade and bypass summary."));
+
+    OPT_REMOVE.init("remove",
+        'r',
+        _("   Remove the packages founds, use with care."));
+
+    OPT_SIZE.init("size",
+        's',
+        _("\t   Return the number of updates."));
+
+    OPT_UPDATE.init("upgrade",
+        'u',
+        _("  Upgrade the package with the same name."));
+
+    OPT_CONFIG_FILE.init("conf",
+        0,
+        _("  Specify alternative 'cards.conf' configuration file"),
+        true,
+        _("<file>"));
+
+    OPT_DOWNLOAD_ONLY.init("download-only",
+        0,
+        _("Only download the binaries that are needed to be upgraded."));
+
+    OPT_DOWNLOAD_READY.init("ready",
+        0,
+        _("\t   Only check if all binaries that are needed are downloaded."));
 
     OPT_DRY.init("dry",
         0,
@@ -204,41 +231,19 @@ As for the generation, a private key is needed, it is used by the packager only.
         0,
         _("\t   Do not tracks meta-datas of installed packages."));
 
-    OPT_REMOVE.init("remove",
-        'r',
-        _("   Remove the packages founds, use with care."));
-
     OPT_NOLOGENTRY.init("nolog",
         0,
         _("    don't add a log entry for this install set."));
 
-    OPT_DISABLE.init("disable",
-        'd',
-        _("  Ignore Pre and Post install scripts."));
-
-    OPT_SIZE.init("size",
-        's',
-        _("\t   Return the number of updates."));
-
-    OPT_CHECK.init("check",
-        'c',
-        _("\t   Check if they are some updates."));
+    OPT_NO_SYNC.init("no-sync",
+        0,
+        _("\t   Don't upgrade local metadata (not recommended)."));
 
     OPT_ROOT.init("root",
         0,
         _("  Specify alternative installation root"),
         true,
         _("<path>"));
-
-    OPT_CONFIG_FILE.init("conf",
-        0,
-        _("  Specify alternative 'cards.conf' configuration file"),
-        true,
-        _("<file>"));
-
-    OPT_NAMES.init("name",
-        'n',
-        _("\t   Search only in the name of the package."));
 
     addOption(CMD_CONFIG, OPT_CONFIG_FILE, false);
 
@@ -247,6 +252,7 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_UPGRADE, OPT_NO_SYNC, false);
     addOption(CMD_UPGRADE, OPT_SIZE, false);
     addOption(CMD_UPGRADE, OPT_CHECK, false);
+    addOption(CMD_UPGRADE, OPT_PROCEED, false);
     addOption(CMD_UPGRADE, OPT_ROOT, false);
     addOption(CMD_UPGRADE, OPT_CONFIG_FILE, false);
 

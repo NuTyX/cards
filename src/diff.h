@@ -33,6 +33,7 @@ class diff : public pkgdbh
             const std::string& configFileName);
 
         void showInfo();
+        void summary();
 
         const unsigned int packagesConflict();
         const unsigned int packagesReplace();
@@ -40,7 +41,7 @@ class diff : public pkgdbh
         const unsigned int packagesNewBuild();
         const unsigned int packagesOutOfDate();
         const unsigned int packagesOK();
-
+        const unsigned int ratio();
         const unsigned int size();
 };
 

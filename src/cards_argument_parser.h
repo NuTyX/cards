@@ -16,6 +16,7 @@ class CardsArgumentParser : public ArgParser
 
 		static ArgParser::APOpt OPT_CHECK;
 		static ArgParser::APOpt OPT_SIZE;
+		static ArgParser::APOpt OPT_PROCEED;
 
 		static ArgParser::APOpt OPT_FULL;
 		static ArgParser::APOpt OPT_FORCE;
@@ -25,9 +26,7 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APOpt OPT_BINARIES;
 		static ArgParser::APOpt OPT_SETS;
 
-		static ArgParser::APOpt OPT_IGNORE;
 		static ArgParser::APOpt OPT_NOLOGENTRY;
-
 
 		static ArgParser::APOpt OPT_DISABLE;
 		static ArgParser::APOpt OPT_NO_META;

@@ -63,7 +63,7 @@
 #define NAME 'N'
 #define VERSION 'V'
 #define RELEASE 'r'
-#define SIZE_I 'S'
+#define SPACE 'S'
 #define ARCHITECTURE 'a'
 #define DESCRIPTION  'D'
 #define URL 'U'
@@ -82,6 +82,7 @@
 #define HASHSUM 'H'
 #define SIGNATURE 'I'
 #define SIZE 'i'
+#define CONFLICTS 'o'
 
 
 #define PKG_REJECTED "var/lib/pkg/rejected"
