@@ -131,6 +131,14 @@ const std::set<std::string>& pkg::categories()
 {
 	return m_categories;
 }
+void pkg::conflicts(const std::set<std::string>& conflicts)
+{
+	m_conflicts = conflicts;
+}
+const std::set<std::string>& pkg::conflicts()
+{
+	return m_conflicts;
+}
 void pkg::arch(const std::string& arch)
 {
 	m_arch = arch;

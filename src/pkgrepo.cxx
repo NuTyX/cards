@@ -423,6 +423,7 @@ void pkgrepo::parse()
         std::set<std::string> pkgSet;
         std::set<std::string> pkgAlias;
         std::set<std::string> pkgCategories;
+        std::set<std::string> pkgConflicts;
         std::set<std::string> pkgLibs;
         std::set<std::pair<std::string, time_t>> pkgDependencies;
         std::pair<std::string, time_t> dependency;
@@ -448,7 +449,7 @@ void pkgrepo::parse()
                 case RELEASE:
                     info.release(stoi(p.substr(1)));
                     continue;
-                case SIZE_I:
+                case SPACE:
                     info.space(atoi(p.substr(1).c_str()));
                     continue;
                 case ARCHITECTURE:
@@ -502,6 +503,9 @@ void pkgrepo::parse()
                 case CATEGORIES:
                     pkgCategories.insert(p.substr(1));
                     continue;
+                case CONFLICTS:
+                    pkgConflicts.insert(p.substr(1));
+                    continue;
                 case HASHSUM:
                     info.hash(p.substr(1));
                     continue;
@@ -523,10 +527,12 @@ void pkgrepo::parse()
                 info.sets(pkgSet);
                 info.categories(pkgCategories);
                 info.dependencies(pkgDependencies);
+                info.conflicts(pkgConflicts);
                 pkgAlias.clear();
                 pkgSet.clear();
                 pkgCategories.clear();
                 pkgDependencies.clear();
+                pkgConflicts.clear();
                 pkgLibs.clear();
                 m_listOfPackages[pkgName] = info;
                 continue;

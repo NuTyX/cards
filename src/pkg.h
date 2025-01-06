@@ -23,6 +23,7 @@ class pkg
 	std::set<std::string> 	m_alias;
 	std::set<std::string> 	m_sets;
 	std::set<std::string> 	m_categories;
+	std::set<std::string>   m_conflicts;
 
 	std::string				m_group;
 	std::string				m_baseName;
@@ -56,6 +57,7 @@ public:
 	const std::set<std::string>& 	alias();
 	const std::set<std::string>& 	sets();
 	const std::set<std::string>&	categories();
+	const std::set<std::string>&    conflicts();
 	const std::string& 		arch();
 	const std::string& 		license();
 	const std::string&		signature();
@@ -77,6 +79,7 @@ public:
 	void					alias(const std::set<std::string>& alias);
 	void					sets(const std::set<std::string>& sets);
 	void					categories(const std::set<std::string>& categories);
+	void					conflicts(const std::set<std::string>& conflicts);
 
 	void					collection(const std::string& collection);
 	void					baseName(const std::string& baseName);

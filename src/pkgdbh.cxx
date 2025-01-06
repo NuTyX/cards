@@ -531,8 +531,8 @@ void pkgdbh::buildDatabase(const bool& files)
 					info.baseName(i.substr(0,i.size() - s.size()));
 					continue;
 
-				case SIZE_I:
-					info.space( atoi(s.substr(1).c_str()) );
+				case SPACE:
+					info.space(atoi(s.substr(1).c_str()));
 					continue;
 
 				case ALIAS:
