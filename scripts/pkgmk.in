@@ -707,7 +707,7 @@ add_meta_files() {
 	done
 }
 add_meta_to_archive() {
-    local NAME TAR SIZE_I DESC URL CONT PACK MAINT GROUP LICENSE
+    local NAME TAR SPACE DESC URL CONT PACK MAINT GROUP LICENSE
     NAME="$(get_package_name $1)"
     GROUP="$(echo $NAME|cut -d "." -f2)"
     [ "$GROUP" == "$NAME" ] && unset GROUP
@@ -731,13 +731,13 @@ add_meta_to_archive() {
     [ ! -z "$url" ] && URL=$url
     [ ! -z "$license" ]  && LICENSE=$license
 
-    SIZE_I="$(du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1)"
+    SPACE="$(du -b $PKGMK_PACKAGE_DIR/$1|sed "s/\t/ /"|cut -d " " -f1)"
 
 	echo "N$NAME" > .META
 	echo "V$version" >> .META
 	echo "r$release" >> .META
 	echo "B$PKGMK_BUILDVER" >> .META
-	echo "S$SIZE_I" >> .META
+	echo "S$SPACE" >> .META
 	echo "c$COLLECTION" >> .META
 	echo "a$PKGMK_ARCH" >> .META
 
@@ -807,14 +807,18 @@ add_meta_to_archive() {
 		info "Adding Sets to Archive $NAME"
 		for i in ${set[@]}; do
 			echo "s$i" >> .META
-
 		done
 	fi
 	if [ ! -z "$categories" ]; then
 		info "Adding Categories to Archive $NAME"
 		for i in ${categories[@]}; do
 			echo "T$i" >> .META
-
+		done
+	fi
+	if [ ! -z "$conflicts"]; then
+		info "Adding Conflict packages to Archive $NAME"
+		for i in ${conflicts[@]}; do
+			echo "o$i" >> .META
 		done
 	fi
 	bsdtar -tf $PKGMK_PACKAGE_DIR/$1 > .MTREE
