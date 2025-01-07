@@ -56,7 +56,7 @@ The locale which are going to be installed, the architecture of your machine."),
 
     addCommand(CMD_QUERY, "query",
         _("list owner of file(s) matching the query."),
-        "",
+        _("list owner(s) of file(s) matching <pattern>"),
         ArgParser::EQ, 1, _("<pattern>"));
 
     addCommand(CMD_INFO, "info",
@@ -269,6 +269,9 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_INFO, OPT_CONFIG_FILE, false);
 
     addOption(CMD_SEARCH, OPT_NAMES, false);
+
+    addOption(CMD_QUERY, OPT_BINARIES, false);
+    addOption(CMD_FILES, OPT_BINARIES, false);
 
     addOption(CMD_REMOVE, OPT_ROOT, false);
     addOption(CMD_REMOVE, OPT_CONFIG_FILE, false);

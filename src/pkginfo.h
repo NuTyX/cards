@@ -35,7 +35,9 @@ public:
     pkginfo();
 
     virtual void    parseArguments(int argc, char** argv);
-    void            list();
+    void            installed();
+    void            list(const std::string& packageName);
+    void            query(const std::string& fileName);
     void            details(const std::string& packageName);
     virtual void    run();
     virtual void    finish();

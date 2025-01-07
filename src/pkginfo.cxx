@@ -143,9 +143,19 @@ void pkginfo::parseArguments(int argc, char** argv)
         treatErrors(m_arg);
     }
 }
-void pkginfo::list()
+void pkginfo::list(const std::string& packageName)
+{
+    m_list_mode = 1;
+    m_arg = packageName;
+}
+void pkginfo::installed()
 {
     m_installed_mode = 1;
+}
+void pkginfo::query(const std::string& fileName)
+{
+    m_owner_mode = 1;
+    m_arg = fileName;
 }
 void pkginfo::details(const std::string& packageName)
 {

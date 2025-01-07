@@ -70,7 +70,7 @@ info::info(const CardsArgumentParser& argParser,
 			<< std::endl
 			<< std::endl;
 		pkginfo pkginfo("cards info");
-		pkginfo.list();
+		pkginfo.installed();
 		pkginfo.run();
 		return;
 	}
@@ -94,47 +94,60 @@ info::info(const CardsArgumentParser& argParser,
         unsigned int width1 = result.begin()->second.collection.length(); // Width of "Collection"
         unsigned int width2 = result.begin()->first.length(); // Width of "Package"
 
-		for (auto i : m_pkgrepo.getListOfPackages()) {
-			for (auto j : i.second.files) {
-				const std::string file('/' + j);
-				if (!regexec(&preg, file.c_str(), 0, 0, 0)) {
-					info Info;
-					Info.collection = i.second.collection();
-					Info.file = j;
-					result.push_back(std::pair<std::string, info>(i.first, Info));
-					if (i.second.collection().length() > width1) {
-						width1 = i.second.collection().length();
-					}
-					if (i.first.length() > width2) {
-						width2 = i.first.length();
+		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
+			for (auto i : m_pkgrepo.getListOfPackages()) {
+				for (auto j : i.second.files) {
+					const std::string file('/' + j);
+					if (!regexec(&preg, file.c_str(), 0, 0, 0)) {
+						info Info;
+						Info.collection = i.second.collection();
+						Info.file = j;
+						result.push_back(std::pair<std::string, info>(i.first, Info));
+						if (i.second.collection().length() > width1) {
+							width1 = i.second.collection().length();
+						}
+						if (i.first.length() > width2) {
+							width2 = i.first.length();
+						}
 					}
 				}
 			}
-		}
-		regfree(&preg);
-        if (result.size() > 1) {
-            for (auto i : result) {
-                std::cout << std::left
-                    << std::setw(width1 + 2)
-                    << i.second.collection
-                    << std::setw(width2 + 2)
-                    << i.first
-                    << i.second.file
-                    << std::endl;
-                }
-        } else {
+			regfree(&preg);
+        	if (result.size() > 1) {
+            	for (auto i : result) {
+                	std::cout << std::left
+                		<< std::setw(width1 + 2)
+               	    	<< i.second.collection
+               	    	<< std::setw(width2 + 2)
+            	        << i.first
+            	        << i.second.file
+        	            << std::endl;
+    	            }
+	        } else {
                 std::cout << _(": no owner(s) found") << std::endl;
-        }
-
+        	}
+		} else {
+			pkginfo pkginfo("cards query");
+			pkginfo.query(m_argParser.otherArguments()[0]);
+			pkginfo.run();
+			return;
+		}
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_FILES)) {
-
-		for (auto i : m_pkgrepo.getListOfPackages()) {
-			if (m_argParser.otherArguments()[0] == i.first) {
-					for (auto f : i.second.files)
-						std::cout << f << std::endl;
+		if (m_argParser.isSet(CardsArgumentParser::OPT_BINARIES)) {
+			for (auto i : m_pkgrepo.getListOfPackages()) {
+				if (m_argParser.otherArguments()[0] == i.first) {
+						for (auto f : i.second.files)
+							std::cout << f << std::endl;
+				}
+			}
+		} else {
+			pkginfo pkginfo("cards files");
+			pkginfo.list(m_argParser.otherArguments()[0]);
+			pkginfo.run();
+			return;
 		}
-	}
+
 	}
 	if ((m_argParser.getCmdValue() == ArgParser::CMD_SEARCH) ) {
 
