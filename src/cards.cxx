@@ -212,6 +212,9 @@ int main(int argc, char** argv)
         }
         case ArgParser::CMD_UPGRADE: {
             cards::upgrade upgrade(cardsArgPars, configFile);
+            if (cardsArgPars.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
+                return upgrade.Isdownload();
+
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_INSTALL: {

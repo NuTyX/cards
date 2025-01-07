@@ -19,95 +19,87 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 		m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
 		return;
 
-	m_progress = true;
-	
-	buildDatabase(true);
+	buildDatabase(false);
 
 	if (m_diff.ratio() > 20) {
 		if(!m_argParser.isSet(CardsArgumentParser::OPT_PROCEED)) {
 			m_diff.summary();
 			std::cout << std::endl
-				<< _("Number of obsolets packages (")
-				<< m_diff.ratio()
-				<< " %) "
-				<< _("is high !!!\n\n\
-Use the command: ")
+				<< _("Percentage of obsoletes packages: ")
+				<<  m_diff.ratio() << " %"
+				<< std::endl << std::endl
+				<< _("Use the command: ")
 				<< BLUE
-				<< "cards diff"
-				<< WHITE
-				<< "|more"
+				<< "cards diff|more"
 				<< NORMAL
-				<< _(" for more details.\n\n");
+				<< std::endl
+				<< _("to see all the details about the upgrade.")
+				<< std::endl << std::endl;
 			return;
 		}
 
 	}
-	std::set<std::string> listOfExistPackages;
+	bool found = false;
 	for (auto i:m_listOfPackages) {
 		if (m_pkgrepo.checkBinaryExist(i.first)) {
-			listOfExistPackages.insert(i.first);
+			found = true;
+			break;
 		}
 	}
-	if (listOfExistPackages.empty()) {
+	if (!found) {
 		m_actualError = cards::ERROR_ENUM_CANNOT_FIND_DEPOT;
 		treatErrors("");
 	}
-
-	if (!m_config.groups().empty()) {
-		std::set<std::string> tmpList;
+	for (auto j : m_config.groups()) {
 		for (auto i : m_listOfPackages) {
 			if (!i.second.group().empty())
 				continue;
 
-			for ( auto j : m_config.groups() ) {
-				std::string packageName  = i.first + "." + j;
-				if (m_pkgrepo.checkBinaryExist(packageName))
-					tmpList.insert(packageName);
-			}
-		}
-		if (tmpList.size() > 0) {
-			for (auto i : tmpList) {
+			std::string packageName = i.first + "." + j;
+			if (m_pkgrepo.checkBinaryExist(packageName)) {
 				std::pair<std::string,time_t> packageNameBuildDate;
-				packageNameBuildDate.first = i;
-				packageNameBuildDate.second = m_pkgrepo.getBinaryBuildTime(i);
+				packageNameBuildDate.first = packageName;
+				packageNameBuildDate.second = m_pkgrepo.getBinaryBuildTime(packageName);
+
 				if (checkPackageNameBuildDateSame(packageNameBuildDate))
 					continue;
+
 				m_ListOfPackagesToUpdate.insert(packageNameBuildDate);
 			}
 		}
 	}
-
 	for (auto i : m_listOfPackages) {
 		if (!m_pkgrepo.checkBinaryExist(i.first)) {
 			// If it's not automatically installed
-			// We don't need to remove it automatically
+			// We don't want it to be removed automatically
 			if(i.second.dependency()) {
 				m_ListOfPackagesToDelete.insert(i.first);
 			}
 			continue;
 		}
 		std::pair<std::string,time_t> packageNameBuildDate;
-		m_package packageNameToDeal;
-		packageNameBuildDate.first = i.first ;
+		packageNameBuildDate.first = i.first;
+		packageNameBuildDate.second = m_pkgrepo.getBinaryBuildTime(i.first);
 
-		if (checkPackageNameBuildDateSame(packageNameBuildDate)) {
+		if (checkPackageNameBuildDateSame(packageNameBuildDate))
 			continue;
-		}
+
 		m_ListOfPackagesToUpdate.insert(packageNameBuildDate);
 	}
 	if (m_ListOfPackagesToUpdate.size() == 0  &&
 			(m_ListOfPackagesToDelete.size() == 0)) {
 				std::cout << _("Your system is up to date.") << std::endl;
-	} else {
-		if (!m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
-			if (getuid()) {
-				m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-				treatErrors("");
-			}
-		}
-		if (!m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
-			upgradePackages();
+				return;
 	}
+	if (!m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY)) {
+		if (getuid()) {
+			m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
+			treatErrors("");
+		}
+	}
+	if (!m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_READY))
+		upgradePackages();
+
 }
 int upgrade::Isdownload()
 {
@@ -115,7 +107,7 @@ int upgrade::Isdownload()
 	for (auto i : m_ListOfPackagesToUpdate) {
 		packageFileName = m_pkgrepo.fileName(i.first);
 		m_pkgrepo.checkHash(packageFileName);
-		if ( ! m_pkgrepo.checkHash(i.first))
+		if (!m_pkgrepo.checkHash(i.first))
 			return EXIT_FAILURE;
 	}
 
@@ -126,6 +118,13 @@ void upgrade::upgradePackages()
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY))
 		return;
 
+	for (auto i : m_ListOfPackagesToDelete) {
+		cards::lock Lock(m_root,true);
+		buildDatabase(true);
+		removePackageFilesRefsFromDB(i);
+		removePackageFiles(i);
+		syslog(LOG_INFO,"%s removed",i.c_str());
+	}
 	for (auto i : m_ListOfPackagesToUpdate)
 		m_pkgrepo.generateDependencies(i);
 
@@ -135,25 +134,17 @@ void upgrade::upgradePackages()
 				+ m_pkgrepo.fileName(i.first);
 
 		m_force=true;
-		if (checkPackageNameExist(i.first)) {
+		if (checkPackageNameExist(i.first))
 			m_upgrade=true;
-		} else {
+		else
 			m_upgrade=false;
-		}
+
 		run();
 		std::string p = i.first
 			+ " "
 			+ m_pkgrepo.version(i.first);
 		syslog(LOG_INFO,"%s upgraded",p.c_str());
 	}
-	for (auto i : m_ListOfPackagesToDelete) {
-		cards::lock Lock(m_root,true);
-		buildDatabase(true);
-		removePackageFilesRefsFromDB(i);
-		removePackageFiles(i);
-		syslog(LOG_INFO,"%s removed",i.c_str());
-	}
-
 	m_sync.purge();
 }
 }

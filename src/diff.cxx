@@ -103,7 +103,7 @@ void diff::summary()
 	std::cout << _("Rebuild Packages (newer build date): ")
 		<< m_packagesNewBuild
 		<< std::endl;
-	std::cout << _("Obsolet Packages (will be removed): ")
+	std::cout << _("Obsoletes Packages (will be removed): ")
 		<< m_packagesObsolet
 		<< std::endl;
 	std::cout << _("Conflict Packages (will be removed): ")
@@ -181,7 +181,7 @@ void diff::showInfo()
 			<< std::endl;
 	}
 	std::cout << std::endl
-		<< _("Obsolet Packages (will be removed): ")
+		<< _("Obsoletes Packages (will be removed): ")
 		<< m_packagesObsolet
 		<< std::endl;
 	for (auto i : m_listOfPackagesToDeal){
@@ -194,17 +194,16 @@ void diff::showInfo()
 	}
 	if (ratio() > 20) {
 		std::cout << std::endl
-			<< _("Number of obsolets packages (")
-			<< ratio()
-			<< " %) "
-			<< _("is high !!!\n\n\
-Use the command: ")
+			<< _("Percentage of obsoletes packages: ")
+			<< ratio() << " %"
+			<< std::endl << std::endl
+			<< _("Use the command: ")
 			<< BLUE
-			<< "cards upgrade"
-			<< WHITE
-			<< " --proceed"
+			<< "cards upgrade --proceed"
 			<< NORMAL
-			<< _(" when you're ready to upgrade your system.\n\n");		
+			<< std::endl
+			<< _("when you're ready to upgrade your system.")
+			<< std::endl << std::endl;		
 	}
 }
 const unsigned int diff::packagesObsolet() {
