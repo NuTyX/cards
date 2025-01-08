@@ -43,6 +43,9 @@ class diff : public pkgdbh
         const unsigned int packagesOK();
         const unsigned int ratio();
         const unsigned int size();
+        const unsigned long downloadSize();
+        const unsigned long AddSize();
+        const unsigned long RemoveSize();
 };
 
 }
