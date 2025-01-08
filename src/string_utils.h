@@ -44,7 +44,7 @@ std::string ultos(unsigned long int value);
 
 std::string mtos(mode_t mode);
 std::string trimFileName(const std::string& filename);
-std::string sizeHumanRead(int value);
+std::string sizeHumanRead(unsigned long value);
 
 /*param s the string to be searched, param delimiter the delimiter char 
 return the value after the first occurance of a delimiter */

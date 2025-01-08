@@ -26,11 +26,11 @@ keyValue splitKeyValue(std::string s, char delimiter)
   return pv;
 }
 
-std::string sizeHumanRead(int value)
+std::string sizeHumanRead(unsigned long value)
 {
 	char buffer[255];
 	if ( value < KILO ) {
-		snprintf(buffer,255,"%d",value);
+		snprintf(buffer,255,"%lu",value);
 		return buffer;
 	}
 	if ( value < MEGA ) {
