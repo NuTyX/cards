@@ -243,8 +243,8 @@ msgstr "Paquet: "
 msgid " have a wrong signature."
 msgstr " a une fausse signature."
 
-msgid "<package> | <collection>"
-msgstr "<paquet> | <collection>"
+msgid "<package> | <collection> | <set>"
+msgstr "<paquet> | <collection> | <jeu>"
 
 msgid "File"
 msgstr "Fichier"
@@ -426,6 +426,9 @@ msgstr "octets"
 msgid "Number of Files: "
 msgstr "Nombre de fichiers  : "
 
+msgid "Number of Packages: "
+msgstr "Nombre de Paquets: "
+
 msgid " file(s)"
 msgstr " fichier(s)"
 
@@ -580,6 +583,9 @@ msgstr "synchronise les metadonnées locales et distantes "
 msgid "install the binary found on the mirror."
 msgstr "installe le binaire trouvé sur le serveur."
 
+msgid "If -b it will search in the repository cache."
+msgstr "Si -b, la recherche se fait dans les paquets disponibles sur le serveur."
+
 msgid "If -n it will search in the name of the available packages only."
 msgstr "Si -n, la recherche se fait dans le nom des paquets disponibles uniquement."
 
@@ -604,14 +610,9 @@ msgstr "Vous pouvez aussi lire 'man cards', 'man cards.conf', 'man pkgmk', 'man 
 msgid "print info about cards configuration."
 msgstr "affiche les informations de la configuration de cards."
 
-msgid "It can show the defined Directories where alls the packages are located. The locale which are going to be installed, the architecture of your machine, the base system directory and the logfile directory."
-msgstr "Il peut afficher les répertoires défini dans lesquels les paquets sont stockés. La locale qui sera installée, l'architecture de la machine, le répertoire contenant la liste des paquets pour revenir à un système de base et le répertoire contenant les logs de compilation."
-
-msgid "return to a basic system."
-msgstr "retour à un système de base."
-
-msgid "It will REMOVE ALL THE PACKAGES not listed in the base system list directory."
-msgstr "Va SUPPRIMER TOUS LES PAQUETS qui ne sont pas dans la liste des dossiers définis dans le répertoire de base."
+msgid "It can show the defined Directories where alls the packages are located.\n\
+The locale which are going to be installed, the architecture of your machine."
+msgstr "Il peut afficher les répertoires défini dans lesquels les paquets sont stockés. La locale qui sera installée, l'architecture de la machine et le répertoire contenant les logs de compilation."
 
 msgid "list the file(s) of the <package>."
 msgstr "Affiche le(s) fichier(s) du <paquet>."
@@ -759,15 +760,11 @@ Si l'option -u est passée, le paquet sera mis à jour.\n\
 Si l'option -f est passée, l'installation sera forcée et les fichiers en conflits seront écrasés."
 
 msgid "It can remove one or more packages.\n\
-If you want to remove a package from the base list, \
-you should pass the -a argument. \n\
-If you specify an existing collection, all packages  \
-that belong to this collection will be deleted."
+If you specify an existing collection/set, all packages \
+that belong to this collection/set will be deleted."
 msgstr "Peut supprimer un ou plusieurs paquets. \n\
-Si vous souhaitez supprimer un paquet de la liste de base, \
-vous devez passer l'argument -a. \n\
-Si vous spécifiez une collection existante, tous les paquets \n\
-appartenant à cette collection seront supprimés."
+Si vous spécifiez une collection/jeu, tous les paquets \
+appartenant à cette collection/jeu seront supprimés."
 
 msgid "It's mainly use to know if they are no duplicate call of any dependency."
 msgstr "Principalement utilisé pour savoir si il n'y a pas certaines dépendances en double."
@@ -883,3 +880,51 @@ msgstr "La collection "
 
 msgid " is part of the minimal system and cannot be removed !!!"
 msgstr " fait parti du système minimum et ne peut pas être supprimée !!!"
+
+msgid "  Proceed with upgrade and bypass details information."
+msgstr "  Procède à la mise à jour sans montrer les détails."
+
+msgid "Summary: "
+msgstr "Résumé: "
+
+msgid "Percentage of obsoletes packages: "
+msgstr "Percentage de paquets obsolètes: "
+
+msgid "Use the command: "
+msgstr "Utilisez la commande: "
+
+msgid "to see all the details about the upgrade."
+msgstr "pour voir tous les détails concernant cette mise à jour."
+
+msgid "when you're ready to upgrade your system."
+msgstr "quand vous êtes prêt pour lancer la mise à jour de votre système."
+
+msgid "Unchanged Packages:                       "
+msgstr "Paquets inchangés:                                        "
+
+msgid "Out of Date Packages (different version): "
+msgstr "Paquets périmés (version différent):                      "
+
+msgid "Rebuild Packages (newer build date):      "
+msgstr "Paquets reconstruits (date de construction plus récente): "
+
+msgid "Obsoletes Packages (will be removed):     "
+msgstr "Paquets obsolètes Packages (seront supprimé):             "
+
+msgid "Conflict Packages (will be removed):      "
+msgstr "Paquets en conflit (seront supprimé):                     "
+
+msgid "Total size of download:              "
+msgstr "Taille totale du téléchargement:       "
+
+msgid "Total size of reinstalled packages:  "
+msgstr "Taille totale des paquets reinstallés: "
+
+msgid "Total size of remove packages:       "
+msgstr "Taille totale des paquets supprimé:    "
+
+msgid "Total amount of added bytes:         "
+msgstr "Nombre d'octets ajoutés:               "
+
+msgid "Total amount of removed bytes:       "
+msgstr "Nombre d'octets supprimés:             "
