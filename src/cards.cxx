@@ -104,10 +104,18 @@ int main(int argc, char** argv)
                  << "                             "
                  << _("If -n it will search in the name of the available packages only.")
                  << endl;
-            cout << BLUE << "  query" << NORMAL << "  <file>              "
-                 << _("list owner of file(s) matching the query.") << endl;
-            cout << BLUE << "  files" << NORMAL << "  <package>           "
-                 << _("list the file(s) owned by the <package>") << endl;
+            cout << BLUE << "  query" << NORMAL << "  [-b] <file>         "
+                 << _("list owner of file(s) matching the query.")
+                 << endl
+                 << "                             "
+                 << _("If -b it will search in the repository cache.")
+                 << endl;
+            cout << BLUE << "  files" << NORMAL << "  [-b] <package>      "
+                 << _("list the file(s) owned by the <package>")
+                 << endl
+                 << "                             "
+                 << _("If -b it will search in the repository cache.")
+                 << endl;
             cout << GREEN << _("\nSYNCHRONIZATION") << NORMAL << endl;
             cout << BLUE << "  sync" << NORMAL << "                       "
                  << _("synchronize the local and remote meta datas.") << endl;
