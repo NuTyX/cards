@@ -19,7 +19,8 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 		m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
 		return;
 
-	buildDatabase(false);
+	m_progress = true;
+	buildDatabase(true);
 
 	if (m_diff.ratio() > 20) {
 		if(!m_argParser.isSet(CardsArgumentParser::OPT_PROCEED)) {
@@ -118,13 +119,6 @@ void upgrade::upgradePackages()
 	if (m_argParser.isSet(CardsArgumentParser::OPT_DOWNLOAD_ONLY))
 		return;
 
-	for (auto i : m_ListOfPackagesToDelete) {
-		cards::lock Lock(m_root,true);
-		buildDatabase(true);
-		removePackageFilesRefsFromDB(i);
-		removePackageFiles(i);
-		syslog(LOG_INFO,"%s removed",i.c_str());
-	}
 	for (auto i : m_ListOfPackagesToUpdate)
 		m_pkgrepo.generateDependencies(i);
 
@@ -145,6 +139,18 @@ void upgrade::upgradePackages()
 			+ m_pkgrepo.version(i.first);
 		syslog(LOG_INFO,"%s upgraded",p.c_str());
 	}
+	for (auto i : m_ListOfPackagesToDelete) {
+		cards::lock Lock(m_root,true);
+		buildDatabase(true);
+		removePackageFilesRefsFromDB(i);
+		removePackageFiles(i);
+		syslog(LOG_INFO,"%s removed",i.c_str());
+	}
 	m_sync.purge();
+	std::cout << std::endl
+		<< _("Summary: ")
+		<< std::endl;
+	m_diff.summary();
+	std::cout << std::endl << std::endl;
 }
 }
