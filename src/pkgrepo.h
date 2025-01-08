@@ -25,6 +25,7 @@ struct m_package {
 	std::string available_version;
 	unsigned int installed_space;
 	unsigned int available_space;
+          unsigned int available_size;
 	UpgradeEnum status;
 
 };
@@ -146,6 +147,7 @@ public:
     std::string&             fileHash(const std::string& name);
     std::string&             getBinaryPackageInfo(const std::string& name);
     unsigned int             getSpace(const std::string& name);
+    unsigned int             getSize(const std::string& name);
     std::string&             version(const std::string& name);
     unsigned short int       release(const std::string& name);
 

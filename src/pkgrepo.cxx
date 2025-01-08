@@ -669,6 +669,11 @@ unsigned int pkgrepo::getSpace(const std::string& name)
     parse();
     return m_listOfPackages[name].space();
 }
+unsigned int pkgrepo::getSize(const std::string& name)
+{
+    parse();
+    return m_listOfPackages[name].size();
+}
 std::string& pkgrepo::fileName(const std::string& name)
 {
     parse();
