@@ -91,9 +91,9 @@ If -f is passed as optional argument, it will force the install means overwrite 
     addCommand(CMD_REMOVE, "remove",
         _("remove one or more packages or a complete collection."),
         _("It can remove one or more packages.\n\
-If you specify an existing collection, all packages \
-that belong to this collection will be deleted."),
-        ArgParser::MIN, 1, _("<package> | <collection>"));
+If you specify an existing collection/set, all packages \
+that belong to this collection/set will be deleted."),
+        ArgParser::MIN, 1, _("<package> | <collection> | <set>"));
 
     addCommand(CMD_UPGRADE, "upgrade",
         _("upgrade you installation with a single command."),
@@ -195,7 +195,7 @@ As for the generation, a private key is needed, it is used by the packager only.
 
     OPT_PROCEED.init("proceed",
         'p',
-        _("  Proceed with upgrade and bypass summary."));
+        _("  Proceed with upgrade and bypass details information."));
 
     OPT_REMOVE.init("remove",
         'r',
