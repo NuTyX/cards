@@ -74,6 +74,9 @@ diff::diff(const CardsArgumentParser& argParser,
 			if(i.second.dependency()) {
 				++m_packagesObsolet;
 				packageNameToDeal.status = STATUS_ENUM_UPG_OBSOLET;
+			} else {
+				++m_packagesUnMaint;
+				packageNameToDeal.status = STATUS_ENUM_UPG_UNMAINT;
 			}
 		}
 		m_listOfPackagesToDeal[i.first]= packageNameToDeal;
@@ -129,53 +132,7 @@ const unsigned int diff::ratio()
 	auto p = ((float)m_packagesOK/m_listOfPackages.size())*100;
 	return 100 - (int)p;
 }
-void diff::summary()
-{
-	std::cout << std::endl
-		<< _("Number of Packages: ")
-		<< m_listOfPackages.size()
-		<< std::endl;
-	std::cout << _("Unchanged Packages:                       ")
-		<< m_packagesOK
-		<< std::endl;
-	std::cout << _("Out of Date Packages (different version): ")
-		<< m_packagesOutOfDate
-		<< std::endl;
-	std::cout << _("Rebuild Packages (newer build date):      ")
-		<< m_packagesNewBuild
-		<< std::endl;
-	std::cout << _("Obsoletes Packages (will be removed):     ")
-		<< m_packagesObsolet
-		<< std::endl;
-	std::cout << _("Conflict Packages (will be removed):      ")
-		<< m_packagesConflict
-		<< std::endl;
-	std::cout << _("Total size of download:              ")
-            + sizeHumanRead(downloadSize())
-            + _("bytes")
-			<< std::endl;
-	std::cout << _("Total size of reinstalled packages:  ")
-            + sizeHumanRead(AddSize())
-            + _("bytes")
-			<< std::endl;
-	std::cout << _("Total size of remove packages:       ")
-            + sizeHumanRead(RemoveSize())
-            + _("bytes")
-			<< std::endl;
-	if (AddSize() > RemoveSize())
-		std::cout << _("Total amount of added bytes:         ")
-            + sizeHumanRead(AddSize() - RemoveSize())
-            + _("bytes")
-			<< std::endl;
-	if (RemoveSize() > AddSize())
-		std::cout << _("Total amount of removed bytes:       ")
-            + sizeHumanRead(RemoveSize() - AddSize())
-            + _("bytes")
-			<< std::endl;
-
-
-}
-void diff::showInfo()
+void diff::showInfo(bool details)
 {
 	if (size() == 0) {
 		std::cout << _("Your system is up to date.")
@@ -190,86 +147,114 @@ void diff::showInfo()
 	std::string installed = _("Installed:");
 	if (installed.length() > width2)
 		width2 = installed.length();
-
 	for (auto i : m_listOfPackagesToDeal) {
-		if (i.first.length() > width1)
-			width1 = i.first.length();
+		if (i.second.status == STATUS_ENUM_UPG_OUTOFDATE) {
+			if (i.first.length() > width1)
+				width1 = i.first.length();
 
-		if (i.second.installed_version.length() > width2)
-			width2 = i.second.installed_version.length();
+			if (i.second.installed_version.length() > width2)
+				width2 = i.second.installed_version.length();
+		}
 	}
 	++width1;
 	++width2;
 	std::cout << std::endl
-		<< _("Number of Packages: ")
+		<< _("Number of Packages:                       ")
 		<< m_listOfPackages.size()
 		<< std::endl;
-	std::cout << std::endl
-		<< _("Unchanged Packages:                       ")
+	std::cout << _("Unchanged Packages:                       ")
 		<< m_packagesOK
 		<< std::endl;
-
 	std::cout << std::endl
 		<< _("Out of Date Packages (different version): ")
 		<< m_packagesOutOfDate
 		<< std::endl;
-
-	std::cout << std::left
-		<< std::setw(width1)
-		<< _("Name:")
-		<< std::setw(width2)
-		<< _("Installed:")
-		<< _("Available:")
-		<< std::endl;
-
-	for (auto i : m_listOfPackagesToDeal) {
-		if (i.second.status != STATUS_ENUM_UPG_OUTOFDATE)
-			continue;
-		std::cout << std::left
-		<< std::setw(width1)
-		<< i.first 
-		<< std::setw(width2)
-		<< i.second.installed_version
-		<< i.second.available_version
-		<< std::endl;
-	}
-	std::cout << std::endl
-		<< _("Rebuild Packages (newer build date):      ")
-		<< m_packagesNewBuild
-		<< std::endl;
-	for (auto i : m_listOfPackagesToDeal){
-		if (i.second.status != STATUS_ENUM_UPG_NEWBUILD)
-			continue;
+	if (details) {
 		std::cout << std::left
 			<< std::setw(width1)
-			<< i.first
+			<< _("Name:")
+			<< std::setw(width2)
+			<< _("Installed:")
+			<< _("Available:")
 			<< std::endl;
-	}
-	std::cout << std::endl
-		<< _("Obsoletes Packages (will be removed):     ")
-		<< m_packagesObsolet
-		<< std::endl;
-	for (auto i : m_listOfPackagesToDeal){
-		if (i.second.status != STATUS_ENUM_UPG_OBSOLET)
-			continue;
-		std::cout << std::left
+
+		for (auto i : m_listOfPackagesToDeal) {
+			if (i.second.status != STATUS_ENUM_UPG_OUTOFDATE)
+				continue;
+			std::cout << std::left
 			<< std::setw(width1)
 			<< i.first
+			<< std::setw(width2)
+			<< i.second.installed_version
+			<< i.second.available_version
 			<< std::endl;
+		}
 	}
-	std::cout << std::endl
+	if (m_packagesNewBuild > 0) {
+		std::cout << std::endl
+			<< _("Rebuild Packages (newer build date):      ")
+			<< m_packagesNewBuild
+			<< std::endl;
+		if (details) {
+			for (auto i : m_listOfPackagesToDeal){
+				if (i.second.status != STATUS_ENUM_UPG_NEWBUILD)
+					continue;
+				std::cout << std::left
+					<< std::setw(width1)
+					<< i.first
+					<< std::endl;
+			}
+		}
+	}
+	if (m_packagesObsolet > 0) {
+		std::cout << std::endl
+			<< _("Obsoletes Packages (will be removed):     ")
+			<< m_packagesObsolet
+			<< std::endl;
+		if (details) {
+			for (auto i : m_listOfPackagesToDeal){
+				if (i.second.status != STATUS_ENUM_UPG_OBSOLET)
+					continue;
+				std::cout << std::left
+					<< std::setw(width1)
+					<< i.first
+					<< std::endl;
+			}
+		}
+	}
+	if (m_packagesConflict > 0) {
+		std::cout << std::endl
 		<< _("Conflict Packages (will be removed):      ")
 		<< m_packagesConflict
 		<< std::endl;
-	for (auto i : m_listOfPackagesToDeal){
-		if (i.second.status != STATUS_ENUM_UPG_CONFLICT)
-			continue;
-		std::cout << std::left
-			<< std::setw(width1)
-			<< i.first
-			<< std::endl;
+		if (details) {
+			for (auto i : m_listOfPackagesToDeal){
+				if (i.second.status != STATUS_ENUM_UPG_CONFLICT)
+					continue;
+				std::cout << std::left
+					<< std::setw(width1)
+					<< i.first
+					<< std::endl;
+			}
+		}
 	}
-
+	if (m_packagesUnMaint > 0) {
+		std::cout << std::endl
+			<< _("Unmaintained Packages (should be remove): ")
+			<< m_packagesUnMaint
+			<< std::endl;
+		if (details) {
+			for (auto i : m_listOfPackagesToDeal){
+				if (i.second.status != STATUS_ENUM_UPG_UNMAINT)
+					continue;
+				std::cout << std::left
+					<< std::setw(width1)
+					<< i.first
+					<< std::endl;
+			}
+		}
+	}
+	amountInfo();
 	if (ratio() > 20) {
 		std::cout << std::endl
 			<< _("Percentage of obsoletes packages: ")
@@ -277,12 +262,42 @@ void diff::showInfo()
 			<< std::endl << std::endl
 			<< _("Use the command: ")
 			<< BLUE
-			<< "cards upgrade --proceed"
+			<< "sudo cards upgrade --proceed"
 			<< NORMAL
 			<< std::endl
 			<< _("when you're ready to upgrade your system.")
 			<< std::endl << std::endl;		
 	}
+}
+void diff::amountInfo() {
+	std::cout << std::endl
+		<< _("Available space on your system:           ")
+		+ sizeHumanRead(availableSpace())
+        + _("bytes")
+		<< std::endl;
+	std::cout << std::endl
+		<< _("Total download size:                      ")
+        + sizeHumanRead(downloadSize())
+        + _("bytes")
+		<< std::endl;
+	std::cout << _("Total size of reinstalled packages:       ")
+        + sizeHumanRead(AddSize())
+        + _("bytes")
+		<< std::endl;
+	std::cout << _("Total size of remove packages:            ")
+        + sizeHumanRead(RemoveSize())
+        + _("bytes")
+		<< std::endl;
+	if (AddSize() > RemoveSize())
+		std::cout << _("Total amount of added bytes:              ")
+			+ sizeHumanRead(AddSize() - RemoveSize())
+            + _("bytes")
+			<< std::endl;
+	if (RemoveSize() > AddSize())
+		std::cout << _("Total amount of removed bytes:            ")
+            + sizeHumanRead(RemoveSize() - AddSize())
+            + _("bytes")
+			<< std::endl;
 }
 const unsigned int diff::packagesObsolet() {
 	return m_packagesObsolet;
@@ -299,6 +314,9 @@ const unsigned int diff::packagesOutOfDate() {
 const unsigned int diff::packagesNewBuild() {
 	return m_packagesNewBuild;
 }
+const unsigned int diff::packagesUnMaint() {
+	return m_packagesUnMaint;
+}
 const unsigned int diff::packagesOK() {
 	return m_packagesOK;
 }
@@ -309,5 +327,11 @@ const unsigned int diff::size() {
 		+ m_packagesOutOfDate
 		+ m_packagesNewBuild;
 }
+const unsigned long long diff::availableSpace()
+{
+	struct statvfs buffer;
+	statvfs("/", &buffer);
+	return buffer.f_bsize * buffer.f_bavail;
 
+}
 }

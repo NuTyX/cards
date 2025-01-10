@@ -6,6 +6,8 @@
 #include "pkgrepo.h"
 #include "cards_argument_parser.h"
 
+#include <sys/statvfs.h>
+
 namespace cards {
 
 class diff : public pkgdbh
@@ -21,6 +23,7 @@ class diff : public pkgdbh
     unsigned int               m_packagesObsolet;
     unsigned int               m_packagesNewBuild;
     unsigned int               m_packagesOutOfDate;
+    unsigned int               m_packagesUnMaint;
     unsigned int               m_packagesOK;
     
     
@@ -32,14 +35,17 @@ class diff : public pkgdbh
         diff(const CardsArgumentParser& argParser,
             const std::string& configFileName);
 
-        void showInfo();
-        void summary();
+        void showInfo(bool details);
+        void amountInfo();
+
+        const unsigned long long availableSpace();
 
         const unsigned int packagesConflict();
         const unsigned int packagesReplace();
         const unsigned int packagesObsolet();
         const unsigned int packagesNewBuild();
         const unsigned int packagesOutOfDate();
+        const unsigned int packagesUnMaint();
         const unsigned int packagesOK();
         const unsigned int ratio();
         const unsigned int size();

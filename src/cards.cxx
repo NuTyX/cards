@@ -215,7 +215,7 @@ int main(int argc, char** argv)
         }
         case ArgParser::CMD_DIFF: {
             cards::diff diff(cardsArgPars, configFile);
-            diff.showInfo();
+            diff.showInfo(true);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_UPGRADE: {
