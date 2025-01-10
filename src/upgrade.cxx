@@ -17,14 +17,14 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 
 	if (m_argParser.isSet(CardsArgumentParser::OPT_CHECK) ||
 		m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
-		return;
+			return;
 
 	m_progress = true;
 	buildDatabase(true);
 
 	if (m_diff.ratio() > 20) {
 		if(!m_argParser.isSet(CardsArgumentParser::OPT_PROCEED)) {
-			m_diff.summary();
+			m_diff.showInfo(false);
 			std::cout << std::endl
 				<< _("Percentage of obsoletes packages: ")
 				<<  m_diff.ratio() << " %"
@@ -150,7 +150,7 @@ void upgrade::upgradePackages()
 	std::cout << std::endl
 		<< _("Summary: ")
 		<< std::endl;
-	m_diff.summary();
+	m_diff.showInfo(false);
 	std::cout << std::endl << std::endl;
 }
 }
