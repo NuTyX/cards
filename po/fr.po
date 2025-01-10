@@ -328,7 +328,7 @@ msgid "Name:"
 msgstr "Nom:"
 
 msgid "Installed:"
-msgstr "Installé:"
+msgstr "Interne:"
 
 msgid "Available:"
 msgstr "Disponible:"
@@ -425,9 +425,6 @@ msgstr "octets"
 
 msgid "Number of Files: "
 msgstr "Nombre de fichiers  : "
-
-msgid "Number of Packages: "
-msgstr "Nombre de Paquets: "
 
 msgid " file(s)"
 msgstr " fichier(s)"
@@ -899,32 +896,41 @@ msgstr "pour voir tous les détails concernant cette mise à jour."
 msgid "when you're ready to upgrade your system."
 msgstr "quand vous êtes prêt pour lancer la mise à jour de votre système."
 
+msgid "Number of Packages:                       "
+msgstr "Nombre de Paquets:                                "
+
 msgid "Unchanged Packages:                       "
-msgstr "Paquets inchangés:                                        "
+msgstr "Paquets inchangés:                                "
 
 msgid "Out of Date Packages (different version): "
-msgstr "Paquets périmés (version différent):                      "
+msgstr "Paquets périmés (versions différentes):           "
 
 msgid "Rebuild Packages (newer build date):      "
-msgstr "Paquets reconstruits (date de construction plus récente): "
+msgstr "Paquets reconstruits (construction plus récente): "
 
 msgid "Obsoletes Packages (will be removed):     "
-msgstr "Paquets obsolètes Packages (seront supprimé):             "
+msgstr "Paquets obsolètes (seront supprimés):             "
+
+msgid "Unmaintained Packages (should be remove): "
+msgstr "Paquets non maintenus                             "
 
 msgid "Conflict Packages (will be removed):      "
-msgstr "Paquets en conflit (seront supprimé):                     "
+msgstr "Paquets en conflit (seront supprimés):            "
 
-msgid "Total size of download:              "
-msgstr "Taille totale du téléchargement:       "
+msgid "Total download size:                      "
+msgstr "Taille totale du téléchargement:                  "
 
-msgid "Total size of reinstalled packages:  "
-msgstr "Taille totale des paquets reinstallés: "
+msgid "Total size of reinstalled packages:       "
+msgstr "Taille totale des paquets reinstallés:            "
 
-msgid "Total size of remove packages:       "
-msgstr "Taille totale des paquets supprimé:    "
+msgid "Total size of remove packages:            "
+msgstr "Taille totale des paquets supprimé:               "
 
-msgid "Total amount of added bytes:         "
-msgstr "Nombre d'octets ajoutés:               "
+msgid "Total amount of added bytes:              "
+msgstr "Nombre d'octets ajoutés:                          "
 
-msgid "Total amount of removed bytes:       "
-msgstr "Nombre d'octets supprimés:             "
+msgid "Total amount of removed bytes:            "
+msgstr "Nombre d'octets supprimés:                        "
+
+msgid "Available space on your system:           "
+msgstr "Espace disponible sur votre système:              "
