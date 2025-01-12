@@ -388,7 +388,7 @@ find_set () {
   do
      for n in $c/*/Pkgfile
      do
-         set=$(. $n; echo $set)
+         set=($(. $n; echo "${set[@]}"))
          [ -z $set ] && continue
          for s in ${set[@]}
          do
