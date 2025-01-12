@@ -815,7 +815,7 @@ add_meta_to_archive() {
 			echo "T$i" >> .META
 		done
 	fi
-	if [ ! -z "$conflicts"]; then
+	if [ ! -z "$conflicts" ]; then
 		info "Adding Conflict packages to Archive $NAME"
 		for i in ${conflicts[@]}; do
 			echo "o$i" >> .META
