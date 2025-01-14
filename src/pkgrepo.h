@@ -26,7 +26,7 @@ struct m_package {
 	unsigned int installed_space;
 	unsigned int available_space;
           unsigned int available_size;
-	UpgradeEnum status;
+	StatusEnumUpgrade status;
 
 };
 

@@ -57,7 +57,7 @@ enum ErrorEnum {
 	ERROR_ENUM_WRONG_SIGNATURE
 };
 
-enum UpgradeEnum {
+enum StatusEnumUpgrade {
 	STATUS_ENUM_UPG_OK,
 	STATUS_ENUM_UPG_UNMAINT,
 	STATUS_ENUM_UPG_OBSOLET,
