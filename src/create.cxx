@@ -80,6 +80,8 @@ void create::getLocalePackagesList()
 			if (m_pkgrepo.checkBinaryExist(name)) {
 				std::string packageName  = m_pkgrepo.dirName(name) + "/" + m_pkgrepo.fileName(name);
 				packageFileName = m_pkgrepo.fileName(name);
+                // FIXME cannot download package from here
+                // Need to throw an error instead
 				if (!checkFileExist(packageName))
 					m_pkgrepo.downloadPackageFileName(name);
 				tmpList.insert(name);
