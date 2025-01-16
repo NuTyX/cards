@@ -68,35 +68,31 @@ void create::core()
 }
 void create::getLocalePackagesList()
 {
-	if (m_config.groups().empty())
-		return;
+    if (m_config.groups().empty())
+        return;
 
-	std::string packageFileName;
+    std::set<std::string> tmpList;
+    for (auto i : m_config.groups()) {
+        for (auto j : m_pkgrepo.getDependenciesList()) {
+            std::string name = j.first + "." + i;
+            if (m_pkgrepo.checkBinaryExist(name)) {
+                std::string packageName  = m_pkgrepo.dirName(name)
+                    + "/"
+                    + m_pkgrepo.fileName(name);
+                if (!checkFileExist(packageName)) {
+                    m_actualError = ERROR_ENUM_PACKAGE_NOT_FOUND;
+                    treatErrors(packageName);
 
-	std::set<std::string> tmpList;
-	for (auto i : m_config.groups()) {
-		for (auto j : m_pkgrepo.getDependenciesList()) {
-			std::string name = j.first + "." + i;
-			if (m_pkgrepo.checkBinaryExist(name)) {
-				std::string packageName  = m_pkgrepo.dirName(name) + "/" + m_pkgrepo.fileName(name);
-				packageFileName = m_pkgrepo.fileName(name);
-                // FIXME cannot download package from here
-                // Need to throw an error instead
-				if (!checkFileExist(packageName))
-					m_pkgrepo.downloadPackageFileName(name);
-				tmpList.insert(name);
-			}
-		}
-	}
-	if (tmpList.size() > 0 ) {
-		for (auto i : tmpList) {
-			std::pair<std::string,time_t> PackageTime;
-			PackageTime.first=i;
-			PackageTime.second=0;
-
-			m_pkgrepo.generateDependencies(i);
-		}
-	}
+                }
+                tmpList.insert(name);
+            }
+        }
+    }
+    if (tmpList.size() > 0 ) {
+        for (auto i : tmpList) {
+            m_pkgrepo.generateDependencies(i);
+        }
+    }
 }
 void create::base()
 {
