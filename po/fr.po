@@ -174,6 +174,9 @@ msgstr " pas installé précédement (supprimez -u pour installer)"
 msgid ": listed file(s) already installed (use -f to ignore and overwrite)"
 msgstr ": fichier(s) listé(s) déjà installé(s) (utilisez -f pour les ignorer et les remplacer)"
 
+msgid " is in the basesystem (use -f to remove it anyway)"
+msgstr " est dans le système de base (utilisez -f pour le supprimer malgré les risques.)"
+
 msgid ": line too long, aborting"
 msgstr ": ligne trop longue, abandon"
 
@@ -758,10 +761,12 @@ Si l'option -f est passée, l'installation sera forcée et les fichiers en confl
 
 msgid "It can remove one or more packages.\n\
 If you specify an existing collection/set, all packages \
-that belong to this collection/set will be deleted."
+that belong to this collection/set will be deleted.\n\
+If -f is passed as optional argument, it will force the remove regardless the risk that implies."
 msgstr "Peut supprimer un ou plusieurs paquets. \n\
 Si vous spécifiez une collection/jeu, tous les paquets \
-appartenant à cette collection/jeu seront supprimés."
+appartenant à cette collection/jeu seront supprimés.\n\
+Si l'option -f est passée, la suppression du paquet sera forcée malgré les risques."
 
 msgid "It's mainly use to know if they are no duplicate call of any dependency."
 msgstr "Principalement utilisé pour savoir si il n'y a pas certaines dépendances en double."
@@ -773,8 +778,8 @@ msgstr "Recherche dans votre dépot locale. La recherche se fait dans categories
 nom, description, URL, packager et version.\n\
 L'<expr> doit contenir 2 caractères minimum."
 
-msgid "\t   Force install, overwrite conflicting files."
-msgstr "\t   Force l'installation, écrase les fichiers en conflit."
+msgid "\t   Force the action."
+msgstr "\t   Force l'action."
 
 msgid "  Upgrade the package with the same name."
 msgstr "  Met à jour le paquet avec le même nom."
