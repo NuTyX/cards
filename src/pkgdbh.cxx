@@ -152,6 +152,9 @@ void pkgdbh::treatErrors(const std::string& s) const
 		case ERROR_ENUM_LISTED_FILES_ALLREADY_INSTALLED:
 			throw std::runtime_error(s + _(": listed file(s) already installed (use -f to ignore and overwrite)"));
 			break;
+		case ERROR_ENUM_PACKAGE_IN_BASESYSTEM:
+			throw std::runtime_error(_("package ") + s + _(" is in the basesystem (use -f to remove it anyway)"));
+			break;
 		case ERROR_ENUM_PKGADD_CONFIG_LINE_TOO_LONG:
 			throw RunTimeErrorWithErrno(s + _(": line too long, aborting"));
 			break;

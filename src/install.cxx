@@ -71,7 +71,9 @@ install::install(const CardsArgumentParser& argParser,
 	getLocalePackagesList();
 
 	for (auto i : m_pkgrepo.getDependenciesList()) {
-		m_packageArchiveName = m_pkgrepo.dirName(i.first) + "/" + m_pkgrepo.fileName(i.first);
+		m_packageArchiveName = m_pkgrepo.dirName(i.first)
+			+ "/"
+			+ m_pkgrepo.fileName(i.first);
 		archive packageArchive(m_packageArchiveName.c_str());
 		std::string p = "";
 		if (checkPackageNameExist(packageArchive.name())) {
@@ -124,9 +126,13 @@ void install::getLocalePackagesList()
 	std::set<std::string> tmpList;
 	for (auto i : config.groups()) {
 		for (auto j : m_pkgrepo.getDependenciesList()) {
-			std::string name = j.first + "." + i;
+			std::string name = j.first
+				+ "."
+				+ i;
 			if (m_pkgrepo.checkBinaryExist(name)) {
-				std::string packageName  = m_pkgrepo.dirName(name) + "/" + m_pkgrepo.fileName(name);
+				std::string packageName  = m_pkgrepo.dirName(name)
+					+ "/"
+					+ m_pkgrepo.fileName(name);
 				packageFileName = m_pkgrepo.fileName(name);
 				if ( ! checkFileExist(packageName) )
 					m_pkgrepo.downloadPackageFileName(name);

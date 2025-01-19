@@ -92,7 +92,8 @@ If -f is passed as optional argument, it will force the install means overwrite 
         _("remove one or more packages or a complete collection."),
         _("It can remove one or more packages.\n\
 If you specify an existing collection/set, all packages \
-that belong to this collection/set will be deleted."),
+that belong to this collection/set will be deleted.\n\
+If -f is passed as optional argument, it will force the remove regardless the risk that implies."),
         ArgParser::MIN, 1, _("<package> | <collection> | <set>"));
 
     addCommand(CMD_UPGRADE, "upgrade",
@@ -171,7 +172,7 @@ As for the generation, a private key is needed, it is used by the packager only.
 
     OPT_FORCE.init("force",
         'f',
-        _("\t   Force install, overwrite conflicting files."));
+        _("\t   Force the action."));
 
     OPT_BINARIES.init("binaries",
         'b',
@@ -282,6 +283,8 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_INSTALL, OPT_ROOT, false);
     addOption(CMD_INSTALL, OPT_NOLOGENTRY, false);
     addOption(CMD_INSTALL, OPT_CONFIG_FILE, false);
+
+    addOption(CMD_REMOVE, OPT_FORCE, false);
 
     addOption(CMD_CREATE, OPT_DRY, false);
     addOption(CMD_CREATE, OPT_NO_META, false);

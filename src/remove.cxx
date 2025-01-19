@@ -50,7 +50,7 @@ remove::remove(const std::string& commandName,
 				listOfPackagesToRemove.insert(PackageToRemove);
 			}
 		}
-		if ( listOfPackagesToRemove.empty()) {
+		if (listOfPackagesToRemove.empty()) {
 			for (auto j : m_listOfPackages) {
 				for (auto k : j.second.sets()) {
 					if ( i == k ) {
@@ -65,6 +65,7 @@ remove::remove(const std::string& commandName,
 			// if it's an alias get the real name
 			std::string a = m_listOfAlias [i];
 			PackageToRemove.first = a ;
+			PackageToRemove.second = getCollection(i);
 			listOfPackagesToRemove.insert(PackageToRemove);
 		}
 	}
@@ -83,15 +84,14 @@ remove::remove(const std::string& commandName,
 			listOfPackagesToRemove.insert(i);
 	}
 	for ( auto i : listOfPackagesToRemove ) {
-		bool found = false;
-		if (i.second == "base") {
-			std::cout << "The package '" << i.first
-				<< "' is in the base collection" << std::endl;
-				continue;
-		}
-		m_packageName = i.first;
-		if (m_packageName.size() == 0 )
+		if (i.first.size() == 0 )
 			continue;
+		m_packageName = i.first;
+		if ((i.second == "base") &&
+			(!m_argParser.isSet(CardsArgumentParser::OPT_FORCE))) {
+				m_actualError = cards::ERROR_ENUM_PACKAGE_IN_BASESYSTEM;
+				treatErrors(i.first);
+		}
 		run();
 		std::string name = "(" +  m_packageCollection + ") ";
 		name += i.first;
