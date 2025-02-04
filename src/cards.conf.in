@@ -1,112 +1,20 @@
-##
-## Dossiers où trouver les recettes
-## L'ordre est important
-## Premier trouvé premier compilé et/ou premier installé
-##
-## A noter que c'est bien les paquets de "base" en dernier et les paquets "gui-extra" en premier
-## et que l'on specifie le dossier parent du jeu de paquets:
-## Le contenu d'un dossier paquet ressemble donc à ceci dans le cas de:
-##
-##
+## Please check man cards.conf(5)
+#
 ## Folders where the recipes should be located.
 ## The order is important
 ## First found first compiled and/or first installed
 ##
-## Note that it's the "base" packages which will be the last and the "desktop" packages
+## Note that it's the "base" packages which will be the last and the "gui-extra" packages
 ## the first and that we do specify the parent folder of the set of packages category:
-## The content of a folder package look like this in the case of:
-##
-## /var/lib/pkg/depot/cli/alsa-utils/.PKGREPO
-##                                  /Pkgfile
-##                                  /alsa-utils123468110i686.cards.tar.xz
-##                                  /alsa-utils123468110x86_64.cards.tar.xz
-##                                  /alsa-utils.doc123468110any.cards.tar.xz
-##                                  /alsa-utils.post-install
-##                                  /...
-
-## A COLLECTION CAN BE MADE OF ports only OR MADE OF binaries
-## The only criteria for determining this is: with or without '|<url adress>' at the end of a line starting with the
-## keyword 'dir'. Following examples:
-
-## This is a port collection located in '/usr/ports/my_ports'
-# dir /usr/ports/my_ports
-
-## This is a binaries collection located in '/depot/x86_64/gui|http://downloads.nutyx.org'.
-## It will contain all the binaires from the 'http://downloads.nutyx.org' mirror
-# dir /depot/x86_64/gui|http://downloads.nutyx.org
-
-## Uncomment following lines if you want to compile your own ports
-## Afterwards use the command 'ports -u' to update all the ports
-## These are examples of directories.
-## IMPORTANT NOTE: There are severall methods to build your own ports.
-## !!!! Read the documentation first  at http://www.nutyx.org !!!!
-##
-
-# dir /usr/ports/gui-extra
-# dir /usr/ports/gui
-# dir /usr/ports/cli-extra
-# dir /usr/ports/cli
-# dir /usr/ports/base
 
 ## The NuTyX name and version are found in the /var/lib/pkg/nutyx-version file
-## The Colletion name (xfce4-extra, xfce4, gui, gui-extra, cli, cli-extra, base)
-## must exist on the mirror http://downloads.nutyx.org (in this case)
-## Check for your version what are the available collections at http://downloads.nutyx.org/<NuTyX-version>
+## The Colletion name (gui, gui-extra, cli, cli-extra, base)
+## must exist on the mirror https://downloads.nutyx.org (in this case)
+## Check for your version what are the available collections at http://downloads.nutyx.org/x86_64/<version>
 #
-## Le nom et la version de NuTyX se trouvent dans le fichier /var/lib/pkg/nutyx-version
-## Le nom des collections (xfce4-extra, xfce4, gui, gui-extra,cli, cli-extra, base)
-## doivent exister sur le mirroir http://downloads.nutyx.org (dans ce cas)
-## Vérifiez quelles sont les collections disponibles sur http://downloads.nutyx.org/<NuTyX-version>
-#
-# dir /var/lib/pkg/depot/enlightenment-extra|http://downloads.nutyx.org
-# dir /var/lib/pkg/depot/enlightenment|http://downloads.nutyx.org
-# dir /var/lib/pkg/depot/gnome-extra|http://downloads.nutyx.org
-# dir /var/lib/pkg/depot/gnome|http://downloads.nutyx.org
-# dir /var/lib/pkg/depot/mate-extra|http://downloads.nutyx.org
-# dir /var/lib/pkg/depot/mate|http://downloads.nutyx.org
-#
-dir /var/lib/pkg/depot/lxqt-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/lxqt|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/lxde-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/lxde|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/gnome-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/gnome|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/mate-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/mate|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/kde5-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/kde5|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/xfce4-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/xfce4|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/gui-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/gui|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/cli-extra|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/cli|http://downloads.nutyx.org
-dir /var/lib/pkg/depot/base|http://downloads.nutyx.org
-
-# A collection can be
-
-## Cards needs to know if it is allowed to remove the package you pass to the command argument:
-##   cards remove <packagename>
-## We don't want do delete the 'glibc package' for example :)
-## Moreover if there is a need to come back to a base system, following folder(s) should contain packages
-##
-##
-## Cards doit vérifier si il peut supprimer le paquet passé en argument:
-#    cards remove <packagename>
-#  En effet, nous ne souhaitons pas supprimer le paquet glibc par exemple :)
-#  De plus, si l'on veut revenir à un système de base, les dossiers suivant doivent contenir des paquets
-#
-## In the following setting, packages from base system will not be deleted
-## Dans le cas ci-dessous, les paquets des collections base ne seront pas supprimés
-base /var/lib/pkg/depot/base
-
-##
 ## We can specify which locale should be installed (more than one are allowed)
 ## Following example sets: german, dutch, and french locales
 ## The command 'setup-nutyx -cl' add the selected locale into cards.conf file
-##
-## On peut spécifier quelle(s) locale(s) doivent être installées
-## La commande 'setup-nutyx -cl' ajoute la locale selectionnée dans le fichier cards.conf
 ##
 # locale de
 # locale nl
@@ -117,18 +25,8 @@ base /var/lib/pkg/depot/base
 ##
 ## Cards can log the output of the creation of the final package when a:
 #
-#   cards create -r <name of package>
+#   cards create <name of package>
 #
 ## if following variable is set and is refering to a folder: the compilation will be logged
-##
-##
-## Si vous avez l'intention de construire vos propre paquets, cette option va vous plaire
-## Si non, ignorez-la
-##
-## Cards va enrégistrer la sortie de la création du paquet final lors d'un:
-#
-#   cards create -r <nom de paquet >
-#
-##  si la variable ci-dessous est définie et pointe sur un dossier
 # logdir /var/log/pkgbuild
 
