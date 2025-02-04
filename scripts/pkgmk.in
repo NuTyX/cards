@@ -689,16 +689,13 @@ add_meta_files() {
 	local NAME
 	NAME="$(get_package_name $1)"
 	cd $PKG
-	if [ -f $PKGMK_ROOT/${NAME}.README ]; then
-		cp $PKGMK_ROOT/${NAME}.README .README
-	fi
 	if [ -f $PKGMK_ROOT/${NAME}.pre-install ]; then
 		cp $PKGMK_ROOT/${NAME}.pre-install .PRE
 	fi
 	if [ -f $PKGMK_ROOT/${NAME}.post-install ]; then
 		cp $PKGMK_ROOT/${NAME}.post-install .POST
 	fi
-	for file in .README .PRE .POST; do
+	for file in .PRE .POST; do
 		if [ -f $file ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/$1 \
 			$file
@@ -825,7 +822,7 @@ add_meta_to_archive() {
 
 	rm $PKGMK_PACKAGE_DIR/$1
 
-	for file in .META .MTREE .README .PRE .POST .INFO; do
+	for file in .META .MTREE .PRE .POST; do
 		if [ -f $file ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/$1 \
 			$file
