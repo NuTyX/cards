@@ -976,4 +976,9 @@ std::set<std::string>& pkgrepo::getListOfFiles(const std::string& name)
     parse();
     return m_listOfPackages[name].files;
 }
+std::set<std::pair<std::string,time_t>>& pkgrepo::getDependenciesList(const std::string& name)
+{
+    parse();
+    return m_listOfPackages[name].dependencies();
+}
 } // end of 'cards' namespace

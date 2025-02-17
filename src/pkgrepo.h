@@ -161,6 +161,8 @@ public:
 
     std::vector<std::pair<std::string,time_t>>&
                              getDependenciesList();
+    std::set<std::pair<std::string, time_t>>&
+                             getDependenciesList(const std::string& name);
     void                     addDependenciesList(std::pair<std::string,time_t>& name);
 
     const repo_t&            getListOfPackages();
