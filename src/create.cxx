@@ -360,45 +360,24 @@ void create::buildCollection()
             continue;
         }
         // Last chance for build the i package
-        // We check if runtime libs are installed, then
-        // we check if all the runtime libs are still existing.
-        // We search through all the packages per level
-        // And for each packages we search through each librairies
+        // First we check if the lib exist in any dependencies if not
+        // we check if lib is installed if not
+        // we check if all the runtime libs are still existing if not
+        // for each packages we search through each librairies per level
         // for a matching one.
         bool found = true;
         std::string missingSharedLib;
         for (auto lib : m_pkgrepo.getLibs(i)) {
             found = false;
-            int level = 0;
-            while (level < m_pkgfile.getLevel(i)) {
-                for (auto pkg : m_pkgfile.getListOfPackages()) {
-                    if (!m_pkgrepo.checkBinaryExist(pkg.first))
-                        continue;
-
-                    if (pkg.second.level() != level)
-                        continue;
-
-                    for (auto deplib : m_pkgrepo.getLibs(pkg.first) ) {
-                        if (deplib == lib) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    std::string libPackage = pkg.first + ".lib";
-                    if (m_pkgrepo.checkBinaryExist(libPackage)) {
-                        for (auto deplib : m_pkgrepo.getLibs(libPackage))
-                            if (deplib == lib) {
-                                found = true;
-                                break;
-                            }
-                    }
-                    if (found)
+            for (auto dep : m_pkgrepo.getDependenciesList(i)) {
+                for (auto file:m_pkgrepo.getListOfFiles(dep.first)) {
+                    if (file.find('/' + lib) != std::string::npos) {
+                        found = true;
                         break;
+                    }
                 }
                 if (found)
                     break;
-
-                level++;
             }
             if (!found) {
                 if (checkFileNameExist(lib)) {
@@ -417,7 +396,6 @@ void create::buildCollection()
                 }
             }
             if (!found) {
-                // Last chance to find the lib.
                 // In the list of files of the 'i' package
                 for (auto file : m_pkgrepo.getListOfFiles(i)) {
                     if (file.find(lib) != std::string::npos) {
@@ -425,6 +403,40 @@ void create::buildCollection()
                         break;
                     }
                 }
+            }
+            if (!found) {
+                // Last chance to find the lib.
+                int level = 0;
+                while (level < m_pkgfile.getLevel(i)) {
+                    for (auto pkg : m_pkgfile.getListOfPackages()) {
+                        if (!m_pkgrepo.checkBinaryExist(pkg.first))
+                            continue;
+
+                        if (pkg.second.level() != level)
+                            continue;
+
+                        for (auto deplib : m_pkgrepo.getLibs(pkg.first) ) {
+                            if (deplib == lib) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        std::string libPackage = pkg.first + ".lib";
+                        if (m_pkgrepo.checkBinaryExist(libPackage)) {
+                            for (auto deplib : m_pkgrepo.getLibs(libPackage))
+                                if (deplib == lib) {
+                                    found = true;
+                                    break;
+                                }
+                        }
+                        if (found)
+                            break;
+                    }
+                    if (found)
+                        break;
+
+                    level++;
+                    }
             }
             if (!found) {
                     missingSharedLib = lib;
