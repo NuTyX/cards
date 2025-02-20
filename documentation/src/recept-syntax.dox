@@ -48,15 +48,6 @@ For example:
 xmms.pre-install
 glib.post-install
 \endcode
-
-We can also find a README file. As for the scripts above, it will take the name of the package as prefix
-
-For example:
-
-\code{.sh}
-samba.README
-rsync.service.README
-\endcode
  
 \section recept_syntax_the_pkgfile_file The Pkgfile file
 
