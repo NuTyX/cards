@@ -293,7 +293,6 @@ void create::run()
         removeFile (m_root, "/.META");
         removeFile (m_root, "/.PRE");
         removeFile (m_root, "/.POST");
-        removeFile (m_root, "/.README");
 	    m_listOfPackages[package.first] = package.second;
     }
 	postRun();
