@@ -235,6 +235,10 @@ int main(int argc, char** argv)
         }
             return EXIT_SUCCESS;
        case ArgParser::CMD_PURGE: {
+            if (getuid()) {
+                string s = "";
+                throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
+            }
             cards::sync sync;
             sync.purge();
             return EXIT_SUCCESS;
