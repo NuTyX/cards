@@ -18,18 +18,14 @@ diff::diff(const CardsArgumentParser& argParser,
 	, m_packagesOK(0)
 {
 
-	if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_SYNC)) {
-		for (auto collection : m_config.dirUrl()) {
-			if (collection.url.size() == 0 )
-				continue;
+	for (auto collection : m_config.dirUrl()) {
+		if (collection.url.size() == 0 )
+			continue;
 
-			if (getuid()) {
-				m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
-				treatErrors("");
-			}
-		}
-		m_sync.run();
 	}
+
+	if (!getuid())
+		m_sync.run();
 
     buildDatabase(false);
 
@@ -80,15 +76,6 @@ diff::diff(const CardsArgumentParser& argParser,
 			}
 		}
 		m_listOfPackagesToDeal[i.first]= packageNameToDeal;
-	}
-	if (m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
-		std::cout << size()
-		<< std::endl;
-	else if (m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) {
-		if (size() > 0)
-			std::cout << "yes\n";
-		else
-			std::cout << "no\n";
 	}
 }
 const unsigned long diff::downloadSize()

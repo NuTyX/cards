@@ -15,10 +15,18 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root = m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
 
-	if (m_argParser.isSet(CardsArgumentParser::OPT_CHECK) ||
-		m_argParser.isSet(CardsArgumentParser::OPT_SIZE))
-			return;
-
+	if (m_argParser.isSet(CardsArgumentParser::OPT_CHECK)) {
+		if (m_diff.size() > 0)
+			std::cout << "yes\n";
+		else
+			std::cout << "no\n";
+		return;
+	}
+	if (m_argParser.isSet(CardsArgumentParser::OPT_SIZE)){
+		std::cout << m_diff.size()
+			<< std::endl;
+		return;
+	}
 	m_progress = true;
 	buildDatabase(true);
 
