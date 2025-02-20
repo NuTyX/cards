@@ -45,7 +45,6 @@
 
 #define DEFAULT_BYTES_PER_BLOCK (20 * 512)
 #define METAFILE ".META"
-#define INFOFILE ".INFO"
 #define MTREEFILE ".MTREE"
 
 #define PKG_DB_DIR "var/lib/pkg/DB/"
@@ -55,7 +54,6 @@
 #define PKG_RECEPT "/Pkgfile"
 #define PKG_REPO_META "/.REPO"
 #define PKG_REPO_FILES "/.FILES"
-#define PKG_README "README"
 #define PKG_PRE_INSTALL ".PRE"
 #define PKG_POST_INSTALL ".POST"
 
