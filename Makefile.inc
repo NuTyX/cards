@@ -27,7 +27,7 @@ INSTALL_DATA = $(INSTALL) -m 644
 INSTALL_DIR  = $(INSTALL) -d
 
 
-VERSION = 3.1.0
+VERSION = 3.2-rc1
 
 NAME = cards-$(VERSION)
 
