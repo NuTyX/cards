@@ -1487,6 +1487,11 @@ main() {
 
 
 	if [ "$PKGMK_UP_TO_DATE" = "yes" ]; then
+		TARGET="$PKGMK_PACKAGE_DIR/${name}${PKGMK_PACKAGE_EXT}$version-$release"
+		if [ ! -f $TARGET ]; then
+			info "Package '$TARGET' is not up to date."
+			exit 0
+		fi
 		get_packages_list
 		if [ ! -z $TARGETS ]; then
 			for TARGET in ${TARGETS[@]}; do
@@ -1509,16 +1514,9 @@ main() {
 	BUILD_NEEDED="no"
 
 	# From here on check the base package not any group
-	get_packages_list
-	if [ -z $TARGETS ]; then
-		TARGET="$PKGMK_PACKAGE_DIR/${name}${PKGMK_PACKAGE_EXT}$version-$release"
-		if [ "$(build_needed)" = "no" ] && [ "$PKGMK_FORCE" = "no" ]; then
-			info "Package '$TARGET' is up to date."
-		else
-			[ "$PKGMK_PACK_ONLY" == "yes" ] ||  download_source
-			BUILD_NEEDED="yes"
-		fi
-	else
+	TARGET="$PKGMK_PACKAGE_DIR/${name}${PKGMK_PACKAGE_EXT}$version-$release"
+	if [ -f $TARGET ]; then
+		get_packages_list
 		FOUND=false
 		for TARGET in ${TARGETS[@]}; do
 			if [ "$(build_needed)" = "no" ] && [ "$PKGMK_FORCE" = "no" ]; then
@@ -1532,6 +1530,10 @@ main() {
 				break
 			fi
 		done
+	else
+		FOUND=false
+		[ "$PKGMK_PACK_ONLY" == "yes" ] ||  download_source
+		BUILD_NEEDED="yes"
 	fi
 	if [ ! -z $FOUND ] ; then
 		if [ $FOUND != true ];  then
