@@ -289,11 +289,8 @@ void create::run()
 	    // Add the info about the files to the DB
 	    addPackageFilesRefsToDB(package.first, package.second);
     } else {
-        removeFile (m_root, "/.MTREE");
-        removeFile (m_root, "/.META");
-        removeFile (m_root, "/.PRE");
-        removeFile (m_root, "/.POST");
-	    m_listOfPackages[package.first] = package.second;
+        cleanupMetaFiles(m_root);
+        m_listOfPackages[package.first] = package.second;
     }
 	postRun();
 

@@ -204,6 +204,12 @@ void cleanupMetaFiles(const std::string& basedir)
 #endif
 		removeFile ( basedir, "/.MTREE");
 	}
+	if ( checkFileExist ( basedir + "/.README" ) ) {
+#ifdef DEBUG
+		std::cerr << basedir << "/.README removed" << std::endl;
+#endif
+		removeFile ( basedir, "/.README");
+	}
 }
 void removeFile(const std::string& basedir, const std::string& filename)
 {
