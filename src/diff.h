@@ -22,6 +22,7 @@ class diff : public pkgdbh
     unsigned int               m_packagesReplace;
     unsigned int               m_packagesObsolet;
     unsigned int               m_packagesNewBuild;
+    unsigned int               m_packagesNew;
     unsigned int               m_packagesOutOfDate;
     unsigned int               m_packagesUnMaint;
     unsigned int               m_packagesOK;
@@ -44,6 +45,7 @@ class diff : public pkgdbh
         const unsigned int packagesReplace();
         const unsigned int packagesObsolet();
         const unsigned int packagesNewBuild();
+        const unsigned int packagesNew();
         const unsigned int packagesOutOfDate();
         const unsigned int packagesUnMaint();
         const unsigned int packagesOK();

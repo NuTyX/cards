@@ -15,6 +15,8 @@ diff::diff(const CardsArgumentParser& argParser,
 	, m_packagesObsolet(0)
 	, m_packagesOutOfDate(0)
 	, m_packagesNewBuild(0)
+	, m_packagesUnMaint(0)
+	, m_packagesNew(0)
 	, m_packagesOK(0)
 {
 
@@ -35,12 +37,9 @@ diff::diff(const CardsArgumentParser& argParser,
 		packageNameToDeal.available_size = 0;
 		packageNameToDeal.installed_space = 0;
 		packageNameToDeal.available_space = 0;
-
+		packageNameBuild.first = i.first;
+		packageNameBuild.second = m_pkgrepo.getBinaryBuildTime(i.first);
 		if (m_pkgrepo.checkBinaryExist(i.first)) {
-
-			packageNameBuild.first = i.first;
-			packageNameBuild.second = m_pkgrepo.getBinaryBuildTime(i.first);
-
 			if (checkPackageNameBuildDateSame(packageNameBuild)) {
 				++m_packagesOK;
 				packageNameToDeal.status = STATUS_ENUM_UPG_OK;
@@ -75,7 +74,7 @@ diff::diff(const CardsArgumentParser& argParser,
 				packageNameToDeal.status = STATUS_ENUM_UPG_UNMAINT;
 			}
 		}
-		m_listOfPackagesToDeal[i.first]= packageNameToDeal;
+		m_listOfPackagesToDeal[i.first] = packageNameToDeal;
 	}
 }
 const unsigned long diff::downloadSize()
@@ -151,6 +150,9 @@ void diff::showInfo(bool details)
 		<< std::endl;
 	std::cout << _("Unchanged Packages:                       ")
 		<< m_packagesOK
+		<< std::endl;
+	std::cout << _("Added packages:                           ")
+		<< m_packagesNew
 		<< std::endl;
 	std::cout << std::endl
 		<< _("Out of Date Packages (different version): ")
@@ -312,7 +314,9 @@ const unsigned int diff::size() {
 		+ m_packagesObsolet
 		+ m_packagesReplace
 		+ m_packagesOutOfDate
-		+ m_packagesNewBuild;
+		+ m_packagesNewBuild
+		+ m_packagesNew
+		+ m_packagesUnMaint;
 }
 const unsigned long long diff::availableSpace()
 {
