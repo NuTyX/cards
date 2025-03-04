@@ -37,9 +37,9 @@ diff::diff(const CardsArgumentParser& argParser,
 		packageNameToDeal.available_size = 0;
 		packageNameToDeal.installed_space = 0;
 		packageNameToDeal.available_space = 0;
-		packageNameBuild.first = i.first;
-		packageNameBuild.second = m_pkgrepo.getBinaryBuildTime(i.first);
 		if (m_pkgrepo.checkBinaryExist(i.first)) {
+			packageNameBuild.first = i.first;
+			packageNameBuild.second = m_pkgrepo.getBinaryBuildTime(i.first);
 			if (checkPackageNameBuildDateSame(packageNameBuild)) {
 				++m_packagesOK;
 				packageNameToDeal.status = STATUS_ENUM_UPG_OK;
