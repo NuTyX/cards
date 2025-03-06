@@ -907,6 +907,9 @@ msgstr "Nombre de Paquets:                                "
 msgid "Unchanged Packages:                       "
 msgstr "Paquets inchangés:                                "
 
+msgid "Added packages (new dependencies):        "
+msgstr "Paquets ajoutés (nouvelles dépendances):          "
+
 msgid "Out of Date Packages (different version): "
 msgstr "Paquets périmés (versions différentes):           "
 
@@ -916,7 +919,7 @@ msgstr "Paquets reconstruits (construction plus récente): "
 msgid "Obsoletes Packages (will be removed):     "
 msgstr "Paquets obsolètes (seront supprimés):             "
 
-msgid "Unmaintained Packages (should be remove): "
+msgid "Unmaintained Packages (should be removed):"
 msgstr "Paquets non maintenus                             "
 
 msgid "Conflict Packages (will be removed):      "

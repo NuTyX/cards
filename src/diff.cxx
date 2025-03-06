@@ -151,7 +151,7 @@ void diff::showInfo(bool details)
 	std::cout << _("Unchanged Packages:                       ")
 		<< m_packagesOK
 		<< std::endl;
-	std::cout << _("Added packages:                           ")
+	std::cout << _("Added packages (new dependencies):        ")
 		<< m_packagesNew
 		<< std::endl;
 	std::cout << std::endl
@@ -229,7 +229,7 @@ void diff::showInfo(bool details)
 	}
 	if (m_packagesUnMaint > 0) {
 		std::cout << std::endl
-			<< _("Unmaintained Packages (should be remove): ")
+			<< _("Unmaintained Packages (should be removed):")
 			<< m_packagesUnMaint
 			<< std::endl;
 		if (details) {
