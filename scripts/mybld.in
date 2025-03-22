@@ -851,9 +851,9 @@ if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
   sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/DEPOT || \
   error "mounting ${ROOTMOUNT}/$(uname -m)/${VERSION}"
   if [ -z "${PARAM[0]}" ]; then
-     if [ ! -f $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.PKGREPO ]; then
+     if [ ! -f $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.REPO ]; then
         sudo mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}
-        sudo touch $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.PKGREPO
+        sudo touch $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.REPO
      fi
   fi
 else
