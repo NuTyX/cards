@@ -366,7 +366,7 @@ void create::buildCollection()
         for (auto lib : m_pkgrepo.getLibs(i)) {
             found = false;
             for (auto dep : m_pkgrepo.getDependenciesList(i)) {
-                for (auto file:m_pkgrepo.getListOfFiles(dep.first)) {
+                for (auto file : m_pkgrepo.getListOfFiles(dep.first)) {
                     if (file.find('/' + lib) != std::string::npos) {
                         found = true;
                         break;
@@ -419,11 +419,12 @@ void create::buildCollection()
                         }
                         std::string libPackage = pkg.first + ".lib";
                         if (m_pkgrepo.checkBinaryExist(libPackage)) {
-                            for (auto deplib : m_pkgrepo.getLibs(libPackage))
+                            for (auto deplib : m_pkgrepo.getLibs(libPackage)) {
                                 if (deplib == lib) {
                                     found = true;
                                     break;
                                 }
+                            }
                         }
                         if (found)
                             break;
@@ -432,11 +433,84 @@ void create::buildCollection()
                         break;
 
                     level++;
-                    }
+                }
             }
             if (!found) {
                     missingSharedLib = lib;
                     break;
+            }
+        }
+        if (found) {
+            // If all the libs of the 'i' package were found
+            // we still need to check the i.lib package as well
+            std::string iLib = i + ".lib";
+            if (m_pkgrepo.checkBinaryExist(iLib)) {
+                std::cout << "Checking: " << iLib << std::endl;
+                // and check if all libs of i-lib exists
+                found = false;
+                for (auto lib : m_pkgrepo.getLibs(iLib)) {
+                    for (auto dep : m_pkgrepo.getDependenciesList(iLib)) {
+                        for (auto file : m_pkgrepo.getListOfFiles(dep.first)) {
+                            if (file.find('/' + lib) != std::string::npos) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found)
+                            break;
+                    }
+                    if (!found) {
+                        if (checkFileNameExist(lib)) {
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        // In the list of files of the 'i.lib' package
+                        for (auto file : m_pkgrepo.getListOfFiles(iLib)) {
+                            if (file.find(lib) != std::string::npos) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!found) {
+                        // Last chance to find the lib.
+                        int level = 0;
+                        while (level < m_pkgfile.getLevel(i)) {
+                            for (auto pkg : m_pkgfile.getListOfPackages()) {
+                                if (!m_pkgrepo.checkBinaryExist(pkg.first))
+                                    continue;
+
+                                if (pkg.second.level() != level)
+                                    continue;
+
+                                for (auto deplib : m_pkgrepo.getLibs(pkg.first) ) {
+                                    if (deplib == lib) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                std::string libPackage = pkg.first + ".lib";
+                                if (m_pkgrepo.checkBinaryExist(libPackage)) {
+                                    for (auto deplib : m_pkgrepo.getLibs(libPackage)) {
+                                        if (deplib == lib) {
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if(found)
+                                break;
+
+                            level++;
+                        }
+                    }
+                    if (!found) {
+                        missingSharedLib = lib;
+                        break;
+                    }
+                }
             }
         }
         if (!found) {
