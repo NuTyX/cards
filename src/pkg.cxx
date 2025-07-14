@@ -179,6 +179,14 @@ const std::string& pkg::branch()
 {
 	return m_branch;
 }
+void pkg::system(const std::string& system)
+{
+	m_system = system;
+}
+const std::string& pkg::system()
+{
+	return m_system;
+}
 void pkg::build(const time_t build)
 {
 	m_build = build;

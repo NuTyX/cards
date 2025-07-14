@@ -33,6 +33,7 @@ class pkg
 	std::string 			m_signature;
 	std::string 			m_origin;
 	std::string 			m_branch;
+	std::string 			m_system;
 
 	std::string 			m_hash;
 	time_t 					m_build;
@@ -63,6 +64,7 @@ public:
 	const std::string&		signature();
 	const std::string&		origin();
 	const std::string&		branch();
+	const std::string&		system();
 	const std::string&		hash();
 	time_t					build();
 
@@ -90,6 +92,7 @@ public:
 	void					hash(const std::string& hash);
 	void					origin(const std::string& origin);
 	void					branch (const std::string& branch);
+	void					system (const std::string& system);
 	void					build(time_t time);
 
 };
