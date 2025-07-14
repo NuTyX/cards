@@ -2,11 +2,11 @@
 
 #include "mysql.h"
 
-namespace Sql
+namespace sql
 {
-mysql::mysql(const char *configFileName)
+mysql::mysql(const std::string& configFileName)
+    : m_sqlConfig(configFileName)
 {
-	cards::conf m_sqlConfig(configFileName);
 	m_socket=NULL;
 
 	m_connection = mysql_init(NULL);

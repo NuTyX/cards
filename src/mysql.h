@@ -2,10 +2,13 @@
 
 #pragma once
 
+#include "conf.h"
 #include "file_utils.h"
 #include <mysql/mysql.h>
 
-namespace Sql {
+/// @brief Basic sql db interface for the website
+
+namespace sql {
 
 struct boardInfo_t {
     std::string category;
@@ -33,7 +36,7 @@ typedef std::vector<messageInfo_t> message_t;
 
 class mysql {
 public:
-    mysql(const char* configFileName);
+    mysql(const std::string& configFileName);
     virtual ~mysql();
 
     void lastPosts(const char* forum);
