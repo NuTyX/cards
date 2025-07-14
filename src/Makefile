@@ -76,14 +76,12 @@ LIBOBJECTS =  pkg.o \
 	pkgrepo.o
 
 WEBOBJECTS = pkg.o \
-	db.o \
-	cache.o \
 	system_utils.o \
 	file_utils.o \
 	conf.o \
 	string_utils.o \
-	pkgrepo.o \
 	mysql.o \
+	webrepo.o \
 	webcards.o
 
 HEADERS = pkg.h \
