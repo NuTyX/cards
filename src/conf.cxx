@@ -58,12 +58,15 @@ void conf::parseConfig()
 					DU.collection = stripWhiteSpace(dir.substr(pos+1));
 					DU.depot = dir.substr(0,pos);
 				}
+				// TODO find a better solution
+				/*
 				for (auto i : m_dirUrl) {
 					if (i.collection == DU.collection) {
 						found = true;
 						break;
 					}
 				}
+				*/
 				if (!found)
 					m_dirUrl.push_back(DU);
 			}
