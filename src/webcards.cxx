@@ -5,7 +5,7 @@
 #include "www/menu_webcards.h"
 
 using namespace std;
-using namespace Sql;
+using namespace sql;
 
 std::vector<std::string> parseHTMLDelimitedList
 (const std::vector<std::string>& text,
@@ -127,9 +127,9 @@ string::size_type parseArguments(arguments_t &arguments)
 	listOfArguments = parseDelimitedSetList(pArgument,"&");
 	arguments.docName="index";
 	for ( auto i : listOfArguments) {
-		pos = i.find("arch=");
+		pos = i.find("system=");
 		if ( pos != std::string::npos ){
-			arguments.packageArch = i.substr(pos+5);
+			arguments.packageSystem = i.substr(pos+7);
 		}
 		pos = i.find("branch=");
 		if ( pos != std::string::npos ){
@@ -152,10 +152,10 @@ string::size_type parseArguments(arguments_t &arguments)
 			arguments.type = i.substr(pos+5);
 		}
 	}
-	if ( arguments.packageArch.size() == 0)
-		arguments.packageArch="x86_64";
+	if ( arguments.packageSystem.size() == 0)
+		arguments.packageSystem="sys-v";
 	if ( arguments.packageBranch.size() == 0)
-		arguments.packageBranch="rolling";
+		arguments.packageBranch="testing";
 	if ( arguments.type.size() == 0)
 		arguments.type="pkg";
 	return pos;
@@ -179,42 +179,42 @@ void searchpkg(contentInfo_t &contentInfo, arguments_t &arguments)
 		contentInfo.text.push_back( "      <input type=\"radio\" name=\"type\" value=\"col\" /> COLLECTION" );
 	contentInfo.text.push_back( "    <tr class=\"even\">");
 	contentInfo.text.push_back( "     <td>");
-	contentInfo.text.push_back( "      <h4>Release</h4>");
+	contentInfo.text.push_back( "      <h4>Branch</h4>");
 	contentInfo.text.push_back( "     <td>");
 
 	if ( arguments.packageBranch == "rolling" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"rolling\" checked=\"checked\" /> Rolling");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"rolling\" checked=\"checked\" /> rolling");
 	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"rolling\" /> Rolling");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"rolling\" /> rolling");
 	contentInfo.text.push_back( "     <br>");
 	if ( arguments.packageBranch == "testing" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"testing\" checked=\"checked\"/> Testing");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"testing\" checked=\"checked\"/> testing");
 	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"testing\" /> Testing");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"testing\" /> testing");
 	contentInfo.text.push_back( "     <br>");
 	if ( arguments.packageBranch == "all" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" checked=\"checked\"/> All" );
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" checked=\"checked\"/> all" );
 	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" /> All");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"branch\" value=\"all\" /> all");
 
 	contentInfo.text.push_back( "    <tr class=\"odd\">");
 	contentInfo.text.push_back( "     <td>");
-	contentInfo.text.push_back( "      <h4>Architecture</h4>");
+	contentInfo.text.push_back( "      <h4>System</h4>");
 	contentInfo.text.push_back( "     <td>");
-	if ( arguments.packageArch == "x86_64" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" checked=\"checked\" /> x86_64");
+	if ( arguments.packageSystem == "sys-v" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"system\" value=\"sys-v\" checked=\"checked\" /> sys-v");
 	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"x86_64\" /> x86_64");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"system\" value=\"sys-v\" /> sys-v");
 	contentInfo.text.push_back( "     <br>");
-	if ( arguments.packageArch == "i686" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"i686\" checked=\"checked\" /> i686");
+	if ( arguments.packageSystem == "systemd" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"system\" value=\"systemd\" checked=\"checked\" /> systemd");
 	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"i686\" /> i686");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"system\" value=\"systemd\" /> systemd");
 	contentInfo.text.push_back( "     <br>");
-	if ( arguments.packageArch == "all" )
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" checked=\"checked\" /> All");
+	if ( arguments.packageSystem == "all" )
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"system\" value=\"all\" checked=\"checked\" /> all");
 	else
-		contentInfo.text.push_back( "      <input type=\"radio\" name=\"arch\" value=\"all\" /> All");
+		contentInfo.text.push_back( "      <input type=\"radio\" name=\"system\" value=\"all\" /> all");
 
 	contentInfo.text.push_back( "    <tr class=\"even\" valign=\"middle\">");
 	contentInfo.text.push_back( "     <td>");
@@ -285,67 +285,62 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 	std::string row = "odd";
 	contentInfo_t contentInfo;
 	contentInfo.date = getDateFromEpoch(timer);
-	std::vector<RepoInfo> List;
-	repo repoList(".webcards.conf");
 	std::set<std::string> listOfPackages;
-	List = repoList.getRepoInfo();
-	for (auto i : List) {
-		for (auto j : i.packagesList) {
-			if ( arguments.type == "col" ) {
-				if ( convertToLowerCase(search) == i.collection ) {
-					if ( ( arguments.packageBranch != i.branch ) &&
-						( arguments.packageBranch != "all" ) )
-						continue;
-					if ( ( arguments.packageArch != i.arch ) &&
-						( arguments.packageArch != "all" )  )
-						continue;
-					INSERTPACKAGE(j.basePackageName, j.basePackageName);
-					continue;
-				}
-				continue;
-			}
-			if ( search.size() == 0 ) {
-				INSERTPACKAGE(j.basePackageName, j.basePackageName);
-			} else {
-				if ( ( arguments.packageBranch != i.branch ) &&
+	cards::webrepo repoList(".webcards.conf");
+
+	for (auto i : repoList.getListOfPackages()) {
+		if ( arguments.type == "col" ) {
+			if ( convertToLowerCase(search) == i.second.collection() ) {
+				if ( ( arguments.packageBranch != i.second.branch() ) &&
 					( arguments.packageBranch != "all" ) )
 					continue;
-				if ( ( arguments.packageArch != i.arch ) &&
-					( arguments.packageArch != "all" )  )
+				if ( ( arguments.packageSystem != i.second.system() ) &&
+					( arguments.packageSystem != "all" )  )
 					continue;
-				std::string::size_type pos;
-				pos = i.collection.find(convertToLowerCase(search));
-				if (pos != std::string::npos) {
-					INSERTPACKAGE(j.basePackageName, j.basePackageName);
-					continue;
+				INSERTPACKAGE(i.second.baseName(), i.second.baseName());
+				continue;
+			}
+			continue;
+		}
+		if ( search.size() == 0 ) {
+			INSERTPACKAGE(i.second.baseName(), i.second.baseName());
+		} else {
+			if ( ( arguments.packageBranch != i.second.branch() ) &&
+				( arguments.packageBranch != "all" ) )
+				continue;
+			if ( ( arguments.packageSystem != i.second.system() ) &&
+				( arguments.packageSystem != "all" )  )
+				continue;
+			std::string::size_type pos;
+			pos = i.second.collection().find(convertToLowerCase(search));
+			if (pos != std::string::npos) {
+				INSERTPACKAGE(i.second.baseName(), i.second.baseName());
+				continue;
+			}
+			pos = i.second.baseName().find(convertToLowerCase(search));
+			if (pos != std::string::npos) {
+				INSERTPACKAGE(i.second.baseName(), i.second.baseName());
+				continue;
+			}
+			pos = convertToLowerCase(i.second.description()).find(convertToLowerCase(search));
+			if (pos != std::string::npos) {
+				INSERTPACKAGE(i.second.baseName(), i.second.baseName());
+				continue;
+			}
+			std::set<std::string> groupList;
+			groupList = parseDelimitedSetList(i.second.group()," ");
+			for ( auto k : groupList ) {
+				if ( convertToLowerCase(search) == k ) {
+					std::string name = i.second.baseName()
+						+ "."
+						+ k;
+					INSERTPACKAGE(i.second.baseName(), name);
 				}
-				pos = j.basePackageName.find(convertToLowerCase(search));
-				if (pos != std::string::npos) {
-					INSERTPACKAGE(j.basePackageName, j.basePackageName);
-					continue;
-				}
-				pos = convertToLowerCase(j.description).find(convertToLowerCase(search));
-				if (pos != std::string::npos) {
-					INSERTPACKAGE(j.basePackageName, j.basePackageName);
-					continue;
-				}
-				std::set<std::string> groupList;
-				groupList = parseDelimitedSetList(j.group," ");
-				for ( auto k : groupList ) {
-					if ( convertToLowerCase(search) == k ) {
-						std::string name = j.basePackageName
-							+ "."
-							+ k;
-						INSERTPACKAGE(j.basePackageName, name);
-					}
-				}
-				std::set<std::string> aliasList;
-				aliasList = parseDelimitedSetList(j.alias," ");
-				for ( auto k : aliasList ) {
-					if ( convertToLowerCase(search) == k ) {
-						std::string name = j.basePackageName;
-						INSERTPACKAGE(j.basePackageName, name);
-					}
+			}
+			for ( auto k : i.second.alias() ) {
+				if ( convertToLowerCase(search) == k ) {
+					std::string name = i.second.baseName();
+					INSERTPACKAGE(i.second.baseName(), name);
 				}
 			}
 		}
@@ -364,7 +359,7 @@ contentInfo_t getFormatedBinaryPackageList(arguments_t &arguments)
 	searchpkg(contentInfo,arguments);
 	contentInfo.text.push_back("<table>");
 	contentInfo.text.push_back("  <tr class=\"header\">");
-	contentInfo.text.push_back("  <td>ARCH</td><td>RELEASE</td>\
+	contentInfo.text.push_back("  <td>SYSTEM</td><td>BRANCH</td>\
 <td>COLLECTION</td>\
 <td>NAME</td>\
 <td>VERSION</td>\
@@ -549,14 +544,13 @@ int main (int argc, char** argv)
 
 std::cout << "\n      </td>\n     </tr>\n    </table>\n" \
   << "    <footer>\n     <p>\n" \
-  << "      &copy; 2007 - 2024 <a href=\".\">NuTyX</a>.\n    <br>\n" \
+  << "      &copy; 2007 - 2025 <a href=\".\">NuTyX</a>.\n    <br>\n" \
   << "   Generated by cards " <<  PACKAGE_VERSION  << " in ";
 
 	high_resolution_clock::time_point t2 = high_resolution_clock::now();
 	duration<double> time_span = duration_cast<duration<double>>((t2 - t1)*1000);
 
 std::cout << time_span.count() << " mS \n   <br><br>\n" \
-    << "Hosted by <a href=\"https://tuxfamily.org\"><img src=\"../graphics/logo_tuxfamily_50.png\"/></a><br><br>\n" \
     << "     <a href=\"http://www.wtfpl.net/\">\n" \
     << "     <img src=\"../graphics/logo_wtfpl_80.png\"\n" \
     << "     width=\"80\" height=\"15\" alt=\"WTFPL\" /></a> \n" \
