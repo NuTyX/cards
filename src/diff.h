@@ -15,8 +15,8 @@ class diff : public pkgdbh
     std::string                m_configFileName;
     std::map<std::string, m_package>
                                m_listOfPackagesToDeal;
-    cards::pkgrepo             m_pkgrepo;
     cards::sync                m_sync;
+    cards::pkgrepo             m_pkgrepo;
     cards::conf                m_config;
     unsigned int               m_packagesConflict;
     unsigned int               m_packagesReplace;

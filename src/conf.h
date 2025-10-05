@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "string_utils.h"
+#include "file_utils.h"
 
 namespace cards {
 
@@ -43,6 +43,7 @@ public:
 
     conf(const std::string& filename);
     ~conf();
+    void purge();
 
     const std::string& version();
     const std::string& url();

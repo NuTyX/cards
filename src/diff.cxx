@@ -6,8 +6,8 @@ namespace cards {
 
 diff::diff(const CardsArgumentParser& argParser,
 		const std::string& configFileName)
-	: m_pkgrepo(configFileName)
-	, m_sync(configFileName)
+	: m_sync(configFileName)
+	, m_pkgrepo(configFileName)
 	, m_argParser(argParser)
 	, m_config(configFileName)
 	, m_packagesConflict(0)
@@ -25,9 +25,6 @@ diff::diff(const CardsArgumentParser& argParser,
 			continue;
 
 	}
-
-	if (!getuid())
-		m_sync.run();
 
     buildDatabase(false);
 

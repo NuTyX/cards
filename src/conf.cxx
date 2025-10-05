@@ -138,7 +138,22 @@ void conf::parseConfig()
 	}
 
 }
+void conf::purge()
+{
+	std::set<std::string> listOfFiles;
+	for (auto collection : dirUrl()) {
+		std::string path = collection.depot
+			+ "/"
+			+ collection.collection;
 
+		if (collection.url.size() == 0 )
+			continue;
+
+		findRecursiveFile(listOfFiles, path.c_str(),WS_DEFAULT);
+		for (auto file : listOfFiles)
+			remove(file.c_str());
+	}
+}
 conf::~conf()
 {
 	//nothing todo ATM

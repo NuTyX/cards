@@ -21,22 +21,9 @@ sync::sync(const std::string configFile)
 {
     m_pkgRepoFile = DEFAULT_PKG_REPO;
     m_pkgFilesFile = DEFAULT_PKG_FILES;
-}
-void sync::purge()
-{
-	std::set<std::string> listOfFiles;
-	for (auto collection : m_config.dirUrl()) {
-		std::string path = collection.depot
-			+ "/"
-			+ collection.collection;
+	if (!getuid())
+		run();
 
-		if (collection.url.size() == 0 )
-			continue;
-
-		findRecursiveFile(listOfFiles, path.c_str(),WS_DEFAULT);
-		for (auto file : listOfFiles)
-			remove(file.c_str());
-	}
 }
 void sync::run() 
 {

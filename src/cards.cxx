@@ -239,8 +239,8 @@ int main(int argc, char** argv)
                 string s = "";
                 throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
             }
-            cards::sync sync;
-            sync.purge();
+            cards::conf config(configFile);;
+            config.purge();
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_CREATE: {

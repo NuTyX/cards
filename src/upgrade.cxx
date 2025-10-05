@@ -7,10 +7,9 @@ namespace cards {
 upgrade::upgrade(const CardsArgumentParser& argParser,
 	const std::string& configFileName)
 	: m_argParser(argParser)
-	, m_sync(configFileName)
+	, m_diff(argParser,configFileName)
 	, m_pkgrepo(configFileName)
 	, m_config(configFileName)
-	, m_diff(argParser,configFileName)
 {
 	if (m_argParser.isSet(CardsArgumentParser::OPT_ROOT))
 		m_root = m_argParser.getOptionValue(CardsArgumentParser::OPT_ROOT);
@@ -154,7 +153,7 @@ void upgrade::upgradePackages()
 		removePackageFiles(i);
 		syslog(LOG_INFO,"%s removed",i.c_str());
 	}
-	m_sync.purge();
+	m_config.purge();
 	std::cout << std::endl
 		<< _("Summary: ")
 		<< std::endl;

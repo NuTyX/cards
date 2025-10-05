@@ -15,10 +15,9 @@ class upgrade : public pkgadd {
 	std::set<std::string>                    m_ListOfPackagesToDelete;
 	std::set<std::pair<std::string, time_t>> m_ListOfPackagesToUpdate;
 	const CardsArgumentParser&               m_argParser;
-	cards::sync                              m_sync;
+	cards::diff                              m_diff;
 	cards::pkgrepo                           m_pkgrepo;
 	cards::conf                              m_config;
-	cards::diff                              m_diff;
 
 public:
 	/**
