@@ -642,10 +642,21 @@ build() {
 				make
 				make DESTDIR=$PKG install;;
 
-			python3)
-				cd ${_name}-$version
-				python3 setup.py build
-				python3 setup.py install --prefix=/usr --root=$PKG;;
+			python)
+				cd $name-$version
+				pip3 wheel -w dist   \
+				--no-build-isolation \
+				--no-deps $PWD
+				pip3 install      \
+				--no-index        \
+				--find-links dist \
+				--no-cache-dir    \
+				--no-user         \
+				--root=$PKG       \
+				$name
+
+				find $PKG -type d -name vendor -o \
+				-name tests | xargs rm -rf;;
 
 			xorg)
 				cd ${_name}-$version

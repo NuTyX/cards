@@ -1,0 +1,556 @@
+#!/usr/bin/env bash
+#  SPDX-License-Identifier: LGPL-2.1-or-later
+#  Copyright (c) 2020 - .... by NuTyX team (https://nutyx.org)
+
+PACKAGES_FOLDER="$PWD"
+COLLECTIONS="base cli cli-extra gui gui-extra"
+ARCHDIR="/devel/archlinux"
+ARCHDEPOTURL="https://mirror.puzzle.ch/archlinux"
+PARAMS=""
+UPDATE=0
+SUMMARY=0
+FIRST=1
+DEBUG=0
+NOTFOUND=0
+
+T_NOTFOUND=""
+PNFn=0
+PFn=0
+PODn=0
+wowoutput=()
+
+declare -A outdpkgcount
+
+########################################################################
+# FUNCTIONS
+########################################################################
+
+showhelp() {
+echo "
+Script to find outdated packages / collections
+Usage:
+-u|--update    : clone or update arch packages to allow comparison
+
+-s|--summary   : do not show outdated packages but just number / collection
+
+-nf|--notfound : show not found packages (not shown by default)
+
+-h|--help      : show this help
+
+--debug        : show debug messages (useful for dev this script)
+"
+}
+
+debug() {
+  if [ "$DEBUG" == "1" ]; then
+    echo "debug >>> $1"
+  fi
+}
+
+## the 4 following functions are used to version comparison
+verlte() {
+    [  "$1" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+}
+verlt() {
+    [ "$1" = "$2" ] && return 1 || verlte $1 $2
+}
+tobe_updated() {
+  PODn=$((PODn + 1))
+
+  #echo "$(basename $i) $pkgver ($version) [$packager]"
+  #shows packager name only
+  tmpCOLLECTION=$(echo "$COLLECTION" | tr -dc '[[:alpha:]]')
+  declare -g -n ref="wowoutput$tmpCOLLECTION"
+  ref+=("$(basename $i) $pkgver ($version) [$(cut -d'<' -f1 <<< $packager | xargs)]")
+  
+  ((outdpkgcount[$tmpCOLLECTION]++))
+  
+}
+#up_to_date() {
+#  echo "$(basename $i) $pkgver ($version) [$packager] up to date"
+#}
+
+datediff() {
+    d1=$(date -d "$1" +%s)
+    d2=$(date -d "$2" +%s)
+    diff=$(( (d1 - d2) / 86400 ))
+    if [ $diff -lt 0 ]
+    then
+        diff=$((-$diff))
+    fi
+    echo $diff
+}
+update_repo() {
+  rm -rf "$HOME$ARCHDIR"
+  mkdir -p "$HOME$ARCHDIR"
+  cd "$HOME$ARCHDIR"
+  for ALG in core extra
+  do
+	curl -s $ARCHDEPOTURL/$ALG/os/x86_64/$ALG.db -o $ALG.db|| continue
+	if [ -f $ALG.db ];then
+	   bsdtar --list --file $ALG.db|grep /$ >> list
+    else
+        echo "file $ALG.db not found, cannot proceed"
+        exit
+	fi
+  done
+  for AFULLNAME in $(cat $HOME$ARCHDIR/list)
+  do
+      ANAME=${AFULLNAME%-*-*}
+	  AVERSION=${AFULLNAME/$ANAME-/}
+	  pkgver=${AVERSION%-*}
+      [ ! -z $ANAME ] && echo "pkgver=${pkgver##*:}" > \
+      $HOME$ARCHDIR/$ANAME
+	  unset ANAME AVERSION
+  done
+  rm list
+}
+# this function replaces package name to "match" with arch repos
+getarchname() {
+  case $PKGNAME in
+    gnulib|gstreamer-0|gstreamer-plugins-base-0|liblinear|ovmf|\
+    openjdk|libatomic-ops|eigen2|make-ca|qt2|xfce4-appmenu-plugin|\
+    grub-efi|linux-mainline|cards|*cards|eudev|runyx|lcms|noip2|\
+    sysvinit|sysklogd|elogind|nutyx|kernel|kernel*|broadcom-wl-*|\
+    vboxhost*|nvidia*|virtualbox-guest|font-adobe-*|blocaled|qtkeychain|\
+    font-arabic-misc|font-bh-*|font-bitstream-*|upgrade-nutyx|\
+    font-ibm-type1|font-misc-ethiopic|font-xfree86-type1|\
+    rox-filer|sshaskpass|xquisite|openbox-jp-theme)
+     ARCHNAME="";;
+
+    gtk-update-icon-cache)
+     ARCHNAME="gtk3";;
+
+    element-desktop)
+     ARCHNAME="element.io";;
+    
+    gtksharp2)
+     ARCHNAME="gtk-sharp-2";;
+
+    perl-yapp)
+     ARCHNAME="perl-parse-yapp";;
+
+    perl-pcsc)
+     ARCHNAME="pcsc-perl";;
+
+    nextcloud-desktop)
+     ARCHNAME="nextcloud-client";;
+
+    libreoffice)
+     ARCHNAME="libreoffice-fresh";;
+
+    openssl-10)
+     ARCHNAME="openssl-1.0";;
+
+    pygmentize)
+     ARCHNAME="python-pygments";;
+
+    mygpoclient)
+     ARCHNAME="python-mygpoclient";;
+
+    poppler*)
+     ARCHNAME="poppler";;
+
+    apache-ant)
+     ARCHNAME="ant";;
+
+    rustc)
+     ARCHNAME="rust";;
+
+    sdl1|libunique1)
+     ARCHNAME=${PKGNAME/1/};;
+
+    squashfs)
+     ARCHNAME="squashfs-tools";;
+
+    autoconf2-13)
+     ARCHNAME="autoconf2.13";;
+
+    inih|lrdf|yaml)
+     ARCHNAME="lib${PKGNAME}";;
+
+    libelf)
+     ARCHNAME="elfutils";;
+
+    eigen3)
+     ARCHNAME="eigen";;
+
+    fdk-aac)
+     ARCHNAME="fdkaac";;
+
+    gdk-pixbuf|glib|openjpeg|freetype|sdl)
+     ARCHNAME="${PKGNAME}2";;
+
+    gtkmm|fuse|gtksourceview|gtkspell)
+     ARCHNAME="${PKGNAME}3";;
+
+    kerberos)
+     ARCHNAME="krb5";;
+
+    mutagen)
+     ARCHNAME="python-mutagen";;
+
+    net-tool-cvs)
+     ARCHNAME="net-tools";;
+
+    newt)
+     ARCHNAME="libnewt";;
+
+    node)
+     ARCHNAME="nodejs";;
+
+    aspell-dict)
+     ARCHNANE="aspell-fr";;
+
+    libmpcdec)
+     ARCHNAME="musepack";;
+
+    xvid)
+     ARCHNAME="xvidcore";;
+
+    xapian)
+     ARCHNAME="xapian-core";;
+
+    tidy-html5)
+     ARCHNAME="tidy";;
+
+    vte)
+     ARCHNAME="vte3";;
+
+    perl-glib)
+     ARCHNAME="glib-perl";;
+
+    dbus-launch)
+     ARCHNAME="dbus";;
+
+    telegram)
+     ARCHNAME="telegram-desktop";;
+     
+    transmission-qt|phonon-qt)
+     ARCHNAME=${PKGNAME/-qt/};;
+
+    dejavu-ttf)
+     ARCHNAME="ttf-dejavu";;
+
+    python-cups|python-gobject|python-atspi|python-smbc|python-xdg)
+     ARCHNAME="${PKGNAME/python-/py}";;
+
+    python2-gobject2)
+      ARCHNAME="${PKGNAME/python2-/py}";;
+
+    python-qt)
+     ARCHNAME="${PKGNAME/python-/py}5";;
+
+    python-dbus|python-dbus-data)
+     ARCHNAME="dbus-python";;
+
+    python2-docutils|python-docutils)
+     ARCHNAME="docutils";;
+
+    freefont-ttf)
+     ARCHNAME="ttf-freefont";;
+
+    xorg-term)
+     ARCHNAME="xterm";;
+
+    xorg-font-alias)
+     ARCHNAME="xorg-fonts-alias";;
+
+    xorg-encodings)
+     ARCHNAME="xorg-fonts-encodings";;
+
+    lxde-gpicview)
+     ARCHNAME="gpicview";;
+
+    python-parsing|python-curl)
+     ARCHNAME=${PKGNAME/-/-py};;
+
+    python-tkinter)
+    ARCHNAME="python";;
+
+    tracker|tracker-miners)
+     ARCHNAME=${PKGNAME/tracker/tracker3};;
+
+    gtkmm2|graphite2|tracker2|tracker2-miners|python2-distutils-extra|\
+    python2-evdev|python2-lxml|python2-ply|python2-pyparsing|\
+    python2-simplejson|python2-six|python2-xdg)
+     ARCHNAME=${PKGNAME/2/};;
+
+    oxygen-icons5)
+     ARCHNAME=${PKGNAME/5/};;
+
+    xorg-fontconfig|xorg-pixman|xorg-xkeyboard-config|xorg-xbitmaps|xorg-xtrans|xorg-luit|xorg-glu|xorg-xcursor-themes)
+     ARCHNAME=${PKGNAME/xorg-/};;
+
+    sdl-*)
+     ARCHNAME=${PKGNAME/sdl-/sdl2_};;
+
+    sdl1-*)
+     ARCHNAME=${PKGNAME/sdl1-/sdl_};;
+
+    qtbase|qtcharts|qtconnectivity|qtdatavis3d|qtdeclarative|qtgamepad|\
+    qtgraphicaleffects|qtimageformats|qtlocation|qtmultimedia|\
+    qtnetworkauth|qtquickcontrols|qtquickcontrols2|qtremoteobjects|qtscript|\
+    qtscxml|qtsensors|qtserialbus|qtserialport|qtspeech|qtsvg|qttools|\
+    qttranslations|qtwayland|qtwebchannel|qtwebkit|qtwebsockets|qtx11extras|\
+    qtxmlpatterns|qt3d|qtdoc|qtvirtualkeyboard)
+     ARCHNAME=${PKGNAME/qt/qt5-};;
+
+    liba52)
+     ARCHNAME="a52dec";;
+
+    live)
+     ARCHNAME="live-media";;
+
+    libzeitgeist|libostree|librest)
+     ARCHNAME=${PKGNAME/lib/};;
+
+    xorg-libxscrnsaver)
+     ARCHNAME="libxss";;
+
+    xorg-lib*|xorg-xf86*)
+     ARCHNAME=${PKGNAME/xorg-/};;
+
+    libindicator-gtk3|oxygen-gtk3)
+     ARCHNAME=${PKGNAME/-gtk3/};;
+
+    libfm-extra)
+     ARCHNAME="libfm";;
+
+    gstreamer-plugins-libav)
+     ARCHNAME="gst-libav";;
+
+    gstreamer-vaapi)
+     ARCHNAME=$PKGNAME;;
+
+    gstreamer-*)
+     ARCHNAME=${PKGNAME/gstreamer-/gst-};;
+
+    mate-libkbd|mate-libmixer|mate-libweather)
+     ARCHNAME=${PKGNAME/mate-lib/libmate};;
+
+    lxde-randr|lxde-terminal|lxde-panel|lxde-appearance|lxde-appearance-obconf|lxde-input|lxde-session|lxde-task)
+     ARCHNAME=${PKGNAME/lxde-/lx};;
+
+    sg3-utils|wpa-supplicant|wireless-tools|lm-sensors)
+     ARCHNAME=${PKGNAME/-/_};;
+
+    vid-stab)
+     ARCHNAME=${PKGNAME/-/\.};;
+
+    lua54-lgi)
+     ARCHNAME="lgi";;
+
+	gvim)
+     ARCHNAME="vim";;
+    
+    skypeforlinux)
+     ARCHNAME="skypeforlinux-stable-bin";;
+
+    *)
+     ARCHNAME=$PKGNAME;;
+
+  esac
+}
+
+## Begin here
+#
+########################################################################
+# ARGUMENTS PARSING
+########################################################################
+
+while (( "$#" )); do
+  case "$1" in
+    -u|--update)
+      UPDATE=1
+      shift
+      ;;
+    -s|--summary)
+      SUMMARY=1
+      shift
+      ;;
+    -nf|--notfound)
+      NOTFOUND=1
+      shift
+      ;;
+    -h|--help)
+      showhelp
+      exit 0
+      ;;
+    --debug)
+      DEBUG=1
+      shift
+      ;;
+    -*|--*=)
+      echo "Error: unrecognized option $1" >&2
+      exit 1
+      ;;
+    *)
+      if [[ "$COLLECTIONS" =~ .*"$1".* ]]; then
+        if [[ $FIRST = 1 ]]; then
+          PARAMS+="$1"
+          FIRST=0
+        else
+          PARAMS+=" $1"
+        fi
+        shift
+    else
+    echo "Error: unknown collection $1"
+    exit 1
+    fi
+      ;;
+  esac
+done
+
+eval set -- "$PARAMS"
+
+if [ -z "$PARAMS" ]; then
+  PARAMS=$COLLECTIONS
+else
+  PARAMS=$(echo "$PARAMS" | tr ' ' '\n' | sort | tr '\n' ' ')
+fi
+
+debug "update:$UPDATE summary:$SUMMARY notfound:$NOTFOUND collections:$PARAMS
+"
+
+########################################################################
+# -u|--update  =>  UPDATE REPOS
+########################################################################
+
+if [ "$UPDATE" == "1" ]; then
+  update_repo $ALG
+  if [ $? == 0 ]; then
+    echo "updated ARCH repository"
+  else
+    wowoutput+=("failed updating ARCH repository")
+  fi
+  wowoutput+=("")
+fi
+
+
+#
+# LOOP ON COLLECTIONS AND PACKAGES
+#
+
+MAX=0
+for COLLECTION in ${PARAMS[@]}
+do
+  #count collection with more chars
+  [ ${#COLLECTION} -gt ${MAX} ] && MAX=${#COLLECTION}
+  
+  tmpCOLLECTION=$(echo "wowoutput$COLLECTION" | tr -dc '[[:alpha:]]')
+  declare -g -x -n ref="$tmpCOLLECTION"
+  ref=()
+  
+  tmpCOLLECTION=$(echo "$COLLECTION" | tr -dc '[[:alpha:]]')
+  declare -g -x -i ref2="nb$tmpCOLLECTION"
+  ref2=0
+  
+  for i in $PACKAGES_FOLDER/$COLLECTION/*
+  do
+    PKGNAME=$(basename $i)
+    NOTEXIST="no"
+
+    getarchname
+
+    [ "$ARCHNAME" == "" ] && continue
+    
+    PFn=$((PFn + 1))
+    . $i/Pkgfile
+    
+    [ -f "$HOME$ARCHDIR/$ARCHNAME" ] && \
+    . $HOME$ARCHDIR/$ARCHNAME
+
+    if [ -z "$pkgver" ]; then
+      PNFn=$((PNFn + 1))
+      T_NOTFOUND+="$(basename $i) "
+      continue
+    fi
+    if [ ${pkgver%%+*} != "$version" ]; then
+
+      #keep this line for debugging
+      #debug "verlt ${version//[!0-9]/} ${pkgver//[!0-9]/} && tobe_updated"
+      #verlt ${version//[!0-9.]/} ${pkgver//[!0-9.]/} && tobe_updated || up_to_date
+      verlt ${version//[!0-9.]/} ${pkgver//[!0-9.]/} && tobe_updated
+
+    fi
+    unset pkgver version packager
+  done
+done
+
+
+########################################################################
+# -s|--summary  =>  LIST NUMBER OF PACKAGES / COLLECTIONS
+########################################################################
+
+if [ "$SUMMARY" == "1" ]; then
+
+  for COLLECTION in ${PARAMS[@]}
+  do
+    outcol=$(printf "%*s" "$MAX" "$COLLECTION")
+    tmpCOLLECTION=$(echo "$COLLECTION" | tr -dc '[[:alpha:]]')
+    val=${outdpkgcount[$tmpCOLLECTION]}
+    wowoutput+=("$outcol : $val packages
+")
+
+  done
+ 
+else
+
+########################################################################
+# no summary => all outdated packages / collection
+########################################################################
+
+  for COLLECTION in ${PARAMS[@]}
+  do
+    tmpCOLLECTION=$(echo "$COLLECTION" | tr -dc '[[:alpha:]]')
+    val=${outdpkgcount[$tmpCOLLECTION]}
+
+    wowoutput+=("
+$COLLECTION : $val packages
+")
+
+    tmpCOLLECTION=$(echo "wowoutput$COLLECTION" | tr -dc '[[:alpha:]]')
+    declare -g -n ref="$tmpCOLLECTION"
+
+    for i in "${ref[@]}"
+    do
+      wowoutput+=("    $i")
+    done
+  done
+  
+fi
+
+########################################################################
+# TOTAL line
+########################################################################
+wowoutput+=("
+TOTAL: $PODn / $PFn outdated packages")
+
+########################################################################
+# packages not found
+########################################################################
+
+[ $((PNFn)) -gt 0 ] && wowoutput+=("
+NOT FOUND : $PNFn packages
+")
+
+if [ "$NOTFOUND" == "1" ]; then
+
+  for i in ${T_NOTFOUND[@]}
+  do
+    wowoutput+=("    $i")
+  done
+  
+fi
+
+########################################################################
+# Actual OUTPUT
+########################################################################
+
+for i in "${wowoutput[@]}"
+do
+  echo "$i"
+done
+
+echo "Thank you for choosing outdated ≧◔◡◔≦ 🄯 NuTyX"
