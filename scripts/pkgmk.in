@@ -642,7 +642,7 @@ build() {
 				make
 				make DESTDIR=$PKG install;;
 
-			pip3)
+			pip3|python3)
 				cd ${_name}-$version
 				pip3 wheel -w dist   \
 				--no-build-isolation \
