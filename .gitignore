@@ -5,6 +5,7 @@
 *.geany
 .tools_depend
 .libs_depend
+.web_depend
 build-collection
 build-port
 ports
@@ -15,6 +16,7 @@ pkgadd
 pkgrm
 pkginfo
 Pkgfile
+index.cgi
 a.out
 *.gch
 ChangeLog
