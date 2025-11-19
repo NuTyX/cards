@@ -118,6 +118,9 @@ getarchname() {
     rox-filer|sshaskpass|xquisite|openbox-jp-theme)
      ARCHNAME="";;
 
+    *-firmware)
+     ARCHNAME="linux-firmware";;
+
     gtk-update-icon-cache)
      ARCHNAME="gtk3";;
 
@@ -151,6 +154,15 @@ getarchname() {
     poppler*)
      ARCHNAME="poppler";;
 
+    transmission*)
+     ARCHNAME="transmission-cli";;
+
+    wireshark)
+     ARCHNAME="wireshark-cli";;
+
+    qemu)
+     ARCHNAME="qemu-common";;
+
     apache-ant)
      ARCHNAME="ant";;
 
@@ -172,16 +184,19 @@ getarchname() {
     libelf)
      ARCHNAME="elfutils";;
 
-    eigen3)
-     ARCHNAME="eigen";;
+    i3)
+     ARCHNAME="i3-wm";;
+
+    gimp3|eigen3)
+     ARCHNAME="${PKGNAME/3/}";;
 
     fdk-aac)
      ARCHNAME="fdkaac";;
 
-    gdk-pixbuf|glib|openjpeg|freetype|sdl)
+    gdk-pixbuf|glib|openjpeg|freetype|sdl|python-tinycss)
      ARCHNAME="${PKGNAME}2";;
 
-    gtkmm|fuse|gtksourceview|gtkspell)
+    gtkmm|fuse|gtksourceview|gtkspell|libwnck|vte)
      ARCHNAME="${PKGNAME}3";;
 
     kerberos)
@@ -214,9 +229,6 @@ getarchname() {
     tidy-html5)
      ARCHNAME="tidy";;
 
-    vte)
-     ARCHNAME="vte3";;
-
     perl-glib)
      ARCHNAME="glib-perl";;
 
@@ -226,26 +238,26 @@ getarchname() {
     telegram)
      ARCHNAME="telegram-desktop";;
      
-    transmission-qt|phonon-qt)
-     ARCHNAME=${PKGNAME/-qt/};;
+    phonon)
+     ARCHNAME="phonon-qt6";;
 
     dejavu-ttf)
      ARCHNAME="ttf-dejavu";;
 
-    python-cups|python-gobject|python-atspi|python-smbc|python-xdg)
-     ARCHNAME="${PKGNAME/python-/py}";;
+    pyproject-metadata)
+     ARCHNAME="python-$PKGNAME";;
+
+    python-cups|python-smbc|python-xdg|python-codestyle)
+     ARCHNAME="python-${PKGNAME/python-/py}";;
+
+    python-meson)
+     ARCHNAME="${PKGNAME/python-//}-python";;
 
     python2-gobject2)
       ARCHNAME="${PKGNAME/python2-/py}";;
 
     python-qt)
      ARCHNAME="${PKGNAME/python-/py}5";;
-
-    python-dbus|python-dbus-data)
-     ARCHNAME="dbus-python";;
-
-    python2-docutils|python-docutils)
-     ARCHNAME="docutils";;
 
     freefont-ttf)
      ARCHNAME="ttf-freefont";;
@@ -268,12 +280,13 @@ getarchname() {
     python-tkinter)
     ARCHNAME="python";;
 
+    python-hypercorn)
+    ARCHNAME="${PKGNAME/python-//}";;
+
     tracker|tracker-miners)
      ARCHNAME=${PKGNAME/tracker/tracker3};;
 
-    gtkmm2|graphite2|tracker2|tracker2-miners|python2-distutils-extra|\
-    python2-evdev|python2-lxml|python2-ply|python2-pyparsing|\
-    python2-simplejson|python2-six|python2-xdg)
+    gtkmm2|graphite2|tracker2|tracker2-miners)
      ARCHNAME=${PKGNAME/2/};;
 
     oxygen-icons5)
@@ -341,11 +354,8 @@ getarchname() {
     lua54-lgi)
      ARCHNAME="lgi";;
 
-	gvim)
+    gvim)
      ARCHNAME="vim";;
-    
-    skypeforlinux)
-     ARCHNAME="skypeforlinux-stable-bin";;
 
     *)
      ARCHNAME=$PKGNAME;;
