@@ -187,7 +187,7 @@ getarchname() {
     i3)
      ARCHNAME="i3-wm";;
 
-    gimp3|eigen3)
+    eigen3)
      ARCHNAME="${PKGNAME/3/}";;
 
     fdk-aac)
