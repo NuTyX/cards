@@ -612,9 +612,10 @@ build() {
 	else
 		case $build in
 			meson)
-				meson setup --prefix /usr \
-					--buildtype plain     \
-					$name-$version builddir
+				meson setup --prefix /usr   \
+					--buildtype plain       \
+					$name-$version builddir \
+					${PKGMK_MESON_OPTIONS}
 				meson compile -C   builddir
 				DESTDIR=$PKG \
 				meson install -C   builddir;;
