@@ -288,4 +288,6 @@ As for the generation, a private key is needed, it is used by the packager only.
 
     addOption(CMD_SYNC, OPT_CONFIG_FILE, false);
 
+    addOption(CMD_REPO,OPT_CONFIG_FILE,false);
+
 }
