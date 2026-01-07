@@ -151,13 +151,16 @@ rsync_binaries () {
     exit 1
   fi
   if [ ! -z ${PARAM[0]} ]; then
-    echo "
+    echo "sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*
+rm $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*
 rsync $options \
 $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*  \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 "
     echo -n "  OK ? (y) : "
     answer
+    sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)$VERSION/$COLLECTION/${PARAM[0]}.*
+    rm $ROOTMOUNT/$(uname -m)$VERSION/$COLLECTION/${PARAM[0]}.*
     rsync $options \
 $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.* \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/

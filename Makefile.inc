@@ -4,17 +4,18 @@
 #  Copyright (c) 2013 - .... by NuTyX team (https://nutyx.org)
 
 DESTDIR =
-USRBINDIR = ${DESTDIR}/usr/bin
-BINDIR = ${DESTDIR}/bin
-SBINDIR = ${DESTDIR}/sbin
-MANDIR = ${DESTDIR}/usr/share/man
-SOUNDDIR = ${DESTDIR}/usr/share/sounds/cards
-LIBDIR = ${DESTDIR}/usr/lib
+PREFIX = /usr
+USRBINDIR = ${DESTDIR}/${PREFIX}/bin
+BINDIR = ${DESTDIR}/${PREFIX}/bin
+SBINDIR = ${DESTDIR}/${PREFIX}/sbin
+MANDIR = ${DESTDIR}/${PREFIX}/share/man
+SOUNDDIR = ${DESTDIR}/${PREFIX}/share/sounds/cards
+LIBDIR = ${DESTDIR}/${PREFIX}/lib
 ETCDIR = ${DESTDIR}/etc
 VARDIR = ${DESTDIR}/var/lib/pkg
-LOCALEDIR = ${DESTDIR}/usr/share/locale
-DOCDIR    = ${DESTDIR}/usr/share/doc
-APPDIR    = ${DESTDIR}/usr/share/applications
+LOCALEDIR = ${DESTDIR}/${PREFIX}/share/locale
+DOCDIR    = ${DESTDIR}/${PREFIX}/share/doc
+APPDIR    = ${DESTDIR}/${PREFIX}/share/applications
 
 INSTALL   = /usr/bin/install -c
 RMDIR     = rm -rf
