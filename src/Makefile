@@ -184,7 +184,7 @@ endif
 install: all install-libs
 	install -v -D -m0755 pkgadd $(BINDIR)/pkgadd
 	install -v -D -m0755 cards $(BINDIR)/cards
-	install -v -D -m0755 setup-nutyx-log $(SBINDIR)/setup-nutyx-log
+	install -v -D -m0755 setup-nutyx-log $(BINDIR)/setup-nutyx-log
 	install -v -D -m0644 pkgadd.conf $(VARDIR)/pkgadd.conf
 	install -v -D -m0644 cards.conf $(ETCDIR)/cards.conf.example
 	ln -sfv pkgadd $(BINDIR)/pkgrm
