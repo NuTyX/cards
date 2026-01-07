@@ -9,7 +9,7 @@ if [ -z "${1}" ]; then
 fi
 
 VERSION=${1}
-[ -z $BRANCH ] && BRANCH="testing"
+[ -z $BRANCH ] && BRANCH="testingd"
 
 if [ ! -f WHENCE ];then
   echo "
@@ -71,9 +71,19 @@ set=(linux-firmware)
 name=${FILE//\//-}-firmware
 version=$VERSION
 
-makedepends=(rdfind)
-source=(WHENCE
-        https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/snapshot/linux-firmware-\$version.tar.gz)
+makedepends=(rdfind)" > $DIR/Pkgfile
+
+case ${FILE//\//-} in
+  "rt2860sta"|"rt2870sta")
+    echo "run=(rt2800usb-firmware)" >> $DIR/Pkgfile ;;
+
+  "rtl8192ee"|"rtl8723bs")
+    echo "run=(rtl8xxxu-firmware)" >> $DIR/Pkgfile ;;
+
+esac
+
+echo "source=(WHENCE
+        https://gitlab.com/kernel-firmware/linux-firmware/-/archive/\$version/linux-firmware-\$version.tar.bz2)
 
 build() {
 
@@ -82,10 +92,13 @@ cd linux-firmware-\$version
 # delete this python check as long we don't know what's missing here
 sed -i "/check_whence.py/d" copy-firmware.sh
 
-cp ../WHENCE .
-make DESTDIR=\$PKG FIRMWAREDIR=/lib/firmware install
+# ignore broken links as it's irrelevant when using DESTDIR
+sed 's@err \"Broken@warn \"Brocken@' copy-firmware.sh
 
-install -Dt \$PKG/usr/share/licenses/\$name -m644 WHENCE" > $DIR/Pkgfile
+cp ../WHENCE .
+make DESTDIR=\$PKG FIRMWAREDIR=/lib/firmware NUM_JOBS=1 install
+
+install -Dt \$PKG/usr/share/licenses/\$name -m644 WHENCE" >> $DIR/Pkgfile
 
 for LICENSE in $(grep LICEN $DIR/WHENCE|sed -e 's/^.*See //;s/ .*//')
 do
