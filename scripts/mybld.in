@@ -159,8 +159,8 @@ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 "
     echo -n "  OK ? (y) : "
     answer
-    sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)$VERSION/$COLLECTION/${PARAM[0]}.*
-    rm $ROOTMOUNT/$(uname -m)$VERSION/$COLLECTION/${PARAM[0]}.*
+    sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*
+    rm $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*
     rsync $options \
 $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.* \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
@@ -318,8 +318,8 @@ umount_all() {
 	for FOLDER in $MOUNT_POINTS ; do
 		if mountpoint -q $ROOT/${VERSION}/${COLLECTION}/${FOLDER}; then
 			sudo umount -R $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
-			sudo rm -d     $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 		fi
+        sudo rm -d  $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 	done
 }
 
