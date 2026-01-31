@@ -319,7 +319,7 @@ umount_all() {
 		if mountpoint -q $ROOT/${VERSION}/${COLLECTION}/${FOLDER}; then
 			sudo umount -R $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 		fi
-        sudo rm -d  $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
+        sudo rm -df  $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 	done
 }
 
