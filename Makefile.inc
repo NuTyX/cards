@@ -1,7 +1,7 @@
 #  SPDX-License-Identifier: LGPL-2.1-or-later
 #  Copyright (c) 2000 - 2005 by Per Liden <per@fukt.bth.se>
 #  Copyright (c) 2006 - 2013 by CRUX team (https://crux.nu)
-#  Copyright (c) 2013 - .... by NuTyX team (https://nutyx.org)
+#  Copyright (c) 2013 - 2026 by NuTyX team (https://nutyx.org)
 
 DESTDIR =
 PREFIX = /usr
@@ -28,7 +28,7 @@ INSTALL_DATA = $(INSTALL) -m 644
 INSTALL_DIR  = $(INSTALL) -d
 
 
-VERSION = 3.4.0
+VERSION = 3.4.1
 
 NAME = cards-$(VERSION)
 
