@@ -11,6 +11,10 @@ OPTIONS
       -c, --cleanup <collection>
               Clean the /<version>/<collection> folder in a safety way.
 
+      --commit <collection>/<package> [comment]
+             commit the <package> from the <collection>.
+             The [comment] will be added if exist.
+
       -A, --ask
               Ask for confirmation.
 
@@ -120,7 +124,24 @@ make DESTDIR=\$PKG install
 }" > ${COLLECTION}/${PARAM}/Pkgfile
   $EDITOR ${COLLECTION}/${PARAM}/Pkgfile
 }
-
+commit() {
+  [ ! -f $1/Pkgfile ] && return
+  release=1
+  . $1/Pkgfile
+  if [ -z $version ]; then
+    printf "ERROR: version is not set\n"
+    return -1
+  fi
+  if [ -z $name ]; then
+    name="$(basename $1)"
+    printf "WARNING: name was not set\n"
+  fi
+  git add $1
+  COMMENT="$name $version-$release"
+  [ ! -z "$2" ] && COMMENT+="
+$2"
+  git commit -m "$COMMENT"
+}
 create_folders () {
   if [ -z "$VERSION" ]; then
     echo "
@@ -159,8 +180,7 @@ $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
 "
     echo -n "  OK ? (y) : "
     answer
-    sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*
-    rm $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*
+    sudo rm -f $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*
     rsync $options \
 $URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.* \
 $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
@@ -215,6 +235,11 @@ parse_arguments() {
         exit 1
       fi
       PARAM+=($1);;
+
+    --commit)
+      shift
+      commit "$@"
+      exit 0;;
 
     -n|--new)
       shift
