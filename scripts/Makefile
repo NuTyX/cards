@@ -19,7 +19,6 @@ install: all
 	install -D -m0755 resolve-libs $(BINDIR)/resolve-libs
 	install -D -m0755 pkgmk $(USRBINDIR)/pkgmk
 	install -D -m0644 pkgmk.conf $(ETCDIR)/pkgmk.conf.example
-	install -D -m0644 cards $(ETCDIR)/profile.d/cards.sh
 	install -D -m0644 libcards.pc $(LIBDIR)/pkgconfig/libcards.pc
 
 
