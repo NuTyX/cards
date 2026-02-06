@@ -934,7 +934,6 @@ echo -n "  Commit ? (y) : "
 answer
 
 cd "${GIT_PROJ}"
-source /etc/profile.d/cards.sh
 
 if [ -z ${PACKAGES_LIST} ]; then
    echo "commit $COLLECTION/${PARAM[0]}"
