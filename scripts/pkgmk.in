@@ -29,7 +29,7 @@ error() {
 }
 abort_on_build() {
         error $1
-        exit $E_BUILD
+        exit ${E_BUILD}
 }
 have_function() {
 	declare -f "$1" >/dev/null
@@ -85,47 +85,47 @@ check_pkgfile() {
 	local SIZE NAME_TEST RELEASE_TEST DESC_TEST
 	if [ "${name}" == "" ]; then
 		error "Variable 'name' not initiated or not found in $PKGMK_PKGFILE."
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	if [ "$(type -t build)" != "function" ] && [ "$PKGMK_PKGFILE" == "Pkgfile" ]; then
 		error "Function 'build' not specified in $PKGMK_PKGFILE."
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	NAME_TEST="$(echo "${name}" | sed 's@[[a-z0-9]*[-_+]*]*@@g')"
 	if [ "$NAME_TEST" != "" ]; then
 		error "Variable 'name' contains following illegal characters: $NAME_TEST"
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	if [ ${#name} -gt 50 ];then
 		error "Variable 'name' length higher then 50 characters."
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	if [ "${version}" == "" ]; then
 		error "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	if [ "${release}" == "" ]; then
 		error "Variable 'release' not initiated or not found in $PKGMK_PKGFILE."
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	RELEASE_TEST="$(echo "${release}" | sed 's@[0-9]*@@g')"
 	if [ "$RELEASE_TEST" != "" ]; then
 		error "Variable 'release' contains following illegal characters: $RELEASE_TEST"
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	if [ $release -gt  99999999 ]; then
 		error "Variable 'release' outside limit which is '99999999'"
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	if [ "${description}" == "" ]; then
 		error "Variable 'description' not initiated or not found in $PKGMK_PKGFILE."
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	SIZE=${#description}
 	if [ $SIZE -gt 255 ];then
 		error "Variable 'description' length higher then 255 characters, please resize to 255 char ]"
 		info "$description <== $SIZE characters"
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	if [ ! -z "$alias" ];then
 		get_collections
@@ -137,7 +137,7 @@ check_pkgfile() {
 				[ "$p" == "${name}" ] && continue
 				if [ "$a" == "$p" ];then
 					error "$a is a port, duplicate alias"
-					exit $E_ALIAS
+					exit ${E_ALIAS}
 				fi
 				( unset alias
 				. ../$p/$PKGMK_PKGFILE
@@ -146,12 +146,12 @@ check_pkgfile() {
 					do
 						if [ "$ca" == "$a" ];then
 							error "$a is a alias of $p, duplicate alias"
-							exit $E_ALIAS
+							exit ${E_ALIAS}
 						fi
 
 					done
 					unset alias
-				fi ) || exit $E_ALIAS
+				fi ) || exit ${E_ALIAS}
 			done
 		done
 	fi
@@ -178,19 +178,19 @@ get_categories() {
 check_directory() {
 	if [ ! -d $1 ]; then
 		error "Directory '$1' does not exist."
-		exit $E_DIR_PERM
+		exit ${E_DIR_PERM}
 	elif [ ! -w $1 ]; then
 		error "Directory '$1' not writable."
-		exit $E_DIR_PERM
+		exit ${E_DIR_PERM}
 	elif [ ! -x $1 ] || [ ! -r $1 ]; then
 		error "Directory '$1' not readable."
-		exit $E_DIR_PERM
+		exit ${E_DIR_PERM}
 	fi
 }
 check_file() {
 	if [ -e $1 ] && [ ! -w $1 ]; then
 		error "File '$1' is not writable."
-		exit $E_GENERAL
+		exit ${E_GENERAL}
 	fi
 }
 download_file() {
@@ -199,7 +199,7 @@ download_file() {
 	PKGMK_DOWNLOAD_PROG=${PKGMK_DOWNLOAD_PROG:-curl}
 	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then
 		error "Command '${PKGMK_DOWNLOAD_PROG}' not found."
-		exit $E_GENERAL
+		exit ${E_GENERAL}
 	fi
 
 	LOCAL_FILENAME="$(get_filename $FILE)"
@@ -252,7 +252,7 @@ download_file() {
 
 	if [ $error != 0 ]; then
 		error "Downloading '$1' failed."
-		exit $E_DOWNLOAD
+		exit ${E_DOWNLOAD}
 	fi
 
 	mv -f "$LOCAL_FILENAME_PARTIAL" "$LOCAL_FILENAME"
@@ -265,13 +265,13 @@ download_source() {
 		if [ ! -e $LOCAL_FILENAME ]; then
 			if [ "$LOCAL_FILENAME" = "$FILE" ]; then
 				error "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
-				exit $E_DOWNLOAD
+				exit ${E_DOWNLOAD}
 			else
 				if [ "$PKGMK_DOWNLOAD" = "yes" ]; then
 					download_file $FILE
 				else
 					error "Source file '$LOCAL_FILENAME' not found (use option -d to download)."
-					exit $E_DOWNLOAD
+					exit ${E_DOWNLOAD}
 				fi
 			fi
 		fi
@@ -312,7 +312,7 @@ unpack_source() {
 				rm -rf $PKGMK_WORK_DIR
 			fi
 			error "Building '$TARGET' failed."
-			exit $E_UNPACK
+			exit ${E_UNPACK}
 		fi
 	done
 }
@@ -584,7 +584,7 @@ remove_man() {
 	done
 }
 pack_service() {
-	local DIR="etc/rc.d"
+	local DIR="usr/lib/systemd/system"
 	if [ -d $DIR ]; then
 		bsdtar -r -f \
 		$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
@@ -593,7 +593,7 @@ pack_service() {
 	fi
 }
 remove_service() {
-	local DIR="etc/rc.d"
+	local DIR="usr/lib/systemd/system"
 	if [ -d $DIR ]; then
 		rm -r $DIR
 	fi
@@ -612,9 +612,12 @@ build() {
 	else
 		case $build in
 			meson)
-				meson setup --prefix /usr   \
-					--buildtype plain       \
-					$name-$version builddir \
+				meson setup --prefix /usr    \
+					--buildtype      plain   \
+					--libexecdir     lib     \
+					--sbindir        bin     \
+					-D            b_pie=true \
+					$name-$version builddir  \
 					${PKGMK_MESON_OPTIONS}
 				meson compile -C   builddir
 				DESTDIR=$PKG \
@@ -693,7 +696,7 @@ build() {
 
 			*)
 				echo "$(basename $PKGMK_COMMAND): function build invalid build type"
-				exit $E_BUILD ;;
+				exit ${E_BUILD} ;;
 		esac
 	fi
 }
@@ -777,7 +780,7 @@ add_meta_to_archive() {
 				if [ "$($PKGMK_PKGINFO -b $rd)" == "0" ] || [ "$($PKGMK_PKGINFO -b $rd)" == "" ]; then
 					error "Runtime dependency $rd not found, cannot continue"
 					clean
-					exit $E_DEPS;
+					exit ${E_DEPS};
 				fi
 				echo "R$rd$(pkginfo -b $rd)" >> .META
 			done
@@ -790,7 +793,7 @@ add_meta_to_archive() {
 					if [ "$($PKGMK_PKGINFO -b $rd)" == "0" ] || [ "$($PKGMK_PKGINFO -b $rd)" == "" ]; then
 						error "Runtime dependency $rd not found, cannot continue"
 						clean
-						exit $E_DEPS;
+						exit ${E_DEPS};
 					fi
 					echo "R$rd$($PKGMK_PKGINFO -b $rd)" >> .META
 				done
@@ -915,7 +918,7 @@ build_package() {
 			else
 				remove_dependencies
 				error "Building '$TARGET' failed."
-				exit $E_BUILD
+				exit ${E_BUILD}
 			fi
 
 			if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}* ]; then
@@ -929,7 +932,7 @@ build_package() {
 			if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 				remove_dependencies
 				error "Building '$TARGET' failed."
-				exit $E_BUILD
+				exit ${E_BUILD}
 			fi
 			cd $SRC
 			# $PKG should be empty here
@@ -981,7 +984,7 @@ build_package() {
 				else
 					remove_dependencies
 					error "Building '$TARGET' failed."
-					exit $E_BUILD
+					exit ${E_BUILD}
 				fi
 			else
 				if [ "$1" != "$TARGET" ]; then
@@ -994,7 +997,7 @@ build_package() {
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					remove_dependencies
 					error "Building '$TARGET' failed."
-					exit $E_BUILD
+					exit ${E_BUILD}
 				fi
 			fi
 			# Add the meta in each package
@@ -1002,7 +1005,7 @@ build_package() {
 				if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
 					remove_dependencies
 					error "Building '$TARGET' failed."
-					exit $E_BUILD
+					exit ${E_BUILD}
 				fi
 				j=0
 			fi
@@ -1018,7 +1021,7 @@ build_package() {
 				else
 					remove_dependencies
 					error "Building '$TARGET' failed."
-					exit $E_BUILD
+					exit ${E_BUILD}
 				fi
 			else
 				for DIR in usr/share/locale/${group}* opt/*/share/locale/${group}*; do
@@ -1041,7 +1044,7 @@ build_package() {
   		if [[ -z $(ls) ]]; then
 			remove_dependencies
 			error "No files found in $PKG..."
-			exit $E_BUILD
+			exit ${E_BUILD}
    		fi
 		bsdtar -r -f $PKGMK_PACKAGE_DIR/${name}${PKGMK_PACKAGE_EXT}$version-$release *
 		if [ $? = 0 ]; then
@@ -1066,7 +1069,7 @@ build_package() {
         		if [ -z $TARGETS ]; then
 					remove_dependencies
 					error "Package(s) not found(s)..."
-					exit $E_BUILD
+					exit ${E_BUILD}
         		fi
 			for TARGET in ${TARGETS[@]}; do
 				add_meta_files $TARGET
@@ -1085,7 +1088,7 @@ build_package() {
 		fi
 		remove_dependencies
 		error "Building '$TARGET' failed."
-		exit $E_BUILD
+		exit ${E_BUILD}
 	fi
 }
 install_package() {
@@ -1093,7 +1096,7 @@ install_package() {
 	get_packages_list
 	if [ -z $TARGETS ]; then
 		error "Package(s) not found(s) nothing to install..."
-		exit $E_INSTALL
+		exit ${E_INSTALL}
 	fi
 	for TARGET in ${TARGETS[@]}; do
 			info "Installing '$TARGET'."
@@ -1112,7 +1115,7 @@ install_package() {
 				info "Installing '$TARGET' succeeded."
 			else
 				error "Installing '$TARGET' failed."
-				exit $E_INSTALL
+				exit ${E_INSTALL}
 			fi
 	done
 }
@@ -1153,13 +1156,13 @@ update_footprint() {
 		get_packages_list
 		if [ -z $TARGETS ]; then
 			error "Package(s) not found(s), unable to update footprint."
-			exit $E_FOOTPRINT
+			exit ${E_FOOTPRINT}
 		fi
 	fi
 	for TARGET in ${TARGETS[@]}; do
 		if [ ! -f $PKGMK_PACKAGE_DIR/$TARGET ]; then
 			error "Unable to update footprint. File '$TARGET' not found."
-			exit $E_FOOTPRINT
+			exit ${E_FOOTPRINT}
 		fi
 		PKGMK_FOOTPRINT="$(get_package_name $TARGET)".footprint
 		check_file "$PKGMK_FOOTPRINT"
@@ -1220,6 +1223,13 @@ check_build() {
 			echo $i
 		done
 	fi
+	if [ -d $PKG/usr/sbin ];
+		abort_on_build "/usr/sbin should not exist"
+	fi
+	if [ -d $PKG/sbin ];
+		abort_on_build "/sbin should not exist"
+	fi
+
 }
 clean_old_binaries() {
 
@@ -1237,7 +1247,7 @@ interrupted() {
 		rm -rf $PKGMK_WORK_DIR
 	fi
 
-	exit $E_GENERAL
+	exit ${E_GENERAL}
 }
 print_help() {
 	echo "usage: $(basename $PKGMK_COMMAND) [options]"
@@ -1340,7 +1350,7 @@ main() {
 
 	if [ ! -f $PKGMK_CONFFILE ]; then
 		error "File '$PKGMK_CONFFILE' not found."
-		exit $E_GENERAL
+		exit ${E_GENERAL}
 	fi
 
 	. $PKGMK_CONFFILE
@@ -1381,7 +1391,7 @@ main() {
 
 	if [ ! -f $PKGMK_PKGFILE  ]; then
 		error "File '$PKGMK_PKGFILE' not found."
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	# Need to be set so that we can use the 'name' variable
 	name=$NAME
@@ -1394,11 +1404,11 @@ main() {
 	[ -z $name ] && name=$NAME
 	if [ "$name" != "$NAME" ]; then
 		error "Variable 'name' not the same as port name (directory)."
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	if [ -z "$version" ]; then
 		error "Variable 'version' not initiated or not found in $PKGMK_PKGFILE."
-		exit $E_PKGFILE
+		exit ${E_PKGFILE}
 	fi
 	if [ "$PKGMK_SHOW_VERSION" == "yes" ]; then
 		echo "$version"
@@ -1416,7 +1426,7 @@ main() {
 			;;
 		*)
 			error "Compression mode '$PKGMK_COMPRESSION_MODE' not supported"
-			exit $E_GENERAL
+			exit ${E_GENERAL}
 			;;
 	esac
 	case $PKGMK_COMPRESSION_MODE in

@@ -90,12 +90,16 @@ build() {
 cd linux-firmware-\$version
 
 # delete this python check as long we don't know what's missing here
-sed -i "/check_whence.py/d" copy-firmware.sh
+sed -i "/check_whence.py/d" copy-firmware.sh" >> $DIR/Pkgfile
 
-# ignore broken links as it's irrelevant when using DESTDIR
-sed 's@err \"Broken@warn \"Brocken@' copy-firmware.sh
+case ${FILE//\//-} in
+  "rt2860sta"|"rt2870sta"|"rtl8192ee"|"rtl8723bs")
+    echo "# ignore broken links as it's irrelevant when using DESTDIR
+sed -i 's@err \"Broken@warn \"Brocken@' copy-firmware.sh" >> $DIR/Pkgfile
+  ;;
+esac
 
-cp ../WHENCE .
+echo "cp ../WHENCE .
 make DESTDIR=\$PKG FIRMWAREDIR=/lib/firmware NUM_JOBS=1 install
 
 install -Dt \$PKG/usr/share/licenses/\$name -m644 WHENCE" >> $DIR/Pkgfile

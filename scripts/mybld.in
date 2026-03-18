@@ -5,7 +5,7 @@
 usage () {
   echo '
 USAGE
-      mybld [option] <collection>|<package> [version]
+      mybld [option] <collection>|<set>|<package> [version]
 
 OPTIONS
       -c, --cleanup <collection>
@@ -271,7 +271,7 @@ parse_arguments() {
       shift
       if [ -z ${1} ]; then
         echo "
->>> Specify the name
+>>> Specify a <set>/<package>
 "
         exit 1
       fi
@@ -295,7 +295,7 @@ Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
       shift
       if [ -z ${1} ]; then
         echo "
->>> Specify a collection/name
+>>> Specify a <collection>/<name>
 "
         exit 1
       fi
@@ -307,7 +307,7 @@ Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
       shift
       if [ -z ${1} ]; then
         echo "
->>> Specify a collection/name
+>>> Specify a <collection>/<name>
 "
         exit 1
       fi
@@ -609,6 +609,7 @@ if [ ! -z ${PARAM[1]} ];then
   find_version
   [ -z "$PACKAGES_LIST" ] && find_set
 fi
+
 if [ "$INIT" == "yes" ]; then
   create_folders
   exit 0
