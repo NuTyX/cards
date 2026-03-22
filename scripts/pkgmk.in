@@ -28,7 +28,7 @@ error() {
 	info "ERROR: $1" >&2
 }
 abort_on_build() {
-        error $1
+        error "$1"
         exit ${E_BUILD}
 }
 have_function() {
@@ -75,7 +75,9 @@ get_collections() {
 	done
 }
 get_filename() {
-	if [[ $1 =~ ^(http|https|ftp|file)://.*/(.+) ]]; then
+	if [[ $1 =~ ^(https://*.git) ]]; then
+		echo "$PKGMK_SOURCE_DIR/$name-$version${PKGMK_GIT_EXT}"
+	elif [[ $1 =~ ^(http|https|ftp|file)://.*/(.+) ]]; then
 		echo "$PKGMK_SOURCE_DIR/${BASH_REMATCH[2]}"
 	else
 		echo $1
@@ -195,11 +197,29 @@ check_file() {
 }
 download_file() {
 	info "Downloading '$1'."
+	pwd
+	case $1 in
+		*.git)
+			if [ ! "`type -p git`" ]; then
+				error "please install or add git in the dependencies."
+				exit ${E_DOWNLOAD}
+			fi
+			git clone $1 $name-$version
+			cd $name-$version
+			git checkout $version
+			cd -
+			bsdtar -a -cvf $PKGMK_SOURCE_DIR/$name-$version${PKGMK_GIT_EXT} $name-$version
+			rm -rf $name-$version
+			return ;;
+		*)
+
+	esac
+
 
 	PKGMK_DOWNLOAD_PROG=${PKGMK_DOWNLOAD_PROG:-curl}
 	if [ ! "`type -p ${PKGMK_DOWNLOAD_PROG}`" ]; then
 		error "Command '${PKGMK_DOWNLOAD_PROG}' not found."
-		exit ${E_GENERAL}
+		exit ${E_DOWNLOAD}
 	fi
 
 	LOCAL_FILENAME="$(get_filename $FILE)"
@@ -874,12 +894,6 @@ build_package() {
 	if [ "$UID" != "0" ]; then
 		warning "Packages should be built as root."
 	fi
-	for group in ${PKGMK_GROUPS[@]}; do
-		if [ "$group" == "lib32" ];then
-			PKGMK_IGNORE_LIB32="no"
-			break
-		fi
-	done
 	if [ "$PKGMK_PACK_ONLY" == "no" ];then
 		info "Building starting..."
 		unpack_source
@@ -905,40 +919,6 @@ build_package() {
 			BUILD_SUCCESSFUL="yes"
 		fi
 
-		PKGMK_BUILDVER="$(date +%s)"
-		clean_old_binaries
-
-		if [ "$PKGMK_IGNORE_LIB32" == "no" ]; then
-			group="lib32"
-			BUILD_SUCCESSFUL="no"
-			(set -e -x ; $group)
-			if [ $? = 0 ]; then
-				j=1
-				BUILD_SUCCESSFUL="yes"
-			else
-				remove_dependencies
-				error "Building '$TARGET' failed."
-				exit ${E_BUILD}
-			fi
-
-			if [ -f $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}* ]; then
-				rm $PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}*
-			fi
-
-			cd $PKG
-
-			pack_lib32
-
-			if [ "$BUILD_SUCCESSFUL"  == "no" ]; then
-				remove_dependencies
-				error "Building '$TARGET' failed."
-				exit ${E_BUILD}
-			fi
-			cd $SRC
-			# $PKG should be empty here
-			rm -rf $PKG
-			mkdir -p $PKG
-		fi
 		if [ "$BUILD_SUCCESSFUL" == "yes" ]; then
 			BUILD_SUCCESSFUL="no"
 			(set -e -x ; build)
@@ -967,6 +947,9 @@ build_package() {
 		fi
 
 		compress_manpages
+		clean_old_binaries
+
+
 
 		cd $PKG
 		i=0
@@ -974,7 +957,6 @@ build_package() {
 
 
 		for group in ${PKGMK_GROUPS[@]}; do
-			[ "$group" == "lib32" ] && continue
 			if [ "$(type -t ${group})" == "function" ]; then
 				BUILD_SUCCESSFUL="no"
 				(set -e -x ;${group})
@@ -1223,11 +1205,11 @@ check_build() {
 			echo $i
 		done
 	fi
-	if [ -d $PKG/usr/sbin ];
-		abort_on_build "/usr/sbin should not exist"
+	if [ -d $PKG/usr/sbin ]; then
+		abort_on_build "/usr/sbin should not be present in the final package"
 	fi
-	if [ -d $PKG/sbin ];
-		abort_on_build "/sbin should not exist"
+	if [ -d $PKG/sbin ]; then
+		abort_on_build "/sbin should not be present in the final package"
 	fi
 
 }
@@ -1615,6 +1597,8 @@ PKGMK_PKGFILE="Pkgfile"
 
 PKGMK_BUILDVER="$(date +%s)"
 PKGMK_PACKAGE_EXT=".cards-"
+PKGMK_GIT_EXT=".git.tar.xz"
+
 PKGMK_ARCH="$(uname -m)"
 
 PKGMK_NOSTRIP=".nostrip"
