@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 HEADER="libcards-test.h"
 
 echo "/*" > $HEADER

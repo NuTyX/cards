@@ -138,7 +138,7 @@ int process::exec(const int argc, char** argv)
 int process::executeShell()
 {
     // TODO: make shell exchangable
-    static const char SH[] = "/bin/sh";
+    static const char SH[] = "/usr/bin/sh";
     int status = 0;
     if (m_fileDescriptorLog > 0) {
         status = execShellLog(SH);

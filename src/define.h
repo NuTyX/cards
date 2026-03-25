@@ -87,10 +87,10 @@
 #define PKGADD_CONF "var/lib/pkg/pkgadd.conf"
 #define PKGADD_CONF_MAXLINE 1024
 
-#define LDCONFIG "sbin/ldconfig"
+#define LDCONFIG "usr/bin/ldconfig"
 #define LDCONFIG_CONF "etc/ld.so.conf"
 #define LDCONFIG_CONF_ARGS "-r "
-#define SHELL "bin/sh"
+#define SHELL "usr/bin/sh"
 
 // /usr/bin/install-info --info-dir="/usr/share/info" /usr/share/info/<file>.info"
 #define INSTALL_INFO "usr/bin/install-info"
