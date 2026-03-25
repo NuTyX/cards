@@ -5,7 +5,7 @@
 
 include ../Makefile.inc
 
-all: pkgmk mybld cards resolve-libs libcards.pc
+all: pkgmk mybld resolve-libs libcards.pc
 
 %: %.in
 	sed -e "s/#VERSION#/$(VERSION)/" $< > $@
@@ -26,7 +26,6 @@ clean:
 	rm -f pkgmk
 	rm -f mybld
 	rm -f resolve-libs
-	rm -f cards
 	rm -f libcards.pc
 
 distclean: clean
