@@ -75,7 +75,7 @@ get_collections() {
 	done
 }
 get_filename() {
-	if [[ $1 =~ ^(https://*.git) ]]; then
+	if [[ $1 =~ git$ ]]; then
 		echo "$PKGMK_SOURCE_DIR/$name-$version${PKGMK_GIT_EXT}"
 	elif [[ $1 =~ ^(http|https|ftp|file)://.*/(.+) ]]; then
 		echo "$PKGMK_SOURCE_DIR/${BASH_REMATCH[2]}"
@@ -604,19 +604,22 @@ remove_man() {
 	done
 }
 pack_service() {
-	local DIR="usr/lib/systemd/system"
-	if [ -d $DIR ]; then
-		bsdtar -r -f \
-		$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
-		$DIR || BUILD_SUCCESSFUL="no"
-		j=1
-	fi
+	local DIR
+	for DIR in usr/lib/systemd/system usr/lib/systemd/user; do
+		if [ -d $DIR ]; then
+			bsdtar -r -f \
+			$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
+			$DIR || BUILD_SUCCESSFUL="no"
+			j=1
+		fi
+	done
 }
 remove_service() {
-	local DIR="usr/lib/systemd/system"
-	if [ -d $DIR ]; then
-		rm -r $DIR
-	fi
+	local DIR
+	for DIR in usr/lib/systemd/system usr/lib/systemd/user; do
+		[ -d $DIR ] && rm -r $DIR
+	done
+	rm -d usr/lib/systemd
 }
 build() {
 	if [ -z $build ]; then
