@@ -27,7 +27,7 @@ OPTIONS
       -C, --check <package>
              Check if all the source files can be downloaded.
 
-      -i, --increment <package>
+      -i, --increment <package>|<set>
              Increment the release number and build the package.
 
       -I, --init
@@ -255,7 +255,7 @@ parse_arguments() {
 "
       exit 1;;
 
-	-C|--check)
+    -C|--check)
       CHECK="yes"
       shift
       if [ -z ${1} ]; then
@@ -326,7 +326,7 @@ Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
       usage
       exit 1;;
     *)
-        PARAM+=($1)
+        PARAM+=($1) ;;
     esac
 
     shift
@@ -609,13 +609,10 @@ if [ ! -z ${PARAM[1]} ];then
   find_version
   [ -z "$PACKAGES_LIST" ] && find_set
 fi
-
 if [ "$INIT" == "yes" ]; then
   create_folders
   exit 0
 fi
-
-[ -z "$PACKAGES_LIST" ] || CONFIRM="yes"
 
 [ -z "$COLLECTION" ] && find_collection
 
@@ -631,6 +628,11 @@ if [ -z "${PARAM[0]}" ]; then
     exit  1
   fi
 fi
+if [ -z "${COLLECTION}" ]; then
+    find_set
+fi
+
+[ -z "$PACKAGES_LIST" ] || CONFIRM="yes"
 
 if [ -z "${COLLECTION}" ]; then
   echo "
@@ -763,30 +765,37 @@ if [ -z "$PACKAGES_LIST" ]; then
       echo "  contributors: $contributors -> $newcontributors"
     fi
     echo ""
+  else
+    if [ "$INCREMENT" == "yes" ]; then
+      find_new_packager
+      echo " Upgrading ${PARAM[0]}:"
+      echo "       version: $version-$release -> $version-$((release+1))"
+      if [ "$packager" != "$newpackager" ]; then
+        echo "      packager: $packager -> $newpackager"
+        echo "  contributors: $contributors -> $newcontributors"
+      fi
+      echo ""
+    fi
   fi
 else
   for i in ${PACKAGES_LIST[@]}
   do
+    release=1
     . $i/Pkgfile
+    [ -z $release ] && release=1
     find_new_packager
-    echo " Upgrading $(basename $i): $version -> ${PARAM[1]}"
+    echo -n " Upgrading $(basename $i): "
+    if [ "$INCREMENT" == "yes" ]; then
+        echo "version: $version-$release -> $version-$((release+1))"
+    else
+        echo "version: $version-$release -> ${PARAM[1]}"
+    fi
     if [ "$packager" != "$newpackager" ]; then
        echo "      packager: $packager -> $newpackager"
        echo "  contributors: $contributors -> $newcontributors"
        echo ""
     fi
   done
-  echo ""
-fi
-
-if [ "$INCREMENT" == "yes" ]; then
-  find_new_packager
-  echo " Upgrading ${PARAM[0]}:"
-  echo "       version: $version-$release -> $version-$((release+1))"
-  if [ "$packager" != "$newpackager" ]; then
-    echo "      packager: $packager -> $newpackager"
-    echo "  contributors: $contributors -> $newcontributors"
-  fi
   echo ""
 fi
 if [ "$CONFIRM" == "yes" ]; then
@@ -819,21 +828,29 @@ else
   echo ""
   for i in ${PACKAGES_LIST[@]}
   do
+    release=1
     . $i/Pkgfile
     find_new_packager
-    sed -i "s@version=$version@version=${PARAM[1]}@" \
+    if [ "$INCREMENT" != "yes" ]; then
+        sed -i "s@version=$version@version=${PARAM[1]}@" \
       "${i}"/Pkgfile
-     sed -i "/release=/d" "${i}"/Pkgfile
-     if [ "$packager" != "$newpackager" ]; then
+    fi
+    sed -i "/release=/d" "${i}"/Pkgfile
+    if [ "$packager" != "$newpackager" ]; then
       sed -e 's/^\(packager=\).*/\1/g' \
        -e "s/packager=/packager=\"$newpackager\"/" \
        -i "${i}"/Pkgfile
       sed -e 's/^\(contributors=\).*/\1/g' \
        -e "s/contributors=/contributors=\"$newcontributors\"/" \
        -i "${i}"/Pkgfile
-     fi
-     release=1
-     . $i/Pkgfile
+    fi
+
+    if [ "$INCREMENT" == "yes" ]; then
+        sed -i "/^version=/ a release=$((release+1))" "${i}"/Pkgfile
+    else
+        sed -i "/^version=/ a release=1" "${i}"/Pkgfile
+    fi
+    . $i/Pkgfile
      cd $i
      check_download_sources
      echo "====> sources of $i [ OK ]"
@@ -849,21 +866,22 @@ if [ "${PARAM[1]}" = "" ]; then
             exit 1
         fi
     fi
-fi
 
-if [ "$INCREMENT" == "yes" ]; then
-  sed -i "/release=/d" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-  sed -i "/^version=/ a release=$((release+1))" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-  if [ "$packager" != "$newpackager" ]; then
-    sed -e 's/^\(packager=\).*/\1/g' \
-    -e "s/packager=/packager=\"$newpackager\"/" \
-    -i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
-    sed -e 's/^\(contributors=\).*/\1/g' \
-    -e "s/contributors=/contributors=\"$newcontributors\"/" \
-    -i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+fi
+if [ -z "$PACKAGES_LIST" ]; then
+  if [ "$INCREMENT" == "yes" ]; then
+    sed -i "/release=/d" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+    sed -i "/^version=/ a release=$((release+1))" "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+    if [ "$packager" != "$newpackager" ]; then
+      sed -e 's/^\(packager=\).*/\1/g' \
+      -e "s/packager=/packager=\"$newpackager\"/" \
+      -i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+      sed -e 's/^\(contributors=\).*/\1/g' \
+      -e "s/contributors=/contributors=\"$newcontributors\"/" \
+      -i "$COLLECTION"/"${PARAM[0]}"/Pkgfile
+    fi
   fi
 fi
-
 if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
    release=1
    . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
@@ -875,6 +893,7 @@ if [ "$CHECK" == "yes" ]; then
 "
    exit 0
 fi
+
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error "cannot create $ROOT/${VERSION}/${COLLECTION}/DEPOT  directory"
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
   sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/DEPOT || \
