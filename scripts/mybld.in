@@ -926,7 +926,6 @@ MOUNT_POINTS="$MOUNT_POINTS $GIT"
 sudo KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx $QUIET|| \
 error "sudo KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" DEPOT=\"/DEPOT\" DEVEL=\"$DEVEL\" install-nutyx $QUIET"
 
-[ -z $MANUAL ] && ding
 umount_all
 remove_all "/${VERSION}/${COLLECTION}"
 unset VERSION DEVEL
