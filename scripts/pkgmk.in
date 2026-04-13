@@ -535,7 +535,8 @@ remove_lib() {
 pack_devel() {
 	local DIR SUBDIR
 	for DIR in usr opt/*; do
-		for SUBDIR in include lib/pkgconfig lib64/pkgconfig share/pkgconfig; do
+		for SUBDIR in include lib/pkgconfig share/pkgconfig \
+			lib/cmake lib/qt6/mkspecs lib/qt6/metatypes; do
 			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
 				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
@@ -550,7 +551,8 @@ pack_devel() {
 remove_devel() {
 	local DIR SUBDIR
 	for DIR in usr opt/*; do
-		for SUBDIR in include lib/pkgconfig lib64/pkgconfig share/pkgconfig; do
+		for SUBDIR in include lib/pkgconfig share/pkgconfig \
+			lib/cmake lib/qt6/mkspecs lib/qt6/metatypes; do
 			if [ -d $DIR/$SUBDIR ]; then
 				rm -r $DIR/$SUBDIR
 			fi

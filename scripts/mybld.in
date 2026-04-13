@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #  SPDX-License-Identifier: LGPL-2.1-or-later
-#  Copyright (c) 2016 - 2024 by NuTyX team (http://nutyx.org)
+#  Copyright (c) 2016 - 2026 by NuTyX team (https://nutyx.org)
 
 usage () {
   echo '
@@ -221,7 +221,6 @@ $URL/$(uname -m)/$VERSION/ \
 $ROOTMOUNT/$(uname -m)/$VERSION/
   exit 0
 }
-
 parse_arguments() {
   while [ "$1" ]; do
     case $1 in
@@ -332,13 +331,10 @@ Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
     shift
   done
 }
-
 interrupted() {
   echo "Interrupted !!!"
 }
-
 trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
-
 umount_all() {
 	for FOLDER in $MOUNT_POINTS ; do
 		if mountpoint -q $ROOT/${VERSION}/${COLLECTION}/${FOLDER}; then
@@ -347,7 +343,6 @@ umount_all() {
         sudo rm -df  $ROOT/${VERSION}/${COLLECTION}/${FOLDER} || exit 1
 	done
 }
-
 remove_all() {
 	for FOLDER in $MOUNT_POINTS; do
 		if [ -d $ROOT/${VERSION}/${COLLECTION}/${FOLDER} ]; then
@@ -380,7 +375,6 @@ remove_all() {
 >>>   $ROOT/${VERSION}/${COLLECTION} cleanup successfully ...
 "
 }
-
 answer() {
   read a
   if [ "$a" != "y" ] && [ "$a" != "Y" ] && [ "$a" != "yes" ]; then
@@ -390,7 +384,6 @@ Answer should be 'y, Y or yes'
     exit 1
   fi
 }
-
 error() {
   echo ">>> ERROR: $1"
   umount_all
@@ -475,7 +468,6 @@ find_collection () {
   [ -z $COLLECTION ] || COLLECTION=$(basename $COLLECTION)
   [ -z $COLLECTION ] || unset PARAM
 }
-
 setup_pkgmk_conf() {
 [ -z  "$PKGMK_GROUPS" ] && PKGMK_GROUPS="devel man doc service"
 [ -z  "$PKGMK_KEEP_SOURCES" ] && PKGMK_KEEP_SOURCES="yes"
@@ -543,8 +535,6 @@ collection $i"
   CARDS_CONF+="
 logdir /LOGS"
 }
-#
-#
 ########################################################################
 # BEGIN HERE
 ########################################################################
@@ -554,7 +544,6 @@ if [ "$UID" == "0" ]; then
 "
     exit 1
 fi
-
 [ -f $HOME/.mybld ] && source $HOME/.mybld
 [ -z "$ROOTMOUNT" ] && ROOTMOUNT="$HOME/www"
 [ -z "$ROOT" ] && ROOT="$HOME/mybld"
