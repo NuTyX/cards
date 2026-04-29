@@ -7,11 +7,9 @@ int main () {
 			<< i.url
 			<< "\ncollection: "
 			<< i.collection
-			<< "\ndir: "
-			<< i.dir
 			<< "\ndepot: "
-      << i.depot
-      << std::endl;
+			<< i.depot
+			<< std::endl;
 	return 0;
 }
 // vim:set ts=2 :
