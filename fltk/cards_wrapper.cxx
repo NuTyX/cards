@@ -280,11 +280,11 @@ namespace cards
     void cards_wrapper::m_RefreshPackageList_Thread()
     {
         m_job_running =true;
-        cards_client Cards;
+        pkgdbh Cards;
         cards::pkgrepo pkgrepo("/etc/cards.conf");
         // First pass get all package available
         m_ClearPackagesList();
-        std::set<std::string> InstalledPackages = Cards.ListOfInstalledPackages();
+        std::set<std::string> InstalledPackages = Cards.getSetOfPackagesNames();
         for (auto i : pkgrepo.getListOfPackages())
         {
            cards::cache* Pack = new cards::cache();

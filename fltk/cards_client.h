@@ -56,15 +56,6 @@ namespace cards
         virtual ~cards_client (){};
 
         /**
-         * \brief Get list of installed package
-         *
-         * Return string array content installed package
-         *
-         * \return string array contain installed package list
-         */
-        std::set<std::string> ListOfInstalledPackages();
-
-        /**
          * \brief Install a package list
          *
          * Launch Cards Install process

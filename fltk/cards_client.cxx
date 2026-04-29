@@ -14,12 +14,6 @@ namespace cards
         m_log = cards_logger::instance();
     }
 
-    /// Get a string list of installed packages
-    std::set<std::string> cards_client::ListOfInstalledPackages()
-    {
-        return getSetOfPackagesNames();
-    }
-
     /// Install a package list
     void cards_client::InstallPackages(const std::set<std::string>& pPackageList)
     {
