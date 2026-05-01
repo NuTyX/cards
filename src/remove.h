@@ -4,7 +4,7 @@
 
 #include "pkgrm.h"
 #include "cards_argument_parser.h"
-#include "pkgrepo.h"
+#include "conf.h"
 
 namespace cards {
 /**
