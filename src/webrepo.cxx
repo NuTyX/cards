@@ -36,7 +36,7 @@ void webrepo::parse(){
 
         if (version == "systemd") {
             info.system("systemd");
-            info.branch("rolling");
+            info.branch("systemd");
         }
         if (version == "rolling") {
             info.system("sys-v");
@@ -44,7 +44,7 @@ void webrepo::parse(){
         }
         if (version == "testingd"){
             info.system("systemd");
-            info.branch("testing");
+            info.branch("testingd");
         }
         if (version == "testing") {
             info.system("sys-v");
