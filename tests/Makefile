@@ -5,7 +5,7 @@
 
 include ../Makefile.inc
 
-all: deplist deptree uname pkgdbh pkgrepo pkgfile string vector conf
+all: count deplist deptree uname pkgdbh pkgrepo pkgfile string vector conf
 
 deplist:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
@@ -41,6 +41,11 @@ conf:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
 	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
 	rm $@.o
+count:
+	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
+	$(CXX) $@.o -o $@ -L"../src" -lcards -lcurl -larchive -lcrypto
+	rm $@.o
+
 
 pkgrepo:
 	$(CXX) -DNDEBUG -std=c++11 -O2 -Werror -pedantic -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -fPIC -c -o $@.o $@.cxx
@@ -62,6 +67,7 @@ clean:
 	rm -f vector
 	rm -f uname
 	rm -f conf
+	rm -f count
 	rm -f string
 
 # End of file
