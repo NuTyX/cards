@@ -25,7 +25,7 @@ struct m_package {
 	std::string available_version;
 	unsigned int installed_space;
 	unsigned int available_space;
-          unsigned int available_size;
+	unsigned int available_size;
 	StatusEnumUpgrade status;
 
 };
