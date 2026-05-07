@@ -5,6 +5,8 @@
 #include "conf.h"
 #include "pkg.h"
 
+#include <sys/mman.h>
+
 namespace cards {
 
 typedef std::map<std::string, cards::pkg> webrepo_t;
