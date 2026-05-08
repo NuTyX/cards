@@ -348,9 +348,9 @@ int parseFile(std::set<std::string>& fileContent, const char* fileName)
 	if (!fp)
 		return -1;
 	const int length = BUFSIZ;
-  char input[length];
+	char input[length];
 	std::string line;
-  while (fgets(input, length, fp)) {
+	while (fgets(input, length, fp)) {
 		input[strlen(input)-1] = '\0';
 		line = input;
     fileContent.insert(line);
