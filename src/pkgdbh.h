@@ -91,6 +91,7 @@ protected:
 
     void                    getFootprintPackage(std::string& filename);
 
+    bool                    m_runPrePost;
     bool                    m_progress;
     std::string             m_packageName;
     std::string             m_packageArchiveVersion;

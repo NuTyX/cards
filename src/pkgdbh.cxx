@@ -231,6 +231,12 @@ void pkgdbh::progressInfo()
 		case ACTION_ENUM_PKG_PREINSTALL_END:
 			std::cout << _("pre-install: finish") << std::endl;
 			break;
+		case ACTION_ENUM_PKG_PREREMOVE_START:
+			std::cout << _("pre-remove: start") << std::endl;
+			break;
+		case ACTION_ENUM_PKG_PREREMOVE_END:
+			std::cout << _("pre-remove: finish") << std::endl;
+			break;
 		case ACTION_ENUM_PKG_INSTALL_START:
 			j=0;
 			std::cout << _("   ADD: (")
@@ -257,6 +263,12 @@ void pkgdbh::progressInfo()
 			break;
 		case ACTION_ENUM_PKG_POSTINSTALL_END:
 			std::cout << _("post-install: finish") << std::endl;
+			break;
+		case ACTION_ENUM_PKG_POSTREMOVE_START:
+			std::cout << _("post-remove: start") << std::endl;
+			break;
+		case ACTION_ENUM_PKG_POSTREMOVE_END:
+			std::cout << _("post-remove: finish") << std::endl;
 			break;
 		case ACTION_ENUM_DB_ADD_PKG_START:
 			break;
@@ -645,10 +657,15 @@ void pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 		if (i[0] == '.')
 			metaFilesList.insert(metaFilesList.end(), i );
 
-	}
+		}
 	for (auto i : metaFilesList)
 		info.files.erase(i);
 	removeFile (m_root, "/.MTREE");
+	if (checkFileExist(m_root + PKG_PRE_REMOVE))
+		metaFilesList.insert(PKG_PRE_REMOVE);
+	if (checkFileExist(m_root + PKG_POST_REMOVE))
+		metaFilesList.insert(PKG_POST_REMOVE);
+
 	metaFilesList.insert(METAFILE);
 	std::set<std::string> fileContent;
 	if ( parseFile(fileContent,METAFILE) == -1 ) {
