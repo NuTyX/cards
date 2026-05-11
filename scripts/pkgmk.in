@@ -588,7 +588,7 @@ pack_man() {
 	local DIR SUBDIR
 	for DIR in usr/share opt/*/share; do
 		for SUBDIR in info man; do
-			if [ -d $DIR/$SUBDIR  ]; then
+			if [ -d $DIR/$SUBDIR ]; then
 				bsdtar -r -f \
 				$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
 				$DIR/$SUBDIR || BUILD_SUCCESSFUL="no"
@@ -601,7 +601,7 @@ remove_man() {
 	local DIR SUBDIR
 	for DIR in usr/share opt/*/share; do
 		for SUBDIR in info man; do
-			if [ -d $DIR/$SUBDIR  ]; then
+			if [ -d $DIR/$SUBDIR ]; then
 				rm -r $DIR/$SUBDIR
 			fi
 		done
@@ -623,7 +623,9 @@ remove_service() {
 	for DIR in usr/lib/systemd/system usr/lib/systemd/user; do
 		[ -d $DIR ] && rm -r $DIR
 	done
-	rm -d usr/lib/systemd
+	if [ -d usr/lib/systemd ]; then
+		rm -d usr/lib/systemd
+	fi
 }
 build() {
 	if [ -z $build ]; then
