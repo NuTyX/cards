@@ -29,7 +29,6 @@ class pkgadd : public pkgdbh {
 
 protected:
 	std::string 	m_packageArchiveName;
-	bool 			m_runPrePost;
 	bool 			m_upgrade;
 	bool 			m_force;
 	std::set<std::string>

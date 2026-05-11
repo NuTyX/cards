@@ -7,17 +7,17 @@
 
 pkgadd::pkgadd()
 	: pkgdbh("pkgadd"),
-	m_runPrePost(true),
 	m_upgrade(false),
 	m_force(false)
 {
+	m_runPrePost = true;
 }
 pkgadd::pkgadd(const std::string& commandName)
 	: pkgdbh(commandName),
-	m_runPrePost(true),
 	m_upgrade(false),
 	m_force(false)
 {
+	m_runPrePost = true;
 }
 void pkgadd::parseArguments(int argc, char** argv)
 {
