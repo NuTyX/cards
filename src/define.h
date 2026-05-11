@@ -49,13 +49,19 @@
 
 #define PKG_DB_DIR "var/lib/pkg/DB/"
 
+// Followiin 4 files are part of DB
 #define PKG_FILES "/files"
 #define PKG_META "/META"
+#define PKG_PRE "/PRER"    //pre-remove script
+#define PKG_POST "/POSTR"  // post-remove schript
+
 #define PKG_RECEPT "/Pkgfile"
 #define PKG_REPO_META "/.REPO"
 #define PKG_REPO_FILES "/.FILES"
 #define PKG_PRE_INSTALL ".PRE"
 #define PKG_POST_INSTALL ".POST"
+#define PKG_PRE_REMOVE ".PRER"
+#define PKG_POST_REMOVE ".POSTR"
 
 // Package Attributes
 #define NAME 'N'
