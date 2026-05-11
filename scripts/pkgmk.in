@@ -441,6 +441,8 @@ check_footprint() {
 					sed '/^.README/d' | \
 					sed '/^.PRE/d' | \
 					sed '/^.POST/d' | \
+					sed '/^.PRER/d' | \
+					sed '/^.POSTR/d' | \
 					sed '/^.FILE/d' | \
 					sed '/^.MTREE/d' | \
 					sed '/^+++/d' | \
@@ -735,7 +737,13 @@ add_meta_files() {
 	if [ -f $PKGMK_ROOT/${NAME}.post-install ]; then
 		cp $PKGMK_ROOT/${NAME}.post-install .POST
 	fi
-	for file in .PRE .POST; do
+	if [ -f $PKGMK_ROOT/${NAME}.pre-remove ]; then
+		cp $PKGMK_ROOT/${NAME}.pre-remove .PRER
+	fi
+	if [ -f $PKGMK_ROOT/${NAME}.post-remove ]; then
+		cp $PKGMK_ROOT/${NAME}.post-remove .POSTR
+	fi
+	for file in .PRE .POST .PRER .POSTR; do
 		if [ -f $file ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/$1 \
 			$file
@@ -862,7 +870,7 @@ add_meta_to_archive() {
 
 	rm $PKGMK_PACKAGE_DIR/$1
 
-	for file in .META .MTREE .PRE .POST; do
+	for file in .META .MTREE .PRE .POST .PRER .POSTR; do
 		if [ -f $file ]; then
 			bsdtar -r -f $PKGMK_PACKAGE_DIR/$1 \
 			$file
