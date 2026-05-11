@@ -42,6 +42,23 @@ Make a pause before starting compilation. Usefull for tracking down issues.
 Ask for a confirmation before proceed.
 
 .TP
+.B "\-i, \-\-increment <package>|<set>"
+Increment the release number and build the package or the set of packages.
+
+.TP
+.B "\-d, \-\-diff"
+Check what are the outdated packages.
+
+.TP
+.B "\-C, \-\-check"
+Check if all the source files can be downloaded.
+
+.TP
+.B "\-\-commit  <collection>/<package> [comment]"
+Commit the <package> from the <collection>.
+The [comment] will be added if exist.
+
+.TP
 .B "\-n, \-\-new <collection/<package> [version] [description]"
 Create a new <collection>/<package> and fillup the username, email, [version] [description]
 .B "\-i, \-\-increment <package>"
@@ -57,7 +74,7 @@ no need to specify the collection name anymore.
 .TP
 .B "<Paramater 2 (optionnal)>"
 This parameter works only together with the paramater 1.
-It will replace the version of the port ( and then the binaries ) with the value specify by parameter 2.
+It will replace the version of the port or the set of packages ( and then the binaries ) with the value specify by parameter 2.
 
 Example:
 
