@@ -10,14 +10,12 @@ pkgadd::pkgadd()
 	m_upgrade(false),
 	m_force(false)
 {
-	m_runPrePost = true;
 }
 pkgadd::pkgadd(const std::string& commandName)
 	: pkgdbh(commandName),
 	m_upgrade(false),
 	m_force(false)
 {
-	m_runPrePost = true;
 }
 void pkgadd::parseArguments(int argc, char** argv)
 {
@@ -53,7 +51,8 @@ void pkgadd::parseArguments(int argc, char** argv)
 		m_actualError = cards::ERROR_ENUM_ONLY_ROOT_CAN_INSTALL_UPGRADE_REMOVE;
 		treatErrors("");
 	}
-
+	// Retrieving info about all the packages
+	buildDatabase(true);
 }
 void pkgadd::preRun()
 {
@@ -67,9 +66,6 @@ void pkgadd::preRun()
 }
 void pkgadd::run()
 {
-	// Retrieving info about all the packages
-	buildDatabase(true);
-
 	// Reading the archiving to find a list of files
 	std::pair<std::string, cards::db> package = openArchivePackage(m_packageArchiveName);
 

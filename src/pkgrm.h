@@ -18,7 +18,7 @@ protected:
 
 public:
 	pkgrm(const std::string& commandName) : pkgdbh(commandName) {}
-	pkgrm();
+	pkgrm() : pkgdbh("pkgrm") {}
 	void preRun();
 	void postRun();
 	void run();

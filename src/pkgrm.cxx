@@ -5,11 +5,6 @@
 
 #include "pkgrm.h"
 
-pkgrm::pkgrm ()
-	: pkgdbh("pkgrm")
-{
-	m_runPrePost = true;
-}
 void pkgrm::getListOfManInstalledPackages ()
 {
 	buildSimpleDependenciesDatabase();
@@ -71,9 +66,6 @@ void pkgrm::run()
 	}
 
 	cards::lock Lock(m_root, true);
-
-	// Retrieve info about all the packages
-	buildDatabase(true);
 
 	readRulesFile();
 

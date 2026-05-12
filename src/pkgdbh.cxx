@@ -11,6 +11,7 @@ pkgdbh::pkgdbh(const std::string& name)
 	: m_utilName(name)
 	, m_DB_Empty(true)
 	, m_progress(false)
+	, m_runPrePost(true)
 	, m_root("/")
 {
 	openlog(m_utilName.c_str(),LOG_CONS,LOG_LOCAL7);
@@ -19,6 +20,7 @@ pkgdbh::pkgdbh()
 	: m_utilName("pkgdbh")
 	, m_DB_Empty(true)
 	, m_progress(false)
+	, m_runPrePost(true)
 	, m_root("/")
 {
 }
@@ -47,6 +49,8 @@ void pkgdbh::parseArguments(int argc, char** argv)
 			m_packageName = option;
 		}
 	}
+	// Retrieve info about all the packages
+	buildDatabase(true);
 }
 void pkgdbh::run(int argc, char** argv)
 {
