@@ -277,13 +277,13 @@ void pkgdbh::progressInfo()
 		case ACTION_ENUM_RM_PKG_FILES_START:
 			j=0;
 			std::cout << _("REMOVE: (")
-				<< m_packageCollection
+				<< getCollection(m_packageName)
 				<< ") "
 				<< m_packageName
 				<< " "
-				<< m_packageVersion
+				<< getVersion(m_packageName)
 				<< "-"
-				<< m_packageRelease
+				<< getRelease(m_packageName)
 				<< ", "
 				<< m_filesList.size()
 				<< _(" files: ");
@@ -338,57 +338,55 @@ std::set<std::string> pkgdbh::getSetOfItems(const std::string& PackageName, cons
 }
 std::string pkgdbh::getDescription(const std::string& name) const
 {
-	return getSingleItem(name,'D');
+	return getSingleItem(name, DESCRIPTION);
 }
 std::string pkgdbh::getVersion(const std::string& name) const
 {
-	return getSingleItem(name,'V');
+	return getSingleItem(name, VERSION);
+}
+std::string pkgdbh::getRelease(const std::string& name) const
+{
+	return getSingleItem(name, RELEASE);
 }
 std::string pkgdbh::getCollection(const std::string& name) const
 {
-	return getSingleItem(name,'c');
+	return getSingleItem(name, COLLECTION);
 }
 std::string pkgdbh::getSets(const std::string& name) const
 {
 	std::string s;
-	for (auto i: getSetOfItems(name,'s'))
+	for (auto i: getSetOfItems(name, SETS))
 		s = s + " " + i;
 	return s;
 }
 std::set<std::string> pkgdbh::getSetOfSets(const std::string& name) const
 {
-	return getSetOfItems(name,'s');
+	return getSetOfItems(name, SETS);
 }
 std::set<std::string> pkgdbh::getSetOfCategories (const std::string& name) const
 {
-	return getSetOfItems(name, 'T');
+	return getSetOfItems(name, CATEGORIES);
 }
 std::string pkgdbh::getCategories(const std::string& name) const
 {
 	std::string s;
-	for (auto i: getSetOfItems(name,'T'))
+	for (auto i: getSetOfItems(name, CATEGORIES))
 		s = s + " " + i;
 	return s;
 }
 std::string pkgdbh::getArch(const std::string& name) const
 {
-	return getSingleItem(name,'A');
+	return getSingleItem(name, ARCHITECTURE);
 }
 std::string pkgdbh::getLicense(const std::string& name) const
 {
-	return getSingleItem(name,'L');
+	return getSingleItem(name, LICENSE);
 }
 unsigned int pkgdbh::getSize(const std::string& name) const
 {
-	std::string r = getSingleItem(name,'S');
+	std::string r = getSingleItem(name, SPACE);
 	return atoi(r.c_str());
 }
-unsigned int pkgdbh::getRelease(const std::string& name) const
-{
-	std::string r = getSingleItem(name,'r');
-	return atoi(r.c_str());
-}
-
 // Append to the "DB" the number of packages founds
 // directory containing a file named files
 void pkgdbh::getListOfPackagesNames()

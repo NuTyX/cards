@@ -147,6 +147,7 @@ public:
     std::set<std::string>&  getSetOfPackagesNames();
     std::string             getDescription(const std::string& name) const;
     std::string             getVersion(const std::string& name) const;
+    std::string             getRelease(const std::string& name) const;
     std::string             getCollection(const std::string& name) const;
     std::string             getSets(const std::string& name) const;
     std::set<std::string>   getSetOfSets(const std::string& name) const;
@@ -161,7 +162,6 @@ public:
     const unsigned int      getNumberOfFiles();
     unsigned int            getInstalledFilesNumber();
     unsigned int            getSize(const std::string& name) const;
-    unsigned int            getRelease(const std::string& name) const;
 
     bool                    checkPackageNameUptodate(archive& archiveName);
     bool                    checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName);
