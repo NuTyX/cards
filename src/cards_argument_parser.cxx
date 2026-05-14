@@ -21,6 +21,7 @@ ArgParser::APOpt CardsArgumentParser::OPT_SETS;
 
 ArgParser::APOpt CardsArgumentParser::OPT_DISABLE;
 ArgParser::APOpt CardsArgumentParser::OPT_NO_META;
+ArgParser::APOpt CardsArgumentParser::OPT_NO_PROGRESS;
 
 ArgParser::APOpt CardsArgumentParser::OPT_NOLOGENTRY;
 
@@ -240,6 +241,10 @@ As for the generation, a private key is needed, it is used by the packager only.
         0,
         _("\t   Don't upgrade local metadata (not recommended)."));
 
+    OPT_NO_PROGRESS.init("no-progress",
+        0,
+        _("  Don't show progress info during process."));
+
     OPT_ROOT.init("root",
         0,
         _("  Specify alternative installation root"),
@@ -251,6 +256,7 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_UPGRADE, OPT_DOWNLOAD_READY, false);
     addOption(CMD_UPGRADE, OPT_DOWNLOAD_ONLY, false);
     addOption(CMD_UPGRADE, OPT_NO_SYNC, false);
+    addOption(CMD_UPGRADE, OPT_NO_PROGRESS, false);
     addOption(CMD_UPGRADE, OPT_SIZE, false);
     addOption(CMD_UPGRADE, OPT_CHECK, false);
     addOption(CMD_UPGRADE, OPT_PROCEED, false);
@@ -287,6 +293,7 @@ As for the generation, a private key is needed, it is used by the packager only.
     addOption(CMD_CREATE, OPT_ROOT, false);
 
     addOption(CMD_SYNC, OPT_CONFIG_FILE, false);
+    addOption(CMD_SYNC, OPT_NO_PROGRESS, false);
 
     addOption(CMD_REPO,OPT_CONFIG_FILE,false);
 

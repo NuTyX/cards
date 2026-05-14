@@ -27,9 +27,10 @@ class CardsArgumentParser : public ArgParser
 		static ArgParser::APOpt OPT_SETS;
 
 		static ArgParser::APOpt OPT_NOLOGENTRY;
+		static ArgParser::APOpt OPT_NO_PROGRESS;
+		static ArgParser::APOpt OPT_NO_META;
 
 		static ArgParser::APOpt OPT_DISABLE;
-		static ArgParser::APOpt OPT_NO_META;
 
 		static ArgParser::APOpt OPT_DRY;
 		static ArgParser::APOpt OPT_REMOVE;
