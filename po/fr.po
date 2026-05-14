@@ -829,6 +829,9 @@ msgstr "\t   Recherche uniquement dans le nom du paquet."
 msgid "\t   Don't upgrade local metadata (not recommended)."
 msgstr "\t   Ne pas mettre les metadonnées locales à jour (déconseillé)."
 
+msgid "  Don't show progress info during process."
+msgstr "  N'affiche pas d'information de progression durant le processus."
+
 msgid "Only download the binaries that are needed to be upgraded."
 msgstr "Télécharge uniquement les binaires nécessaires pour la mise à jour."
 

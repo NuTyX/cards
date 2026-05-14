@@ -160,9 +160,8 @@ int main(int argc, char** argv)
                 cout << _("log directory: ")
                      << config.logdir() << endl;
             }
-        }
             return EXIT_SUCCESS;
-
+        }
         case ArgParser::CMD_FILES: {
             cards::info info(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
@@ -171,19 +170,14 @@ int main(int argc, char** argv)
             cards::info info(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
         }
-        case ArgParser::CMD_SYNC:
+        case ArgParser::CMD_SYNC: {
             if (getuid()) {
                 string s = "";
                 throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
             }
-            if (cardsArgPars.isSet(CardsArgumentParser::OPT_CONFIG_FILE)) {
-                cards::sync sync(configFile);
-                sync.run();
-            } else {
-                cards::sync sync;
-                sync.run();
-            }
+            cards::sync sync(cardsArgPars, configFile.c_str());
             return EXIT_SUCCESS;
+        }
         case ArgParser::CMD_KEYS: {
             if (!getuid()) {
                 string s = "";
