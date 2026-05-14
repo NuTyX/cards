@@ -242,8 +242,7 @@ void pkgrepo::downloadPackageFileName(const std::string& packageName)
             + "/"
             + m_listOfPackages[packageName].fileName(),
         m_listOfPackages[packageName].dirName(),
-        m_listOfPackages[packageName].fileName(),
-        true);
+        m_listOfPackages[packageName].fileName());
 }
 std::vector<std::pair<std::string, time_t>>&
 pkgrepo::getDependenciesList()
