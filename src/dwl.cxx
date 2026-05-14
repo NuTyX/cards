@@ -14,28 +14,31 @@ dwlEvent::~dwlEvent()
 	dwl::UnSuscribeFromEvents(this);
 }
 
-dwl::dwl(std::vector<InfoFile> destinationFiles, bool progress)
+dwl::dwl(std::vector<fileToDownload> destinationFiles, bool progress)
 	: m_progress(progress)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
 	m_curl = curl_easy_init();
 	if (! m_curl)
 		throw std::runtime_error ("Curl error");
-	if ( progress ) {
-		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 0L);
-	} else {
-		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
-	}
+
+	curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
+
 	m_slist=nullptr;
 	m_slist= curl_slist_append(m_slist, "Cache-Control: no-cache");
 	for (auto i : destinationFiles)
 	{
-		m_url = i.url;
-		m_destinationFile.filename = i.filename;
-		m_destinationFile.dirname = i.dirname;
-		m_downloadFileName = i.dirname + i.filename;
-		m_downloadProgress.name = i.filename;
-		createRecursiveDirs(i.dirname);
+		if (i.fileName == PUBLICKEY)
+			m_fileName = i.fileName;
+		else
+			m_fileName = i.fileName + ".zst";
+
+		m_url = i.url + m_fileName;
+		m_destinationFile.filename = m_fileName;
+		m_destinationFile.dirname = i.dirName;
+		m_downloadFileName = i.dirName + m_fileName;
+		createRecursiveDirs(i.dirName);
+
 		initFileToDownload(m_url,m_downloadFileName);
 
 		get();
@@ -43,12 +46,10 @@ dwl::dwl(std::vector<InfoFile> destinationFiles, bool progress)
 }
 dwl::dwl(std::string url,
 	std::string dirName,
-	std::string fileName,
-	bool progress)
-	: m_fileInfo(fileName),
-		m_url(url),
-		m_downloadFileName(dirName + "/" + fileName),
-		m_progress(progress)
+	std::string fileName)
+	: m_fileName(fileName)
+	, m_url(url)
+	, m_downloadFileName(dirName + "/" + fileName)
 {
 
 	curl_global_init(CURL_GLOBAL_ALL);
@@ -60,22 +61,21 @@ dwl::dwl(std::string url,
 	createRecursiveDirs(dirName);
 
 	initFileToDownload(m_url, m_downloadFileName);
-	if ( progress ) {
-		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 0L);
-	} else {
-		curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 1L);
-	}
 
+	//TODO: perhaps this could be improved.
+	m_progress = false;
+	curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 0L);
 	get();
+	std::cout << std::endl;
 }
 void dwl::get()
 {
-	if (! m_progress)
+	if (m_progress)
 		rotatingCursor();
 
 	m_downloadProgress.lastruntime = 0;
 	m_downloadProgress.curl = m_curl;
-	m_downloadProgress.name = m_fileInfo;
+	m_downloadProgress.name = m_fileName;
 	/*
 	TODO Maybe there is a more efficient way to do this, but
 	for the moment we never want to use server side cache
@@ -93,8 +93,6 @@ void dwl::get()
 	curl_easy_setopt(m_curl, CURLOPT_VERBOSE, 1L);
 #endif
 	m_curlCode = curl_easy_perform(m_curl);
-	if (m_progress)
-		std::cout << std::endl;
 	if ( m_curlCode != CURLE_OK) {
 		std::cerr << curl_easy_strerror(m_curlCode) << std::endl;
 		throw std::runtime_error ( "\n\nURL   : " +

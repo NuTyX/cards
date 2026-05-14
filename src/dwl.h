@@ -69,7 +69,7 @@ class dwl
 		bool			m_progress;
 		std::string		m_url;
 		std::string		m_downloadFileName;
-		std::string		m_fileInfo;
+		std::string		m_fileName;
 
 		CURL*			m_curl;
 		CURLcode		m_curlCode;
@@ -128,22 +128,20 @@ class dwl
 		* \param url Complete downloading address including the file
 		* \param dirName Destination folder
 		* \param fileName file where to store the downloaded datas
-		* \param progress If true, show what's going on
 		*/
 		dwl(std::string url,
 			std::string dirName,
-			std::string fileName,
-			bool progress);
+			std::string fileName);
 
 		/**
 		* Constructor
-		* Download a list of InfoFile (a vector of InfoFile type)
-		* InfoFile consist of (amount other fields.. ) Name of the file and the signature of the file to download
+		* Download a list of fileToDownload (a vector of fileToDownload type)
+		* fileToDownload consist of Name of the file, the url and the local directory of the file to download
 		*
 		* \param destinationFiles List of files to download
 		* \param progress If true, show what's going on
 		*/
-		dwl(std::vector<InfoFile> destinationFiles,
+		dwl(std::vector<fileToDownload> destinationFiles,
 			bool progress);
 
 		/**
