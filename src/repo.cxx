@@ -23,7 +23,8 @@ repo::repo(const CardsArgumentParser& argParser,
                     << std::endl;
                 break;
             }
-            rotatingCursor();
+            if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_PROGRESS))
+                rotatingCursor();
         }
         std::cout << "All "
             << m_pkgrepo.getListOfPackages().size()
@@ -115,8 +116,8 @@ repo::repo(const CardsArgumentParser& argParser,
 
                 file = "\n";
                 fwrite(file.c_str(),1, file.size(),mp);
-
-                rotatingCursor();
+                if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_PROGRESS))
+                    rotatingCursor();
             }
             fclose(fp);
             fclose(mp);
