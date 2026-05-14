@@ -4,6 +4,7 @@
 
 #include "conf.h"
 #include "dwl.h"
+#include "cards_argument_parser.h"
 
 #include <zstd.h>
 
@@ -15,12 +16,13 @@ class sync
 	std::string m_root;
 	std::string m_configFile;
 
-	cards::conf m_config;
-	void        uncompress(std::string fileName);
+	const CardsArgumentParser&  m_argParser;
+	cards::conf                 m_config;
+	void        uncompress(const std::string& fileName);
 
 public:
-	sync();
-	sync(const std::string configFile);
+	sync(const CardsArgumentParser& argParser,
+		const std::string& configFileName);
 
 	void        run();
 

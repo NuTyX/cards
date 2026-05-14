@@ -6,17 +6,11 @@ namespace cards {
 const std::string sync::DEFAULT_PKG_REPO = ".REPO";
 const std::string sync::DEFAULT_PKG_FILES = ".FILES";
 
-sync::sync()
-	: m_root("/")
-	, m_config("/etc/cards.conf")
-    , m_configFile("/etc/cards.conf")
-{
-    m_pkgRepoFile = DEFAULT_PKG_REPO;
-    m_pkgFilesFile = DEFAULT_PKG_FILES;
-}
-sync::sync(const std::string configFile)
-	: m_root("/")
-	, m_configFile(configFile)
+sync::sync(const CardsArgumentParser& argParser,
+	const std::string& configFileName)
+	: m_argParser(argParser)
+	, m_root("/")
+	, m_configFile(configFileName)
 	, m_config(m_root + m_configFile)
 {
     m_pkgRepoFile = DEFAULT_PKG_REPO;
@@ -25,67 +19,57 @@ sync::sync(const std::string configFile)
 		run();
 
 }
+
 void sync::run() 
 {
+	bool progress = true;
+	if (m_argParser.isSet(CardsArgumentParser::OPT_NO_PROGRESS))
+		progress = false;
+
+	fileToDownload destinationFile;
+	std::vector<fileToDownload> destinationFiles;
 	for (auto collection : m_config.dirUrl()) {
 		if (collection.url.size() == 0 )
 			continue;
-
-		cards::dwl key(collection.url
+		destinationFile.url = collection.url
 			+ "/"
 			+ m_config.arch()
 			+ "/"
 			+ m_config.version()
 			+ "/"
 			+ collection.collection
-			+ "/"
-			+ PUBLICKEY,
-			collection.depot + "/" + collection.collection,
-			PUBLICKEY, false);
-
-		cards::dwl repo(collection.url
-			+ "/"
-			+ m_config.arch()
-			+ "/"
-			+ m_config.version()
+			+ "/";
+		destinationFile.dirName = collection.depot
 			+ "/"
 			+ collection.collection
-			+ "/"
-			+ m_pkgRepoFile
-			+ ".zst",
-			collection.depot + "/" + collection.collection,
-			m_pkgRepoFile + ".zst", false);
+			+ "/";
+		destinationFile.fileName = PUBLICKEY;
+		destinationFiles.push_back(destinationFile);
 
-		uncompress(collection.depot + "/"
-					+ collection.collection
-					+ "/"
-					+ m_pkgRepoFile);
+		destinationFile.fileName = m_pkgRepoFile;
+		destinationFiles.push_back(destinationFile);
 
-		cards::dwl files(collection.url
-			+ "/"
-			+ m_config.arch()
-			+ "/"
-			+ m_config.version()
-			+ "/"
-			+ collection.collection
-			+ "/"
-			+ m_pkgFilesFile
-			+ ".zst",
-			collection.depot + "/" + collection.collection,
-			m_pkgFilesFile + ".zst", false);
-
-		uncompress(collection.depot + "/"
-					+ collection.collection
-					+ "/"
-					+ m_pkgFilesFile);
+		destinationFile.fileName = m_pkgFilesFile;
+		destinationFiles.push_back(destinationFile);
 	}
+
+	cards::dwl(destinationFiles, progress);
+
+	for (auto file : destinationFiles) {
+		if (file.fileName == PUBLICKEY )
+			continue;
+
+		uncompress(file.dirName + file.fileName);
+	}
+	if (progress)
+		std::cout << std::endl;
 }
-void sync::uncompress(const std::string fileName)
+void sync::uncompress(const std::string& fileName)
 {
 	std::ifstream inFile(fileName + ".zst", std::ios::binary);
 	if (!inFile) {
-	std::cerr << "Cannot open file: " << fileName << "\n";
-	return;
+		std::cerr << "Cannot open file: " << fileName << "\n";
+		return;
 	}
 
 	inFile.seekg(0, std::ios::end);
@@ -128,7 +112,6 @@ void sync::uncompress(const std::string fileName)
 		<< std::endl;
 
 	outFile.write(decompressData.data(),decompressData.size());
-
 	outFile.close();
 }
 
