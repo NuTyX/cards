@@ -39,6 +39,11 @@ struct InfoFile {
     utimbuf acmodtime;
     FILE* stream;
 };
+struct fileToDownload {
+    std::string url;
+    std::string dirName;
+	std::string fileName;
+};
 void* getDatas(void* var, FILE* file, long offset, size_t size, size_t nmemb);
 std::string trimFileName(const std::string& filename);
 time_t getEpochModifyTimeFile(const std::string& filename);
