@@ -6,10 +6,10 @@ namespace cards {
 
 diff::diff(const CardsArgumentParser& argParser,
 		const std::string& configFileName)
-	: m_sync(configFileName)
+	: m_config(configFileName)
+	, m_sync(argParser, configFileName)
 	, m_pkgrepo(configFileName)
 	, m_argParser(argParser)
-	, m_config(configFileName)
 	, m_packagesConflict(0)
 	, m_packagesReplace(0)
 	, m_packagesObsolet(0)
@@ -19,13 +19,6 @@ diff::diff(const CardsArgumentParser& argParser,
 	, m_packagesNew(0)
 	, m_packagesOK(0)
 {
-
-	for (auto collection : m_config.dirUrl()) {
-		if (collection.url.size() == 0 )
-			continue;
-
-	}
-
     buildDatabase(false);
 
 	m_package packageNameToDeal;
