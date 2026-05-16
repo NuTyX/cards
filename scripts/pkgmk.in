@@ -197,7 +197,6 @@ check_file() {
 }
 download_file() {
 	info "Downloading '$1'."
-	pwd
 	case $1 in
 		*.git)
 			if [ ! "`type -p git`" ]; then
