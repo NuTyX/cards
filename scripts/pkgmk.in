@@ -1593,7 +1593,7 @@ main() {
 
 trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
 
-export LC_ALL=POSIX
+export LC_ALL=C.UTF-8
 
 readonly PKGMK_VERSION="#VERSION#"
 readonly PKGMK_COMMAND="$0"
