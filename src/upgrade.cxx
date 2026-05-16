@@ -26,10 +26,12 @@ upgrade::upgrade(const CardsArgumentParser& argParser,
 			<< std::endl;
 		return;
 	}
-	if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_PROGRESS))
-		m_progress = true;
+	m_progress = true;
 
 	buildDatabase(true);
+
+	if (m_argParser.isSet(CardsArgumentParser::OPT_NO_PROGRESS))
+		m_progress = false;
 
 	if (m_diff.ratio() > 20) {
 		if(!m_argParser.isSet(CardsArgumentParser::OPT_PROCEED)) {
