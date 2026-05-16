@@ -24,6 +24,11 @@ Set make options.
 .br
 Default: none
 .TP
+\fBexport JOBS='NUMBER'\fP
+Set the number of commands to run simultaneously when building a port.
+.br
+Default: none
+.TP
 \fBPKGMK_SOURCE_MIRRORS=('STRING')\fP
 Set mirrors to check and download source archives from.
 .br

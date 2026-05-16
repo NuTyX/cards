@@ -19,6 +19,11 @@ Configure les options du compilateur C++.
 .br
 Défaut: rien
 .TP
+\fBexport JOBS='NUMBER'\fP
+Défini le nombre de commande pouvant être lancé simultanément lors de la construction d'un port.
+.br
+Défaut: rien
+.TP
 \fBPKGMK_SOURCE_MIRRORS=('STRING')\fP
 Défini les mirroirs url à vérifier et à utiliser pour télécharger les archives sources.
 .br

@@ -472,7 +472,7 @@ setup_pkgmk_conf() {
 [ -z  "$PKGMK_GROUPS" ] && PKGMK_GROUPS="devel man doc service"
 [ -z  "$PKGMK_KEEP_SOURCES" ] && PKGMK_KEEP_SOURCES="yes"
 [ -z  "$PKGMK_WORK_DIR" ] && PKGMK_WORK_DIR="/tmp/work"
-[ -z  "$PKGMK_COMPRESSION_OPTS" ] && PKGMK_COMPRESSION_OPTS="-19 --threads=$(getconf _NPROCESSORS_ONLN)"
+[ -z  "$PKGMK_COMPRESSION_OPTS" ] && PKGMK_COMPRESSION_OPTS="-19 --threads=$(nproc)"
 [ -z  "$PKGMK_COMPRESS_PACKAGE" ] && PKGMK_COMPRESS_PACKAGE="yes"
 [ -z  "$PKGMK_COMPRESSION_MODE" ] && PKGMK_COMPRESSION_MODE="zst"
 [ -z  "$PKGMK_LOCALES" ] && PKGMK_LOCALES="af an ar as az be bg \
@@ -482,7 +482,9 @@ ro ru rw si sq sk sl sr sv ta te th tr uk ur uz vi xh zh"
 
   PKGMK_CONF='export CFLAGS="-O2 -pipe"
 export CXXFLAGS="${CFLAGS}"
-export MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)"
+export JOBS=$(nproc)
+export MAKEFLAGS="-j ${JOBS}"
+
 PKGMK_CLEAN="no"
 PKGMK_SOURCE_DIR="/sources"
 PKGMK_IGNORE_REPO="no"
