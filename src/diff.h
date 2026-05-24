@@ -4,6 +4,7 @@
 #include "pkgdbh.h"
 #include "sync.h"
 #include "pkgrepo.h"
+#include "cards_argument_parser.h"
 
 #include <sys/statvfs.h>
 

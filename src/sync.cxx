@@ -6,12 +6,12 @@ namespace cards {
 const std::string sync::DEFAULT_PKG_REPO = ".REPO";
 const std::string sync::DEFAULT_PKG_FILES = ".FILES";
 
-sync::sync(const CardsArgumentParser& argParser,
-	const std::string& configFileName)
-	: m_argParser(argParser)
-	, m_root("/")
+sync::sync(const std::string& configFileName,
+		const bool& progress)
+	: m_root("/")
 	, m_configFile(configFileName)
 	, m_config(m_root + m_configFile)
+	, m_progress(progress)
 {
     m_pkgRepoFile = DEFAULT_PKG_REPO;
     m_pkgFilesFile = DEFAULT_PKG_FILES;
@@ -22,10 +22,6 @@ sync::sync(const CardsArgumentParser& argParser,
 
 void sync::run() 
 {
-	bool progress = true;
-	if (m_argParser.isSet(CardsArgumentParser::OPT_NO_PROGRESS))
-		progress = false;
-
 	fileToDownload destinationFile;
 	std::vector<fileToDownload> destinationFiles;
 	for (auto collection : m_config.dirUrl()) {
@@ -53,7 +49,7 @@ void sync::run()
 		destinationFiles.push_back(destinationFile);
 	}
 
-	cards::dwl(destinationFiles, progress);
+	cards::dwl(destinationFiles, m_progress);
 
 	for (auto file : destinationFiles) {
 		if (file.fileName == PUBLICKEY )
@@ -61,7 +57,7 @@ void sync::run()
 
 		uncompress(file.dirName + file.fileName);
 	}
-	if (progress)
+	if (m_progress)
 		std::cout << std::endl;
 }
 void sync::uncompress(const std::string& fileName)

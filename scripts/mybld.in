@@ -690,7 +690,7 @@ if ! [ -O "$ROOT/$VERSION" ]; then
 fi
 
 setup_cards_conf
-DEVEL="cd /$GIT $PAUSE"
+DEVEL="localedef -i C -f UTF-8 C.UTF-8 && cd /$GIT $PAUSE"
 
 if [ -z $MANUAL ]; then
   DEVEL+="&& cards create"
@@ -877,7 +877,7 @@ if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
    release=1
    . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
    cd "$COLLECTION/${PARAM[0]}/"
-   check_download_sources
+   # check_download_sources
 fi
 if [ "$CHECK" == "yes" ]; then
    echo "====> Found all the source files

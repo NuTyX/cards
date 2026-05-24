@@ -7,7 +7,7 @@ namespace cards {
 diff::diff(const CardsArgumentParser& argParser,
 		const std::string& configFileName)
 	: m_config(configFileName)
-	, m_sync(argParser, configFileName)
+	, m_sync(configFileName,argParser.isSet(CardsArgumentParser::OPT_NO_PROGRESS))
 	, m_pkgrepo(configFileName)
 	, m_argParser(argParser)
 	, m_packagesConflict(0)

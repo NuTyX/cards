@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     bindtextdomain(GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
     textdomain(GETTEXT_PACKAGE);
     string root = "/";
-    string configFile =  root + "etc/cards.conf";
+    string configFile =  "/etc/cards.conf";
     try {
         CardsArgumentParser cardsArgPars;
         cardsArgPars.parse(argc, argv);
@@ -175,7 +175,7 @@ int main(int argc, char** argv)
                 string s = "";
                 throw runtime_error(s + _(" only root can install / sync / purge / upgrade / remove packages"));
             }
-            cards::sync sync(cardsArgPars, configFile.c_str());
+            cards::sync sync(configFile, !cardsArgPars.isSet(CardsArgumentParser::OPT_NO_PROGRESS));
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_KEYS: {
