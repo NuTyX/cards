@@ -34,9 +34,9 @@
 #define PRIVATEKEY "/.private.key"
 #define PUBLICKEY "/.PKEY"
 
-#define GIGA 1e9
-#define MEGA 1e6
-#define KILO 1e3
+#define GIGA 0x1p30
+#define MEGA 0x1p20
+#define KILO 0x1p10
 #define PACKAGE_LOCALE_DIR "/usr/share/locale"
 #define GETTEXT_PACKAGE "cards"
 
