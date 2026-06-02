@@ -28,7 +28,7 @@ if [ -z $HOME ]; then
 
 fi
 
-ROOT=$HOME/$BRANCH/base
+ROOT=$HOME/$BRANCH/cli-extra
 
 cp WHENCE WHENCE.in
 
