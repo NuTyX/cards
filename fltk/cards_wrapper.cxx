@@ -43,14 +43,14 @@ namespace cards
             delete m_ptcards_wrapper;
     }
 
-    // Add a nex suscriber to the callback event list
+    // Add a new subscriber to the callback event list
     void cards_wrapper::subscribeToEvents(cards_event_handler* pCallBack)
     {
-        // Todo : Check if the new susciber is already in the container
+        // Todo : Check if the new subscriber is already in the container
         m_arrEventHandler.push_back(pCallBack);
     }
 
-    /// Remove an event suscriber from event callback list
+    /// Remove an event subscriber from event callback list
     void cards_wrapper::unsubscribeFromEvents(cards_event_handler* pCallBack)
     {
         std::vector<cards_event_handler*>::iterator it;
@@ -206,7 +206,7 @@ namespace cards
         {
             try
             {
-                cards::sync sync;
+                cards::sync sync("/etc/cards.conf",true);
                 sync.run();
             }
             catch (std::exception& e)

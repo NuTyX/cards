@@ -87,7 +87,7 @@ namespace cards
                 treatErrors(pack);
             }
 
-            // Remove metadata about the package removed
+            // Remove meta data about the package removed
             removePackageFilesRefsFromDB(pack);
 
             // Remove the files on hd
@@ -146,14 +146,14 @@ namespace cards
 			}
 		}
 
-    // Add a nex suscriber to the callback event list
+    // Add a new subscriber to the callback event list
     void cards_client::subscribeToEvents(cards_clientEvents* pCallBack)
     {
-        // Todo : Check if the new susciber is already in the container
+        // Todo : Check if the new subscriber is already in the container
         m_arrCallback.push_back(pCallBack);
     }
 
-    /// Remove an event suscriber from event callback list
+    /// Remove an event subscriber from event callback list
     void cards_client::unsubscribeFromEvents(cards_clientEvents* pCallBack)
     {
         std::vector<cards_clientEvents*>::iterator it;
