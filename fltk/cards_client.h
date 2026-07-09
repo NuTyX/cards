@@ -69,16 +69,16 @@ namespace cards
          */
         void RemovePackages(const std::set<std::string>& pPackageList);
             /**
-         * \brief Suscribe to CARDS events
+         * \brief Subscribe to CARDS events
          *
          * Record callback from client class which submit callback from Card lib
          */
         void subscribeToEvents(cards_clientEvents* pCallBack);
 
         /**
-         * \brief Unsuscribe from CARDS Events
+         * \brief Unsubscribe from CARDS Events
          *
-         * Unsuscribe client class callbock form Suscribe list
+         * Unsubscribe client class callback form Subscribe list
          */
         void unsubscribeFromEvents(cards_clientEvents* pCallBack);
 

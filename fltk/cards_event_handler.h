@@ -27,7 +27,7 @@ namespace cards
     // Define cards_wrapper singleton for friendship
     class cards_wrapper;
 
-    // Define Cards cards_logger singleton for friednship
+    // Define Cards cards_logger singleton for friendship
     class cards_logger;
     /** \class cards_event_handler
      * \brief Abstract class to handle event from cards_wrapper

@@ -44,9 +44,9 @@ install::install(const CardsArgumentParser& argParser,
 			std::string p = "";
 			if (checkPackageNameExist(packageArchive.name())) {
 				p = "Upgrade ";
-				m_upgrade=1;
+				m_upgrade = true;
 			} else {
-				m_upgrade=0;
+				m_upgrade = false;
 			}
 
 			m_packageArchiveName = pkg;
@@ -77,10 +77,10 @@ install::install(const CardsArgumentParser& argParser,
 		archive packageArchive(m_packageArchiveName.c_str());
 		std::string p = "";
 		if (checkPackageNameExist(packageArchive.name())) {
-			m_upgrade=1;
+			m_upgrade = true;
 			p = "Upgrade ";
 		} else {
-			m_upgrade=0;
+			m_upgrade = false;
 		}
 		if (i.second > 0)
 			setDependency();

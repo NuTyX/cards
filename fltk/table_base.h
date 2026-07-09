@@ -72,7 +72,7 @@ public:
      * displayed as a list sorted by package name, description, version
      */
     virtual void refreshTable() = 0; // Load the packages list
-    void autowidth(int pad); // Automatically set the columns widths to the longuest string
+    void autowidth(int pad); // Automatically set the columns widths to the longest string
     void resizeWindow();	// Resize the parent window to size of table
     void setFilter(const std::string& pValue);
     int getCntRowSelected();

@@ -659,11 +659,11 @@ void create::buildBinary(std::string packageName)
 
 		if (checkPackageNameExist(name)) {
 			message = name + ": is ALLREADY installed";
-            m_upgrade = 1;
+            m_upgrade = true;
 		}
         m_packageArchiveName = packageFile;
         run();
-        m_upgrade = 0;
+        m_upgrade = false;
         std::cout << message << std::endl;
         if (m_config.logdir() != "") {
             write(m_fdlog, message.c_str(), message.length());

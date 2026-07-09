@@ -43,7 +43,7 @@ enum widgetID
  * \brief FTLTK Main window of application
  *
  * This class derivate Fl_Window for FLTK window handle
- * Card_event_handler inheritence is done to enable
+ * Card_event_handler inheritance is done to enable
  * receiving events callback from cards_wrapper :
  * This is a mechanism to ensure GUI application never blocked
  * by libcard operation. This also ensure libcard is quiet to

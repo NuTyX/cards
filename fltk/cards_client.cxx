@@ -43,11 +43,11 @@ namespace cards
             std::string name = packageArchive.name();
             if ( checkPackageNameExist(name ))
             {
-                m_upgrade=1;
+                m_upgrade = true;
             }
             else
             {
-                m_upgrade=0;
+                m_upgrade = false;
             }
             if (i.second > 0)
                 setDependency();
