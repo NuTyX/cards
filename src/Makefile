@@ -51,6 +51,7 @@ CARDSOBJECTS =	pkg.o \
 	remove.o \
 	info.o \
 	list.o \
+	files.o \
 	diff.o \
 	upgrade.o \
 	repo.o \

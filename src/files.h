@@ -7,15 +7,13 @@
 #include "conf.h"
 #include "cards_argument_parser.h"
 
-#include <sys/mman.h>
 
 namespace cards {
 
-class list {
+class files{
     const CardsArgumentParser& m_argParser;
     std::string                m_configFileName;
     void parse();
-    void parseSets();
 
     public:
         /**
@@ -24,7 +22,7 @@ class list {
          * \param argParser CardsArgumentParser type
          * \param configFileName Specify the configuration file name to use
          */
-        list(const CardsArgumentParser& argParser, const std::string& configFileName);
+        files(const CardsArgumentParser& argParser, const std::string& configFileName);
 
 };
 

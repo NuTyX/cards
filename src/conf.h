@@ -10,6 +10,9 @@ struct DirUrl {
     std::string collection;
     std::string depot;
     std::string url;
+    size_t sFiles;
+    size_t sRepo;
+
 };
 
 class conf {
@@ -43,6 +46,7 @@ public:
 
     conf(const std::string& filename);
     ~conf();
+    void size();
     void purge();
 
     const std::string& version();

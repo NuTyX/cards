@@ -7,6 +7,7 @@
 #include "dwl.h"
 #include "info.h"
 #include "list.h"
+#include "files.h"
 #include "install.h"
 #include "level.h"
 #include "pkginfo.h"
@@ -164,7 +165,7 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_FILES: {
-            cards::info info(cardsArgPars, configFile.c_str());
+            cards::files files(cardsArgPars, configFile);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_SEARCH: {

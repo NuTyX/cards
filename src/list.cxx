@@ -22,46 +22,35 @@ list::list(const CardsArgumentParser& argParser,
     pkginfo.run();
 }
 void list::parseSets() {
-
+    int fd = 0;
     cards::conf config(m_configFileName);
-
-    struct stat st;
-    size_t size = 0; // Size of the file we parse
+    config.size();
 
     std::set<std::string> sortedListOfSets;
+
     for (auto i : config.dirUrl()) {
-        std::string s = i.depot + "/" + i.collection + "/.REPO";
+        std::string s = i.depot + "/" + i.collection + PKG_REPO_META;
 
-        int fd = open(s.c_str(),O_RDONLY);
-
-        if (fstat(fd, &st) < 0) {
-			perror("fstat");
-			close(fd);
-            std::cerr << "Cannot access "
-                << s
-                << "\n Quit now !!!"
-                << std::endl;
-			return;
-		}
-        size = st.st_size;
+        fd = open(s.c_str(),O_RDONLY);
 
 		char *data = static_cast<char*>
-			(mmap(nullptr, size, PROT_READ, MAP_PRIVATE, fd, 0));
-            if (data == MAP_FAILED) {
-			perror("mmap");
+			(mmap(nullptr, i.sRepo, PROT_READ, MAP_PRIVATE, fd, 0));
+
+        if (data == MAP_FAILED) {
+		    perror("mmap");
             std::cerr << "Cannot read "
                 << s
                 << "\n Quit now !!!"
                 << std::endl;
-			close(fd);
-			return;
+		    close(fd);
+		    return;
 		}
 
         const char *p = data;
-		const char *end = data + size;
+		const char *end = data + i.sRepo;
 
         while (p < end) {
-            const char *nl = (const char*)memchr(p, '\n', size);
+            const char *nl = (const char*)memchr(p, '\n', i.sRepo);
             if (!nl)
                 nl = end;
 
@@ -76,13 +65,14 @@ void list::parseSets() {
 			}
 			p = nl + 1;
 		}
-        munmap(data,size);
+        munmap(data,i.sRepo);
 		close(fd);
     }
     for (auto s : sortedListOfSets)
         printf("%s\n", s.c_str());
 }
 void list::parse() {
+    int fd = 0;
 	struct package {
 		std::string name;
 		std::string ver;
@@ -91,32 +81,19 @@ void list::parse() {
 	};
 
     cards::conf config(m_configFileName);
-
-    struct stat st;
-    size_t size = 0;      // Size of the file we parse
+    config.size();
 
     std::vector<package> listOfPackages;
 
     for (auto i : config.dirUrl()) {
-        std::string s = i.depot + "/" + i.collection + "/.REPO";
+        std::string s = i.depot + "/" + i.collection + PKG_REPO_META;
     
-        int fd = open(s.c_str(),O_RDONLY);
-
-        if (fstat(fd, &st) < 0) {
-			perror("fstat");
-			close(fd);
-            std::cerr << "Cannot access "
-                << s
-                << "\n Quit now !!!"
-                << std::endl;
-			return;
-		}
-        size = st.st_size;
+        fd = open(s.c_str(),O_RDONLY);
 
 		char *data = static_cast<char*>
-			(mmap(nullptr, size, PROT_READ, MAP_PRIVATE, fd, 0));
+			(mmap(nullptr, i.sRepo, PROT_READ, MAP_PRIVATE, fd, 0));
         
-            if (data == MAP_FAILED) {
+        if (data == MAP_FAILED) {
 			perror("mmap");
             std::cerr << "Cannot read "
                 << s
@@ -128,13 +105,13 @@ void list::parse() {
         
         
         const char *p = data;
-		const char *end = data + size;
+		const char *end = data + i.sRepo;
         
         package pkg;
         pkg.col=" ";
 
         while (p < end) {
-			const char *nl = (const char*)memchr(p, '\n', size);
+			const char *nl = (const char*)memchr(p, '\n', i.sRepo);
     		if (!nl)
 				nl = end;
 
@@ -160,7 +137,7 @@ void list::parse() {
 			}
 			p = nl + 1;
 		}
-        munmap(data,size);
+        munmap(data,i.sRepo);
 		close(fd);
     }
     for (auto p : listOfPackages)

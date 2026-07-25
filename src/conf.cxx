@@ -138,6 +138,37 @@ void conf::parseConfig()
 	}
 
 }
+void conf::size() {
+	struct stat st;
+	for (auto& collection : dirUrl()) {
+		std::string s = collection.depot
+			+ "/"
+			+ collection.collection
+			+ PKG_REPO_FILES;
+        if (stat(s.c_str(), &st) < 0) {
+			perror("stat");
+            std::cerr << "Continue with next !!!"
+                << s
+                << "\n Quit now !!!"
+                << std::endl;
+		} else {
+			collection.sFiles = st.st_size;
+		}
+		s = collection.depot
+			+ "/"
+			+ collection.collection
+			+ PKG_REPO_META;
+        if (stat(s.c_str(), &st) < 0) {
+			perror("stat");
+            std::cerr << "Cannot access "
+                << s
+                << "\n Continue with next !!!"
+                << std::endl;
+		} else {
+			collection.sRepo = st.st_size;
+		}
+	}
+}
 void conf::purge()
 {
 	std::set<std::string> listOfFiles;
