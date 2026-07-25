@@ -13,12 +13,74 @@ list::list(const CardsArgumentParser& argParser,
         parse();
         return;
     }
-	std::cout << "List of installed Packages: "
-		<< std::endl
-		<< std::endl;
+    if ((m_argParser.isSet(CardsArgumentParser::OPT_SETS))) {
+        parseSets();
+        return;
+    }
     pkginfo pkginfo("cards list");
     pkginfo.installed();
     pkginfo.run();
+}
+void list::parseSets() {
+
+    cards::conf config(m_configFileName);
+
+    struct stat st;
+    size_t size = 0; // Size of the file we parse
+
+    std::set<std::string> sortedListOfSets;
+    for (auto i : config.dirUrl()) {
+        std::string s = i.depot + "/" + i.collection + "/.REPO";
+
+        int fd = open(s.c_str(),O_RDONLY);
+
+        if (fstat(fd, &st) < 0) {
+			perror("fstat");
+			close(fd);
+            std::cerr << "Cannot access "
+                << s
+                << "\n Quit now !!!"
+                << std::endl;
+			return;
+		}
+        size = st.st_size;
+
+		char *data = static_cast<char*>
+			(mmap(nullptr, size, PROT_READ, MAP_PRIVATE, fd, 0));
+            if (data == MAP_FAILED) {
+			perror("mmap");
+            std::cerr << "Cannot read "
+                << s
+                << "\n Quit now !!!"
+                << std::endl;
+			close(fd);
+			return;
+		}
+
+        const char *p = data;
+		const char *end = data + size;
+
+        while (p < end) {
+            const char *nl = (const char*)memchr(p, '\n', size);
+            if (!nl)
+                nl = end;
+
+			if (p[0] != '\n') {
+				size_t len = nl - p;
+				std::string found(p + 1, len - 1);
+				switch (p[0]) {
+					case SETS:
+                        sortedListOfSets.insert(found);
+						break;
+				}
+			}
+			p = nl + 1;
+		}
+        munmap(data,size);
+		close(fd);
+    }
+    for (auto s : sortedListOfSets)
+        printf("%s\n", s.c_str());
 }
 void list::parse() {
 	struct package {
@@ -43,7 +105,7 @@ void list::parse() {
         if (fstat(fd, &st) < 0) {
 			perror("fstat");
 			close(fd);
-            std::cerr << "Cannot open "
+            std::cerr << "Cannot access "
                 << s
                 << "\n Quit now !!!"
                 << std::endl;
@@ -101,9 +163,6 @@ void list::parse() {
         munmap(data,size);
 		close(fd);
     }
-	std::cout << "\n\nList of available binaries Packages: "
-		<< std::endl
-		<< std::endl;
     for (auto p : listOfPackages)
         printf("(%s) %s %s-%s\n"
             , p.col.c_str()

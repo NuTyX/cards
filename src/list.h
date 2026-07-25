@@ -17,6 +17,7 @@ class list {
     const CardsArgumentParser& m_argParser;
     std::string                m_configFileName;
     void parse();
+    void parseSets();
 
     public:
         /**
