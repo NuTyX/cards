@@ -30,4 +30,4 @@ class info
 };
 
 
-}
+} // cards namespace

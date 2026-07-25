@@ -6,6 +6,7 @@
 #include "deptree.h"
 #include "dwl.h"
 #include "info.h"
+#include "list.h"
 #include "install.h"
 #include "level.h"
 #include "pkginfo.h"
@@ -196,7 +197,7 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_LIST: {
-            cards::info info(cardsArgPars, configFile);
+            cards::list list(cardsArgPars, configFile);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_QUERY: {
