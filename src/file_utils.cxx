@@ -345,15 +345,15 @@ int findRecursiveFile(std::set<std::string>& filenameList, const char *filename,
 int parseFile(std::set<std::string>& fileContent, const char* fileName)
 {
 	FILE* fp = fopen(fileName, "r");
+
 	if (!fp)
 		return -1;
-	const int length = BUFSIZ;
-	char input[length];
-	std::string line;
-	while (fgets(input, length, fp)) {
+
+	char input[BUFSIZ];
+
+	while (fgets(input, BUFSIZ, fp)) {
 		input[strlen(input)-1] = '\0';
-		line = input;
-    fileContent.insert(line);
+		fileContent.insert(input);
   }
   fclose(fp);
   return 0;
@@ -362,15 +362,15 @@ int parseFile(std::set<std::string>& fileContent, const char* fileName)
 int parseFile(std::vector<std::string>& fileContent, const char* fileName)
 {
 	FILE* fp = fopen(fileName, "r");
+
 	if (!fp)
 		return -1;
-	const int length = BUFSIZ;
-	char input[length];
-	std::string line;
-	while (fgets(input, length, fp)) {
+
+	char input[BUFSIZ];
+
+	while (fgets(input, BUFSIZ, fp)) {
 		input[strlen(input)-1] = '\0';
-		line = input;
-		fileContent.push_back(line);
+		fileContent.push_back(input);
 	}
 	fclose(fp);
 	return 0;
@@ -380,13 +380,13 @@ int parseFile(std::string& Depends, const char* key, const char* fileName)
 	FILE* fp = fopen(fileName, "r" );
 	if (!fp)
 		return -1;
-	const int length = BUFSIZ;
-	char input[length];
+
+	char input[BUFSIZ];
 	std::string k = key;
 	std::string line;
 	std::string::size_type pos;
 	bool find_end = false;
-	while ( fgets( input, length, fp ) ) {
+	while ( fgets( input, BUFSIZ, fp ) ) {
 		line = stripWhiteSpace( input );
 		if ( find_end ) {
 			pos = line.find( ')' );
