@@ -31,30 +31,30 @@ void files::parse() {
         std::string s = i.depot + "/" + i.collection + PKG_REPO_FILES;
         repoFiles.clear();
         pkgFound = false;
-        if (parseFile(repoFiles,s.c_str()) !=0) {
-           std::cerr << "Cannot read the file: "
-                      << s
-                      << std::endl
-                      << "... continue with next"
-                      << std::endl;
-            continue;
-		}
-		for ( auto p : repoFiles) {
-			if (p[0] == '@') {
-                pos = p.find(pkgName);
+
+        // Checking file's access already done
+        FILE* fp = fopen (s.c_str(),"r");
+
+        std::string line(BUFSIZ,'\0');
+        char input[BUFSIZ];
+        while (fgets(input,BUFSIZ,fp)) {
+            input[strlen(input)-1] = '\0';
+            line = input;
+            if (line[0] == '@')  {
+                pos = line.find(pkgName);
 				if (pos != std::string::npos) {
 					pkgFound = true;
 					continue;
 				}
 			}
 			if (pkgFound) {
-				if (p.size() > 0) {
-					std::cout << p << std::endl;
+				if (line.size() > 0) {
+					std::cout << line << std::endl;
 				} else {
 					pkgFound = false;
 				}
 			}
-		}
+        }
     }
 }
 
