@@ -21,7 +21,6 @@ void files::parse() {
     std::string pkgName = "@" + m_argParser.otherArguments()[0] + ".cards-";
     std::string::size_type pos;
     bool pkgFound = false;
-    std::vector<std::string> repoFiles;
 
 
     cards::conf config(m_configFileName);
@@ -29,7 +28,6 @@ void files::parse() {
 
     for (auto i : config.dirUrl()) {
         std::string s = i.depot + "/" + i.collection + PKG_REPO_FILES;
-        repoFiles.clear();
         pkgFound = false;
 
         // Checking file's access already done
