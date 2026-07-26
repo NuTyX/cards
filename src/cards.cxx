@@ -8,6 +8,7 @@
 #include "info.h"
 #include "list.h"
 #include "files.h"
+#include "query.h"
 #include "install.h"
 #include "level.h"
 #include "pkginfo.h"
@@ -169,7 +170,7 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_SEARCH: {
-            cards::info info(cardsArgPars, configFile.c_str());
+            cards::info info(cardsArgPars, configFile);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_SYNC: {
@@ -202,7 +203,7 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_QUERY: {
-            cards::info info(cardsArgPars, configFile);
+            cards::query query(cardsArgPars, configFile);
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_INFO: {
