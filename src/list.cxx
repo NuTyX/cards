@@ -102,11 +102,10 @@ void list::parse() {
 			close(fd);
 			return;
 		}
-        
-        
-        const char *p = data;
+
+		const char *p = data;
 		const char *end = data + i.sRepo;
-        
+ 
         package pkg;
         pkg.col=" ";
 

@@ -22,9 +22,7 @@ void files::parse() {
     std::string::size_type pos;
     bool pkgFound = false;
 
-
     cards::conf config(m_configFileName);
-
 
     for (auto i : config.dirUrl()) {
         std::string s = i.depot + "/" + i.collection + PKG_REPO_FILES;
@@ -49,10 +47,12 @@ void files::parse() {
 				if (line.size() > 0) {
 					std::cout << line << std::endl;
 				} else {
-					pkgFound = false;
+					fclose(fp);
+					return;
 				}
 			}
         }
+        fclose(fp);
     }
 }
 

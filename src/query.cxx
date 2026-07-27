@@ -70,6 +70,7 @@ void query::parse() {
                 }
             }
         }
+        fclose(fp);
     }
     regfree(&preg);
     if (listOfFiles.size() > 1) {
