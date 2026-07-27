@@ -76,7 +76,7 @@ get_collections() {
 }
 get_filename() {
 	if [[ $1 =~ git$ ]]; then
-		echo "$PKGMK_SOURCE_DIR/$name-$version${PKGMK_GIT_EXT}"
+		echo "$PKGMK_SOURCE_DIR/$name${PKGMK_GIT_EXT}"
 	elif [[ $1 =~ ^(http|https|ftp|file)://.*/(.+) ]]; then
 		echo "$PKGMK_SOURCE_DIR/${BASH_REMATCH[2]}"
 	else
@@ -203,12 +203,9 @@ download_file() {
 				error "please install or add git in the dependencies."
 				exit ${E_DOWNLOAD}
 			fi
-			git clone $1 $name-$version
-			cd $name-$version
-			git checkout $version
-			cd -
-			bsdtar -a -cvf $PKGMK_SOURCE_DIR/$name-$version${PKGMK_GIT_EXT} $name-$version
-			rm -rf $name-$version
+			git clone $1 $name
+			bsdtar -cvf $PKGMK_SOURCE_DIR/$name${PKGMK_GIT_EXT} $name
+			rm -rf $name
 			return ;;
 		*)
 
@@ -293,6 +290,25 @@ download_source() {
 					exit ${E_DOWNLOAD}
 				fi
 			fi
+		else
+			case $LOCAL_FILENAME in
+				*${PKGMK_GIT_EXT})
+					if [ ! "`type -p git`" ]; then
+						error "please install or add git in the dependencies."
+						exit ${E_DOWNLOAD}
+					fi
+					make_work_dir
+					bsdtar -p -o -C $SRC -xf $LOCAL_FILENAME
+					cd $SRC/$name || abort_on_build
+					git switch -
+					git pull
+					git checkout $version
+					cd ..
+					bsdtar -cvf $PKGMK_SOURCE_DIR/$name${PKGMK_GIT_EXT} $name
+					rm -rf $name
+					return;;
+				*)
+			esac
 		fi
 	done
 }
