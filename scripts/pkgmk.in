@@ -29,7 +29,7 @@ error() {
 }
 abort_on_build() {
         error "$1"
-        exit ${E_BUILD}
+        exit $2
 }
 have_function() {
 	declare -f "$1" >/dev/null
@@ -290,25 +290,6 @@ download_source() {
 					exit ${E_DOWNLOAD}
 				fi
 			fi
-		else
-			case $LOCAL_FILENAME in
-				*${PKGMK_GIT_EXT})
-					if [ ! "`type -p git`" ]; then
-						error "please install or add git in the dependencies."
-						exit ${E_DOWNLOAD}
-					fi
-					make_work_dir
-					bsdtar -p -o -C $SRC -xf $LOCAL_FILENAME
-					cd $SRC/$name || abort_on_build
-					git switch -
-					git pull
-					git checkout $version
-					cd ..
-					bsdtar -cvf $PKGMK_SOURCE_DIR/$name${PKGMK_GIT_EXT} $name
-					rm -rf $name
-					return;;
-				*)
-			esac
 		fi
 	done
 }
@@ -330,7 +311,23 @@ unpack_source() {
 		case $LOCAL_FILENAME in
 			*.tar|*.tar.gz|*.tar.Z|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.txz|*.tar.lzma|*.zip|*.tar.zst|*.rpm|*.tar.lz|*.7z|*.deb)
 				if [ "$PKGMK_IGNORE_UNPACK" != "yes" ];then
-					COMMAND="bsdtar -p -o -C $SRC -xf $LOCAL_FILENAME"
+					case $LOCAL_FILENAME in
+						*${PKGMK_GIT_EXT})
+							if [ ! "`type -p git`" ]; then
+								error "please install or add git in the dependencies."
+								exit ${E_DOWNLOAD}
+							fi
+							bsdtar -p -o -C $SRC -xf $LOCAL_FILENAME
+							cd $SRC/$name
+							git switch -
+							git pull
+							git checkout $version
+							cd ..
+							bsdtar -cvf $PKGMK_SOURCE_DIR/$name${PKGMK_GIT_EXT} $name
+							COMMAND="mv $name $name-$version";;
+						*)
+							COMMAND="bsdtar -p -o -C $SRC -xf $LOCAL_FILENAME";;
+					esac
 				else
 					COMMAND="cp $LOCAL_FILENAME $SRC"
 				fi ;;
@@ -485,10 +482,8 @@ check_footprint() {
 	done
 }
 make_work_dir() {
-	export PKG="$PKGMK_WORK_DIR/pkg"
-	export SRC="$PKGMK_WORK_DIR/src"
-	pkgdir=$PKG
-	srcdir=$SRC
+	PKG="$PKGMK_WORK_DIR/pkg"
+	SRC="$PKGMK_WORK_DIR/src"
 	umask 022
 
 	cd $PKGMK_ROOT
@@ -919,6 +914,7 @@ build_package() {
 
 	check_file "$TARGET"
 	make_work_dir
+	download_source
 
 	if [ "$UID" != "0" ]; then
 		warning "Packages should be built as root."
@@ -1558,19 +1554,16 @@ main() {
 				fi
 				info "Package '$TARGET' is up to date."
 			else
-				download_source
 				BUILD_NEEDED="yes"
 				break
 			fi
 		done
 	else
 		FOUND=false
-		[ "$PKGMK_PACK_ONLY" == "yes" ] ||  download_source
 		BUILD_NEEDED="yes"
 	fi
 	if [ ! -z $FOUND ] ; then
 		if [ $FOUND != true ];  then
-			download_source
 			TARGET=$PKGMK_PACKAGE_DIR/${name}${PKGMK_PACKAGE_EXT}$version-$release
 			BUILD_NEEDED="yes"
 		fi
