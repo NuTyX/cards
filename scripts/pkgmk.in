@@ -317,11 +317,12 @@ unpack_source() {
 								error "please install or add git in the dependencies."
 								exit ${E_DOWNLOAD}
 							fi
+							[ -z $tag ] && tag=$version
 							bsdtar -p -o -C $SRC -xf $LOCAL_FILENAME
 							cd $SRC/$name
 							git switch -
 							git pull
-							git checkout $version
+							git checkout $tag
 							cd ..
 							bsdtar -cvf $PKGMK_SOURCE_DIR/$name${PKGMK_GIT_EXT} $name
 							COMMAND="mv $name $name-$version";;
