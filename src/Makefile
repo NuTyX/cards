@@ -53,6 +53,7 @@ CARDSOBJECTS =	pkg.o \
 	list.o \
 	files.o \
 	query.o \
+	search.o \
 	diff.o \
 	upgrade.o \
 	repo.o \
