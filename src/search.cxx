@@ -51,6 +51,7 @@ void search::parse(){
 			if (p[0] == '\n') {
 				m_listOfPackages.push_back(pkg);
 				pkg.group="";
+				pkg.description="";
 			} else {
 				size_t len = nl - p;
 				std::string found(p + 1, len - 1);
