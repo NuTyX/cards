@@ -539,6 +539,48 @@ void pkgrepo::parse()
         }
     }
 }
+void pkgrepo::parse(const std::string& packageNameFiles)
+{
+	cache info;
+	std::string pkgName;
+	bool pkgFound = false;
+	std::string::size_type pos;
+
+	for (auto i : m_config.dirUrl()) {
+        info.dirName(i.depot + "/" + i.collection);
+        std::string repoFile = info.dirName()
+            + PKG_REPO_FILES;
+		std::vector<std::string> repoFileContent;
+		if (parseFile(repoFileContent,repoFile.c_str()) != 0) {
+			std::cerr << "Cannot read the file: "
+                      << repoFile
+                      << std::endl
+                      << "... continue with next"
+                      << std::endl;
+			continue;
+		}
+
+		for ( auto p : repoFileContent) {
+			if (p[0] == '@') {
+                pos = p.find(".cards-");
+				if (pos != std::string::npos) {
+                    pkgName = p.substr(1,pos-1);
+					if (packageNameFiles == pkgName) {
+						pkgFound = true;
+						continue;
+					}
+				}
+			}
+			if (pkgFound) {
+				if (p.size() > 0) {
+					m_listOfPackages[pkgName].files.insert(p);
+				} else {
+					pkgFound = false;
+				}
+			}
+		}
+	}
+}
 std::set<std::pair<std::string, time_t>>
 pkgrepo::getPackageDependencies(const std::string& filename)
 {
@@ -939,10 +981,10 @@ std::set<std::string> pkgrepo::getLibs(const std::string& name)
 
     return m_listOfPackages[name].libs();
 }
-std::set<std::string>& pkgrepo::getListOfFiles(const std::string& name)
+std::set<std::string>& pkgrepo::getListOfFiles(const std::string& packageNameFiles)
 {
-    parse();
-    return m_listOfPackages[name].files;
+    parse(packageNameFiles);
+    return m_listOfPackages[packageNameFiles].files;
 }
 std::set<std::pair<std::string,time_t>>& pkgrepo::getDependenciesList(const std::string& name)
 {

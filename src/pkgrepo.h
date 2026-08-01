@@ -58,7 +58,16 @@ class pkgrepo {
                              m_dependenciesList;
 
     void                     treatErrors(const std::string& s) const;
+	/**
+	 * Parse all the packages info
+	 *
+	 */
     void                     parse();
+	/**
+	 * Parse all the files of a packageName
+	 *
+	 */
+    void                     parse(const std::string& packageNameFiles);
     void                     errors();
 
 public:
