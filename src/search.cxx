@@ -50,6 +50,7 @@ void search::parse(){
 
 			if (p[0] == '\n') {
 				m_listOfPackages.push_back(pkg);
+				pkg.group="";
 			} else {
 				size_t len = nl - p;
 				std::string found(p + 1, len - 1);
@@ -104,7 +105,6 @@ void search::list() {
 			if (dbh.checkPackageNameExist(j.name)) {
 				std::cout << GREEN;
 			}
-
 			std::cout << j.name
 					<< NORMAL
 					<< " " << j.version
@@ -125,7 +125,6 @@ void search::list() {
 			pos = convertToLowerCase(j.version).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 		if (pos != std::string::npos) {
 			if (j.group.size() > 0) {
-				found = false;
 				/*
 				 * TODO find a better algo
 				 */
