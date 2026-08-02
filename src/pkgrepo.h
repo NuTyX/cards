@@ -74,6 +74,11 @@ public:
     pkgrepo(const std::string& fileName);
     virtual ~pkgrepo() { ERR_free_strings(); }
 
+	/**
+	 * Parse all the files for all the packages
+	 *
+	 */
+    void                     parseFiles();
     void                     generateDependencies(const std::pair<std::string,time_t>& packageName);
     void                     generateDependencies();
     void                     generateDependencies(const std::string& packageName);

@@ -298,6 +298,7 @@ void create::run()
 void create::buildCollection()
 {
     checkBinaries();
+    m_pkgrepo.parseFiles();
     std::string ArchiveFile;
     for (auto i : m_pkgfile.getListOfPackagesFromCollection(m_argParser.otherArguments()[0])) {
         if (!m_pkgrepo.checkBinaryExist(i)) {
