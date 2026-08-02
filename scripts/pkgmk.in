@@ -491,29 +491,6 @@ make_work_dir() {
 	[ "$PKGMK_PACK_ONLY" == "yes" ] ||  rm -rf $PKGMK_WORK_DIR
 	mkdir -p $SRC $PKG
 }
-lib32() {
-	CFLAGS="${CFLAGS} -m32"
-	CXXFLAGS="${CXXFLAGS} -m32"
-	LDFLAGS="${LDFLAGS} -m32"
-	PKG_CONFIG_LIBDIR="/usr/lib32/pkgconfig"
-
-	cd $name-$version
-	./configure  --prefix=/usr \
-		--libdir=/usr/lib32
-	make
-	make DESTDIR=$PKG install
-}
-pack_lib32() {
-	local DIR
-	for DIR in usr/lib32 lib32; do
-		if [ -d $DIR ]; then
-			bsdtar -r -f \
-			$PKGMK_PACKAGE_DIR/${name}.${group}${PKGMK_PACKAGE_EXT}$version-$release \
-			$DIR || BUILD_SUCCESSFUL="no"
-			j=1
-		fi
-	done
-}
 pack_lib() {
 	local DIR SUBDIR
 	for DIR in usr opt/*; do
