@@ -87,6 +87,7 @@
 #define SIGNATURE 'I'
 #define SIZE 'i'
 #define CONFLICTS 'o'
+#define NLS 'n'
 
 
 #define PKG_REJECTED "var/lib/pkg/rejected"

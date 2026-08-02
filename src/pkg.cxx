@@ -99,6 +99,14 @@ const std::string& pkg::group()
 {
 	return m_group;
 }
+void pkg::nls(const std::string& nls)
+{
+	m_nls = nls;
+}
+const std::string& pkg::nls()
+{
+	return m_nls;
+}
 void pkg::sets(const std::set<std::string>& sets)
 {
 	m_sets = sets;

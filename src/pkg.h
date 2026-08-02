@@ -26,6 +26,7 @@ class pkg
 	std::set<std::string>   m_conflicts;
 
 	std::string				m_group;
+	std::string				m_nls;
 	std::string				m_baseName;
 	std::string				m_collection;
 	std::string 			m_arch;
@@ -52,6 +53,7 @@ public:
 	unsigned short int 		release();
 
 	const std::string&		group();
+	const std::string&		nls();
 	const std::string&		baseName();
 	const std::string&		collection();
 	const std::set<std::string>&    libs();
@@ -86,6 +88,7 @@ public:
 	void					collection(const std::string& collection);
 	void					baseName(const std::string& baseName);
 	void					group(const std::string& group);
+	void					nls(const std::string& nls);
 	void					arch(const std::string& arch);
 	void					license(const std::string& license);
 	void					signature(const std::string& signature);
