@@ -741,10 +741,29 @@ add_meta_files() {
 	done
 }
 add_meta_to_archive() {
-    local NAME TAR SPACE DESC URL CONT PACK MAINT GROUP LICENSE
+    local NAME TAR SPACE DESC URL CONT PACK MAINT GROUP NLS LICENSE G \
+    FOUND
+    FOUND="no"
     NAME="$(get_package_name $1)"
     GROUP="$(echo $NAME|cut -d "." -f2)"
-    [ "$GROUP" == "$NAME" ] && unset GROUP
+    if [ "$GROUP" == "$NAME" ]; then
+		unset GROUP
+		unset NLS
+		unset G
+	else
+		G="yes"
+		for i in ${PKGMK_GROUPS[@]}; do
+			info "$i $GROUP"
+			if [ "$GROUP" == "$i" ];then
+				FOUND="yes"
+				break
+			fi
+		done
+		if [ "$FOUND" != "yes" ]; then
+				NLS=$GROUP
+				unset GROUP
+		fi
+	fi
     info  "Adding meta data to Archive $NAME"
 
     TAR="$PKGMK_WORK_DIR/tar"
@@ -775,7 +794,7 @@ add_meta_to_archive() {
 	echo "c$COLLECTION" >> .META
 	echo "a$PKGMK_ARCH" >> .META
 
-	if [ -z "$GROUP" ]; then
+	if [ -z "$G" ]; then
 		echo "D$DESC" >> .META
 		echo "U$URL" >> .META
 		echo "C$CONT" >> .META
@@ -783,7 +802,13 @@ add_meta_to_archive() {
 		echo "P$PACK" >> .META
 		echo "L$LICENSE" >> .META
 	else
-		echo "g$GROUP" >> .META
+		if [ -z "$NLS" ]; then
+			echo "g$GROUP" >> .META
+			info "g$GROUP"
+		else
+			echo "n$NLS" >> .META
+			info "n$NLS"
+		fi
 	fi
 
 	if [ "$PKGMK_IGNORE_RUNTIMEDEPS" == "no" ];then
@@ -807,7 +832,7 @@ add_meta_to_archive() {
 				echo "R$rd$(pkginfo -b $rd)" >> .META
 			done
 		fi
-		if [ ! -z "$GROUP" ]; then
+		if [ ! -z "$G" ]; then
 			rds=("run_$GROUP[@]")
 			if [ ! -z "$(echo ${!rds})" ]; then
 				info "Adding runtime deps to Archive $NAME"
