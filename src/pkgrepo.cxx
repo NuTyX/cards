@@ -698,8 +698,10 @@ std::set<std::string>& pkgrepo::getListOfPackagesFromCollection(const std::strin
     parse();
 
     for (auto p : m_listOfPackages) {
-        if ((m_listOfPackages[p.first].collection() == name) && (m_listOfPackages[p.first].group() == "")) {
-            m_binaryCollectionList.insert(p.first);
+        if ((m_listOfPackages[p.first].collection() == name)
+			&& (m_listOfPackages[p.first].group() == "")
+			&& (m_listOfPackages[p.first].nls() == "")) {
+				m_binaryCollectionList.insert(p.first);
         }
     }
 

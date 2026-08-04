@@ -753,7 +753,6 @@ add_meta_to_archive() {
 	else
 		G="yes"
 		for i in ${PKGMK_GROUPS[@]}; do
-			info "$i $GROUP"
 			if [ "$GROUP" == "$i" ];then
 				FOUND="yes"
 				break
@@ -804,10 +803,8 @@ add_meta_to_archive() {
 	else
 		if [ -z "$NLS" ]; then
 			echo "g$GROUP" >> .META
-			info "g$GROUP"
 		else
 			echo "n$NLS" >> .META
-			info "n$NLS"
 		fi
 	fi
 
