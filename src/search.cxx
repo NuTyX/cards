@@ -21,12 +21,12 @@ void search::parse(){
 
     for (auto i : config.dirUrl()) {
         std::string s = i.depot + "/" + i.collection + PKG_REPO_META;
-    
+
         fd = open(s.c_str(),O_RDONLY);
 
 		char *data = static_cast<char*>
 			(mmap(nullptr, i.sRepo, PROT_READ, MAP_PRIVATE, fd, 0));
-        
+
         if (data == MAP_FAILED) {
 			perror("mmap");
             std::cerr << "Cannot read "
@@ -39,7 +39,7 @@ void search::parse(){
 
 		const char *p = data;
 		const char *end = data + i.sRepo;
- 
+
         package pkg;
         pkg.collection=" ";
 
@@ -52,6 +52,7 @@ void search::parse(){
 				m_listOfPackages.push_back(pkg);
 				pkg.group="";
 				pkg.description="";
+				pkg.nls="";
 			} else {
 				size_t len = nl - p;
 				std::string found(p + 1, len - 1);
@@ -79,6 +80,9 @@ void search::parse(){
 						break;
 					case GROUP:
 						pkg.group = found;
+						break;
+					case NLS:
+						pkg.nls = found;
 						break;
 				}
 			}
@@ -125,20 +129,8 @@ void search::list() {
 		if  (pos == std::string::npos)
 			pos = convertToLowerCase(j.version).find(convertToLowerCase(m_argParser.otherArguments()[0]));
 		if (pos != std::string::npos) {
-			if (j.group.size() > 0) {
-				/*
-				 * TODO find a better algo
-				 */
-				if (j.group == "devel")
-					found = true;
-				if (j.group == "man")
-					found = true;
-				if (j.group == "service")
-					found = true;
-				if (j.group == "lib")
-					found = true;
-				if (j.group == "doc")
-					found = true;
+			if (j.nls.size() > 0) {
+				found = false;
 			} else {
 				found = true;
 			}

@@ -21,6 +21,7 @@ class search {
 		std::string url;
 		std::string packager;
 		std::string group;
+		std::string nls;
 	};
 
     const CardsArgumentParser& m_argParser;
@@ -33,7 +34,7 @@ class search {
     public:
         /**
          * Default constructor
-         * 
+         *
          * \param argParser CardsArgumentParser type
          * \param configFileName Specify the configuration file name to use
          */
@@ -42,3 +43,4 @@ class search {
 };
 
 } // cards namespace
+
