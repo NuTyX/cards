@@ -212,7 +212,8 @@ void create::installDependencies(std::string& packageName)
             for (auto packageFile : m_pkgrepo.getListOfPackagesFromGroup(i)) {
                 archive packageArchive(packageFile);
 
-                if (packageArchive.group().empty()) {
+                if ((packageArchive.group().empty())
+					&& packageArchive.nls().empty()) {
                     if (!checkPackageNameExist(packageArchive.name())) {
                         commandName = "ADD: ";
                         message = commandName + packageFile;
