@@ -89,6 +89,7 @@ public:
 
 	std::string name();
 	std::string group();
+	std::string nls();
 
 	// return the name + epochvalue
 	std::string namebuildn();

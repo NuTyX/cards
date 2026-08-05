@@ -296,6 +296,16 @@ std::string archive::group()
     }
     return "";
 }
+std::string archive::nls()
+{
+    for (auto s : m_contentMeta) {
+        if (s[0] == NLS) {
+            return s.substr(1);
+            break;
+        }
+    }
+    return "";
+}
 std::string archive::maintainer()
 {
     for (auto s : m_contentMeta) {
