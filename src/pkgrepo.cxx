@@ -683,9 +683,10 @@ std::set<std::string>& pkgrepo::getListOfPackagesFromSet(const std::string& name
 
     for (auto p : m_listOfPackages) {
         for (auto s : m_listOfPackages[p.first].sets()) {
-            if ((s == name) && (p.second.group() == "")) {
-                m_binarySetList.insert(p.first);
-                break;
+            if ((s == name) && (p.second.group() == "")
+			&& (p.second.nls() == "")) {
+				m_binarySetList.insert(p.first);
+				break;
             }
         }
     }
