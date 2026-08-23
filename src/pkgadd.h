@@ -6,7 +6,7 @@
 #pragma once
 
 #include "pkgdbh.h"
-
+#include "state.h"
 /**
  * \brief pkgadd class
  *

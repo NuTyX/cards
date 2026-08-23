@@ -153,6 +153,17 @@ void pkgadd::postRun()
 		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_END);
 		removeFile(m_root,PKG_POST_INSTALL);
 	}
+	if (checkFileExist(PKG_POST_INSTALL_LUA))
+	{
+		if ( ! m_runPrePost) {
+			removeFile(m_root,PKG_POST_INSTALL_LUA);
+			return;
+		}
+		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_START);
+		state(PKG_POST_INSTALL_LUA);
+		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_END);
+		removeFile(m_root,PKG_POST_INSTALL_LUA);
+	}
 }
 void pkgadd::printHelp() const
 {

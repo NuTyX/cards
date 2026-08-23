@@ -4,6 +4,7 @@
 //  Copyright (c) 2013 - .... by NuTyX team (https://nutyx.org)
 
 #include "pkgdbh.h"
+#include "state.h"
 
 using __gnu_cxx::stdio_filebuf;
 
