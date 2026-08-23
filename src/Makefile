@@ -5,7 +5,8 @@
 
 include ../Makefile.inc
 
-TOOLSOBJECTS =	pkg.o \
+TOOLSOBJECTS =	state.o \
+	pkg.o \
 	db.o \
 	cache.o \
 	system_utils.o \
@@ -21,7 +22,8 @@ TOOLSOBJECTS =	pkg.o \
 	pkginfo.o \
 	tools.o
 
-CARDSOBJECTS =	pkg.o \
+CARDSOBJECTS =	state.o \
+	pkg.o \
 	db.o \
 	system_utils.o \
 	string_utils.o \
@@ -59,7 +61,8 @@ CARDSOBJECTS =	pkg.o \
 	repo.o \
 	cards.o
 
-LIBOBJECTS =  pkg.o \
+LIBOBJECTS =  state.o \
+	pkg.o \
 	db.o \
 	cache.o \
 	system_utils.o \
@@ -88,7 +91,8 @@ WEBOBJECTS = pkg.o \
 	webrepo.o \
 	webcards.o
 
-HEADERS = pkg.h \
+HEADERS = state.h \
+	pkg.h \
 	db.h  \
 	define.h \
 	enum.h \
@@ -149,11 +153,11 @@ conf:
 	sed -e "s/#ARCH#/`uname -m`/" cards.conf.in > cards.conf
 
 pkgadd: .tools_depend $(TOOLSOBJECTS)
-	$(CXX) -g $(TOOLSOBJECTS) -o $@ -static $(LIBARCHIVELIBS) 
+	$(CXX) -g $(TOOLSOBJECTS) -o $@ -static $(LIBARCHIVELIBS) $(LIBLUA)
 	echo "$@ is ready"
 
 cards:  .cards_depend $(CARDSOBJECTS)
-	$(CXX) -g $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
+	$(CXX) -g $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS) $(LIBLUA)
 	echo "$@ is ready"
 
 .libs_depend:
