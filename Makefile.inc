@@ -40,7 +40,7 @@ CFLAGS += -D_GNU_SOURCE
 
 LIBARCHIVELIBS := $(shell pkg-config --libs --static libarchive)
 LIBCURLLIBS := $(shell pkg-config --libs --static libcurl)
-
+LIBLUA := $(shell pkg-config --libs --static lua)
 LIBMYSQLCLIENT := -lmysqlclient
 
 LDFLAGS += $(LIBARCHIVELIBS)
