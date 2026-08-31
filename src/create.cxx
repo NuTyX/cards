@@ -125,13 +125,11 @@ void create::base()
 }
 bool create::isACollection()
 {
-    DIR* d;
-    struct dirent* dir;
-    d = opendir(m_argParser.otherArguments()[0].c_str());
-    if (d)
-        return true;
+    struct stat st;
+    if (stat(m_argParser.otherArguments()[0].c_str(),&st) != 0)
+        return false;
 
-    return false;
+    return S_ISDIR(st.st_mode);
 }
 void create::parseArguments()
 {
