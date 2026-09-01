@@ -354,7 +354,7 @@ get_packages_list() {
 	FILTER=${PKGMK_PACKAGE_EXT##*.}
 	i=0
 	unset TARGETS
-	for FILE in $(find $PKGMK_PACKAGE_DIR -name "$name.*${FILTER}*"); do
+	for FILE in $(find -L $PKGMK_PACKAGE_DIR -name "$name.*${FILTER}*"); do
 		TARGETS[i]="$(basename $FILE)"
 		i=$((i+1))
 	done
