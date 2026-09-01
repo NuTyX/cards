@@ -366,7 +366,7 @@ remove_all() {
 		! mountpoint -q ${FOLDER} || continue
 		sudo rm -r $FOLDER || exit 1
 	done
-	for f in "$(find $ROOT/${VERSION}/${COLLECTION}/)"; do
+	for f in "$(find -L $ROOT/${VERSION}/${COLLECTION}/)"; do
 		[ "$f" == "$ROOT/${VERSION}/${COLLECTION}/" ] && break
         rm -i $f
 	done
@@ -464,7 +464,7 @@ find_collection () {
   done
   [ -z $COLLECTION ] || return
 
-  COLLECTION="$(find . -type d -name ${PARAM[0]})"
+  COLLECTION="$(find -L . -type d -name ${PARAM[0]})"
   [ -z $COLLECTION ] || COLLECTION=$(basename $COLLECTION)
   [ -z $COLLECTION ] || unset PARAM
 }
@@ -494,7 +494,7 @@ PKGMK_IGNORE_RUNTIMEDEPS="no"'
 PKGMK_LOCALES=($PKGMK_LOCALES)
 PKGMK_KEEP_SOURCES=\"$PKGMK_KEEP_SOURCES\"
 PKGMK_WORK_DIR=\"$PKGMK_WORK_DIR\"
-PKGMK_PACKAGE_DIR=\"/DEPOT/$COLLECTION\"
+PKGMK_PACKAGE_DIR=\"/DEPOT/$VERSION/$COLLECTION\"
 PKGMK_GROUPS=($PKGMK_GROUPS)
 PKGMK_COMPRESSION_OPTS=\"$PKGMK_COMPRESSION_OPTS\"
 PKGMK_COMPRESS_PACKAGE=\"$PKGMK_COMPRESS_PACKAGE\"
@@ -503,7 +503,7 @@ PKGMK_COMPRESSION_MODE=\"$PKGMK_COMPRESSION_MODE\""
 setup_cards_conf() {
   CARDS_CONF="group devel
 group lib
-depot /DEPOT"
+depot /DEPOT/$VERSION"
   FOUND="no"
   MYCOLLECTION="${COLLECTION%-extra}"
   for i in "${COLLECTIONS[@]}"
@@ -553,7 +553,6 @@ fi
 [ -z "$EDITOR" ] && EDITOR="vi"
 [ -z "$COLLECTIONS" ] && COLLECTIONS=(gui cli base)
 [ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
-
 GIT_PROJ=$(pwd)
 GIT="mybld/$(basename $GIT_PROJ)"
 CLEANUP="no"
@@ -742,7 +741,7 @@ $CARDS_CONF
               DEVEL: $DEVEL
           ROOTMOUNT: $ROOTMOUNT
 running the command: sudo KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" \
-DEPOT=\"/DEPOT\" DEVEL=\"$DEVEL\" install-nutyx $QUIET
+DEPOT=\"$DEPOT/$VERSION\" DEVEL=\"$DEVEL\" install-nutyx $QUIET
 "
 fi
 if [ -z "$PACKAGES_LIST" ]; then
@@ -887,12 +886,12 @@ fi
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error "cannot create $ROOT/${VERSION}/${COLLECTION}/DEPOT  directory"
 if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
-  sudo mount --bind ${ROOTMOUNT}/$(uname -m)/${VERSION} $ROOT/${VERSION}/${COLLECTION}/DEPOT || \
-  error "mounting ${ROOTMOUNT}/$(uname -m)/${VERSION}"
+  sudo mount --bind ${ROOTMOUNT}/$(uname -m) $ROOT/${VERSION}/${COLLECTION}/DEPOT || \
+  error "mounting ${ROOTMOUNT}/$(uname -m)"
   if [ -z "${PARAM[0]}" ]; then
-     if [ ! -f $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.REPO ]; then
-        sudo mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}
-        sudo touch $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.REPO
+     if [ ! -f $ROOT/${VERSION}/${COLLECTION}/DEPOT/$VERSION/${COLLECTION}/.REPO ]; then
+        sudo mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT/$VERSION/${COLLECTION}
+        sudo touch    $ROOT/${VERSION}/${COLLECTION}/DEPOT/$VERSION/${COLLECTION}/.REPO
      fi
   fi
 else
@@ -925,8 +924,8 @@ error "mounting ${GIT_PROJ}"
 
 MOUNT_POINTS="$MOUNT_POINTS $GIT"
 
-sudo KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" install-nutyx $QUIET|| \
-error "sudo KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" DEPOT=\"/DEPOT\" DEVEL=\"$DEVEL\" install-nutyx $QUIET"
+sudo KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT/$VERSION" DEVEL="$DEVEL" install-nutyx $QUIET|| \
+error "sudo KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" DEPOT=\"/DEPOT/$VERSION\" DEVEL=\"$DEVEL\" install-nutyx $QUIET"
 
 umount_all
 remove_all "/${VERSION}/${COLLECTION}"
