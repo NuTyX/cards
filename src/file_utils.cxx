@@ -247,8 +247,8 @@ int findDir(std::set<std::string>& filesList, const std::string& path)
   {
     while ((dir = readdir(d)) != nullptr)
     {
-			if ( dir->d_name[0] != '.' ) { // ignore any .directories
-        	filesList.insert(dir->d_name);
+	if ( dir->d_name[0] != '.' ) { // ignore any .directories
+	filesList.insert(dir->d_name);
       }
     }
     closedir(d);
