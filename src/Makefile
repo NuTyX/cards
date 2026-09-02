@@ -157,7 +157,7 @@ pkgadd: .tools_depend $(TOOLSOBJECTS)
 	echo "$@ is ready"
 
 cards:  .cards_depend $(CARDSOBJECTS)
-	$(CXX) -g $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS) $(LIBLUA)
+	$(CXX) -g $(CARDSOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS)
 	echo "$@ is ready"
 
 .libs_depend:

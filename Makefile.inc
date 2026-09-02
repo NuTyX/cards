@@ -43,7 +43,7 @@ LIBCURLLIBS := $(shell pkg-config --libs --static libcurl)
 LIBLUA := $(shell pkg-config --libs --static lua)
 LIBMYSQLCLIENT := -lmysqlclient
 
-LDFLAGS += $(LIBARCHIVELIBS)
+LDFLAGS += $(LIBARCHIVELIBS) -Wl,-Bstatic -llua -Wl,-Bdynamic
 
 .SUFFIXES:	.cpp .cc .cxx .c
 
