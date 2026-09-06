@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
+#include "state.h"
 #include "create.h"
 #include "dependent.h"
 #include "depends.h"
@@ -165,6 +166,9 @@ int main(int argc, char** argv)
                      << config.logdir() << endl;
             }
             return EXIT_SUCCESS;
+        }
+        case ArgParser::CMD_LUA: {
+            return state(cardsArgPars.otherArguments()[0].c_str());
         }
         case ArgParser::CMD_FILES: {
             cards::files files(cardsArgPars, configFile);

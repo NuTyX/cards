@@ -48,6 +48,7 @@ public:
         enum CMD {
             CMD_HELP = 1,
             CMD_CONFIG,
+            CMD_LUA,
             CMD_INSTALL,
             CMD_REMOVE,
             CMD_FILES,

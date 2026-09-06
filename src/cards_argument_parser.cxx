@@ -45,6 +45,11 @@ CardsArgumentParser::CardsArgumentParser()
 The locale which are going to be installed, the architecture of your machine."),
         ArgParser::NONE, 0, "");
 
+    addCommand(CMD_LUA, "lua",
+        _("The lua interpreter."),
+        _("A lua script can be tested before integrated into a package."),
+        ArgParser::EQ, 1, "<script name>");
+
     addCommand(CMD_FILES, "files",
         _("list the file(s) of the <package>."),
         "",

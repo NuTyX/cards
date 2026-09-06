@@ -237,6 +237,9 @@ msgstr "Paquet"
 msgid "<package>"
 msgstr "<paquet>"
 
+msgid "<script name>"
+msgstr "<nom du script>"
+
 msgid "Packages"
 msgstr "Paquets"
 
@@ -628,6 +631,12 @@ msgstr "affiche tous les détails d'un paquet tel que la version, la taille, la 
 
 msgid "list all packages."
 msgstr "affiche une liste de tous les paquets"
+
+msgid "The lua interpreter."
+msgstr "L'interpreteur lua."
+
+msgid "A lua script can be tested before integrated into a package."
+msgstr "Un script lua peut-être testé avant d'être intégré dans un paquet."
 
 msgid "It will list available packages."
 msgstr "Affiche une liste de tous les paquets disponibles."
