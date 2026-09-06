@@ -668,6 +668,10 @@ void pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 		metaFilesList.insert(PKG_PRE_REMOVE);
 	if (checkFileExist(m_root + PKG_POST_REMOVE))
 		metaFilesList.insert(PKG_POST_REMOVE);
+	if (checkFileExist(m_root + PKG_PRE_REMOVE_LUA))
+		metaFilesList.insert(PKG_PRE_REMOVE_LUA);
+	if (checkFileExist(m_root + PKG_POST_REMOVE_LUA))
+		metaFilesList.insert(PKG_POST_REMOVE_LUA);
 
 	metaFilesList.insert(METAFILE);
 	std::set<std::string> fileContent;
@@ -688,6 +692,12 @@ void pkgdbh::moveMetaFilesPackage(const std::string& name, cards::db& info)
 			treatErrors( i + " to " + file);
 		}
 		if ( i == PKG_POST_INSTALL ) {
+			if (copyFile(i.c_str(), file.c_str()) == -1) {
+				m_actualError = cards::ERROR_ENUM_CANNOT_COPY_FILE;
+				treatErrors( file  + " to " + i);
+			}
+		}
+		if ( i == PKG_POST_INSTALL_LUA ) {
 			if (copyFile(i.c_str(), file.c_str()) == -1) {
 				m_actualError = cards::ERROR_ENUM_CANNOT_COPY_FILE;
 				treatErrors( file  + " to " + i);
@@ -1198,7 +1208,7 @@ void pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 		ARCHIVE_OK; ++m_installedFilesNumber)
 	{
 		const char *archive_filename = archive_entry_pathname(entry);
-		if ( strcmp(archive_filename,PKG_PRE_INSTALL) == 0)
+		if (strcmp(archive_filename,PKG_PRE_INSTALL_LUA) == 0)
 		{
 			unsigned int flags = ARCHIVE_EXTRACT_OWNER | ARCHIVE_EXTRACT_PERM | ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_UNLINK;
 			if (archive_read_extract(archive, entry, flags) != ARCHIVE_OK)
@@ -1211,11 +1221,30 @@ void pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 				exit(EXIT_FAILURE);
 			}
 			break;
-
 		}
-
+		if (strcmp(archive_filename,PKG_PRE_INSTALL) == 0)
+		{
+			unsigned int flags = ARCHIVE_EXTRACT_OWNER | ARCHIVE_EXTRACT_PERM | ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_UNLINK;
+			if (archive_read_extract(archive, entry, flags) != ARCHIVE_OK)
+			{
+				const char* msg = archive_error_string(archive);
+				std::cerr << m_utilName
+					<< _(": could not install ")
+					<< archive_filename
+					<< " : " << msg << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			break;
+		}
 	}
 	FREE_ARCHIVE(archive);
+	if (checkFileNameExist(PKG_PRE_INSTALL_LUA))
+	{
+		progressInfo(cards::ACTION_ENUM_PKG_PREINSTALL_START);
+		state(PKG_PRE_INSTALL_LUA);
+		removeFile(m_root,PKG_PRE_INSTALL_LUA);
+		progressInfo(cards::ACTION_ENUM_PKG_PREINSTALL_END);
+	}
 	if (checkFileExist(PKG_PRE_INSTALL))
 	{
 		progressInfo(cards::ACTION_ENUM_PKG_PREINSTALL_START);

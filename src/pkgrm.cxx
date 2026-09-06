@@ -45,7 +45,14 @@ void pkgrm::getDirectDependencies(std::string& name)
 }
 void pkgrm::preRun()
 {
-	std::string s = m_root + PKG_DB_DIR + m_packageName + PKG_PRE;
+	std::string s = m_root + PKG_DB_DIR + m_packageName + PKG_PRE_LUA;
+	if (checkFileExist(s))
+	{
+		progressInfo(cards::ACTION_ENUM_PKG_PREREMOVE_START);
+		state(s.c_str());
+		progressInfo(cards::ACTION_ENUM_PKG_PREREMOVE_END);
+	}
+	s = m_root + PKG_DB_DIR + m_packageName + PKG_PRE;
 	if (checkFileExist(s))
 	{
 		progressInfo(cards::ACTION_ENUM_PKG_PREREMOVE_START);
@@ -79,7 +86,7 @@ void pkgrm::run()
 	// Remove the files on hd
 	removePackageFiles(m_packageName);
 
-	if ( m_runPrePost)
+	if (m_runPrePost)
 		postRun();
 
 	// Remove metadata about the package removed
@@ -87,7 +94,17 @@ void pkgrm::run()
 }
 void pkgrm::postRun()
 {
-	std::string s = m_root + PKG_DB_DIR + m_packageName + PKG_POST;
+	std::string s = m_root + PKG_DB_DIR + m_packageName + PKG_POST_LUA;
+	if (checkFileExist(s))
+	{
+		if ( ! m_runPrePost) {
+			return;
+		}
+		progressInfo(cards::ACTION_ENUM_PKG_POSTREMOVE_START);
+		state(s.c_str());
+		progressInfo(cards::ACTION_ENUM_PKG_POSTREMOVE_END);
+	}
+	s = m_root + PKG_DB_DIR + m_packageName + PKG_POST;
 	if (checkFileExist(s))
 	{
 		if ( ! m_runPrePost) {

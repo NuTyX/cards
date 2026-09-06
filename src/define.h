@@ -49,11 +49,13 @@
 
 #define PKG_DB_DIR "var/lib/pkg/DB/"
 
-// Followiin 4 files are part of DB
+// Following 6 files can be part of DB
 #define PKG_FILES "/files"
 #define PKG_META "/META"
 #define PKG_PRE "/PRER"    //pre-remove script
 #define PKG_POST "/POSTR"  // post-remove schript
+#define PKG_PRE_LUA "/PRERL"    //pre-remove lua script
+#define PKG_POST_LUA "/POSTRL"  // post-remove lua schript
 
 #define PKG_RECEPT "/Pkgfile"
 #define PKG_REPO_META "/.REPO"
@@ -63,7 +65,9 @@
 #define PKG_POST_INSTALL ".POST"
 #define PKG_POST_INSTALL_LUA ".POSTL"
 #define PKG_PRE_REMOVE ".PRER"
+#define PKG_PRE_REMOVE_LUA ".PRERL"
 #define PKG_POST_REMOVE ".POSTR"
+#define PKG_POST_REMOVE_LUA ".POSTRL"
 
 // Package Attributes
 #define NAME 'N'

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "pkgdbh.h"
+#include "state.h"
 
 class pkgrm : public pkgdbh {
 
