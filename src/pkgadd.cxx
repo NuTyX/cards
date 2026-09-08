@@ -160,7 +160,7 @@ void pkgadd::postRun()
 			return;
 		}
 		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_START);
-		state(PKG_POST_INSTALL_LUA);
+		cards::state(PKG_POST_INSTALL_LUA);
 		progressInfo(cards::ACTION_ENUM_PKG_POSTINSTALL_END);
 		removeFile(m_root,PKG_POST_INSTALL_LUA);
 	}

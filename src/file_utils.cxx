@@ -198,6 +198,48 @@ void cleanupMetaFiles(const std::string& basedir)
 #endif
 		removeFile ( basedir , "/.POST");
 	}
+	if ( checkFileExist ( basedir + "/.PREL" ) ) {
+#ifdef DEBUG
+		std::cerr << basedir << "/.PREL removed" << std::endl;
+#endif
+		removeFile ( basedir, "/.PREL");
+	}
+	if ( checkFileExist ( basedir + "/.POSTL" ) ) {
+#ifdef DEBUG
+		std::cerr << basedir << "/.POSTL removed" << std::endl;
+#endif
+		removeFile ( basedir , "/.POSTL");
+	}
+	if ( checkFileExist ( basedir + "/.POSTR" ) ) {
+#ifdef DEBUG
+		std::cerr << basedir << "/.POSTR removed" << std::endl;
+#endif
+		removeFile ( basedir , "/.POSTR");
+	}
+	if ( checkFileExist ( basedir + "/.PRER" ) ) {
+#ifdef DEBUG
+		std::cerr << basedir << "/.PRER removed" << std::endl;
+#endif
+		removeFile ( basedir, "/.PRER");
+	}
+	if ( checkFileExist ( basedir + "/.PRERL" ) ) {
+#ifdef DEBUG
+		std::cerr << basedir << "/.PRERL removed" << std::endl;
+#endif
+		removeFile ( basedir, "/.PRERL");
+	}
+	if ( checkFileExist ( basedir + "/.POSTRL" ) ) {
+#ifdef DEBUG
+		std::cerr << basedir << "/.POSTRL removed" << std::endl;
+#endif
+		removeFile ( basedir , "/.POSTRL");
+	}
+	if ( checkFileExist ( basedir + "/.POSTL" ) ) {
+#ifdef DEBUG
+		std::cerr << basedir << "/.POSTL removed" << std::endl;
+#endif
+		removeFile ( basedir , "/.POSTL");
+	}
 	if ( checkFileExist ( basedir + "/.MTREE" ) ) {
 #ifdef DEBUG
 		std::cerr << basedir << "/.MTREE removed" << std::endl;
@@ -222,16 +264,32 @@ void removeFile(const std::string& basedir, const std::string& filename)
 int copyFile( const char *  destFile, const char *  origFile)
 {
 	FILE * infile  = fopen(origFile,  "rb");
+	if (!infile)
+		return -1;
+
 	FILE * outfile = fopen(destFile, "wb");
-
-	char buffer[BUFSIZ];
-
-	while (!feof(infile)) {
-		int n = fread(buffer, 1, BUFSIZ, infile);
-		fwrite(buffer, 1, n, outfile);
+	if (!outfile) {
+		fclose(infile);
+		return -1;
 	}
 
-	fflush(outfile);
+	char buffer[BUFSIZ];
+	size_t n;
+
+	while ((n = fread(buffer, 1, sizeof(buffer), infile)) > 0) {
+		if (fwrite(buffer, 1, n, outfile) != n) {
+			fclose(infile);
+			fclose(outfile);
+			return -1;
+		}
+	}
+
+	if(ferror(infile)) {
+		fclose(infile);
+		fclose(outfile);
+		return -1;
+	}
+
 
 	fclose(infile);
 	fclose(outfile);

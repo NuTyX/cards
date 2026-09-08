@@ -49,7 +49,7 @@ void pkgrm::preRun()
 	if (checkFileExist(s))
 	{
 		progressInfo(cards::ACTION_ENUM_PKG_PREREMOVE_START);
-		state(s.c_str());
+		cards::state(s.c_str());
 		progressInfo(cards::ACTION_ENUM_PKG_PREREMOVE_END);
 	}
 	s = m_root + PKG_DB_DIR + m_packageName + PKG_PRE;
@@ -101,7 +101,7 @@ void pkgrm::postRun()
 			return;
 		}
 		progressInfo(cards::ACTION_ENUM_PKG_POSTREMOVE_START);
-		state(s.c_str());
+		cards::state(s.c_str());
 		progressInfo(cards::ACTION_ENUM_PKG_POSTREMOVE_END);
 	}
 	s = m_root + PKG_DB_DIR + m_packageName + PKG_POST;

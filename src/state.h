@@ -1,13 +1,8 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-#ifdef __cplusplus
-}
-#endif
+#include "lua.h"
+namespace cards {
 
 int state(const char *fileName);
+
+} // cards namespace

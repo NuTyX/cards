@@ -1241,7 +1241,7 @@ void pkgdbh::extractAndRunPREfromPackage(const std::string& filename)
 	if (checkFileNameExist(PKG_PRE_INSTALL_LUA))
 	{
 		progressInfo(cards::ACTION_ENUM_PKG_PREINSTALL_START);
-		state(PKG_PRE_INSTALL_LUA);
+		cards::state(PKG_PRE_INSTALL_LUA);
 		removeFile(m_root,PKG_PRE_INSTALL_LUA);
 		progressInfo(cards::ACTION_ENUM_PKG_PREINSTALL_END);
 	}

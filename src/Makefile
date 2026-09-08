@@ -5,7 +5,8 @@
 
 include ../Makefile.inc
 
-TOOLSOBJECTS =	state.o \
+TOOLSOBJECTS =	lua.o \
+	state.o \
 	pkg.o \
 	db.o \
 	cache.o \
@@ -22,7 +23,8 @@ TOOLSOBJECTS =	state.o \
 	pkginfo.o \
 	tools.o
 
-CARDSOBJECTS =	state.o \
+CARDSOBJECTS =	lua.o \
+	state.o \
 	pkg.o \
 	db.o \
 	system_utils.o \
@@ -61,7 +63,8 @@ CARDSOBJECTS =	state.o \
 	repo.o \
 	cards.o
 
-LIBOBJECTS =  state.o \
+LIBOBJECTS =  lua.o \
+	state.o \
 	pkg.o \
 	db.o \
 	cache.o \
@@ -91,7 +94,8 @@ WEBOBJECTS = pkg.o \
 	webrepo.o \
 	webcards.o
 
-HEADERS = state.h \
+HEADERS = lua.h  \
+	state.h \
 	pkg.h \
 	db.h  \
 	define.h \

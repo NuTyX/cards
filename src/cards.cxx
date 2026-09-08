@@ -168,7 +168,7 @@ int main(int argc, char** argv)
             return EXIT_SUCCESS;
         }
         case ArgParser::CMD_LUA: {
-            return state(cardsArgPars.otherArguments()[0].c_str());
+            return cards::state(cardsArgPars.otherArguments()[0].c_str());
         }
         case ArgParser::CMD_FILES: {
             cards::files files(cardsArgPars, configFile);

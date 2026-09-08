@@ -1,4 +1,5 @@
 #include "state.h"
+namespace cards {
 
 int state(const char* fileName)
 {
@@ -8,6 +9,8 @@ int state(const char* fileName)
         return 1;
 
     luaL_openlibs(L);
+
+    luaRegister(L);
 
     int result = luaL_dofile(L, fileName);
 
@@ -21,3 +24,5 @@ int state(const char* fileName)
 
     return result;
 }
+
+} // cards namespace
