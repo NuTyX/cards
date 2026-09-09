@@ -724,11 +724,11 @@ add_meta_files() {
 	local NAME
 	NAME="$(get_package_name $1)"
 	cd $PKG
-	if [ -f $PKGMK_ROOT/${NAME}.pre-install-lua ]; then
-		cp $PKGMK_ROOT/${NAME}.pre-install-lua .PREL
+	if [ -f $PKGMK_ROOT/${NAME}.pre-install.lua ]; then
+		cp $PKGMK_ROOT/${NAME}.pre-install.lua .PREL
 	fi
-	if [ -f $PKGMK_ROOT/${NAME}.post-install-lua ]; then
-		cp $PKGMK_ROOT/${NAME}.post-install-lua .POSTL
+	if [ -f $PKGMK_ROOT/${NAME}.post-install.lua ]; then
+		cp $PKGMK_ROOT/${NAME}.post-install.lua .POSTL
 	fi
 	if [ -f $PKGMK_ROOT/${NAME}.pre-install ]; then
 		cp $PKGMK_ROOT/${NAME}.pre-install .PRE
@@ -736,11 +736,11 @@ add_meta_files() {
 	if [ -f $PKGMK_ROOT/${NAME}.post-install ]; then
 		cp $PKGMK_ROOT/${NAME}.post-install .POST
 	fi
-	if [ -f $PKGMK_ROOT/${NAME}.pre-remove-lua ]; then
-		cp $PKGMK_ROOT/${NAME}.pre-remove-lua .PRERL
+	if [ -f $PKGMK_ROOT/${NAME}.pre-remove.lua ]; then
+		cp $PKGMK_ROOT/${NAME}.pre-remove.lua .PRERL
 	fi
-	if [ -f $PKGMK_ROOT/${NAME}.post-remove-lua ]; then
-		cp $PKGMK_ROOT/${NAME}.post-remove-lua .POSTRL
+	if [ -f $PKGMK_ROOT/${NAME}.post-remove.lua ]; then
+		cp $PKGMK_ROOT/${NAME}.post-remove.lua .POSTRL
 	fi
 	if [ -f $PKGMK_ROOT/${NAME}.pre-remove ]; then
 		cp $PKGMK_ROOT/${NAME}.pre-remove .PRER
