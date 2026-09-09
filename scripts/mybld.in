@@ -405,7 +405,7 @@ find_new_packager () {
 }
 find_set () {
   local i=0 c n set s
-  for c in base cli cli-extra gui gui-extra
+  for c in $(find . -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n')
   do
      for n in $c/*/Pkgfile
      do
@@ -427,8 +427,7 @@ find_set () {
 }
 find_version () {
   local i=0 p c n version
-  #TODO consider 'mycollection' 'mycollection-extra' if exists
-  for c in base cli cli-extra gui gui-extra
+  for c in $(find . -mindepth 1 -maxdepth 1 -type d ! -name '.*' -printf '%f\n')
   do
      for n in $c/*/Pkgfile
      do
