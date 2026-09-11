@@ -100,6 +100,8 @@
 #define PKGADD_CONF "var/lib/pkg/pkgadd.conf"
 #define PKGADD_CONF_MAXLINE 1024
 
+#define DEPMOD "usr/bin/depmod"
+#define DEPMOD_ARGS "-a "
 #define LDCONFIG "usr/bin/ldconfig"
 #define LDCONFIG_CONF "etc/ld.so.conf"
 #define LDCONFIG_CONF_ARGS "-r "

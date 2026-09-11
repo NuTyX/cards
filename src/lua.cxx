@@ -45,20 +45,33 @@ static int fsRm(lua_State *L)
 
     return 0;
 }
+static int depmod(lua_State *L)
+{
+    const char *version = luaL_checkstring(L, 1);
 
+    process p(DEPMOD, std::string(DEPMOD_ARGS) + version, 0);
+    return p.execute();
+}
 static const luaL_Reg fs[] = {
     { "ln", fsLn },
     { "cp", fsCp },
     { "rm", fsRm },
-	{ "mv", fsMv },
+    { "mv", fsMv },
     { NULL, NULL }
 };
 
+static const luaL_Reg cards[] = {
+    { "depmod", depmod },
+    { NULL, NULL }
+};
 void luaRegister(lua_State *L)
 {
     lua_newtable(L);              // cards
 
+    luaL_setfuncs(L, cards, 0);
+
     lua_newtable(L);              // cards.fs
+
 
     luaL_setfuncs(L, fs, 0);
 
