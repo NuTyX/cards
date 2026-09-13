@@ -13,3 +13,4 @@ cards.fs.rm("test")
 cards.fs.ln("test2", "test")
 cards.fs.mv("test", "test1")
 
+cards.depmod("7.2.4-1-nutyx")
