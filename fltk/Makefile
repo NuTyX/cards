@@ -20,7 +20,7 @@ FLOBJECTS = cards_event_handler.o \
 	$(CXX) -g $(CXXFLAGS) -MM $(FLOBJECTS:.o=.cxx) > .flcards_depend
 
 flcards: .flcards_depend $(FLOBJECTS)
-	$(CXX) $(FLOBJECTS) -o $@ $(LDFLAGS) $(LIBCURLLIBS) $(LIBFLTK) -lcards
+	$(CXX) $(FLOBJECTS) -o $@ $(FLDFLAGS) $(LIBCURLLIBS) $(LIBFLTK) -lcards
 	echo "$@ is ready"
 
 clean:

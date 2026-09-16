@@ -44,6 +44,7 @@ LIBLUA := $(shell pkg-config --libs --static lua)
 LIBMYSQLCLIENT := -lmysqlclient
 
 LDFLAGS += $(LIBARCHIVELIBS) -Wl,-Bstatic -llua -Wl,-Bdynamic
+FLDFLAGS += $(LIBARCHIVELIBS) $(LIBLUA)
 
 .SUFFIXES:	.cpp .cc .cxx .c
 
