@@ -622,8 +622,8 @@ remove_service() {
 build() {
 	if [ -z $build ]; then
 		# debian package is standard
-		if [ -f data.tar.xz ]; then
-			bsdtar -xf data.tar.xz -C $PKG
+		if [ -f data.tar* ]; then
+			bsdtar -xf data.tar* -C $PKG
 		else
 			cd $name-$version
 			./configure --prefix=/usr
