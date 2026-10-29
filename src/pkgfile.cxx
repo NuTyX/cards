@@ -116,7 +116,7 @@ void pkgfile::parse()
                 for (auto p : pkgFileContent) {
                     std::string line = stripWhiteSpace(p);
                     replaceAll(line, ",", " ");
-                    replaceAll(line, "\\", " ");
+                    replaceAll(line, "\"", " ");
                     if (line[0] == '#')
                         continue;
                     if (line.substr(0, 12) == "description=")
