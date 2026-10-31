@@ -1392,16 +1392,12 @@ main() {
 
 	COLLECTION="$(basename $(dirname $PKGMK_ROOT))"
 	if [ -z $PKGMK_COLLECTIONS ]; then
-		if [ $COLLECTION != "base" ]; then
+		if [ $COLLECTION != "cli" ]; then
 			case $COLLECTION in
-				cli)
-					PKGMK_COLLECTIONS="base cli";;
-				cli-extra)
-					PKGMK_COLLECTIONS="base cli cli-extra";;
 				gui)
-					PKGMK_COLLECTIONS="base cli gui";;
+					PKGMK_COLLECTIONS="cli gui";;
 				*)
-					PKGMK_COLLECTIONS="base cli gui $COLLECTION";;
+					PKGMK_COLLECTIONS="cli gui $COLLECTION";;
 			esac
 		else
 			PKGMK_COLLECTIONS=($COLLECTION)
