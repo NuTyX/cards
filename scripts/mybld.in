@@ -136,7 +136,8 @@ commit() {
     name="$(basename $1)"
     printf "WARNING: name was not set\n"
   fi
-  git add $1
+  cd ${COLLECTION}
+  git add $(basename $1)
   COMMENT="$name $version-$release"
   [ ! -z "$2" ] && COMMENT+="
 $2"
@@ -236,9 +237,16 @@ parse_arguments() {
       PARAM+=($1);;
 
     --commit)
+      COMMIT="yes"
       shift
-      commit "$@"
-      exit 0;;
+      if [ -z ${1} ]; then
+        echo "
+>>> Specify a <package>
+"
+        exit 1
+      fi
+      PARAM+=($1);;
+
 
     -n|--new)
       shift
@@ -630,6 +638,12 @@ if [ -z "${COLLECTION}" ]; then
   exit  1
 fi
 
+if [ "$COMMIT" == "yes" ];then
+    commit ${COLLECTION}/${PARAM[0]}
+    exit 0
+fi
+
+
 if [[ -d "$ROOT/${VERSION}/${COLLECTION}" && "$CLEANUP" != "yes" ]]; then
   mount | grep /"${VERSION}/${COLLECTION}"
   echo "
@@ -945,7 +959,7 @@ cd "${GIT_PROJ}"
 
 if [ -z ${PACKAGES_LIST} ]; then
    echo "commit $COLLECTION/${PARAM[0]}"
-   commit "$COLLECTION/${PARAM[0]}"
+   commit $COLLECTION/${PARAM[0]}
 else
    for i in ${PACKAGES_LIST[@]}
    do
