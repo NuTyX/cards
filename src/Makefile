@@ -145,7 +145,7 @@ libs:	.libs_depend $(LIBOBJECTS)
 	|grep -v '^#endif /*'|grep -v '^//' >> libcards.h
 	-@echo "#endif" >> libcards.h
 
-all: setup-nutyx-log pkgadd cards conf libs
+all: setup-nutyx-log pkgadd cards libs
 
 webcards: .web_depend $(WEBOBJECTS)
 	$(CXX) $(WEBOBJECTS) -o index.cgi $(LIBMYSQLCLIENT)
@@ -153,8 +153,6 @@ webcards: .web_depend $(WEBOBJECTS)
 
 setup-nutyx-log:
 	${CC} system_log.c -o $@
-conf:
-	sed -e "s/#ARCH#/`uname -m`/" cards.conf.in > cards.conf
 
 pkgadd: .tools_depend $(TOOLSOBJECTS)
 	$(CXX) -g $(TOOLSOBJECTS) -o $@ -static $(LIBARCHIVELIBS) $(LIBLUA)
@@ -198,7 +196,6 @@ install: all install-libs
 	install -v -D -m0755 cards $(BINDIR)/cards
 	install -v -D -m0755 setup-nutyx-log $(BINDIR)/setup-nutyx-log
 	install -v -D -m0644 pkgadd.conf $(VARDIR)/pkgadd.conf
-	install -v -D -m0644 cards.conf $(ETCDIR)/cards.conf.example
 	ln -sfv pkgadd $(BINDIR)/pkgrm
 	ln -sfv pkgadd $(BINDIR)/pkginfo
 
@@ -231,7 +228,6 @@ clean:
 	rm -fv test
 	rm -fv pkgadd
 	rm -fv cards
-	rm -fv cards.conf
 	rm -fv index.cgi
 
 distclean: clean
