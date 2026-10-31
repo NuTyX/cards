@@ -9,7 +9,7 @@ if [ -z "${1}" ]; then
 fi
 
 VERSION=${1}
-[ -z $BRANCH ] && BRANCH="testingd"
+[ -z $BRANCH ] && BRANCH="systemd"
 
 if [ ! -f WHENCE ];then
   echo "
@@ -28,7 +28,7 @@ if [ -z $HOME ]; then
 
 fi
 
-ROOT=$HOME/$BRANCH/cli-extra
+ROOT=$HOME/$BRANCH/kernels
 
 cp WHENCE WHENCE.in
 

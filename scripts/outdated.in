@@ -3,7 +3,7 @@
 #  Copyright (c) 2020 - .... by NuTyX team (https://nutyx.org)
 
 PACKAGES_FOLDER="$PWD"
-COLLECTIONS="base cli cli-extra gui gui-extra"
+COLLECTIONS="cli gui"
 ARCHDIR="/devel/archlinux"
 ARCHDEPOTURL="https://mirror.puzzle.ch/archlinux"
 PARAMS=""
