@@ -558,8 +558,8 @@ fi
 [ -z "$ROOT" ] && ROOT="$HOME/mybld"
 [ -z "$URL" ] && URL="rsync://download.nutyx.org/nutyx"
 [ -z "$EDITOR" ] && EDITOR="vi"
-[ -z "$COLLECTIONS" ] && COLLECTIONS=(gui cli base)
-[ -z "$VERSION" ] && VERSION="$(git branch --show-current)"
+[ -z "$COLLECTIONS" ] && COLLECTIONS=(gui cli)
+[ -z "$VERSION" ] && VERSION="$(basename $PWD)"
 GIT_PROJ=$(pwd)
 GIT="mybld/$(basename $GIT_PROJ)"
 CLEANUP="no"
@@ -569,12 +569,6 @@ if [ -z "$GIT_PROJ" ]; then
   exit 1
 fi
 
-if [ ! -d .git ]; then
-  echo "
->>> No Git project found in '"$GIT_PROJ"', The '.git' folder not exist.
-"
-  exit 1
-fi
 if [ -z "${1}" ]; then
   echo "
 >>> At least one argument is mandatory
@@ -612,6 +606,13 @@ if [ "$INIT" == "yes" ]; then
 fi
 
 [ -z "$COLLECTION" ] && find_collection
+
+if [ ! -d ${COLLECTION}/.git ]; then
+  echo "
+>>> No Git project found in '"$GIT_PROJ/${COLLECTION}"', The '.git' folder doen't exist.
+"
+  exit 1
+fi
 
 if [ "$SYNC" == "yes" ]; then
   rsync_binaries
