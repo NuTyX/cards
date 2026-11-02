@@ -2,6 +2,27 @@
 #  SPDX-License-Identifier: LGPL-2.1-or-later
 #  Copyright (c) 2016 - 2026 by NuTyX team (https://nutyx.org)
 
+msg_info() {
+  echo "====> $1"
+}
+msg_error() {
+  echo "
+>>>  $1
+"
+}
+error() {
+  msg_error $1
+  umount_all
+  remove_all
+  exit 1
+}
+answer() {
+  read a
+  if [ "$a" != "y" ] && [ "$a" != "Y" ] && [ "$a" != "yes" ]; then
+    msg_error "Answer should be 'y, Y or yes'"
+    exit 1
+  fi
+}
 usage () {
   echo '
 USAGE
@@ -11,9 +32,27 @@ OPTIONS
       -c, --cleanup <collection>
               Clean the /<version>/<collection> folder in a safety way.
 
-      --commit <collection>/<package> [comment]
-             commit the <package> from the <collection>.
+      --commit <package> [comment]
+             commit the <package> from the found collection.
              The [comment] will be added if exist.
+
+      --diff <package>|<collection>
+             show the non committed change of the <package>|<collection>.
+
+      --restore <package>
+             revert the change of the <package>.
+
+      --log <package>|<collection>
+             show the historical change of the <package>|<collection>.
+
+      --status <package>|<collection>
+             show the status of the <package>|<collection>.
+
+      --pull <collection>
+             retrieve the latest status or the <collection>.
+
+      --push <collection>
+             update the <collection> on the remote repository.
 
       -A, --ask
               Ask for confirmation.
@@ -33,8 +72,8 @@ OPTIONS
       -I, --init
              Create all the necessary folder (sources, LOGS and depot).
 
-      -d, --diff
-             Check what are the outdated packages
+      -d
+             Check what are the outdated binaries packages
 
       -s, --sync <collection>
              Synchronize all the binaries of the <collection>.
@@ -61,13 +100,13 @@ check_download_sources() {
 		LOCAL_FILENAME="$(get_filename $FILE)"
 		if [ ! -e $LOCAL_FILENAME ]; then
 			if [ "$LOCAL_FILENAME" = "$FILE" ]; then
-				echo "Source file '$LOCAL_FILENAME' not found (can not be downloaded, URL not specified)."
+				msg_error "Source file '$LOCAL_FILENAME' not found"
+				msg_error "(can not be downloaded, URL not specified)."
 				exit 1
 			else
 					curl $DOWNLOAD_OPTS $FILE
 					if [ $? != 0 ]; then
-						echo ">>>    $FILE' not found, check URL !!!
-"
+						msg_error "$FILE' not found, check URL !!!"
 						exit 1
 					fi
 			fi
@@ -77,27 +116,19 @@ check_download_sources() {
 }
 generate_Pkgfile() {
   if [ ! -d ${COLLECTION} ]; then
-    echo  "
->>>     The collection '${COLLECTION}' does not exist
-"
+    msg_error "The collection '${COLLECTION}' does not exist"
     exit 1
   fi
   if [ "$(git config user.name)" == "" ];then
-    echo "
->>>     your username is not set in your $HOME/.gitconfig
-"
+    msg_error "your username is not set in your $HOME/.gitconfig"
     exit 1
   fi
   if [ "$(git config user.email)" == "" ];then
-    echo "
->>>     your email is  not set in your $HOME/.gitconfig
-"
+    msg_error "your email is  not set in your $HOME/.gitconfig"
     exit 1
   fi
   if [ -f ${COLLECTION}/${PARAM}/Pkgfile ];then
-    echo "
->>>     ABORT: File '${COLLECTION}/${PARAM}/Pkgfile' already exist !!!
-"
+    msg_error "ABORT: File '${COLLECTION}/${PARAM}/Pkgfile' already exist !!!"
     exit 1
   fi
   mkdir -p "${COLLECTION}/${PARAM}"
@@ -145,9 +176,7 @@ $2"
 }
 create_folders () {
   if [ -z "$VERSION" ]; then
-    echo "
->>>     VERSION is not SET
-"
+    msg_error "VERSION is not SET"
     exit 1
   fi
   sudo mkdir -p $ROOT/$VERSION
@@ -158,8 +187,7 @@ create_folders () {
 ding() {
 PLAY="$(which paplay)"
 if [ -z $PLAY ]; then
-  echo " ====> Install pulseaudio, cannot play sound
-"
+  msg_error "Install pulseaudio, cannot play sound"
   return
 fi
 $PLAY /usr/share/sounds/cards/ding.wav &
@@ -167,9 +195,7 @@ $PLAY /usr/share/sounds/cards/ding.wav &
 rsync_binaries () {
   local options="-avd --no-r --delete"
   if [ -z "$VERSION" ]; then
-    echo "
->>>     VERSION is not SET
-"
+    msg_error "VERSION is not SET"
     exit 1
   fi
   if [ ! -z ${PARAM[0]} ]; then
@@ -229,9 +255,7 @@ parse_arguments() {
       CLEANUP="yes"
       shift
       if [ -z ${1} ]; then
-        echo "
->>> Specify the collection
-"
+        msg_error "Specify the collection"
         exit 1
       fi
       PARAM+=($1);;
@@ -240,13 +264,24 @@ parse_arguments() {
       COMMIT="yes"
       shift
       if [ -z ${1} ]; then
-        echo "
->>> Specify a <package>
-"
+        msg_error "Specify a <package>"
         exit 1
       fi
       PARAM+=($1);;
 
+    --push|--pull|--log|--diff|--status|--restore)
+      GITC="pull"
+      [ "${1}" == "--push" ] && GITC="push"
+      [ "${1}" == "--log" ] && GITC="log"
+      [ "${1}" == "--diff" ] && GITC="diff"
+      [ "${1}" == "--status" ] && GITC="status"
+      [ "${1}" == "--restore" ] && GITC="restore"
+      shift
+      if [ -z ${1} ]; then
+        msg_error "Specify a <collection>/<package>"
+        exit 1
+      fi
+      PARAM+=($1);;
 
     -n|--new)
       shift
@@ -257,18 +292,14 @@ parse_arguments() {
         generate_Pkgfile "$@"
         exit 0
       fi
-      echo "
->>> The package '${PARAM}' already exist in the '${COLLECTION}' collection !!!
-"
+      msg_error "The package '${PARAM}' already exist in the '${COLLECTION}' collection !!!"
       exit 1;;
 
     -C|--check)
       CHECK="yes"
       shift
       if [ -z ${1} ]; then
-        echo "
->>> Specify the name
-"
+        msg_error "Specify the name"
         exit 1
       fi
       PARAM+=($1);;
@@ -277,9 +308,7 @@ parse_arguments() {
       INCREMENT="yes"
       shift
       if [ -z ${1} ]; then
-        echo "
->>> Specify a <set>/<package>
-"
+        msg_error "Specify a <set>/<package>"
         exit 1
       fi
       PARAM+=($1);;
@@ -292,30 +321,26 @@ Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
 
     -v|--verbose)
       VERBOSE="yes"
-      echo "====> You want verbose mode on install-nutyx command:" ;;
+      msg_info "You want verbose mode on install-nutyx command:" ;;
 
     -I|--init)
       INIT="yes";;
 
-    -d|--diff)
+    -d)
       DIFF="yes"
       shift
       if [ -z ${1} ]; then
-        echo "
->>> Specify a <collection>/<name>
-"
+        msg_error "Specify a <collection>/<name>"
         exit 1
       fi
-      echo "====> You want to know if the '$1' collection is clean:"
+      msg_info "You want to know if the '$1' collection is clean:"
       PARAM+=($1);;
 
     -s|--sync)
       SYNC="yes"
       shift
       if [ -z ${1} ]; then
-        echo "
->>> Specify a <collection>/<name>
-"
+        msg_error "Specify a <collection>/<name>"
         exit 1
       fi
       PARAM+=($1);;
@@ -323,7 +348,7 @@ Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
     -A|--ask)
       CONFIRM="yes"
       VERBOSE="yes"
-      echo "====> You ask for confirmation:" ;;
+      msg_info "You ask for confirmation:" ;;
 
     -h|--help)
       usage
@@ -340,7 +365,7 @@ Type exit when finish.\n\n Good Luck !!!\n\n\" && bash";;
   done
 }
 interrupted() {
-  echo "Interrupted !!!"
+  msg_info "Interrupted !!!"
 }
 trap "interrupted" SIGHUP SIGINT SIGQUIT SIGTERM
 umount_all() {
@@ -379,24 +404,7 @@ remove_all() {
         rm -i $f
 	done
     rm -d $ROOT/${VERSION}/${COLLECTION} || exit 1
-	echo "
->>>   $ROOT/${VERSION}/${COLLECTION} cleanup successfully ...
-"
-}
-answer() {
-  read a
-  if [ "$a" != "y" ] && [ "$a" != "Y" ] && [ "$a" != "yes" ]; then
-    echo "
-Answer should be 'y, Y or yes'
-"
-    exit 1
-  fi
-}
-error() {
-  echo ">>> ERROR: $1"
-  umount_all
-  remove_all
-  exit 1
+	msg_info "$ROOT/${VERSION}/${COLLECTION} cleanup successfully ..."
 }
 find_new_packager () {
   newpackager="$(git config user.name) <$(git config user.email)>"
@@ -548,9 +556,7 @@ logdir /LOGS"
 # BEGIN HERE
 ########################################################################
 if [ "$UID" == "0" ]; then
-    echo "
->>> The 'root' account is not allow to use $(basename ${0})
-"
+    msg_error "The 'root' account is not allow to use $(basename ${0})"
     exit 1
 fi
 [ -f $HOME/.mybld ] && source $HOME/.mybld
@@ -563,6 +569,7 @@ fi
 GIT_PROJ=$(pwd)
 GIT="mybld/$(basename $GIT_PROJ)"
 CLEANUP="no"
+GITC="no"
 
 if [ -z "$GIT_PROJ" ]; then
   error "Git root: ${GIT_PROJ} empty"
@@ -570,27 +577,19 @@ if [ -z "$GIT_PROJ" ]; then
 fi
 
 if [ -z "${1}" ]; then
-  echo "
->>> At least one argument is mandatory
-"
+  msg_error "At least one argument is mandatory"
   exit 1
 fi
 if ! ( $(which rsync > /dev/null) ); then
-  echo "
->>>     'rsync' not available
-"
+  msg_error "'rsync' not available"
   exit 1
 fi
 if ! ( $(which git > /dev/null) ); then
-  echo "
->>>     'git' not available
-"
+  msg_error "'git' not available"
   exit 1
 fi
 if ! ( $(which $EDITOR > /dev/null) ); then
-  echo "
->>>     '$EDITOR' not available
-"
+  msg_error "'$EDITOR' not available"
   exit 1
 fi
 
@@ -606,11 +605,12 @@ if [ "$INIT" == "yes" ]; then
 fi
 
 [ -z "$COLLECTION" ] && find_collection
+[ -z "$COLLECTION" ] && msg_error "collection ${2} not found"
+[ -z "$COLLECTION" ] && exit 1
+
 
 if [ ! -d ${COLLECTION}/.git ]; then
-  echo "
->>> No Git project found in '"$GIT_PROJ/${COLLECTION}"', The '.git' folder doen't exist.
-"
+  msg_error "No Git project found in '"$GIT_PROJ/${COLLECTION}"', The '.git' folder doen't exist."
   exit 1
 fi
 
@@ -620,9 +620,7 @@ fi
 
 if [ -z "${PARAM[0]}" ]; then
   if [ -z "${COLLECTION}" ]; then
-    echo "
->>> Specify the collection
-"
+    msg_error "Specify the collection"
     exit  1
   fi
 fi
@@ -633,23 +631,30 @@ fi
 [ -z "$PACKAGES_LIST" ] || CONFIRM="yes"
 
 if [ -z "${COLLECTION}" ]; then
-  echo "
->>> package '${PARAM[0]}' not found in any collection
-"
+  msg_error "package '${PARAM[0]}' not found in any collection"
   exit  1
 fi
 
-if [ "$COMMIT" == "yes" ];then
+if [ "$COMMIT" == "yes" ]; then
     commit ${COLLECTION}/${PARAM[0]}
     exit 0
 fi
 
-
+if [ "$GITC" != "no" ]; then
+    cd ${COLLECTION}
+    if [ "${GITC}" == "log" ] || [ "${GITC}" == "diff" ] || \
+	   [ "${GITC}" == "status" ] || [ "${GITC}" == "restore" ]; then
+      if [ ! -z "${PARAM}" ]; then
+         git $GITC ${PARAM}
+         exit 0
+      fi
+    fi
+    git $GITC
+    exit 0
+fi
 if [[ -d "$ROOT/${VERSION}/${COLLECTION}" && "$CLEANUP" != "yes" ]]; then
   mount | grep /"${VERSION}/${COLLECTION}"
-  echo "
->>> $ROOT/${VERSION}/${COLLECTION} exist ...
-"
+  msg_error "$ROOT/${VERSION}/${COLLECTION} exist ..."
   echo -n "Safety cleanup of $ROOT/${VERSION}/${COLLECTION} ? : "
   answer
   CLEANUP="auto"
@@ -666,23 +671,23 @@ if [ -z ${PACKAGES_LIST} ]; then
  if [ ! -z "${PARAM[1]}" ]; then
   CONFIRM="yes"
     if [ ! -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
-      echo " $COLLECTION/${PARAM[0]}/Pkgfile not exist"
+      msg_error " $COLLECTION/${PARAM[0]}/Pkgfile not exist"
       exit 1
     fi
     . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
     if [ -z "$version" ]; then
-      echo ">>> version variable not set !"
+      msg_error "version variable not set !"
       exit 1
     fi
     if [ "$version" == "${PARAM[1]}" ]; then
-      echo ">>> version is the same !!!"
+      msg_error "version is the same !!!"
       exit 1
     fi
  fi
  if [ "$INCREMENT" == "yes" ]; then
   CONFIRM="yes"
   if [ ! -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
-    echo " $COLLECTION/${PARAM[0]}/Pkgfile not exist"
+    msg_error "$COLLECTION/${PARAM[0]}/Pkgfile not exist"
     exit 1
   fi
   . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
@@ -692,13 +697,13 @@ if [ -z ${PACKAGES_LIST} ]; then
 fi
 # check if VERSION folder exist
 if ! [ -d "$ROOT/$VERSION" ]; then
-  echo ">>>   $ROOT/$VERSION folder not exist."
+  msg_error "$ROOT/$VERSION folder not exist."
   exit 1
 fi
 
 # check if VERSION is own by me
 if ! [ -O "$ROOT/$VERSION" ]; then
-  echo ">>> $ROOT/$VERSION is not own by $(whoami)"
+  msg_info "$ROOT/$VERSION is not own by $(whoami)"
   exit 1
 fi
 
@@ -738,7 +743,7 @@ if [ ! -z $VERBOSE ]; then
 "
     cat $HOME/.mybld
   else
-    echo "====> Config file $HOME/.mybld not found"
+    msg_info "Config file $HOME/.mybld not found"
   fi
   echo "
 pkgmk.conf:
@@ -857,7 +862,7 @@ else
     . $i/Pkgfile
      cd $i
      check_download_sources
-     echo "====> sources of $i [ OK ]"
+     msg_info "sources of $i [ OK ]"
      cd - > /dev/null
   done
   echo ""
@@ -866,7 +871,7 @@ if [ "${PARAM[1]}" = "" ]; then
     if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
         . "$COLLECTION"/"${PARAM[0]}"/Pkgfile
         if [ -z "$version" ]; then
-            echo ">>> version variable not set !"
+            msg_error "version variable not set !"
             exit 1
         fi
     fi
@@ -893,8 +898,7 @@ if [ -f "$COLLECTION/${PARAM[0]}/Pkgfile" ]; then
    # check_download_sources
 fi
 if [ "$CHECK" == "yes" ]; then
-   echo "====> Found all the source files
-"
+   msg_info "Found all the source files"
    exit 0
 fi
 
