@@ -1392,15 +1392,8 @@ main() {
 
 	COLLECTION="$(basename $(dirname $PKGMK_ROOT))"
 	if [ -z $PKGMK_COLLECTIONS ]; then
-		if [ $COLLECTION != "cli" ]; then
-			case $COLLECTION in
-				gui)
-					PKGMK_COLLECTIONS="cli gui";;
-				*)
-					PKGMK_COLLECTIONS="cli gui $COLLECTION";;
-			esac
-		else
-			PKGMK_COLLECTIONS=($COLLECTION)
+		if [ $COLLECTION != "nlos" ]; then
+			PKGMK_COLLECTIONS=(nlos $COLLECTION)
 		fi
 	fi
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
