@@ -564,7 +564,7 @@ fi
 [ -z "$ROOT" ] && ROOT="$HOME/mybld"
 [ -z "$URL" ] && URL="rsync://download.nutyx.org/nutyx"
 [ -z "$EDITOR" ] && EDITOR="vi"
-[ -z "$COLLECTIONS" ] && COLLECTIONS=(gui cli)
+[ -z "$COLLECTIONS" ] && COLLECTIONS=(nlos)
 [ -z "$VERSION" ] && VERSION="$(basename $PWD)"
 GIT_PROJ=$(pwd)
 GIT="mybld/$(basename $GIT_PROJ)"
