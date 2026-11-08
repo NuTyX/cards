@@ -1394,6 +1394,8 @@ main() {
 	if [ -z $PKGMK_COLLECTIONS ]; then
 		if [ $COLLECTION != "nlos" ]; then
 			PKGMK_COLLECTIONS=(nlos $COLLECTION)
+		else
+			PKGMK_COLLECTIONS=($COLLECTION)
 		fi
 	fi
 	if [ "$PKGMK_RECURSIVE" = "yes" ]; then
