@@ -133,4 +133,23 @@ remove::remove(const std::string& commandName,
 		syslog(LOG_INFO,"%s",name.c_str());
 	}
 }
+void remove::run()
+{
+	cards::lock Lock(m_root, true);
+
+	if (!checkPackageNameExist(m_packageName))
+		return;
+
+	if (m_runPrePost)
+		preRun();
+
+	// Remove the files on hd
+	removePackageFiles(m_packageName);
+
+	if (m_runPrePost)
+		postRun();
+
+	// Remove metadata about the package removed
+	removePackageFilesRefsFromDB(m_packageName);
+}
 }

@@ -31,5 +31,7 @@ class remove: public pkgrm
         remove(const std::string& commandName,
 	        const CardsArgumentParser& argParser,
 	        const std::string& configFileName);
+
+        void run();
 };
 }
