@@ -114,6 +114,8 @@ void create::base()
         cards::lock Lock(m_root, true);
     for (auto i : list) {
         m_packageName = i;
+        if (!checkPackageNameExist(m_packageName))
+            continue;
 
         // Remove the files on hd
         removePackageFiles(m_packageName);
