@@ -115,12 +115,12 @@ void create::base()
     for (auto i : list) {
         m_packageName = i;
 
+        // Remove the files on hd
+        removePackageFiles(m_packageName);
+
         // Remove metadata about the package removed
         if (!m_argParser.isSet(CardsArgumentParser::OPT_NO_META))
             removePackageFilesRefsFromDB(m_packageName);
-
-        // Remove the files on hd
-        removePackageFiles(m_packageName);
     }
 }
 bool create::isACollection()
