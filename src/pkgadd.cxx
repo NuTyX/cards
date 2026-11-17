@@ -72,13 +72,10 @@ void pkgadd::run()
 	readRulesFile();
 
 	bool installed = checkPackageNameExist(package.first);
-	if (installed && !m_upgrade)
-	{
+	if (installed && !m_upgrade) {
 		m_actualError = cards::ERROR_ENUM_PACKAGE_ALLREADY_INSTALL;
 		treatErrors (package.first);
-	}
-	else if (!installed && m_upgrade)
-	{
+	} else if (!installed && m_upgrade) {
 		m_actualError = cards::ERROR_ENUM_PACKAGE_NOT_PREVIOUSLY_INSTALL;
 		treatErrors(package.first);
 	}
@@ -132,6 +129,12 @@ void pkgadd::run()
 
 		// Add the info about the files to the DB
 		addPackageFilesRefsToDB(package.first, package.second);
+
+		m_listOfAlias[package.first] = package.first;
+		for (auto n:package.second.alias())
+			m_listOfAlias[n] = package.first;
+
+
 	}
 	postRun();
 }
