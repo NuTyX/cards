@@ -282,13 +282,13 @@ void pkgdbh::progressInfo()
 		case ACTION_ENUM_RM_PKG_FILES_START:
 			j=0;
 			std::cout << _("REMOVE: (")
-				<< getCollection(m_packageName)
+				<< m_packageCollection
 				<< ") "
 				<< m_packageName
 				<< " "
-				<< getVersion(m_packageName)
+				<< m_packageVersion
 				<< "-"
-				<< getRelease(m_packageName)
+				<< m_packageRelease
 				<< ", "
 				<< m_filesList.size()
 				<< _(" files: ");
@@ -895,8 +895,8 @@ pkgdbh::checkPackageNameUptodate(std::pair<std::string, cards::db>& archiveName)
 		return false;
 	return true;
 }
-
-bool pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild)
+bool
+pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& dependencieNameBuild)
 {
 	if (dependencieNameBuild.second == 0) {
 		return false;
@@ -913,17 +913,12 @@ bool pkgdbh::checkPackageNameBuildDateSame(const std::pair<std::string,time_t>& 
 // Remove meta data about the removed package
 void pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 {
-	if ( checkPackageNameExist(name)){
-		m_packageVersion = m_listOfPackages[name].version();
-		m_packageRelease = itos(m_listOfPackages[name].release());
-		m_packageCollection = m_listOfPackages[name].collection();
-	}
 	std::set<std::string> metaFilesList;
 	const std::string packagedir = m_root + PKG_DB_DIR ;
 	const std::string arch = m_listOfPackages[name].arch();
 	const std::string packagenamedir = m_root + PKG_DB_DIR + name;
 
-	if ( findDir(metaFilesList, packagenamedir) != 0 ) {
+	if (findDir(metaFilesList, packagenamedir) != 0) {
 		m_actualError = cards::ERROR_ENUM_CANNOT_READ_FILE;
 		treatErrors(packagenamedir);
 	}
@@ -936,15 +931,18 @@ void pkgdbh::removePackageFilesRefsFromDB(const std::string& name)
 				}
 			}
 	}
-	if( remove(packagenamedir.c_str()) == -1) {
+	if (remove(packagenamedir.c_str()) == -1) {
 		const char* msg = strerror(errno);
 		std::cerr << m_utilName << ": could not remove " << packagenamedir << ": " << msg << std::endl;
 	}
 }
-
-// Remove the physical files after followings some rules
 void pkgdbh::removePackageFiles(const std::string& name)
 {
+	if (checkPackageNameExist(name)) {
+		m_packageVersion = m_listOfPackages[name].version();
+		m_packageRelease = itos(m_listOfPackages[name].release());
+		m_packageCollection = m_listOfPackages[name].collection();
+	}
 	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
 	m_listOfAlias.erase(name);
@@ -981,10 +979,15 @@ void pkgdbh::removePackageFiles(const std::string& name)
 	}
 	progressInfo(cards::ACTION_ENUM_RM_PKG_FILES_END);
 }
-
+// Remove the physical files after followings some rules
 void pkgdbh::removePackageFiles(const std::string& name,
 		const std::set<std::string>& keep_list)
 {
+	if (checkPackageNameExist(name)) {
+		m_packageVersion = m_listOfPackages[name].version();
+		m_packageRelease = itos(m_listOfPackages[name].release());
+		m_packageCollection = m_listOfPackages[name].collection();
+	}
 	m_filesList = m_listOfPackages[name].files;
 	m_listOfPackages.erase(name);
 	m_listOfAlias.erase(name);
