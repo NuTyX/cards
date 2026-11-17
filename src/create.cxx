@@ -293,6 +293,11 @@ void create::run()
         cleanupMetaFiles(m_root);
         m_listOfPackages[package.first] = package.second;
     }
+
+	m_listOfAlias[package.first] = package.first;
+	for (auto n:package.second.alias())
+		m_listOfAlias[n] = package.first;
+
 	postRun();
 
 }
