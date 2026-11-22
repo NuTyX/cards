@@ -30,7 +30,7 @@
 #define HELP_COMMAND _("\033[1;34mcommand\033[1;0m")
 
 #define CARDS_CONF_FILE "/etc/cards.conf"
-#define NUTYX_VERSION_FILE "/var/lib/pkg/nutyx-version"
+#define OS_RELEASE_FILE "/etc/os-release"
 #define PRIVATEKEY "/.private.key"
 #define PUBLICKEY "/.PKEY"
 
@@ -38,6 +38,7 @@
 #define MEGA 0x1p20
 #define KILO 0x1p10
 #define PACKAGE_LOCALE_DIR "/usr/share/locale"
+#define PACKAGE_DEPOT_DIR "/var/lib/pkg/depot"
 #define GETTEXT_PACKAGE "cards"
 
 #define uint8 unsigned char
