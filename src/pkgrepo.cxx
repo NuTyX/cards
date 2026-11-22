@@ -401,9 +401,9 @@ void pkgrepo::parse()
         info.collection(i.collection);
         info.origin(i.url
             + "/"
-            + getMachineType()
+            + m_config.id()
             + "/"
-            + m_config.version()
+            + m_config.arch()
             + "/"
             + i.collection);
         std::vector<std::string> repoFileContent;

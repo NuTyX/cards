@@ -29,9 +29,9 @@ void sync::run()
 			continue;
 		destinationFile.url = collection.url
 			+ "/"
-			+ m_config.arch()
+			+ m_config.id()
 			+ "/"
-			+ m_config.version()
+			+ m_config.arch()
 			+ "/"
 			+ collection.collection
 			+ "/";
