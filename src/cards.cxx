@@ -150,9 +150,9 @@ int main(int argc, char** argv)
                     cout << _(" from ")
                          << i.url
                          << "/"
-                         << config.arch()
+                         << config.id()
                          << "/"
-                         << config.version()
+                         << config.arch()
                          << "/"
                          << i.collection;
                 cout << endl;
