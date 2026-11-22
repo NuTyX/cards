@@ -7,7 +7,7 @@ msg_info() {
 }
 msg_error() {
   echo "
->>>  $1
+>>>  $1 !!!
 "
 }
 error() {
@@ -509,7 +509,7 @@ PKGMK_IGNORE_RUNTIMEDEPS="no"'
 PKGMK_LOCALES=($PKGMK_LOCALES)
 PKGMK_KEEP_SOURCES=\"$PKGMK_KEEP_SOURCES\"
 PKGMK_WORK_DIR=\"$PKGMK_WORK_DIR\"
-PKGMK_PACKAGE_DIR=\"/DEPOT/$VERSION/$COLLECTION\"
+PKGMK_PACKAGE_DIR=\"/DEPOT/$COLLECTION\"
 PKGMK_GROUPS=($PKGMK_GROUPS)
 PKGMK_COMPRESSION_OPTS=\"$PKGMK_COMPRESSION_OPTS\"
 PKGMK_COMPRESS_PACKAGE=\"$PKGMK_COMPRESS_PACKAGE\"
@@ -518,37 +518,13 @@ PKGMK_COMPRESSION_MODE=\"$PKGMK_COMPRESSION_MODE\""
 setup_cards_conf() {
   CARDS_CONF="group devel
 group lib
-depot /DEPOT/$VERSION"
-  FOUND="no"
-  MYCOLLECTION="${COLLECTION%-extra}"
-  for i in "${COLLECTIONS[@]}"
-  do
-     [ $i == $MYCOLLECTION ] && FOUND="yes"
-  done
-  if [ $FOUND == "yes" ]; then
-    unset MYCOLLECTION
+depot /DEPOT"
+  if [ "${DEPOT_OS}" != "$COLLECTION" ]; then
+      CARDS_CONF+="
+collection $COLLECTION"
   fi
-  FOUND="no"
-  for i in "$MYCOLLECTION" "${COLLECTIONS[@]}"
-  do
-    [ -z $i ] && continue
-    if [ $FOUND == "yes" ];then
-      CARDS_CONF+="
-collection $i"
-      continue
-    fi
-    if [ $COLLECTION == $i-extra ]; then
-      CARDS_CONF+="
-collection $i-extra
-collection $i"
-      FOUND="yes"
-    fi
-    if  [ $COLLECTION == $i ]; then
-      CARDS_CONF+="
-collection $i"
-      FOUND="yes"
-    fi
-  done
+  CARDS_CONF+="
+collection ${DEPOT_OS}"
   CARDS_CONF+="
 logdir /LOGS"
 }
@@ -559,13 +535,15 @@ if [ "$UID" == "0" ]; then
     msg_error "The 'root' account is not allow to use $(basename ${0})"
     exit 1
 fi
+DEPOT_OS="os"
+[ -z "$VERSION" ] && VERSION="$(basename $PWD)"
+[ -z "$VERSION" ] || DEPOT_OS+="-$VERSION"
 [ -f $HOME/.mybld ] && source $HOME/.mybld
 [ -z "$ROOTMOUNT" ] && ROOTMOUNT="$HOME/www"
 [ -z "$ROOT" ] && ROOT="$HOME/mybld"
 [ -z "$URL" ] && URL="rsync://download.nutyx.org/nutyx"
 [ -z "$EDITOR" ] && EDITOR="vi"
-[ -z "$COLLECTIONS" ] && COLLECTIONS=(os)
-[ -z "$VERSION" ] && VERSION="$(basename $PWD)"
+
 GIT_PROJ=$(pwd)
 GIT="mybld/$(basename $GIT_PROJ)"
 CLEANUP="no"
@@ -760,9 +738,10 @@ $CARDS_CONF
               DEVEL: $DEVEL
           ROOTMOUNT: $ROOTMOUNT
 running the command: sudo KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" \
-DEPOT=\"$DEPOT/$VERSION\" DEVEL=\"$DEVEL\" install-nutyx $QUIET
+DEPOT=\"/DEPOT\" DEVEL=\"$DEVEL\" VERSION=\"$VERSION\" install-nutyx $QUIET
 "
 fi
+
 if [ -z "$PACKAGES_LIST" ]; then
   if [ ! -z "${PARAM[1]}" ]; then
     find_new_packager
@@ -901,20 +880,21 @@ if [ "$CHECK" == "yes" ]; then
    msg_info "Found all the source files"
    exit 0
 fi
-
-mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error "cannot create $ROOT/${VERSION}/${COLLECTION}/DEPOT  directory"
-if [ -d ${ROOTMOUNT}/$(uname -m)/${VERSION} ]; then
-  sudo mount --bind ${ROOTMOUNT}/$(uname -m) $ROOT/${VERSION}/${COLLECTION}/DEPOT || \
+DEPOT_ROOT="nutyx/$(uname -m)"
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT || error "cannot create $ROOT/${VERSION}/${COLLECTION}/DEPOT directory"
+if [ -d ${ROOTMOUNT}/${DEPOT_ROOT} ]; then
+  sudo mount --bind ${ROOTMOUNT}/${DEPOT_ROOT} $ROOT/${VERSION}/${COLLECTION}/DEPOT || \
   error "mounting ${ROOTMOUNT}/$(uname -m)"
   if [ -z "${PARAM[0]}" ]; then
-     if [ ! -f $ROOT/${VERSION}/${COLLECTION}/DEPOT/$VERSION/${COLLECTION}/.REPO ]; then
-        sudo mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT/$VERSION/${COLLECTION}
-        sudo touch    $ROOT/${VERSION}/${COLLECTION}/DEPOT/$VERSION/${COLLECTION}/.REPO
+     if [ ! -f $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.REPO ]; then
+        sudo mkdir -p $ROOT/${VERSION}/${COLLECTION}/DEPOT
+        sudo touch    $ROOT/${VERSION}/${COLLECTION}/DEPOT/${COLLECTION}/.REPO
      fi
   fi
 else
-  error "${ROOTMOUNT}/$(uname -m)/${VERSION} not exist."
+  error "${ROOTMOUNT}/${DEPOT_ROOT} not exist."
 fi
+
 MOUNT_POINTS="DEPOT"
 
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/LOGS
@@ -926,10 +906,10 @@ else
 fi
 MOUNT_POINTS="$MOUNT_POINTS LOGS"
 
-mkdir -p $ROOT/${VERSION}/${COLLECTION}/sources || error /${VERSION}/${COLLECTION}
+mkdir -p $ROOT/${VERSION}/${COLLECTION}/sources || error "/${VERSION}/${COLLECTION} not existing"
 if [ -d ${ROOTMOUNT}/sources ]; then
   sudo mount --bind ${ROOTMOUNT}/sources $ROOT/${VERSION}/${COLLECTION}/sources || \
-  error "mounting ${ROOTMOUNT}/sources"
+  error "Cannot mount ${ROOTMOUNT}/sources"
 else
   error "${ROOTMOUNT}/sources not existing"
 fi
@@ -938,12 +918,13 @@ MOUNT_POINTS="$MOUNT_POINTS sources"
 mkdir -p $ROOT/${VERSION}/${COLLECTION}/$GIT
 
 sudo mount --bind ${GIT_PROJ} $ROOT/${VERSION}/${COLLECTION}/$GIT || \
-error "mounting ${GIT_PROJ}"
+error "Cannot mount ${GIT_PROJ}"
 
 MOUNT_POINTS="$MOUNT_POINTS $GIT"
 
-sudo KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT/$VERSION" DEVEL="$DEVEL" install-nutyx $QUIET|| \
-error "sudo KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" DEPOT=\"/DEPOT/$VERSION\" DEVEL=\"$DEVEL\" install-nutyx $QUIET"
+sudo KERNEL="NONE" LFS="$ROOT/${VERSION}/${COLLECTION}" DEPOT="/DEPOT" DEVEL="$DEVEL" VERSION="$VERSION" install-nutyx $QUIET|| \
+error "sudo KERNEL=\"NONE\" LFS=\"$ROOT/${VERSION}/${COLLECTION}\" DEPOT=\"/DEPOT\" \
+DEVEL=\"$DEVEL\" VERSION=\"$VERSION\" install-nutyx $QUIET"
 
 umount_all
 remove_all "/${VERSION}/${COLLECTION}"
