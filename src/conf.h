@@ -19,9 +19,10 @@ class conf {
 
     std::string m_filename;
     std::string m_name;
-    std::string m_version;
     std::string m_arch;
     std::string m_depot;
+    std::string m_id; // OS name
+    std::string m_version;
     std::string m_url;
     std::string m_keypath;
     std::string m_dir;
@@ -40,7 +41,7 @@ class conf {
     std::vector<DirUrl>      m_sysconf;
     std::vector<DirUrl>      m_userconf;
 
-    void parseConfig();
+    void parseConfig(const char);
 
 public:
 
@@ -49,7 +50,6 @@ public:
     void size();
     void purge();
 
-    const std::string& version();
     const std::string& url();
     const std::string& keypath();
     const std::string& hostname();
@@ -57,6 +57,8 @@ public:
     const std::string& password();
     const std::string& database();
     const std::string& arch();
+    const std::string& version();
+    const std::string& id();
     const std::string& depot();
     const std::string& logdir();
 

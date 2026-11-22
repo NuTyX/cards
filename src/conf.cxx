@@ -6,11 +6,11 @@ namespace cards {
 conf::conf(const std::string& filename)
 {
 	m_filename = filename;
-	parseConfig();
-	m_filename = NUTYX_VERSION_FILE;
-	parseConfig();
+	parseConfig(' ');
+	m_filename = OS_RELEASE_FILE;
+	parseConfig('=');
 }
-void conf::parseConfig()
+void conf::parseConfig(const char c)
 {
 	FILE* fp = fopen(m_filename.c_str(), "r");
 	if (!fp)
@@ -31,15 +31,19 @@ void conf::parseConfig()
 		}
 
 		// whitespace separates
-		pos = s.find(' ');
-		if (pos == std::string::npos) {
+		pos = s.find(c);
+		if (c == ' '  && pos == std::string::npos) {
 			// try with a tab
 			pos = s.find('\t');
 		}
 		if (pos != std::string::npos) {
 			std::string key = s.substr(0, pos);
-			std::string val = stripWhiteSpace(s.substr(pos));
+			std::string val = stripWhiteSpace(s.substr(pos+1));
 
+			if (key == "ID") {
+				if (m_id.empty())
+					m_id = val;
+			}
 			if (key == "dir") {
 				std::string dir;
 				std::string::size_type pos = val.find('|');
@@ -106,7 +110,7 @@ void conf::parseConfig()
 			if (key == "name") {
 				m_name = val;
 			}
-			if (key == "version") {
+			if (key == "VERSION_ID") {
 				if (m_version.empty())
 					m_version = val;
 			}
@@ -130,11 +134,12 @@ void conf::parseConfig()
 				i.url = m_url;
 		}
 	}
-	if (!m_depot.empty()) {
-		for (auto& i : m_dirUrl) {
-			if (i.depot.empty())
-				i.depot = m_depot;
-		}
+	if (m_depot.empty())
+		m_depot = PACKAGE_DEPOT_DIR;
+
+	for (auto& i : m_dirUrl) {
+		if (i.depot.empty())
+			i.depot = m_depot;
 	}
 
 }
@@ -216,6 +221,10 @@ const std::string& conf::password()
 const std::string& conf::database()
 {
 	return m_database;
+}
+const std::string& conf::id()
+{
+	return m_id;
 }
 const std::string& conf::version()
 {
