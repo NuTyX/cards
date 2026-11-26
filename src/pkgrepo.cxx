@@ -394,7 +394,7 @@ void pkgrepo::parse()
     cache info;
 
     for (auto i : m_config.dirUrl()) {
-        info.dirName(i.depot + "/" + i.collection);
+        info.dirName(i.depot);
         std::string repoFile = info.dirName()
             + PKG_REPO_META;
 
