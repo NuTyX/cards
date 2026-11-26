@@ -5,10 +5,10 @@ namespace cards {
 
 conf::conf(const std::string& filename)
 {
-	m_filename = filename;
-	parseConfig(' ');
 	m_filename = OS_RELEASE_FILE;
 	parseConfig('=');
+	m_filename = filename;
+	parseConfig(' ');
 }
 void conf::parseConfig(const char c)
 {
@@ -40,9 +40,17 @@ void conf::parseConfig(const char c)
 			std::string key = s.substr(0, pos);
 			std::string val = stripWhiteSpace(s.substr(pos+1));
 
+			if (key == "VARIANT_ID") {
+				if (m_variant_id.empty())
+					m_variant_id = val;
+			}
 			if (key == "ID") {
 				if (m_id.empty())
 					m_id = val;
+			}
+			if (key == "RELEASE_TYPE") {
+				if (m_release_type.empty())
+					m_release_type = val;
 			}
 			if (key == "dir") {
 				std::string dir;
@@ -75,6 +83,8 @@ void conf::parseConfig(const char c)
 					m_dirUrl.push_back(DU);
 			}
 			if (key == "collection") {
+				if (val == m_variant_id)
+					continue;
 				cards::DirUrl DU;
 				DU.collection = val;
 				for (auto i : m_dirUrl) {
@@ -137,9 +147,28 @@ void conf::parseConfig(const char c)
 	if (m_depot.empty())
 		m_depot = PACKAGE_DEPOT_DIR;
 
+	cards::DirUrl DU;
+	DU.collection = m_variant_id;
+
+	if (m_release_type.empty()) {
+		DU.depot = m_depot +
+			"/" +
+			DU.collection;
+	} else {
+		DU.depot = m_depot +
+			"/" +
+			DU.collection +
+			"-" +
+			m_release_type;
+	}
+
+	m_dirUrl.push_back(DU);
+
 	for (auto& i : m_dirUrl) {
 		if (i.depot.empty())
-			i.depot = m_depot;
+			i.depot = m_depot +
+				"/" +
+				i.collection;
 	}
 
 }
