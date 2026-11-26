@@ -21,7 +21,9 @@ class conf {
     std::string m_name;
     std::string m_arch;
     std::string m_depot;
+    std::string m_release_type; // if empty we're on stable branch
     std::string m_id; // OS name
+    std::string m_variant_id; // normally it's os
     std::string m_version;
     std::string m_url;
     std::string m_keypath;
