@@ -143,9 +143,7 @@ int main(int argc, char** argv)
                 index++;
                 cout << index
                      << _(" Directory: ")
-                     << i.depot
-                     << "/"
-                     << i.collection;
+                     << i.depot;
                 if (i.url != "")
                     cout << _(" from ")
                          << i.url
