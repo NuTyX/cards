@@ -9,6 +9,7 @@ conf::conf(const std::string& filename)
 	parseConfig('=');
 	m_filename = filename;
 	parseConfig(' ');
+	add_os();
 }
 void conf::parseConfig(const char c)
 {
@@ -85,6 +86,7 @@ void conf::parseConfig(const char c)
 			if (key == "collection") {
 				if (val == m_variant_id)
 					continue;
+
 				cards::DirUrl DU;
 				DU.collection = val;
 				for (auto i : m_dirUrl) {
@@ -138,6 +140,9 @@ void conf::parseConfig(const char c)
 		}
 	}
 	fclose(fp);
+}
+void conf::add_os()
+{
 	if (!m_url.empty()) {
 		for (auto& i : m_dirUrl) {
 			if (i.url.empty())
@@ -161,7 +166,6 @@ void conf::parseConfig(const char c)
 			"-" +
 			m_release_type;
 	}
-
 	m_dirUrl.push_back(DU);
 
 	for (auto& i : m_dirUrl) {

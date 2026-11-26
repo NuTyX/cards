@@ -44,6 +44,7 @@ class conf {
     std::vector<DirUrl>      m_userconf;
 
     void parseConfig(const char);
+	void add_os();
 
 public:
 
