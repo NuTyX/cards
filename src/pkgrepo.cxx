@@ -546,7 +546,7 @@ void pkgrepo::parseFiles()
 	std::string::size_type pos;
 
 	for (auto i : m_config.dirUrl()) {
-        info.dirName(i.depot + "/" + i.collection);
+        info.dirName(i.depot);
         std::string repoFile = info.dirName()
             + PKG_REPO_FILES;
 		std::vector<std::string> repoFileContent;
@@ -586,7 +586,7 @@ void pkgrepo::parse(const std::string& packageNameFiles)
 	std::string::size_type pos;
 
 	for (auto i : m_config.dirUrl()) {
-        info.dirName(i.depot + "/" + i.collection);
+        info.dirName(i.depot);
         std::string repoFile = info.dirName()
             + PKG_REPO_FILES;
 		std::vector<std::string> repoFileContent;
