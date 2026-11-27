@@ -399,13 +399,7 @@ void pkgrepo::parse()
             + PKG_REPO_META;
 
         info.collection(i.collection);
-        info.origin(i.url
-            + "/"
-            + m_config.id()
-            + "/"
-            + m_config.arch()
-            + "/"
-            + i.collection);
+        info.origin(i.url);
         std::vector<std::string> repoFileContent;
 
         if (parseFile(repoFileContent, repoFile.c_str()) != 0) {

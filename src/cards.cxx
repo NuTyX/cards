@@ -146,13 +146,7 @@ int main(int argc, char** argv)
                      << i.depot;
                 if (i.url != "")
                     cout << _(" from ")
-                         << i.url
-                         << "/"
-                         << config.id()
-                         << "/"
-                         << config.arch()
-                         << "/"
-                         << i.collection;
+                         << i.url;
                 cout << endl;
             }
             cout << _("Binaries : ")

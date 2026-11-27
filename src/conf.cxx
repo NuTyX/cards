@@ -143,15 +143,10 @@ void conf::parseConfig(const char c)
 }
 void conf::add_os()
 {
-	if (!m_url.empty()) {
-		for (auto& i : m_dirUrl) {
-			if (i.url.empty())
-				i.url = m_url;
-		}
-	}
 	if (m_depot.empty())
 		m_depot = PACKAGE_DEPOT_DIR;
 
+	std::string c;
 	cards::DirUrl DU;
 	DU.collection = m_variant_id;
 
@@ -166,7 +161,43 @@ void conf::add_os()
 			"-" +
 			m_release_type;
 	}
+	if (!m_url.empty()) {
+		if (m_release_type.empty()) {
+			DU.url = m_url +
+				"/" +
+				m_id +
+				"/" +
+				m_arch +
+				"/" +
+				m_variant_id;
+		} else {
+			DU.url = m_url +
+				"/" +
+				m_id +
+				"/" +
+				m_arch +
+				"/" +
+				m_variant_id +
+				"-" +
+				m_release_type;
+		}
+	}
+
 	m_dirUrl.push_back(DU);
+
+	if (!m_url.empty()) {
+		for (auto& i : m_dirUrl) {
+			if (i.url.empty()) {
+				i.url = m_url +
+					"/" +
+					m_id +
+					"/" +
+					m_arch +
+					"/" +
+					i.collection;
+			}
+		}
+	}
 
 	for (auto& i : m_dirUrl) {
 		if (i.depot.empty())
