@@ -524,8 +524,6 @@ depot /DEPOT"
 collection $COLLECTION"
   fi
   CARDS_CONF+="
-collection ${DEPOT_OS}"
-  CARDS_CONF+="
 logdir /LOGS"
 }
 ########################################################################
@@ -536,8 +534,7 @@ if [ "$UID" == "0" ]; then
     exit 1
 fi
 DEPOT_OS="os"
-[ -z "$VERSION" ] && VERSION="$(basename $PWD)"
-[ -z "$VERSION" ] || DEPOT_OS+="-$VERSION"
+[ -z "$VERSION" ] && VERSION="$(cd ${DEPOT_OS} && git branch --show-current)"
 [ -f $HOME/.mybld ] && source $HOME/.mybld
 [ -z "$ROOTMOUNT" ] && ROOTMOUNT="$HOME/www"
 [ -z "$ROOT" ] && ROOT="$HOME/mybld"
