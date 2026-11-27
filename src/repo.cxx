@@ -44,9 +44,7 @@ repo::repo(const CardsArgumentParser& argParser,
 
             found = true;
             std::set<std::string> listOfFiles;
-            std::string path = dir.depot
-                + "/"
-                + dir.collection;
+            std::string path = dir.depot;
 
             std::string repometa = path + PKG_REPO_META;
             std::string repofile = path + PKG_REPO_FILES;
