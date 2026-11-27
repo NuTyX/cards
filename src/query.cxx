@@ -43,7 +43,7 @@ void query::parse() {
     cards::conf config(m_configFileName);
 
     for (auto i : config.dirUrl()) {
-        std::string s = i.depot + "/" + i.collection + PKG_REPO_FILES;
+        std::string s = i.depot + PKG_REPO_FILES;
 
         // Checking file's access already done
         FILE* fp = fopen (s.c_str(),"r");
