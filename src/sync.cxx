@@ -28,17 +28,10 @@ void sync::run()
 		if (collection.url.size() == 0 )
 			continue;
 		destinationFile.url = collection.url
-			+ "/"
-			+ m_config.id()
-			+ "/"
-			+ m_config.arch()
-			+ "/"
-			+ collection.collection
 			+ "/";
 		destinationFile.dirName = collection.depot
-			+ "/"
-			+ collection.collection
 			+ "/";
+
 		destinationFile.fileName = PUBLICKEY;
 		destinationFiles.push_back(destinationFile);
 
