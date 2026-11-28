@@ -181,7 +181,7 @@ create_folders () {
   fi
   sudo mkdir -p $ROOT/$VERSION
   sudo chown -R $(whoami):$(whoami) $ROOT/$VERSION
-  sudo mkdir -p /$ROOTMOUNT/{logs/$(uname -m)/$VERSION,sources,$(uname -m)/$VERSION}
+  sudo mkdir -p /$ROOTMOUNT/{logs/$(uname -m)/$VERSION,sources,$(uname -m)}
   sudo chown -R $(whoami):$(whoami) /$ROOTMOUNT
 }
 ding() {
@@ -194,41 +194,40 @@ $PLAY /usr/share/sounds/cards/ding.wav &
 }
 rsync_binaries () {
   local options="-avd --no-r --delete"
-  if [ -z "$VERSION" ]; then
-    msg_error "VERSION is not SET"
-    exit 1
+  if [ "$VERSION" != "${STABLE_OS}" ]; then
+    [ "$COLLECTION" == "${DEPOT_OS}" ] && COLLECTION+="-$VERSION"
   fi
   if [ ! -z ${PARAM[0]} ]; then
-    echo "sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*
-rm $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*
+    echo "sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$COLLECTION/${PARAM[0]}.*
+rm $ROOTMOUNT/$(uname -m)/$COLLECTION/${PARAM[0]}.*
 rsync $options \
-$URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*  \
-$ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+$URL/$(uname -m)/$COLLECTION/${PARAM[0]}.*  \
+$ROOTMOUNT/$(uname -m)/$COLLECTION/${PARAM[0]}.*
 "
     echo -n "  OK ? (y) : "
     answer
-    sudo rm -f $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.*
+    sudo rm -f $ROOTMOUNT/$(uname -m)/$COLLECTION/${PARAM[0]}.*
     rsync $options \
-$URL/$(uname -m)/$VERSION/$COLLECTION/${PARAM[0]}.* \
-$ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+$URL/$(uname -m)/$COLLECTION/${PARAM[0]}.* \
+$ROOTMOUNT/$(uname -m)/$COLLECTION/
     exit 0
   fi
 
   if [ ! -z $COLLECTION ]; then
     echo "
-sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
-sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+sudo mkdir -p $ROOTMOUNT/$(uname -m)/$COLLECTION/
+sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$COLLECTION/
 rsync $options \
-$URL/$(uname -m)/$VERSION/$COLLECTION/ \
-$ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+$URL/$(uname -m)/$COLLECTION/ \
+$ROOTMOUNT/$(uname -m)/$COLLECTION/
 "
     echo -n "  OK ? (y) : "
     answer
-    sudo mkdir -p $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
-    sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+    sudo mkdir -p $ROOTMOUNT/$(uname -m)/$COLLECTION/
+    sudo chown -R $(whoami):$(whoami) $ROOTMOUNT/$(uname -m)/$COLLECTION/
     rsync $options \
 $URL/$(uname -m)/$VERSION/$COLLECTION/ \
-$ROOTMOUNT/$(uname -m)/$VERSION/$COLLECTION/
+$ROOTMOUNT/$(uname -m)/$COLLECTION/
     exit 0
   fi
 
@@ -533,10 +532,12 @@ if [ "$UID" == "0" ]; then
     msg_error "The 'root' account is not allow to use $(basename ${0})"
     exit 1
 fi
+STABLE_OS="stable"
 DEPOT_OS="os"
 [ -z "$VERSION" ] && VERSION="$(cd ${DEPOT_OS} && git branch --show-current)"
+
 [ -f $HOME/.mybld ] && source $HOME/.mybld
-[ -z "$ROOTMOUNT" ] && ROOTMOUNT="$HOME/www"
+[ -z "$ROOTMOUNT" ] && ROOTMOUNT="$HOME/www/nutyx"
 [ -z "$ROOT" ] && ROOT="$HOME/mybld"
 [ -z "$URL" ] && URL="rsync://download.nutyx.org/nutyx"
 [ -z "$EDITOR" ] && EDITOR="vi"
